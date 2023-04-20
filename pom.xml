@@ -600,7 +600,7 @@
                         <dependency>
                             <groupId>org.apache.groovy</groupId>
                             <artifactId>groovy</artifactId>
-                            <version>4.0.11</version>
+                            <version>${groovyVersion}</version>
                             <scope>runtime</scope>
                         </dependency>
                     </dependencies>
