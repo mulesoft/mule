@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockito.Matchers;
 
 @SmallTest
 public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends AbstractMuleTestCase {
@@ -47,7 +47,7 @@ public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends Abstr
   public void resolvesEmptyDependencies() throws Exception {
     List<MuleCoreExtension> coreExtensions = Collections.EMPTY_LIST;
     dependencyResolver.resolveDependencies(coreExtensions);
-    verify(dependencyDiscoverer, times(0)).findDependencies(Matchers.<MuleCoreExtension>anyObject());
+    verify(dependencyDiscoverer, times(0)).findDependencies(any());
   }
 
   @Test
@@ -60,7 +60,7 @@ public class ReflectionMuleCoreExtensionDependencyResolverTestCase extends Abstr
     coreExtensions.add(extension1);
 
     final List<MuleCoreExtension> resolvedCoreExtensions = dependencyResolver.resolveDependencies(coreExtensions);
-    verify(dependencyDiscoverer, times(2)).findDependencies(Matchers.<MuleCoreExtension>anyObject());
+    verify(dependencyDiscoverer, times(2)).findDependencies(any());
 
     assertThat(resolvedCoreExtensions.size(), equalTo(2));
     assertThat(resolvedCoreExtensions.get(0), sameInstance(extension1));

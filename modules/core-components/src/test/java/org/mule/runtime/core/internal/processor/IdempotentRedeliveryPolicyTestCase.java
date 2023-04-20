@@ -91,10 +91,10 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
   public static final int MAX_REDELIVERY_COUNT = 5;
   private static ObjectSerializer serializer;
 
-  private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS.get());
-  private final Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
-  private final Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS.get());
-  private final InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS.get());
+  private final ObjectStoreManager mockObjectStoreManager = mock(ObjectStoreManager.class, RETURNS_DEEP_STUBS);
+  private final Processor mockFailingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS);
+  private final Processor mockWaitingMessageProcessor = mock(Processor.class, RETURNS_DEEP_STUBS);
+  private final InternalMessage message = mock(InternalMessage.class, RETURNS_DEEP_STUBS);
   private final Latch waitLatch = new Latch();
   private final CountDownLatch waitingMessageProcessorExecutionLatch = new CountDownLatch(2);
   private final IdempotentRedeliveryPolicy irp = new IdempotentRedeliveryPolicy();
@@ -120,7 +120,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
 
     when(mockFailingMessageProcessor.apply(any(Publisher.class)))
         .thenAnswer(invocation -> {
-          MessagingException me = mock(MessagingException.class, RETURNS_DEEP_STUBS.get());
+          MessagingException me = mock(MessagingException.class, RETURNS_DEEP_STUBS);
           CoreEvent event = mock(CoreEvent.class);
           when(event.getError()).thenReturn(of(mock(Error.class)));
           when(me.getEvent()).thenReturn(event);

@@ -111,7 +111,7 @@ public class LoggingAppStartErrorTestCase extends AbstractApplicationDeploymentT
     NotificationListenerRegistry notificationListenerRegistryMock = mock(NotificationListenerRegistry.class);
     when(defaultRegistryMock.lookupByType(any())).thenReturn(Optional.of(notificationListenerRegistryMock));
 
-    ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS.get());
+    ApplicationDescriptor applicationDescriptorMock = mock(ApplicationDescriptor.class, RETURNS_DEEP_STUBS);
     when(applicationDescriptorMock.getClassLoaderConfiguration())
         .thenReturn(new ClassLoaderConfigurationBuilder().containing(new URL("file:/target/classes")).build());
     application = new DefaultMuleApplication(applicationDescriptorMock, parentArtifactClassLoader, emptyList(),
