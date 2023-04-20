@@ -35,7 +35,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
@@ -90,7 +89,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String MULESOFT = "MuleSoft";
@@ -192,7 +190,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
     when(connectionProviderModel.getModelProperty(ConnectionProviderFactoryModelProperty.class))
         .thenReturn(Optional.of(new ConnectionProviderFactoryModelProperty(mock(ConnectionProviderFactory.class,
-                                                                                RETURNS_DEEP_STUBS.get()))));
+                                                                                RETURNS_DEEP_STUBS))));
     mockParameters(extension1ConfigurationModel);
     mockConfigurationInstance(extension1ConfigurationModel, configInstance);
 
@@ -302,7 +300,7 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
       new Thread(() -> extensionsManager.getConfiguration(extensionModel1, extension1OperationModel, event)).start();
       joinerLatch.countDown();
       return null;
-    }).when(registry).registerObject(anyString(), anyObject());
+    }).when(registry).registerObject(anyString(), any());
     Optional<ConfigurationInstance> configurationInstance = extensionsManager.getConfiguration(extensionModel1,
                                                                                                extension1OperationModel,
                                                                                                event);

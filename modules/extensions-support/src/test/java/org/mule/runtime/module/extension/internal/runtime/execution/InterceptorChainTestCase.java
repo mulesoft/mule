@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
@@ -30,13 +30,10 @@ import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class InterceptorChainTestCase extends AbstractMuleTestCase {
 
   @Mock
@@ -231,7 +228,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
     assertThat(chain.onError(ctx, e), is(sameInstance(e)));
     chain.abort(ctx);
 
-    verifyZeroInteractions(ctx, callback);
+    verifyNoInteractions(ctx, callback);
   }
 
   private void mockErrorIdentity(Interceptor<OperationModel>... interceptors) {

@@ -18,7 +18,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -69,6 +68,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
@@ -202,7 +202,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
     if (connectionProvider.isPresent()) {
       verify(connectionManager, times(1)).bind(value, connectionProvider.get());
     } else {
-      verify(connectionManager, never()).bind(same(value), anyObject());
+      verify(connectionManager, never()).bind(same(value), ArgumentMatchers.any());
     }
   }
 
@@ -286,7 +286,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
     if (connectionProvider.isPresent()) {
       verify(connectionManager).unbind(value);
     } else {
-      verify(connectionManager, never()).unbind(anyObject());
+      verify(connectionManager, never()).unbind(ArgumentMatchers.any());
     }
   }
 
