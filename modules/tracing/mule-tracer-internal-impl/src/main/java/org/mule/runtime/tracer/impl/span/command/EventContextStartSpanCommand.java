@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.command.SpanMDCUtils.setCurrentTracingInformationToMdc;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import static java.util.Optional.empty;
@@ -55,6 +56,10 @@ public class EventContextStartSpanCommand extends
         spanContext.setSpan(newSpan, assertion);
       }
 
+      if (newSpan != null) {
+        setCurrentTracingInformationToMdc(newSpan);
+      }
+
       return ofNullable(newSpan);
     };
   }
@@ -63,4 +68,5 @@ public class EventContextStartSpanCommand extends
   TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> getTriFunction() {
     return triFunction;
   }
+
 }

@@ -35,6 +35,7 @@ import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 
+import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
@@ -224,6 +225,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
                                          TraceFlags.getSampled(), TraceState.getDefault());
       }
     }
+  }
+
+  @Override
+  public SpanIdentifier getSpanIdentifierBasedOnExport() {
+    return new OpentelemetrySpanIdentifier(spanContext.getSpanId(), spanContext.getTraceId());
   }
 
   @Override

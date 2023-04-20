@@ -7,12 +7,16 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.command.SpanMDCUtils.removeCurrentTracingInformationFromMdc;
+import static org.mule.runtime.tracer.impl.span.command.SpanMDCUtils.setCurrentTracingInformationToMdc;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
+import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.slf4j.Logger;
@@ -40,6 +44,13 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
 
       if (spanContext != null) {
         spanContext.endSpan(assertion);
+      }
+
+      Optional<InternalSpan> internalSpan = spanContext.getSpan();
+      if (internalSpan.isPresent()) {
+        setCurrentTracingInformationToMdc(internalSpan.get());
+      } else {
+        removeCurrentTracingInformationFromMdc();
       }
     };
   }
