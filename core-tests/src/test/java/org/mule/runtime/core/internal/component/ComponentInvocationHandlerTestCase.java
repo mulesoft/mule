@@ -117,8 +117,8 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     ClassLoader childCl = createDelegatorClassLoader();
 
     Class<Component> annotatedClass = addAnnotationsToClass(childCl.loadClass(Delegator.class.getName()));
-
-    assertThat(annotatedClass.getClassLoader(), instanceOf(CompositeClassLoader.class));
+    // ByteBuddy creates the class in an own class loader, which is child of the defined class loader
+    assertThat(annotatedClass.getClassLoader().getParent(), instanceOf(CompositeClassLoader.class));
   }
 
   @Test
