@@ -237,7 +237,8 @@
         <surefire.args>${surefire.args.base}</surefire.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <groovyVersion>4.0.11</groovyVersion>
+        <!-- this groovy version is to be used during the build process, not bundled in the distro -->
+        <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
         <allureJunitVersion>2.8.1</allureJunitVersion>
@@ -600,7 +601,7 @@
                         <dependency>
                             <groupId>org.apache.groovy</groupId>
                             <artifactId>groovy</artifactId>
-                            <version>${groovyVersion}</version>
+                            <version>${groovyVersionBuild}</version>
                             <scope>runtime</scope>
                         </dependency>
                     </dependencies>
