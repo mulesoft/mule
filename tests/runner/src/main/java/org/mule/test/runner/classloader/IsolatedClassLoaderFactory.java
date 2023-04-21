@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CL
 import static org.mule.runtime.container.api.TestContainerClassLoaderAssembler.create;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 
 import static java.lang.Boolean.valueOf;
@@ -50,7 +51,6 @@ import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoad
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactUrlClassification;
@@ -96,7 +96,7 @@ public class IsolatedClassLoaderFactory {
   private final ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private final PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
   private final ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory =
-      new ServiceClassLoaderFactory();
+      serviceClassLoaderFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
