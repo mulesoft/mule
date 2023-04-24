@@ -37,7 +37,7 @@ public class ArtifactUrlClassification {
    */
   public ArtifactUrlClassification(String artifactId, Artifact artifact, List<URL> urls) {
     requireNonNull(artifactId, "artifactId cannot be null");
-    requireNonNull(artifact, "name cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
     requireNonNull(urls, "urls cannot be null");
 
     this.artifactId = artifactId;
