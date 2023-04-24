@@ -15,6 +15,7 @@
     <description>Provides descriptors and class loaders for deployment artifacts</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.deployment.model</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

@@ -12,6 +12,7 @@
     <description>Mule service module. Provides services support to Mule container.</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.service</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <project.build.java11SourceDirectory>${project.basedir}/src/main/java11</project.build.java11SourceDirectory>

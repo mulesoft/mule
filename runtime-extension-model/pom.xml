@@ -12,6 +12,7 @@
     <name>Mule 4 Runtime Extension model</name>
 
     <properties>
+        <javaModuleName>org.mule.runtime.extension.model</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 

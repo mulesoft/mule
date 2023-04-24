@@ -15,6 +15,7 @@
     <description>Implements the Deployment Model</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.deployment.model.impl</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <maven.compat.version>3.3.9</maven.compat.version>
     </properties>

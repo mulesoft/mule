@@ -15,6 +15,7 @@
     <description>Provides behavior necessary for loading artifacts</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.artifact.activation</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
