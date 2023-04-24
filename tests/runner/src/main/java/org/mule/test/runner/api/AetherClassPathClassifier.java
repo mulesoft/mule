@@ -132,7 +132,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private final DependencyResolver dependencyResolver;
   private final ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private final PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
-  private final ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
 
   static String getMuleVersion() {
     try {
@@ -306,8 +305,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           try {
             return new ArtifactUrlClassification(ArtifactIdUtils
                 .toId(pluginSharedLibDependency.getArtifact()),
-                                                 pluginSharedLibDependency.getArtifact()
-                                                     .getArtifactId(),
+                                                 pluginSharedLibDependency.getArtifact(),
                                                  Lists.newArrayList(dependencyResolver
                                                      .resolveArtifact(pluginSharedLibDependency.getArtifact(),
                                                                       rootArtifactRemoteRepositories)
@@ -679,10 +677,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link ArtifactsUrlClassification}
    */
   private List<ServiceUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
+    ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver(classificationNodes);
+
     return classificationNodes.stream().map(node -> {
       final String versionLessId = toVersionlessId(node.getArtifact());
       return serviceResourcesResolver
-          .resolveServiceResourcesFor(new ArtifactUrlClassification(versionLessId, node.getArtifact().getArtifactId(),
+          .resolveServiceResourcesFor(new ArtifactUrlClassification(versionLessId,
+                                                                    node.getArtifact(),
                                                                     node.getUrls()));
     }).collect(toList());
   }

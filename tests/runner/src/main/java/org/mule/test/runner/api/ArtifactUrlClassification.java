@@ -9,14 +9,15 @@ package org.mule.test.runner.api;
 
 import static java.util.Objects.requireNonNull;
 
-import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.List;
 
+import org.eclipse.aether.artifact.Artifact;
+
 /**
- * Defines the result of the classification process for a {@link Artifact}. It contains a {@link List} of {@link URL}s for its
+ * Defines the result of the classification process for an {@link Artifact}. It contains a {@link List} of {@link URL}s for its
  * {@link ArtifactClassLoader}.
  *
  * @since 4.0
@@ -24,27 +25,33 @@ import java.util.List;
 public class ArtifactUrlClassification {
 
   private final List<URL> urls;
+  private final Artifact artifact;
   private final String name;
   private final String artifactId;
 
   /**
    * Creates an instance of the classification.
    *
-   * @param name a {@link String} representing the name of the artifact. Not null.
-   * @param urls list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}. Not null.
+   * @param artifact a {@link String} representing the name of the artifact. Not null.
+   * @param urls     list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}. Not null.
    */
-  public ArtifactUrlClassification(String artifactId, String name, List<URL> urls) {
+  public ArtifactUrlClassification(String artifactId, Artifact artifact, List<URL> urls) {
     requireNonNull(artifactId, "artifactId cannot be null");
-    requireNonNull(name, "name cannot be null");
+    requireNonNull(artifact, "name cannot be null");
     requireNonNull(urls, "urls cannot be null");
 
     this.artifactId = artifactId;
-    this.name = name;
+    this.artifact = artifact;
+    this.name = artifact.getArtifactId();
     this.urls = urls;
   }
 
   public List<URL> getUrls() {
     return urls;
+  }
+
+  public Artifact getArtifact() {
+    return artifact;
   }
 
   public String getName() {
