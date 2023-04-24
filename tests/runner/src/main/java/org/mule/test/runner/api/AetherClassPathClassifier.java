@@ -24,6 +24,7 @@ import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -69,7 +70,6 @@ import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
 
@@ -152,8 +152,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   public AetherClassPathClassifier(DependencyResolver dependencyResolver,
                                    ArtifactClassificationTypeResolver artifactClassificationTypeResolver) {
-    checkNotNull(dependencyResolver, "dependencyResolver cannot be null");
-    checkNotNull(artifactClassificationTypeResolver, "artifactClassificationTypeResolver cannot be null");
+    requireNonNull(dependencyResolver, "dependencyResolver cannot be null");
+    requireNonNull(artifactClassificationTypeResolver, "artifactClassificationTypeResolver cannot be null");
 
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
@@ -213,11 +213,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
     }
 
-    List<ArtifactUrlClassification> serviceUrlClassifications =
+    List<ServiceUrlClassification> serviceUrlClassifications =
         buildServicesUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
     if (logger.isDebugEnabled()) {
       logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
-          .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId()).collect(toList()));
+          .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
     }
 
     List<URL> containerUrls =
@@ -248,10 +248,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact.
    * @return a {@link List} of {@link ArtifactUrlClassification}s that would be the one used for the plugins class loaders.
    */
-  private List<ArtifactUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
-                                                                         final List<Dependency> directDependencies,
-                                                                         ArtifactClassificationType rootArtifactType,
-                                                                         final List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private List<ServiceUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
+                                                                        final List<Dependency> directDependencies,
+                                                                        ArtifactClassificationType rootArtifactType,
+                                                                        final List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<ArtifactClassificationNode> servicesClassified = newArrayList();
 
     final Predicate<Dependency> muleServiceClassifiedDependencyFilter =
@@ -404,7 +404,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private List<URL> buildContainerUrlClassification(ClassPathClassifierContext context,
                                                     List<Dependency> directDependencies,
                                                     List<ArtifactUrlClassification> applicationSharedLibUrls,
-                                                    List<ArtifactUrlClassification> serviceUrlClassifications,
+                                                    List<ServiceUrlClassification> serviceUrlClassifications,
                                                     List<PluginUrlClassification> pluginUrlClassifications,
                                                     ArtifactClassificationType rootArtifactType,
                                                     List<RemoteRepository> rootArtifactRemoteRepositories) {
@@ -678,7 +678,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param classificationNodes the fat object classified that needs to be transformed
    * @return {@link ArtifactsUrlClassification}
    */
-  private List<ArtifactUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
+  private List<ServiceUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
     return classificationNodes.stream().map(node -> {
       final String versionLessId = toVersionlessId(node.getArtifact());
       return serviceResourcesResolver
@@ -778,27 +778,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     List<URL> serviceUrls = new ArrayList<>();
-    serviceUrls.add(serviceBundleUrl);
-
-    File serviceLibFolder = new File(serviceExplodedDir, "lib");
-    File[] libs = serviceLibFolder.listFiles();
-    Stream.of(libs)
-        .map(lib -> {
-          try {
-            return lib.toURI().toURL();
-          } catch (MalformedURLException e) {
-            throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify
-                + "' classification",
-                                            e);
-          }
-        })
-        .forEach(serviceUrls::add);
-
-    final List<Class> exportClasses = getArtifactExportedClasses(artifactToClassify, context, rootArtifactRemoteRepositories);
+    try {
+      serviceUrls.add(serviceExplodedDir.toURI().toURL());
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
+                                      e);
+    }
 
     ArtifactClassificationNode artifactUrlClassification = new ArtifactClassificationNode(artifactToClassify,
                                                                                           serviceUrls,
-                                                                                          exportClasses,
+                                                                                          emptyList(),
                                                                                           emptyList());
 
     logger.debug("Artifact discovered: {}", toId(artifactUrlClassification.getArtifact()));

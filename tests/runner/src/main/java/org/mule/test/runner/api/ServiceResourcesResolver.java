@@ -9,10 +9,19 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.loadServiceModel;
 
-import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import static java.util.Optional.empty;
 
+import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -28,22 +37,32 @@ public class ServiceResourcesResolver {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  private final ServiceDescriptorFactory serviceDescriptorFactory =
+      new ServiceDescriptorFactory(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+                                   ArtifactDescriptorValidatorBuilder.builder());
+
   /**
    * Resolves for the given {@link ArtifactUrlClassification} the resources exported.
    *
    * @param serviceUrlClassification {@link ArtifactUrlClassification} to be resolved
    * @return {@link ArtifactUrlClassification} with the resources resolved
    */
-  public ArtifactUrlClassification resolveServiceResourcesFor(ArtifactUrlClassification serviceUrlClassification) {
+  public ServiceUrlClassification resolveServiceResourcesFor(ArtifactUrlClassification serviceUrlClassification) {
     try (URLClassLoader classLoader = new URLClassLoader(serviceUrlClassification.getUrls().toArray(new URL[0]), null)) {
       MuleServiceModel muleServiceModel = loadServiceModel(classLoader);
 
+      serviceDescriptorFactory.create(new File(serviceUrlClassification.getUrls().get(0).toURI()), empty());
+
       // TODO: MULE-15471: to fix one service per artifact assumption
-      return new ArtifactUrlClassification(serviceUrlClassification.getArtifactId(),
-                                           muleServiceModel.getContracts().get(0).getServiceProviderClassName(),
-                                           serviceUrlClassification.getUrls());
+      return new ServiceUrlClassification(serviceDescriptorFactory
+          .create(new File(serviceUrlClassification.getUrls().get(0).toURI()), empty()),
+                                          serviceUrlClassification.getArtifactId(),
+                                          "service/" + muleServiceModel.getName(),
+                                          serviceUrlClassification.getUrls());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    } catch (ArtifactDescriptorCreateException | URISyntaxException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 }

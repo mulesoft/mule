@@ -46,16 +46,15 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
-import org.mule.test.runner.api.ArtifactUrlClassification;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
+import org.mule.test.runner.api.ServiceUrlClassification;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -334,19 +333,20 @@ public class IsolatedClassLoaderFactory {
   protected List<ArtifactClassLoader> createServiceClassLoaders(MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
                                                                 ArtifactsUrlClassification artifactsUrlClassification) {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
-    for (ArtifactUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
+    for (ServiceUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {
       logClassLoaderUrls("SERVICE (" + serviceUrlClassification.getArtifactId() + ")", serviceUrlClassification.getUrls());
 
-      ServiceDescriptor descriptor = new ServiceDescriptor(serviceUrlClassification.getName());
-      descriptor.setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
-          .containing(serviceUrlClassification.getUrls())
-          .build());
-      ArtifactClassLoader artifactClassLoader = serviceClassLoaderFactory.create(serviceUrlClassification.getName(),
+      ServiceDescriptor descriptor = serviceUrlClassification.getDercriptor();
+      ArtifactClassLoader artifactClassLoader = serviceClassLoaderFactory.create(getServiceArtifactId(descriptor),
                                                                                  descriptor,
                                                                                  containerClassLoaderWrapper);
       servicesArtifactClassLoaders.add(artifactClassLoader);
     }
     return servicesArtifactClassLoaders;
+  }
+
+  private String getServiceArtifactId(ServiceDescriptor serviceDescriptor) {
+    return "service/" + serviceDescriptor.getName();
   }
 
   /**
