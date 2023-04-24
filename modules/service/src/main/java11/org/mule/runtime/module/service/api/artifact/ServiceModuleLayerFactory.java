@@ -15,19 +15,8 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
- *
  */
-// TODO W-12780081 - remove usages of deprecated creation method
-public class ServiceClassLoaderFactory
-    implements ArtifactClassLoaderFactory<ServiceDescriptor>, ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> {
-
-  /**
-   * @deprecated from 4.6 use {@link ServiceClassLoaderFactoryProvider} instead.
-   */
-  @Deprecated
-  public ServiceClassLoaderFactory() {
-    // Nothing to do
-  }
+class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
   /**
    * {@inheritDoc}
@@ -38,8 +27,8 @@ public class ServiceClassLoaderFactory
   @Deprecated
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy) {
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
-                                       lookupPolicy);
+    // TODO W-12683074 implement this using ModuleLayers
+    return super.create(artifactId, descriptor, parent, lookupPolicy);
   }
 
   /**
@@ -48,8 +37,7 @@ public class ServiceClassLoaderFactory
   @Override
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
                                     MuleContainerClassLoaderWrapper containerClassLoader) {
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
-                                       containerClassLoader.getContainerClassLoader().getClassLoader(),
-                                       containerClassLoader.getContainerClassLoaderLookupPolicy());
+    // TODO W-12683074 implement this using ModuleLayers
+    return super.create(artifactId, descriptor, containerClassLoader);
   }
 }

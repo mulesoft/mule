@@ -188,7 +188,7 @@
         <dependency.plugin.version>3.1.2</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
         <assembly.plugin.version>3.3.0</assembly.plugin.version>
-        <jar.plugin.version>3.0.2</jar.plugin.version>
+        <jar.plugin.version>3.3.0</jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
         <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>

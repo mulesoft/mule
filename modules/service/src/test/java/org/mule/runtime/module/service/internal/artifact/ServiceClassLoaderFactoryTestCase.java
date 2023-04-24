@@ -7,6 +7,9 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
+
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -14,7 +17,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -36,7 +39,7 @@ public class ServiceClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   private final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
   @Rule
   public TemporaryFolder serviceFolder = new TemporaryFolder();
-  private ServiceClassLoaderFactory factory = new ServiceClassLoaderFactory();
+  private final ServiceClassLoaderFactory factory = serviceClassLoaderFactory();
   private ServiceDescriptor descriptor;
 
   @Before
