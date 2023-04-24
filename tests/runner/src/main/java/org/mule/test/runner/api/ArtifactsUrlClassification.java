@@ -7,7 +7,7 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.net.URL;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ArtifactsUrlClassification {
 
   private final List<URL> containerUrls;
-  private final List<ArtifactUrlClassification> serviceUrlClassifications;
+  private final List<ServiceUrlClassification> serviceUrlClassifications;
   private final List<URL> applicationSharedLibUrls;
   private final List<PluginUrlClassification> pluginUrlClassifications;
   private final List<URL> testRunnerLibUrls;
@@ -45,17 +45,17 @@ public class ArtifactsUrlClassification {
    * @param testRunnerExportedLibUrls define the artifacts that will exported on the test runner plugin in addition to the test
    *                                  classes and resources from the module being tested
    */
-  public ArtifactsUrlClassification(List<URL> containerUrls, List<ArtifactUrlClassification> serviceUrlClassifications,
+  public ArtifactsUrlClassification(List<URL> containerUrls, List<ServiceUrlClassification> serviceUrlClassifications,
                                     List<URL> testRunnerLibUrls, List<URL> applicationLibUrls, List<URL> applicationSharedLibUrls,
                                     List<PluginUrlClassification> pluginUrlClassifications,
                                     List<URL> testRunnerExportedLibUrls) {
-    checkNotNull(containerUrls, "containerUrls cannot be null");
-    checkNotNull(serviceUrlClassifications, "serviceUrlClassifications cannot be null");
-    checkNotNull(testRunnerLibUrls, "testRunnerLibUrls cannot be null");
-    checkNotNull(applicationLibUrls, "applicationLibUrls cannot be null");
-    checkNotNull(applicationSharedLibUrls, "applicationSharedLibUrls cannot be null");
-    checkNotNull(pluginUrlClassifications, "pluginUrlClassifications cannot be null");
-    checkNotNull(testRunnerExportedLibUrls, "testRunnerExportedLibUrls cannot be null");
+    requireNonNull(containerUrls, "containerUrls cannot be null");
+    requireNonNull(serviceUrlClassifications, "serviceUrlClassifications cannot be null");
+    requireNonNull(testRunnerLibUrls, "testRunnerLibUrls cannot be null");
+    requireNonNull(applicationLibUrls, "applicationLibUrls cannot be null");
+    requireNonNull(applicationSharedLibUrls, "applicationSharedLibUrls cannot be null");
+    requireNonNull(pluginUrlClassifications, "pluginUrlClassifications cannot be null");
+    requireNonNull(testRunnerExportedLibUrls, "testRunnerExportedLibUrls cannot be null");
 
     this.containerUrls = containerUrls;
     this.serviceUrlClassifications = serviceUrlClassifications;
@@ -70,7 +70,7 @@ public class ArtifactsUrlClassification {
     return containerUrls;
   }
 
-  public List<ArtifactUrlClassification> getServiceUrlClassifications() {
+  public List<ServiceUrlClassification> getServiceUrlClassifications() {
     return serviceUrlClassifications;
   }
 

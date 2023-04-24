@@ -9,12 +9,31 @@ package org.mule.test.runner.api;
 
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.loadServiceModel;
 
-import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import static java.util.Optional.empty;
 
+import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
+import org.mule.runtime.api.deployment.meta.MuleServiceModel;
+import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,22 +47,73 @@ public class ServiceResourcesResolver {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  private final ServiceDescriptorFactory serviceDescriptorFactory;
+
+  public ServiceResourcesResolver(Collection<ArtifactClassificationNode> classificationNodes) {
+    serviceDescriptorFactory =
+        new ServiceDescriptorFactory(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+                                     ArtifactDescriptorValidatorBuilder.builder()) {
+
+          // In the test runner we already have the Maven artifact of the service available,
+          // no need to use a loader to get that again.
+          protected BundleDescriptor getBundleDescriptor(File serviceFolder,
+                                                         MuleServiceModel artifactModel,
+                                                         Optional<Properties> deploymentProperties) {
+            return classificationNodes.stream()
+                .filter(node -> {
+                  try {
+                    return node.getUrls().get(0).equals(serviceFolder.toURI().toURL());
+                  } catch (MalformedURLException e) {
+                    throw new IllegalArgumentException(e);
+                  }
+                })
+                .map(node -> new BundleDescriptor.Builder()
+                    .setArtifactId(node.getArtifact().getArtifactId())
+                    .setGroupId(node.getArtifact().getGroupId())
+                    .setVersion(node.getArtifact().getVersion())
+                    .setBaseVersion(node.getArtifact().getVersion())
+                    .setType(node.getArtifact().getExtension())
+                    .setClassifier(node.getArtifact().getClassifier())
+                    .build())
+                .findAny()
+                .get();
+          }
+
+          @Override
+          protected ClassLoaderConfiguration getClassLoaderConfiguration(File serviceFolder,
+                                                                         Optional<Properties> deploymentProperties,
+                                                                         MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                                         BundleDescriptor bundleDescriptor) {
+            try {
+              return new LibFolderClassLoaderConfigurationLoader().load(serviceFolder, Collections.emptyMap(),
+                                                                        getArtifactType());
+            } catch (InvalidDescriptorLoaderException e) {
+              throw new IllegalArgumentException(e);
+            }
+          }
+        };
+  }
+
   /**
    * Resolves for the given {@link ArtifactUrlClassification} the resources exported.
    *
    * @param serviceUrlClassification {@link ArtifactUrlClassification} to be resolved
    * @return {@link ArtifactUrlClassification} with the resources resolved
    */
-  public ArtifactUrlClassification resolveServiceResourcesFor(ArtifactUrlClassification serviceUrlClassification) {
+  public ServiceUrlClassification resolveServiceResourcesFor(ArtifactUrlClassification serviceUrlClassification) {
     try (URLClassLoader classLoader = new URLClassLoader(serviceUrlClassification.getUrls().toArray(new URL[0]), null)) {
       MuleServiceModel muleServiceModel = loadServiceModel(classLoader);
 
       // TODO: MULE-15471: to fix one service per artifact assumption
-      return new ArtifactUrlClassification(serviceUrlClassification.getArtifactId(),
-                                           muleServiceModel.getContracts().get(0).getServiceProviderClassName(),
-                                           serviceUrlClassification.getUrls());
+      return new ServiceUrlClassification(serviceDescriptorFactory
+          .create(new File(serviceUrlClassification.getUrls().get(0).toURI()), empty()),
+                                          serviceUrlClassification.getArtifactId(),
+                                          "service/" + muleServiceModel.getName(),
+                                          serviceUrlClassification.getUrls());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    } catch (ArtifactDescriptorCreateException | URISyntaxException e) {
+      throw new IllegalArgumentException(e);
     }
   }
 }

@@ -7,11 +7,13 @@
 
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+
+import static java.io.File.separator;
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoInstantiate;
@@ -187,9 +189,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     }
   }
 
-  private ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
-                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                                               BundleDescriptor bundleDescriptor) {
+  protected ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
+                                                                 MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                                 BundleDescriptor bundleDescriptor) {
     ClassLoaderConfigurationLoader classLoaderConfigurationLoader;
     try {
       classLoaderConfigurationLoader =
