@@ -38,7 +38,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
   private boolean ignoreParamsWithProperties;
 
   @Inject
-  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
+  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Inject
   private ExpressionLanguage expressionLanguage;
