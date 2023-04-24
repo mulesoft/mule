@@ -206,7 +206,7 @@
         <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
-        <gmavenPluginVersion>1.5</gmavenPluginVersion>
+        <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
         <javadocPluginVersion>3.2.0</javadocPluginVersion>
         <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
@@ -589,15 +589,10 @@
                     <version>${war.plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>gmaven-plugin</artifactId>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
                     <version>${gmavenPluginVersion}</version>
                     <dependencies>
-                        <dependency>
-                            <groupId>org.codehaus.gmaven.runtime</groupId>
-                            <artifactId>gmaven-runtime-1.8</artifactId>
-                            <version>${gmavenPluginVersion}</version>
-                        </dependency>
                         <dependency>
                             <groupId>org.apache.groovy</groupId>
                             <artifactId>groovy</artifactId>
