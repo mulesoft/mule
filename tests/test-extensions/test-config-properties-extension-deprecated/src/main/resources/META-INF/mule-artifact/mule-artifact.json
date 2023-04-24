@@ -17,7 +17,7 @@
         "org.mule.test.crafted.config.properties.deprecated.extension"
       ],
       "exportedResources": [
-        "META-INF/services/org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory"
+        "META-INF/services/org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory"
       ]
     }
   },

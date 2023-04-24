@@ -6,19 +6,15 @@
  */
 package org.mule.test.complex.config.properties.deprecated.extension;
 
-import static org.mule.runtime.config.internal.dsl.model.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
 import static org.mule.test.complex.config.properties.deprecated.extension.ConfigPropertiesExtensionDeprecated.NAMESPACE_PREFIX;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
-import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ResourceProvider;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 public class ComplexConfigurationPropertiesProviderFactory implements ConfigurationPropertiesProviderFactory {
 
@@ -30,17 +26,8 @@ public class ComplexConfigurationPropertiesProviderFactory implements Configurat
   }
 
   @Override
-  public org.mule.runtime.properties.api.ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                                                        UnaryOperator<String> localResolver,
-                                                                                        ResourceProvider externalResourceProvider) {
-    DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
-    ConfigurationParameters configurationParameters =
-        resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
-
-    return createProvider(configurationParameters);
-  }
-
-  private ComplexConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters) {
+  public ComplexConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
+                                                               ResourceProvider externalResourceProvider) {
     ConfigurationParameters connectionProvider = parameters.getComplexConfigurationParameter(ComponentIdentifier.builder()
         .namespace(NAMESPACE_PREFIX)
         .name("provider-connection").build()).get(0);

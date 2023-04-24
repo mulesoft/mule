@@ -16,7 +16,7 @@ import org.mule.sdk.api.annotation.dsl.xml.Xml;
 @Configurations(ConfigPropertiesExtensionDeprecatedConfig.class)
 @Export(
     classes = {ComplexConfigurationPropertiesProviderFactory.class},
-    resources = {"META-INF/services/org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory"})
+    resources = {"META-INF/services/org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory"})
 public class ConfigPropertiesExtensionDeprecated {
 
   public static final String NAMESPACE_PREFIX = "config-properties-deprecated";

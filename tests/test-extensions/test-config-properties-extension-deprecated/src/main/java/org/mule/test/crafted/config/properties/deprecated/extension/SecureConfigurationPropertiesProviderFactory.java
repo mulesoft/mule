@@ -7,19 +7,13 @@
 package org.mule.test.crafted.config.properties.deprecated.extension;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.config.internal.dsl.model.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
 import static org.mule.test.crafted.config.properties.deprecated.extension.TestConfigPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
-import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
-import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
-import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ResourceProvider;
-
-import java.util.function.UnaryOperator;
 
 /**
  * Builds the provider for the secure-configuration-properties element.
@@ -38,18 +32,8 @@ public class SecureConfigurationPropertiesProviderFactory implements Configurati
   }
 
   @Override
-  public ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                        UnaryOperator<String> localResolver,
-                                                        ResourceProvider externalResourceProvider) {
-    DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
-    ConfigurationParameters configurationParameters =
-        resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
-
-    return createProvider(configurationParameters, uri -> externalResourceProvider.getResourceAsStream(uri));
-  }
-
-  private SecureConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
-                                                               ResourceProvider externalResourceProvider) {
+  public SecureConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
+                                                              ResourceProvider externalResourceProvider) {
     String file = parameters.getStringParameter("file");
     Preconditions.checkArgument(file != null, "Required attribute 'file' of 'secure-configuration-properties' not found");
 
