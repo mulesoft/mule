@@ -32,7 +32,8 @@ public class ArtifactUrlClassification {
   /**
    * Creates an instance of the classification.
    *
-   * @param artifact a {@link String} representing the name of the artifact. Not null.
+   * @param artifactId a {@link String} representing the id of the artifact. Not null.
+   * @param artifact the Maven artifact representation. Not null.
    * @param urls     list of {@link URL}s that would be used to create the {@link java.net.URLClassLoader}. Not null.
    */
   public ArtifactUrlClassification(String artifactId, Artifact artifact, List<URL> urls) {
