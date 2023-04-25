@@ -4,6 +4,54 @@
       "ignore": [
         {
           "code": "java.class.removed",
+          "old": "class javax.resource.spi.work.ExecutionContext",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "ExecutionContext",
+          "elementKind": "class",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface javax.resource.spi.work.Work",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "Work",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class javax.resource.spi.work.WorkEvent",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "WorkEvent",
+          "elementKind": "class",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface javax.resource.spi.work.WorkListener",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "WorkListener",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.context.WorkManager",
+          "package": "org.mule.runtime.core.api.context",
+          "classSimpleName": "WorkManager",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.context.WorkManagerSource",
+          "package": "org.mule.runtime.core.api.context",
+          "classSimpleName": "WorkManagerSource",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo",
           "package": "org.mule.runtime.core.api.tracing.customization",
           "classSimpleName": "ComponentExecutionInitialSpanInfo",
