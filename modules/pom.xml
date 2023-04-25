@@ -13,6 +13,7 @@
     <description>Modules which extend the Mule Core but do not qualify as Transports</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.modules.parent</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 

@@ -16,6 +16,7 @@
     </description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <jsoup.version>1.15.3</jsoup.version>
         <mule.runtime.version>${project.version}</mule.runtime.version>

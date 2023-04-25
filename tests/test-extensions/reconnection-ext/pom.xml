@@ -15,6 +15,7 @@
     <description>A Mule extension for testing reconnection</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.test.extension.reconnection</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

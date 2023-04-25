@@ -13,6 +13,7 @@
     <description>Modules related to the memory management service</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.memory.management.parent</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 

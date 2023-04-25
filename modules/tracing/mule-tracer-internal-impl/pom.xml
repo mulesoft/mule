@@ -22,6 +22,7 @@
     <description>Implementation for the internal tracer</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.internal.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

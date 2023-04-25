@@ -15,6 +15,7 @@
     <description>A Mule extension for testing Localisation Properties provider</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.test.extension.localisation</javaModuleName>
         <testExtensionModelLoaderId>crafted-localisation-properties</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

@@ -17,6 +17,7 @@
     <description>A Mule extension for testing TX support</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.test.extension.transactional</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

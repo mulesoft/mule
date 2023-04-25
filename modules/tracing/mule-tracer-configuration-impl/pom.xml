@@ -21,6 +21,7 @@
     <description>Implementation to configure tracing generation</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.configuration.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

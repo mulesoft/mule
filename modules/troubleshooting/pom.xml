@@ -13,6 +13,7 @@
     <description>Module containing an injectable interface capable to call certain troubleshooting operations</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.troubleshooting</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <revapi.failOnUnresolvedArtifacts>false</revapi.failOnUnresolvedArtifacts>
     </properties>

@@ -22,6 +22,7 @@
     <description>Definitions for Mule tracer</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.api</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

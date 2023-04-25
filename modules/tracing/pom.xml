@@ -20,6 +20,7 @@
     <description>Modules related to the Runtime Tracer</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracing.parent</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 

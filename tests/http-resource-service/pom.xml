@@ -13,6 +13,7 @@
     <description>HTTP service implementation used for testing purposes which features resource usage</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.test.http.resource.services</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
