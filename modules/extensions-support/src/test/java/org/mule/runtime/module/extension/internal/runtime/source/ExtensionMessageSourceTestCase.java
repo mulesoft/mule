@@ -17,8 +17,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.m
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import javax.resource.spi.work.Work;
-
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -147,7 +145,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     }).when(source).onStart(sourceCallback);
 
     doAnswer(invocation -> {
-      ((Work) invocation.getArguments()[0]).run();
+      ((Runnable) invocation.getArguments()[0]).run();
       return null;
     }).when(cpuLightScheduler).execute(any());
 
