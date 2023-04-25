@@ -35,26 +35,31 @@ public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEventData> {
 
   private final Matcher<String> eventNameMatcher = equalTo(OTEL_EXCEPTION_EVENT_NAME);
   private final ErrorTypeMatcher errorTypeMatcher;
-  private final Matcher<String> errorDescriptionMatcher;
+  private Matcher<String> errorDescriptionMatcher;
   private final Matcher<String> errorEscapedMatcher = equalTo("true");
-  private final Matcher<String> errorStackTraceMatcher = not(emptyOrNullString());
+  private Matcher<String> errorStackTraceMatcher = not(emptyOrNullString());
 
-  public ExceptionEventMatcher(String errorType, String errorDescription) {
-    String[] errorTypeComponents = errorType.split(":");
-    if (errorTypeComponents.length != 2) {
-      throw new IllegalArgumentException(format("Wrong error type: %s", errorType));
-    }
-    this.errorTypeMatcher = ErrorTypeMatcher.errorType(errorTypeComponents[0], errorTypeComponents[1]);
-    this.errorDescriptionMatcher = equalTo(errorDescription);
-  }
-
-  public ExceptionEventMatcher(String errorType) {
+  private ExceptionEventMatcher(String errorType) {
     String[] errorTypeComponents = errorType.split(":");
     if (errorTypeComponents.length != 2) {
       throw new IllegalArgumentException(format("Wrong error type: %s", errorType));
     }
     this.errorTypeMatcher = ErrorTypeMatcher.errorType(errorTypeComponents[0], errorTypeComponents[1]);
     this.errorDescriptionMatcher = any(String.class);
+  }
+
+  public static ExceptionEventMatcher errorType(String errorType) {
+    return new ExceptionEventMatcher(errorType);
+  }
+
+  public ExceptionEventMatcher stackTrace(String stackTrace) {
+    this.errorStackTraceMatcher = equalTo(stackTrace);
+    return this;
+  }
+
+  public ExceptionEventMatcher errorDescription(String errorDescription) {
+    this.errorDescriptionMatcher = equalTo(errorDescription);
+    return this;
   }
 
   @Override

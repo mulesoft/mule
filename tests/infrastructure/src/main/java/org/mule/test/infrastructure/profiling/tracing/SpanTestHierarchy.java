@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.errorType;
 
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
@@ -110,6 +111,11 @@ public class SpanTestHierarchy {
 
   public SpanTestHierarchy addExceptionData(String errorType) {
     currentNode.expectException(errorType);
+    return this;
+  }
+
+  public SpanTestHierarchy addExceptionData(ExceptionEventMatcher exceptionEventMatcher) {
+    currentNode.expectException(exceptionEventMatcher);
     return this;
   }
 
@@ -224,11 +230,15 @@ public class SpanTestHierarchy {
     }
 
     public void expectException(String errorType, String errorDescription) {
-      this.exceptionEventMatcher = new ExceptionEventMatcher(errorType, errorDescription);
+      this.exceptionEventMatcher = errorType(errorType).errorDescription(errorDescription);
     }
 
     public void expectException(String errorType) {
-      this.exceptionEventMatcher = new ExceptionEventMatcher(errorType);
+      this.exceptionEventMatcher = errorType(errorType);
+    }
+
+    public void expectException(ExceptionEventMatcher exceptionEventMatcher) {
+      this.exceptionEventMatcher = exceptionEventMatcher;
     }
 
     public String getAttribute(String key) {
