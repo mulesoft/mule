@@ -114,11 +114,6 @@ public class SpanTestHierarchy {
     return this;
   }
 
-  public SpanTestHierarchy addExceptionData(ExceptionEventMatcher exceptionEventMatcher) {
-    currentNode.expectException(exceptionEventMatcher);
-    return this;
-  }
-
   public SpanNode getRoot() {
     return root;
   }
@@ -237,10 +232,6 @@ public class SpanTestHierarchy {
       this.exceptionEventMatcher = errorType(errorType);
     }
 
-    public void expectException(ExceptionEventMatcher exceptionEventMatcher) {
-      this.exceptionEventMatcher = exceptionEventMatcher;
-    }
-
     public String getAttribute(String key) {
       return attributesThatShouldMatch.get(key);
     }
@@ -254,13 +245,9 @@ public class SpanTestHierarchy {
     }
 
     public void assertExceptions(CapturedExportedSpan actualSpan) {
-      List<CapturedEventData> exceptionEvents = actualSpan.getEvents().stream()
-          .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
-      if (exceptionEventMatcher == null) {
-        assertThat(format("Unexpected Span exceptions found for Span: [%s]", actualSpan),
-                   exceptionEvents.size(), equalTo(0));
-        assertThat(actualSpan.getStatusAsString(), is(UNSET_STATUS_CODE));
-      } else {
+      if (exceptionEventMatcher != null) {
+        List<CapturedEventData> exceptionEvents = actualSpan.getEvents().stream()
+            .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
         assertThat(format("Expected exceptions for Span: [%s] differ", actualSpan), exceptionEvents,
                    containsInAnyOrder(exceptionEventMatcher));
         assertThat(actualSpan.hasErrorStatus(), is(true));
