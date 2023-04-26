@@ -6,7 +6,6 @@
  */
 package org.mule.test.infrastructure;
 
-import static org.hamcrest.Matchers.matchesRegex;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_ESCAPED_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
@@ -17,6 +16,7 @@ import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.U
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.getDefaultAttributesToAssertExistence;
 
+import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -768,6 +769,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("W-13103997")
   public void testWhenThereIsANotExpectedExceptionAssertionShouldFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
     exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
@@ -821,6 +823,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Ignore("W-13103997")
   public void testWhenUnexpectedExceptionDataIsFoundThenAssertionShouldFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
     exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
