@@ -9,6 +9,7 @@ package org.mule.runtime.tracer.exporter.impl.optel.resources;
 
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
@@ -86,8 +87,12 @@ public class OpenTelemetryResources {
                                                                 SpanExporter spanExporter)
       throws SpanExporterConfiguratorException {
 
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Endpoint is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT));
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Protocol Type is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE));
+
     int maxBatchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE));
-    LOGGER.debug("{} is {}", MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, maxBatchSize);
 
     if (maxBatchSize < 512) {
       throw new SpanExporterConfiguratorException("The batch max size cannot be lower than 512");
@@ -95,7 +100,6 @@ public class OpenTelemetryResources {
 
     int batchQueueSize =
         parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE));
-    LOGGER.debug("{} is {}", MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE, batchQueueSize);
 
     return builder(spanExporter)
         .setMaxQueueSize(batchQueueSize)

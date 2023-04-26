@@ -94,7 +94,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
     if (isExportEnabled()) {
-      LOGGER.info("{} is enabled.", MULE_OPEN_TELEMETRY_EXPORTER_ENABLED);
+      LOGGER.info("Mule Open Telemetry Tracer Exporter is enabled.");
       return OpenTelemetryResources.resolveOpenTelemetrySpanProcessor(configuration, privilegedConfiguration,
                                                                       resolveOpenTelemetrySpanExporter());
     } else {
