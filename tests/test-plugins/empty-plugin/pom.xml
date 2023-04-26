@@ -13,7 +13,7 @@
     <packaging>mule-plugin</packaging>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.plugin.empty</javaModuleName>
+        <javaModuleName>org.mule.test.plugin.empty</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

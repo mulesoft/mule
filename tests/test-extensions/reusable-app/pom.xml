@@ -21,7 +21,7 @@
     <description>A Mule extension for testing</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.extension.reusable.app</javaModuleName>
+        <javaModuleName>org.mule.test.extension.reusable.app</javaModuleName>
         <commonsLangVersion>3.8.1</commonsLangVersion>
         <mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
     </properties>

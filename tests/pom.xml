@@ -12,7 +12,6 @@
     <name>Mule Tests</name>
 
     <properties>
-        <javaModuleName>org.mule.runtime.mule.test.parent</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 

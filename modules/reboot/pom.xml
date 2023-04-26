@@ -12,7 +12,7 @@
     <name>Mule 4 Container</name>
 
     <properties>
-        <javaModuleName>org.mule.runtime.reboot</javaModuleName>
+        <javaModuleName>org.mule.boot</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

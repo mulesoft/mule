@@ -15,7 +15,7 @@
     <description>A Mule extension for testing Configuration Properties provider</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.extension.config.properties</javaModuleName>
+        <javaModuleName>org.mule.test.extension.config.properties</javaModuleName>
         <testExtensionModelLoaderId>crafted-config-properties</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

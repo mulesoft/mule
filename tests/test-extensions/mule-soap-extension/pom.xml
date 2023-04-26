@@ -15,7 +15,7 @@
     <description>A Mule extension for testing Soap Connect</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.extension.soap</javaModuleName>
+        <javaModuleName>org.mule.test.extension.soap</javaModuleName>
         <testExtensionModelLoaderId>soap</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

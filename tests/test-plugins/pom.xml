@@ -14,7 +14,6 @@
     <description>Provides plugins to use on tests</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.plugins.parent</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

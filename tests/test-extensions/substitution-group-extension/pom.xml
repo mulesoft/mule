@@ -24,7 +24,7 @@
     </dependencies>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.extension.substitution.group</javaModuleName>
+        <javaModuleName>org.mule.test.extension.substitution.group</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

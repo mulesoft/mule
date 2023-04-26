@@ -15,7 +15,6 @@
     </description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.all.modules</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

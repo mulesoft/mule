@@ -18,7 +18,7 @@
     <description>A Mule extension for testing</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.extension.metadata</javaModuleName>
+        <javaModuleName>org.mule.test.extension.metadata</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

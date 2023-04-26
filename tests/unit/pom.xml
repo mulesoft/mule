@@ -12,7 +12,7 @@
     <description>Mule Unit Test framework (TCK)</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.unit</javaModuleName>
+        <javaModuleName>org.mule.test.unit</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

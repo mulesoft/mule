@@ -12,8 +12,8 @@
 	<description>Tests constants to use with Allure Annotations.</description>
 
     <properties>
-		<javaModuleName>org.mule.runtime.test.allure</javaModuleName>
-        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+		<javaModuleName>org.mule.test.allure</javaModuleName>
+		<formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
 </project>

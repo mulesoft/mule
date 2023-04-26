@@ -12,7 +12,7 @@
     <packaging>mule-plugin</packaging>
 
     <properties>
-        <javaModuleName>org.mule.runtime.test.processor.chains</javaModuleName>
+        <javaModuleName>org.mule.test.processor.chains</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

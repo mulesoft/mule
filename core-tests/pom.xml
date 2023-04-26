@@ -12,7 +12,7 @@
     <description>Mule Core Unit Tests</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.core.tests</javaModuleName>
+        <javaModuleName>org.mule.test.core</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
     

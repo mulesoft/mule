@@ -17,7 +17,7 @@
     <description>This module tests the Memory Management Module implementation</description>
 
     <properties>
-        <javaModuleName>org.mule.runtime.memory.management.tests</javaModuleName>
+        <javaModuleName>org.mule.test.memory.management</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
