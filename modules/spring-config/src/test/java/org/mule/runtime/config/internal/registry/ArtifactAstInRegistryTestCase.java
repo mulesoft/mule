@@ -111,15 +111,11 @@ public class ArtifactAstInRegistryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void artifactAstAvailableInRegistryIfEnabled() {
-    assumeThat(addArtifactAstToRegistry, is(true));
     ArtifactAst actualArtifactAst = muleContext.getRegistry().lookupObject(OBJECT_ARTIFACT_AST);
-    assertThat(actualArtifactAst.getArtifactName(), is("my mock ast"));
-  }
-
-  @Test
-  public void artifactAstNotAvailableInRegistryIfNotEnabled() {
-    assumeThat(addArtifactAstToRegistry, is(false));
-    ArtifactAst actualArtifactAst = muleContext.getRegistry().lookupObject(OBJECT_ARTIFACT_AST);
-    assertThat(actualArtifactAst, is(nullValue()));
+    if (addArtifactAstToRegistry) {
+      assertThat(actualArtifactAst.getArtifactName(), is("my mock ast"));
+    } else {
+      assertThat(actualArtifactAst, is(nullValue()));
+    }
   }
 }
