@@ -12,7 +12,7 @@
 	<description>Tests constants to use with Allure Annotations.</description>
 
     <properties>
-	    <javaModuleName>org.mule.test.allure</javaModuleName>
+        <javaModuleName>org.mule.test.allure</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
