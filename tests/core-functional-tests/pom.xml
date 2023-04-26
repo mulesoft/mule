@@ -14,7 +14,7 @@
     <description>Module for testing mule core features in a functional way</description>
 
     <properties>
-        <javaModuleName>org.mule.core.functional.tests</javaModuleName>
+        <javaModuleName>org.mule.test.core.functional</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
