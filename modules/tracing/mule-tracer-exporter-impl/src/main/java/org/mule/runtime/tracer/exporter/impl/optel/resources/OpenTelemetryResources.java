@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.exporter.impl.optel.resources;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
@@ -15,9 +14,10 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.valueOf;
 
-import static java.time.Duration.ofMillis;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
+import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
@@ -41,6 +41,8 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Retriever open telemetry resources.
@@ -48,6 +50,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  * @since 4.5.0
  */
 public class OpenTelemetryResources {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetryResources.class);
 
   private OpenTelemetryResources() {}
 
@@ -83,6 +87,7 @@ public class OpenTelemetryResources {
       throws SpanExporterConfiguratorException {
 
     int maxBatchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE));
+    LOGGER.debug("{} is {}", MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, maxBatchSize);
 
     if (maxBatchSize < 512) {
       throw new SpanExporterConfiguratorException("The batch max size cannot be lower than 512");
@@ -90,6 +95,7 @@ public class OpenTelemetryResources {
 
     int batchQueueSize =
         parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE));
+    LOGGER.debug("{} is {}", MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE, batchQueueSize);
 
     return builder(spanExporter)
         .setMaxQueueSize(batchQueueSize)
