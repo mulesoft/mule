@@ -18,6 +18,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.maven.pom.parser.internal.version.MavenVersion;
+import org.mule.maven.pom.parser.internal.version.MavenVersionConstraintParser;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -29,10 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionConstraint;
 import org.slf4j.Logger;
 
 /**
@@ -54,10 +52,9 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
     String artifactId = pluginArtifactCoordinates.getGroupId() + ":"
         + pluginArtifactCoordinates.getArtifactId() + ":" + pluginArtifactCoordinates.getVersion();
 
-    GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
-    Version pluginArtifactCoordinatesVersion;
+    MavenVersion pluginArtifactCoordinatesVersion;
     try {
-      pluginArtifactCoordinatesVersion = genericVersionScheme.parseVersion(pluginArtifactCoordinates.getVersion());
+      pluginArtifactCoordinatesVersion = new MavenVersion(pluginArtifactCoordinates.getVersion());
     } catch (Exception e) {
       LOGGER.warn("Error parsing version '{}' for artifact '{}', patches against this artifact will not be applied",
                   pluginArtifactCoordinates.getVersion(), artifactId);
@@ -82,9 +79,10 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
                       .stream()
                       .anyMatch(affectedVersion -> {
                         try {
-                          VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
-                          return versionConstraint.containsVersion(pluginArtifactCoordinatesVersion);
-                        } catch (InvalidVersionSpecificationException e) {
+                          MavenVersionConstraintParser mavenVersionConstraintParser =
+                              new MavenVersionConstraintParser(affectedVersion);
+                          return mavenVersionConstraintParser.containsVersion(pluginArtifactCoordinatesVersion);
+                        } catch (Exception e) {
                           throw new MuleRuntimeException(createStaticMessage(format("Could not parse plugin patch affect version '%s'",
                                                                                     affectedVersion)),
                                                          e);
