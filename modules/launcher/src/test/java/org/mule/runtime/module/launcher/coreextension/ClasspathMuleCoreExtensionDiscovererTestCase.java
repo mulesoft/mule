@@ -52,7 +52,7 @@ public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTe
     });
 
     assertThat(discover.size(), equalTo(2));
-    assertThat(discover.get(1), instanceOf(PrioritizedTestCoreExtension.class));
+    assertThat(discover.get(0), instanceOf(PrioritizedTestCoreExtension.class));
     assertThat(discover.get(1), instanceOf(TestCoreExtension.class));
     assertThat(((TestCoreExtension) discover.get(1)).containerClassLoader, is(artifactClassLoader));
   }
