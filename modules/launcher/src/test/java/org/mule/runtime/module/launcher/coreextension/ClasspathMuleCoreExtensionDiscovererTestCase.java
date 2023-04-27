@@ -51,9 +51,10 @@ public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTe
       }
     });
 
-    assertThat(discover.size(), equalTo(1));
-    assertThat(discover.get(0), instanceOf(TestCoreExtension.class));
-    assertThat(((TestCoreExtension) discover.get(0)).containerClassLoader, is(artifactClassLoader));
+    assertThat(discover.size(), equalTo(2));
+    assertThat(discover.get(1), instanceOf(PrioritizedTestCoreExtension.class));
+    assertThat(discover.get(1), instanceOf(TestCoreExtension.class));
+    assertThat(((TestCoreExtension) discover.get(1)).containerClassLoader, is(artifactClassLoader));
   }
 
   public static class TestCoreExtension implements MuleCoreExtension {
@@ -89,6 +90,14 @@ public class ClasspathMuleCoreExtensionDiscovererTestCase extends AbstractMuleTe
     @Override
     public void stop() throws MuleException {
 
+    }
+  }
+
+  public static class PrioritizedTestCoreExtension extends TestCoreExtension {
+
+    @Override
+    public int priority() {
+      return 0;
     }
   }
 }
