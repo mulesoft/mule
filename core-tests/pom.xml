@@ -64,8 +64,8 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mule.runtime</groupId>
-                    <artifactId>mule-module-logging</artifactId>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
