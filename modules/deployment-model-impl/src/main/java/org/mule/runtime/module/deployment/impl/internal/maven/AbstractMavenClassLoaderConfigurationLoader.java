@@ -9,14 +9,15 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleHome;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.REPOSITORY_FOLDER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
@@ -41,7 +42,6 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
-import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -52,7 +52,7 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
@@ -274,7 +274,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     String artifactId = thisArtifactCoordinates.getGroupId() + ":"
         + thisArtifactCoordinates.getArtifactId() + ":" + thisArtifactCoordinates.getVersion();
     try {
-      File muleArtifactPatchesFolder = new File(MuleContainerBootstrapUtils.getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
+      File muleArtifactPatchesFolder = new File(getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
       if (muleArtifactPatchesFolder.exists()) {
         String[] jarFiles = muleArtifactPatchesFolder.list((dir, name) -> name != null && name.endsWith(".jar"));
         for (String jarFile : jarFiles) {
@@ -310,7 +310,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
                 })) {
               try {
                 URL mulePluginPatchUrl =
-                    new File(MuleContainerBootstrapUtils.getMuleHome(),
+                    new File(getMuleHome(),
                              Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, jarFile).toString())
                                  .toURL();
                 patches.add(mulePluginPatchUrl);

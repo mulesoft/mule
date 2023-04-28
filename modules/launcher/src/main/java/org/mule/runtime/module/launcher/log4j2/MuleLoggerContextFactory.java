@@ -7,10 +7,10 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleBase;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleConfDir;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.LOGGER;
 import static org.mule.runtime.module.launcher.log4j2.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleBase;
-import static org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils.getMuleConfDir;
 
 import static java.lang.System.getProperty;
 
