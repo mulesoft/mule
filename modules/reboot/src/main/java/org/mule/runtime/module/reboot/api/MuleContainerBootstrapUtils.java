@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.reboot.api;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import org.mule.runtime.core.api.util.ClassUtils;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_BASE_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_HOME_DIRECTORY_PROPERTY;
+
 import org.mule.runtime.module.reboot.MuleContainerBootstrap;
 
 import java.io.File;
@@ -117,7 +117,7 @@ public final class MuleContainerBootstrapUtils {
   //////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * @see ClassUtils#getResource
+   * @see org.mule.runtime.core.api.util.ClassUtils#getResource
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
     URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {

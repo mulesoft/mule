@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_HOME_DIRECTORY_PROPERTY;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 

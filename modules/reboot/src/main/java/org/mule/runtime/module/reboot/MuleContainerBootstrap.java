@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.reboot;
 
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
 
@@ -31,6 +30,9 @@ import org.tanukisoftware.wrapper.WrapperManager;
  * Note: this class is intentionally kept free of any external library dependencies and therefore repeats a few utility methods.
  */
 public class MuleContainerBootstrap {
+
+  public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
+  public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
 
   private static final String MULE_MODULE_REBOOT_POM_FILE_PATH =
       "META-INF/maven/org.mule.module/mule-module-reboot/pom.properties";
