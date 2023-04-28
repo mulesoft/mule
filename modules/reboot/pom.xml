@@ -26,6 +26,10 @@
                         <goals>
                             <goal>jar-no-fork</goal>
                         </goals>
+                        <configuration>
+                            <!-- Never skip this becuase it is required to build another module in the ee repo -->
+                            <skipSource>false</skipSource>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
