@@ -21,7 +21,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -122,7 +121,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
     DataType outputDataType = DataType.builder().type(Integer.class).mediaType(ANY).charset(DEFAULT_ENCODING).build();
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
-    when(transformer.transform(anyObject())).thenReturn(1);
+    when(transformer.transform(any())).thenReturn(1);
 
     CoreEvent muleEvent = mock(CoreEvent.class);
 
@@ -139,7 +138,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
     DataType outputDataType = DataType.builder().type(Integer.class).charset(CUSTOM_ENCODING).build();
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
-    when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
+    when(transformer.transform(any())).thenReturn(Integer.valueOf(1));
 
     CoreEvent muleEvent = mock(CoreEvent.class);
 
@@ -189,7 +188,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
     Transformer transformer = mock(Transformer.class);
-    when(transformer.transform(anyObject(), anyObject())).thenReturn(TEST_PAYLOAD);
+    when(transformer.transform(any(), any())).thenReturn(TEST_PAYLOAD);
     when(transformersRegistry.lookupTransformer(any(), any())).thenReturn(transformer);
 
     assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(APPLICATION_XML.getPrimaryType()));

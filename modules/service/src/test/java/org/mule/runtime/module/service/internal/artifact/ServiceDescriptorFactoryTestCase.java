@@ -12,7 +12,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -46,6 +45,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 @Story(ARTIFACT_DESCRIPTORS)
@@ -77,12 +77,13 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
             .build());
 
 
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(BundleDescriptorLoader.class))))
+    when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(), argThat(equalTo(BundleDescriptorLoader.class))))
         .thenReturn(bundleDescriptorLoaderMock);
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderConfigurationLoader.class))))
-        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
+    when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(),
+                                        argThat(equalTo(ClassLoaderConfigurationLoader.class))))
+                                            .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
-    doNothing().when(artifactDescriptorValidator).validate(anyObject());
+    doNothing().when(artifactDescriptorValidator).validate(ArgumentMatchers.any());
 
     serviceDescriptorFactory = new ServiceDescriptorFactory(descriptorLoaderRepository, builder());
   }

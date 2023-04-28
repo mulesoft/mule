@@ -10,6 +10,8 @@ package org.mule.functional.junit4;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.junit.MockitoJUnit.rule;
+
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.tck.MuleTestUtils.getTestFlow;
 
@@ -30,6 +32,7 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
 import javax.inject.Inject;
 
 import org.junit.Rule;
+import org.mockito.junit.MockitoRule;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -59,6 +62,9 @@ import org.junit.Rule;
     },
     testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"})
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
+
+  @Rule
+  public MockitoRule rule = rule();
 
   @Inject
   protected ConfigurationComponentLocator locator;

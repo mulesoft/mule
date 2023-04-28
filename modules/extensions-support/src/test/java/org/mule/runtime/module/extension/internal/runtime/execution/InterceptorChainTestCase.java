@@ -17,8 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
@@ -29,15 +30,17 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class InterceptorChainTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public MockitoRule rule = rule();
 
   @Mock
   private Interceptor<OperationModel> interceptor1;
@@ -231,7 +234,7 @@ public class InterceptorChainTestCase extends AbstractMuleTestCase {
     assertThat(chain.onError(ctx, e), is(sameInstance(e)));
     chain.abort(ctx);
 
-    verifyZeroInteractions(ctx, callback);
+    verifyNoInteractions(ctx, callback);
   }
 
   private void mockErrorIdentity(Interceptor<OperationModel>... interceptors) {

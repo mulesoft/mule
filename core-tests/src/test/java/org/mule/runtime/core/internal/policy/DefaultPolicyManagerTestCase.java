@@ -6,24 +6,6 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.lang.Thread.sleep;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.functional.Either.left;
@@ -33,6 +15,26 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+
+import static java.lang.Thread.sleep;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -66,7 +68,6 @@ import org.mule.tck.probe.PollingProber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -421,7 +422,7 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
         new PhantomReference<>(sourcePolicy, sourcePolicyReferenceQueue);
 
     // An event and a source policy context are created in order to emulate an inflight event.
-    InternalEvent event = mock(InternalEvent.class, RETURNS_MOCKS);
+    InternalEvent event = mock(InternalEvent.class, RETURNS_DEEP_STUBS);
     PolicyPointcutParameters policyPointcutParameters = mock(PolicyPointcutParameters.class);
     SourcePolicyContext sourcePolicyContext = new SourcePolicyContext(policyPointcutParameters);
     when(event.getSourcePolicyContext()).thenReturn((EventInternalContext) sourcePolicyContext);
@@ -440,6 +441,8 @@ public class DefaultPolicyManagerTestCase extends AbstractMuleContextTestCase {
     verifyActivePolicies(1);
 
     // No more inflight events should trigger the policy disposal.
+    // This is needed because of some mockito references.
+    reset(event);
     event = null;
     sourcePolicyContext = null;
     System.gc();

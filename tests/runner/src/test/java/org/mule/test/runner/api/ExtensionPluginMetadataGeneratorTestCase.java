@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +53,7 @@ public class ExtensionPluginMetadataGeneratorTestCase extends AbstractMuleTestCa
   public void before() throws Exception {
     depResolver = mock(DependencyResolver.class);
     ExtensionModelLoaderFinder finder = mock(ExtensionModelLoaderFinder.class);
-    when(finder.findLoaderByProperty(anyObject(), anyObject(), anyObject()))
+    when(finder.findLoaderByProperty(any(), any(), any()))
         .thenReturn(Optional.of(new DefaultJavaExtensionModelLoader()));
     generator = new ExtensionPluginMetadataGenerator(temporaryFolder.newFolder(), finder);
   }

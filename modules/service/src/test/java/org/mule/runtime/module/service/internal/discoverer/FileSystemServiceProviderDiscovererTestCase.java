@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -53,6 +52,7 @@ import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
 @Feature(SERVICES)
@@ -89,12 +89,13 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
             .build());
 
 
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(BundleDescriptorLoader.class))))
+    when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(), argThat(equalTo(BundleDescriptorLoader.class))))
         .thenReturn(bundleDescriptorLoaderMock);
-    when(descriptorLoaderRepository.get(anyString(), anyObject(), argThat(equalTo(ClassLoaderConfigurationLoader.class))))
-        .thenReturn(mock(ClassLoaderConfigurationLoader.class));
+    when(descriptorLoaderRepository.get(anyString(), ArgumentMatchers.any(),
+                                        argThat(equalTo(ClassLoaderConfigurationLoader.class))))
+                                            .thenReturn(mock(ClassLoaderConfigurationLoader.class));
 
-    doNothing().when(artifactDescriptorValidator).validate(anyObject());
+    doNothing().when(artifactDescriptorValidator).validate(ArgumentMatchers.any());
   }
 
   @Test

@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -126,7 +126,7 @@ public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {
   @Test
   public void close() throws Exception {
     managedConnection.close();
-    verify(pool, never()).returnObject(anyObject());
+    verify(pool, never()).returnObject(any());
   }
 
   @Test

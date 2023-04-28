@@ -150,7 +150,7 @@ public class InstanceLockGroupTestCase extends AbstractMuleTestCase {
   }
 
   private void lockUnlockThenDestroy(int lockTimes) {
-    mockLockProvider = Mockito.mock(LockProvider.class, Answers.RETURNS_DEEP_STUBS.get());
+    mockLockProvider = Mockito.mock(LockProvider.class, Answers.RETURNS_DEEP_STUBS);
     InstanceLockGroup instanceLockGroup = new InstanceLockGroup(mockLockProvider);
     for (int i = 0; i < lockTimes; i++) {
       instanceLockGroup.lock("lockId");

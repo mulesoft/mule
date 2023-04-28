@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -77,7 +76,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void produce() throws Exception {
     List<String> page = asList("bleh");
-    when(delegate.getPage(anyObject())).thenReturn(page);
+    when(delegate.getPage(any())).thenReturn(page);
     assertThat(page, sameInstance(producer.produce()));
   }
 
@@ -114,7 +113,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void totalAvailable() {
     final int total = 10;
-    when(delegate.getTotalResults(anyObject())).thenReturn(of(total));
+    when(delegate.getTotalResults(any())).thenReturn(of(total));
     assertThat(total, is(producer.getSize()));
   }
 

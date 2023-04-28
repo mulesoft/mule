@@ -39,7 +39,7 @@ public class XaTxQueueTransactionJournalTestCase extends AbstractMuleContextTest
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS.get());
+  private final DefaultQueueStore mockQueueInfo = mock(DefaultQueueStore.class, RETURNS_DEEP_STUBS);
 
   @Before
   public void setUp() {

@@ -82,7 +82,7 @@ public class PrimaryNodeLifecycleNotificationListenerTestCase extends AbstractMu
 
   @Test
   public void testOnNotificationWithLifecycleStateEnabledStarted() throws MuleException {
-    mockStartableAndLifecycleStateEnabled = mock(StartableAndLifecycleStateEnabled.class, Answers.RETURNS_DEEP_STUBS.get());
+    mockStartableAndLifecycleStateEnabled = mock(StartableAndLifecycleStateEnabled.class, Answers.RETURNS_DEEP_STUBS);
     when(mockStartableAndLifecycleStateEnabled.getLifecycleState().isStarted()).thenReturn(true);
     this.notificationListener =
         new PrimaryNodeLifecycleNotificationListener(mockStartableAndLifecycleStateEnabled, notificationRegistrer);
@@ -92,7 +92,7 @@ public class PrimaryNodeLifecycleNotificationListenerTestCase extends AbstractMu
 
   @Test
   public void testOnNotificationWithLifecycleStateEnabledStopped() throws MuleException {
-    mockStartableAndLifecycleStateEnabled = mock(StartableAndLifecycleStateEnabled.class, Answers.RETURNS_DEEP_STUBS.get());
+    mockStartableAndLifecycleStateEnabled = mock(StartableAndLifecycleStateEnabled.class, Answers.RETURNS_DEEP_STUBS);
     when(mockStartableAndLifecycleStateEnabled.getLifecycleState().isStarted()).thenReturn(false);
     this.notificationListener =
         new PrimaryNodeLifecycleNotificationListener(mockStartableAndLifecycleStateEnabled, notificationRegistrer);

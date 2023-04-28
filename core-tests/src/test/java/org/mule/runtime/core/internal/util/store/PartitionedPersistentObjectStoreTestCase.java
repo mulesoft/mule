@@ -41,7 +41,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
   private static final String OBJECT_KEY = "key";
   private static final String OBJECT_BASE_VALUE = "value";
 
-  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS.get());
+  private MuleContext mockMuleContext = mock(MuleContext.class, Answers.RETURNS_DEEP_STUBS);
   private PartitionedPersistentObjectStore<Serializable> os;
   private int numberOfPartitions = 3;
 

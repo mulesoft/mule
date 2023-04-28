@@ -24,12 +24,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -72,22 +72,18 @@ import java.util.Set;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(APP_CREATION)
 @Story(HEAVYWEIGHT)
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({MuleDeployableProjectModelBuilder.class, DeployableProjectModel.class, DefaultApplicationFactory.class,
-    AbstractDeployableProjectModelBuilder.class})
-@PowerMockIgnore({"javax.management.*", "javax.script.*"})
 public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   private static final String DOMAIN_NAME = "test-domain";
@@ -117,6 +113,7 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
                                     getRuntimeLockFactory(),
                                     mock(MemoryManagementService.class),
                                     mock(ArtifactConfigurationProcessor.class));
+  private MockedStatic<AbstractDeployableProjectModelBuilder> utilities;
 
   public DefaultApplicationFactoryTestCase() {}
 
@@ -125,15 +122,15 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    mockStatic(AbstractDeployableProjectModelBuilder.class);
-    when(isHeavyPackage(any())).thenReturn(true);
-    when(defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
-    DeployableProjectModel deployableProjectModelMock = PowerMockito.mock(DeployableProjectModel.class);
+    utilities = mockStatic(AbstractDeployableProjectModelBuilder.class);
+    utilities.when(() -> isHeavyPackage(any())).thenReturn(true);
+    utilities.when(() -> defaultDeployableProjectModelBuilder(any(), any(), anyBoolean())).thenCallRealMethod();
+    DeployableProjectModel deployableProjectModelMock = Mockito.mock(DeployableProjectModel.class);
     doNothing().when(deployableProjectModelMock).validate();
     MuleDeployableProjectModelBuilder muleDeployableProjectModelBuilderMock =
-        PowerMockito.mock(MuleDeployableProjectModelBuilder.class);
+        mock(MuleDeployableProjectModelBuilder.class);
     when(muleDeployableProjectModelBuilderMock.build()).thenReturn(deployableProjectModelMock);
-    whenNew(MuleDeployableProjectModelBuilder.class).withAnyArguments().thenReturn(muleDeployableProjectModelBuilderMock);
+    mockConstruction(MuleDeployableProjectModelBuilder.class);
   }
 
   @Test
@@ -229,5 +226,10 @@ public class DefaultApplicationFactoryTestCase extends AbstractMuleTestCase {
             .thenReturn(descriptor);
     expectedException.expect(DeploymentException.class);
     applicationFactory.createArtifact(new File(APP_NAME), empty());
+  }
+
+  @After
+  public void after() {
+    utilities.close();
   }
 }

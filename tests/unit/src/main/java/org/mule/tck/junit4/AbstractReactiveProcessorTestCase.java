@@ -53,7 +53,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   protected Mode mode;
 
   protected ConfigurationComponentLocator configurationComponentLocator =
-      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS.get());
+      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
 
   public AbstractReactiveProcessorTestCase(Mode mode) {
     this.mode = mode;

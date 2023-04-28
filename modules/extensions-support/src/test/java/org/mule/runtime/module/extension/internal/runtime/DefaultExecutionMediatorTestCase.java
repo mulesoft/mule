@@ -31,7 +31,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyVararg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.clearInvocations;
@@ -582,10 +581,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-      verify(interceptor1, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor1, times(expectedRetries)).onError(same(operationContext), any());
       verify(interceptor1, times(expectedRetries)).after(operationContext, null);
 
-      verify(interceptor2, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor2, times(expectedRetries)).onError(same(operationContext), any());
       verify(interceptor2, times(expectedRetries)).after(operationContext, null);
     });
   }

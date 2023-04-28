@@ -228,7 +228,7 @@ public final class ExtensionsTestUtils {
         }
       }
 
-      return RETURNS_DEEP_STUBS.get().answer(invocation);
+      return RETURNS_DEEP_STUBS.answer(invocation);
     });
   }
 

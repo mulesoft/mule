@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -15,7 +16,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
@@ -38,6 +38,7 @@ import org.mule.tck.size.SmallTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -89,13 +90,15 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     contextConfigurer = new LoggerContextConfigurer();
     when(context.isStandalone()).thenReturn(true);
     when(context.getConfiguration()).thenReturn(configuration);
+    when(context.getConfigFile()).thenReturn(null);
+    when(configuration.getAppenders()).thenReturn(emptyMap());
 
     converter = null;
 
     doAnswer(invocation -> {
       converter = invocation.getArguments()[1];
       return null;
-    }).when(configuration).addComponent(eq("Converter"), anyObject());
+    }).when(configuration).addComponent(eq("Converter"), any());
 
     when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(invocation -> converter);
   }

@@ -919,8 +919,10 @@ public class ModelBasedMetadataCacheKeyGeneratorTestCase extends AbstractMetadat
         .thenReturn(of(new MetadataResolverFactoryModelProperty(NullMetadataResolverFactory::new)));
 
     when(operationModel.getParameterGroupModels()).thenReturn(Arrays.asList(parameterGroupModel, metadataKeyIdGroup));
+    List<ParameterModel> parameterModels = new ArrayList<>(operationModel.getAllParameterModels());
     when(operationModel.getAllParameterModels()).thenReturn(ImmutableList.<ParameterModel>builder()
         .addAll(componentParameterModels)
+        .addAll(parameterModels)
         .addAll(partParameterModels)
         .build());
   }

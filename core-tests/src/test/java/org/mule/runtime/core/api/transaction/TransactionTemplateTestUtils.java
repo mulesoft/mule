@@ -35,7 +35,7 @@ public class TransactionTemplateTestUtils {
 
   public static ExecutionCallback<CoreEvent> getFailureTransactionCallback() throws Exception {
     return () -> {
-      throw mock(MessagingException.class, RETURNS_MOCKS.get());
+      throw mock(MessagingException.class, RETURNS_MOCKS);
     };
   }
 

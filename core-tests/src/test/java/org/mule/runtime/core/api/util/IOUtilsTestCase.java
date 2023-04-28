@@ -34,11 +34,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -61,28 +62,21 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.apache.commons.lang3.StringUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-
+import org.mockito.MockedStatic;
 import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtils.class)
-@PowerMockIgnore("javax.management.*")
 public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   private static final List<String> POWER_MOCK_PLUGINS = asList("mock-maker-inline", InlineByteBuddyMockMaker.class.getName());
@@ -206,22 +200,27 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
-    PowerMockito.spy(IOUtils.class);
-    AtomicReference<URLConnection> connection = new AtomicReference<>();
+    try (MockedStatic<IOUtils> utilities = mockStatic(IOUtils.class)) {
+      AtomicReference<URLConnection> connection = new AtomicReference<>();
 
-    url = spy(url);
-    when(IOUtils.class, "getResourceAsUrl", anyString(), any(Class.class), anyBoolean(), anyBoolean())
-        .thenReturn(url);
+      final URL mockedURL = spy(url);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class)))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(invocationOnMock -> mockedURL);
 
-    when(url.openConnection()).then(a -> {
-      URLConnection conn = spy((URLConnection) a.callRealMethod());
-      connection.set(conn);
-      return conn;
-    });
+      when(mockedURL.openConnection()).thenAnswer(a -> {
+        URLConnection conn = spy((URLConnection) a.callRealMethod());
+        connection.set(conn);
+        return conn;
+      });
 
-    getResourceAsStream(RESOURCE_NAME, getClass());
+      getResourceAsStream(RESOURCE_NAME, getClass());
 
-    return connection.get();
+      return connection.get();
+    }
   }
 
   private void assertInputStream(URLConnection connection) throws Exception {
