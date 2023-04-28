@@ -11,8 +11,8 @@ import org.mule.runtime.core.internal.logger.CustomLoggerFactory;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.BasicMDCAdapter;
 import org.slf4j.helpers.BasicMarkerFactory;
-import org.slf4j.helpers.NOPMDCAdapter;
 import org.slf4j.spi.MDCAdapter;
 
 /**
@@ -55,7 +55,7 @@ public class StaticLoggerBinder implements org.slf4j.spi.SLF4JServiceProvider {
 
   @Override
   public MDCAdapter getMDCAdapter() {
-    return new NOPMDCAdapter();
+    return new BasicMDCAdapter();
   }
 
   @Override
