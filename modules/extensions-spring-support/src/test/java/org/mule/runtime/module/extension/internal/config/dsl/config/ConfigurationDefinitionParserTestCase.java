@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.mockito.internal.invocation.InterceptedInvocation;
@@ -44,7 +43,6 @@ import org.mockito.internal.invocation.InterceptedInvocation;
 public class ConfigurationDefinitionParserTestCase {
 
   @Test
-  @Ignore("W-12625688")
   public void typeConverterUsesTheClassloaderOfTheParser() throws Exception {
     List<ComponentBuildingDefinition> componentBuildingDefinitions;
 
