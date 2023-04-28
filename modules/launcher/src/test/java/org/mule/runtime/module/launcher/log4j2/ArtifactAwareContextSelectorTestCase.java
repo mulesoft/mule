@@ -53,7 +53,6 @@ import org.apache.logging.log4j.core.LoggerContext;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -64,7 +63,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@Ignore("W-12625688")
 public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
 
   private static final String POLICY_TEMPLATE_NAME = "policyTemplate";
