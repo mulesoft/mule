@@ -7,17 +7,18 @@
 
 package org.mule.runtime.tracer.exporter.impl.optel.resources;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.valueOf;
 
-import static java.time.Duration.ofMillis;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
+import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
@@ -41,6 +42,8 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Retriever open telemetry resources.
@@ -48,6 +51,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  * @since 4.5.0
  */
 public class OpenTelemetryResources {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetryResources.class);
 
   private OpenTelemetryResources() {}
 
@@ -81,6 +86,11 @@ public class OpenTelemetryResources {
                                                                 SpanExporterConfiguration privilegedSpanExporterConfiguration,
                                                                 SpanExporter spanExporter)
       throws SpanExporterConfiguratorException {
+
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Endpoint is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT));
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Protocol Type is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE));
 
     int maxBatchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE));
 

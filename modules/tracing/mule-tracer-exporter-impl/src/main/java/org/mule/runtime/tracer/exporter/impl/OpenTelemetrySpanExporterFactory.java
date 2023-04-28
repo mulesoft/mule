@@ -25,7 +25,6 @@ import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
-
 import org.mule.runtime.tracer.exporter.impl.capturer.CapturingSpanExporterWrapper;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources;
@@ -35,6 +34,8 @@ import javax.inject.Inject;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import io.opentelemetry.sdk.trace.SpanProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link SpanExporterFactory} that creates {@link SpanExporter} that exports the internal spans as
@@ -43,6 +44,8 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
  * @since 4.5.0
  */
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Disposable, Initialisable {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetrySpanExporterFactory.class);
 
   @Inject
   private SpanExporterConfiguration configuration;
@@ -91,6 +94,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
     if (isExportEnabled()) {
+      LOGGER.info("Mule Open Telemetry Tracer Exporter is enabled.");
       return OpenTelemetryResources.resolveOpenTelemetrySpanProcessor(configuration, privilegedConfiguration,
                                                                       resolveOpenTelemetrySpanExporter());
     } else {
