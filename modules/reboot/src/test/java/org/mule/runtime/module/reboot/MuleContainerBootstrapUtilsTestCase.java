@@ -67,15 +67,6 @@ public class MuleContainerBootstrapUtilsTestCase {
   }
 
   /**
-   * Test method for {@link MuleContainerBootstrapUtils#getMuleLocalJarFile()}.
-   */
-  @Test
-  public void testGetMuleLocalJarFile() {
-    File muleLocalJar = MuleContainerBootstrapUtils.getMuleLocalJarFile();
-    assertNotNull(muleLocalJar.getAbsolutePath());
-  }
-
-  /**
    * Test method for {@link MuleContainerBootstrapUtils#getResource(java.lang.String, java.lang.Class)}.
    * 
    * @throws IOException

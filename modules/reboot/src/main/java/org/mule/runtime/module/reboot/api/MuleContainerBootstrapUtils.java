@@ -85,25 +85,11 @@ public final class MuleContainerBootstrapUtils {
     return isStandalone() ? new File(getMuleBase(), MULE_APPS_FILENAME) : null;
   }
 
-  // TODO remove
-  /**
-   * @param appName name of the application
-   * @return null if running embedded, otherwise the app dir as a File ref
-   */
-  public static File getMuleAppDir(String appName) {
-    return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
-  }
-
   /**
    * @return null if running embedded
    */
   public static File getMuleLibDir() {
     return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
-  }
-
-  // TODO Remove
-  public static File getMuleLocalJarFile() {
-    return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
   }
 
   public static File getMuleDomainsDir() {
