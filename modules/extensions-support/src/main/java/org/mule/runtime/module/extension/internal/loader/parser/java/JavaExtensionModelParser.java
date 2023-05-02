@@ -6,20 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEntitlementInfo;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceRepeatableAnnotation;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.getExceptionHandlerModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils.parseExtensionErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.lib.JavaExternalLibModelParserUtils.parseExternalLibraryModels;
@@ -27,7 +22,13 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.noti
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.parseNotifications;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveExtensionMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
+
+import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -68,6 +69,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfigurat
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.ExportInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
+import org.mule.runtime.module.extension.internal.loader.parser.java.lifecycle.ArtifactLifecycleListenerParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -79,7 +83,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,6 +400,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public ExtensionDevelopmentFramework getDevelopmentFramework() {
     return JAVA_SDK;
+  }
+
+  @Override
+  public Optional<ArtifactLifecycleListener> getArtifactLifecycleListener() {
+    return new ArtifactLifecycleListenerParser().getArtifactLifecycleListener(extensionElement);
   }
 
   public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {

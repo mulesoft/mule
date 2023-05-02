@@ -32,6 +32,7 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.CompileTimeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParserFactory;
@@ -103,6 +104,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
         .ifPresent(m -> declarer.withModelProperty(new CompileTimeModelProperty()));
 
     declarer.withModelProperty(new DevelopmentFrameworkModelProperty(parser.getDevelopmentFramework()));
+    parser.getArtifactLifecycleListener().map(ArtifactLifecycleListenerModelProperty::new).ifPresent(declarer::withModelProperty);
 
     this.declarer = declarer;
     namespace = getExtensionsNamespace(declarer.getDeclaration());

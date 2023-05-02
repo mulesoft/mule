@@ -19,6 +19,7 @@ import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.List;
 import java.util.Map;
@@ -171,4 +172,11 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @since 4.6.0
    */
   ExtensionDevelopmentFramework getDevelopmentFramework();
+
+  /**
+   * @return the extension's {@link ArtifactLifecycleListener} if one was defined.
+   *
+   * @since 4.6.0
+   */
+  Optional<ArtifactLifecycleListener> getArtifactLifecycleListener();
 }

@@ -32,6 +32,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +146,11 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  @Override
+  public Optional<ArtifactLifecycleListener> getArtifactLifecycleListener() {
+    return empty();
   }
 
   /**
