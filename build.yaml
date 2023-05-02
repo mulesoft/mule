@@ -15,9 +15,11 @@ mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Da
 projectType: runtime
 # TODO W-13029381 Change to 17
 jdkTool: OPEN-JDK11
-additionalTestConfigs:
-  jdk8:
-    testJdkTool: OPEN-JDK8
+testJdkTool: OPEN-JDK8
+# TODO W-13136426 Reenable testing with java 11
+#additionalTestConfigs:
+#  jdk8:
+#    testJdkTool: OPEN-JDK8
 # TODO W-13029381 uncomment when default changes to java 17
   #jdk11:
     #testJdkTool: OPEN-JDK11
