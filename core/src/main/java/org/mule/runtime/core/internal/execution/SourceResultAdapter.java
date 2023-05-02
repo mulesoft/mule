@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static org.mule.runtime.core.internal.execution.NoopSourceDistributedTraceContextManager.getEmptySourceDistributedTraceContextManager;
+import static org.mule.runtime.core.internal.execution.NoopSourceDistributedTraceContextManager.getNoopSourceDistributedTraceContextManager;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -78,7 +78,7 @@ public class SourceResultAdapter {
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
                              Optional<PollItemInformation> pollItemInformation) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
-         getEmptySourceDistributedTraceContextManager(), null, emptyMap(), pollItemInformation);
+         getNoopSourceDistributedTraceContextManager(), null, emptyMap(), pollItemInformation);
   }
 
   public SourceResultAdapter(Result<?, ?> result,

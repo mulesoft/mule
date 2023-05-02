@@ -29,7 +29,7 @@ public class NoopSourceDistributedTraceContextManager implements DistributedTrac
 
   }
 
-  public static DistributedTraceContextManager getEmptySourceDistributedTraceContextManager() {
+  public static DistributedTraceContextManager getNoopSourceDistributedTraceContextManager() {
     return INSTANCE;
   }
 
