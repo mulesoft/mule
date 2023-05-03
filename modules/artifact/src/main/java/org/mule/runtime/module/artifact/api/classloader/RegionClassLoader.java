@@ -459,6 +459,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     resourceMapping.clear();
 
     super.dispose();
+    ownerClassLoader = null;
 
     // System.gc() by default
     regionResourceReleaser.release();
