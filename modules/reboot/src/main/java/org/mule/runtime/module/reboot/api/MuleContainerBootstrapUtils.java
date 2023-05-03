@@ -27,7 +27,6 @@ public final class MuleContainerBootstrapUtils {
   public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
   private static final String MULE_APPS_FILENAME = "apps";
   private static final String MULE_LIB_FILENAME = "lib/mule";
-  private static final String MULE_TMP_FILENAME = "tmp";
   private static final String MULE_CONF_FILENAME = "conf";
 
   private MuleContainerBootstrapUtils() {
@@ -86,10 +85,22 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
+   * @param appName name of the application
+   * @return null if running embedded, otherwise the app dir as a File ref
+   */
+  public static File getMuleAppDir(String appName) {
+    return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
+  }
+
+  /**
    * @return null if running embedded
    */
   public static File getMuleLibDir() {
     return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
+  }
+
+  public static File getMuleLocalJarFile() {
+    return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
   }
 
   public static File getMuleDomainsDir() {
