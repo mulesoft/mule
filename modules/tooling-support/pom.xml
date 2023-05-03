@@ -13,6 +13,7 @@
     <description>This modules provides a set of services for tooling applications.</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tooling.support</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

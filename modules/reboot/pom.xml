@@ -12,6 +12,7 @@
     <name>Mule 4 Container</name>
 
     <properties>
+        <javaModuleName>org.mule.boot</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

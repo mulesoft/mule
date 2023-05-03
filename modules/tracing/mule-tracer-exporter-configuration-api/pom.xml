@@ -22,6 +22,7 @@
     <description>Api for the internal tracer exporter configuration</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.exporter.configuration.api</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

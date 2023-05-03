@@ -15,6 +15,7 @@
     <description>A Mule extension for testing Soap Connect Custom Transports</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.rick.and.morty</javaModuleName>
         <testExtensionModelLoaderId>soap</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

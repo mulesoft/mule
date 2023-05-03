@@ -12,6 +12,7 @@
     <description>Micro-benchmarks to test the performance of core Mule functionality</description>
 
     <properties>
+        <javaModuleName>org.mule.test.performance</javaModuleName>
         <jmh.version>1.21</jmh.version>
     
         <skipExportTests>false</skipExportTests>

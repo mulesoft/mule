@@ -17,6 +17,7 @@
     <description>A Mule extension for testing the semantic terms functionality</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.semantic.terms</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

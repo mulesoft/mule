@@ -13,6 +13,7 @@
     <description>Provides container artifact related functionality</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.container</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>

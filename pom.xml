@@ -130,6 +130,7 @@
     <properties>
         <javaVersion>1.8</javaVersion>
         <javaReleaseVersion>8</javaReleaseVersion>
+        <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -490,10 +491,62 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${deploy.plugin.version}</version>
                 </plugin>
+                <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
+                    where <packaging>jar</packaging> is used. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${jar.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-test-jar</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skipExportTests}</skip>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <archive>
+                            <!--
+                                Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
+                                and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
+                             -->
+                            <index>false</index>
+                            <!-- List dependencies in the MANIFEST.MF -->
+                            <manifest>
+                                <!-- Note that we do not generate a classpath into the manifest, since doing so
+                                     significantly slows down compilations that use the jar -->
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
+                            <!-- Custom Entries -->
+                            <manifestEntries>
+                                <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                                <!-- include repository revision from buildnumber plugin -->
+                                <Build-Revision>${buildNumber}</Build-Revision>
+                                <Build-Date>${timestamp}</Build-Date>
+                                <Dev-List-Email>${dev.list}</Dev-List-Email>
+                                <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
+                                <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
+                                <More-Info>For more information go to ${productUrl}</More-Info>
+                                <Support>Get commercial support: ${project.organization.url}/support</Support>
+                                <Description>Mule Runtime and Integration Platform</Description>
+                                <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
+                                <Vendor-Url>${project.organization.url}</Vendor-Url>
+                                <Product-Url>${productUrl}</Product-Url>
+                                <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                                <Git-tags>${git.tags}</Git-tags>
+                                <Git-branch>${git.branch}</Git-branch>
+                                <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                                <Git-commit-id>${git.commit.id}</Git-commit-id>
+                                <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                                <Git-commit-time>${git.commit.time}</Git-commit-time>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -805,61 +858,6 @@
                 </configuration>
             </plugin>
 
-            <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
-                where <packaging>jar</packaging> is used. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipExportTests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <archive>
-                        <!--
-                            Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
-                            and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
-                         -->
-                        <index>false</index>
-                        <!-- List dependencies in the MANIFEST.MF -->
-                        <manifest>
-                            <!-- Note that we do not generate a classpath into the manifest, since doing so
-                                 significantly slows down compilations that use the jar -->
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                        <!-- Custom Entries -->
-                        <manifestEntries>
-                            <!-- include repository revision from buildnumber plugin -->
-                            <Build-Revision>${buildNumber}</Build-Revision>
-                            <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
-                            <More-Info>For more information go to ${productUrl}</More-Info>
-                            <Support>Get commercial support: ${project.organization.url}/support</Support>
-                            <Description>Mule Runtime and Integration Platform</Description>
-                            <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                            <Vendor-Url>${project.organization.url}</Vendor-Url>
-                            <Product-Url>${productUrl}</Product-Url>
-                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                            <Git-tags>${git.tags}</Git-tags>
-                            <Git-branch>${git.branch}</Git-branch>
-                            <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
-                            <Git-commit-id>${git.commit.id}</Git-commit-id>
-                            <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
-                            <Git-commit-time>${git.commit.time}</Git-commit-time>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>

@@ -15,6 +15,7 @@
     <description>Provides container artifacts deployment functionality</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.deployment</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

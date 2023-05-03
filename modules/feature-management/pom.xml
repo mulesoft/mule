@@ -16,6 +16,7 @@
     <description>This module performs feature management for the runtime</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.feature.management</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

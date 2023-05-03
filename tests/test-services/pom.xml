@@ -13,6 +13,7 @@
     <description>Container services used for testing purposes</description>
 
     <properties>
+        <javaModuleName>org.mule.test.services</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

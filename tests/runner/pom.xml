@@ -12,6 +12,7 @@
     <description>Test Runner for Mule Integration Tests</description>
 
     <properties>
+        <javaModuleName>org.mule.test.runner</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

@@ -16,6 +16,7 @@
     <description>This module provides an API for license verification</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.license.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

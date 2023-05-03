@@ -9,6 +9,7 @@
     <artifactId>mule-service-oauth-api</artifactId>
     
     <properties>
+        <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <muleOAuthClientVersion>1.2.0-SNAPSHOT</muleOAuthClientVersion>
     </properties>

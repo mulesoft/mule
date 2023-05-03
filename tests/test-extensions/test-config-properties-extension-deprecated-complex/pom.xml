@@ -15,6 +15,7 @@
     <description>A Mule extension with complex elements for testing deprecated Configuration Properties provider</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.config.properties.deprecated.complex</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

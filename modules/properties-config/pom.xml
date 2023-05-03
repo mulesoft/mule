@@ -11,6 +11,7 @@
     <name>Properties Config</name>
     
     <properties>
+        <javaModuleName>org.mule.runtime.properties.config</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

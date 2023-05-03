@@ -15,6 +15,7 @@
     <description>A Mule extension for testing deprecated Configuration Properties provider</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.config.properties.deprecated</javaModuleName>
         <testExtensionModelLoaderId>crafted-config-properties-deprecated</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

@@ -16,6 +16,7 @@
     <description>This module handles the global configuration of the Mule Runtime</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.global.config</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

@@ -13,6 +13,7 @@
     <description>Mule test framework components (TCK)</description>
 
     <properties>
+        <javaModuleName>org.mule.test.component.plugin</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

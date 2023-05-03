@@ -22,6 +22,7 @@
     <description>Definitions for setting configuration for tracing levels and overrides</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.customization.api</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

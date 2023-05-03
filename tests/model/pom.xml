@@ -12,6 +12,7 @@
     <description>Mule Unit Test Model</description>
 
     <properties>
+        <javaModuleName>org.mule.test.model</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

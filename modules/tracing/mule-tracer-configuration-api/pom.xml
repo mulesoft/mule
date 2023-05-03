@@ -15,6 +15,7 @@
     <description>Api to configure tracing generation</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.configuration.api</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
