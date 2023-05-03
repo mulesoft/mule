@@ -14,7 +14,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_C
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
@@ -338,7 +337,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureParallelForeachFlattenMessage();
       configureDisableRegistryBootstrapOptionalEntries();
       configureDisableApplyObjectProcessor();
-      configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
@@ -1438,17 +1436,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
                                                 minMuleVersion("4.7.0"));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_BYTE_BUDDY_OBJECT_CREATION} feature flag.
-   *
-   * @since 4.3.0-202203
-   */
-  private static void configureEnableByteBuddyObjectCreation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
-                                                minMuleVersion("4.6.0"));
   }
 
   /**
