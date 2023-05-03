@@ -35,7 +35,7 @@ public class ExtensionOnMuleContextDisposedNotificationListener
 
   /**
    * If the Extension modeled by the given {@code extensionModel} has an {@link ArtifactLifecycleListener}, this method will
-   * create and register a {@link NotificationListener} for when the artifact's context get disposed in order to call the
+   * create and register a {@link NotificationListener} for when the artifact's context gets disposed in order to call the
    * {@link ArtifactLifecycleListener#onArtifactDisposal(ArtifactDisposalContext)} method with the corresponding context.
    * 
    * @param serverNotificationManager the {@link ServerNotificationManager} associated with the artifact the extension belongs to.

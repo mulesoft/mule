@@ -11,6 +11,8 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.withLifecycleListenerPlugin;
 import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -19,6 +21,7 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -26,9 +29,18 @@ import org.mule.tck.probe.PollingProber;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 
+/**
+ * Tests that Extension's {@link ArtifactLifecycleListener}s are honoured for the different lifecycle phases.
+ * <p>
+ * Currently, only artifact disposal is supported.
+ */
+@Feature(JAVA_SDK)
+@Story(ARTIFACT_LIFECYCLE_LISTENER)
 public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCase {
 
   private static final int PROBER_POLLING_INTERVAL = 100;
@@ -48,23 +60,27 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
 
   @Test
   public void lifecycleListenerGetsCalledOnUndeploy() throws Exception {
+    // Prepares an application that depends on an extension that declares an ArtifactLifecycleListener
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
         // Adds a random class to the application's ClassLoader, so we can try loading it during the listener's execution.
         .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
-
     addPackedAppFromBuilder(applicationFileBuilder);
 
+    // Starts the deployment
     startDeployment();
     triggerDirectoryWatcher();
 
     assertThat(deploymentListener.isAppDeployed(), is(true));
 
+    // Executes a flow with an operation that leaks the application's ClassLoader
     executeApplicationFlow("main");
 
+    // Undeploys the application
     assertThat(removeAppAnchorFile(APP_NAME), is(true));
     triggerDirectoryWatcher();
     assertThat(deploymentListener.isAppUndeployed(), is(true));
 
+    // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearAllLogs();
       System.gc();
