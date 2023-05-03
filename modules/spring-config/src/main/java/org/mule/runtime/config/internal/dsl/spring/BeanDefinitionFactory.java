@@ -130,8 +130,6 @@ public class BeanDefinitionFactory {
   private final BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> dslParamGroupProcessor;
   private final BeanDefinitionCreator<CreateParamBeanDefinitionRequest> paramProcessor;
   private final ObjectFactoryClassRepository objectFactoryClassRepository = new ObjectFactoryClassRepository();
-  // TODO W-10815440 Remove this
-  private final boolean enableByteBuddy;
 
   /**
    * @param componentBuildingDefinitionRegistry a registry with all the known {@code ComponentBuildingDefinition}s by the
@@ -139,10 +137,9 @@ public class BeanDefinitionFactory {
    * @param errorTypeRepository
    */
   public BeanDefinitionFactory(String artifactId, ComponentBuildingDefinitionRegistry componentBuildingDefinitionRegistry,
-                               boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces, boolean enableByteBuddy) {
+                               boolean disableTrimWhitespaces, boolean disablePojoCdataTrimWhitespaces) {
     this.artifactId = artifactId;
     this.componentBuildingDefinitionRegistry = componentBuildingDefinitionRegistry;
-    this.enableByteBuddy = enableByteBuddy;
     this.componentProcessor = buildComponentProcessorChainOfResponsability(disableTrimWhitespaces);
     this.dslParamGroupProcessor = buildDslParamGroupChainOfResponsability(disableTrimWhitespaces);
     this.paramProcessor = buildParamChainOfResponsability(disableTrimWhitespaces, disablePojoCdataTrimWhitespaces);
@@ -672,7 +669,7 @@ public class BeanDefinitionFactory {
     SimpleTypeBeanComponentDefinitionCreator simpleTypeBeanDefinitionCreator = new SimpleTypeBeanComponentDefinitionCreator();
     MapEntryBeanDefinitionCreator mapEntryBeanDefinitionCreator = new MapEntryBeanDefinitionCreator();
     CommonComponentBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
+        new CommonComponentBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
 
     eagerObjectCreator.setNext(objectBeanDefinitionCreator);
     objectBeanDefinitionCreator.setNext(simpleTypeBeanDefinitionCreator);
@@ -683,7 +680,7 @@ public class BeanDefinitionFactory {
   }
 
   private BeanDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> buildDslParamGroupChainOfResponsability(boolean disableTrimWhitespaces) {
-    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
+    return new CommonDslParamGroupBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
   }
 
   private BeanDefinitionCreator<CreateParamBeanDefinitionRequest> buildParamChainOfResponsability(boolean disableTrimWhitespaces,
@@ -693,7 +690,7 @@ public class BeanDefinitionFactory {
     CollectionBeanDefinitionCreator collectionBeanDefinitionCreator = new CollectionBeanDefinitionCreator();
     MapBeanDefinitionCreator mapBeanDefinitionCreator = new MapBeanDefinitionCreator();
     CommonParamBeanDefinitionCreator commonComponentModelProcessor =
-        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
+        new CommonParamBeanDefinitionCreator(objectFactoryClassRepository, disableTrimWhitespaces);
 
     simpleTypeBeanDefinitionCreator.setNext(collectionBeanDefinitionCreator);
     collectionBeanDefinitionCreator.setNext(mapBeanDefinitionCreator);

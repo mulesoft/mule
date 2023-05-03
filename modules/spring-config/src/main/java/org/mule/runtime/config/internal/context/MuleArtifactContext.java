@@ -244,8 +244,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
                                   componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()),
                                   featureFlaggingService.isEnabled(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING),
-                                  featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING),
-                                  featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION));
+                                  featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING));
 
     // TODO W-10855416: remove this
     this.validateAppModelWithRegionClassloader =

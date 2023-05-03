@@ -25,8 +25,8 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 class CommonDslParamGroupBeanDefinitionCreator extends CommonBeanBaseDefinitionCreator<CreateDslParamGroupBeanDefinitionRequest> {
 
   public CommonDslParamGroupBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                                  boolean disableTrimWhitespaces, boolean enableByteBuddy) {
-    super(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
+                                                  boolean disableTrimWhitespaces) {
+    super(objectFactoryClassRepository, disableTrimWhitespaces);
   }
 
   @Override

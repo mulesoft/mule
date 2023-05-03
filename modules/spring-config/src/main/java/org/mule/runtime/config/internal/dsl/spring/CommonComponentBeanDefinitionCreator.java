@@ -42,8 +42,8 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
   private final BeanDefinitionPostProcessor beanDefinitionPostProcessor;
 
   public CommonComponentBeanDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                              boolean disableTrimWhitespaces, boolean enableByteBuddy) {
-    super(objectFactoryClassRepository, disableTrimWhitespaces, enableByteBuddy);
+                                              boolean disableTrimWhitespaces) {
+    super(objectFactoryClassRepository, disableTrimWhitespaces);
 
     this.beanDefinitionPostProcessor = resolvePostProcessor();
   }

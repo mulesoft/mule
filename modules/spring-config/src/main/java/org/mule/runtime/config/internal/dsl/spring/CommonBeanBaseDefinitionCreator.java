@@ -47,7 +47,7 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
   private final boolean disableTrimWhitespaces;
 
   public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                         boolean disableTrimWhitespaces, boolean enableByteBuddy) {
+                                         boolean disableTrimWhitespaces) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.disableTrimWhitespaces = disableTrimWhitespaces;
   }
