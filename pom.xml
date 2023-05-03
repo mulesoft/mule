@@ -548,6 +548,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <workingDirectory>${project.build.directory}</workingDirectory>
                         <argLine>${surefire.args}</argLine>
                         <trimStackTrace>false</trimStackTrace>
