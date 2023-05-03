@@ -6,10 +6,15 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.core.api.util.ClassUtils.isConcrete;
+import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 
-import static org.apache.commons.lang3.JavaVersion.JAVA_12;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -22,10 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import static org.mule.runtime.core.api.util.ClassUtils.isConcrete;
-import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.tck.testmodels.fruit.AbstractFruit;
@@ -335,24 +337,41 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void setFinalStaticFieldValue() throws Exception {
-    if (isJavaVersionAtLeast(JAVA_12)) {
+    final List<String> newFinalStaticHashProperties = asList("three", "four");
+
+    if (isStaticFinalModificationForbidden()) {
       expectedException.expect(IllegalAccessException.class);
       expectedException.expectMessage("Can not set static final");
     }
-    final List<String> newFinalStaticHashProperties = asList("three", "four");
     ClassUtils.setStaticFieldValue(HashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+
     assertThat(newFinalStaticHashProperties, equalTo(HashBlob.getFinalStaticHashProperties()));
   }
 
   @Test
   public void setFinalStaticFieldRecursive() throws Exception {
-    if (isJavaVersionAtLeast(JAVA_12)) {
+    final List<String> newFinalStaticHashProperties = asList("three", "four");
+
+    if (isStaticFinalModificationForbidden()) {
       expectedException.expect(IllegalAccessException.class);
       expectedException.expectMessage("Can not set static final");
     }
-    final List<String> newFinalStaticHashProperties = asList("three", "four");
     ClassUtils.setStaticFieldValue(ExtendedHashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
+
     assertThat(newFinalStaticHashProperties, equalTo(ExtendedHashBlob.getFinalStaticHashProperties()));
+  }
+
+  /**
+   * Starting with Java 12 changing field modifiers is not allowed.
+   * <p>
+   * https://github.com/openjdk/jdk/commit/9c70e26c146ae4c5a2e2311948efec9bf662bb8c
+   * <p>
+   * However, we do the check against Java 17 because we only want to reference LTS versions.
+   *
+   * @return Whether static final fields modification via reflection is forbidden.
+   */
+  private boolean isStaticFinalModificationForbidden() {
+    return isJavaVersionAtLeast(JAVA_17);
   }
 
   @Test(expected = NoSuchFieldException.class)

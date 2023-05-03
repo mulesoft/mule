@@ -6,19 +6,20 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
+import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
+
 import static java.lang.Boolean.getBoolean;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
 
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
-import static org.apache.commons.lang3.JavaVersion.JAVA_12;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
-import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
@@ -54,8 +55,6 @@ import java.util.concurrent.Callable;
 import java.util.function.Function;
 
 import com.google.common.primitives.Primitives;
-import org.apache.commons.lang.SystemUtils;
-import org.apache.commons.lang3.JavaVersion;
 
 /**
  * Extend the Apache Commons ClassUtils to provide additional functionality.
@@ -454,7 +453,8 @@ public class ClassUtils {
   private static void removeFinalModifierFromField(Field field) throws NoSuchFieldException, IllegalAccessException {
     // Starting with Java 12 changing field modifiers is not allowed.
     // https://github.com/openjdk/jdk/commit/9c70e26c146ae4c5a2e2311948efec9bf662bb8c
-    if (isJavaVersionAtLeast(JAVA_12)) {
+    // However, we do the check against Java 17 because we only want to reference LTS versions
+    if (isJavaVersionAtLeast(JAVA_17)) {
       return;
     }
     Field modifiersField = getField(Field.class, "modifiers", false);
