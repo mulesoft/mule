@@ -345,6 +345,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     }
     ClassUtils.setStaticFieldValue(HashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
 
+    // This assertion will not be executed if static final modification is not allowed (an exception will be expected earlier)
     assertThat(newFinalStaticHashProperties, equalTo(HashBlob.getFinalStaticHashProperties()));
   }
 
@@ -358,6 +359,7 @@ public class ClassUtilsTestCase extends AbstractMuleTestCase {
     }
     ClassUtils.setStaticFieldValue(ExtendedHashBlob.class, "finalStaticHashProperties", newFinalStaticHashProperties, true);
 
+    // This assertion will not be executed if static final modification is not allowed (an exception will be expected earlier)
     assertThat(newFinalStaticHashProperties, equalTo(ExtendedHashBlob.getFinalStaticHashProperties()));
   }
 
