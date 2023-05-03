@@ -4,24 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.reboot.api;
+package org.mule.runtime.core.internal.util;
 
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_BASE_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_HOME_DIRECTORY_PROPERTY;
-
-import org.mule.runtime.module.reboot.MuleContainerBootstrap;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_BASE_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
-/**
- * @deprecated use org.mule.runtime.core.internal.util.MuleContainerUtils instead.
- */
-@Deprecated
-public final class MuleContainerBootstrapUtils {
+public final class MuleContainerUtils {
 
   public static final String MULE_DOMAIN_FOLDER = "domains";
   public static final String MULE_LOCAL_JAR_FILENAME = "mule-local-install.jar";
@@ -29,7 +20,7 @@ public final class MuleContainerBootstrapUtils {
   private static final String MULE_LIB_FILENAME = "lib/mule";
   private static final String MULE_CONF_FILENAME = "conf";
 
-  private MuleContainerBootstrapUtils() {
+  private MuleContainerUtils() {
     // utility class only
   }
 
@@ -85,22 +76,10 @@ public final class MuleContainerBootstrapUtils {
   }
 
   /**
-   * @param appName name of the application
-   * @return null if running embedded, otherwise the app dir as a File ref
-   */
-  public static File getMuleAppDir(String appName) {
-    return isStandalone() ? new File(getMuleAppsDir(), appName) : null;
-  }
-
-  /**
    * @return null if running embedded
    */
   public static File getMuleLibDir() {
     return isStandalone() ? new File(getMuleHome(), MULE_LIB_FILENAME) : null;
-  }
-
-  public static File getMuleLocalJarFile() {
-    return isStandalone() ? new File(getMuleLibDir(), MULE_LOCAL_JAR_FILENAME) : null;
   }
 
   public static File getMuleDomainsDir() {
@@ -112,32 +91,6 @@ public final class MuleContainerBootstrapUtils {
    */
   public static File getMuleConfDir() {
     return isStandalone() ? new File(getMuleBase(), MULE_CONF_FILENAME) : null;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////////
-  // The following methods are intentionally duplicated from org.mule.runtime.core.util so that
-  // mule-module-reboot has no external dependencies at system startup.
-  //////////////////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * @see org.mule.runtime.core.api.util.ClassUtils#getResource
-   */
-  public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      return cl != null ? cl.getResource(resourceName) : null;
-    });
-
-    if (url == null) {
-      url = AccessController
-          .doPrivileged((PrivilegedAction<URL>) () -> MuleContainerBootstrap.class.getClassLoader().getResource(resourceName));
-    }
-
-    if (url == null) {
-      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
-    }
-
-    return url;
   }
 
 }

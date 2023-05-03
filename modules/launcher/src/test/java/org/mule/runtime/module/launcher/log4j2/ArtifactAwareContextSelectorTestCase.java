@@ -7,6 +7,7 @@
 package org.mule.runtime.module.launcher.log4j2;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleHome;
 import static org.mule.runtime.module.launcher.log4j2.LoggerContextReaperThreadFactory.THREAD_NAME;
 import static org.mule.runtime.module.launcher.log4j2.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
@@ -35,7 +36,6 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitProbe;
@@ -159,7 +159,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   @Test
   public void defaultToConfWhenNoConfigFound() {
     when(regionClassLoader.findLocalResource(anyString())).thenReturn(null);
-    File expected = new File(MuleContainerBootstrapUtils.getMuleHome(), "conf");
+    File expected = new File(getMuleHome(), "conf");
     expected = new File(expected, "log4j2.xml");
     LoggerContext ctx = selector.getContext("", regionClassLoader, true);
     assertThat(ctx.getConfigLocation(), equalTo(expected.toURI()));

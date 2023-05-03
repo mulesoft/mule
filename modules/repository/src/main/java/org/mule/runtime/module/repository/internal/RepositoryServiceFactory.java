@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.repository.internal;
 
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleLibDir;
+
 import org.mule.runtime.module.repository.api.RepositoryService;
 
 import java.io.File;
@@ -80,7 +81,7 @@ public class RepositoryServiceFactory {
     if (userDefinedDependenciesFolder != null) {
       repositoryFolder = new File(userDefinedDependenciesFolder);
     } else {
-      repositoryFolder = new File(MuleContainerBootstrapUtils.getMuleLibDir(), REPOSITORY_FOLDER);
+      repositoryFolder = new File(getMuleLibDir(), REPOSITORY_FOLDER);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("Using dependencies folder " + repositoryFolder.getAbsolutePath());
