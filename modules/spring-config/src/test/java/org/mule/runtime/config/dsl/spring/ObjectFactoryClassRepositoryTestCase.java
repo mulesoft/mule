@@ -23,14 +23,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoRule;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 @Issue("W-10672687")
 public class ObjectFactoryClassRepositoryTestCase {
 
   @Rule
   public MockitoRule rule = rule();
-  
+
   @Test
   public void testSetters() throws Exception {
 
