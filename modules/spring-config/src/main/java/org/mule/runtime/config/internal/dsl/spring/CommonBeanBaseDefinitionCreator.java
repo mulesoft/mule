@@ -45,13 +45,11 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final boolean disableTrimWhitespaces;
-  private final boolean enableByteBuddy;
 
   public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                         boolean disableTrimWhitespaces, boolean enableByteBuddy) {
+                                         boolean disableTrimWhitespaces) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.disableTrimWhitespaces = disableTrimWhitespaces;
-    this.enableByteBuddy = enableByteBuddy;
   }
 
   @Override
@@ -125,13 +123,6 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
   private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final SpringComponentModel componentModel,
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
-
-    if (!enableByteBuddy) {
-      return rootBeanDefinition(objectFactoryClassRepository
-          .getObjectFactoryDynamicClass(componentBuildingDefinition,
-                                        objectFactoryType, componentModel.getType(),
-                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
-    }
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType, componentModel.getType()))
