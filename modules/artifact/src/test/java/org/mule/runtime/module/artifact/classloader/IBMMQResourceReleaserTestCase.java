@@ -20,9 +20,11 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
@@ -56,14 +58,13 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
@@ -140,6 +141,10 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), is(false));
+
     Properties props = System.getProperties();
     props.remove("avoid.ibm.mq.cleanup");
     props.remove("avoid.ibm.mq.cleanup.mbeans");

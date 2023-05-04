@@ -18,8 +18,12 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.enumerate;
 
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.maven.client.api.MavenClient;
@@ -116,6 +120,9 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), is(false));
 
     URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
     final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
