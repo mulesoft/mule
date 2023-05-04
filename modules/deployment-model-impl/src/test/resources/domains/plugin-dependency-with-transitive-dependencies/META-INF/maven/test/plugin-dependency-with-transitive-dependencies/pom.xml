@@ -10,7 +10,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>test</groupId>
+            <groupId>deployment.test</groupId>
             <artifactId>plugin-with-transitive-dependencies</artifactId>
             <version>1.0.0</version>
             <classifier>mule-plugin</classifier>
