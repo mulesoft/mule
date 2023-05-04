@@ -67,27 +67,27 @@
                     </archive>
                 </configuration>
             </plugin>
-	        <plugin>
-	            <groupId>org.codehaus.mojo</groupId>
-	            <artifactId>build-helper-maven-plugin</artifactId>
-	            <version>3.2.0</version>
-	            <executions>
-	                <execution>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
                         <!-- Add the java 11 sources to the source artifact -->
-	                	<id>attach-java11-sources</id>
-	                	<!-- This has to run after compilation so it doesn't interfere with it (compler has its own MRJAR configuration) -->
-	                    <phase>prepare-package</phase>
-	                    <goals>
-	                        <goal>add-source</goal>
-	                    </goals>
-	                    <configuration>
-	                        <sources>
-	                            <source>src/main/java11</source>
-	                        </sources>
-	                    </configuration>
-	                </execution>
-	            </executions>
-	        </plugin>
+                        <id>attach-java11-sources</id>
+                        <!-- This has to run after compilation so it doesn't interfere with it (compler has its own MRJAR configuration) -->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java11</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

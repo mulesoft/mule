@@ -14,6 +14,9 @@
     <description>Provides policies to use on tests</description>
 
     <properties>
+        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
+        <surefire.args>${surefire.args.base} --add-opens java.base/java.lang=ALL-UNNAMED</surefire.args>
+
         <javaModuleName>org.mule.test.policies</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>

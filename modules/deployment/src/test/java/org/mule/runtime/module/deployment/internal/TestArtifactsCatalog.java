@@ -142,12 +142,12 @@ public final class TestArtifactsCatalog {
     defaulServiceEchoJarFile = new JarCompiler()
         .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
                    getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
-        .compile("mule-module-service-echo-default-4.0-SNAPSHOT.jar");
+        .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler().compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
                                                            getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
         .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
-        .compile("mule-module-service-foo-default-4.0-SNAPSHOT.jar");
+        .compile("mule-module-service-foo-4.0-SNAPSHOT.jar");
 
     helloExtensionV1JarFile = new ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/hello/HelloExtension.java"),
