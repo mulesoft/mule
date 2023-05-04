@@ -76,9 +76,17 @@ public class MuleContainerBootstrap {
       muleHome = new File(muleHomeVar).getCanonicalFile();
     }
 
-    if (muleHome == null || !muleHome.exists() || !muleHome.isDirectory()) {
-      throw new IllegalArgumentException("Either the system property " + MULE_HOME_DIRECTORY_PROPERTY
-          + " is not set or does not contain a valid directory.");
+    if (muleHome == null) {
+      throw new IllegalArgumentException("The system property " + MULE_HOME_DIRECTORY_PROPERTY
+          + " is not set.");
+    }
+    if (!muleHome.exists()) {
+      throw new IllegalArgumentException("The system property " + MULE_HOME_DIRECTORY_PROPERTY
+          + " does not contain a valid directory (" + muleHome.getAbsolutePath() + ").");
+    }
+    if (!muleHome.isDirectory()) {
+      throw new IllegalArgumentException("The system property " + MULE_HOME_DIRECTORY_PROPERTY
+          + " does not contain a valid directory (" + muleHome.getAbsolutePath() + ").");
     }
     return muleHome;
   }
