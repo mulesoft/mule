@@ -43,7 +43,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.stream.Stream;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
@@ -121,7 +120,6 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     verify(pluginDeclarer, never()).withImportedType(any());
   }
 
-  @Ignore("W-12625688")
   @Test
   @Issue("MULE-18581")
   @Description("Simulate the scenario of a plugins declaring subtypes from another plugin "
@@ -129,7 +127,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
   public void importForSubtypesFromOtherPlugin() throws ClassNotFoundException {
     final Type baseAType = createType(baseMetadataType, BaseType.class);
     final Type subAType = createType(subMetadataType, SubType.class);
-    when(pluginCtx.getExtensionClassLoader()).thenReturn(mock(ClassLoader.class));
+    when(pluginCtx.getExtensionClassLoader()).thenReturn(spy(ClassLoader.class));
 
     when(typeMapping.getClassValue(any())).thenReturn(baseAType);
     when(typeMapping.getClassArrayValue(any())).thenReturn(asList(subAType));

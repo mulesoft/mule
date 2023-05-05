@@ -37,7 +37,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -47,7 +46,6 @@ import io.qameta.allure.Story;
 @Issue("W-11069995")
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
-@Ignore("W-12625688")
 public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends AbstractMuleTestCase {
 
   private ArtifactClassLoaderManager artifactClassLoaderManager;
