@@ -46,6 +46,7 @@ public class TestServicesSetup extends ExternalResource {
   private File schedulerService;
   private File expressionLanguageService;
   private File expressionLanguageMetadataService;
+  private boolean expressionLanguageMetadataServiceDisabled;
 
   public TestServicesSetup(TemporaryFolder compilerWorkFolder) {
     this.compilerWorkFolder = compilerWorkFolder;
@@ -83,6 +84,14 @@ public class TestServicesSetup extends ExternalResource {
   }
 
   /**
+   * Allows to disable the expression language metadata service implementation to be used in the test suite. This is useful if the
+   * ExpressionLanguageService already provides the metadata service, as DataWeave does.
+   */
+  public void disableExpressionLanguageMetadataService() throws IOException {
+    this.expressionLanguageMetadataServiceDisabled = true;
+  }
+
+  /**
    * Copies the pre-built services to the services folder being used by the test. The first call to this method actually builds
    * the services.
    * 
@@ -96,8 +105,10 @@ public class TestServicesSetup extends ExternalResource {
                   new File(servicesFolder, SCHEDULER_SERVICE_NAME));
     copyDirectory(expressionLanguageService,
                   new File(servicesFolder, EXPRESSION_LANGUAGE_SERVICE_NAME));
-    copyDirectory(expressionLanguageMetadataService,
-                  new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+    if (!expressionLanguageMetadataServiceDisabled) {
+      copyDirectory(expressionLanguageMetadataService,
+                    new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+    }
   }
 
   private void initNotOverriddenServices() throws IOException {
@@ -108,7 +119,7 @@ public class TestServicesSetup extends ExternalResource {
       expressionLanguageService =
           buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
     }
-    if (expressionLanguageMetadataService == null) {
+    if (!expressionLanguageMetadataServiceDisabled && expressionLanguageMetadataService == null) {
       expressionLanguageMetadataService =
           buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
     }
@@ -124,7 +135,7 @@ public class TestServicesSetup extends ExternalResource {
       expressionLanguageService.delete();
       expressionLanguageService = null;
     }
-    if (expressionLanguageMetadataService != null) {
+    if (!expressionLanguageMetadataServiceDisabled && expressionLanguageMetadataService != null) {
       expressionLanguageMetadataService.delete();
       expressionLanguageMetadataService = null;
     }

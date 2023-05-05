@@ -135,6 +135,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId> 
+            <scope>test</scope>         
+        </dependency> 
+        <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-module-test-policy</artifactId>
             <version>${project.version}</version>
