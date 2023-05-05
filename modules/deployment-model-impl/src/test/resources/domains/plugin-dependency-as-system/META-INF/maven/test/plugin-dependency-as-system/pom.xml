@@ -9,7 +9,8 @@
     <version>1.0.0</version>
 
     <properties>
-        <dependencyGroupId>test</dependencyGroupId>
+        <dependencyGroupId>deployment.test</dependencyGroupId>
+        <dependencyGroupIdFolder>deployment/test</dependencyGroupIdFolder>
         <dependencyArtifactId>plugin-with-transitive-dependency</dependencyArtifactId>
         <dependencyVersion>1.0.0</dependencyVersion>
     </properties>
@@ -21,7 +22,7 @@
             <version>${dependencyVersion}</version>
             <classifier>mule-plugin</classifier>
             <scope>system</scope>
-            <systemPath>${muleRuntimeConfig.maven.repositoryLocation}/${dependencyGroupId}/${dependencyArtifactId}/${dependencyVersion}/${dependencyArtifactId}-${dependencyVersion}-mule-plugin.jar</systemPath>
+            <systemPath>${muleRuntimeConfig.maven.repositoryLocation}/${dependencyGroupIdFolder}/${dependencyArtifactId}/${dependencyVersion}/${dependencyArtifactId}-${dependencyVersion}-mule-plugin.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
