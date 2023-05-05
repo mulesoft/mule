@@ -43,7 +43,7 @@ public class LevelInitialExportInfoProviderTestCase {
   private static final String MULE_COMPONENT_NAMESPACE = "mule";
   private static final String DUMMY_COMPONENT_NAME = "dummy";
   private static final String GET_CONNECTION = "get-connection";
-
+  public static final String PARAMETER_RESOLUTION = "parameter-resolution";
 
   private static final String EXECUTION_TIME = "execution-time";
   private final InitialExportInfoProvider initialExportInfoProvider;
@@ -73,12 +73,12 @@ public class LevelInitialExportInfoProviderTestCase {
         {"overview-get-connection", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
             GET_CONNECTION, FALSE},
         {"debug-parameter-resolution", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
-            PARAMETER_RESOLUTION_SPAN_NAME,
+            PARAMETER_RESOLUTION,
             TRUE},
         {"monitoring-parameter-resolution", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
-            PARAMETER_RESOLUTION_SPAN_NAME, FALSE},
+            PARAMETER_RESOLUTION, FALSE},
         {"overview-parameter-resolution", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
-            PARAMETER_RESOLUTION_SPAN_NAME, FALSE},
+            PARAMETER_RESOLUTION, FALSE},
         {"debug-execution-time", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, EXECUTION_TIME,
             TRUE},
         {"monitoring-execution-time", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
