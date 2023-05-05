@@ -4,20 +4,17 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+package org.mule.runtime.jpms.api;
 
 /**
- * Bootstrap for the Mule CE Container.
+ * No-op implementation of JpmsUtils to use when running on JVM 8.
  * 
- * @moduleGraph
- * @since 4.6
+ * @since 4.5
  */
-module org.mule.boot {
-  
-  requires org.mule.runtime.logging;
-  requires org.mule.runtime.jpms.utils;
+public class JpmsUtils {
 
-  requires commons.cli;
-  // Tanuki wrapper
-  requires wrapper;
+  public static void validateNoBootModuleLayerTweaking() {
+    // nothing to do
+  }
 
 }
