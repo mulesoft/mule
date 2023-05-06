@@ -23,20 +23,21 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class MavenTestUtils {
 
   private static final String POM = "pom";
 
-  public static void installArtifact(File artifactFile, File repositoryLocation) throws IOException {
+  public static Collection<File> installArtifact(File artifactFile, File repositoryLocation) throws IOException {
     String artifactExtension = getExtension(artifactFile.getName());
     MavenPomParser parser = discoverProvider().createMavenPomParserClient(artifactFile.toPath());
     if (POM.equals(artifactExtension)) {
-      installArtifact(artifactFile, repositoryLocation, parser);
+      return installArtifact(artifactFile, repositoryLocation, parser);
     } else {
       File packagedArtifact = packageArtifact(artifactFile, parser.getModel());
-      installArtifact(packagedArtifact, repositoryLocation, parser);
+      return installArtifact(packagedArtifact, repositoryLocation, parser);
     }
   }
 
@@ -54,7 +55,7 @@ public class MavenTestUtils {
     return compressedFile;
   }
 
-  private static void installArtifact(File artifactFile, File repositoryLocation, MavenPomParser parser)
+  private static Collection<File> installArtifact(File artifactFile, File repositoryLocation, MavenPomParser parser)
       throws IOException {
     MavenPomModel pomModel = parser.getModel();
     List<String> artifactLocationInRepo = new ArrayList<>(asList(pomModel.getGroupId().split("\\.")));
@@ -67,11 +68,15 @@ public class MavenTestUtils {
 
     artifactLocationInRepoFile.mkdirs();
 
-    copyFile(artifactFile, new File(pathToArtifactLocationInRepo.toString(), artifactFile.getName()), true);
+    File repoArtifactFile = new File(pathToArtifactLocationInRepo.toString(), artifactFile.getName());
+    copyFile(artifactFile, repoArtifactFile, true);
 
     // Copy the pom without the classifier.
     String pomFileName = artifactFile.getName().replaceFirst("(.*\\.[0-9]*\\.[0-9]*\\.?[0-9]?).*", "$1") + ".pom";
-    copyFile(parser.getModel().getPomFile().get(), new File(pathToArtifactLocationInRepo.toString(), pomFileName), true);
+    File repoPomFile = new File(pathToArtifactLocationInRepo.toString(), pomFileName);
+    copyFile(parser.getModel().getPomFile().get(), repoPomFile, true);
+
+    return asList(repoArtifactFile, repoPomFile);
   }
 
 }

@@ -64,13 +64,17 @@ import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -128,9 +132,19 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Rule
   public ExpectedException expectedException = none();
 
+  private List<File> installedArtifactFiles;
+
   @Before
   public void setUp() throws Exception {
     GlobalConfigLoader.reset();
+    installedArtifactFiles = new ArrayList<>();
+  }
+
+  @After
+  public void tearDown() {
+    installedArtifactFiles
+        .forEach(f -> f.delete());
+    installedArtifactFiles.clear();
   }
 
   @Test
@@ -287,8 +301,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyWithTransitiveDependency() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependency"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependency");
 
@@ -312,11 +326,11 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-2.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependencies"));
+    installArtifactInRepo(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-2.0.0.pom"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependencies");
 
@@ -489,8 +503,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginAsSystemDependencyIsResolved() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependency"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-as-system");
 
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
@@ -551,8 +565,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithSameDependencyWithDifferentClassifier() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/same-dep-diff-classifier");
 
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
@@ -570,10 +584,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginWithSameDependencyWithDifferentClassifier() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies-different-classifier"),
-                    new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependencies-different-classifier"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier");
 
@@ -593,8 +606,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginWithSameDependencyWithDifferentClassifierAsAdditionalDependencies() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier-as-additional");
 
@@ -608,6 +621,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
                         containsString("test-empty-plugin"),
                         containsString("library-1.0.0.jar"),
                         containsString("library-1.0.0-test-jar.jar")));
+  }
+
+  private void installArtifactInRepo(File artifact) throws IOException {
+    installedArtifactFiles.addAll(installArtifact(artifact, new File(repositoryLocation.getValue())));
   }
 
   private void requiredProductValidationExpectedException(String appName) {
