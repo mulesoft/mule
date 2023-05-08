@@ -16,6 +16,8 @@
     </description>
 
     <properties>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+
         <javaModuleName>org.mule.runtime.extensions.xml.support</javaModuleName>
         <activemq.version>5.15.12</activemq.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>

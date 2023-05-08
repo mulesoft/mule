@@ -10,11 +10,14 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.classloaderConnectExtensionPlugin;
-import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
+
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Paths.get;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -30,21 +33,24 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
-import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.weave.v2.el.WeaveServiceProvider;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
 
 /**
  * Contains tests for domain deployment that require a functioning expression language service
@@ -59,6 +65,12 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
   public static void setUpELService() throws IOException {
     testServicesSetup
         .overrideExpressionLanguageService(DomainDeploymentWithELServiceTestCase::getRealExpressionLanguageServiceFile);
+    testServicesSetup.disableExpressionLanguageMetadataService();
+  }
+
+  @AfterClass
+  public static void tearDownELService() {
+    testServicesSetup.reset();
   }
 
   private final DomainFileBuilder domainWithConfigsFileBuilder =
@@ -96,15 +108,23 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
   }
 
   private static File getRealExpressionLanguageServiceFile(File tempFolder) {
-    final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
-    final File defaultServiceJarFile = getResourceFile(weaveJarUrl.getFile(), tempFolder);
+    try {
+      final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
+      String weaveSeriveFileName = Paths.get(weaveJarUrl.toURI()).getFileName().toString();
+      String weaveServiceArtifactId = weaveSeriveFileName.substring(0, weaveSeriveFileName.length() - 4);
 
-    return new ServiceFileBuilder("expressionLanguageService")
-        .withServiceProviderClass("org.mule.weave.v2.el.WeaveServiceProvider")
-        .forContract("org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService")
-        .usingLibrary(defaultServiceJarFile.getAbsolutePath())
-        .unpack(true)
-        .getArtifactFile();
+      // Unpack the service because java doesn't allow to create a classloader with jars within a zip out of the box.
+      File serviceExplodedDir;
+      serviceExplodedDir = createTempDirectory(weaveServiceArtifactId).toFile();
+
+      URL serviceBundleUrl = weaveJarUrl;
+
+      unzip(get(serviceBundleUrl.toURI()).toFile(), serviceExplodedDir);
+      return serviceExplodedDir;
+
+    } catch (IOException | URISyntaxException e) {
+      throw new IllegalStateException("Couldn't prepare RealExpressionLanguageService.", e);
+    }
   }
 
   @Test

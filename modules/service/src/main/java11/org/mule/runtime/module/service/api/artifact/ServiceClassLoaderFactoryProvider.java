@@ -12,10 +12,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-
-import org.mule.runtime.api.util.MuleSystemProperties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

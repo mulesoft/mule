@@ -239,7 +239,7 @@ public class CompilerUtils {
      * @return
      */
     protected File compressGeneratedFiles(File targetFolder, String jarName) {
-      checkArgument(targetFolder != null, "targetFolder cannot be byll");
+      checkArgument(targetFolder != null, "targetFolder cannot be null");
       checkArgument(!StringUtils.isEmpty(jarName), "jar name cannot be empty");
 
       Collection<File> files = listFiles(targetFolder, TRUE, TRUE);

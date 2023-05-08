@@ -16,6 +16,8 @@
     </description>
 
     <properties>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <jsoup.version>1.15.3</jsoup.version>
