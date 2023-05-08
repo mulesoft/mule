@@ -16,8 +16,7 @@
     </description>
 
     <properties>
-        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
-        <surefire.args>${surefire.args.base} --add-opens java.base/java.lang=ALL-UNNAMED -XX:+IgnoreUnrecognizedVMOptions</surefire.args>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.xml.support</javaModuleName>
         <activemq.version>5.15.12</activemq.version>
