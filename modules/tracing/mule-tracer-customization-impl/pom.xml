@@ -12,12 +12,12 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-tracing-parent</artifactId>
-        <version>4.5.0-SNAPSHOT</version>
+        <version>4.5.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-tracer-customization-impl</artifactId>
-    <version>4.5.0-SNAPSHOT</version>
+    <version>4.5.1-SNAPSHOT</version>
     <name>Mule Tracer Exporter Api</name>
     <description>Implementation for setting configuration for tracing levels and overrides</description>
 
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>4.5.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
