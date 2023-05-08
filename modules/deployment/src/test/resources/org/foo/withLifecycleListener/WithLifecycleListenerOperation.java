@@ -17,7 +17,7 @@ public class WithLifecycleListenerOperation {
     private MuleContext muleContext;
 
     public void leak() {
-        // Leaks both the Application's ClassLoader and the Extension's.
+        // Leaks both the execution ClassLoader and the Extension's.
         new LeakingThread(muleContext.getExecutionClassLoader()).start();
         new LeakingThread(this.getClass().getClassLoader()).start();
     }

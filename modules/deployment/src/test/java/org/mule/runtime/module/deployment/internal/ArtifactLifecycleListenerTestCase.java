@@ -18,9 +18,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.deployment.model.api.application.Application;
+import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -45,98 +48,190 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
 
   private static final int PROBER_POLLING_INTERVAL = 100;
   private static final int PROBER_POLLING_TIMEOUT = 5000;
-  private static final String APP_CONFIG_FILE = "app-with-lifecycle-listener-declaration-extension";
-  private static final String APP_NAME = "appWithExtensionPlugin-1.0.0-mule-application";
+  private static final String APP_NAME = "app-with-lifecycle-listener-extension";
+  private static final String DOMAIN_NAME = "domain-with-lifecycle-listener-plugin";
 
   @Rule
   public SystemProperty directoryWatcherChangeCheckInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "5");
 
-  private final TestDeploymentListener deploymentListener;
+  private final TestApplicationDeploymentListener appDeploymentListener;
+  private final TestDomainDeploymentListener domainDeploymentListener;
 
   public ArtifactLifecycleListenerTestCase(boolean parallelDeployment) {
     super(parallelDeployment);
-    this.deploymentListener = new TestDeploymentListener(this, APP_NAME);
+    this.appDeploymentListener = new TestApplicationDeploymentListener(new ApplicationFileBuilder(APP_NAME));
+    this.domainDeploymentListener = new TestDomainDeploymentListener(new DomainFileBuilder(DOMAIN_NAME));
   }
 
   @Test
-  public void lifecycleListenerGetsCalledOnUndeploy() throws Exception {
+  public void whenExtensionIsInAppThenLifecycleListenerGetsCalledOnAppUndeploy() throws Exception {
     // Prepares an application that depends on an extension that declares an ArtifactLifecycleListener
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
-        // Adds a random class to the application's ClassLoader, so we can try loading it during the listener's execution.
-        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+        .dependingOn(withLifecycleListenerPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     // Starts the deployment
     startDeployment();
     triggerDirectoryWatcher();
 
-    assertThat(deploymentListener.isAppDeployed(), is(true));
+    assertThat(appDeploymentListener.isArtifactDeployed(), is(true));
 
     // Executes a flow with an operation that leaks the application's ClassLoader
     executeApplicationFlow("main");
 
     // Undeploys the application
-    assertThat(removeAppAnchorFile(APP_NAME), is(true));
+    assertThat(removeAppAnchorFile(applicationFileBuilder.getId()), is(true));
     triggerDirectoryWatcher();
-    assertThat(deploymentListener.isAppUndeployed(), is(true));
+    assertThat(appDeploymentListener.isArtifactUndeployed(), is(true));
 
     // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
+    assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
+  }
+
+  @Test
+  public void whenExtensionIsInDomainThenLifecycleListenerGetsCalledBothOnDomainAndAppUndeploy() throws Exception {
+    // Prepares a domain that depends on an extension that declares an ArtifactLifecycleListener
+    DomainFileBuilder domainFileBuilder = getDomainDependingOnExtensionWithLifecycleListenerFileBuilder();
+    addPackedDomainFromBuilder(domainFileBuilder);
+
+    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
+        .dependingOn(domainFileBuilder);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    // Starts the deployment
+    startDeployment();
+    triggerDirectoryWatcher();
+
+    assertThat(domainDeploymentListener.isArtifactDeployed(), is(true));
+    assertThat(appDeploymentListener.isArtifactDeployed(), is(true));
+
+    // Executes a flow with an operation that leaks the domain's ClassLoader
+    executeApplicationFlow("main");
+
+    // Undeploys the application
+    assertThat(removeAppAnchorFile(applicationFileBuilder.getId()), is(true));
+    triggerDirectoryWatcher();
+    assertThat(appDeploymentListener.isArtifactUndeployed(), is(true));
+    assertThat(domainDeploymentListener.isArtifactUndeployed(), is(false));
+
+    // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
+    assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
+
+    // Undeploys the domain
+    assertThat(removeDomainAnchorFile(domainFileBuilder.getId()), is(true));
+    triggerDirectoryWatcher();
+    assertThat(domainDeploymentListener.isArtifactUndeployed(), is(true));
+
+    // After some time, the domain's ClassLoader should be collectable, thanks to the extension's LifecycleListener
+    assertClassLoaderIsCollectable(domainDeploymentListener.getPhantomReference());
+  }
+
+  private void assertClassLoaderIsCollectable(PhantomReference<ArtifactClassLoader> classLoaderReference) {
     new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
       clearAllLogs();
       System.gc();
-      assertThat(deploymentListener.getPhantomReference().isEnqueued(), is(true));
+      assertThat(classLoaderReference.isEnqueued(), is(true));
       return true;
     }));
   }
 
-  private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
-    return createExtensionApplicationWithServices(APP_CONFIG_FILE + ".xml", withLifecycleListenerPlugin);
+  private ApplicationFileBuilder getApplicationFileBuilder() {
+    return appDeploymentListener.getBaseFileBuilder()
+        .definedBy("app-with-lifecycle-listener-extension.xml")
+        // Adds a random class to the artifact's ClassLoader, so we can try loading it during the listener's execution.
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
+  }
+
+  private DomainFileBuilder getDomainDependingOnExtensionWithLifecycleListenerFileBuilder() {
+    return domainDeploymentListener.getBaseFileBuilder()
+        .definedBy("empty-domain-config.xml")
+        .dependingOn(withLifecycleListenerPlugin)
+        // Adds a random class to the artifact's ClassLoader, so we can try loading it during the listener's execution.
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   }
 
   @Override
   protected void configureDeploymentService() {
-    deploymentService.addDeploymentListener(deploymentListener);
+    deploymentService.addDeploymentListener(appDeploymentListener);
+    deploymentService.addDomainDeploymentListener(domainDeploymentListener);
   }
 
-  private static class TestDeploymentListener implements DeploymentListener {
+  private abstract static class TestArtifactDeploymentListener implements DeploymentListener {
 
     private PhantomReference<ArtifactClassLoader> phantomReference;
 
-    private boolean appDeployed;
+    private boolean artifactDeployed;
 
-    private boolean appUndeployed;
+    private boolean artifactUndeployed;
 
-    private final String appName;
+    protected final DeployableFileBuilder<?> deployableFileBuilder;
 
-    private final ArtifactLifecycleListenerTestCase deploymentTestCase;
-
-    TestDeploymentListener(ArtifactLifecycleListenerTestCase deploymentTestCase, String appName) {
-      this.deploymentTestCase = deploymentTestCase;
-      this.appName = appName;
+    TestArtifactDeploymentListener(DeployableFileBuilder<?> baseFileBuilder) {
+      this.deployableFileBuilder = baseFileBuilder;
     }
 
     @Override
     public void onDeploymentSuccess(String artifactName) {
-      Application app = deploymentTestCase.findApp(appName, 1);
-      appDeployed = true;
-      phantomReference = new PhantomReference<>(app.getArtifactClassLoader(), new ReferenceQueue<>());
-    };
+      if (deployableFileBuilder.getId().equals(artifactName)) {
+        artifactDeployed = true;
+        phantomReference =
+            new PhantomReference<>(getArtifactClassLoader(deployableFileBuilder.getId()), new ReferenceQueue<>());
+      }
+    }
 
     @Override
     public void onUndeploymentSuccess(String artifactName) {
-      appUndeployed = true;
+      if (deployableFileBuilder.getId().equals(artifactName)) {
+        artifactUndeployed = true;
+      }
     }
 
     public PhantomReference<ArtifactClassLoader> getPhantomReference() {
       return phantomReference;
     }
 
-    public boolean isAppDeployed() {
-      return appDeployed;
+    public boolean isArtifactDeployed() {
+      return artifactDeployed;
     }
 
-    public boolean isAppUndeployed() {
-      return appUndeployed;
+    public boolean isArtifactUndeployed() {
+      return artifactUndeployed;
     }
-  };
+
+    protected abstract ArtifactClassLoader getArtifactClassLoader(String artifactName);
+  }
+
+  private class TestApplicationDeploymentListener extends TestArtifactDeploymentListener {
+
+    TestApplicationDeploymentListener(ApplicationFileBuilder baseFileBuilder) {
+      super(baseFileBuilder);
+    }
+
+    @Override
+    protected ArtifactClassLoader getArtifactClassLoader(String appName) {
+      Application app = findApp(appName, 1);
+      return app.getArtifactClassLoader();
+    }
+
+    public ApplicationFileBuilder getBaseFileBuilder() {
+      return (ApplicationFileBuilder) deployableFileBuilder;
+    }
+  }
+
+  private class TestDomainDeploymentListener extends TestArtifactDeploymentListener {
+
+    TestDomainDeploymentListener(DomainFileBuilder baseFileBuilder) {
+      super(baseFileBuilder);
+    }
+
+    @Override
+    protected ArtifactClassLoader getArtifactClassLoader(String domainName) {
+      Domain domain = findADomain(domainName);
+      return domain.getArtifactClassLoader();
+    }
+
+    public DomainFileBuilder getBaseFileBuilder() {
+      return (DomainFileBuilder) deployableFileBuilder;
+    }
+  }
 }
