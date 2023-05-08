@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 /**
  * Creates {@link ArtifactClassLoader} for service descriptors.
  */
-public class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
+class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
   private static final String SERVICE_MODULE_NAME_PREFIX = "org.mule.service.";
   private static final String SCHEDULER_SERVICE_MODULE_NAME = "org.mule.service.scheduler";
