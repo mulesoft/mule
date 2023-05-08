@@ -167,7 +167,7 @@
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.5.1-SNAPSHOT</muleHttpPolicyApiVersion>
         <muleMavenClientApi>1.7.1-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.7.0-SNAPSHOT</muleMavenClientImpl>
+        <muleMavenClientImpl>1.7.1-SNAPSHOT</muleMavenClientImpl>
         <muleMavenClientTest>1.7.1-SNAPSHOT</muleMavenClientTest>
         <mulePolicyApiVersion>1.5.1-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.5.1-SNAPSHOT</muleApiVersion>
