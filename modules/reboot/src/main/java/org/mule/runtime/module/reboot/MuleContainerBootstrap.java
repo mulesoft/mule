@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.reboot;
 
-import static org.mule.runtime.jpms.api.JpmsUtils.validateNoBootModuleLayerTweaking;
-
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
 
@@ -36,8 +34,6 @@ public class MuleContainerBootstrap {
   public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
   public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
 
-  public static final String MULE_SKIP_MODULE_TWEAKING_VALIDATION = "mule.module.tweaking.validation.skip";
-
   private static final String MULE_MODULE_REBOOT_POM_FILE_PATH =
       "META-INF/maven/org.mule.module/mule-module-reboot/pom.properties";
 
@@ -52,16 +48,6 @@ public class MuleContainerBootstrap {
     // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
     // the initialization phase of your application
     SLF4JBridgeHandler.install();
-
-    if (Boolean.getBoolean(MULE_SKIP_MODULE_TWEAKING_VALIDATION)) {
-      System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      System.out.println("!! WARNING!");
-      System.out.println("!! '" + MULE_SKIP_MODULE_TWEAKING_VALIDATION
-          + "' property MUST ONLY be used temporarily in development environments.");
-      System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    } else {
-      validateNoBootModuleLayerTweaking();
-    }
 
     // Parse any command line options based on the list above.
     CommandLine commandLine = parseCommandLine(args);

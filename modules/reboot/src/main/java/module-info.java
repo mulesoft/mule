@@ -14,7 +14,6 @@
 module org.mule.boot {
   
   requires org.mule.runtime.logging;
-  requires org.mule.runtime.jpms.utils;
 
   requires commons.cli;
   // Tanuki wrapper

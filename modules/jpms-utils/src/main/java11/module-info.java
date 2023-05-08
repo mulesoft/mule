@@ -13,8 +13,6 @@
  */
 module org.mule.runtime.jpms.utils {
 
-  requires java.management;
-
   exports org.mule.runtime.jpms.api;
 
 }

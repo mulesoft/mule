@@ -43,7 +43,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -66,11 +65,6 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
     testServicesSetup
         .overrideExpressionLanguageService(DomainDeploymentWithELServiceTestCase::getRealExpressionLanguageServiceFile);
     testServicesSetup.disableExpressionLanguageMetadataService();
-  }
-
-  @AfterClass
-  public static void tearDownELService() {
-    testServicesSetup.reset();
   }
 
   private final DomainFileBuilder domainWithConfigsFileBuilder =

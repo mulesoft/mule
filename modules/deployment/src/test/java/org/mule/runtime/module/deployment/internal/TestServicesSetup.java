@@ -140,11 +140,4 @@ public class TestServicesSetup extends ExternalResource {
       expressionLanguageMetadataService = null;
     }
   }
-
-  public void reset() {
-    schedulerService = null;
-    expressionLanguageService = null;
-    expressionLanguageMetadataService = null;
-    expressionLanguageMetadataServiceDisabled = false;
-  }
 }

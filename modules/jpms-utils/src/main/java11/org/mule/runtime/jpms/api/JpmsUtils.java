@@ -7,58 +7,10 @@
 package org.mule.runtime.jpms.api;
 
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
-import static java.util.stream.Collectors.toList;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.util.List;
 
-/**
- * Utilities related to how Mule uses the Java Module system.
- * 
- * @since 4.5
- */
 public class JpmsUtils {
-
-  private static final String REQUIRED_ADD_MODULES =
-      "--add-modules="
-          + "org.mule.runtime.jpms.utils,"
-          + "java.scripting,"
-          + "java.sql,"
-          + "com.fasterxml.jackson.core";
-  private static final String REQUIRED_CE_BOOT_ADD_EXPORTS =
-      "--add-exports=org.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
-  private static final String REQUIRED_BOOT_ADD_EXPORTS =
-      "--add-exports=com.mulesoft.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
-  private static final String REQUIRED_ADD_OPENS =
-      "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
-
-  /**
-   * Validates that no module tweaking jvm options (i.e: {@code --add-opens}, {@code --add-exports}, ...) have been provided in
-   * addition to the minimal required by the Mule Runtime to function properly.
-   */
-  public static void validateNoBootModuleLayerTweaking() {
-    RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
-    List<String> arguments = runtimeMxBean.getInputArguments();
-
-    List<String> illegalArguments = arguments
-        .stream()
-        .filter(arg -> arg.startsWith("--add-exports")
-            || arg.startsWith("--add-opens")
-            || arg.startsWith("--add-modules")
-            || arg.startsWith("--add-reads")
-            || arg.startsWith("--patch-module"))
-        .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
-            || arg.equals(REQUIRED_CE_BOOT_ADD_EXPORTS)
-            || arg.equals(REQUIRED_BOOT_ADD_EXPORTS)
-            || arg.equals(REQUIRED_ADD_OPENS)))
-        .collect(toList());
-
-    if (!illegalArguments.isEmpty()) {
-      throw new IllegalArgumentException("Invalid module tweaking options passed to the JVM running the Mule Runtime: "
-          + illegalArguments);
-    }
-  }
 
   /**
    * 
