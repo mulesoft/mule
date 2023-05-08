@@ -9,13 +9,12 @@ package org.mule.runtime.metrics.impl.instrument;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
-import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.impl.instrument.builder.LongCounterBuilderWithInstrumentRepository;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 
 /**
- * An implementation of {@link LongUpDownCounter}.
+ * An implementation of {@link LongCounter}.
  */
 public class DefaultLongCounter implements LongCounter {
 
