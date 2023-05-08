@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
-import static org.mule.runtime.metrics.api.instrument.InstrumentType.LONG_COUNTER;
-
 /**
  * A counter for register long measurements, only incremental.
  */
@@ -29,9 +27,4 @@ public interface LongCounter extends Instrument {
    * @return the unit for this measurement.
    */
   String getUnit();
-
-  @Override
-  default InstrumentType getInstrumentType() {
-    return LONG_COUNTER;
-  }
 }

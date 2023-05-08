@@ -88,7 +88,7 @@ public class DefaultLongCounter implements LongCounter {
     @Override
     public LongCounter build() {
       return ofNullable(instrumentRepository)
-          .map(repository -> (LongCounter) repository.register(name, name -> doBuild(name, description, unit)))
+          .map(repository -> (LongCounter) repository.create(name, name -> doBuild(name, description, unit)))
           .orElse(doBuild(name, description, unit));
     }
 

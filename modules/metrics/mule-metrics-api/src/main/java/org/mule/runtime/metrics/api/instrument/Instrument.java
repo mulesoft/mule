@@ -20,9 +20,4 @@ public interface Instrument {
    * @return the description of the instrument.
    */
   String getDescription();
-
-  /**
-   * @return the {@link InstrumentType}
-   */
-  InstrumentType getInstrumentType();
 }

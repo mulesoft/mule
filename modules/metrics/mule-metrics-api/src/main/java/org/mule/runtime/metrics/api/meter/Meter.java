@@ -35,7 +35,7 @@ public interface Meter {
   LongUpDownCounterBuilder upDownCounterBuilder(String name);
 
   /**
-   * @param name the name of the instrumen
+   * @param name the name of the instrument.
    * @return the counter builder
    */
   LongCounterBuilder counterBuilder(String name);

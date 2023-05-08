@@ -92,8 +92,8 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     @Override
     public LongUpDownCounter build() {
       return ofNullable(instrumentRepository)
-          .map(repository -> (LongUpDownCounter) repository.register(name,
-                                                                     name -> doBuild(name, description, unit, initialValue)))
+          .map(repository -> (LongUpDownCounter) repository.create(name,
+                                                                   name -> doBuild(name, description, unit, initialValue)))
           .orElse(doBuild(name, description, unit, initialValue));
     }
 

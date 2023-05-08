@@ -8,7 +8,6 @@ package org.mule.runtime.metrics.impl.meter.repository;
 
 import org.mule.runtime.metrics.api.meter.Meter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -24,7 +23,7 @@ public class MeterRepository {
    * @param name            the name of the meter
    * @param builderFunction the builder function to create {@link Meter} if not present.
    */
-  public Meter register(String name, Function<String, Meter> builderFunction) {
+  public Meter create(String name, Function<String, Meter> builderFunction) {
     return meterMap.computeIfAbsent(name, builderFunction);
   }
 

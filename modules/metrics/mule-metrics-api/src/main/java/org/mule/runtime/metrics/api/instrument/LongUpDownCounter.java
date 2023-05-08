@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
-import static org.mule.runtime.metrics.api.instrument.InstrumentType.LONG_UP_DOWN_COUNTER;
-
 /**
  * A counter for register long measurements.
  */
@@ -29,10 +27,5 @@ public interface LongUpDownCounter extends Instrument {
    * @return the unit for this measurement.
    */
   String getUnit();
-
-  @Override
-  default InstrumentType getInstrumentType() {
-    return LONG_UP_DOWN_COUNTER;
-  }
 
 }

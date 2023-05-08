@@ -73,7 +73,7 @@ public class DefaultMeter implements Meter {
 
     @Override
     public Meter build() {
-      return ofNullable(meterRepository).map(repository -> repository.register(meterName, name -> doBuild(name, description)))
+      return ofNullable(meterRepository).map(repository -> repository.create(meterName, name -> doBuild(name, description)))
           .orElse(doBuild(meterName, description));
     }
 

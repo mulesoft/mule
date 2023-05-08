@@ -59,7 +59,7 @@ public class DefaultLongCounterTestCase {
     assertThat(longCounter.getName(), equalTo(instrumentName));
     assertThat(longCounter.getDescription(), equalTo(instrumentDescription));
     assertThat(longCounter.getUnit(), equalTo(unit));
-    verify(repository).register(eq(instrumentName), any());
+    verify(repository).create(eq(instrumentName), any());
 
     // Verify counter.
     verifyCounterValues(longCounter);

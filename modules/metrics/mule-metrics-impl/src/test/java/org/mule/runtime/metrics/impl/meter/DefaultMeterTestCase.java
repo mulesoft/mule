@@ -53,7 +53,7 @@ public class DefaultMeterTestCase {
     Meter meter = DefaultMeter.builder(meterName).withMeterRepository(meterRepository).build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), isEmptyOrNullString());
-    verify(meterRepository).register(eq(meterName), any());
+    verify(meterRepository).create(eq(meterName), any());
   }
 
   @Test
@@ -64,7 +64,7 @@ public class DefaultMeterTestCase {
     Meter meter = DefaultMeter.builder(meterName).withMeterRepository(meterRepository).withDescription(testEmptyString).build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), equalTo(testEmptyString));
-    verify(meterRepository).register(eq(meterName), any());
+    verify(meterRepository).create(eq(meterName), any());
   }
 
 }

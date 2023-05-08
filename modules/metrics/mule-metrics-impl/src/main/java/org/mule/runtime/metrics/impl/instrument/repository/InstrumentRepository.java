@@ -23,7 +23,7 @@ public class InstrumentRepository {
    * @param name            the name of the {@link Instrument}
    * @param builderFunction the builder function to create {@link Instrument} if not present.
    */
-  public Instrument register(String name, Function<String, Instrument> builderFunction) {
+  public Instrument create(String name, Function<String, Instrument> builderFunction) {
     return instrumentMap.computeIfAbsent(name, builderFunction);
   }
 }
