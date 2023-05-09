@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.customization.impl.export;
 
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
@@ -19,7 +20,6 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.DebugInitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.OverviewInitialExportInfoProvider;
@@ -38,16 +38,14 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class LevelInitialExportInfoProviderTestCase {
 
-  public static final String HTTP_CONNECTOR_COMPONENT_NAMESPACE = "http";
-  public static final String HTTP_REQUEST_COMPONENT_NAME = "request";
-  public static final String MULE_COMPONENT_NAMESPACE = "mule";
-  public static final String DUMMY_COMPONENT_NAME = "dummy";
-  public static final String CONNECTION_CREATION_NAME = "connection-creation";
+  private static final String HTTP_CONNECTOR_COMPONENT_NAMESPACE = "http";
+  private static final String HTTP_REQUEST_COMPONENT_NAME = "request";
+  private static final String MULE_COMPONENT_NAMESPACE = "mule";
+  private static final String DUMMY_COMPONENT_NAME = "dummy";
+  private static final String GET_CONNECTION = "get-connection";
+  public static final String PARAMETER_RESOLUTION = "parameter-resolution";
 
-  public static final String PARAMETER_RESOLUTION_NAME = "parameter-resolution";
-
-  public static final String EXECUTION_TIME = "execution-time";
-  private final String testName;
+  private static final String EXECUTION_TIME = "execution-time";
   private final InitialExportInfoProvider initialExportInfoProvider;
   private final String componentNamespace;
   private final String componentName;
@@ -68,18 +66,19 @@ public class LevelInitialExportInfoProviderTestCase {
             DUMMY_COMPONENT_NAME, TRUE},
         {"overview-dummy", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
             DUMMY_COMPONENT_NAME, FALSE},
-        {"debug-connection-creation", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, CONNECTION_CREATION_NAME,
+        {"debug-get-connection", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, GET_CONNECTION,
             TRUE},
-        {"monitoring-connection-creation", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
-            CONNECTION_CREATION_NAME, FALSE},
-        {"overview-connection-creation", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
-            CONNECTION_CREATION_NAME, FALSE},
-        {"debug-parameter-resolution", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, PARAMETER_RESOLUTION_NAME,
+        {"monitoring-get-connection", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
+            GET_CONNECTION, FALSE},
+        {"overview-get-connection", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
+            GET_CONNECTION, FALSE},
+        {"debug-parameter-resolution", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
+            PARAMETER_RESOLUTION,
             TRUE},
         {"monitoring-parameter-resolution", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
-            PARAMETER_RESOLUTION_NAME, FALSE},
+            PARAMETER_RESOLUTION, FALSE},
         {"overview-parameter-resolution", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
-            PARAMETER_RESOLUTION_NAME, FALSE},
+            PARAMETER_RESOLUTION, FALSE},
         {"debug-execution-time", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, EXECUTION_TIME,
             TRUE},
         {"monitoring-execution-time", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
@@ -91,16 +90,14 @@ public class LevelInitialExportInfoProviderTestCase {
   public LevelInitialExportInfoProviderTestCase(String testName, InitialExportInfoProvider initialExportInfoProvider,
                                                 String componentNamespace, String componentName,
                                                 Boolean expectedExportableResult) {
-    this.testName = testName;
     this.initialExportInfoProvider = initialExportInfoProvider;
     this.componentNamespace = componentNamespace;
     this.componentName = componentName;
     this.expectedExportableResult = expectedExportableResult;
-
   }
 
   @Test
-  public void tetComponent() {
+  public void testComponent() {
     Component component = mock(Component.class);
     ComponentIdentifier identifier = mock(ComponentIdentifier.class);
     when(component.getIdentifier()).thenReturn(identifier);

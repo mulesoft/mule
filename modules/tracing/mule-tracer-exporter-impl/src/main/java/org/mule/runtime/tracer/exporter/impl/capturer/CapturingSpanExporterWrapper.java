@@ -138,7 +138,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       public List<CapturedEventData> getEvents() {
         return spanData.getEvents().stream().map(
-                                                 OpenTelemetryEventDataWrapper::new)
+                                                 OpenTelemetryCapturedEventDataWrapper::new)
             .collect(Collectors.toList());
       }
 
@@ -182,11 +182,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
     /**
      * Allows capturing the Open Telemetry Span events.
      */
-    private static final class OpenTelemetryEventDataWrapper implements CapturedEventData {
+    private static final class OpenTelemetryCapturedEventDataWrapper implements CapturedEventData {
 
       private final EventData eventData;
 
-      public OpenTelemetryEventDataWrapper(EventData eventData) {
+      public OpenTelemetryCapturedEventDataWrapper(EventData eventData) {
         this.eventData = eventData;
       }
 

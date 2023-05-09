@@ -43,6 +43,7 @@ import java.util.function.Supplier;
  */
 public interface EventTracer<T extends Event> {
 
+  // TODO: W-13057253: Refactor in order to provide Component related sugars.
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link Event}.
    *

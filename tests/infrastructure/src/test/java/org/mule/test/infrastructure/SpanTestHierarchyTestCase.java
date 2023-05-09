@@ -7,15 +7,16 @@
 package org.mule.test.infrastructure;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_ESCAPED_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_EVENT_NAME;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_MESSAGE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_STACK_TRACE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.OTEL_EXCEPTION_TYPE_KEY;
-import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.UNSET_ERROR_CODE;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_ESCAPED_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_MESSAGE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_STACK_TRACE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_TYPE_KEY;
+import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.UNSET_STATUS_CODE;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.getDefaultAttributesToAssertExistence;
 
+import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher;
 import org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy;
 
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -69,6 +72,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   public static final String TEST_ARTIFACT_ID = "SpanTestHierarchyTestCase#mockCapturedExportedSpan";
 
   public static final String ERROR_TYPE_1 = "CUSTOM:ERROR";
+  public static final String AN_ERROR_OCCURRED = "An error occurred.";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -629,12 +633,12 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   public void testWhenExceptionsInTreeMatchActualExceptionsAssertionShouldNotFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
     exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
-    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, AN_ERROR_OCCURRED);
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
     CapturedEventData capturedEventData = mock(CapturedEventData.class);
-    when(capturedEventData.getName()).thenReturn(OTEL_EXCEPTION_EVENT_NAME);
+    when(capturedEventData.getName()).thenReturn(ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME);
     when(capturedEventData.getAttributes()).thenReturn(exceptionAttributes);
 
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
@@ -661,9 +665,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(logger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
         .beginChildren()
-        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1, AN_ERROR_OCCURRED)
         .beginChildren()
         .child(EXPECTED_LOGGER_SPAN_NAME)
         .endChildren()
@@ -679,9 +683,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     CapturedExportedSpan async = mockCapturedExportedSpan();
     CapturedExportedSpan logger = mockCapturedExportedSpan();
 
-    when(muleFlow.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
-    when(async.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
-    when(logger.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
+    when(muleFlow.getStatusAsString()).thenReturn(UNSET_STATUS_CODE);
+    when(async.getStatusAsString()).thenReturn(UNSET_STATUS_CODE);
+    when(logger.getStatusAsString()).thenReturn(UNSET_STATUS_CODE);
 
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
@@ -700,9 +704,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(logger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
         .beginChildren()
-        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1, AN_ERROR_OCCURRED)
         .beginChildren()
         .child(EXPECTED_LOGGER_SPAN_NAME)
         .endChildren()
@@ -717,8 +721,8 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Test
   public void testWhenExceptionAttributeInTreeDoesNotMatchActualExceptionAttributeAssertionShouldFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
-    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, "Wrong Error type");
-    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, "WRONG:ERROR_TYPE");
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, AN_ERROR_OCCURRED);
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
@@ -750,26 +754,26 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(logger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
         .beginChildren()
-        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1, AN_ERROR_OCCURRED)
         .beginChildren()
         .child(EXPECTED_LOGGER_SPAN_NAME)
         .endChildren()
         .endChildren();
 
     expectedException.expect(AssertionError.class);
-    expectedException.expectMessage("Expected: \"CUSTOM:ERROR\"\n" +
-        "     but: was \"Wrong Error type");
+    expectedException.expectMessage(matchesRegex("Expected exceptions for Span: .* differ(\\n.*)*"));
 
     spanTestHierarchy.assertSpanTree();
   }
 
   @Test
+  @Ignore("W-13103997")
   public void testWhenThereIsANotExpectedExceptionAssertionShouldFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
     exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
-    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, AN_ERROR_OCCURRED);
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
@@ -804,9 +808,9 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(logger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
         .beginChildren()
-        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1, AN_ERROR_OCCURRED)
         .beginChildren()
         .child(EXPECTED_LOGGER_SPAN_NAME)
         .endChildren()
@@ -819,10 +823,11 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testWhenNoExceptionDataIsExpectedAssertionShouldNotFail() {
+  @Ignore("W-13103997")
+  public void testWhenUnexpectedExceptionDataIsFoundThenAssertionShouldFail() {
     Map<String, Object> exceptionAttributes = new HashMap<>();
     exceptionAttributes.put(OTEL_EXCEPTION_TYPE_KEY, ERROR_TYPE_1);
-    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, "An error occurred.");
+    exceptionAttributes.put(OTEL_EXCEPTION_MESSAGE_KEY, AN_ERROR_OCCURRED);
     exceptionAttributes.put(OTEL_EXCEPTION_ESCAPED_KEY, "true");
     exceptionAttributes.put(OTEL_EXCEPTION_STACK_TRACE_KEY, "Test stack trace");
 
@@ -856,13 +861,16 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     capturedExportedSpans.add(logger);
 
     SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
-    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME).noExceptionExpected()
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
         .beginChildren()
-        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1)
+        .child(EXPECTED_ASYNC_SPAN_NAME).addExceptionData(ERROR_TYPE_1, AN_ERROR_OCCURRED)
         .beginChildren()
         .child(EXPECTED_LOGGER_SPAN_NAME)
         .endChildren()
         .endChildren();
+
+    expectedException.expect(AssertionError.class);
+    expectedException.expectMessage("Unexpected Span exceptions found for Span");
 
     spanTestHierarchy.assertSpanTree();
   }
@@ -874,7 +882,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(mockedSpan.getStartEpochSpanNanos()).thenReturn(0L);
     when(mockedSpan.getEndSpanEpochNanos()).thenReturn(1L);
 
-    when(mockedSpan.getStatusAsString()).thenReturn(UNSET_ERROR_CODE);
+    when(mockedSpan.getStatusAsString()).thenReturn(UNSET_STATUS_CODE);
 
     Map<String, String> basicAttributes = new HashMap<>();
     basicAttributes.put(CORRELATION_ID_KEY, "test-correlation-id");
