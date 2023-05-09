@@ -8,11 +8,13 @@ package org.mule.runtime.oauth.api;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
+import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
+import org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
-import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 
 import java.util.Map;

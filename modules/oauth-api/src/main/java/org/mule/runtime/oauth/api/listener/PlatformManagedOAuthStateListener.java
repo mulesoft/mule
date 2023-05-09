@@ -8,7 +8,8 @@ package org.mule.runtime.oauth.api.listener;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.listener.OAuthStateListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 /**
  * Allows to get notified about certain events related to Platform Managed OAuth tokens

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.oauth.api.state;
 
-import static org.mule.runtime.oauth.api.state.DancerState.HAS_TOKEN;
-import static org.mule.runtime.oauth.api.state.DancerState.NO_TOKEN;
-import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState.createRefreshOAuthContextLock;
+import static org.mule.oauth.client.api.state.DancerState.HAS_TOKEN;
+import static org.mule.oauth.client.api.state.DancerState.NO_TOKEN;
+import static org.mule.oauth.client.api.state.ResourceOwnerOAuthContextWithRefreshState.createRefreshOAuthContextLock;
 
+import org.mule.oauth.client.api.state.DancerState;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContextWithRefreshState;
 import org.mule.runtime.api.lock.LockFactory;
 
 import java.io.Serializable;

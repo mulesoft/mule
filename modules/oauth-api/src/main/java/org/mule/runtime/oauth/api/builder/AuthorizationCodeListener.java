@@ -13,6 +13,6 @@ package org.mule.runtime.oauth.api.builder;
  * @deprecated since 4.2.2. Use {@link org.mule.runtime.oauth.api.listener.AuthorizationCodeListener} instead
  */
 @Deprecated
-public interface AuthorizationCodeListener extends org.mule.runtime.oauth.api.listener.AuthorizationCodeListener {
+public interface AuthorizationCodeListener extends org.mule.oauth.client.api.listener.AuthorizationCodeListener {
 
 }

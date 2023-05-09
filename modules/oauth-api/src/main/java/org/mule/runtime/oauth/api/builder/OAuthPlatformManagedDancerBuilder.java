@@ -8,6 +8,7 @@ package org.mule.runtime.oauth.api.builder;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
+import org.mule.oauth.client.api.builder.OAuthDancerBuilder;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
 
