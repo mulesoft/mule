@@ -18,6 +18,7 @@ import static java.sql.DriverManager.getDrivers;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -45,11 +46,14 @@ import org.slf4j.LoggerFactory;
  * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has to use
  * {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
  * <p>
- * <p/>
  * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
  * class must be loaded by each artifact class loader that is being disposed. So, it cannot contain any of the prefixes that force
  * a class to be loaded from the container.
+ *
+ * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
+ *             the {@link Driver SQL driver}. We still keep it to support legacy extensions.
  */
+@Deprecated
 public class JdbcResourceReleaser implements ResourceReleaser {
 
   /*

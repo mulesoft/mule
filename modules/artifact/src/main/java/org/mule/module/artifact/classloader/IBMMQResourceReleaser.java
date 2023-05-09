@@ -16,6 +16,8 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
+
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -35,7 +37,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A Utility class for releasing all the known references that may lead to a ClassLoader leak.
+ *
+ * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
+ *             the IBM MQ driver. We still keep it to support legacy extensions.
  */
+@Deprecated
 public class IBMMQResourceReleaser implements ResourceReleaser {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IBMMQResourceReleaser.class);

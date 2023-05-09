@@ -9,6 +9,7 @@ package org.mule.module.artifact.classloader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,7 +29,11 @@ import org.slf4j.LoggerFactory;
  * a class to be loaded from the container.
  *
  * @since 4.3, 4.2.3
+ * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
+ *             dynamic languages which may be retaining {@link ClassLoader} references through {@link ClassValue}s (e.g.: Scala).
+ *             We still keep it to support legacy extensions.
  */
+@Deprecated
 public class ScalaClassValueReleaser implements ResourceReleaser {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ScalaClassValueReleaser.class);

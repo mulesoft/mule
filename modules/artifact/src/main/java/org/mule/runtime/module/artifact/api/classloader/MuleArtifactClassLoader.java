@@ -15,10 +15,13 @@ import static java.lang.System.identityHashCode;
 import static java.lang.reflect.Modifier.isAbstract;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
+import org.mule.module.artifact.classloader.AwsIdleConnectionReaperResourceReleaser;
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
@@ -94,6 +97,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
                                                                             + "-?" + NO_SPACES + "?"
                                                                             // type
                                                                             + "\\." + NO_SPACES);
+  private static final boolean IS_JAVA_VERSION_AT_MOST_11 = isJavaVersionAtMost(JAVA_11);
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
@@ -106,7 +110,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private volatile boolean shouldReleaseIbmMQResources = false;
   private volatile boolean shouldReleaseActiveMQReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
-  private final ResourceReleaser scalaClassValueReleaserInstance;
   private final ResourceReleaser mvelClassLoaderReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
@@ -129,7 +132,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
     this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
-    this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
     this.mvelClassLoaderReleaserInstance = new MvelClassLoaderReleaser(this);
   }
 
@@ -307,44 +309,45 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     });
     descriptorMapping.clear();
 
-    try {
-      clearReferences();
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
+    invokeCoreResourceReleasers();
 
-    try {
-      if (shouldReleaseJdbcReferences) {
-        createResourceReleaserInstance().release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
-
-    try {
-      if (shouldReleaseIbmMQResources) {
-        new IBMMQResourceReleaser(this).release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
-
-    try {
-      if (shouldReleaseActiveMQReferences) {
-        new ActiveMQResourceReleaser(this).release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
+    // When running on Java 17, the resource releaser logic from the Mule Runtime will not be used.
+    // The resource releasing responsibility will be delegated to each extension instead.
+    if (IS_JAVA_VERSION_AT_MOST_11) {
+      invokeLegacyExtensionsResourceReleasers();
     }
 
     super.dispose();
     shutdownListeners();
   }
 
-  private void clearReferences() {
-    classLoaderReferenceReleaser.release();
-    scalaClassValueReleaserInstance.release();
-    mvelClassLoaderReleaserInstance.release();
+  private void invokeCoreResourceReleasers() {
+    try {
+      classLoaderReferenceReleaser.release();
+      mvelClassLoaderReleaserInstance.release();
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
+    }
+  }
+
+  @Deprecated
+  private void invokeLegacyExtensionsResourceReleasers() {
+    try {
+      new AwsIdleConnectionReaperResourceReleaser(this).release();
+      new ScalaClassValueReleaser().release();
+
+      if (shouldReleaseJdbcReferences) {
+        createResourceReleaserInstance().release();
+      }
+      if (shouldReleaseIbmMQResources) {
+        new IBMMQResourceReleaser(this).release();
+      }
+      if (shouldReleaseActiveMQReferences) {
+        new ActiveMQResourceReleaser(this).release();
+      }
+    } catch (Throwable t) {
+      reportPossibleLeak(t, artifactId);
+    }
   }
 
   void reportPossibleLeak(Throwable t, String artifactId) {
