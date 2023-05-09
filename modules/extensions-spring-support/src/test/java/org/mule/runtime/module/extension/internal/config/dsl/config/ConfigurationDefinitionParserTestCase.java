@@ -6,19 +6,21 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.config;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.internal.el.datetime.Date;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -38,8 +40,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import org.mockito.internal.invocation.InterceptedInvocation;
-
 public class ConfigurationDefinitionParserTestCase {
 
   @Test
@@ -48,7 +48,7 @@ public class ConfigurationDefinitionParserTestCase {
 
     Thread thread = Thread.currentThread();
     ClassLoader currentClassLoader = thread.getContextClassLoader();
-    TestClassLoader classLoader = spy(getTestClassLoader());
+    TestClassLoader classLoader = getTestClassLoader();
     setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
       Builder<?> definitionBuilder = new Builder<>().withIdentifier("test").withNamespace("namespace");
@@ -74,13 +74,13 @@ public class ConfigurationDefinitionParserTestCase {
 
     Optional<TypeConverter<?, ?>> typeConverter = componentBuildingDefinitions.get(1).getTypeConverter();
 
-    int testClassLoaderInvocations = mockingDetails(classLoader).getInvocations().size();
+    int testClassLoaderInvocations = classLoader.getInvocations().size();
     typeConverter.get().convert(null);
-    List<?> invocations = ((List<?>) mockingDetails(classLoader).getInvocations());
-    String invocation = ((InterceptedInvocation) invocations.get(invocations.size() - 1)).getArgument(0);
+    List<Pair<String, String>> invocations = classLoader.getInvocations();
+    String invocationArg = (invocations.get(invocations.size() - 1)).getSecond();
 
-    assertThat(testClassLoaderInvocations + 2, is(invocations.size()));
-    assertThat(invocation, is("org.mule.runtime.core.internal.el.datetime.Date"));
+    assertThat(invocations, iterableWithSize(testClassLoaderInvocations + 2));
+    assertThat(invocationArg, is("org.mule.runtime.core.internal.el.datetime.Date"));
   }
 
   private TestClassLoader getTestClassLoader() {
