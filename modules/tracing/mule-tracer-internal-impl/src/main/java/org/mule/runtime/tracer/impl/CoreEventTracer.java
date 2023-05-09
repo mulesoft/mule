@@ -166,7 +166,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
-    boolean enablePutTraceIdAndSpanIdInMdc = featureFlaggingService.isEnabled(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC)`;
+    boolean enablePutTraceIdAndSpanIdInMdc = featureFlaggingService.isEnabled(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC);
     startCommand = getEventContextStartSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE,
                                                        propagateTracingExceptions, eventSpanFactory,
                                                        enablePutTraceIdAndSpanIdInMdc);
