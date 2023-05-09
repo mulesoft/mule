@@ -34,8 +34,6 @@ import org.apache.commons.lang3.function.TriFunction;
 public class EventContextStartSpanCommand extends
     AbstractFailsafeTriCommand<Optional<InternalSpan>, EventContext, InitialSpanInfo, Assertion> {
 
-  private final boolean spanIdAndTraceIdInMdc = false;
-
   private final TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> triFunction;
 
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(Logger logger,
@@ -60,7 +58,7 @@ public class EventContextStartSpanCommand extends
         spanContext.setSpan(newSpan, assertion);
       }
 
-       if (spanIdAndTraceIdInMdc && newSpan != null) {
+      if (spanIdAndTraceIdInMdc && newSpan != null) {
         setCurrentTracingInformationToMdc(newSpan);
       }
 
