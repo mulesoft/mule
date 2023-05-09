@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.function.Consumer;
 

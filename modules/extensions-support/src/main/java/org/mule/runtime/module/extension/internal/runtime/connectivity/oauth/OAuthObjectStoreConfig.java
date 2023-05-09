@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 /**
  * Groups the sum of all the parameters that a user configured in order to specify in which store should the runtime store the

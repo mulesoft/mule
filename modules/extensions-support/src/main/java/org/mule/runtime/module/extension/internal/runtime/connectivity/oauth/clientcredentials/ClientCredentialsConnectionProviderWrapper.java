@@ -22,8 +22,8 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Map;

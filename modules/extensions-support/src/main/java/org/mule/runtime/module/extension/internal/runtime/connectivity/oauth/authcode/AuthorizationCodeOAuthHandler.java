@@ -21,6 +21,12 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 import static reactor.core.publisher.Mono.from;
 
+import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.AuthorizationCodeRequest;
+import org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext;
+import org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,12 +49,6 @@ import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.Immutabl
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
-import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
-import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
-import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;

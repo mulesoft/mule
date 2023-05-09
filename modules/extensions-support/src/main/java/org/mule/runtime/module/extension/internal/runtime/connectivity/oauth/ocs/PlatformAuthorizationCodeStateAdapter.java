@@ -8,10 +8,10 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.oc
 
 import static java.util.Optional.empty;
 
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
