@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.reboot;
 
+import static org.mule.runtime.jpms.api.JpmsUtils.validateNoBootModuleLayerTweaking;
+
 import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
 
@@ -48,6 +50,8 @@ public class MuleContainerBootstrap {
     // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
     // the initialization phase of your application
     SLF4JBridgeHandler.install();
+
+    validateNoBootModuleLayerTweaking();
 
     // Parse any command line options based on the list above.
     CommandLine commandLine = parseCommandLine(args);
