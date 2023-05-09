@@ -34,17 +34,21 @@ import org.apache.commons.lang3.function.TriFunction;
 public class EventContextStartSpanCommand extends
     AbstractFailsafeTriCommand<Optional<InternalSpan>, EventContext, InitialSpanInfo, Assertion> {
 
+  private final boolean spanIdAndTraceIdInMdc = false;
+
   private final TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> triFunction;
 
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(Logger logger,
                                                                                  String errorMessage,
                                                                                  boolean propagateException,
-                                                                                 EventSpanFactory eventSpanFactory) {
-    return new EventContextStartSpanCommand(logger, errorMessage, propagateException, eventSpanFactory);
+                                                                                 EventSpanFactory eventSpanFactory,
+                                                                                 boolean spanIdAndTraceIdInMdc) {
+    return new EventContextStartSpanCommand(logger, errorMessage, propagateException, eventSpanFactory, spanIdAndTraceIdInMdc);
   }
 
   private EventContextStartSpanCommand(Logger logger, String errorMessage, boolean propagateException,
-                                       EventSpanFactory eventSpanFactory) {
+                                       EventSpanFactory eventSpanFactory,
+                                       boolean spanIdAndTraceIdInMdc) {
     super(logger, errorMessage, propagateException, empty());
     this.triFunction = (eventContext, initialSpanInfo, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
@@ -56,7 +60,7 @@ public class EventContextStartSpanCommand extends
         spanContext.setSpan(newSpan, assertion);
       }
 
-      if (newSpan != null) {
+       if (spanIdAndTraceIdInMdc && newSpan != null) {
         setCurrentTracingInformationToMdc(newSpan);
       }
 

@@ -33,11 +33,13 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
 
   public static EventContextEndSpanCommand getEventContextEndSpanCommandFrom(Logger logger,
                                                                              String errorMessage,
-                                                                             boolean propagateException) {
-    return new EventContextEndSpanCommand(logger, errorMessage, propagateException);
+                                                                             boolean propagateException,
+                                                                             boolean putTraceIdAndSpanIdInMdc) {
+    return new EventContextEndSpanCommand(logger, errorMessage, propagateException, putTraceIdAndSpanIdInMdc);
   }
 
-  private EventContextEndSpanCommand(Logger logger, String errorMessage, boolean propagateExceptions) {
+  private EventContextEndSpanCommand(Logger logger, String errorMessage, boolean propagateExceptions,
+                                     boolean traceIdAndSpanIdInMdc) {
     super(logger, errorMessage, propagateExceptions);
     this.consumer = (eventContext, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
@@ -46,13 +48,19 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
         spanContext.endSpan(assertion);
       }
 
-      Optional<InternalSpan> internalSpan = spanContext.getSpan();
-      if (internalSpan.isPresent()) {
-        setCurrentTracingInformationToMdc(internalSpan.get());
-      } else {
-        removeCurrentTracingInformationFromMdc();
+      if (traceIdAndSpanIdInMdc) {
+        resetOrRemoveTraceIdAndSpanIdInMDC(spanContext);
       }
     };
+  }
+
+  private static void resetOrRemoveTraceIdAndSpanIdInMDC(SpanContext spanContext) {
+    Optional<InternalSpan> internalSpan = spanContext.getSpan();
+    if (internalSpan.isPresent()) {
+      setCurrentTracingInformationToMdc(internalSpan.get());
+    } else {
+      removeCurrentTracingInformationFromMdc();
+    }
   }
 
   @Override
