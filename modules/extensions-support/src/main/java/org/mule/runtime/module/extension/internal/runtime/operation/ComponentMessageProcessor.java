@@ -131,8 +131,12 @@ import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.TargetReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.tracing.TracedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.util.Collection;
@@ -150,7 +154,6 @@ import javax.inject.Inject;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-import org.togglz.core.user.FeatureUser;
 import reactor.core.publisher.Flux;
 import reactor.util.context.ContextView;
 
@@ -185,7 +188,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
   protected final ExtensionModel extensionModel;
-  protected final ResolverSet resolverSet;
+  protected ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
@@ -219,6 +222,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ProfilingService profilingService;
 
   @Inject
+  private EventTracer<CoreEvent> coreEventEventTracer;
+
+  @Inject
+  InitialSpanInfoProvider initialSpanInfoProvider;
+
+  @Inject
   private FeatureFlaggingService featureFlaggingService;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
@@ -242,7 +251,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
-  private FeatureUser featureUser;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -491,7 +499,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             operationContext = operationExecutionParams.getExecutionContextAdapter();
             operationContext.changeEvent(event);
           } else {
-            // there was an error propagated before <execute-next> and the operation execution parameters don't exists yet.
+            // There was an error propagated before <execute-next> and the operation execution parameters don't exist yet.
             operationContext = createExecutionContext(event);
           }
 
@@ -526,15 +534,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     };
   }
 
-  // TODO MULE-18482: decouple policies and operation logic
+  // TODO MULE-18482: Decouple policies and operation logic
   private boolean isTargetWithPolicies(CoreEvent event) {
     return !from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
     if (shouldUsePrecalculatedContext(event)) {
-      // If the event already contains an execution context, use that one.
-      // Only for interceptable components!
+      // Intercepted components optimization: If the event already contains an execution context, use that one.
+      // (the context is already calculated as part of the interception)
       return getPrecalculatedContext(event).getConfiguration();
     } else {
       // Otherwise, generate the context as usual.
@@ -596,6 +604,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       initProcessingStrategy();
 
+      // Since the tracing feature is Component aware at all levels, we cannot do this wrapping earlier (for example, at component
+      // building time)
+      resolverSet = new TracedResolverSet(muleContext, coreEventEventTracer,
+                                          initialSpanInfoProvider
+                                              .getInitialSpanInfo(this, InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME, ""))
+                                                  .merge(resolverSet);
+
       initialised = true;
     }
   }
@@ -617,7 +632,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void startInnerFlux() {
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
-    // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
+    // This is a round-robin, so it can handle concurrent events and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
       final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
 
@@ -1092,10 +1107,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
+    coreEventEventTracer
+        .startComponentSpan(event,
+                            initialSpanInfoProvider.getInitialSpanInfo(this, InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME));
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();
+    } finally {
+      coreEventEventTracer.endCurrentSpan(event);
     }
   }
 

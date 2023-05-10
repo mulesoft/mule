@@ -104,10 +104,23 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
     ResolverSetResult.Builder builder = getResolverSetBuilder();
 
     for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolveRecursively(entry.getValue(), context));
+      builder.add(entry.getKey(), resolve(entry, context));
     }
 
     return builder.build();
+  }
+
+  /**
+   * Resolves the value for one of the {@link ValueResolver} entries of this {@link ResolverSet}.
+   * 
+   * @param entry                 A {@link ValueResolver} entry.
+   * @param valueResolvingContext {@link ValueResolvingContext} that will be used to resolve the value.
+   * @return The resolved value.
+   * @throws MuleException If the resolution fails.
+   */
+  protected Object resolve(Map.Entry<String, ValueResolver<?>> entry, ValueResolvingContext valueResolvingContext)
+      throws MuleException {
+    return resolveRecursively(entry.getValue(), valueResolvingContext);
   }
 
   /**
