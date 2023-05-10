@@ -6,8 +6,32 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+import org.mule.oauth.client.api.listener.ClientCredentialsListener;
+
+import java.util.Map;
+
+/**
+ * Provides compatibility with version 1.x of the mule-oauth-client, which is a transitive api of the service api.
+ * 
+ * @deprecated since 1.5, use {@link org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder} from
+ *             {@code mule-oauth-client 2.x}.
+ */
 @Deprecated
 public interface OAuthClientCredentialsDancerBuilder
-    extends org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder {
+    extends org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder,
+    org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.oauth.client.api.ClientCredentialsOAuthDancer> {
+
+  @Override
+  OAuthClientCredentialsDancerBuilder customParameters(Map<String, String> customParameters);
+
+  @Override
+  OAuthClientCredentialsDancerBuilder customHeaders(Map<String, String> customHeaders);
+
+  @Override
+  OAuthClientCredentialsDancerBuilder addListener(ClientCredentialsListener listener);
+
+  @Override
+  @Deprecated
+  OAuthClientCredentialsDancerBuilder encodeClientCredentialsInBody(boolean encodeClientCredentialsInBody);
 
 }
