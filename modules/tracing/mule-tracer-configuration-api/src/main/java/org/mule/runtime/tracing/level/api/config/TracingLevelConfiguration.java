@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracing.level.api.config;
 
+import java.util.HashMap;
+
 /**
  * Allows to configure the desired tracing level
  *
@@ -15,4 +17,6 @@ package org.mule.runtime.tracing.level.api.config;
 public interface TracingLevelConfiguration {
 
   TracingLevel getTracingLevel();
+
+  HashMap<String, TracingLevel> getTracingLevelOverrides();
 }
