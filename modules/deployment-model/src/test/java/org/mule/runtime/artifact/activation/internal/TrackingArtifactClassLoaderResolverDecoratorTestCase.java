@@ -61,7 +61,7 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
                                                                 mock(RegionClassLoader.class),
                                                                 mock(ClassLoaderLookupPolicy.class));
     Function<String, MuleDeployableArtifactClassLoader> classLoaderWithPluginsFactory = (artifactName) -> {
-      MuleDeployableArtifactClassLoader classLoader = spy(classLoaderFactory.apply(artifactName));
+      MuleDeployableArtifactClassLoader classLoader = classLoaderFactory.apply(artifactName);
       List<ArtifactClassLoader> pluginClassLoaders = new ArrayList<>();
       pluginClassLoaders.add(classLoaderFactory.apply(artifactName + " Plugin Class loader 1"));
       pluginClassLoaders.add(classLoaderFactory.apply(artifactName + " Plugin Class loader 2"));
