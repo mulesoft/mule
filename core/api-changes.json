@@ -3,6 +3,15 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.api.profiling.tracing.SpanIdentifier org.mule.runtime.tracer.api.span.exporter.SpanExporter::getSpanIdentifierBasedOnExport()",
+          "package": "org.mule.runtime.tracer.api.span.exporter",
+          "classSimpleName": "SpanExporter",
+          "methodName": "getSpanIdentifierBasedOnExport",
+          "elementKind": "method",
+          "justification": "Added a method to retrieve the identifier"
+        },
+        {
           "code": "java.class.removed",
           "old": "class javax.resource.spi.work.ExecutionContext",
           "package": "javax.resource.spi.work",

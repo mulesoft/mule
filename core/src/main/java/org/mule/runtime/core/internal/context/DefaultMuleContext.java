@@ -27,6 +27,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
@@ -345,6 +346,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureForeachRouterRejectsMapExpressionFeatureFlag();
       configureHonourInsecureTlsConfiguration();
       configureUseTransactionSinkIndex();
+      configurePutTraceIdAndSpanIdInMdc();
       configureEnableTracerConfigurationAtApplicationLevel();
     }
   }
@@ -1534,6 +1536,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureUseTransactionSinkIndex() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, featureContext -> true);
+  }
+
+  private static void configurePutTraceIdAndSpanIdInMdc() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC, featureContext -> false);
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

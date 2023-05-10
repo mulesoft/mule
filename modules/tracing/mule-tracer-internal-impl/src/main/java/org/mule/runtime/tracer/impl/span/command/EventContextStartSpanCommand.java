@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.command.SpanMDCUtils.setCurrentTracingInformationToMdc;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import static java.util.Optional.empty;
@@ -38,12 +39,14 @@ public class EventContextStartSpanCommand extends
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(Logger logger,
                                                                                  String errorMessage,
                                                                                  boolean propagateException,
-                                                                                 EventSpanFactory eventSpanFactory) {
-    return new EventContextStartSpanCommand(logger, errorMessage, propagateException, eventSpanFactory);
+                                                                                 EventSpanFactory eventSpanFactory,
+                                                                                 boolean spanIdAndTraceIdInMdc) {
+    return new EventContextStartSpanCommand(logger, errorMessage, propagateException, eventSpanFactory, spanIdAndTraceIdInMdc);
   }
 
   private EventContextStartSpanCommand(Logger logger, String errorMessage, boolean propagateException,
-                                       EventSpanFactory eventSpanFactory) {
+                                       EventSpanFactory eventSpanFactory,
+                                       boolean spanIdAndTraceIdInMdc) {
     super(logger, errorMessage, propagateException, empty());
     this.triFunction = (eventContext, initialSpanInfo, assertion) -> {
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
@@ -55,6 +58,10 @@ public class EventContextStartSpanCommand extends
         spanContext.setSpan(newSpan, assertion);
       }
 
+      if (spanIdAndTraceIdInMdc && newSpan != null) {
+        setCurrentTracingInformationToMdc(newSpan);
+      }
+
       return ofNullable(newSpan);
     };
   }
@@ -63,4 +70,5 @@ public class EventContextStartSpanCommand extends
   TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> getTriFunction() {
     return triFunction;
   }
+
 }

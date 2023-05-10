@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
 import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
@@ -23,6 +25,7 @@ import static java.lang.Boolean.getBoolean;
 import static org.slf4j.LoggerFactory.getLogger;
 
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -81,6 +84,9 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Inject
   private EventSpanFactory eventSpanFactory;
+
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
 
   private EventContextStartSpanCommand startCommand;
 
@@ -160,10 +166,12 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    boolean enablePutTraceIdAndSpanIdInMdc = featureFlaggingService.isEnabled(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC);
     startCommand = getEventContextStartSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE,
-                                                       propagateTracingExceptions, eventSpanFactory);
+                                                       propagateTracingExceptions, eventSpanFactory,
+                                                       enablePutTraceIdAndSpanIdInMdc);
     endCommand = getEventContextEndSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_END_COMMAND_MESSAGE,
-                                                   propagateTracingExceptions);
+                                                   propagateTracingExceptions, enablePutTraceIdAndSpanIdInMdc);
     injectDistributedTraceContextCommand = getEventContextInjectDistributedTraceContextCommand(LOGGER,
                                                                                                ERROR_ON_EXECUTING_CORE_EVENT_TRACER_INJECT_DISTRIBUTED_TRACE_CONTEXT_COMMAND_MESSAGE,
                                                                                                false);

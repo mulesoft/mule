@@ -42,7 +42,7 @@ public class EventContextEndSpanCommandTestCase {
     Assertion assertion = mock(Assertion.class);
 
     EventContextEndSpanCommand endCommand =
-        getEventContextEndSpanCommandFrom(mock(Logger.class), TEST_ERROR, true);
+        getEventContextEndSpanCommandFrom(mock(Logger.class), TEST_ERROR, true, true);
     endCommand.execute((EventContext) eventContext, assertion);
 
     verify(spanContext).endSpan(assertion);

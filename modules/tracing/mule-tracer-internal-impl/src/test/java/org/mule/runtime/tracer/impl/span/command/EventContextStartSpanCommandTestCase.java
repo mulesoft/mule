@@ -51,7 +51,8 @@ public class EventContextStartSpanCommandTestCase {
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom(mock(Logger.class),
                                                                                     TEST_ERROR_MESSAGE,
                                                                                     true,
-                                                                                    eventContextFactory);
+                                                                                    eventContextFactory,
+                                                                                    true);
 
     Optional<InternalSpan> internalSpan = startCommand.execute(eventContext, initialSpanInfo, assertion);
 
@@ -76,7 +77,8 @@ public class EventContextStartSpanCommandTestCase {
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom(mock(Logger.class),
                                                                                     TEST_ERROR_MESSAGE,
                                                                                     true,
-                                                                                    eventContextFactory);
+                                                                                    eventContextFactory,
+                                                                                    true);
 
     Optional<InternalSpan> internalSpan = startCommand.execute((EventContext) eventContext, initialSpanInfo, assertion);
 

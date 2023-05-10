@@ -9,6 +9,7 @@ package org.mule.runtime.tracer.api.span.exporter;
 
 import static java.util.Collections.emptyMap;
 
+import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
@@ -40,6 +41,11 @@ public interface SpanExporter {
 
     @Override
     public InternalSpan getInternalSpan() {
+      return null;
+    }
+
+    @Override
+    public SpanIdentifier getSpanIdentifierBasedOnExport() {
       return null;
     }
   };
@@ -113,4 +119,9 @@ public interface SpanExporter {
    * @param spanSerializedAsMap the serialization map that represents the span in W3C format.
    */
   default void updateParentSpanFrom(Map<String, String> spanSerializedAsMap) {}
+
+  /**
+   * @return a {@link SpanIdentifier} based on the export.
+   */
+  SpanIdentifier getSpanIdentifierBasedOnExport();
 }

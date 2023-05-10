@@ -38,6 +38,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   public static final String STATUS = "status.override";
 
   private final InitialSpanInfo initialSpanInfo;
+  private SpanIdentifier identifier;
   private SpanExporter spanExporter = NOOP_EXPORTER;
   private SpanError lastError;
 
@@ -64,7 +65,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   @Override
   public SpanIdentifier getIdentifier() {
-    return null;
+    return identifier;
   }
 
   @Override
@@ -185,6 +186,10 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
     return internalSpan;
   }
 
+  private void updateIdentifierBasedOnExporter() {
+    this.identifier = spanExporter.getSpanIdentifierBasedOnExport();
+  }
+
   /**
    * x A Builder for {@link ExportOnEndExecutionSpan}
    *
@@ -231,6 +236,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
 
       exportOnEndExecutionSpan.spanExporter = spanExporterFactory.getSpanExporter(exportOnEndExecutionSpan, initialSpanInfo);
+      exportOnEndExecutionSpan.updateIdentifierBasedOnExporter();
 
       return exportOnEndExecutionSpan;
     }
