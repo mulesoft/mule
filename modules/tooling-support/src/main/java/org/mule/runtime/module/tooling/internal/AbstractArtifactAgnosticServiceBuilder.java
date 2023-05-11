@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -13,7 +14,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 
 import static java.nio.file.Files.createDirectories;
 import static java.util.Collections.emptyMap;
@@ -26,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
@@ -51,7 +52,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
     implements ArtifactAgnosticServiceBuilder<T, S> {
@@ -122,7 +122,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
             .setOptional(dependency.getOptional())
             .setSystemPath(dependency.getSystemPath())
             .setExclusions(dependency.getExclusions().stream()
-                .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
+                .map(exclusion -> new ArtifactCoordinates(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
             .build();
 
 

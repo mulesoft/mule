@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
+import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASS_LOADER_MODEL_VERSION_120;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
-import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
-import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMavenClassLoaderConfigurationLoader.CLASS_LOADER_MODEL_VERSION_120;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -33,7 +35,6 @@ import java.util.Map;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * Builder for a {@link ClassLoaderConfiguration} with information from a {@link ClassLoaderModel} included when packaging the
@@ -69,7 +70,7 @@ public class HeavyweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
+  protected Map<ArtifactCoordinates, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()
