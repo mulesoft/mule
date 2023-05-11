@@ -10,7 +10,7 @@
           "exampleUseChainInNewApi": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer is part of the API",
           "package": "org.mule.runtime.oauth.api",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.externalClassExposedInAPI",
@@ -19,7 +19,7 @@
           "exampleUseChainInNewApi": "interface org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer is part of the API",
           "package": "org.mule.runtime.oauth.api",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -31,60 +31,23 @@
           "classSimpleName": "PlatformManagedOAuthDancer",
           "methodName": "getContext",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
-          "code": "java.class.noLongerImplementsInterface",
+          "code": "java.class.removed",
           "old": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
-          "new": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
-          "interface": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "AuthorizationCodeListener",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
-          "code": "java.class.noLongerImplementsInterface",
-          "old": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
-          "new": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
-          "interface": "org.mule.runtime.oauth.api.listener.OAuthStateListener",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "AuthorizationCodeListener",
-          "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter void org.mule.runtime.oauth.api.builder.ClientCredentialsListener::onTokenRefreshed(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
-          "new": "parameter void org.mule.runtime.oauth.api.builder.ClientCredentialsListener::onTokenRefreshed(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===)",
-          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
-          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "ClientCredentialsListener",
-          "methodName": "onTokenRefreshed",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.class.noLongerImplementsInterface",
+          "code": "java.class.removed",
           "old": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
-          "new": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
-          "interface": "org.mule.runtime.oauth.api.listener.ClientCredentialsListener",
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "ClientCredentialsListener",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.class.noLongerImplementsInterface",
-          "old": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
-          "new": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
-          "interface": "org.mule.runtime.oauth.api.listener.OAuthStateListener",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "ClientCredentialsListener",
-          "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.removed",
@@ -92,20 +55,7 @@
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "ClientCredentialsLocation",
           "elementKind": "enum",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::addListener(===org.mule.runtime.oauth.api.listener.AuthorizationCodeListener===)",
-          "new": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::addListener(===org.mule.oauth.client.api.listener.AuthorizationCodeListener===)",
-          "oldType": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
-          "newType": "org.mule.oauth.client.api.listener.AuthorizationCodeListener",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
-          "methodName": "addListener",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeParameterChanged",
@@ -118,7 +68,7 @@
           "methodName": "afterDanceCallback",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeParameterChanged",
@@ -131,7 +81,7 @@
           "methodName": "beforeDanceCallback",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.noLongerDefault",
@@ -143,7 +93,7 @@
           "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
           "methodName": "encodeClientCredentialsInBody",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.nowAbstract",
@@ -155,7 +105,7 @@
           "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
           "methodName": "encodeClientCredentialsInBody",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.noLongerImplementsInterface",
@@ -165,31 +115,7 @@
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.annotation.removed",
-          "old": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
-          "new": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
-          "annotationType": "org.mule.api.annotation.NoImplement",
-          "annotation": "@org.mule.api.annotation.NoImplement",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
-          "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder::addListener(===org.mule.runtime.oauth.api.listener.ClientCredentialsListener===)",
-          "new": "parameter org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder::addListener(===org.mule.oauth.client.api.listener.ClientCredentialsListener===)",
-          "oldType": "org.mule.runtime.oauth.api.listener.ClientCredentialsListener",
-          "newType": "org.mule.oauth.client.api.listener.ClientCredentialsListener",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
-          "methodName": "addListener",
-          "parameterIndex": "0",
-          "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.noLongerImplementsInterface",
@@ -199,18 +125,7 @@
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "OAuthClientCredentialsDancerBuilder",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.annotation.removed",
-          "old": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
-          "new": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
-          "annotationType": "org.mule.api.annotation.NoImplement",
-          "annotation": "@org.mule.api.annotation.NoImplement",
-          "package": "org.mule.runtime.oauth.api.builder",
-          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
-          "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.noLongerDefault",
@@ -222,7 +137,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "name",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.nowAbstract",
@@ -234,7 +149,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "name",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.noLongerDefault",
@@ -246,7 +161,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "tokenUrl",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.nowAbstract",
@@ -258,7 +173,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "tokenUrl",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.noLongerDefault",
@@ -270,7 +185,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "tokenUrl",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.nowAbstract",
@@ -282,7 +197,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "tokenUrl",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -295,7 +210,7 @@
           "methodName": "withClientCredentialsIn",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.noLongerDefault",
@@ -307,7 +222,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "withClientCredentialsIn",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.nowAbstract",
@@ -319,7 +234,7 @@
           "classSimpleName": "OAuthDancerBuilder",
           "methodName": "withClientCredentialsIn",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.noLongerImplementsInterface",
@@ -329,23 +244,26 @@
           "package": "org.mule.runtime.oauth.api.builder",
           "classSimpleName": "OAuthPlatformManagedDancerBuilder",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
-          "code": "java.class.removed",
+          "code": "java.class.noLongerImplementsInterface",
           "old": "interface org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "new": "interface org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "interface": "org.mule.runtime.oauth.api.listener.OAuthStateListener",
           "package": "org.mule.runtime.oauth.api.listener",
           "classSimpleName": "AuthorizationCodeListener",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.oauth.api.listener.ClientCredentialsListener",
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.listener.ClientCredentialsListener::onTokenRefreshed(org.mule.oauth.client.api.state.ResourceOwnerOAuthContext)",
           "package": "org.mule.runtime.oauth.api.listener",
           "classSimpleName": "ClientCredentialsListener",
-          "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "methodName": "onTokenRefreshed",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -358,7 +276,7 @@
           "methodName": "onAccessToken",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -371,7 +289,7 @@
           "methodName": "onTokenRefreshed",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.noLongerImplementsInterface",
@@ -381,7 +299,7 @@
           "package": "org.mule.runtime.oauth.api.listener",
           "classSimpleName": "PlatformManagedOAuthStateListener",
           "elementKind": "interface",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.class.removed",
@@ -389,7 +307,7 @@
           "package": "org.mule.runtime.oauth.api.state",
           "classSimpleName": "DancerState",
           "elementKind": "enum",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -401,7 +319,7 @@
           "classSimpleName": "DefaultResourceOwnerOAuthContext",
           "methodName": "getDancerState",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.parameterTypeChanged",
@@ -414,17 +332,7 @@
           "methodName": "setDancerState",
           "parameterIndex": "0",
           "elementKind": "parameter",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
-        },
-        {
-          "code": "java.class.noLongerImplementsInterface",
-          "old": "class org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext",
-          "new": "class org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext",
-          "interface": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
-          "package": "org.mule.runtime.oauth.api.state",
-          "classSimpleName": "DefaultResourceOwnerOAuthContext",
-          "elementKind": "class",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         },
         {
           "code": "java.method.returnTypeChanged",
@@ -436,7 +344,7 @@
           "classSimpleName": "ResourceOwnerOAuthContext",
           "methodName": "getDancerState",
           "elementKind": "method",
-          "justification": "W-13167592: Fixeds split package betwen service and client"
+          "justification": "W-13167592: Fixed split package betwen service and client"
         }
       ]
     }

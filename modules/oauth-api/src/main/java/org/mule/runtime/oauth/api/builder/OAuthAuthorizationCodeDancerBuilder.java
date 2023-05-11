@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.oauth.client.api.AuthorizationCodeRequest;
 import org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext;
 import org.mule.oauth.client.api.builder.ClientCredentialsLocation;
@@ -28,6 +29,7 @@ import java.util.function.Supplier;
  *             {@code mule-oauth-client 2.x}.
  */
 @Deprecated
+@NoImplement
 public interface OAuthAuthorizationCodeDancerBuilder
     extends org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder,
     org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.oauth.client.api.AuthorizationCodeOAuthDancer> {
@@ -83,6 +85,8 @@ public interface OAuthAuthorizationCodeDancerBuilder
 
   @Override
   OAuthAuthorizationCodeDancerBuilder addListener(AuthorizationCodeListener listener);
+
+  OAuthAuthorizationCodeDancerBuilder addListener(org.mule.runtime.oauth.api.listener.AuthorizationCodeListener listener);
 
   @Override
   OAuthAuthorizationCodeDancerBuilder addAdditionalRefreshTokenRequestParameters(MultiMap<String, String> additionalParameters);

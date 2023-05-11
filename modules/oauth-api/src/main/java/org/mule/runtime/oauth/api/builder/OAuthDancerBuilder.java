@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.oauth.client.api.builder.ClientCredentialsLocation;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.http.api.client.HttpClient;
@@ -21,6 +22,7 @@ import java.util.function.Function;
  * @deprecated since 1.5, use {@link org.mule.oauth.client.api.builder.OAuthDancerBuilder} from {@code mule-oauth-client 2.x}.
  */
 @Deprecated
+@NoImplement
 public interface OAuthDancerBuilder<D> extends org.mule.oauth.client.api.builder.OAuthDancerBuilder<D> {
 
   @Override

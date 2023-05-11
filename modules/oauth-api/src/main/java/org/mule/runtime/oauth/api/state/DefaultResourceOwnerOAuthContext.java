@@ -28,7 +28,8 @@ import java.util.concurrent.locks.Lock;
  * @deprecated Use {@link ResourceOwnerOAuthContextWithRefreshState} instead.
  */
 @Deprecated
-public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAuthContext, Serializable {
+public final class DefaultResourceOwnerOAuthContext
+    implements ResourceOwnerOAuthContext, org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext, Serializable {
 
   private static final long serialVersionUID = -4260965520423792113L;
 

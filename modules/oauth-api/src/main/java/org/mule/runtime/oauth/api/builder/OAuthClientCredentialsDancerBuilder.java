@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.oauth.api.builder;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.oauth.client.api.listener.ClientCredentialsListener;
 
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Map;
  *             {@code mule-oauth-client 2.x}.
  */
 @Deprecated
+@NoImplement
 public interface OAuthClientCredentialsDancerBuilder
     extends org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder,
     org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.oauth.client.api.ClientCredentialsOAuthDancer> {
@@ -29,6 +31,8 @@ public interface OAuthClientCredentialsDancerBuilder
 
   @Override
   OAuthClientCredentialsDancerBuilder addListener(ClientCredentialsListener listener);
+
+  OAuthClientCredentialsDancerBuilder addListener(org.mule.runtime.oauth.api.listener.ClientCredentialsListener listener);
 
   @Override
   @Deprecated

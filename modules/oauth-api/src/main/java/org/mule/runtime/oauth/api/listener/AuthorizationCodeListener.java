@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.oauth.api.builder;
+package org.mule.runtime.oauth.api.listener;
 
 /**
  * Allows to get notified about certain events related to an OAuth dance with Authorization Code grant type
