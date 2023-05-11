@@ -64,7 +64,7 @@ public abstract class AbstractErrorTypesValidation extends AbstractErrorValidati
     }
 
     if (ignoreParamsWithProperties) {
-      if (getErrorTypeParam(component).getRawValue().contains("${")) {
+      if (getErrorTypeParam(component).getRawValue() != null && getErrorTypeParam(component).getRawValue().contains("${")) {
         return false;
       }
     }
