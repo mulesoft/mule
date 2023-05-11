@@ -24,14 +24,15 @@ public class DefaultLongCounter implements LongCounter {
 
   private final String name;
   private final String description;
-
   private final String unit;
+  private final String meterName;
   private long value;
 
-  private DefaultLongCounter(String name, String description, String unit) {
+  private DefaultLongCounter(String name, String description, String unit, String meterName) {
     this.name = name;
     this.description = description;
     this.unit = unit;
+    this.meterName = meterName;
   }
 
   @Override
@@ -62,12 +63,18 @@ public class DefaultLongCounter implements LongCounter {
     return unit;
   }
 
+  @Override
+  public String getMeterName() {
+    return meterName;
+  }
+
   private static class DefaultLongCounterBuilder implements LongCounterBuilderWithInstrumentRepository {
 
     private final String name;
     private InstrumentRepository instrumentRepository;
     private String description;
     private String unit;
+    private String meterName;
 
     public DefaultLongCounterBuilder(String name) {
       this.name = name;
@@ -86,14 +93,20 @@ public class DefaultLongCounter implements LongCounter {
     }
 
     @Override
-    public LongCounter build() {
-      return ofNullable(instrumentRepository)
-          .map(repository -> (LongCounter) repository.create(name, name -> doBuild(name, description, unit)))
-          .orElse(doBuild(name, description, unit));
+    public LongCounterBuilder withMeterName(String meterName) {
+      this.meterName = meterName;
+      return this;
     }
 
-    private LongCounter doBuild(String name, String description, String unit) {
-      return new DefaultLongCounter(name, description, unit);
+    @Override
+    public LongCounter build() {
+      return ofNullable(instrumentRepository)
+          .map(repository -> (LongCounter) repository.create(name, name -> doBuild(name, description, unit, meterName)))
+          .orElse(doBuild(name, description, unit, meterName));
+    }
+
+    private LongCounter doBuild(String name, String description, String unit, String meterName) {
+      return new DefaultLongCounter(name, description, unit, meterName);
     }
 
     @Override

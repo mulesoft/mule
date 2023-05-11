@@ -44,6 +44,15 @@ public interface LongUpDownCounterBuilder {
   LongUpDownCounterBuilder withInitialValue(long initialValue);
 
   /**
+   * Sets the meter name for the instrument to build.
+   *
+   * @param meterName the meter name.
+   *
+   * @return the {@link LongCounterBuilder}.
+   */
+  LongUpDownCounterBuilder withMeterName(String meterName);
+
+  /**
    * @return the {@link LongCounter}.
    */
   LongUpDownCounter build();

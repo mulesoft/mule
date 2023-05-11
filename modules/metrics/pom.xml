@@ -26,6 +26,8 @@
     <modules>
         <module>mule-metrics-api</module>
         <module>mule-metrics-impl</module>
+        <module>mule-metrics-exporter-api</module>
+        <module>mule-metrics-exporter-impl</module>
     </modules>
 
     <build>
