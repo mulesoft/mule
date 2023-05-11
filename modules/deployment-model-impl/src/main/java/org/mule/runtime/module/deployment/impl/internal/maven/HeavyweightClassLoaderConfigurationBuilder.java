@@ -17,6 +17,7 @@ import static org.mule.runtime.module.deployment.impl.internal.maven.AbstractMav
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
@@ -69,7 +70,7 @@ public class HeavyweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
+  protected Map<ArtifactCoordinates, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     if (packagerClassLoaderModel instanceof AppClassLoaderModel) {
       AppClassLoaderModel appClassLoaderModel = (AppClassLoaderModel) packagerClassLoaderModel;
       appClassLoaderModel.getAdditionalPluginDependencies()

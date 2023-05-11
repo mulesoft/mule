@@ -22,6 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -148,7 +149,7 @@ public abstract class ArtifactClassLoaderConfigurationBuilder extends ClassLoade
     });
   }
 
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
+  protected Map<ArtifactCoordinates, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
     return parser.getPomAdditionalPluginDependenciesForArtifacts();
   }
 

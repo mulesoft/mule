@@ -292,7 +292,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private void resolveAdditionalPluginDependencies(MavenClient mavenClient, MavenPomParser parser,
                                                    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     // Parse additional plugin dependencies
-    Map<Pair<String, String>, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
+    Map<org.mule.maven.pom.parser.api.model.ArtifactCoordinates, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
         parser.getPomAdditionalPluginDependenciesForArtifacts();
 
     AdditionalPluginDependenciesResolver additionalPluginDependenciesResolver =

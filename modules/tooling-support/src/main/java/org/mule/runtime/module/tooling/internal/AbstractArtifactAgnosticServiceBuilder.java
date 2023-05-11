@@ -26,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
@@ -122,7 +123,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
             .setOptional(dependency.getOptional())
             .setSystemPath(dependency.getSystemPath())
             .setExclusions(dependency.getExclusions().stream()
-                .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
+                .map(exclusion -> new ArtifactCoordinates(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
             .build();
 
 
