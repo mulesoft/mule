@@ -20,6 +20,8 @@ import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFields;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.oauth.client.api.builder.ClientCredentialsLocation;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -46,8 +48,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.aut
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderWrapper;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.ImmutableAuthorizationCodeState;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
-import org.mule.runtime.oauth.api.builder.ClientCredentialsLocation;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 
 import java.lang.reflect.Field;

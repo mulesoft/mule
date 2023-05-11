@@ -10,7 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.oauth.internal.util.ClassLoaderUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;

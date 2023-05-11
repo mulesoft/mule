@@ -8,11 +8,11 @@ package org.mule.runtime.oauth.api;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
+import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.runtime.api.el.MuleExpressionLanguage;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
-import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 
 import java.util.Map;
@@ -40,9 +40,9 @@ public interface OAuthService extends Service {
    * @param expressionEvaluator the object used to evaluate expressions.
    * @return a builder for a client-credentials grant type dancer.
    */
-  <T> OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(LockFactory lockProvider,
-                                                                                  Map<String, T> tokensStore,
-                                                                                  MuleExpressionLanguage expressionEvaluator);
+  <T> org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder clientCredentialsGrantTypeDancerBuilder(LockFactory lockProvider,
+                                                                                                                     Map<String, T> tokensStore,
+                                                                                                                     MuleExpressionLanguage expressionEvaluator);
 
   /**
    * Creates a builder for an {@link AuthorizationCodeOAuthDancer} for authorization code grant type. The dancer will use the
@@ -54,9 +54,9 @@ public interface OAuthService extends Service {
    * @param expressionEvaluator the object used to evaluate expressions.
    * @return a builder for an authorization-code grant type dancer.
    */
-  <T> OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
-                                                                                  Map<String, T> tokensStore,
-                                                                                  MuleExpressionLanguage expressionEvaluator);
+  <T> org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder authorizationCodeGrantTypeDancerBuilder(LockFactory lockProvider,
+                                                                                                                     Map<String, T> tokensStore,
+                                                                                                                     MuleExpressionLanguage expressionEvaluator);
 
   /**
    * Creates a builder for a {@link PlatformManagedOAuthDancer} that obtains access tokens that are provisioned and managed by the

@@ -8,9 +8,9 @@ package org.mule.runtime.oauth.api;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.concurrent.CompletableFuture;
 

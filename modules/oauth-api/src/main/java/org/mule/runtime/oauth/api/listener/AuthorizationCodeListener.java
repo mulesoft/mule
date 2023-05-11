@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.oauth.api.builder;
+package org.mule.runtime.oauth.api.listener;
 
 /**
  * Allows to get notified about certain events related to an OAuth dance with Authorization Code grant type
@@ -13,6 +13,6 @@ package org.mule.runtime.oauth.api.builder;
  * @deprecated since 4.2.2. Use {@link org.mule.runtime.oauth.api.listener.AuthorizationCodeListener} instead
  */
 @Deprecated
-public interface AuthorizationCodeListener extends org.mule.runtime.oauth.api.listener.AuthorizationCodeListener {
+public interface AuthorizationCodeListener extends org.mule.oauth.client.api.listener.AuthorizationCodeListener {
 
 }

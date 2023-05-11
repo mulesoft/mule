@@ -16,7 +16,7 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Map;

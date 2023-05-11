@@ -11,7 +11,7 @@
     <properties>
         <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>1.2.0-SNAPSHOT</muleOAuthClientVersion>
+        <muleOAuthClientVersion>2.0.0-SNAPSHOT</muleOAuthClientVersion>
     </properties>
 
     <dependencies>
@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.commons</groupId>
-            <artifactId>mule-oauth-client</artifactId>
+            <artifactId>mule-oauth-client-api</artifactId>
             <version>${muleOAuthClientVersion}</version>
         </dependency>
     </dependencies>

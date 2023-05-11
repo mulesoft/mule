@@ -29,6 +29,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -73,7 +74,6 @@ import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
 import java.util.Map;
