@@ -345,6 +345,17 @@
           "methodName": "getDancerState",
           "elementKind": "method",
           "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D extends java.lang.Object>",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
         }
       ]
     }
