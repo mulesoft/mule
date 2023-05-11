@@ -1,3 +1,4 @@
+agentLabel: "windows2019-heavy"
 upstreamProjects:
   Mule-runtime/metadata-model-api/master,
   Mule-runtime/mule-profiling-api/master,
