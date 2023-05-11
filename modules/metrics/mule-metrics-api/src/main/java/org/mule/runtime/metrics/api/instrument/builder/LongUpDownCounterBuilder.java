@@ -48,7 +48,7 @@ public interface LongUpDownCounterBuilder {
    *
    * @param meterName the meter name.
    *
-   * @return the {@link LongCounterBuilder}.
+   * @return the {@link LongUpDownCounterBuilder}.
    */
   LongUpDownCounterBuilder withMeterName(String meterName);
 

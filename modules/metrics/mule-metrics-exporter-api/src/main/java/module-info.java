@@ -9,7 +9,7 @@
  * Definitions for Mule Metric exporter.
  *
  * @moduleGraph
- * @since 4.6
+ * @since 4.5
  */
 module org.mule.runtime.metrics.exporter.api {
 

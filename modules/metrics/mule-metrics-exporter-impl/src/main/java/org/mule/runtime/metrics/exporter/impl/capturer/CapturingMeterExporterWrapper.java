@@ -18,6 +18,11 @@ import io.opentelemetry.sdk.metrics.data.MetricData;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.testing.exporter.InMemoryMetricExporter;
 
+/**
+ * A {@link MetricExporter} that captures OpenTelemetry exported metrics.
+ *
+ * @since 4.5.0
+ */
 public class CapturingMeterExporterWrapper implements MetricExporter {
 
   private final Set<InMemoryMetricExporter> meterSniffers = ConcurrentHashMap.newKeySet();

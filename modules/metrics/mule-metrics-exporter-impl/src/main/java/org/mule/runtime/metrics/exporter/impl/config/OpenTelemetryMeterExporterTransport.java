@@ -13,6 +13,11 @@ import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
 
+/**
+ * Specifies different ways in which metrics can be exported.
+ *
+ * @since 4.5.0
+ */
 public enum OpenTelemetryMeterExporterTransport {
 
   GRPC(OtlpGrpcMetricExporter.getDefault()),
