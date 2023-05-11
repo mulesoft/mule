@@ -15,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
@@ -33,6 +32,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -74,10 +74,9 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/mule")));
+    assertContainsResourcePaths(deployableProjectModel,
+                                Paths.get("src", "main", "resources"),
+                                Paths.get("src", "main", "mule"));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
   }
@@ -90,10 +89,9 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/mule")));
+    assertContainsResourcePaths(deployableProjectModel,
+                                Paths.get("src", "main", "resources"),
+                                Paths.get("src", "main", "mule"));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
 
@@ -117,10 +115,9 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/mule")));
+    assertContainsResourcePaths(deployableProjectModel,
+                                Paths.get("src", "main", "resources"),
+                                Paths.get("src", "main", "mule"));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
 
@@ -136,10 +133,9 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getResources(),
                containsInAnyOrder("test-script.dwl", "app.xml"));
 
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main2/resources"),
-                                         containsString("src/main2/mule")));
+    assertContainsResourcePaths(deployableProjectModel,
+                                Paths.get("src", "main2", "resources"),
+                                Paths.get("src", "main2", "mule"));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
   }
@@ -152,11 +148,10 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     assertThat(deployableProjectModel.getResources(),
                containsInAnyOrder("test-script.dwl", "app.xml", "test-script2.dwl"));
 
-    List<String> paths = deployableProjectModel.getResourcesPath().stream().map(Path::toString).collect(toList());
-    assertThat(paths, containsInAnyOrder(
-                                         containsString("src/main/resources"),
-                                         containsString("src/main/resources2"),
-                                         containsString("src/main/mule")));
+    assertContainsResourcePaths(deployableProjectModel,
+                                Paths.get("src", "main", "resources"),
+                                Paths.get("src", "main", "resources2"),
+                                Paths.get("src", "main", "mule"));
 
     assertThat(deployableProjectModel.getDependencies(), hasSize(3));
   }
@@ -287,6 +282,16 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
 
   protected File getDeployableFolder(String appPath) throws URISyntaxException {
     return new File(getClass().getClassLoader().getResource(appPath).toURI());
+  }
+
+  private void assertContainsResourcePaths(DeployableProjectModel deployableProjectModel, Path... expectedResourcePaths) {
+    Path projectFolderPath = deployableProjectModel.getProjectFolder().toPath();
+
+    List<Path> actualResourcePaths = deployableProjectModel.getResourcesPath().stream()
+        .map(projectFolderPath::relativize)
+        .collect(toList());
+
+    assertThat(actualResourcePaths, containsInAnyOrder(expectedResourcePaths));
   }
 
 }
