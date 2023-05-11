@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -13,7 +14,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 
 import static java.nio.file.Files.createDirectories;
 import static java.util.Collections.emptyMap;
@@ -52,7 +52,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
     implements ArtifactAgnosticServiceBuilder<T, S> {
