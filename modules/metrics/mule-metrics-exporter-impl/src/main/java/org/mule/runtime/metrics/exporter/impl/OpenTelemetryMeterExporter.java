@@ -23,6 +23,11 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 
+/**
+ * A {@link MeterExporter} that exports metrics using OpenTelemetry.
+ *
+ * @since 4.5.0
+ */
 public class OpenTelemetryMeterExporter implements MeterExporter {
 
   private MeterProvider meterProvider;
@@ -38,20 +43,20 @@ public class OpenTelemetryMeterExporter implements MeterExporter {
   }
 
   @Override
-  public void registerInstrumentForExport(LongCounter longCounter) {
+  public void enableExport(LongCounter longCounter) {
     Meter meter = meters.get(longCounter.getMeterName());
     meter.counterBuilder(longCounter.getName()).buildWithCallback(measurement -> measurement.record(longCounter.getValue()));
   }
 
   @Override
-  public void registerInstrumentForExport(LongUpDownCounter upDownCounter) {
+  public void enableExport(LongUpDownCounter upDownCounter) {
     Meter meter = meters.get(upDownCounter.getMeterName());
     meter.upDownCounterBuilder(upDownCounter.getName())
         .buildWithCallback(measurement -> measurement.record(upDownCounter.getValue()));
   }
 
   @Override
-  public void registerMeterForExport(org.mule.runtime.metrics.api.meter.Meter meter) {
+  public void registerMeterToExport(org.mule.runtime.metrics.api.meter.Meter meter) {
     meters.put(meter.getName(), meterProvider.meterBuilder(meter.getName()).build());
   }
 }

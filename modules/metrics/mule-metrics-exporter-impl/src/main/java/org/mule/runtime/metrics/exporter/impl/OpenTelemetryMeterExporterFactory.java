@@ -11,6 +11,12 @@ import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
 import org.mule.runtime.metrics.exporter.impl.capturer.CapturingMeterExporterWrapper;
 
+/**
+ * An implementation of {@link MeterExporterFactory} which creates a {@link OpenTelemetryMeterExporter} that exports the internal
+ * metrics using OpenTelemetry
+ *
+ * @since 4.5.0
+ */
 public class OpenTelemetryMeterExporterFactory implements MeterExporterFactory {
 
   public static final CapturingMeterExporterWrapper METER_SNIFFER_EXPORTER = new CapturingMeterExporterWrapper();

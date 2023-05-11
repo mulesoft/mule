@@ -7,6 +7,7 @@
 package org.mule.runtime.metrics.exporter.impl;
 
 import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_SNIFFER_EXPORTER;
+import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport.IN_MEMORY;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -44,7 +45,7 @@ public class OpenTelemetryMeterExporterTestCase {
 
       @Override
       public String getExporterType() {
-        return "IN_MEMORY";
+        return IN_MEMORY.name();
       }
 
       @Override
@@ -67,8 +68,8 @@ public class OpenTelemetryMeterExporterTestCase {
     InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
 
     try {
-      openTelemetryMeterExporter.registerMeterForExport(meter);
-      openTelemetryMeterExporter.registerInstrumentForExport(longCounter);
+      openTelemetryMeterExporter.registerMeterToExport(meter);
+      openTelemetryMeterExporter.enableExport(longCounter);
       longCounter.add(4);
 
       PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
@@ -101,8 +102,8 @@ public class OpenTelemetryMeterExporterTestCase {
     InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
 
     try {
-      openTelemetryMeterExporter.registerMeterForExport(meter);
-      openTelemetryMeterExporter.registerInstrumentForExport(longUpDownCounter);
+      openTelemetryMeterExporter.registerMeterToExport(meter);
+      openTelemetryMeterExporter.enableExport(longUpDownCounter);
       longUpDownCounter.add(4);
       longUpDownCounter.add(-1);
 

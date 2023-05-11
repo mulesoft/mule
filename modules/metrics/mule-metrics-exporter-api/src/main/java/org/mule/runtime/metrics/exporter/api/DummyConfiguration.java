@@ -7,6 +7,10 @@
 
 package org.mule.runtime.metrics.exporter.api;
 
+/**
+ * Dummy configuration to use for tests
+ */
+// TODO W-13065409: Delete and replace tests with real configuration or mock of real configuration
 public interface DummyConfiguration {
 
   public String getExporterType();
