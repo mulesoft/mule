@@ -24,7 +24,7 @@ public class InternalSpanNames {
   public static final String MULE_FLOW_SPAN_NAME = "mule:flow";
   public static final String MULE_SUB_FLOW_SPAN_NAME = "mule:subflow";
   public static final String GET_CONNECTION_SPAN_NAME = "mule:get-connection";
-  public static final String PARAMETER_RESOLUTION_SPAN_NAME = "mule:parameters-resolution";
+  public static final String PARAMETERS_RESOLUTION_SPAN_NAME = "mule:parameters-resolution";
   public static final String EXECUTION_TIME_SPAN_NAME = "mule:execution-time";
   public static final String ON_ERROR_PROPAGATE_SPAN_NAME = "mule:on-error-propagate";
   public static final String ON_ERROR_CONTINUE_SPAN_NAME = "mule:on-error-continue";

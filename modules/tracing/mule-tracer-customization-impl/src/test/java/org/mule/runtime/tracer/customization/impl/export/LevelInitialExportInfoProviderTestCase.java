@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.tracer.customization.impl.export;
 
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 

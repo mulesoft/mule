@@ -34,8 +34,8 @@ public class TracedResolverSet extends ResolverSet {
   protected Object resolve(Map.Entry<String, ValueResolver<?>> entry, ValueResolvingContext valueResolvingContext)
       throws MuleException {
     coreEventEventTracer.startComponentSpan(valueResolvingContext.getEvent(), valueResolutionInitialSpanInfo);
-    coreEventEventTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
     try {
+      coreEventEventTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
       return super.resolve(entry, valueResolvingContext);
     } finally {
       coreEventEventTracer.endCurrentSpan(valueResolvingContext.getEvent());

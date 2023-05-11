@@ -22,10 +22,11 @@ import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.EXECUTION_TIME_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
 
 
@@ -48,7 +49,8 @@ public class DebugInitialExportInfoProvider extends MonitoringInitialExportInfoP
       put(CACHE_CHAIN_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(MESSAGE_PROCESSORS_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(GET_CONNECTION_SPAN_NAME, DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
-      put(PARAMETER_RESOLUTION_SPAN_NAME, DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(PARAMETERS_RESOLUTION_SPAN_NAME, DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
+      put(VALUE_RESOLUTION_SPAN_NAME, DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(EXECUTION_TIME_SPAN_NAME, DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
     }
   };
