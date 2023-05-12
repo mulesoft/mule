@@ -13,6 +13,8 @@ package org.mule.runtime.tracer.customization.api;
  */
 public class InternalSpanNames {
 
+  private InternalSpanNames() {}
+
   public static final String TRY_SCOPE_INNER_CHAIN_SPAN_NAME = "try-scope-inner-chain";
   public static final String EXECUTE_NEXT_SPAN_NAME = "execute-next";
   public static final String POLICY_NEXT_ACTION_SPAN_NAME = "policy-next-action";

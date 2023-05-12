@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime;
+package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -45,7 +45,7 @@ import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
+import org.mule.runtime.module.extension.internal.runtime.TestComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.RouteBuilderValueResolver;
@@ -116,6 +116,10 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
 
     initialiseIfNeeded(processor, muleContext);
+
+    // Since the initialization of the message processor reassigns its inner resolver set, we need to set the spy back.
+    processor.resolverSet = resolverSet;
+
     startIfNeeded(processor);
   }
 
