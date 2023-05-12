@@ -1083,6 +1083,10 @@ public interface AllureConstants {
       String OPEN_TELEMETRY_EXPORTER = "Open Telemetry Exporter";
 
       String TRACING_CONFIGURATION = "Tracing Configuration";
+
+      String METRICS_EXPORTER = "Metrics Exporter";
+
+      String METRICS_IMPLEMENTATION = "Metrics Implementation";
     }
   }
 

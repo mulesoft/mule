@@ -18,8 +18,8 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
  */
 public class DefaultLongUpDownCounter implements LongUpDownCounter {
 
-  public static LongUpDownCounterBuilderWithInstrumentRepository builder(String name) {
-    return new DefaultLongUpDownCounterBuilder(name);
+  public static LongUpDownCounterBuilderWithInstrumentRepository builder(String name, String meterName) {
+    return new DefaultLongUpDownCounterBuilder(name, meterName);
   }
 
   private final String name;
@@ -75,8 +75,9 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     private String meterName;
     private long initialValue;
 
-    public DefaultLongUpDownCounterBuilder(String name) {
+    public DefaultLongUpDownCounterBuilder(String name, String meterName) {
       this.name = name;
+      this.meterName = meterName;
     }
 
     @Override
@@ -94,12 +95,6 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     @Override
     public LongUpDownCounterBuilder withInitialValue(long initialValue) {
       this.initialValue = initialValue;
-      return this;
-    }
-
-    @Override
-    public LongUpDownCounterBuilder withMeterName(String meterName) {
-      this.meterName = meterName;
       return this;
     }
 

@@ -18,8 +18,8 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
  */
 public class DefaultLongCounter implements LongCounter {
 
-  public static LongCounterBuilderWithInstrumentRepository builder(String name) {
-    return new DefaultLongCounterBuilder(name);
+  public static LongCounterBuilderWithInstrumentRepository builder(String name, String meterName) {
+    return new DefaultLongCounterBuilder(name, meterName);
   }
 
   private final String name;
@@ -76,8 +76,9 @@ public class DefaultLongCounter implements LongCounter {
     private String unit;
     private String meterName;
 
-    public DefaultLongCounterBuilder(String name) {
+    public DefaultLongCounterBuilder(String name, String meterName) {
       this.name = name;
+      this.meterName = meterName;
     }
 
     @Override
@@ -89,12 +90,6 @@ public class DefaultLongCounter implements LongCounter {
     @Override
     public LongCounterBuilder withUnit(String unit) {
       this.unit = unit;
-      return this;
-    }
-
-    @Override
-    public LongCounterBuilder withMeterName(String meterName) {
-      this.meterName = meterName;
       return this;
     }
 

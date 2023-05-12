@@ -31,7 +31,7 @@ import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 public class OpenTelemetryMeterExporter implements MeterExporter {
 
   private MeterProvider meterProvider;
-  private Map<String, Meter> meters = new HashMap<>();
+  private Map<String, Meter> openTelemetryMeters = new HashMap<>();
 
   public OpenTelemetryMeterExporter(DummyConfiguration configuration) {
     MetricExporter metricExporter =
@@ -44,19 +44,20 @@ public class OpenTelemetryMeterExporter implements MeterExporter {
 
   @Override
   public void enableExport(LongCounter longCounter) {
-    Meter meter = meters.get(longCounter.getMeterName());
-    meter.counterBuilder(longCounter.getName()).buildWithCallback(measurement -> measurement.record(longCounter.getValue()));
+    Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeterName());
+    openTelemetryMeter.counterBuilder(longCounter.getName())
+        .buildWithCallback(measurement -> measurement.record(longCounter.getValue()));
   }
 
   @Override
   public void enableExport(LongUpDownCounter upDownCounter) {
-    Meter meter = meters.get(upDownCounter.getMeterName());
-    meter.upDownCounterBuilder(upDownCounter.getName())
+    Meter openTelemetryMeter = openTelemetryMeters.get(upDownCounter.getMeterName());
+    openTelemetryMeter.upDownCounterBuilder(upDownCounter.getName())
         .buildWithCallback(measurement -> measurement.record(upDownCounter.getValue()));
   }
 
   @Override
   public void registerMeterToExport(org.mule.runtime.metrics.api.meter.Meter meter) {
-    meters.put(meter.getName(), meterProvider.meterBuilder(meter.getName()).build());
+    openTelemetryMeters.put(meter.getName(), meterProvider.meterBuilder(meter.getName()).build());
   }
 }

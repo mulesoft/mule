@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.metrics.impl;
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_METRICS_PROVIDER;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
@@ -20,7 +21,7 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(PROFILING)
-@Story(TRACING_CONFIGURATION)
+@Story(DEFAULT_METRICS_PROVIDER)
 public class DefaultMeterProviderTestCase {
 
   @Test

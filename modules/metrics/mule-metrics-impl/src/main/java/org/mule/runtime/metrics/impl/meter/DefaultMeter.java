@@ -47,12 +47,12 @@ public class DefaultMeter implements Meter {
 
   @Override
   public LongUpDownCounterBuilder upDownCounterBuilder(String counterName) {
-    return DefaultLongUpDownCounter.builder(counterName).withInstrumentRepository(instrumentRepository).withMeterName(meterName);
+    return DefaultLongUpDownCounter.builder(counterName, meterName).withInstrumentRepository(instrumentRepository);
   }
 
   @Override
   public LongCounterBuilder counterBuilder(String counterName) {
-    return DefaultLongCounter.builder(counterName).withInstrumentRepository(instrumentRepository).withMeterName(meterName);
+    return DefaultLongCounter.builder(counterName, meterName).withInstrumentRepository(instrumentRepository);
   }
 
   private static class DefaultMeterBuilder implements MeterBuilderWithRepository {

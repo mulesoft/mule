@@ -7,16 +7,15 @@
 package org.mule.runtime.metrics.impl.meter;
 
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_IMPLEMENTATION;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEmptyString.isEmptyOrNullString;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.meter.repository.MeterRepository;
@@ -26,7 +25,7 @@ import io.qameta.allure.Story;
 import org.junit.Test;
 
 @Feature(PROFILING)
-@Story(TRACING_CONFIGURATION)
+@Story(METRICS_IMPLEMENTATION)
 public class DefaultMeterTestCase {
 
   @Test

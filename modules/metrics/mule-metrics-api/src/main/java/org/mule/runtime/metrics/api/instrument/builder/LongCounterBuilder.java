@@ -32,15 +32,6 @@ public interface LongCounterBuilder {
   LongCounterBuilder withUnit(String unit);
 
   /**
-   * Sets the meter name for the instrument to build.
-   *
-   * @param meterName the meter name.
-   *
-   * @return the {@link LongCounterBuilder}.
-   */
-  LongCounterBuilder withMeterName(String meterName);
-
-  /**
    * @return the {@link LongCounter}.
    */
   LongCounter build();
