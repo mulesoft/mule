@@ -50,7 +50,6 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.s
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -408,6 +407,10 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
 
     initialiseIfNeeded(messageProcessor, muleContext);
+
+    // Since the initialization of the message processor reassigns its inner resolver set, we need to set the spy back.
+    messageProcessor.resolverSet = resolverSet;
+
     startIfNeeded(messageProcessor);
 
     return messageProcessor;
