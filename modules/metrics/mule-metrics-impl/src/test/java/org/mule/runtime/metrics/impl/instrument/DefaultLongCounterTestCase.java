@@ -8,27 +8,27 @@ package org.mule.runtime.metrics.impl.instrument;
 
 import static org.mule.runtime.metrics.impl.instrument.DefaultLongCounter.builder;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_IMPLEMENTATION;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.rules.ExpectedException.none;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
-@Story(TRACING_CONFIGURATION)
+@Story(METRICS_IMPLEMENTATION)
 public class DefaultLongCounterTestCase {
 
   @Rule
@@ -39,10 +39,12 @@ public class DefaultLongCounterTestCase {
     String instrumentName = "long-counter-test";
     String instrumentDescription = "Long Counter test";
     String unit = "test-unit";
-    LongCounter longCounter = builder(instrumentName).withDescription(instrumentDescription).withUnit(unit).build();
+    String meterName = "test-meter";
+    LongCounter longCounter = builder(instrumentName, meterName).withDescription(instrumentDescription).withUnit(unit).build();
     assertThat(longCounter.getName(), equalTo(instrumentName));
     assertThat(longCounter.getDescription(), equalTo(instrumentDescription));
     assertThat(longCounter.getUnit(), equalTo(unit));
+    assertThat(longCounter.getMeterName(), equalTo(meterName));
 
     // Verify counter.
     verifyCounterValues(longCounter);
@@ -53,12 +55,15 @@ public class DefaultLongCounterTestCase {
     String instrumentName = "long-counter-test";
     String instrumentDescription = "Long Counter test";
     String unit = "test-unit";
+    String meterName = "test-meter";
     InstrumentRepository repository = mock(InstrumentRepository.class);
-    LongCounter longCounter = builder(instrumentName).withInstrumentRepository(repository).withDescription(instrumentDescription)
-        .withUnit(unit).build();
+    LongCounter longCounter =
+        builder(instrumentName, meterName).withInstrumentRepository(repository).withDescription(instrumentDescription)
+            .withUnit(unit).build();
     assertThat(longCounter.getName(), equalTo(instrumentName));
     assertThat(longCounter.getDescription(), equalTo(instrumentDescription));
     assertThat(longCounter.getUnit(), equalTo(unit));
+    assertThat(longCounter.getMeterName(), equalTo(meterName));
     verify(repository).create(eq(instrumentName), any());
 
     // Verify counter.
@@ -71,7 +76,8 @@ public class DefaultLongCounterTestCase {
     String instrumentName = "long-counter-test";
     String instrumentDescription = "Long Counter test";
     String unit = "test-unit";
-    LongCounter longCounter = builder(instrumentName).withDescription(instrumentDescription)
+    String meterName = "test-meter";
+    LongCounter longCounter = builder(instrumentName, meterName).withDescription(instrumentDescription)
         .withUnit(unit).build();
     longCounter.add(-10);
   }

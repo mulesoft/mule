@@ -28,4 +28,8 @@ public interface LongUpDownCounter extends Instrument {
    */
   String getUnit();
 
+  /**
+   * @return the meter name for this counter.
+   */
+  String getMeterName();
 }

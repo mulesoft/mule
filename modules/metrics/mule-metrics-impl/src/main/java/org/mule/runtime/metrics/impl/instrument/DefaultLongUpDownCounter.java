@@ -18,20 +18,22 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
  */
 public class DefaultLongUpDownCounter implements LongUpDownCounter {
 
-  public static LongUpDownCounterBuilderWithInstrumentRepository builder(String name) {
-    return new DefaultLongUpDownCounterBuilder(name);
+  public static LongUpDownCounterBuilderWithInstrumentRepository builder(String name, String meterName) {
+    return new DefaultLongUpDownCounterBuilder(name, meterName);
   }
 
   private final String name;
   private final String description;
   private final String unit;
+  private final String meterName;
   private long value;
 
-  private DefaultLongUpDownCounter(String name, String description, String unit, long initialValue) {
+  private DefaultLongUpDownCounter(String name, String description, String unit, long initialValue, String meterName) {
     this.name = name;
     this.description = description;
     this.value = initialValue;
     this.unit = unit;
+    this.meterName = meterName;
   }
 
   @Override
@@ -59,16 +61,23 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     return unit;
   }
 
+  @Override
+  public String getMeterName() {
+    return meterName;
+  }
+
   private static class DefaultLongUpDownCounterBuilder implements LongUpDownCounterBuilderWithInstrumentRepository {
 
     private final String name;
     private InstrumentRepository instrumentRepository;
     private String description;
     private String unit;
+    private String meterName;
     private long initialValue;
 
-    public DefaultLongUpDownCounterBuilder(String name) {
+    public DefaultLongUpDownCounterBuilder(String name, String meterName) {
       this.name = name;
+      this.meterName = meterName;
     }
 
     @Override
@@ -93,12 +102,13 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     public LongUpDownCounter build() {
       return ofNullable(instrumentRepository)
           .map(repository -> (LongUpDownCounter) repository.create(name,
-                                                                   name -> doBuild(name, description, unit, initialValue)))
-          .orElse(doBuild(name, description, unit, initialValue));
+                                                                   name -> doBuild(name, description, unit, initialValue,
+                                                                                   meterName)))
+          .orElse(doBuild(name, description, unit, initialValue, meterName));
     }
 
-    private LongUpDownCounter doBuild(String name, String description, String unit, long initialValue) {
-      return new DefaultLongUpDownCounter(name, description, unit, initialValue);
+    private LongUpDownCounter doBuild(String name, String description, String unit, long initialValue, String meterName) {
+      return new DefaultLongUpDownCounter(name, description, unit, initialValue, meterName);
     }
 
     @Override

@@ -27,18 +27,18 @@ public class DefaultMeter implements Meter {
     return new DefaultMeterBuilder(meterName);
   }
 
-  private final String name;
+  private final String meterName;
   private final String description;
 
   private final InstrumentRepository instrumentRepository = new InstrumentRepository();
 
-  public DefaultMeter(String name, String description) {
-    this.name = name;
+  public DefaultMeter(String meterName, String description) {
+    this.meterName = meterName;
     this.description = description;
   }
 
   public String getName() {
-    return name;
+    return meterName;
   }
 
   public String getDescription() {
@@ -46,13 +46,13 @@ public class DefaultMeter implements Meter {
   }
 
   @Override
-  public LongUpDownCounterBuilder upDownCounterBuilder(String name) {
-    return DefaultLongUpDownCounter.builder(name).withInstrumentRepository(instrumentRepository);
+  public LongUpDownCounterBuilder upDownCounterBuilder(String counterName) {
+    return DefaultLongUpDownCounter.builder(counterName, meterName).withInstrumentRepository(instrumentRepository);
   }
 
   @Override
-  public LongCounterBuilder counterBuilder(String name) {
-    return DefaultLongCounter.builder(name).withInstrumentRepository(instrumentRepository);
+  public LongCounterBuilder counterBuilder(String counterName) {
+    return DefaultLongCounter.builder(counterName, meterName).withInstrumentRepository(instrumentRepository);
   }
 
   private static class DefaultMeterBuilder implements MeterBuilderWithRepository {

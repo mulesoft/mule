@@ -27,4 +27,9 @@ public interface LongCounter extends Instrument {
    * @return the unit for this measurement.
    */
   String getUnit();
+
+  /**
+   * @return the meter name for this counter.
+   */
+  String getMeterName();
 }
