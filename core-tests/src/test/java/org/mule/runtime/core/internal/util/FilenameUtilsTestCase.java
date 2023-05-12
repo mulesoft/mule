@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.core.internal.util;
 
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.internal.util.FilenameUtils.fileWithPathComponents;
+import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
+
 import static java.io.File.separator;
+
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.SystemUtils.getUserDir;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.util.FileUtils.newFile;
-import static org.mule.runtime.core.internal.util.FilenameUtils.fileWithPathComponents;
-import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecodedPath;
-import org.mule.runtime.core.api.util.FileUtils;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -70,7 +73,8 @@ public class FilenameUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void addsSlashAtBeginningInUnix() {
     String path = "file:/etc/zaraza";
-    assertThat(normalizeDecodedPath(path, false), is("/etc/zaraza"));
+    assertThat(normalizeDecodedPath(path, false),
+               is((IS_OS_WINDOWS ? separator + separator : "/") + "etc/zaraza"));
   }
 
   @Test
