@@ -23,13 +23,15 @@ class DefaultHttpRequestOptions implements HttpRequestOptions {
   private boolean followsRedirect;
   private HttpAuthentication authentication;
   private ProxyConfig proxyConfig;
+  private boolean sendBody;
 
   DefaultHttpRequestOptions(int responseTimeout, boolean followsRedirect, HttpAuthentication authentication,
-                            ProxyConfig proxyConfig) {
+                            ProxyConfig proxyConfig, boolean sendBody) {
     this.responseTimeout = responseTimeout;
     this.followsRedirect = followsRedirect;
     this.authentication = authentication;
     this.proxyConfig = proxyConfig;
+    this.sendBody = sendBody;
   }
 
   @Override
@@ -50,5 +52,10 @@ class DefaultHttpRequestOptions implements HttpRequestOptions {
   @Override
   public Optional<ProxyConfig> getProxyConfig() {
     return ofNullable(proxyConfig);
+  }
+
+  @Override
+  public boolean isSendBody() {
+    return sendBody;
   }
 }

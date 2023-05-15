@@ -52,6 +52,11 @@ public interface HttpRequestOptions {
   Optional<HttpAuthentication> getAuthentication();
 
   /**
+   * @return if the request should contain a body or not.
+   */
+  boolean isSendBody();
+
+  /**
    * @return the {@link ProxyConfig} to use, if any.
    */
   Optional<ProxyConfig> getProxyConfig();
