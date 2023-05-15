@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.extension.internal.loader.xml.validator;
 
+import static org.mule.runtime.api.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
+
 import static java.lang.String.format;
-import static org.mule.runtime.internal.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ComponentAst;

@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-module org.mule.runtime.core.extension.model {
+module org.mule.runtime.extension.model {
 
   requires org.mule.sdk.api;
   requires org.mule.runtime.api;
