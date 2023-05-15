@@ -11,7 +11,7 @@
  * @provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider
  * 
  * @moduleGraph
- * @since 1.5
+ * @since 4.5
  */
 module org.mule.runtime.extension.model {
 
