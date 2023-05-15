@@ -5,6 +5,14 @@
  * LICENSE.txt file.
  */
 
+/**
+ * Extension model for the core Mule Runtime components.
+ *
+ * @provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider
+ * 
+ * @moduleGraph
+ * @since 1.5
+ */
 module org.mule.runtime.extension.model {
 
   requires org.mule.sdk.api;
