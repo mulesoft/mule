@@ -22,7 +22,7 @@ public final class HttpRequestOptionsBuilder {
   private boolean followsRedirect = true;
   private HttpAuthentication authentication;
   private ProxyConfig proxyConfig;
-  private boolean sendBody = true;
+  private boolean sendBodyAlways = true;
 
   HttpRequestOptionsBuilder() {}
 
@@ -31,7 +31,7 @@ public final class HttpRequestOptionsBuilder {
     this.followsRedirect = options.isFollowsRedirect();
     this.authentication = options.getAuthentication().orElse(null);
     this.proxyConfig = options.getProxyConfig().orElse(null);
-    this.sendBody = options.isSendBody();
+    this.sendBodyAlways = options.shouldSendBodyAlways();
   }
 
   public HttpRequestOptionsBuilder responseTimeout(int responseTimeout) {
@@ -54,13 +54,13 @@ public final class HttpRequestOptionsBuilder {
     return this;
   }
 
-  public HttpRequestOptionsBuilder sendBody(boolean sendBody) {
-    this.sendBody = sendBody;
+  public HttpRequestOptionsBuilder sendBodyAlways(boolean sendBodyAlways) {
+    this.sendBodyAlways = sendBodyAlways;
     return this;
   }
 
   public HttpRequestOptions build() {
-    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, proxyConfig, sendBody);
+    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, proxyConfig, sendBodyAlways);
   }
 
 }

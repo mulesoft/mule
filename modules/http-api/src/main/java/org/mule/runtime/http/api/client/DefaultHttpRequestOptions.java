@@ -55,7 +55,7 @@ class DefaultHttpRequestOptions implements HttpRequestOptions {
   }
 
   @Override
-  public boolean isSendBody() {
+  public boolean shouldSendBodyAlways() {
     return sendBody;
   }
 }
