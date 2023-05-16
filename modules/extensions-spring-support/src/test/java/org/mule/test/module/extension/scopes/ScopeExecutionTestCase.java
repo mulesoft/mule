@@ -8,17 +8,21 @@ package org.mule.test.module.extension.scopes;
 
 import static java.lang.Runtime.getRuntime;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.util.ClassUtils;
+import org.mule.runtime.core.privileged.processor.chain.HasMessageProcessors;
 
+import org.hamcrest.core.IsSame;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -56,13 +60,15 @@ public class ScopeExecutionTestCase extends AbstractScopeExecutionTestCase {
 
   @Test
   public void verifySameProcessorInstance() throws Exception {
-    Object getChainFirst = runFlow("getChain").getMessage().getPayload().getValue();
-    Object getChainSecond = runFlow("getChain").getMessage().getPayload().getValue();
+    HasMessageProcessors getChainFirst = (HasMessageProcessors) runFlow("getChain").getMessage().getPayload().getValue();
+    HasMessageProcessors getChainSecond = (HasMessageProcessors) runFlow("getChain").getMessage().getPayload().getValue();
     assertThat(getChainFirst, is(not(sameInstance(getChainSecond))));
 
-    Object firstChain = ClassUtils.getFieldValue(getChainFirst, "chain", false);
-    Object secondChain = ClassUtils.getFieldValue(getChainSecond, "chain", false);
-    assertThat(firstChain, is(sameInstance(secondChain)));
+    assertThat("Multiple executions of the same scope should yield the same processor instances",
+               getChainFirst.getMessageProcessors(),
+               contains(getChainSecond.getMessageProcessors().stream()
+                   .map(IsSame::sameInstance)
+                   .collect(toList())));
   }
 
   @Test

@@ -6,20 +6,21 @@
  */
 package org.mule.test.module.extension.reconnection;
 
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
+import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
+import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
-import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
-import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.FailingConnection;
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
@@ -38,13 +39,12 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
+import org.mule.runtime.core.internal.retry.policies.SimpleRetryPolicy;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -284,11 +284,10 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
-    RetryPolicy policy = template.createRetryInstance();
+    SimpleRetryPolicy policy = (SimpleRetryPolicy) template.createRetryInstance();
 
-    assertThat(getFieldValue(policy, "count", false), is(count));
-    Duration duration = getFieldValue(policy, "frequency", false);
-    assertThat(duration.toMillis(), is(freq));
+    assertThat(policy.getCount(), is(count));
+    assertThat(policy.getFrequency().toMillis(), is(freq));
   }
 
   private void switchConnection() throws Exception {

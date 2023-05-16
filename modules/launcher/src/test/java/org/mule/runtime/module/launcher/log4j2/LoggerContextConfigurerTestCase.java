@@ -6,9 +6,15 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FORCE_CONSOLE_LOG;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
+import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -24,13 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FORCE_CONSOLE_LOG;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
-import static org.mule.runtime.module.launcher.log4j2.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
-import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,7 +38,6 @@ import org.mule.tck.size.SmallTest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -66,10 +65,8 @@ import org.mockito.junit.MockitoRule;
 public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
   private static final String CURRENT_DIRECTORY = ".";
-  private static final String SHUTDOWN_HOOK_PROPERTY = "isShutdownHookEnabled";
   private static final int MONITOR_INTERVAL = 60000;
   private static final String CONVERTER_COMPONENT = "Converter";
-  private static final String FILE_PATTERN_PROPERTY = "filePattern";
   private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
 
   @Rule
@@ -106,7 +103,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
   @Test
   public void disableShutdownHook() throws Exception {
     contextConfigurer.configure(context);
-    assertThat((boolean) ClassUtils.getFieldValue(context.getConfiguration(), SHUTDOWN_HOOK_PROPERTY, true), is(false));
+    assertThat(context.getConfiguration().isShutdownHookEnabled(), is(false));
   }
 
   @Test
@@ -159,13 +156,13 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
     verify(context.getConfiguration()).addAppender(appenderCaptor.capture());
 
-    Appender perAppAppender = appenderCaptor.getValue();
+    RollingFileAppender perAppAppender = appenderCaptor.getValue();
 
     assertThat(perAppAppender, notNullValue());
     assertThat(perAppAppender.getName(), equalTo(PER_APP_FILE_APPENDER_NAME));
     assertThat(perAppAppender.isStarted(), is(true));
 
-    String filePattern = ClassUtils.getFieldValue(perAppAppender, FILE_PATTERN_PROPERTY, true);
+    String filePattern = perAppAppender.getFilePattern();
     String filePatternTemplate = filePattern.substring(filePattern.lastIndexOf('/') + 1);
     String filePatternTemplateDateSuffix = filePatternTemplate.substring(filePatternTemplate.lastIndexOf('.') + 1);
     assertThat(filePatternTemplateDateSuffix, equalTo(FILE_PATTERN_TEMPLATE_DATE_SECTION));

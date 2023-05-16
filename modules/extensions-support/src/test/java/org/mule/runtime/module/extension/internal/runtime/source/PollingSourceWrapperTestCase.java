@@ -6,6 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
+import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
+import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
+import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
+import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
+import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
+import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,16 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.event.Level.DEBUG;
 import static org.slf4j.event.Level.TRACE;
-
-import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
-import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
-import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
-import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
-import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
-import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;
@@ -103,7 +101,6 @@ public class PollingSourceWrapperTestCase {
   @Before
   public void setUp() throws Exception {
     when(componentLocationMock.getRootContainerName()).thenReturn(TEST_FLOW_NAME);
-    setComponentLocationMock();
 
     when(schedulingStrategy.schedule(any(), any())).thenAnswer(new Answer<Void>() {
 
@@ -230,10 +227,6 @@ public class PollingSourceWrapperTestCase {
 
     assertThat(watermarkSettings.isPersistent(), is(isPersistent));
     assertThat(watermarkSettings.getExpirationInterval(), is(equalTo(expirationInterval)));
-  }
-
-  private void setComponentLocationMock() throws Exception {
-    setFieldValue(pollingSourceWrapper, "componentLocation", componentLocationMock, false);
   }
 
   private void startSourcePollWithMockedLogger() throws Exception {
