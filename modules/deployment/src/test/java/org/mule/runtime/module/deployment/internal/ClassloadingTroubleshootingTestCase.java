@@ -14,6 +14,7 @@ import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.o
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.overriderTestLibrary;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
@@ -47,13 +48,16 @@ import java.util.StringJoiner;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
 import com.github.valfirst.slf4jtest.TestLogger;
-import io.qameta.allure.Feature;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-@Feature(CLASSLOADING_ISOLATION)
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+
+@Features({@Feature(LOGGING), @Feature(CLASSLOADING_ISOLATION)})
 public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestCase {
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
