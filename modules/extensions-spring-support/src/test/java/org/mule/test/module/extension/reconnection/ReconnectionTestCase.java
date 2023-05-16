@@ -39,12 +39,14 @@ import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.RetryPolicy;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.policies.SimpleRetryPolicy;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -281,13 +283,18 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     });
   }
 
-  protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
+  private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
-    SimpleRetryPolicy policy = (SimpleRetryPolicy) template.createRetryInstance();
+    RetryPolicy policy = template.createRetryInstance();
 
-    assertThat(policy.getCount(), is(count));
-    assertThat(policy.getFrequency().toMillis(), is(freq));
+    // Needs to use reflection because SimpleRetryPolicy is an internal class on the container ClassLoader which is not visible
+    // from the TestCase's ClassLoader. Still, both methods are accessible (public in this case).
+    Method getCountMethod = policy.getClass().getMethod("getCount");
+    Method getFrequencyMethod = policy.getClass().getMethod("getFrequency");
+
+    assertThat(getCountMethod.invoke(policy), is(count));
+    assertThat(((Duration) getFrequencyMethod.invoke(policy)).toMillis(), is(freq));
   }
 
   private void switchConnection() throws Exception {
