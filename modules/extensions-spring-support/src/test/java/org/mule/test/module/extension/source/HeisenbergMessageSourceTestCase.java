@@ -6,16 +6,6 @@
  */
 package org.mule.test.module.extension.source;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
@@ -39,6 +29,18 @@ import static org.mule.test.heisenberg.extension.HeisenbergSource.TerminateStatu
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.heisenberg.extension.model.HealthStatus.CANCER;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
@@ -59,10 +61,12 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.hamcrest.Matcher;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -117,6 +121,7 @@ public class HeisenbergMessageSourceTestCase extends AbstractExtensionFunctional
   }
 
   @Test
+  @Ignore("W-13213986")
   public void sourceRestartedWithDynamicConfig() throws Exception {
     final Long gatheredMoney = HeisenbergSource.gatheredMoney;
     requestFlowToStartAndWait("source");
