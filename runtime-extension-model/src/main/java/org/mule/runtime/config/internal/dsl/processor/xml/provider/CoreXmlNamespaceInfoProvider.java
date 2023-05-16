@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.dsl.processor.xml;
+package org.mule.runtime.config.internal.dsl.processor.xml.provider;
 
 import static java.util.Arrays.asList;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;

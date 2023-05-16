@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.dsl.utils;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.config.internal.dsl.processor.xml.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.processor.xml.provider.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.BODY_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TRY_SCOPE_NAME;
