@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
-import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
+import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SSL_TYPE;

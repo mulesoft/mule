@@ -21,7 +21,7 @@ import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
+import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.ParseTemplateStory.PARSE_TEMPLATE;
 
