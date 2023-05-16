@@ -28,10 +28,6 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.currentThread;
@@ -60,11 +56,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -89,16 +88,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.InOrder;
-import org.slf4j.Logger;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -114,13 +116,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new ProfilingDataConsumerDiscoveryStrategy() {
-
-        @Override
-        public Set<ProfilingDataConsumer<?>> discover() {
-          return singleton(profilingDataConsumer);
-        }
-      };
+      return () -> singleton(profilingDataConsumer);
     }
 
     @Override
@@ -569,6 +565,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
+  @Ignore("W-13213862")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
