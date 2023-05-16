@@ -12,7 +12,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.module.extension.internal.AbstractComponentDefinitionParser;
+import org.mule.runtime.module.extension.internal.parser.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
