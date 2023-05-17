@@ -41,7 +41,6 @@ import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
-import java.beans.ExceptionListener;
 import java.util.Optional;
 
 import org.slf4j.Logger;

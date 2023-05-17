@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.core.internal.policy;
 
-import static java.lang.System.getProperty;
-import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.mule.runtime.api.notification.FlowConstructNotification.FLOW_CONSTRUCT_STOPPED;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+
+import static java.lang.System.getProperty;
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
@@ -62,12 +63,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link PolicyManager}.
@@ -415,7 +415,7 @@ public class DefaultPolicyManager implements PolicyManager, Lifecycle {
     });
   }
 
-  private void clearActive(@NonNull Object policy) {
+  private void clearActive(Object policy) {
     for (Iterator<DeferredDisposableWeakReference> iterator = activePolicies.iterator(); iterator.hasNext();) {
       if (policy == iterator.next().get()) {
         iterator.remove();
