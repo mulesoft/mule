@@ -18,6 +18,11 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.Map;
 
+/**
+ * An extended {@link ResolverSet} that will trace the resolution of its composed {@link ValueResolver}s.
+ * 
+ * @since 4.5
+ */
 public class TracedResolverSet extends ResolverSet {
 
   private final EventTracer<CoreEvent> coreEventEventTracer;
