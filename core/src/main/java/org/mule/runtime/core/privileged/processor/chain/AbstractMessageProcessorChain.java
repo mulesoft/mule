@@ -307,9 +307,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
         // We verify that there is a processor span to end on ending the current span.
         muleEventTracer.endCurrentSpan(coreEvent, getNotNullSpanTracingCondition());
         // Record the error and end current (MessageProcessor chain) Span. We verify that is the chain span.
+        muleEventTracer.recordErrorAtCurrentSpan(coreEvent, true);
         muleEventTracer.endCurrentSpan(coreEvent,
                                        new SpanNameAssertion(chainInitialSpanInfo.getName()));
-        muleEventTracer.recordErrorAtCurrentSpan(coreEvent, true);
 
         context.error(throwable);
       });

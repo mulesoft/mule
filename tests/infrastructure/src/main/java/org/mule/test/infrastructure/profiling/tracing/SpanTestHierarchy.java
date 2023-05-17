@@ -109,6 +109,11 @@ public class SpanTestHierarchy {
     return this;
   }
 
+  public SpanTestHierarchy addExceptionData(String errorType, String errorDescription, String errorStacktrace) {
+    currentNode.expectException(errorType, errorDescription, errorStacktrace);
+    return this;
+  }
+
   public SpanTestHierarchy addExceptionData(String errorType) {
     currentNode.expectException(errorType);
     return this;
@@ -226,6 +231,10 @@ public class SpanTestHierarchy {
 
     public void expectException(String errorType, String errorDescription) {
       this.exceptionEventMatcher = errorType(errorType).errorDescription(errorDescription);
+    }
+
+    public void expectException(String errorType, String errorDescription, String errorStacktrace) {
+      this.exceptionEventMatcher = errorType(errorType).errorDescription(errorDescription).stackTrace(errorStacktrace);
     }
 
     public void expectException(String errorType) {
