@@ -171,6 +171,20 @@ public class SimpleRetryPolicy implements RetryPolicy {
   }
 
   /**
+   * @return how many times a retry should be attempted.
+   */
+  public int getCount() {
+    return count;
+  }
+
+  /**
+   * @return how long to wait between retries.
+   */
+  public Duration getFrequency() {
+    return frequency;
+  }
+
+  /**
    * Indicates if the policy is applicable for the cause that caused the policy invocation. Subclasses can override this method in
    * order to filter the type of exceptions that does not deserve a retry.
    *
