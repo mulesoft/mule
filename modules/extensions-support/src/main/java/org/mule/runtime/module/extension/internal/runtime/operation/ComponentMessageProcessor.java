@@ -48,6 +48,8 @@ import static org.mule.runtime.module.extension.internal.util.InterceptorChainUt
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
@@ -56,7 +58,6 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
@@ -226,7 +227,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private EventTracer<CoreEvent> coreEventEventTracer;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -609,7 +610,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       // building time)
       resolverSet = new TracedResolverSet(muleContext, coreEventEventTracer,
                                           initialSpanInfoProvider
-                                              .getInitialSpanInfo(this, InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME, ""))
+                                              .getInitialSpanInfo(this, VALUE_RESOLUTION_SPAN_NAME, ""))
                                                   .addAll(resolverSet.getResolvers());
 
       initialised = true;
