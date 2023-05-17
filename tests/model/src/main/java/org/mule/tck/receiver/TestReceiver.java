@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.tck;
+package org.mule.tck.receiver;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
