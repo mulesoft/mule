@@ -64,7 +64,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
-import org.mule.runtime.core.internal.config.builders.ServiceCustomizationsConfigurationBuilder;
+import org.mule.runtime.core.internal.test.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
