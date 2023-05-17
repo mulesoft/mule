@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
+import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
@@ -98,6 +100,24 @@ class DeferredExecutorCallback implements ExecutorCallback, AutoCloseable {
     } finally {
       setContextClassLoader(currentThread, savedClassLoader, outerClassLoader);
     }
+  }
+
+  @Override
+  public ExecutorCallback before(CompletableCallback<Object> beforeCallback) {
+    return new ExecutorCallback() {
+
+      @Override
+      public void complete(Object value) {
+        beforeCallback.complete(value);
+        DeferredExecutorCallback.this.complete(value);
+      }
+
+      @Override
+      public void error(Throwable e) {
+        beforeCallback.error(e);
+        DeferredExecutorCallback.this.error(e);
+      }
+    };
   }
 
   private void callDelegateMethod() {

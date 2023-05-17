@@ -282,6 +282,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.resultTransformer = resultTransformer;
     this.hasNestedChain = hasNestedChain(componentModel);
     this.outerFluxTerminationTimeout = terminationTimeout;
+
   }
 
   @Override
@@ -1044,6 +1045,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
                                         coreEventEventTracer,
+                                        initialSpanInfoProvider
+                                            .getInitialSpanInfo(this, InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME, ""),
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 
