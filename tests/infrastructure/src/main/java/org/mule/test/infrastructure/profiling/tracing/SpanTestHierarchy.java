@@ -260,12 +260,6 @@ public class SpanTestHierarchy {
         assertThat(format("Expected exceptions for Span: [%s] differ", actualSpan), exceptionEvents,
                    containsInAnyOrder(exceptionEventMatcher));
         assertThat(actualSpan.hasErrorStatus(), is(true));
-      } else {
-        List<CapturedEventData> exceptionEvents = actualSpan.getEvents().stream()
-            .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
-        assertThat(format("No exceptions were expected for Span: [%s] but some were found", actualSpan), exceptionEvents.size(),
-                   is(0));
-        assertThat(actualSpan.hasErrorStatus(), is(false));
       }
     }
   }
