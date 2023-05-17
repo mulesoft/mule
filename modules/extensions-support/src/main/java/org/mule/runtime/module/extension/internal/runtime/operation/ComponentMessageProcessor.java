@@ -1043,6 +1043,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
+                                        coreEventEventTracer,
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 

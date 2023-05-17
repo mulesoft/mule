@@ -49,6 +49,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import org.mule.runtime.tracer.api.EventTracer;
 import org.slf4j.Logger;
 
 /**
@@ -76,6 +77,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
   private final ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
+  private final EventTracer<CoreEvent> coreEventEventTracer;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
@@ -86,6 +88,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ClassLoader executionClassLoader,
                                   ResultTransformer resultTransformer,
                                   ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
+                                  EventTracer<CoreEvent> coreEventEventTracer,
                                   boolean suppressErrors) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
@@ -105,6 +108,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
 
     this.threadReleaseDataProducer = threadReleaseDataProducer;
+    this.coreEventEventTracer = coreEventEventTracer;
   }
 
   /**
@@ -122,7 +126,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     try (DeferredExecutorCallback deferredCallback =
         new DeferredExecutorCallback(getDelegateExecutorCallback(getStats(context), callback, context))) {
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
-        executeWithInterceptors(executor, context, deferredCallback);
+        executeWithInterceptors(executor, context, (ExecutorCallback) deferredCallback.before(new OperationExecutionTraceCallback(context, coreEventEventTracer)));
         return null;
       });
     } catch (Exception e) {
@@ -193,7 +197,10 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return future;
     },
                             e -> shouldRetry(e, context),
-                            e -> interceptorChain.onError(context, e),
+                            e -> {
+                                  interceptorChain.onError(context, e);
+                                  // TODO: We need to close the current span from the execution context (a retry will happen).
+                            },
                             NULL_THROWABLE_CONSUMER,
                             identity(),
                             context.getCurrentScheduler())
@@ -229,6 +236,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
       setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
+        // TODO: We need to open the execution span here.
         executor.execute(context, callback);
       } finally {
         profileThreadRelease(context);
