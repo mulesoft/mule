@@ -44,7 +44,7 @@ public class LevelInitialExportInfoProviderTestCase {
   private static final String GET_CONNECTION = "get-connection";
   public static final String PARAMETER_RESOLUTION = "parameters-resolution";
 
-  private static final String EXECUTION_TIME = "execution-time";
+  private static final String OPERATION_EXECUTION = "operation-execution";
   private final InitialExportInfoProvider initialExportInfoProvider;
   private final String componentNamespace;
   private final String componentName;
@@ -78,12 +78,12 @@ public class LevelInitialExportInfoProviderTestCase {
             PARAMETER_RESOLUTION, FALSE},
         {"overview-parameter-resolution", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
             PARAMETER_RESOLUTION, FALSE},
-        {"debug-execution-time", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, EXECUTION_TIME,
+        {"debug-execution-time", new DebugInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE, OPERATION_EXECUTION,
             TRUE},
         {"monitoring-execution-time", new MonitoringInitialExportInfoProvider(), MULE_COMPONENT_NAMESPACE,
-            EXECUTION_TIME, FALSE},
+            OPERATION_EXECUTION, FALSE},
         {"overview-execution-time", new OverviewInitialExportInfoProvider(), HTTP_CONNECTOR_COMPONENT_NAMESPACE,
-            EXECUTION_TIME, FALSE}});
+            OPERATION_EXECUTION, FALSE}});
   }
 
   public LevelInitialExportInfoProviderTestCase(String testName, InitialExportInfoProvider initialExportInfoProvider,
