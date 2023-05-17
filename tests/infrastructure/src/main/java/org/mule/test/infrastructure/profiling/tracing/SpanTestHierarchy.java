@@ -109,6 +109,11 @@ public class SpanTestHierarchy {
     return this;
   }
 
+  public SpanTestHierarchy addExceptionData(String errorType, String errorDescription, String errorStacktrace) {
+    currentNode.expectException(errorType, errorDescription, errorStacktrace);
+    return this;
+  }
+
   public SpanTestHierarchy addExceptionData(String errorType) {
     currentNode.expectException(errorType);
     return this;
@@ -228,6 +233,10 @@ public class SpanTestHierarchy {
       this.exceptionEventMatcher = errorType(errorType).errorDescription(errorDescription);
     }
 
+    public void expectException(String errorType, String errorDescription, String errorStacktrace) {
+      this.exceptionEventMatcher = errorType(errorType).errorDescription(errorDescription).stackTrace(errorStacktrace);
+    }
+
     public void expectException(String errorType) {
       this.exceptionEventMatcher = errorType(errorType);
     }
@@ -251,6 +260,12 @@ public class SpanTestHierarchy {
         assertThat(format("Expected exceptions for Span: [%s] differ", actualSpan), exceptionEvents,
                    containsInAnyOrder(exceptionEventMatcher));
         assertThat(actualSpan.hasErrorStatus(), is(true));
+      } else {
+        List<CapturedEventData> exceptionEvents = actualSpan.getEvents().stream()
+            .filter(capturedEventData -> capturedEventData.getName().equals(OTEL_EXCEPTION_EVENT_NAME)).collect(toList());
+        assertThat(format("No exceptions were expected for Span: [%s] but some were found", actualSpan), exceptionEvents.size(),
+                   is(0));
+        assertThat(actualSpan.hasErrorStatus(), is(false));
       }
     }
   }
