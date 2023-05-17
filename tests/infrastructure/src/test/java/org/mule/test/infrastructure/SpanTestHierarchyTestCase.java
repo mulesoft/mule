@@ -16,6 +16,9 @@ import static org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy.U
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.createAttributeMap;
 import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.getDefaultAttributesToAssertExistence;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -763,7 +766,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
         .endChildren();
 
     expectedException.expect(AssertionError.class);
-    expectedException.expectMessage(matchesRegex("Expected exceptions for Span: .* differ(\\n.*)*"));
+    expectedException.expectMessage(matchesRegex(format("Expected exceptions for Span: .* differ(%s.*)*", lineSeparator())));
 
     spanTestHierarchy.assertSpanTree();
   }
