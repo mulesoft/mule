@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
+import org.mule.runtime.core.internal.exception.ValidationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.core.util.store.InMemoryObjectStore;

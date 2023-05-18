@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing.split;
 
-import org.mule.runtime.core.internal.routing.ValidationException;
+import org.mule.runtime.core.internal.exception.ValidationException;
 
 /**
  * Indicates that the execution of the current event is stopped becasue the message has already been processed. This exception is
