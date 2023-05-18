@@ -29,6 +29,7 @@ import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.ResourceReleaserExecutor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -105,15 +106,14 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String dbResourceReleaserClassLocation = DB_RESOURCE_RELEASER_CLASS_LOCATION;
-  private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
   private volatile boolean shouldReleaseActiveMQReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
-  private final ResourceReleaser mvelClassLoaderReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
+  private final ResourceReleaserExecutor resourceReleaserExecutor = new ResourceReleaserExecutor(this::reportPossibleLeak);
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -131,8 +131,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-    this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
-    this.mvelClassLoaderReleaserInstance = new MvelClassLoaderReleaser(this);
+    this.resourceReleaserExecutor.addResourceReleaser(() -> new ClassLoaderResourceReleaser(this));
+    this.resourceReleaserExecutor.addResourceReleaser(() -> new MvelClassLoaderReleaser(this));
   }
 
   @Override
@@ -309,48 +309,39 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     });
     descriptorMapping.clear();
 
-    invokeCoreResourceReleasers();
-
-    // When running on Java 17, the resource releaser logic from the Mule Runtime will not be used.
+    // When running on Java versions greater than 11, the resource releaser logic from the Mule Runtime will not be used.
     // The resource releasing responsibility will be delegated to each extension instead.
     if (IS_JAVA_VERSION_AT_MOST_11) {
-      invokeLegacyExtensionsResourceReleasers();
+      addLegacyExtensionsResourceReleasers();
     }
+
+    resourceReleaserExecutor.executeResourceReleasers();
 
     super.dispose();
     shutdownListeners();
   }
 
-  private void invokeCoreResourceReleasers() {
-    try {
-      classLoaderReferenceReleaser.release();
-      mvelClassLoaderReleaserInstance.release();
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
-  }
-
   @Deprecated
-  private void invokeLegacyExtensionsResourceReleasers() {
-    try {
-      new AwsIdleConnectionReaperResourceReleaser(this).release();
-      new ScalaClassValueReleaser().release();
+  private void addLegacyExtensionsResourceReleasers() {
+    resourceReleaserExecutor.addResourceReleaser(() -> new AwsIdleConnectionReaperResourceReleaser(this));
+    resourceReleaserExecutor.addResourceReleaser(ScalaClassValueReleaser::new);
 
-      if (shouldReleaseJdbcReferences) {
-        createResourceReleaserInstance().release();
-      }
-      if (shouldReleaseIbmMQResources) {
-        new IBMMQResourceReleaser(this).release();
-      }
-      if (shouldReleaseActiveMQReferences) {
-        new ActiveMQResourceReleaser(this).release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
+    if (shouldReleaseJdbcReferences) {
+      resourceReleaserExecutor.addResourceReleaser(this::createResourceReleaserInstance);
+    }
+    if (shouldReleaseIbmMQResources) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new IBMMQResourceReleaser(this));
+    }
+    if (shouldReleaseActiveMQReferences) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new ActiveMQResourceReleaser(this));
     }
   }
 
-  void reportPossibleLeak(Throwable t, String artifactId) {
+  private void reportPossibleLeak(Throwable t) {
+    reportPossibleLeak(t, artifactId);
+  }
+
+  protected void reportPossibleLeak(Throwable t, String artifactId) {
     final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug(message, artifactId, t);

@@ -6,56 +6,46 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.getField;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
+import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
-import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Properties;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
@@ -69,45 +59,11 @@ public class IBMMQResourceReleaserTriggerTestCase {
   private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
 
   String driverVersion;
-  private ClassLoaderLookupPolicy testLookupPolicy;
   MulePluginClassLoader artifactClassLoader = null;
-  BundleDependency dependency = null;
 
   // Parameterized
   public IBMMQResourceReleaserTriggerTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
-    this.testLookupPolicy = new ClassLoaderLookupPolicy() {
-
-      @Override
-      public LookupStrategy getClassLookupStrategy(String className) {
-        return CHILD_FIRST;
-      }
-
-      @Override
-      public LookupStrategy getPackageLookupStrategy(String packageName) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
-        return null;
-      }
-    };
   }
 
 
@@ -124,31 +80,20 @@ public class IBMMQResourceReleaserTriggerTestCase {
 
   @Before
   public void setup() throws Exception {
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), Is.is(false));
+
     Properties props = System.getProperties();
     props.remove("avoid.ibm.mq.cleanup");
     props.remove("avoid.ibm.mq.cleanup.mbeans");
-    URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
-    final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
 
-    final Supplier<File> localMavenRepository =
-        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
-        newMavenConfigurationBuilder().globalSettingsLocation(toFile(settingsUrl));
-
-    MavenClient mavenClient = mavenClientProvider
-        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
-
-    BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder().setGroupId(DRIVER_GROUP_ID)
-        .setArtifactId(DRIVER_ARTIFACT_ID).setVersion(driverVersion).build();
-
-    dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
-
-    artifactClassLoader = new MulePluginClassLoader("IBMMQResourceReleaserTriggerTestCase", mock(ArtifactDescriptor.class),
-                                                    new URL[] {dependency.getBundleUri().toURL()},
-                                                    currentThread().getContextClassLoader(), testLookupPolicy);
-
-
+    artifactClassLoader =
+        new MulePluginClassLoader("IBMMQResourceReleaserTriggerTestCase",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY);
   }
 
 

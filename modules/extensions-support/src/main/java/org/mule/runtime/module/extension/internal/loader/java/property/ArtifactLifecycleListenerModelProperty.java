@@ -7,20 +7,21 @@
 package org.mule.runtime.module.extension.internal.loader.java.property;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.extension.internal.lifecycle.ArtifactLifecycleListenerFactory;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 /**
- * A model property which gives access to an {@link ArtifactLifecycleListener}.
+ * A model property which gives access to an {@link ArtifactLifecycleListenerFactory} that can be used to create instances of a
+ * given {@link ArtifactLifecycleListener} class.
  *
- * @since 4.6
+ * @since 4.5.0
  */
 public class ArtifactLifecycleListenerModelProperty implements ModelProperty {
 
-  private final ArtifactLifecycleListener artifactLifecycleListener;
+  private final ArtifactLifecycleListenerFactory artifactLifecycleListenerFactory;
 
-  public ArtifactLifecycleListenerModelProperty(ArtifactLifecycleListener artifactLifecycleListener) {
-    this.artifactLifecycleListener = artifactLifecycleListener;
+  public ArtifactLifecycleListenerModelProperty(Class<? extends ArtifactLifecycleListener> artifactLifecycleListenerClass) {
+    this.artifactLifecycleListenerFactory = new ArtifactLifecycleListenerFactory(artifactLifecycleListenerClass);
   }
 
   @Override
@@ -34,9 +35,9 @@ public class ArtifactLifecycleListenerModelProperty implements ModelProperty {
   }
 
   /**
-   * @return the extension's {@link ArtifactLifecycleListener}.
+   * @return the extension's {@link ArtifactLifecycleListenerFactory}.
    */
-  public ArtifactLifecycleListener getArtifactLifecycleListener() {
-    return artifactLifecycleListener;
+  public ArtifactLifecycleListenerFactory getArtifactLifecycleListenerFactory() {
+    return artifactLifecycleListenerFactory;
   }
 }

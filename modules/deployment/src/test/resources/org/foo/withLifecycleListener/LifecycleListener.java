@@ -6,21 +6,28 @@
  */
 package org.foo.withLifecycleListener;
 
+import static java.lang.String.format;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.sdk.api.artifact.lifecycle.ArtifactDisposalContext;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
+import org.slf4j.Logger;
+
 public class LifecycleListener implements ArtifactLifecycleListener {
+
+  private static Logger LOGGER = getLogger(LifecycleListener.class);
 
   @Override
   public void onArtifactDisposal(ArtifactDisposalContext disposalContext) {
-    try {
-      // With this we make sure the ClassLoaders are still usable inside the listener code.
-      Class<?> muleContextClass = disposalContext.getArtifactClassLoader().loadClass("org.foo.EchoTest");
-      Class<?> leakingThreadClass = disposalContext.getExtensionClassLoader().loadClass("org.foo.withLifecycleListener.LeakingThread");
-    } catch (ClassNotFoundException e) {
-      // If one of the avobe failed, we will skip the disposal code, and the associated test will fail.
-      throw new RuntimeException(e);
-    }
+    assertThisClassIsLoadedWithExtensionClassLoader(disposalContext);
+
+    // With this we make sure the ClassLoaders are still usable inside the listener code.
+    assertClassCanBeLoadedWith(disposalContext.getArtifactClassLoader(), "org.foo.EchoTest");
+    assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakingThread");
+
+    // If one of the avobe failed, the exception will make it skip the disposal code, and the associated test will fail.
 
     // Iterates through the threads that are owned by the artifact being disposed of, calling the graceful stop methods and
     // joining them
@@ -35,5 +42,31 @@ public class LifecycleListener implements ArtifactLifecycleListener {
           // Does nothing
         }
       });
+  }
+
+  private void assertClassCanBeLoadedWith(ClassLoader classLoader, String className) {
+    try {
+      Class<?> cls = classLoader.loadClass(className);
+    } catch (ClassNotFoundException e) {
+      fail(format("Expected to be able to load class %s", className), e);
+    }
+  }
+
+  private void assertThisClassIsLoadedWithExtensionClassLoader(ArtifactDisposalContext disposalContext) {
+    if (this.getClass().getClassLoader() != disposalContext.getExtensionClassLoader()) {
+      fail("LifecycleListener was not loaded with the Extension's ClassLoader");
+    }
+  }
+
+  private void fail(String message) {
+    AssertionError error = new AssertionError(message);
+    LOGGER.error(message, error);
+    throw error;
+  }
+
+  private void fail(String message, Throwable cause) {
+    AssertionError error = new AssertionError(message, cause);
+    LOGGER.error(message, error);
+    throw error;
   }
 }

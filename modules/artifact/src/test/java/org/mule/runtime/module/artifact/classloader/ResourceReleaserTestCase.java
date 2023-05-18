@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY;
 
 import static java.lang.Thread.currentThread;
 import static java.sql.DriverManager.deregisterDriver;
@@ -16,6 +16,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.list;
 import static java.util.Locale.getDefault;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -24,11 +26,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.module.artifact.classloader.JdbcResourceReleaser;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
@@ -47,14 +48,14 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
+import io.qameta.allure.Issue;
+import org.hamcrest.core.Is;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import io.qameta.allure.Issue;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -77,6 +78,13 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
 
   public ResourceReleaserTestCase(Function<ClassLoader, MuleArtifactClassLoader> classLoaderFactory) {
     this.classLoaderFactory = classLoaderFactory;
+  }
+
+  @Before
+  public void setup() throws Exception {
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), Is.is(false));
   }
 
   @Test
@@ -148,6 +156,17 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
   }
 
+  @Test
+  public void releaserCanBeInvokedMultipleTimes() throws Exception {
+    Driver jdbcDriver = mock(Driver.class);
+    registerDriver(jdbcDriver);
+
+    assertThat(list(getDrivers()), hasItem(jdbcDriver));
+    new JdbcResourceReleaser().release();
+    new JdbcResourceReleaser().release();
+    assertThat(list(getDrivers()), not(hasItem(jdbcDriver)));
+  }
+
   private void ensureResourceReleaserIsCreatedByCorrectClassLoader(MuleArtifactClassLoader classLoader) throws Exception {
     assertThat(classLoader.getClass().getClassLoader(), is(currentThread().getContextClassLoader()));
     classLoader.setResourceReleaserClassLocation(TEST_RESOURCE_RELEASER_CLASS_LOCATION);
@@ -214,38 +233,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     private ResourceReleaser resourceReleaserInstance;
 
     public TestPluginClassLoader(ClassLoader parentCl) {
-      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, new ClassLoaderLookupPolicy() {
-
-        @Override
-        public LookupStrategy getClassLookupStrategy(String className) {
-          return PARENT_FIRST;
-        }
-
-        @Override
-        public LookupStrategy getPackageLookupStrategy(String packageName) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
-          return null;
-        }
-      });
+      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY);
     }
 
     @Override
@@ -266,38 +254,7 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     private ResourceReleaser resourceReleaserInstance;
 
     public TestApplicationClassLoader(ClassLoader parentCl) {
-      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, new ClassLoaderLookupPolicy() {
-
-        @Override
-        public LookupStrategy getClassLookupStrategy(String className) {
-          return PARENT_FIRST;
-        }
-
-        @Override
-        public LookupStrategy getPackageLookupStrategy(String packageName) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
-          return null;
-        }
-      });
+      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY);
     }
 
     @Override

@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A Utility class for releasing all the known references that may lead to a ClassLoader leak.
  *
- * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
- *             the IBM MQ driver. We still keep it to support legacy extensions.
+ * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
+ *             that are using the IBM MQ driver. We still keep it to support legacy extensions.
  */
 @Deprecated
 public class IBMMQResourceReleaser implements ResourceReleaser {

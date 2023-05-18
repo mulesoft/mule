@@ -103,6 +103,7 @@ public final class TestArtifactsCatalog {
   public static JarFileBuilder overriderTestLibrary;
   public static File pluginEchoJavaxTestClassFile;
   public static File withLifecycleListenerExtensionJarFile;
+  public static File withBrokenLifecycleListenerExtensionJarFile;
 
   private static void initFiles() throws URISyntaxException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
@@ -263,6 +264,11 @@ public final class TestArtifactsCatalog {
                    getResourceFile("/org/foo/withLifecycleListener/LifecycleListener.java"))
         .compile("mule-extension-with-lifecycle-listener-1.0-SNAPSHOT.jar", "1.0.0");
 
+    withBrokenLifecycleListenerExtensionJarFile = new CompilerUtils.ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/withBrokenLifecycleListener/WithBrokenLifecycleListenerExtension.java"),
+                   getResourceFile("/org/foo/withBrokenLifecycleListener/LifecycleListener.java"))
+        .compile("mule-extension-with-broken-lifecycle-listener-1.0-SNAPSHOT.jar", "1.0.0");
+
     pluginEchoJavaxTestClassFile = new SingleClassCompiler()
         .dependingOn(barUtilsJavaxJarFile)
         .compile(getResourceFile("/org/foo/echo/PluginJavaxEcho.java"));
@@ -298,6 +304,7 @@ public final class TestArtifactsCatalog {
   public static ArtifactPluginFileBuilder echoPluginWithLib1;
   public static ArtifactPluginFileBuilder echoPluginWithJavaxLib;
   public static ArtifactPluginFileBuilder withLifecycleListenerPlugin;
+  public static ArtifactPluginFileBuilder withBrokenLifecycleListenerPlugin;
 
   public static void initArtifactPluginFileBuilders() throws URISyntaxException {
     echoPlugin = createEchoPluginBuilder();
@@ -344,6 +351,7 @@ public final class TestArtifactsCatalog {
 
     echoPluginWithJavaxLib = createEchoPluginWithJavaxLib();
     withLifecycleListenerPlugin = createWithLifecycleListenerPlugin();
+    withBrokenLifecycleListenerPlugin = createWithBrokenLifecycleListenerPlugin();
   }
 
   private static ArtifactPluginFileBuilder createEchoPluginWithJavaxLib() {
@@ -581,7 +589,18 @@ public final class TestArtifactsCatalog {
 
 
   private static ArtifactPluginFileBuilder createWithLifecycleListenerPlugin() {
-    String artifactId = "withLifecycleListenerPlugin";
+    return createPluginBuilder("withLifecycleListenerPlugin",
+                               "org.foo.withLifecycleListener.WithLifecycleListenerExtension",
+                               withLifecycleListenerExtensionJarFile);
+  }
+
+  private static ArtifactPluginFileBuilder createWithBrokenLifecycleListenerPlugin() {
+    return createPluginBuilder("withBrokenLifecycleListenerPlugin",
+                               "org.foo.withBrokenLifecycleListener.WithBrokenLifecycleListenerExtension",
+                               withBrokenLifecycleListenerExtensionJarFile);
+  }
+
+  private static ArtifactPluginFileBuilder createPluginBuilder(String artifactId, String extensionModelType, File jarFile) {
     String version = "1.0.0";
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
         .setMinMuleVersion(MIN_MULE_VERSION)
@@ -592,10 +611,10 @@ public final class TestArtifactsCatalog {
     mulePluginModelBuilder.withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptorBuilder().setId(MULE_LOADER_ID)
         .build());
     mulePluginModelBuilder.withExtensionModelDescriber().setId(JAVA_LOADER_ID)
-        .addProperty("type", "org.foo.withLifecycleListener.WithLifecycleListenerExtension")
+        .addProperty("type", extensionModelType)
         .addProperty("version", version);
     return new ArtifactPluginFileBuilder(artifactId)
-        .dependingOn(new JarFileBuilder(artifactId, withLifecycleListenerExtensionJarFile))
+        .dependingOn(new JarFileBuilder(artifactId, jarFile))
         .describedBy(mulePluginModelBuilder.build());
   }
 }

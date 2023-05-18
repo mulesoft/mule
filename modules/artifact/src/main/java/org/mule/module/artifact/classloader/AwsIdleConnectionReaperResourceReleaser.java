@@ -8,6 +8,8 @@ package org.mule.module.artifact.classloader;
 
 import static java.lang.String.format;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
@@ -16,18 +18,18 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Shutdowns the AWS IdleConnectionReaper Thread if one is present, since it will cause a leak if not closed correctly.
  *
- * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
- *             the AWS SDK. We still keep it to support legacy extensions.
+ * @since 4.5.0 (it used to be part of {@link ClassLoaderResourceReleaser} before that).
+ * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
+ *             that are using the AWS SDK. We still keep it to support legacy extensions.
  */
 @Deprecated
 public class AwsIdleConnectionReaperResourceReleaser implements ResourceReleaser {
 
-  private static final Logger logger = LoggerFactory.getLogger(AwsIdleConnectionReaperResourceReleaser.class);
+  private static final Logger LOGGER = getLogger(AwsIdleConnectionReaperResourceReleaser.class);
 
   private final ClassLoader classLoader;
 
@@ -53,8 +55,10 @@ public class AwsIdleConnectionReaperResourceReleaser implements ResourceReleaser
             idleConnectionReaperClass.getMethod("removeConnectionManager", httpClientConnectionManagerClass);
         for (Object connectionManager : httpClientConnectionManagers) {
           boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
-          if (!removed && logger.isDebugEnabled()) {
-            logger
+          if (!removed && LOGGER.isDebugEnabled()) {
+            // TODO W-13222647: check if this should be warn or even error. Also check if the connection manager or client have a
+            // name or something that can help in identifying it
+            LOGGER
                 .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
                               connectionManager));
           }
@@ -68,7 +72,9 @@ public class AwsIdleConnectionReaperResourceReleaser implements ResourceReleaser
     } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException e) {
       // If the class or method is not found, there is nothing to dispose
     } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
-      logger.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
+      // TODO W-13222647: InvocationTargetException should be treated differently, logging the target exception (cause) message
+      // and stack trace
+      LOGGER.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
     }
   }
 }

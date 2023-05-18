@@ -24,6 +24,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
@@ -32,7 +33,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
-import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,7 +149,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   @Override
-  public Optional<ArtifactLifecycleListener> getArtifactLifecycleListener() {
+  public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
     return empty();
   }
 

@@ -16,6 +16,7 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
@@ -174,9 +175,10 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   ExtensionDevelopmentFramework getDevelopmentFramework();
 
   /**
-   * @return the extension's {@link ArtifactLifecycleListener} if one was defined.
+   * @return an {@link Optional} {@link ArtifactLifecycleListenerModelProperty} if an {@link ArtifactLifecycleListener} was
+   *         defined at the extension level.
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
-  Optional<ArtifactLifecycleListener> getArtifactLifecycleListener();
+  Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty();
 }

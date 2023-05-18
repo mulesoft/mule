@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.lifecycle;
 
-import static java.lang.Thread.getAllStackTraces;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.stream;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 
 /**
  * Default implementation of {@link ArtifactDisposalContext}.
+ *
+ * @since 4.5.0
  */
 public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
 
@@ -54,11 +57,10 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
   @Override
   public Stream<Thread> getArtifactOwnedThreads() {
     try {
-      // This may be expensive because it needs to build all the stack traces which we don't actually need.
-      // However, other alternatives like Thread#enumerate would require us to traverse up to the root Thread Group in order
-      // to actually get all threads.
-      // Because this is only executed on disposal, we prefer readability to marginal performance gains.
-      return getAllStackTraces().keySet().stream().filter(this::isArtifactOwnedThread);
+      ThreadGroup threadGroup = getTopLevelThreadGroup();
+      Thread[] allThreads = new Thread[threadGroup.activeCount()];
+      threadGroup.enumerate(allThreads);
+      return stream(allThreads).filter(this::isArtifactOwnedThread);
     } catch (SecurityException e) {
       LOGGER
           .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Thread cleanup will be skipped.",
@@ -93,5 +95,23 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
   @Override
   public boolean isArtifactOwnedThread(Thread thread) {
     return isArtifactClassLoader(thread.getContextClassLoader());
+  }
+
+  private ThreadGroup getTopLevelThreadGroup() {
+    ThreadGroup threadGroup = currentThread().getThreadGroup();
+    while (threadGroup.getParent() != null) {
+      try {
+        threadGroup = threadGroup.getParent();
+      } catch (SecurityException e) {
+        LOGGER
+            .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Parent Thread Group is not accessible. Some threads may not be cleaned up.",
+                  artifactClassLoader.getArtifactId(),
+                  extensionClassLoader.getArtifactId(),
+                  e);
+        return threadGroup;
+      }
+    }
+
+    return threadGroup;
   }
 }

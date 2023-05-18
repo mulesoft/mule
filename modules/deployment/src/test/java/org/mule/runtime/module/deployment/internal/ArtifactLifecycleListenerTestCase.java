@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.withBrokenLifecycleListenerPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.withLifecycleListenerPlugin;
 import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
 import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
@@ -124,6 +125,33 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
 
     // After some time, the domain's ClassLoader should be collectable, thanks to the extension's LifecycleListener
     assertClassLoaderIsCollectable(domainDeploymentListener.getPhantomReference());
+  }
+
+  @Test
+  public void whenOneListenerFailsThenOtherListenersAreStillCalled() throws Exception {
+    // Prepares an application that depends on two extensions with lifecycle listeners, one which fails and another one which
+    // is necessary to avoid a leak
+    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
+        .dependingOn(withLifecycleListenerPlugin)
+        .dependingOn(withBrokenLifecycleListenerPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    // Starts the deployment
+    startDeployment();
+    triggerDirectoryWatcher();
+
+    assertThat(appDeploymentListener.isArtifactDeployed(), is(true));
+
+    // Executes a flow with an operation that leaks the application's ClassLoader
+    executeApplicationFlow("main");
+
+    // Undeploys the application
+    assertThat(removeAppAnchorFile(applicationFileBuilder.getId()), is(true));
+    triggerDirectoryWatcher();
+    assertThat(appDeploymentListener.isArtifactUndeployed(), is(true));
+
+    // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
+    assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
   }
 
   private void assertClassLoaderIsCollectable(PhantomReference<ArtifactClassLoader> classLoaderReference) {

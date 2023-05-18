@@ -26,6 +26,8 @@ import java.util.function.Predicate;
 /**
  * A {@link NotificationListener} implementation to catch artifact context disposal events and dispatch to the corresponding
  * extension's {@link ArtifactLifecycleListener} callback.
+ *
+ * @since 4.5.0
  */
 public class ExtensionOnMuleContextDisposedNotificationListener
     implements MuleContextNotificationListener<MuleContextNotification> {
@@ -46,10 +48,11 @@ public class ExtensionOnMuleContextDisposedNotificationListener
                                                                    ClassLoader executionClassLoader,
                                                                    ExtensionModel extensionModel) {
     Optional<ArtifactLifecycleListener> artifactLifecycleListener = getArtifactLifecycleListener(extensionModel);
-    Optional<ClassLoader> extensionClassLoader = getExtensionClassLoader(extensionModel);
+    Optional<ClassLoader> extensionClassLoader = getExtensionClassLoader(extensionModel)
+        .filter(ArtifactClassLoader.class::isInstance);
+
     if (artifactLifecycleListener.isPresent()
         && extensionClassLoader.isPresent()
-        && extensionClassLoader.get() instanceof ArtifactClassLoader
         && executionClassLoader instanceof ArtifactClassLoader) {
       ArtifactDisposalContext context = new DefaultArtifactDisposalContext((ArtifactClassLoader) executionClassLoader,
                                                                            (ArtifactClassLoader) extensionClassLoader.get());
@@ -62,7 +65,7 @@ public class ExtensionOnMuleContextDisposedNotificationListener
 
   private static Optional<ArtifactLifecycleListener> getArtifactLifecycleListener(ExtensionModel extensionModel) {
     return extensionModel.getModelProperty(ArtifactLifecycleListenerModelProperty.class)
-        .map(ArtifactLifecycleListenerModelProperty::getArtifactLifecycleListener);
+        .map(mp -> mp.getArtifactLifecycleListenerFactory().createArtifactLifecycleListener());
   }
 
   private static Optional<ClassLoader> getExtensionClassLoader(ExtensionModel extensionModel) {

@@ -49,10 +49,12 @@ import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFacto
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExportedClassNamesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
@@ -69,8 +71,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfigurat
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.ExportInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
-import org.mule.runtime.module.extension.internal.loader.parser.java.lifecycle.ArtifactLifecycleListenerParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.annotation.OnArtifactLifecycle;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.ArrayList;
@@ -403,8 +405,9 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   }
 
   @Override
-  public Optional<ArtifactLifecycleListener> getArtifactLifecycleListener() {
-    return new ArtifactLifecycleListenerParser().getArtifactLifecycleListener(extensionElement);
+  public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
+    return parseArtifactLifecycleListener(extensionElement)
+        .map(ArtifactLifecycleListenerModelProperty::new);
   }
 
   public StereotypeModelLoaderDelegate getStereotypeLoaderDelegate() {
@@ -422,5 +425,16 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
                                      xml -> new XmlDslConfiguration(
                                                                     xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::prefix),
                                                                     xml.getStringValue(org.mule.sdk.api.annotation.dsl.xml.Xml::namespace)));
+  }
+
+  private Optional<Class<? extends ArtifactLifecycleListener>> parseArtifactLifecycleListener(ExtensionElement extensionElement) {
+    return extensionElement.getValueFromAnnotation(OnArtifactLifecycle.class)
+        .flatMap(this::parseArtifactLifecycleListener);
+  }
+
+  private Optional<Class<? extends ArtifactLifecycleListener>> parseArtifactLifecycleListener(AnnotationValueFetcher<OnArtifactLifecycle> annotationValueFetcher) {
+    return annotationValueFetcher.getClassValue(OnArtifactLifecycle::value)
+        .getDeclaringClass()
+        .map(cls -> (Class<? extends ArtifactLifecycleListener>) cls);
   }
 }

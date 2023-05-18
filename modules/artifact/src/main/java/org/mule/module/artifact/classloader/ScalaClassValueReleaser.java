@@ -29,9 +29,9 @@ import org.slf4j.LoggerFactory;
  * a class to be loaded from the container.
  *
  * @since 4.3, 4.2.3
- * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
- *             dynamic languages which may be retaining {@link ClassLoader} references through {@link ClassValue}s (e.g.: Scala).
- *             We still keep it to support legacy extensions.
+ * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
+ *             that are using dynamic languages which may be retaining {@link ClassLoader} references through {@link ClassValue}s
+ *             (e.g.: Scala). We still keep it to support legacy extensions.
  */
 @Deprecated
 public class ScalaClassValueReleaser implements ResourceReleaser {

@@ -50,8 +50,8 @@ import org.slf4j.LoggerFactory;
  * class must be loaded by each artifact class loader that is being disposed. So, it cannot contain any of the prefixes that force
  * a class to be loaded from the container.
  *
- * @deprecated This releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions that are using
- *             the {@link Driver SQL driver}. We still keep it to support legacy extensions.
+ * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
+ *             that are using the {@link Driver SQL driver}. We still keep it to support legacy extensions.
  */
 @Deprecated
 public class JdbcResourceReleaser implements ResourceReleaser {
