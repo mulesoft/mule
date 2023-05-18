@@ -12,10 +12,10 @@ import static org.mule.runtime.module.artifact.activation.internal.plugin.Plugin
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.internal.classloader.AbstractArtifactClassLoaderConfigurationAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.model.ClassLoaderModelAssembler;
@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -65,8 +66,10 @@ public class PluginClassLoaderConfigurationAssembler extends AbstractArtifactCla
     this.bundleDependencies = bundleDependencies;
     this.bundleDependency = bundleDependency;
     this.ownerDescriptor = ownerDescriptor;
-    Collection<PluginPatchesResolver> resolverRegistered =
-        new SpiServiceRegistry().lookupProviders(PluginPatchesResolver.class, this.getClass().getClassLoader());
+
+    Collection<PluginPatchesResolver> resolverRegistered = stream(((Iterable<PluginPatchesResolver>) () -> ServiceLoader
+        .load(PluginPatchesResolver.class, this.getClass().getClassLoader()).iterator()).spliterator(), false)
+            .collect(toList());
     if (resolverRegistered.size() > 1) {
       throw new MuleRuntimeException(
                                      createStaticMessage("There is more than 1 PluginPatchesResolver implementation registered: "
