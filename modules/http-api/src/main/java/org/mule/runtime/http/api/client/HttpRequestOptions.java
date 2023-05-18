@@ -52,7 +52,8 @@ public interface HttpRequestOptions {
   Optional<HttpAuthentication> getAuthentication();
 
   /**
-   * @return if the request should contain a body even for methods without body semantics.
+   * @return if the request should contain a body even for methods without body semantics (i.e. GET, DELETE, TRACE, OPTIONS and
+   *         HEAD, see <a href="https://www.rfc-editor.org/rfc/rfc7231">RFC 7231</a>).
    */
   boolean shouldSendBodyAlways();
 
