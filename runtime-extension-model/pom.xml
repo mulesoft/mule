@@ -12,6 +12,9 @@
     <name>Mule 4 Runtime Extension model</name>
 
     <properties>
+    	<!-- xml parser is a test dependency so it is not in the module-path, open its required packages -->
+        <surefire.args>-XX:+IgnoreUnrecognizedVMOptions --add-opens=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED --add-opens=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED ${surefire.args.base}</surefire.args>
+
         <javaModuleName>org.mule.runtime.extension.model</javaModuleName>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
