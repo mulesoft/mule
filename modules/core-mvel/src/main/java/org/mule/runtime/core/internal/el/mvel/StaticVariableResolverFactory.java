@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.el.mvel;
 
 import org.mule.mvel2.ParserConfiguration;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.el.context.ExtendedServerContext;
+import org.mule.runtime.core.internal.el.mvel.context.ExtendedServerContext;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.mvel.function.DateTimeExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.el.mvel.function.RegexExpressionLanguageFuntion;

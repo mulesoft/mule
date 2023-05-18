@@ -87,7 +87,7 @@ public abstract class AbstractMapContext<V> implements Map<String, V> {
 
   @Override
   public Collection<V> values() {
-    List<V> values = new ArrayList<V>(size());
+    List<V> values = new ArrayList<>(size());
     for (String key : keySet()) {
       values.add(get(key));
     }
@@ -97,7 +97,7 @@ public abstract class AbstractMapContext<V> implements Map<String, V> {
   @SuppressWarnings("unchecked")
   @Override
   public Set<Entry<String, V>> entrySet() {
-    Set<Entry<String, V>> entrySet = new HashSet<Entry<String, V>>();
+    Set<Entry<String, V>> entrySet = new HashSet<>();
     for (String key : keySet()) {
       entrySet.add(new DefaultMapEntry(key, get(key)));
     }

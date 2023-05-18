@@ -10,7 +10,7 @@ import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageContext;
 import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageFunction;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.el.context.MessageContext;
+import org.mule.runtime.core.internal.el.mvel.context.MessageContext;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOCase;

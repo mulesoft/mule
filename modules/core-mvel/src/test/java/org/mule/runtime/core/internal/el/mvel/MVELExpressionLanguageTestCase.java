@@ -55,7 +55,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
-import org.mule.runtime.core.internal.el.context.MessageContext;
+import org.mule.runtime.core.internal.el.mvel.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.function.RegexExpressionLanguageFuntion;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
