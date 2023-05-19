@@ -34,6 +34,7 @@ import java.net.URLClassLoader;
 import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +112,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
+  private final List<ClassLoader> dynamicClassLoaders = new ArrayList<>();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -425,5 +427,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   @Override
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), getArtifactId(), toHexString(identityHashCode(this)));
+  }
+
+  @Override
+  public void addDynamicClassLoader(ClassLoader classLoader) {
+    this.dynamicClassLoaders.add(classLoader);
+  }
+
+  @Override
+  public List<ClassLoader> getDynamicClassLoaders() {
+    return dynamicClassLoaders;
   }
 }

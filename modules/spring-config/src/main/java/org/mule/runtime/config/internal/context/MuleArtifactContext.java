@@ -119,6 +119,7 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.io.IOException;
@@ -134,6 +135,7 @@ import java.util.function.Predicate;
 import com.google.common.collect.ImmutableList;
 
 import org.slf4j.Logger;
+import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -270,6 +272,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
 
+    ((RegionClassLoader) getRegionClassLoader()).addClassLoaderDisposeHook(classLoader -> {
+      CachedIntrospectionResults.clearClassLoader(classLoader);
+    });
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -460,6 +465,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (isRunning()) {
       try {
         super.close();
+        resetCommonCaches();
       } catch (Exception e) {
         for (ObjectProvider objectProvider : objectProviders) {
           disposeIfNeeded(objectProvider, LOGGER);

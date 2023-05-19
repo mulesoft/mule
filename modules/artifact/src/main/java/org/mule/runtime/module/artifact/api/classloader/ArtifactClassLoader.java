@@ -8,7 +8,9 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -99,4 +101,10 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    */
   void addShutdownListener(ShutdownListener listener);
 
+
+  default void addDynamicClassLoader(ClassLoader classLoader) {}
+
+  default List<ClassLoader> getDynamicClassLoaders() {
+    return Collections.emptyList();
+  }
 }

@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
@@ -49,9 +50,12 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
       } else {
         return withContextClassLoader(this.extensionClassLoader, () -> {
           // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
-          // extension
-          // with the annotations stuff.
-          return addAnnotationsToClass(configurationType);
+          // extension with the annotations stuff.
+          Class<?> annotated = addAnnotationsToClass(configurationType);
+          if (extensionClassLoader instanceof ArtifactClassLoader) {
+            ((ArtifactClassLoader) extensionClassLoader).addDynamicClassLoader(annotated.getClassLoader());
+          }
+          return annotated;
         });
       }
     });

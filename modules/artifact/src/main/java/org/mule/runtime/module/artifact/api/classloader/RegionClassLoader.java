@@ -22,6 +22,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.core.api.util.CompoundEnumeration;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.module.artifact.api.classloader.exception.ClassNotFoundInRegionException;
@@ -93,6 +94,7 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
    * This behaviour can be changed by extending {@link RegionClassLoader} and calling the provided protected constructor
    */
   private ResourceReleaser regionResourceReleaser = System::gc;
+  private final List<ClassLoaderDisposeHook> classLoaderDisposeHooks = new ArrayList<>(1);
 
   /**
    * Creates a new region.
@@ -467,6 +469,12 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
   private void disposeClassLoader(ArtifactClassLoader classLoader) {
     try {
       classLoader.dispose();
+      classLoaderDisposeHooks.forEach(hook -> {
+        for (ClassLoader dynamicClassLoader : classLoader.getDynamicClassLoaders()) {
+          hook.onDispose(dynamicClassLoader);
+        }
+        hook.onDispose(classLoader.getClassLoader());
+      });
     } catch (Exception e) {
       reportPossibleLeak(e, classLoader.getArtifactId());
     }
@@ -499,6 +507,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
     return "Region already contains classloader for artifact:" + artifactId;
   }
 
+  public void addClassLoaderDisposeHook(ClassLoaderDisposeHook classLoaderDisposeHook) {
+    classLoaderDisposeHooks.add(classLoaderDisposeHook);
+  }
+
   private static class RegionMemberClassLoader {
 
     final ArtifactClassLoader unfilteredClassLoader;
@@ -508,5 +520,10 @@ public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
       this.unfilteredClassLoader = unfilteredClassLoader;
       this.filter = filter;
     }
+  }
+
+  public interface ClassLoaderDisposeHook {
+
+    void onDispose(ClassLoader classLoader);
   }
 }
