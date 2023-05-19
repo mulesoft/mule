@@ -24,7 +24,6 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.jetbrains.annotations.NotNull;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -155,7 +154,6 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     spanTestHierarchy.assertSpanTree();
   }
 
-  @NotNull
   private List<CapturedExportedSpan> getCapturedExportedSpansWithTraceState() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
     Map<String, String> traceState = new HashMap<String, String>() {

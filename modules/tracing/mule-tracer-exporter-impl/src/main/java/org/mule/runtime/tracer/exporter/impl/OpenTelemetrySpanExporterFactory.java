@@ -8,7 +8,6 @@
 package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporter.builder;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
@@ -54,7 +53,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   private SpanExporterConfiguration configuration;
 
   @Inject
-  FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
 
   private SpanExporterConfiguration privilegedConfiguration =
