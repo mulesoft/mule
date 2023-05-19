@@ -23,7 +23,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.el.context.MessageContext;
+import org.mule.runtime.core.internal.el.mvel.context.MessageContext;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionExecutor;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguageContext;
 import org.mule.runtime.core.internal.message.InternalMessage;

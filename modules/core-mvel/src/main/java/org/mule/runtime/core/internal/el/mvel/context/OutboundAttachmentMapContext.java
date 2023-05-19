@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.context;
+package org.mule.runtime.core.internal.el.mvel.context;
 
 import static java.util.Collections.emptyMap;
 

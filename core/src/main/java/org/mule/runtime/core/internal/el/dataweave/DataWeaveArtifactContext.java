@@ -9,10 +9,16 @@ package org.mule.runtime.core.internal.el.dataweave;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.el.context.AbstractArtifactContext;
-import org.mule.runtime.core.privileged.el.context.AbstractMapContext;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
+
+import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
 
 /**
  * Implementation of {@link AbstractArtifactContext} for exposing DataWeave EL artifact context.
@@ -33,7 +39,7 @@ public class DataWeaveArtifactContext extends AbstractArtifactContext {
   /**
    * Context for exposing the {@link Registry} in DataWeave EL.
    */
-  protected static class RegistryWrapperMap extends AbstractMapContext<Object> {
+  protected static class RegistryWrapperMap implements Map<String, Object> {
 
     private Registry registry;
 
@@ -52,18 +58,63 @@ public class DataWeaveArtifactContext extends AbstractArtifactContext {
     }
 
     @Override
-    public Object doGet(String key) {
-      return registry.lookupByName(key).orElse(null);
+    public Object get(Object key) {
+      if (!(key instanceof String)) {
+        return null;
+      }
+      Object value = null;
+      try {
+        value = registry.lookupByName((String) key).orElse(null);
+      } catch (NoSuchElementException nsse) {
+        // Ignore
+      }
+      return value;
     }
 
     @Override
-    public void doPut(String key, Object value) {
+    public Object put(String key, Object value) {
       throw new UnsupportedOperationException("Registry does not support put");
     }
 
     @Override
-    public void doRemove(String key) {
+    public void putAll(Map<? extends String, ? extends Object> m) {
+      for (Entry<? extends String, ? extends Object> entry : m.entrySet()) {
+        put(entry.getKey(), entry.getValue());
+      }
+    }
+
+    @Override
+    public Object remove(Object key) {
       throw new UnsupportedOperationException("Registry does not support remove");
+    }
+
+    @Override
+    public Collection<Object> values() {
+      List<Object> values = new ArrayList<>(size());
+      for (String key : keySet()) {
+        values.add(get(key));
+      }
+      return values;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Set<Entry<String, Object>> entrySet() {
+      Set<Entry<String, Object>> entrySet = new HashSet<>();
+      for (String key : keySet()) {
+        entrySet.add(new DefaultMapEntry(key, get(key)));
+      }
+      return entrySet;
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+      for (String key : keySet()) {
+        if (value.equals(get(key))) {
+          return true;
+        }
+      }
+      return false;
     }
 
     @Override
