@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.soap.api.loader;
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.soap.internal.loader.SoapExtensionModelLoader;
 
 import java.util.Set;

@@ -4,18 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.util.boot;
+package org.mule.runtime.module.artifact.activation.api.extension.discovery.boot;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
-import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
+import static java.util.stream.StreamSupport.stream;
 
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.loader.ExtensionModelLoaderProvider;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 /**
@@ -37,9 +39,9 @@ public final class ExtensionLoaderUtils {
    * @return a {@link Stream} with all the {@link ExtensionModelLoader} available to the given {@code classloader}
    */
   public static Stream<ExtensionModelLoader> lookupExtensionModelLoaders(ClassLoader classLoader) {
-    return new SpiServiceRegistry().lookupProviders(ExtensionModelLoaderProvider.class, classLoader)
-        .stream()
-        .flatMap(p -> p.getExtensionModelLoaders().stream());
+    return stream(((Iterable<ExtensionModelLoaderProvider>) () -> ServiceLoader
+        .load(ExtensionModelLoaderProvider.class, classLoader).iterator()).spliterator(), false)
+            .flatMap(p -> p.getExtensionModelLoaders().stream());
   }
 
   /**

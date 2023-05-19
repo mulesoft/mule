@@ -18,7 +18,8 @@ import java.util.ServiceLoader;
  *
  * @since 3.7.0
  * 
- * @deprecated since 4.5, call {@link ServiceLoader#load(Class, ClassLoader)} directly to avoid requiring the module {@code org.mule.runtime.core} to have visibility on the service interfaces from the modules that use this utils.
+ * @deprecated since 4.5, call {@link ServiceLoader#load(Class, ClassLoader)} directly to avoid requiring the module
+ *             {@code org.mule.runtime.core} to have visibility on the service interfaces from the modules that use this utils.
  */
 @Deprecated
 public final class SpiServiceRegistry extends AbstractServiceRegistry {

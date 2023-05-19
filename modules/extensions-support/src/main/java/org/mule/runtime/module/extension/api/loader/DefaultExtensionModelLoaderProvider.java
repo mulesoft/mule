@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.api.loader;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 

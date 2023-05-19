@@ -9,8 +9,8 @@ package org.mule.runtime.extension.api.loader.xml;
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.loader.ExtensionModelLoaderProvider;
 
 import java.util.Set;
 

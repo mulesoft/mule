@@ -14,7 +14,7 @@ import static java.util.Collections.unmodifiableSet;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider;
+import org.mule.runtime.module.artifact.activation.api.extension.discovery.loader.ExtensionModelLoaderProvider;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkApplicationExtensionModelLoader;
 import org.mule.runtime.module.extension.mule.internal.loader.MuleSdkPluginExtensionModelLoader;
 
