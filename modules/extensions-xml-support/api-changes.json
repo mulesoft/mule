@@ -11,6 +11,16 @@
           "classSimpleName": "XmlSdk1RuntimeExtensionModelProvider",
           "elementKind": "class",
           "justification": "W-12947646: Fix split packages between mule-runtime-extension-model and mule-core"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider",
+          "new": "class org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider",
+          "interface": "org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider",
+          "package": "org.mule.runtime.extension.api.loader.xml",
+          "classSimpleName": "XmlExtensionModelLoaderProvider",
+          "elementKind": "class",
+          "justification": "W-13312344: Moved to org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderProvider in mule-module-artifact-activation"
         }
       ]
     }
