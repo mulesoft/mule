@@ -39,11 +39,11 @@ public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidatio
     return new ErrorHandlerOnErrorTypeExists(Optional.ofNullable(featureFlaggingService), ignoreParams);
   }
 
-  // without type, don't have to verify it - etc. - validation won't fail. not qualified for validation
-  // added it: NPE from applicable method << for the issue
   @Test
-  @Issue("W-xxxxx")
-  @Description("")
+  @Issue("W-12769196")
+  @Description("Without type, it doesn't go through validation process due to the criteria of ErrorHandlerOnErrorTypeExists#applicable. "
+      +
+      "This test was added to check if the applicable method is throwing NPE without the fix.")
   public void errorHandlerWithoutTypeDoesNotFailValidation() {
 
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
