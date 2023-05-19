@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.tracer.customization.impl.export;
 
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETER_RESOLUTION_SPAN_NAME;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
@@ -43,7 +42,7 @@ public class LevelInitialExportInfoProviderTestCase {
   private static final String MULE_COMPONENT_NAMESPACE = "mule";
   private static final String DUMMY_COMPONENT_NAME = "dummy";
   private static final String GET_CONNECTION = "get-connection";
-  public static final String PARAMETER_RESOLUTION = "parameter-resolution";
+  public static final String PARAMETER_RESOLUTION = "parameters-resolution";
 
   private static final String EXECUTION_TIME = "execution-time";
   private final InitialExportInfoProvider initialExportInfoProvider;
