@@ -11,25 +11,29 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.tracer.api.EventTracer;
 
-public class OperationExecutionTraceCallback implements ExecutorCallback {
+public class TracedOperationExecutionCallback implements ExecutorCallback {
 
   private final EventedExecutionContext<?> eventedExecutionContext;
   private final EventTracer<CoreEvent> coreEventEventTracer;
+  private final ExecutorCallback delegate;
 
-  public OperationExecutionTraceCallback(EventedExecutionContext<?> eventedExecutionContext,
-                                         EventTracer<CoreEvent> coreEventEventTracer) {
+  public TracedOperationExecutionCallback(EventedExecutionContext<?> eventedExecutionContext,
+                                          EventTracer<CoreEvent> coreEventEventTracer, ExecutorCallback delegate) {
     this.eventedExecutionContext = eventedExecutionContext;
     this.coreEventEventTracer = coreEventEventTracer;
+    this.delegate = delegate;
   }
 
   @Override
   public void complete(Object value) {
     coreEventEventTracer.endCurrentSpan(eventedExecutionContext.getEvent());
+    delegate.complete(value);
   }
 
   @Override
   public void error(Throwable e) {
     // TODO: Add the ticket ID for the DEBUG level errors task.
     coreEventEventTracer.endCurrentSpan(eventedExecutionContext.getEvent());
+    delegate.error(e);
   }
 }

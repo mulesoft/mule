@@ -53,7 +53,7 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
 
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    attributes.putAll(attributes);
+    attributes.forEach(this::addCurrentSpanAttribute);
   }
 
   public Map<String, String> getSpanRootAttributes() {

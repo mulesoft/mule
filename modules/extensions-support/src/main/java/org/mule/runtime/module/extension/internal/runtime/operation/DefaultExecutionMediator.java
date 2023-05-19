@@ -130,8 +130,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     try (DeferredExecutorCallback deferredCallback =
         new DeferredExecutorCallback(getDelegateExecutorCallback(getStats(context), callback, context))) {
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
-        executeWithInterceptors(executor, context, (ExecutorCallback) deferredCallback
-            .before(new OperationExecutionTraceCallback(context, coreEventEventTracer)));
+        executeWithInterceptors(executor, context, (ExecutorCallback) deferredCallback);
         return null;
       });
     } catch (Exception e) {
@@ -243,7 +242,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
         coreEventEventTracer.startComponentSpan(context.getEvent(), operationExecutionInitialSpanInfo);
-        executor.execute(context, callback);
+        executor.execute(context, new TracedOperationExecutionCallback(context, coreEventEventTracer, callback));
       } finally {
         profileThreadRelease(context);
         setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
@@ -354,4 +353,5 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       delegate.error(e);
     }
   }
+
 }

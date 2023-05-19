@@ -7,7 +7,6 @@
 package org.mule.runtime.tracer.impl;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
 import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
@@ -100,7 +99,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   private EventContextAddAttributeCommand eventContextAddSpanAttributeCommand;
 
-  private EventContextSetCurrentSpanNameCommand eventContextSetCurrentSpanCommand;
+  private EventContextSetCurrentSpanNameCommand eventContextSetCurrentSpanNameCommand;
 
   private EventContextGetDistributedTraceContextMapCommand eventContextGetDistributedTraceContextMap;
 
@@ -141,12 +140,13 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void setCurrentSpanName(CoreEvent coreEvent, String name) {
-    eventContextSetCurrentSpanCommand.execute(coreEvent.getContext(), name);
+    eventContextSetCurrentSpanNameCommand.execute(coreEvent.getContext(), name);
   }
 
   @Override
   public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
     eventContextAddSpanAttributeCommand.execute(coreEvent.getContext(), key, value);
+
   }
 
   @Override
@@ -184,9 +184,9 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
     eventContextAddSpanAttributeCommand = getEventContextAddAttributeCommand(LOGGER,
                                                                              ERROR_ON_EXECUTING_CORE_EVENT_TRACER_ADD_ATTRIBUTE_COMMAND_MESSAGE,
                                                                              propagateTracingExceptions);
-    eventContextSetCurrentSpanCommand = getEventContextSetCurrentSpanNameCommand(LOGGER,
-                                                                                 ERROR_ON_EXECUTING_CORE_EVENT_SET_CURRENT_SPAN_COMMAND_MESSAGE,
-                                                                                 propagateTracingExceptions);
+    eventContextSetCurrentSpanNameCommand = getEventContextSetCurrentSpanNameCommand(LOGGER,
+                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_SET_CURRENT_SPAN_COMMAND_MESSAGE,
+                                                                                     propagateTracingExceptions);
     eventContextGetDistributedTraceContextMap = getEventContextGetDistributedTraceContextMapCommand(LOGGER,
                                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE,
                                                                                                     propagateTracingExceptions);

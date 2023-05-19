@@ -6,10 +6,9 @@
  */
 package org.mule.runtime.tracer.customization.impl.info;
 
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getSpanName;
-
-import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
@@ -64,7 +63,8 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
       name = overriddenName;
       initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name);
     }
-    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain;
+    this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
+        || name.equals(OPERATION_EXECUTION_SPAN_NAME);
     this.rootSpan = isComponentOfName(component, FLOW);
     this.location = getLocationAsString(component.getLocation());
     this.apiId = apiId;

@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.impl.span;
 
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import static java.util.Collections.emptyList;
@@ -20,6 +21,7 @@ import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.util.HashMap;
@@ -174,7 +176,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
+    if (!key.equals(SPAN_KIND) && !key.equals(STATUS) && !initialSpanInfo.isPolicySpan()) {
       additionalAttributes.put(key, value);
     }
     spanExporter.onAdditionalAttribute(key, value);

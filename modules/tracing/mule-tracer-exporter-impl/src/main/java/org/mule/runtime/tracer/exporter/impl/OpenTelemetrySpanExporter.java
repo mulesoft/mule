@@ -307,12 +307,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void onAdditionalAttribute(String key, String value) {
     if (key.equals(SPAN_KIND)) {
-      spanKind = SpanKind.valueOf(value);
-    }
-
-    if (key.equals(STATUS)) {
+      rootSpan.spanKind = SpanKind.valueOf(value);
+    } else if (key.equals(STATUS)) {
       StatusCode statusCode = StatusCode.valueOf(value);
-      statusData = StatusData.create(statusCode, null);
+      rootSpan.statusData = StatusData.create(statusCode, null);
+    } else if (isPolicySpan) {
+      rootSpan.internalSpan.addAttribute(key, value);
     }
   }
 

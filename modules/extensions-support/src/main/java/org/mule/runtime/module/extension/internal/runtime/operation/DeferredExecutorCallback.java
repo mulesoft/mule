@@ -102,24 +102,6 @@ class DeferredExecutorCallback implements ExecutorCallback, AutoCloseable {
     }
   }
 
-  @Override
-  public ExecutorCallback before(CompletableCallback<Object> beforeCallback) {
-    return new ExecutorCallback() {
-
-      @Override
-      public void complete(Object value) {
-        beforeCallback.complete(value);
-        DeferredExecutorCallback.this.complete(value);
-      }
-
-      @Override
-      public void error(Throwable e) {
-        beforeCallback.error(e);
-        DeferredExecutorCallback.this.error(e);
-      }
-    };
-  }
-
   private void callDelegateMethod() {
     if (isErrorCalled) {
       delegate.error(error);
