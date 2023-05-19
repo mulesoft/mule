@@ -25,7 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.runtime.core.internal.routing.ValidationException;
+import org.mule.runtime.core.internal.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
