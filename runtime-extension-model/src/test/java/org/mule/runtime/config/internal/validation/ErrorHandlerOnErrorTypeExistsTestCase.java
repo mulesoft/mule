@@ -31,12 +31,9 @@ import org.junit.Test;
 @Story(DSL_VALIDATION_STORY)
 public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidationTestCase {
 
-  FeatureFlaggingService featureFlaggingService = mock(FeatureFlaggingService.class);
-  boolean ignoreParams = true;
-
   @Override
   protected Validation getValidation() {
-    return new ErrorHandlerOnErrorTypeExists(Optional.ofNullable(featureFlaggingService), ignoreParams);
+    return new ErrorHandlerOnErrorTypeExists();
   }
 
   @Test
@@ -61,8 +58,7 @@ public class ErrorHandlerOnErrorTypeExistsTestCase extends AbstractCoreValidatio
         "        </error-handler>\n" +
         "    </flow>\n" +
         "\n" +
-        "</mule>")
-            .stream().findFirst();
+        "</mule>");
 
     assertThat(msg.isPresent(), equalTo(false));
   }
