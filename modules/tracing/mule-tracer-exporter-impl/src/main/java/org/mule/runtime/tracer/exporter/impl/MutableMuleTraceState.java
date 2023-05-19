@@ -101,11 +101,10 @@ public class MutableMuleTraceState implements TraceState {
   }
 
   /**
-   * @return a copy of the key/values of the trace state without the ancestor key/value.
+   * @ @return adds all the key values of the current span.
    */
-  public MutableMuleTraceState copyWithoutAncestor() {
-    MutableMuleTraceState newMuleTraceState = new MutableMuleTraceState(new HashMap<>(asMap()));
-    newMuleTraceState.state.remove(ANCESTOR_MULE_SPAN_ID);
-    return newMuleTraceState;
+  public void copyAllKeyValuesWithoutAncestor(MutableMuleTraceState targetMuleTraceState) {
+    targetMuleTraceState.state.putAll(state);
+    targetMuleTraceState.state.remove(ANCESTOR_MULE_SPAN_ID);
   }
 }

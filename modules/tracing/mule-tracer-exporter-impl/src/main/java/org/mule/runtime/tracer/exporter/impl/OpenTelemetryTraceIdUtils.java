@@ -170,7 +170,8 @@ public class OpenTelemetryTraceIdUtils {
     return false;
   }
 
-  public static Map<String, String> getContext(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
+  public static Map<String, String> getContext(OpenTelemetrySpanExporter openTelemetrySpanExporter,
+                                               boolean addMuleAncestorSpanId) {
     Map<String, String> context = new HashMap<>();
     if (openTelemetrySpanExporter.getSpanId().equals(INVALID)) {
       return emptyMap();
@@ -193,8 +194,14 @@ public class OpenTelemetryTraceIdUtils {
     chars[TRACE_OPTION_OFFSET] = '0';
     chars[TRACE_OPTION_OFFSET + 1] = '1';
     context.put(TRACE_PARENT, new String(chars, 0, TRACEPARENT_HEADER_SIZE));
-    context.put(TRACE_STATE_KEY,
-                encodeTraceState(openTelemetrySpanExporter.getTraceState().withAncestor(openTelemetrySpanExporter.getSpanId())));
+    if (addMuleAncestorSpanId) {
+      context.put(TRACE_STATE_KEY,
+                  encodeTraceState(openTelemetrySpanExporter.getTraceState()
+                      .withAncestor(openTelemetrySpanExporter.getSpanId())));
+    } else {
+      context.put(TRACE_STATE_KEY,
+                  encodeTraceState(openTelemetrySpanExporter.getTraceState()));
+    }
 
     return context;
   }

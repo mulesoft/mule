@@ -7,12 +7,15 @@
 
 package org.mule.runtime.tracer.exporter.impl;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporter.builder;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
 import static java.lang.Boolean.parseBoolean;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -50,6 +53,10 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Inject
   private SpanExporterConfiguration configuration;
 
+  @Inject
+  FeatureFlaggingService featureFlaggingService;
+
+
   private SpanExporterConfiguration privilegedConfiguration =
       new OpenTelemetryAutoConfigurableSpanExporterConfiguration(key -> null);
 
@@ -65,6 +72,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   private String artifactId;
 
   private String artifactType;
+  private boolean addMuleAncestorSpanId;
 
   public OpenTelemetrySpanExporterFactory() {}
 
@@ -84,6 +92,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
         .withStartSpanInfo(initialExportInfo)
         .withArtifactId(artifactId)
         .withResource(resource)
+        .addMuleAncestorSpanId(addMuleAncestorSpanId)
         .withArtifactType(artifactType)
         .withSpanProcessor(spanProcessor.get())
         .withInternalSpan(internalSpan)
@@ -120,6 +129,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.artifactId = muleContext.getConfiguration().getId();
     this.artifactType = muleContext.getArtifactType().getAsString();
     this.resource = getResource(artifactId);
+    this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
   }
 
   @Override

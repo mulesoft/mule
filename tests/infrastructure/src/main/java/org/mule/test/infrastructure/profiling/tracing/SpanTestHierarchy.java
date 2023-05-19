@@ -22,7 +22,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.errorType;
 
-import org.mule.runtime.api.metadata.MetadataKeysContainerBuilder;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
@@ -183,7 +182,7 @@ public class SpanTestHierarchy {
       String capturedTraceValue = actualSpan.getTraceState().get(key);
 
       if (capturedTraceValue != null) {
-        fail("The span " + expectedNode.spanName + " has no trace state key " + key);
+        fail("The span " + expectedNode.spanName + " has trace state key " + key + " and it must not be present");
       }
     });
   }
@@ -231,7 +230,7 @@ public class SpanTestHierarchy {
     expectedNode.assertExceptions(actualSpan);
   }
 
-  public SpanTestHierarchy addTraceStateAssertion(String key, String value) {
+  public SpanTestHierarchy addTraceStateKeyValueAssertion(String key, String value) {
     currentNode.addTraceStateKeyValueToAssert(key, value);
     return this;
   }
