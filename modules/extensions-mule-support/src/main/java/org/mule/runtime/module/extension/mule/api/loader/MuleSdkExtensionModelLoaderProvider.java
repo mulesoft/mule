@@ -27,7 +27,8 @@ import java.util.Set;
  * @since 4.5.0
  */
 @Experimental
-public class MuleSdkExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+public class MuleSdkExtensionModelLoaderProvider
+    implements ExtensionModelLoaderProvider, org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider {
 
   private final boolean isMuleSdkEnabled = getBoolean(ENABLE_MULE_SDK_PROPERTY);
 

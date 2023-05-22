@@ -14,7 +14,8 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.loade
 
 import java.util.Set;
 
-public class XmlExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+public class XmlExtensionModelLoaderProvider
+    implements ExtensionModelLoaderProvider, org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider {
 
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {

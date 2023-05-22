@@ -19,7 +19,8 @@ import java.util.Set;
  *
  * @since 4.5.0
  */
-public class SoapExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+public class SoapExtensionModelLoaderProvider
+    implements ExtensionModelLoaderProvider, org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider {
 
   @Override
   public Set<ExtensionModelLoader> getExtensionModelLoaders() {

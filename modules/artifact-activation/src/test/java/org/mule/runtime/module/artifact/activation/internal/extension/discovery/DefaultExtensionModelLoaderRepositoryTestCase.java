@@ -36,15 +36,17 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 @Story(EXTENSION_MODEL_LOADER_REPOSITORY)
@@ -120,7 +122,8 @@ public class DefaultExtensionModelLoaderRepositoryTestCase extends AbstractMuleT
 
   }
 
-  public static class TestExtensionModelLoaderProvider implements ExtensionModelLoaderProvider {
+  public static class TestExtensionModelLoaderProvider
+      implements ExtensionModelLoaderProvider, org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider {
 
     @Override
     public Set<ExtensionModelLoader> getExtensionModelLoaders() {
