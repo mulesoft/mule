@@ -4,6 +4,16 @@
       "ignore": [
         {
           "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.module.extension.mule.api.loader.MuleSdkExtensionModelLoaderProvider",
+          "new": "class org.mule.runtime.module.extension.mule.api.loader.MuleSdkExtensionModelLoaderProvider",
+          "interface": "org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider",
+          "package": "org.mule.runtime.module.extension.mule.api.loader",
+          "classSimpleName": "MuleSdkExtensionModelLoaderProvider",
+          "elementKind": "class",
+          "justification": "W-13312344: Moved to org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderProvider in mule-module-artifact-activation"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
           "old": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider",
           "new": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider",
           "interface": "org.mule.runtime.core.api.extension.RuntimeExtensionModelProvider",

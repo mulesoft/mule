@@ -8,7 +8,6 @@
 package org.mule.runtime.module.deployment.impl.internal.policy;
 
 import static org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider.discoverRuntimeExtensionModels;
-import static org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer.discoverRuntimeExtensionModels;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.isParallelExtensionModelLoadingEnabled;
 
 import static java.util.Collections.emptySet;
