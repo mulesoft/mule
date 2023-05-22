@@ -282,7 +282,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.resultTransformer = resultTransformer;
     this.hasNestedChain = hasNestedChain(componentModel);
     this.outerFluxTerminationTimeout = terminationTimeout;
-
   }
 
   @Override

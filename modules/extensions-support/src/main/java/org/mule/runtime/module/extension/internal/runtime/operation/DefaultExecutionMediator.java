@@ -130,7 +130,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     try (DeferredExecutorCallback deferredCallback =
         new DeferredExecutorCallback(getDelegateExecutorCallback(getStats(context), callback, context))) {
       withExecutionTemplate((ExecutionContextAdapter<ComponentModel>) context, () -> {
-        executeWithInterceptors(executor, context, (ExecutorCallback) deferredCallback);
+        executeWithInterceptors(executor, context, deferredCallback);
         return null;
       });
     } catch (Exception e) {
