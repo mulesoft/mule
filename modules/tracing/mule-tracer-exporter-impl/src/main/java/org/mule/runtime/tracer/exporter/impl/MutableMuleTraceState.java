@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.api.trace.TraceStateBuilder;
 import io.opentelemetry.api.trace.propagation.internal.W3CTraceContextEncoding;
-import org.apache.commons.lang.NotImplementedException;
 
 
 /**
@@ -99,7 +98,7 @@ public class MutableMuleTraceState implements TraceState {
   @Override
   public TraceStateBuilder toBuilder() {
     // This is only used internally and it is not implemented.
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   public void put(String key, String value) {
