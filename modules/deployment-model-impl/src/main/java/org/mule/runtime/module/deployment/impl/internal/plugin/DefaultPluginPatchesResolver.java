@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
+import static org.mule.maven.client.api.VersionUtils.discoverVersionUtils;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.walk;
-import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.maven.pom.parser.internal.version.MavenVersion;
-import org.mule.maven.pom.parser.internal.version.MavenVersionConstraintParser;
+import org.mule.maven.client.api.VersionUtils;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
@@ -52,19 +51,11 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
     String artifactId = pluginArtifactCoordinates.getGroupId() + ":"
         + pluginArtifactCoordinates.getArtifactId() + ":" + pluginArtifactCoordinates.getVersion();
 
-    MavenVersion pluginArtifactCoordinatesVersion;
-    try {
-      pluginArtifactCoordinatesVersion = new MavenVersion(pluginArtifactCoordinates.getVersion());
-    } catch (Exception e) {
-      LOGGER.warn("Error parsing version '{}' for artifact '{}', patches against this artifact will not be applied",
-                  pluginArtifactCoordinates.getVersion(), artifactId);
-
-      return emptyList();
-    }
-
     File muleArtifactPatchesFolder = new File(getMuleHomeFolder(), MULE_ARTIFACT_PATCHES_LOCATION);
     try {
       if (muleArtifactPatchesFolder.exists()) {
+        final VersionUtils versionUtils = discoverVersionUtils(this.getClass().getClassLoader());
+
         patches = walk(muleArtifactPatchesFolder.toPath())
             .filter(patchFilePath -> getExtension(patchFilePath.toString()).endsWith(PATCH_FILES_EXTENSION))
             .map(patchFilePath -> {
@@ -75,19 +66,16 @@ public class DefaultPluginPatchesResolver implements PluginPatchesResolver {
                 if (patchedArtifactCoordinates.getGroupId().equals(pluginArtifactCoordinates.getGroupId()) &&
                     patchedArtifactCoordinates.getArtifactId().equals(pluginArtifactCoordinates.getArtifactId()) &&
                     patchedArtifactCoordinates.getClassifier().equals(MULE_PLUGIN_CLASSIFIER)) {
-                  if (muleArtifactPatchingModel.getAffectedVersions()
-                      .stream()
-                      .anyMatch(affectedVersion -> {
-                        try {
-                          MavenVersionConstraintParser mavenVersionConstraintParser =
-                              new MavenVersionConstraintParser(affectedVersion);
-                          return mavenVersionConstraintParser.containsVersion(pluginArtifactCoordinatesVersion);
-                        } catch (Exception e) {
-                          throw new MuleRuntimeException(createStaticMessage(format("Could not parse plugin patch affect version '%s'",
-                                                                                    affectedVersion)),
-                                                         e);
-                        }
-                      })) {
+                  boolean versionContained;
+                  try {
+                    versionContained = versionUtils
+                        .containsVersion(pluginArtifactCoordinates.getVersion(), muleArtifactPatchingModel.getAffectedVersions());
+                  } catch (IllegalArgumentException e) {
+                    throw new MuleRuntimeException(createStaticMessage(e.getMessage()
+                        + ", patches against this artifact will not be applied"), e);
+                  }
+
+                  if (versionContained) {
                     LOGGER.info("Patching artifact '{}' with patch file '{}'", artifactId, patchFilePath);
 
                     return patchFilePath.toFile().toURI().toURL();
