@@ -47,6 +47,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -471,18 +472,18 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
 
       resetCommonCaches();
-      disposeClassLoaders();
+      clearSpringSoftReferencesCachesForDynamicClassLoaders();
     }
   }
 
-  private void disposeClassLoaders() {
+  private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
     RegionClassLoader region = (RegionClassLoader) getRegionClassLoader();
-    CachedIntrospectionResults.clearClassLoader(region.getClassLoader());
+    clearClassLoader(region.getClassLoader());
     for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
       if (pluginClassLoader instanceof WithDynamicClassLoaders) {
         WithDynamicClassLoaders withDynamicClassLoaders = (WithDynamicClassLoaders) pluginClassLoader;
         for (ClassLoader dynamicClassLoader : withDynamicClassLoaders.getDynamicClassLoaders()) {
-          CachedIntrospectionResults.clearClassLoader(dynamicClassLoader);
+          clearClassLoader(dynamicClassLoader);
         }
       }
     }
