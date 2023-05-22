@@ -11,16 +11,22 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation of the ArtifactClassLoader interface for {@code mule-plugin}s, that manages shutdown listeners and has resource
  * releasers.
  */
-public class MulePluginClassLoader extends MuleArtifactClassLoader {
+public class MulePluginClassLoader extends MuleArtifactClassLoader implements WithDynamicClassLoaders {
 
   static {
     registerAsParallelCapable();
   }
+
+  private final Set<ClassLoader> dynamicClassLoaders = new HashSet<>();
+
 
   /**
    * Constructs a new {@link MulePluginClassLoader} for the given URLs
@@ -36,4 +42,13 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
     super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
   }
 
+  @Override
+  public void addDynamicClassLoader(ClassLoader classLoader) {
+    dynamicClassLoaders.add(classLoader);
+  }
+
+  @Override
+  public Set<ClassLoader> getDynamicClassLoaders() {
+    return dynamicClassLoaders;
+  }
 }

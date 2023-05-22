@@ -119,7 +119,9 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.WithDynamicClassLoaders;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.io.IOException;
@@ -133,7 +135,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -271,10 +272,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
-
-    ((RegionClassLoader) getRegionClassLoader()).addClassLoaderDisposeHook(classLoader -> {
-      CachedIntrospectionResults.clearClassLoader(classLoader);
-    });
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -465,7 +462,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     if (isRunning()) {
       try {
         super.close();
-        resetCommonCaches();
       } catch (Exception e) {
         for (ObjectProvider objectProvider : objectProviders) {
           disposeIfNeeded(objectProvider, LOGGER);
@@ -473,6 +469,22 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         throw new MuleRuntimeException(e);
       }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
+
+      resetCommonCaches();
+      disposeClassLoaders();
+    }
+  }
+
+  private void disposeClassLoaders() {
+    RegionClassLoader region = (RegionClassLoader) getRegionClassLoader();
+    CachedIntrospectionResults.clearClassLoader(region.getClassLoader());
+    for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
+      if (pluginClassLoader instanceof WithDynamicClassLoaders) {
+        WithDynamicClassLoaders withDynamicClassLoaders = (WithDynamicClassLoaders) pluginClassLoader;
+        for (ClassLoader dynamicClassLoader : withDynamicClassLoaders.getDynamicClassLoaders()) {
+          CachedIntrospectionResults.clearClassLoader(dynamicClassLoader);
+        }
+      }
     }
   }
 

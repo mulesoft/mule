@@ -6,14 +6,12 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 
 @NoImplement
 public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourceLocator, ClassLoaderLookupPolicyProvider {
@@ -100,11 +98,4 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    * disposed and closed.
    */
   void addShutdownListener(ShutdownListener listener);
-
-
-  default void addDynamicClassLoader(ClassLoader classLoader) {}
-
-  default List<ClassLoader> getDynamicClassLoaders() {
-    return Collections.emptyList();
-  }
 }
