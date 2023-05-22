@@ -19,9 +19,9 @@ import static org.mule.runtime.core.api.util.FileUtils.deleteTree;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.EXTENSION_BUNDLE_TYPE;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
@@ -72,9 +72,9 @@ import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.reflect.FieldUtils.readDeclaredStaticField;
 import static org.apache.commons.lang3.reflect.FieldUtils.writeDeclaredStaticField;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -103,7 +103,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.deployment.meta.Product;
@@ -117,6 +116,7 @@ import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
@@ -177,7 +177,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
+
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -187,8 +190,9 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import org.mockito.verification.VerificationMode;
-import org.slf4j.Logger;
+
 import uk.org.lidalia.slf4jext.Level;
 
 /**

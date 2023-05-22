@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.core.internal.test.builders;
 
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.core.internal.registry.Registry;
 
 import java.util.Map;

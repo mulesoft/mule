@@ -20,7 +20,6 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.MuleRuntimeFeature;
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.notification.NotificationListener;
@@ -30,6 +29,7 @@ import org.mule.runtime.api.notification.PolicyNotificationListener;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyInstance;

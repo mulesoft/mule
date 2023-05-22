@@ -8,8 +8,8 @@
 package org.mule.runtime.module.deployment.api;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter;
 
 /**

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListenerManager;
 
@@ -21,7 +21,7 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
+  private final List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<>();
 
   @Override
   public void addDeploymentListener(DeploymentListener listener) {

@@ -12,10 +12,11 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.lookupObject;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.isConfigLess;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactoryUtils.withArtifactMuleContext;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.connection.CompositeConnectionManager;

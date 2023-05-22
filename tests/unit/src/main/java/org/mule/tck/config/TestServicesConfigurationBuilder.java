@@ -20,8 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.el.DefaultValidationResult;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -32,6 +30,8 @@ import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.scheduler.SchedulerView;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;

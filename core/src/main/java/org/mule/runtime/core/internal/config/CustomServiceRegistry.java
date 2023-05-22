@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.config;
 
-import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 
 import java.util.Map;
 import java.util.Optional;

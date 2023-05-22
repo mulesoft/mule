@@ -9,9 +9,10 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -19,6 +20,7 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 

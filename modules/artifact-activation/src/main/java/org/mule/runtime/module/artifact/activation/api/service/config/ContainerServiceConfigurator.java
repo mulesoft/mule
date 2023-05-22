@@ -9,10 +9,10 @@ package org.mule.runtime.module.artifact.activation.api.service.config;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
-import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 
 import java.util.ArrayList;
 import java.util.List;

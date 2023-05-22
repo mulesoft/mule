@@ -7,15 +7,17 @@
 
 package org.mule.functional.junit4;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import org.mule.runtime.api.config.custom.CustomizationService;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
+
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 import java.util.ArrayList;

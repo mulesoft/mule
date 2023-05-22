@@ -1,4 +1,35 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setServiceConfigurators(===java.util.List<org.mule.runtime.api.config.custom.ServiceConfigurator>===)",
+          "new": "parameter org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration.ArtifactContextConfigurationBuilder::setServiceConfigurators(===java.util.List<org.mule.runtime.core.api.config.custom.ServiceConfigurator>===)",
+          "oldType": "java.util.List<org.mule.runtime.api.config.custom.ServiceConfigurator>",
+          "newType": "java.util.List<org.mule.runtime.core.api.config.custom.ServiceConfigurator>",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfigurationBuilder",
+          "methodName": "setServiceConfigurators",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.ServiceConfigurator in mule-core"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.api.config.custom.ServiceConfigurator> org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration::getServiceConfigurators()",
+          "new": "method java.util.List<org.mule.runtime.core.api.config.custom.ServiceConfigurator> org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration::getServiceConfigurators()",
+          "oldType": "java.util.List<org.mule.runtime.api.config.custom.ServiceConfigurator>",
+          "newType": "java.util.List<org.mule.runtime.core.api.config.custom.ServiceConfigurator>",
+          "package": "org.mule.runtime.deployment.model.api.artifact",
+          "classSimpleName": "ArtifactContextConfiguration",
+          "methodName": "getServiceConfigurators",
+          "elementKind": "method",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.ServiceConfigurator in mule-core"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

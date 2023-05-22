@@ -1,4 +1,36 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.module.deployment.api.ArtifactDeploymentListener::onArtifactCreated(org.mule.runtime.core.api.config.bootstrap.ArtifactType, java.lang.String, ===org.mule.runtime.api.config.custom.CustomizationService===)",
+          "new": "parameter void org.mule.runtime.module.deployment.api.ArtifactDeploymentListener::onArtifactCreated(org.mule.runtime.core.api.config.bootstrap.ArtifactType, java.lang.String, ===org.mule.runtime.core.api.config.custom.CustomizationService===)",
+          "oldType": "org.mule.runtime.api.config.custom.CustomizationService",
+          "newType": "org.mule.runtime.core.api.config.custom.CustomizationService",
+          "package": "org.mule.runtime.module.deployment.api",
+          "classSimpleName": "ArtifactDeploymentListener",
+          "methodName": "onArtifactCreated",
+          "parameterIndex": "2",
+          "elementKind": "parameter",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.CustomizationService in mule-core"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.module.deployment.api.DeploymentListener::onArtifactCreated(java.lang.String, ===org.mule.runtime.api.config.custom.CustomizationService===)",
+          "new": "parameter void org.mule.runtime.module.deployment.api.DeploymentListener::onArtifactCreated(java.lang.String, ===org.mule.runtime.core.api.config.custom.CustomizationService===)",
+          "oldType": "org.mule.runtime.api.config.custom.CustomizationService",
+          "newType": "org.mule.runtime.core.api.config.custom.CustomizationService",
+          "package": "org.mule.runtime.module.deployment.api",
+          "classSimpleName": "DeploymentListener",
+          "methodName": "onArtifactCreated",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.CustomizationService in mule-core"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

@@ -7,9 +7,9 @@
 package org.mule.runtime.core.api.config;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 
 /**

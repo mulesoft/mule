@@ -7,15 +7,17 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.deployment.internal.DeploymentListenerAdapter.UNSUPPORTED_ARTIFACT_TYPE_ERROR;
+
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -25,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 

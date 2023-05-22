@@ -9,11 +9,10 @@ package org.mule.runtime.core.api.config.builders;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
-import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 
 import java.util.ArrayList;

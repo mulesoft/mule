@@ -3,6 +3,44 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.returnTypeChangedCovariantly",
+          "old": "method org.mule.runtime.api.config.custom.CustomizationService org.mule.runtime.core.api.MuleContext::getCustomizationService()",
+          "new": "method org.mule.runtime.core.api.config.custom.CustomizationService org.mule.runtime.core.api.MuleContext::getCustomizationService()",
+          "oldType": "org.mule.runtime.api.config.custom.CustomizationService",
+          "newType": "org.mule.runtime.core.api.config.custom.CustomizationService",
+          "package": "org.mule.runtime.core.api",
+          "classSimpleName": "MuleContext",
+          "methodName": "getCustomizationService",
+          "elementKind": "method",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.CustomizationService in mule-core"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.core.api.config.ConfigurationBuilder::addServiceConfigurator(===org.mule.runtime.api.config.custom.ServiceConfigurator===)",
+          "new": "parameter void org.mule.runtime.core.api.config.ConfigurationBuilder::addServiceConfigurator(===org.mule.runtime.core.api.config.custom.ServiceConfigurator===)",
+          "oldType": "org.mule.runtime.api.config.custom.ServiceConfigurator",
+          "newType": "org.mule.runtime.core.api.config.custom.ServiceConfigurator",
+          "package": "org.mule.runtime.core.api.config",
+          "classSimpleName": "ConfigurationBuilder",
+          "methodName": "addServiceConfigurator",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.ServiceConfigurator in mule-core"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder::addServiceConfigurator(===org.mule.runtime.api.config.custom.ServiceConfigurator===)",
+          "new": "parameter void org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder::addServiceConfigurator(===org.mule.runtime.core.api.config.custom.ServiceConfigurator===)",
+          "oldType": "org.mule.runtime.api.config.custom.ServiceConfigurator",
+          "newType": "org.mule.runtime.core.api.config.custom.ServiceConfigurator",
+          "package": "org.mule.runtime.core.api.config.builders",
+          "classSimpleName": "AbstractConfigurationBuilder",
+          "methodName": "addServiceConfigurator",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13312344: Moved to org.mule.runtime.core.api.config.custom.ServiceConfigurator in mule-core"
+        },
+        {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils",
           "package": "org.mule.runtime.core.api.util.boot",

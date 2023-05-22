@@ -12,13 +12,13 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 
 import java.util.List;

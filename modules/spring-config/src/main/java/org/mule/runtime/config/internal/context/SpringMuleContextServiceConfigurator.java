@@ -65,6 +65,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMAT
 import static org.mule.runtime.core.api.config.MuleProperties.SDK_OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.core.api.config.custom.ServiceConfigurator.lookupConfigurators;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
@@ -79,11 +80,9 @@ import static java.lang.Boolean.valueOf;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.ResourceLocator;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.dsl.model.metadata.ModelBasedMetadataCacheIdGeneratorFactory;
@@ -98,7 +97,6 @@ import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
@@ -138,6 +136,12 @@ import org.mule.runtime.module.extension.api.runtime.compatibility.DefaultForwar
 import org.mule.runtime.module.extension.internal.data.sample.MuleSampleDataService;
 import org.mule.runtime.module.extension.internal.store.SdkObjectStoreManagerAdapter;
 import org.mule.runtime.module.extension.internal.type.catalog.DefaultArtifactTypeLoader;
+import org.mule.runtime.tracer.customization.impl.provider.DefaultInitialSpanInfoProvider;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
+import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
+import org.mule.runtime.tracer.impl.CoreEventTracer;
+import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
+import org.mule.runtime.tracing.level.impl.config.FileTracingLevelConfiguration;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -147,12 +151,6 @@ import javax.inject.Inject;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import org.mule.runtime.tracer.customization.impl.provider.DefaultInitialSpanInfoProvider;
-import org.mule.runtime.tracer.impl.CoreEventTracer;
-import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
-import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
-import org.mule.runtime.tracer.impl.span.factory.ExecutionSpanFactory;
-import org.mule.runtime.tracing.level.impl.config.FileTracingLevelConfiguration;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -331,8 +329,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   }
 
   private void loadServiceConfigurators() {
-    new SpiServiceRegistry()
-        .lookupProviders(ServiceConfigurator.class, Service.class.getClassLoader())
+    lookupConfigurators()
         .forEach(customizationInfo -> customizationInfo.configure(getCustomServiceRegistry()));
   }
 
