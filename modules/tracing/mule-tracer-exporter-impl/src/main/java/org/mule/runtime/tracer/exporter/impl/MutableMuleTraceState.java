@@ -69,6 +69,9 @@ public class MutableMuleTraceState implements TraceState {
 
   @Override
   public boolean isEmpty() {
+    if (ancestorMuleSpanId != null) {
+      return false;
+    }
     return remoteState.isEmpty();
   }
 
