@@ -82,7 +82,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
 
 
   @Test
-  public void testWhenTraceStateKeyAssertedAndNotPresentAssertionShouldFail() {
+  public void testWhenTraceStateKeyIsExpectedButIsNotPresentAssertionShouldFail() {
     expectedException.expectMessage("The span mule:logger has no trace state key key4");
     List<CapturedExportedSpan> capturedExportedSpans = getCapturedExportedSpansWithTraceState();
 
@@ -106,7 +106,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void testWhenTraceStateKeyNonExistedAssertedAndPresentAssertionShouldFail() {
+  public void testWhenTraceStateKeyIsNotExpectedButIsPresentAssertionShouldFail() {
     expectedException.expectMessage("The span mule:logger has trace state key key3 and it must not be present");
     List<CapturedExportedSpan> capturedExportedSpans = getCapturedExportedSpansWithTraceState();
 

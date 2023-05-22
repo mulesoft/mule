@@ -82,7 +82,7 @@ public interface CapturedExportedSpan {
   long getEndSpanEpochNanos();
 
   /**
-   * @return a map containing the key/value corresponding corresponding to the trace state of the captured span.
+   * @return a map containing the key/value corresponding to the trace state of the captured span.
    */
   default Map<String, String> getTraceState() {
     return emptyMap();
