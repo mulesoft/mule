@@ -28,10 +28,13 @@ public class MutableMuleTraceState implements TraceState {
   public static final String TRACE_STATE_KEY = "tracestate";
 
   public static final String ANCESTOR_MULE_SPAN_ID = "ancestor-mule-span-id";
+  private String ancestorMuleSpanId;
+
+  private Map<String, String> remoteState;
 
   /**
    * Returns a {@link MutableMuleTraceState} from the representation as a serialized map.
-   * 
+   *
    * @param serializeAsMap the serialized trace state
    * @return the resulting {@link MutableMuleTraceState}
    */
@@ -41,43 +44,53 @@ public class MutableMuleTraceState implements TraceState {
     if (!StringUtils.isEmpty(traceState)) {
       remoteTraceState = W3CTraceContextEncoding.decodeTraceState(traceState);
     }
-    return new MutableMuleTraceState(remoteTraceState.asMap());
+    return new MutableMuleTraceState(remoteTraceState.asMap(), remoteTraceState.get(ANCESTOR_MULE_SPAN_ID));
   }
 
-  private final Map<String, String> state;
-
-  public MutableMuleTraceState(Map<String, String> state) {
-    this.state = state;
+  public MutableMuleTraceState(Map<String, String> remoteState, String ancestorMuleSpanId) {
+    this.remoteState = remoteState;
+    this.ancestorMuleSpanId = ancestorMuleSpanId;
   }
 
   public MutableMuleTraceState() {
-    this.state = new HashMap<>();
+    this.remoteState = new HashMap<>();
   }
 
   @Nullable
   @Override
   public String get(String key) {
-    return state.get(key);
+    return remoteState.get(key);
   }
 
   @Override
   public int size() {
-    return state.size();
+    return remoteState.size();
   }
 
   @Override
   public boolean isEmpty() {
-    return state.isEmpty();
+    return remoteState.isEmpty();
   }
 
   @Override
   public void forEach(BiConsumer<String, String> biConsumer) {
-    state.forEach(biConsumer);
+    // From the remote state we don't export the ancestor.
+    remoteState.forEach((key, value) -> {
+      if (!key.equals(ANCESTOR_MULE_SPAN_ID)) {
+        biConsumer.accept(key, value);
+      }
+    });
+
+    if (ancestorMuleSpanId != null) {
+      biConsumer.accept(ANCESTOR_MULE_SPAN_ID, ancestorMuleSpanId);
+    }
   }
 
   @Override
   public Map<String, String> asMap() {
-    return state;
+    Map<String, String> mapWithAncestor = new HashMap<>();
+    this.forEach(mapWithAncestor::put);
+    return mapWithAncestor;
   }
 
   @Override
@@ -87,24 +100,21 @@ public class MutableMuleTraceState implements TraceState {
   }
 
   public void put(String key, String value) {
-    state.put(key, value);
+    remoteState.put(key, value);
   }
 
   /**
-   * @param ancestorSpanId span id xthat will be added as an ancestor.
+   * @param ancestorSpanId span id that will be added as an ancestor.
    * @return the trace state with the ancestor key/value.
    */
   public TraceState withAncestor(String ancestorSpanId) {
-    Map<String, String> newMap = new HashMap<>(state);
-    newMap.put(ANCESTOR_MULE_SPAN_ID, ancestorSpanId);
-    return new MutableMuleTraceState(newMap);
+    return new MutableMuleTraceState(remoteState, ancestorSpanId);
   }
 
   /**
-   * @ @return adds all the key values of the current span.
+   * propagates the remote context without the ancestor span id.
    */
-  public void copyAllKeyValuesWithoutAncestor(MutableMuleTraceState targetMuleTraceState) {
-    targetMuleTraceState.state.putAll(state);
-    targetMuleTraceState.state.remove(ANCESTOR_MULE_SPAN_ID);
+  public void propagateRemoteContext(MutableMuleTraceState targetMuleTraceState) {
+    targetMuleTraceState.remoteState = remoteState;
   }
 }

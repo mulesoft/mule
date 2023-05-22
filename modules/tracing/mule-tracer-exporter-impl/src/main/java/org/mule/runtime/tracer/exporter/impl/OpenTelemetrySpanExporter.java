@@ -196,7 +196,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public Map<String, String> exportedSpanAsMap() {
-    return OpenTelemetryTraceIdUtils.getContext(this, addMuleAncestorSpanId);
+    return OpenTelemetryTraceIdUtils.getDistributedTraceContext(this, addMuleAncestorSpanId);
   }
 
   @Override
@@ -243,7 +243,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   public void updateChildSpanExporter(SpanExporter childSpanExporter) {
     if (childSpanExporter instanceof OpenTelemetrySpanExporter) {
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
-      muleTraceState.copyAllKeyValuesWithoutAncestor(childOpenTelemetrySpanExporter.muleTraceState);
+      muleTraceState.propagateRemoteContext(childOpenTelemetrySpanExporter.muleTraceState);
 
       // If it isn't exportable propagate the traceId and spanId
       if (!childOpenTelemetrySpanExporter.exportable) {
@@ -458,7 +458,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     private String artifactType;
     private Resource resource;
     private SpanProcessor spanProcessor;
-    private boolean addMuleAncestorSpanId;
+    private boolean isAddMuleAncestorSpanId;
 
     public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
       this.initialSpanInfo = initialSpanInfo;
@@ -491,7 +491,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     }
 
     public OpenTelemetrySpanExportBuilder addMuleAncestorSpanId(boolean addMuleAncestorSpanId) {
-      this.addMuleAncestorSpanId = addMuleAncestorSpanId;
+      this.isAddMuleAncestorSpanId = addMuleAncestorSpanId;
       return this;
     }
 
@@ -518,7 +518,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       }
 
       return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
-                                           addMuleAncestorSpanId, resource);
+                                           isAddMuleAncestorSpanId, resource);
     }
   }
 
