@@ -203,8 +203,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                             e -> shouldRetry(e, context),
                             e -> {
                               interceptorChain.onError(context, e);
-                              // TODO: Add the ticket ID for the DEBUG level errors task.
-                              coreEventEventTracer.endCurrentSpan(context.getEvent());
                             },
                             NULL_THROWABLE_CONSUMER,
                             identity(),
