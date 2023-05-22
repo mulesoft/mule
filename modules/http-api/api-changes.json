@@ -1,4 +1,19 @@
 {
+  "4.3.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.added",
+          "new": "method org.mule.runtime.http.api.client.HttpRequestOptionsBuilder org.mule.runtime.http.api.client.HttpRequestOptionsBuilder::sendBodyAlways(boolean)",
+          "package": "org.mule.runtime.http.api.client",
+          "classSimpleName": "HttpRequestOptionsBuilder",
+          "methodName": "sendBodyAlways",
+          "elementKind": "method",
+          "justification": "W-12594415: HTTP Connector POST 303 Redirect passing body into the GET Request"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [
