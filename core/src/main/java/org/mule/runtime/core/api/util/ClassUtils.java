@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.metadata.java.api.utils.ClassUtils.getInnerClassName;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getClassLoaderResourceNotFoundExceptionFactory;
 import static org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory.getDefaultFactory;
 import static org.mule.runtime.core.api.util.ExceptionUtils.tryExpecting;
 
@@ -22,8 +23,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
@@ -42,7 +41,6 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,14 +70,6 @@ public class ClassUtils {
   private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<>();
   private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
   public static final String MULE_DESIGN_MODE = "mule.designMode";
-
-  private static LazyValue<ClassLoaderResourceNotFoundExceptionFactory> resourceNotFoundExceptionFactoryLazyValue =
-      new LazyValue(() -> {
-        Collection<ClassLoaderResourceNotFoundExceptionFactory> providers =
-            new SpiServiceRegistry().lookupProviders(ClassLoaderResourceNotFoundExceptionFactory.class,
-                                                     ClassUtils.class.getClassLoader());
-        return providers.isEmpty() ? getDefaultFactory() : providers.iterator().next();
-      });
 
   static {
     wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
@@ -145,7 +135,7 @@ public class ClassUtils {
       }
     }
     if (isDesignModeEnabled()) {
-      throw resourceNotFoundExceptionFactoryLazyValue.get().createResourceNotFoundException(resourceName, classLoader, true);
+      throw getClassLoaderResourceNotFoundExceptionFactory().createResourceNotFoundException(resourceName, classLoader, true);
     } else {
       throw getDefaultFactory().createResourceNotFoundException(resourceName, classLoader, true);
     }
@@ -351,7 +341,7 @@ public class ClassUtils {
         clazz = classLoader.loadClass(getInnerClassName(className));
       } catch (ClassNotFoundException e2) {
         if (isDesignModeEnabled()) {
-          throw resourceNotFoundExceptionFactoryLazyValue.get().createClassNotFoundException(className, classLoader);
+          throw getClassLoaderResourceNotFoundExceptionFactory().createClassNotFoundException(className, classLoader);
         } else {
           throw getDefaultFactory().createClassNotFoundException(className, classLoader);
         }

@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
+import static java.lang.String.format;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.StreamSupport.stream;
+
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 
 /**
@@ -40,6 +44,18 @@ public interface ClassLoaderResourceNotFoundExceptionFactory {
    * @return a new {@link ClassNotFoundException}
    */
   ClassNotFoundException createClassNotFoundException(String className, ClassLoader classLoader);
+
+  static LazyValue<ClassLoaderResourceNotFoundExceptionFactory> resourceNotFoundExceptionFactoryLazyValue =
+      new LazyValue(() -> stream(((Iterable<ClassLoaderResourceNotFoundExceptionFactory>) () -> load(ClassLoaderResourceNotFoundExceptionFactory.class,
+                                                                                                     ClassLoaderResourceNotFoundExceptionFactory.class
+                                                                                                         .getClassLoader())
+                                                                                                             .iterator())
+                                                                                                                 .spliterator(),
+                                 false));
+
+  static ClassLoaderResourceNotFoundExceptionFactory getClassLoaderResourceNotFoundExceptionFactory() {
+    return resourceNotFoundExceptionFactoryLazyValue.get();
+  }
 
   /**
    * @return the default {@link ClassLoaderResourceNotFoundExceptionFactory} to use when there's no other implementation found.
