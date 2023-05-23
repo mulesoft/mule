@@ -7,6 +7,9 @@
 
 package org.mule.runtime.tracer.api.sniffer;
 
+import static java.util.Collections.emptyMap;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -77,4 +80,11 @@ public interface CapturedExportedSpan {
    * @return the end span nanos.
    */
   long getEndSpanEpochNanos();
+
+  /**
+   * @return a map containing the key/value corresponding to the trace state of the captured span.
+   */
+  default Map<String, String> getTraceState() {
+    return emptyMap();
+  }
 }

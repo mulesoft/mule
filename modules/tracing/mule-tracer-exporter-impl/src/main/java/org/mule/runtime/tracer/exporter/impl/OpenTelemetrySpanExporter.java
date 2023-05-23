@@ -9,6 +9,7 @@ package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
+import static org.mule.runtime.tracer.exporter.impl.MutableMuleTraceState.getMutableMuleTraceStateFrom;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.ARTIFACT_TYPE;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.EXCEPTIONS_HAVE_BEEN_RECORDED;
@@ -48,7 +49,6 @@ import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.TraceFlags;
-import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.sdk.common.InstrumentationLibraryInfo;
 import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 import io.opentelemetry.sdk.resources.Resource;
@@ -82,7 +82,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       toInstrumentationScopeInfo(INSTRUMENTATION_LIBRARY_INFO);
   // These are artifact.id, artifact.type and thread.end.name.
   public static final int EXPORTER_ATTRIBUTES_BASE_SIZE = 3;
-
+  public static final String TRACE_PARENT_KEY = "traceparent";
   private final boolean isRootSpan;
   private final boolean isPolicySpan;
   private final InternalSpan internalSpan;
@@ -91,6 +91,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final Map<String, String> rootAttributes = new HashMap<>();
   private final SpanProcessor spanProcessor;
   private final Resource resource;
+  private final boolean addMuleAncestorSpanId;
 
   private boolean exportable;
   private SpanContext spanContext = getInvalid();
@@ -104,12 +105,15 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private String rootName;
   private String endThreadNameValue;
 
+  private MutableMuleTraceState muleTraceState = new MutableMuleTraceState();
+
 
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
                                     InitialSpanInfo initialSpanInfo,
                                     String artifactId,
                                     String artifactType,
                                     SpanProcessor spanProcessor,
+                                    boolean addMuleAncestorSpanId,
                                     Resource resource) {
     this.internalSpan = internalSpan;
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
@@ -119,14 +123,16 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
+    this.addMuleAncestorSpanId = addMuleAncestorSpanId;
     this.resource = resource;
 
     // Generates the span id so that the opentelemetry spans can be lazily initialised if it is exportable
     if (exportable) {
+      String spanId = OpenTelemetryTraceIdUtils.generateSpanId();
       this.spanContext =
           SpanContext.create(OpenTelemetryTraceIdUtils.generateTraceId(getAsInternalSpan(internalSpan.getParent())),
-                             OpenTelemetryTraceIdUtils.generateSpanId(),
-                             TraceFlags.getSampled(), TraceState.getDefault());
+                             spanId,
+                             TraceFlags.getSampled(), muleTraceState);
     }
   }
 
@@ -190,7 +196,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public Map<String, String> exportedSpanAsMap() {
-    return OpenTelemetryTraceIdUtils.getContext(this);
+    return OpenTelemetryTraceIdUtils.getDistributedTraceContext(this, addMuleAncestorSpanId);
   }
 
   @Override
@@ -213,16 +219,17 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
-    parentSpanContext = extractContextFromTraceParent(serializeAsMap.get("traceparent"));
+    parentSpanContext = extractContextFromTraceParent(serializeAsMap.get(TRACE_PARENT_KEY));
+    muleTraceState = getMutableMuleTraceStateFrom(serializeAsMap);
     if (parentSpanContext.isValid()) {
       if (!exportable) {
         // if it not exportable, we set the parent span context so that it is eventually
         // propagated to the next exportable span.
         spanContext = SpanContext.create(parentSpanContext.getTraceId(), parentSpanContext.getSpanId(),
-                                         TraceFlags.getSampled(), TraceState.getDefault());
+                                         TraceFlags.getSampled(), muleTraceState);
       } else {
         spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
-                                         TraceFlags.getSampled(), TraceState.getDefault());
+                                         TraceFlags.getSampled(), muleTraceState);
       }
     }
   }
@@ -236,6 +243,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   public void updateChildSpanExporter(SpanExporter childSpanExporter) {
     if (childSpanExporter instanceof OpenTelemetrySpanExporter) {
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
+      muleTraceState.propagateRemoteContext(childOpenTelemetrySpanExporter.muleTraceState);
 
       // If it isn't exportable propagate the traceId and spanId
       if (!childOpenTelemetrySpanExporter.exportable) {
@@ -435,6 +443,10 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     return INSTRUMENTATION_SCOPE_INFO;
   }
 
+  public MutableMuleTraceState getTraceState() {
+    return muleTraceState;
+  }
+
   /**
    * Builder
    */
@@ -446,6 +458,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     private String artifactType;
     private Resource resource;
     private SpanProcessor spanProcessor;
+    private boolean isAddMuleAncestorSpanId;
 
     public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
       this.initialSpanInfo = initialSpanInfo;
@@ -477,6 +490,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       return this;
     }
 
+    public OpenTelemetrySpanExportBuilder addMuleAncestorSpanId(boolean addMuleAncestorSpanId) {
+      this.isAddMuleAncestorSpanId = addMuleAncestorSpanId;
+      return this;
+    }
+
     public OpenTelemetrySpanExporter build() {
 
       if (initialSpanInfo == null) {
@@ -499,7 +517,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         throw new IllegalArgumentException("Resource is null");
       }
 
-      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor, resource);
+      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
+                                           isAddMuleAncestorSpanId, resource);
     }
   }
 

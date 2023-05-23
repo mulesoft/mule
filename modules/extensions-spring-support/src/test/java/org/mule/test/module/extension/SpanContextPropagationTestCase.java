@@ -52,6 +52,8 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
   private static final long PROBER_FREQUENCY = 1000;
   public static final String W3C_TRACE_PARENT_HEADER = "traceparent";
 
+  public static final String W3C_TRACE_STATE_HEADER = "tracestate";
+
   @Override
   protected String getConfigFile() {
     return "distributed-trace-context-propagation-test.xml";
@@ -121,10 +123,11 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
     for (CoreEvent event : events) {
       Map<String, String> distributedTraceContext =
           (Map<String, String>) event.getMessage().getPayload().getValue();
-      assertThat(distributedTraceContext, aMapWithSize(1));
+      assertThat(distributedTraceContext, aMapWithSize(2));
       // This test was fixed with W-12336322. Only the distributed trace context
       // of the operation should be propagated.
       assertThat(distributedTraceContext, hasKey(W3C_TRACE_PARENT_HEADER));
+      assertThat(distributedTraceContext, hasKey(W3C_TRACE_STATE_HEADER));
     }
   }
 

@@ -80,6 +80,117 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
+
+  @Test
+  public void testWhenTraceStateKeyIsExpectedButIsNotPresentAssertionShouldFail() {
+    expectedException.expectMessage("The span mule:logger has no trace state key key4");
+    List<CapturedExportedSpan> capturedExportedSpans = getCapturedExportedSpansWithTraceState();
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addTraceStateKeyPresentAssertion("key1")
+        .addTraceStateKeyPresentAssertion("key2")
+        .addTraceStateKeyPresentAssertion("key3")
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addTraceStateKeyPresentAssertion("key1")
+        .addTraceStateKeyPresentAssertion("key2")
+        .addTraceStateKeyPresentAssertion("key3")
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addTraceStateKeyPresentAssertion("key4")
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenTraceStateKeyIsNotExpectedButIsPresentAssertionShouldFail() {
+    expectedException.expectMessage("The span mule:logger has trace state key key3 and it must not be present");
+    List<CapturedExportedSpan> capturedExportedSpans = getCapturedExportedSpansWithTraceState();
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addTraceStateKeyPresentAssertion("key1")
+        .addTraceStateKeyPresentAssertion("key2")
+        .addTraceStateKeyPresentAssertion("key3")
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addTraceStateKeyPresentAssertion("key1")
+        .addTraceStateKeyPresentAssertion("key2")
+        .addTraceStateKeyPresentAssertion("key3")
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addTraceStateKeyNotPresentAssertion("key3")
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testAllTraceStateKeyValuesPresent() {
+    List<CapturedExportedSpan> capturedExportedSpans = getCapturedExportedSpansWithTraceState();
+
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(capturedExportedSpans);
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addTraceStateKeyValueAssertion("key1", "value1")
+        .addTraceStateKeyValueAssertion("key2", "value2")
+        .addTraceStateKeyValueAssertion("key3", "value3")
+        .beginChildren()
+        .child(EXPECTED_ASYNC_SPAN_NAME)
+        .addTraceStateKeyValueAssertion("key1", "value1")
+        .addTraceStateKeyValueAssertion("key2", "value2")
+        .addTraceStateKeyValueAssertion("key3", "value3")
+        .beginChildren()
+        .child(EXPECTED_LOGGER_SPAN_NAME)
+        .addTraceStateKeyValueAssertion("key1", "value1")
+        .addTraceStateKeyValueAssertion("key2", "value2")
+        .addTraceStateKeyValueAssertion("key3", "value3")
+        .endChildren()
+        .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  private List<CapturedExportedSpan> getCapturedExportedSpansWithTraceState() {
+    List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();
+    Map<String, String> traceState = new HashMap<String, String>() {
+
+      {
+        put("key1", "value1");
+        put("key2", "value2");
+        put("key3", "value3");
+      }
+    };
+
+    CapturedExportedSpan muleFlow = mockCapturedExportedSpan();
+    CapturedExportedSpan async = mockCapturedExportedSpan();
+    CapturedExportedSpan logger = mockCapturedExportedSpan();
+
+    when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
+    when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
+    when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(muleFlow.getTraceState()).thenReturn(traceState);
+
+    when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
+    when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
+    when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(async.getTraceState()).thenReturn(traceState);
+    when(async.getTraceState()).thenReturn(traceState);
+
+    when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
+    when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
+    when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
+    when(logger.getTraceState()).thenReturn(traceState);
+
+    capturedExportedSpans.add(muleFlow);
+    capturedExportedSpans.add(async);
+    capturedExportedSpans.add(logger);
+    return capturedExportedSpans;
+  }
+
   @Test
   public void testWhenSimpleStructureSpanTreeMatchesExpectedSpansAssertionShouldNotFail() {
     List<CapturedExportedSpan> capturedExportedSpans = new ArrayList<>();

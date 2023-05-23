@@ -7,6 +7,7 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
+import static org.junit.Assert.fail;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
 
 import static java.lang.String.format;
@@ -149,12 +150,41 @@ public class SpanTestHierarchy {
     assertTrue("Expected span: " + expectedNode.spanName + " has a different trace ID than parent",
                hasCorrectTraceId(actualSpan, actualParent != null ? actualParent.getName() : null));
     assertAttributes(actualSpan, expectedNode);
+    assertTraceState(actualSpan, expectedNode);
     assertException(actualSpan, expectedNode);
     assertThat("Expected span: " + expectedNode.spanName + " has incorrect start or end time",
                actualSpan.getStartEpochSpanNanos(),
                is(lessThan(actualSpan.getEndSpanEpochNanos())));
     visitedSpans.add(actualSpan.getSpanId());
     return actualSpan;
+  }
+
+  private void assertTraceState(CapturedExportedSpan actualSpan, SpanNode expectedNode) {
+    expectedNode.getTraceStateEntriesToAssert().forEach((key, value) -> {
+      String capturedTraceValue = actualSpan.getTraceState().get(key);
+      if (capturedTraceValue == null) {
+        fail("The span " + expectedNode.spanName + " has no trace state key " + key);
+      }
+
+      assertThat("The span " + expectedNode.spanName + " has expected value " + value + " for key " + key + ". The value was "
+          + capturedTraceValue, capturedTraceValue, equalTo(value));
+    });
+
+    expectedNode.getTraceStateKeyExistence().forEach(key -> {
+      String capturedTraceValue = actualSpan.getTraceState().get(key);
+
+      if (capturedTraceValue == null) {
+        fail("The span " + expectedNode.spanName + " has no trace state key " + key);
+      }
+    });
+
+    expectedNode.getTraceStateKeyNotExistence().forEach(key -> {
+      String capturedTraceValue = actualSpan.getTraceState().get(key);
+
+      if (capturedTraceValue != null) {
+        fail("The span " + expectedNode.spanName + " has trace state key " + key + " and it must not be present");
+      }
+    });
   }
 
   private boolean hasCorrectParent(CapturedExportedSpan span, String expectedParentName) {
@@ -200,6 +230,21 @@ public class SpanTestHierarchy {
     expectedNode.assertExceptions(actualSpan);
   }
 
+  public SpanTestHierarchy addTraceStateKeyValueAssertion(String key, String value) {
+    currentNode.addTraceStateKeyValueToAssert(key, value);
+    return this;
+  }
+
+  public SpanTestHierarchy addTraceStateKeyNotPresentAssertion(String key) {
+    currentNode.addTraceStateKeyAssertNotExistence(key);
+    return this;
+  }
+
+  public SpanTestHierarchy addTraceStateKeyPresentAssertion(String key) {
+    currentNode.addTraceStateKeyAssertExistence(key);
+    return this;
+  }
+
   private static class SpanNode {
 
     private final String spanName;
@@ -208,6 +253,10 @@ public class SpanTestHierarchy {
     private final Map<String, String> attributesThatShouldMatch = new HashMap<>();
     private final List<String> attributesThatShouldExist = new ArrayList<>();
     private Matcher<CapturedEventData> exceptionEventMatcher;
+
+    private final Map<String, String> traceStateEntriesToAssert = new HashMap<>();
+    private List<String> traceStateKeyExistence = new ArrayList<>();
+    private List<String> traceStateKeyNotExistence = new ArrayList<>();
 
     public SpanNode(String spanName) {
       this.spanName = spanName;
@@ -261,6 +310,30 @@ public class SpanTestHierarchy {
                    containsInAnyOrder(exceptionEventMatcher));
         assertThat(actualSpan.hasErrorStatus(), is(true));
       }
+    }
+
+    public void addTraceStateKeyValueToAssert(String key, String value) {
+      traceStateEntriesToAssert.put(key, value);
+    }
+
+    public Map<String, String> getTraceStateEntriesToAssert() {
+      return traceStateEntriesToAssert;
+    }
+
+    public List<String> getTraceStateKeyExistence() {
+      return traceStateKeyExistence;
+    }
+
+    public List<String> getTraceStateKeyNotExistence() {
+      return traceStateKeyNotExistence;
+    }
+
+    public void addTraceStateKeyAssertNotExistence(String key) {
+      this.traceStateKeyNotExistence.add(key);
+    }
+
+    public void addTraceStateKeyAssertExistence(String key) {
+      this.traceStateKeyExistence.add(key);
     }
   }
 }

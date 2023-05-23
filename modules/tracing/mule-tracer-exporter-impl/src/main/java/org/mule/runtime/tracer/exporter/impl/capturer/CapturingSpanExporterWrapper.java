@@ -177,6 +177,11 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       public long getEndSpanEpochNanos() {
         return spanData.getEndEpochNanos();
       }
+
+      @Override
+      public Map<String, String> getTraceState() {
+        return spanData.getSpanContext().getTraceState().asMap();
+      }
     }
 
     /**
