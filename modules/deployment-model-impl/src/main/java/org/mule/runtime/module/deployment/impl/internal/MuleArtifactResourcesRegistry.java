@@ -38,7 +38,6 @@ import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -245,7 +244,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
             .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
                                                    ArtifactDescriptorValidatorBuilder.builder());
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-    descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+    descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository();
 
     ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = ArtifactDescriptorValidatorBuilder.builder();
 

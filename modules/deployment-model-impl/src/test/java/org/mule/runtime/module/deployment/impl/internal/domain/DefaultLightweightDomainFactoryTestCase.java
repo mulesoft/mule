@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -44,12 +43,13 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(DOMAIN_CREATION)
 @Story(LIGHTWEIGHT)
@@ -65,7 +65,7 @@ public class DefaultLightweightDomainFactoryTestCase extends AbstractMuleTestCas
 
   private final DefaultDomainFactory domainFactory =
       new DefaultDomainFactory(new DomainDescriptorFactory(mock(ArtifactPluginDescriptorLoader.class),
-                                                           new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+                                                           new ServiceRegistryDescriptorLoaderRepository(),
                                                            ArtifactDescriptorValidatorBuilder.builder()),
                                DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                new DefaultDomainManager(),

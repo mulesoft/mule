@@ -118,7 +118,6 @@ import org.mule.runtime.container.api.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.application.Application;
@@ -1281,7 +1280,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
-    return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+    return new ServiceRegistryDescriptorLoaderRepository();
   }
 
   protected static class TestComponent implements Initialisable {

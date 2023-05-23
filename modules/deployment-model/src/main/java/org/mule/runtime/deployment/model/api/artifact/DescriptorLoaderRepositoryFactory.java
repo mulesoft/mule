@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.deployment.model.api.artifact;
 
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 
@@ -17,12 +16,10 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
  */
 public class DescriptorLoaderRepositoryFactory {
 
-  private static final SpiServiceRegistry SERVICE_REGISTRY = new SpiServiceRegistry();
-
   /**
    * @return a newly created {@link DescriptorLoaderRepository} instance.
    */
   public DescriptorLoaderRepository createDescriptorLoaderRepository() {
-    return new ServiceRegistryDescriptorLoaderRepository(SERVICE_REGISTRY);
+    return new ServiceRegistryDescriptorLoaderRepository();
   }
 }

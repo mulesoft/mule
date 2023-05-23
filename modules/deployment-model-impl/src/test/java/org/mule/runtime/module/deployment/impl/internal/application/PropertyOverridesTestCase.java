@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
+
 import static org.apache.commons.io.IOUtils.copy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.deployment.model.api.application.ApplicationDescriptor;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
 import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
@@ -56,7 +56,7 @@ public class PropertyOverridesTestCase extends AbstractMuleTestCase {
         new ApplicationDescriptorFactory(new ArtifactPluginDescriptorLoader(artifactDescriptorFactoryProvider()
             .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
                                                    ArtifactDescriptorValidatorBuilder.builder())),
-                                         new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+                                         new ServiceRegistryDescriptorLoaderRepository(),
                                          ArtifactDescriptorValidatorBuilder.builder());
     applicationDescriptorFactory.setApplicationProperties(descriptor, tempProps);
     Map<String, String> appProps = descriptor.getAppProperties();

@@ -7,35 +7,38 @@
 
 package org.mule.runtime.deployment.model.internal.artifact;
 
-import static java.util.Collections.singleton;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.PLUGIN;
 import static org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository.noRegisteredLoaderError;
 import static org.mule.test.allure.AllureConstants.DescriptorLoaderFeature.DESCRIPTOR_LOADER;
 import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;
 import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory.SERVICE_REGISTRY;
 
-import org.mule.runtime.core.api.registry.ServiceRegistry;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.util.Collection;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 @Features({@Feature(SERVICES), @Feature(DESCRIPTOR_LOADER)})
@@ -44,7 +47,10 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
 
   private static final String LOADER_ID = "loader";
 
-  private final ServiceRegistry serviceRegistry = mock(ServiceRegistry.class);
+  private final ClassLoaderConfigurationLoader classLoaderConfigurationLoader =
+      mock(ClassLoaderConfigurationLoader.class);
+  private final Function<Class<? extends DescriptorLoader>, Stream<? extends DescriptorLoader>> serviceRegistry =
+      spy(clazz -> Stream.of(classLoaderConfigurationLoader));
   private final ServiceRegistryDescriptorLoaderRepository repository =
       new ServiceRegistryDescriptorLoaderRepository(serviceRegistry);
   @Rule
@@ -52,21 +58,16 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
 
   @Test
   public void initializesClassLoaderConfigurationLoadersOnce() throws Exception {
-    ClassLoaderConfigurationLoader expectedClassLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
-    when(expectedClassLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
-    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders =
-        singleton(expectedClassLoaderConfigurationLoader);
-    when(serviceRegistry.lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader()))
-        .thenReturn(classLoaderConfigurationLoaders);
-    when(expectedClassLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
+    when(classLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
+    when(classLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
 
     repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
     repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
 
-    verify(serviceRegistry).lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader());
-    verify(serviceRegistry).lookupProviders(BundleDescriptorLoader.class, getClass().getClassLoader());
-    verify(serviceRegistry, never()).lookupProvider(ClassLoaderConfigurationLoader.class, getClass().getClassLoader());
-    verify(serviceRegistry, never()).lookupProvider(BundleDescriptorLoader.class, getClass().getClassLoader());
+    verify(serviceRegistry).apply(ClassLoaderConfigurationLoader.class);
+    verify(serviceRegistry).apply(BundleDescriptorLoader.class);
+    verify(serviceRegistry, never()).apply(ClassLoaderConfigurationLoader.class);
+    verify(serviceRegistry, never()).apply(BundleDescriptorLoader.class);
   }
 
   @Test
@@ -79,27 +80,17 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
 
   @Test
   public void findsLoader() throws Exception {
-    ClassLoaderConfigurationLoader expectedClassLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
-    when(expectedClassLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
-    when(expectedClassLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
-    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders =
-        singleton(expectedClassLoaderConfigurationLoader);
-    when(serviceRegistry.lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader()))
-        .thenReturn(classLoaderConfigurationLoaders);
+    when(classLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
+    when(classLoaderConfigurationLoader.supportsArtifactType(PLUGIN)).thenReturn(true);
     ClassLoaderConfigurationLoader classLoaderConfigurationLoader =
         repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
 
-    assertThat(classLoaderConfigurationLoader, is(expectedClassLoaderConfigurationLoader));
+    assertThat(classLoaderConfigurationLoader, is(classLoaderConfigurationLoader));
   }
 
   @Test
   public void findsLoaderIdWithType() throws Exception {
-    ClassLoaderConfigurationLoader classLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
     when(classLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
-    Collection<ClassLoaderConfigurationLoader> classLoaderConfigurationLoaders = singleton(classLoaderConfigurationLoader);
-    when(serviceRegistry.lookupProviders(ClassLoaderConfigurationLoader.class, getClass().getClassLoader()))
-        .thenReturn(classLoaderConfigurationLoaders);
-
     expectedException.expect(LoaderNotFoundException.class);
     expectedException.expectMessage(noRegisteredLoaderError(LOADER_ID, BundleDescriptorLoader.class));
 
