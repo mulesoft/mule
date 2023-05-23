@@ -8,7 +8,7 @@
 package org.mule.test.runner.api;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
 
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.MavenPomParserProvider;

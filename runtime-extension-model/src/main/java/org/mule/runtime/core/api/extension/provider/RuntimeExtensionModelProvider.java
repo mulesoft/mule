@@ -6,12 +6,33 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static java.lang.Thread.currentThread;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.StreamSupport.stream;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+
+import java.util.Objects;
+import java.util.Set;
 
 @NoImplement
 public interface RuntimeExtensionModelProvider {
 
   ExtensionModel createExtensionModel();
+
+  /**
+   * Discovers the extension models provided by the Mule Runtime.
+   *
+   * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
+   */
+  static Set<ExtensionModel> discoverRuntimeExtensionModels() {
+    return stream(((Iterable<RuntimeExtensionModelProvider>) () -> load(RuntimeExtensionModelProvider.class, currentThread()
+        .getContextClassLoader()).iterator()).spliterator(), false)
+            .map(RuntimeExtensionModelProvider::createExtensionModel)
+            .filter(Objects::nonNull)
+            .collect(toSet());
+  }
 
 }

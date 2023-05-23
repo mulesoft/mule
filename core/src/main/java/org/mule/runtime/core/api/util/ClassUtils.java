@@ -15,6 +15,8 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.reflect.Modifier.isAbstract;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.StreamSupport.stream;
 
 import static org.apache.commons.lang3.ClassUtils.primitiveToWrapper;
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
@@ -50,9 +52,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.stream.StreamSupport;
 
 import com.google.common.primitives.Primitives;
 
@@ -75,10 +79,13 @@ public class ClassUtils {
 
   private static LazyValue<ClassLoaderResourceNotFoundExceptionFactory> resourceNotFoundExceptionFactoryLazyValue =
       new LazyValue(() -> {
-        Collection<ClassLoaderResourceNotFoundExceptionFactory> providers =
-            new SpiServiceRegistry().lookupProviders(ClassLoaderResourceNotFoundExceptionFactory.class,
-                                                     ClassUtils.class.getClassLoader());
-        return providers.isEmpty() ? getDefaultFactory() : providers.iterator().next();
+        return stream(((Iterable<ClassLoaderResourceNotFoundExceptionFactory>) () -> load(ClassLoaderResourceNotFoundExceptionFactory.class,
+                                                                                          ClassUtils.class.getClassLoader())
+                                                                                              .iterator())
+                                                                                                  .spliterator(),
+                      false)
+                          .findFirst()
+                          .orElseGet(() -> getDefaultFactory());
       });
 
   static {

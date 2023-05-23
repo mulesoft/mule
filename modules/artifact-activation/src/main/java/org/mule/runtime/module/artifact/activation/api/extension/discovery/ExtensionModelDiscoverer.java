@@ -6,20 +6,16 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableSet;
-import static java.util.stream.Collectors.toSet;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -69,14 +65,12 @@ public interface ExtensionModelDiscoverer {
    * Discovers the extension models provided by the Mule Runtime.
    *
    * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
+   * 
+   * @deprecated since 4.5 use {@link RuntimeExtensionModelProvider#discoverRuntimeExtensionModels()} instead.
    */
+  @Deprecated
   static Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    return unmodifiableSet(new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
-        .stream()
-        .map(RuntimeExtensionModelProvider::createExtensionModel)
-        .filter(Objects::nonNull)
-        .collect(toSet()));
+    return unmodifiableSet(RuntimeExtensionModelProvider.discoverRuntimeExtensionModels());
   }
 
   /**

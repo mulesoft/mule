@@ -3,6 +3,14 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils",
+          "package": "org.mule.runtime.core.api.util.boot",
+          "classSimpleName": "ExtensionLoaderUtils",
+          "elementKind": "class",
+          "justification": "W-13312344: Moved to org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils in mule-module-artifact-activation"
+        },
+        {
           "code": "java.method.addedToInterface",
           "new": "method org.mule.runtime.api.profiling.tracing.SpanIdentifier org.mule.runtime.tracer.api.span.exporter.SpanExporter::getSpanIdentifierBasedOnExport()",
           "package": "org.mule.runtime.tracer.api.span.exporter",

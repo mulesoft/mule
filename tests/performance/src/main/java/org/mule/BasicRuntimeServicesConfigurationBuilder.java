@@ -15,7 +15,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 /**
@@ -27,15 +27,15 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
-    new SpiServiceRegistry().lookupProviders(Service.class, BasicRuntimeServicesConfigurationBuilder.class.getClassLoader())
-        .forEach(service -> {
-          try {
-            startIfNeeded(service);
-            registerObject(muleContext, service.getName(), service);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        });
+    final SimpleUnitTestSupportSchedulerService simpleUnitTestSupportSchedulerService =
+        new SimpleUnitTestSupportSchedulerService();
+
+    try {
+      startIfNeeded(simpleUnitTestSupportSchedulerService);
+      registerObject(muleContext, simpleUnitTestSupportSchedulerService.getName(), simpleUnitTestSupportSchedulerService);
+    } catch (MuleException e) {
+      throw new MuleRuntimeException(e);
+    }
 
     DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
     registerObject(muleContext, weaveExpressionExecutor.getName(), weaveExpressionExecutor);

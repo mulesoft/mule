@@ -7,18 +7,20 @@
 
 package org.mule.functional.junit4;
 
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,10 +44,7 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
     this.serviceRepository = serviceRepository;
 
     Set<Class> currentContracts = getRegisteredServiceContracts();
-    testServices = new ArrayList<>(
-                                   new SpiServiceRegistry()
-                                       .lookupProviders(Service.class,
-                                                        TestServicesMuleContextConfigurator.class.getClassLoader()));
+    testServices = asList(new SimpleUnitTestSupportSchedulerService());
 
     testServices.removeIf(s -> currentContracts.stream().anyMatch(c -> c.isInstance(s)));
   }
