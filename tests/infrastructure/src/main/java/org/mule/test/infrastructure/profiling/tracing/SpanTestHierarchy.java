@@ -28,6 +28,7 @@ import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,13 +49,31 @@ public class SpanTestHierarchy {
   private SpanNode currentNode;
   private SpanNode lastChild;
   private static final String NO_PARENT_SPAN = "0000000000000000";
-  private final HashSet<String> visitedSpans = new HashSet();
+  private final HashSet<String> visitedSpans = new HashSet<>();
   private final HashMap<String, CapturedExportedSpan> spanHashMap = new HashMap<>();
-  private final Collection<CapturedExportedSpan> actualExportedSpans;
+  private Collection<CapturedExportedSpan> actualExportedSpans;
 
   public SpanTestHierarchy(Collection<CapturedExportedSpan> actualExportedSpans) {
     this.actualExportedSpans = actualExportedSpans;
     actualExportedSpans.forEach(span -> spanHashMap.put(span.getSpanId(), span));
+  }
+
+  public SpanTestHierarchy() {
+    new SpanTestHierarchy(Collections.emptyList());
+  }
+
+  public int size() {
+    return 1 + size(root);
+  }
+
+  private int size(SpanNode current) {
+    return current.children.size() + current.children.stream().map(this::size).reduce(0, Integer::sum);
+  }
+
+  public SpanTestHierarchy withCapturedSpans(Collection<CapturedExportedSpan> actualExportedSpans) {
+    this.actualExportedSpans = actualExportedSpans;
+    actualExportedSpans.forEach(span -> spanHashMap.put(span.getSpanId(), span));
+    return this;
   }
 
   public SpanTestHierarchy withRoot(String rootName) {
@@ -129,6 +148,7 @@ public class SpanTestHierarchy {
    * correct parent node
    */
   public void assertSpanTree() {
+    visitedSpans.clear();
     assertSpanTree(root, null);
   }
 
