@@ -24,6 +24,11 @@ public interface ServiceConfigurator extends org.mule.runtime.api.config.custom.
     configure((CustomizationService) customizationService);
   }
 
+  /**
+   * Looks up implementations of {@link ServiceConfigurator}.
+   * 
+   * @return the discovered {@link ServiceConfigurator}.
+   */
   static Stream<ServiceConfigurator> lookupConfigurators() {
     return stream(((Iterable<ServiceConfigurator>) () -> load(ServiceConfigurator.class,
                                                               Service.class.getClassLoader())

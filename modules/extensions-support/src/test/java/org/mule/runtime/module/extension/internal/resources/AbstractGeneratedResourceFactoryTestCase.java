@@ -7,9 +7,11 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static java.util.Arrays.stream;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ServiceLoader;

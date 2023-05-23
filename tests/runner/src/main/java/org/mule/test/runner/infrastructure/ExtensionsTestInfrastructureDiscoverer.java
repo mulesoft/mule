@@ -7,14 +7,17 @@
 
 package org.mule.test.runner.infrastructure;
 
-import static com.google.common.collect.ImmutableList.copyOf;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.MuleManifest;
@@ -23,13 +26,13 @@ import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.module.extension.api.dsl.syntax.resources.DslResourceFactory;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

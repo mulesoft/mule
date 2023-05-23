@@ -8,15 +8,16 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ImportedTypeModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.api.dsl.DslResolvingContext;
-import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.module.extension.api.dsl.syntax.resources.DslResourceFactory;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
+import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -28,7 +29,8 @@ import java.util.Set;
  *
  * @since 4.0
  */
-abstract class AbstractXmlResourceFactory implements DslResourceFactory {
+abstract class AbstractXmlResourceFactory
+    implements DslResourceFactory, org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory {
 
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {

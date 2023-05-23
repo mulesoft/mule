@@ -6,18 +6,20 @@
  */
 package org.mule.test.runner.infrastructure;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
+
+import static java.util.Collections.emptyList;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-
-import com.google.common.collect.ImmutableList;
+import org.mule.runtime.module.extension.api.dsl.syntax.resources.DslResourceFactory;
 
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * This class extends {@link ExtensionsTestLoaderResourcesGenerator} that writes the DSL generated resources to the specified

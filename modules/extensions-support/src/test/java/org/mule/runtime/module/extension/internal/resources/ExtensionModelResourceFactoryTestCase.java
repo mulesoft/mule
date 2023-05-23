@@ -6,21 +6,23 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
+import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+
 import static java.lang.Thread.currentThread;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MODEL_JSON_FILE_NAME;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import org.custommonkey.xmlunit.XMLUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +30,7 @@ import org.junit.Test;
 public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase {
 
   private static final String RESOURCE_NAME = "heisenberg-extension-descriptions.xml";
-  private ExtensionDocumentationResourceGenerator resourceFactory = new ExtensionDocumentationResourceGenerator();
+  private final ExtensionDocumentationResourceGenerator resourceFactory = new ExtensionDocumentationResourceGenerator();
   private ExtensionModel extensionModel;
 
   @Before

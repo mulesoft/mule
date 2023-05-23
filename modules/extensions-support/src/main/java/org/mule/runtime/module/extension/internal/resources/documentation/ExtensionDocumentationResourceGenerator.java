@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -23,8 +24,8 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,8 @@ import com.google.common.collect.ImmutableList;
  *
  * @since 4.0
  */
-public class ExtensionDocumentationResourceGenerator implements GeneratedResourceFactory {
+public class ExtensionDocumentationResourceGenerator
+    implements GeneratedResourceFactory, org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory {
 
   @Override
   public Optional<GeneratedResource> generateResource(ExtensionModel extensionModel) {

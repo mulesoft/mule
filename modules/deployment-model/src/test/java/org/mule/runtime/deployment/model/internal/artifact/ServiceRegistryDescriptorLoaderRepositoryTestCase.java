@@ -16,9 +16,9 @@ import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,10 +47,19 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
 
   private static final String LOADER_ID = "loader";
 
-  private final ClassLoaderConfigurationLoader classLoaderConfigurationLoader =
-      mock(ClassLoaderConfigurationLoader.class);
+  private final ClassLoaderConfigurationLoader classLoaderConfigurationLoader = mock(ClassLoaderConfigurationLoader.class);
   private final Function<Class<? extends DescriptorLoader>, Stream<? extends DescriptorLoader>> serviceRegistry =
-      spy(clazz -> Stream.of(classLoaderConfigurationLoader));
+      spyLambda(clazz -> Stream.of(classLoaderConfigurationLoader), Function.class);
+
+  /**
+   * This method overcomes the issue with the original Mockito.spy when passing a lambda which fails with an error saying that the
+   * passed class is final.
+   */
+  @SuppressWarnings("unchecked")
+  public static <R, G extends R> G spyLambda(final G lambda, final Class<R> lambdaType) {
+    return (G) mock(lambdaType, delegatesTo(lambda));
+  }
+
   private final ServiceRegistryDescriptorLoaderRepository repository =
       new ServiceRegistryDescriptorLoaderRepository(serviceRegistry);
   @Rule
@@ -64,14 +73,13 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
     repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
     repository.get(LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class);
 
-    verify(serviceRegistry).apply(ClassLoaderConfigurationLoader.class);
-    verify(serviceRegistry).apply(BundleDescriptorLoader.class);
-    verify(serviceRegistry, never()).apply(ClassLoaderConfigurationLoader.class);
-    verify(serviceRegistry, never()).apply(BundleDescriptorLoader.class);
+    verify(serviceRegistry, times(1)).apply(ClassLoaderConfigurationLoader.class);
+    verify(serviceRegistry, times(1)).apply(BundleDescriptorLoader.class);
   }
 
   @Test
   public void doesNotFindInvalidLoaderId() throws Exception {
+    when(classLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
     expectedException.expect(LoaderNotFoundException.class);
     expectedException.expectMessage(noRegisteredLoaderError("invalid", ClassLoaderConfigurationLoader.class));
 
@@ -91,6 +99,7 @@ public class ServiceRegistryDescriptorLoaderRepositoryTestCase extends AbstractM
   @Test
   public void findsLoaderIdWithType() throws Exception {
     when(classLoaderConfigurationLoader.getId()).thenReturn(LOADER_ID);
+
     expectedException.expect(LoaderNotFoundException.class);
     expectedException.expectMessage(noRegisteredLoaderError(LOADER_ID, BundleDescriptorLoader.class));
 

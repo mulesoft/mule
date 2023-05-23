@@ -12,7 +12,7 @@ import static org.mule.runtime.api.util.collection.Collectors.toImmutableList;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 
 import java.io.File;
 import java.io.IOException;

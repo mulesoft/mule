@@ -6,18 +6,24 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.lang.String.format;
-import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toList;
-import static javax.tools.Diagnostic.Kind.ERROR;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
+import static org.mule.runtime.module.extension.api.dsl.syntax.resources.DslResourceFactory.lookupDslResourceFactories;
+import static org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory.lookupGeneratedResourceFactories;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.lang.String.format;
+import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+
+import static javax.tools.Diagnostic.Kind.ERROR;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -25,13 +31,12 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
-import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.resources.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
 import java.util.HashMap;
@@ -52,7 +57,6 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 
 /**
  * Annotation processor that picks up all the extensions annotated with {@link Extension} or
@@ -179,10 +183,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   }
 
   private List<GeneratedResourceFactory> fetchResourceFactories() {
-
-    return ImmutableList.<GeneratedResourceFactory>builder()
-        .addAll(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, getClass().getClassLoader()))
-        .addAll(serviceRegistry.lookupProviders(DslResourceFactory.class, getClass().getClassLoader())).build();
+    return unmodifiableList(concat(lookupGeneratedResourceFactories(),
+                                   lookupDslResourceFactories())
+                                       .collect(toList()));
   }
 
   /**
