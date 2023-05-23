@@ -7,6 +7,8 @@
 
 package org.mule.runtime.config.internal.util;
 
+import static org.mule.runtime.dsl.internal.component.config.ComponentBuildingDefinitionProviderUtils.lookupComponentBuildingDefinitionProviders;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
@@ -37,9 +39,8 @@ public final class ComponentBuildingDefinitionUtils {
   public static ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
     if (runtimeComponentBuildingDefinitions == null) {
       List<ComponentBuildingDefinition> allDefinitions = new ArrayList<>();
-      new SpiServiceRegistry()
-          .lookupProviders(ComponentBuildingDefinitionProvider.class,
-                           MuleArtifactContext.class.getClassLoader())
+
+      lookupComponentBuildingDefinitionProviders(MuleArtifactContext.class.getClassLoader())
           .forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init();
 
@@ -69,7 +70,7 @@ public final class ComponentBuildingDefinitionUtils {
   public static List<ComponentBuildingDefinition> getExtensionModelsComponentBuildingDefinitions(Set<ExtensionModel> extensionModels,
                                                                                                  DslResolvingContext dslResolvingContext) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    SERVICE_REGISTRY.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
+    lookupComponentBuildingDefinitionProviders(MuleArtifactContext.class.getClassLoader())
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
             ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider =
@@ -95,7 +96,7 @@ public final class ComponentBuildingDefinitionUtils {
    */
   public static List<ComponentBuildingDefinition> getArtifactComponentBuildingDefinitions(ClassLoader classLoader) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    SERVICE_REGISTRY.lookupProviders(ComponentBuildingDefinitionProvider.class, classLoader)
+    lookupComponentBuildingDefinitionProviders(classLoader)
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider.getClass().getClassLoader().equals(classLoader)) {
             componentBuildingDefinitionProvider.init();
