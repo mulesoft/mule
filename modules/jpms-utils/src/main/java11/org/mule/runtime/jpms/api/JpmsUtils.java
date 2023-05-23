@@ -100,6 +100,6 @@ public final class JpmsUtils {
             bootModule.addOpens(pkg, module);
           }
         });
-
   }
+
 }
