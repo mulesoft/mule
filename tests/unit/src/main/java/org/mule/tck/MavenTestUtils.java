@@ -50,9 +50,16 @@ public class MavenTestUtils {
     File compressedFile = new File(explodedArtifactFile, fileNameInRepo);
     compress(compressedFile, listFiles(explodedArtifactFile, null, true).stream()
         .map(f -> new ZipUtils.ZipResource(f.getAbsolutePath(),
-                                           f.getAbsolutePath().substring(explodedArtifactFile.getAbsolutePath().length() + 1)))
+                                           getZipEntryName(explodedArtifactFile, f)))
         .toArray(ZipUtils.ZipResource[]::new));
     return compressedFile;
+  }
+
+  private static String getZipEntryName(File baseDir, File entryFile) {
+    // https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT - 4.4.17.1
+    // The path stored MUST NOT contain a drive or device letter, or a leading slash. All slashes MUST be forward slashes '/' as
+    // opposed to backwards slashes '\'
+    return baseDir.toURI().relativize(entryFile.toURI()).getPath();
   }
 
   private static Collection<File> installArtifact(File artifactFile, File repositoryLocation, MavenPomParser parser)
