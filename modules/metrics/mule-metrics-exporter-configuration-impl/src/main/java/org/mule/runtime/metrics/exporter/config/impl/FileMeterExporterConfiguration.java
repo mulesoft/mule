@@ -7,12 +7,9 @@
 
 package org.mule.runtime.metrics.exporter.config.impl;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFIGURATION_PATH;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION;
-
-import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
