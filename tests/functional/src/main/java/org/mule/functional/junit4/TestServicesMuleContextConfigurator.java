@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.config.custom.CustomizationService;
@@ -25,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Register services implementations.
@@ -44,9 +47,9 @@ public class TestServicesMuleContextConfigurator implements ServiceConfigurator 
     this.serviceRepository = serviceRepository;
 
     Set<Class> currentContracts = getRegisteredServiceContracts();
-    testServices = asList(new SimpleUnitTestSupportSchedulerService());
-
-    testServices.removeIf(s -> currentContracts.stream().anyMatch(c -> c.isInstance(s)));
+    testServices = Stream.of(new SimpleUnitTestSupportSchedulerService())
+        .filter(s -> currentContracts.stream().noneMatch(c -> c.isInstance(s)))
+        .collect(toList());
   }
 
   private Set<Class> getRegisteredServiceContracts() {
