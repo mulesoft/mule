@@ -24,8 +24,16 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.util
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
+
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -72,6 +80,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.info.Export
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
+import org.mule.sdk.api.meta.JavaVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.sdk.api.annotation.OnArtifactLifecycle;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
@@ -111,6 +122,7 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   private Map<MetadataType, List<MetadataType>> subTypes = new LinkedHashMap<>();
   private String namespace;
   private ResolvedMinMuleVersion resolvedMinMuleVersion;
+  private Set<String> supportedJavaVersions;
 
   public JavaExtensionModelParser(ExtensionElement extensionElement, ExtensionLoadingContext loadingContext) {
     this(extensionElement, new StereotypeModelLoaderDelegate(loadingContext), loadingContext);
@@ -143,6 +155,15 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
     parseNotificationModels();
 
     this.resolvedMinMuleVersion = resolveExtensionMinMuleVersion(extensionElement);
+    supportedJavaVersions = parseSupportedJavaVersions(extensionElement);
+  }
+
+  private Set<String> parseSupportedJavaVersions(ExtensionElement extensionElement) {
+    return extensionElement.getValueFromAnnotation(JavaVersionSupport.class)
+        .map(a -> a.getEnumArrayValue(JavaVersionSupport::value).stream()
+            .map(JavaVersion::version)
+            .collect(toCollection(() -> (Set<String>) new LinkedHashSet<String>())))
+        .orElse(emptySet());
   }
 
   private void parseSubtypes() {
@@ -402,6 +423,11 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public ExtensionDevelopmentFramework getDevelopmentFramework() {
     return JAVA_SDK;
+  }
+
+  @Override
+  public Set<String> getSupportedJavaVersions() {
+    return supportedJavaVersions;
   }
 
   @Override

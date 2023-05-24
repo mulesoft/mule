@@ -25,6 +25,7 @@ import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Parses the syntactic definition of an {@link ExtensionModel} so that the semantics reflected in it can be extracted in a
@@ -147,7 +148,7 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   /**
    * The extension's subtype mappings.
    *
-   * @return a {@link Map} wihich keys represent the base types and each value represents the list of known subtypes
+   * @return a {@link Map} which keys represent the base types and each value represents the list of known subtypes
    */
   Map<MetadataType, List<MetadataType>> getSubTypes();
 
@@ -173,6 +174,8 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    * @since 4.6.0
    */
   ExtensionDevelopmentFramework getDevelopmentFramework();
+
+  Set<String> getSupportedJavaVersions();
 
   /**
    * @return an {@link Optional} {@link ArtifactLifecycleListenerModelProperty} if an {@link ArtifactLifecycleListener} was
