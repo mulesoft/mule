@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.validation;
 
-import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -44,7 +44,6 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.values.ValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.loader.annotations.CustomDefinedStaticTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.FieldsValueProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingParameterModelProperty;
