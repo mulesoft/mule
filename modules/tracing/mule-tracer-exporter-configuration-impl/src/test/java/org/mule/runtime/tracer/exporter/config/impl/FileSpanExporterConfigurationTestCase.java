@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
-import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
+import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.nio.file.Path;

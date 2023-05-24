@@ -13,9 +13,9 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ResourceProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
 
 import java.util.Optional;
 
@@ -67,7 +67,7 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
    * @return an Optional with the value of the given key or {@link Optional#empty()} otherwise.
    */
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<ConfigurationProperty> provide(String configurationAttributeKey) {
     if (configurationAttributeKey.startsWith(SECURE_PREFIX)) {
       String effectiveKey = configurationAttributeKey.substring(SECURE_PREFIX.length());
       return Optional.ofNullable(configurationAttributes.get(effectiveKey));
@@ -82,7 +82,7 @@ public class SecureConfigurationPropertiesProvider extends DefaultConfigurationP
           }
 
           @Override
-          public Object getRawValue() {
+          public String getValue() {
             return "initialize".equals(effectiveKey) ? Integer.toString(initializationCount) : Integer.toString(disposeCount);
           }
 

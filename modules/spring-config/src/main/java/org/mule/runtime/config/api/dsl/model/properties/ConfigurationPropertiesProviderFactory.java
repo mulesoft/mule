@@ -12,6 +12,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
 import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.function.UnaryOperator;
@@ -41,7 +42,7 @@ public interface ConfigurationPropertiesProviderFactory
    * @return the properties provider
    */
   ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
-                                                 org.mule.runtime.config.api.dsl.model.ResourceProvider externalResourceProvider);
+                                                 ResourceProvider externalResourceProvider);
 
   /**
    * Builds a properties provider for the provided {@code providerElementDeclaration}.
@@ -52,9 +53,9 @@ public interface ConfigurationPropertiesProviderFactory
    * @return the properties provider
    */
   @Override
-  default org.mule.runtime.properties.api.ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
-                                                                                         UnaryOperator<String> localResolver,
-                                                                                         ResourceProvider externalResourceProvider) {
+  default ConfigurationPropertiesProvider createProvider(ComponentAst providerElementDeclaration,
+                                                         UnaryOperator<String> localResolver,
+                                                         ResourceProvider externalResourceProvider) {
     DefaultConfigurationParameters.Builder configurationParametersBuilder = DefaultConfigurationParameters.builder();
     ConfigurationParameters configurationParameters =
         resolveConfigurationParameters(configurationParametersBuilder, providerElementDeclaration, localResolver);
