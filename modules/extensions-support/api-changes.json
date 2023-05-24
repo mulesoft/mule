@@ -1,4 +1,28 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty",
+          "classSimpleName": "AllowsExpressionWithoutMarkersModelProperty",
+          "exampleUseChainInNewApi": "class org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty is part of the API",
+          "package": "org.mule.runtime.module.extension.api.loader.java.property",
+          "elementKind": "class",
+          "justification": "W-13216278: Added for backwards compatibility"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty",
+          "classSimpleName": "CustomLocationPartModelProperty",
+          "exampleUseChainInNewApi": "class org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty is part of the API",
+          "package": "org.mule.runtime.module.extension.api.loader.java.property",
+          "elementKind": "class",
+          "justification": "W-13216278: Added for backwards compatibility"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

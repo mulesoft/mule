@@ -28,7 +28,7 @@ import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
-import org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty;
+import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
 
 import java.util.List;
 import java.util.Optional;

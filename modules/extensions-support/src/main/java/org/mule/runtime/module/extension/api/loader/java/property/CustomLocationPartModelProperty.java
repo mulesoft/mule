@@ -10,10 +10,13 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ModelProperty;
 
 /**
- * Allows to modify the rules used for building the {@link ComponentLocation} for the component with this property.
- *
- * @since 4.4
+ * Keeps Java API compatibility
+ * 
+ * @since 4.5
+ * 
+ * @deprecated Use {@link org.mule.runtime.core.internal.extension.CustomLocationPartModelProperty} instead.
  */
+@Deprecated
 public class CustomLocationPartModelProperty implements ModelProperty {
 
   private static final long serialVersionUID = 4221736527017299553L;
