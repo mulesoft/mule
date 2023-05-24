@@ -18,7 +18,7 @@ import java.util.Set;
  * Implementation of the ArtifactClassLoader interface for {@code mule-plugin}s, that manages shutdown listeners and has resource
  * releasers.
  */
-public class MulePluginClassLoader extends MuleArtifactClassLoader implements WithDynamicClassLoaders {
+public class MulePluginClassLoader extends MuleArtifactClassLoader implements WithAttachedClassLoaders {
 
   static {
     registerAsParallelCapable();
@@ -42,12 +42,12 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
   }
 
   @Override
-  public void addDynamicClassLoader(ClassLoader classLoader) {
+  public void attachClassLoader(ClassLoader classLoader) {
     dynamicClassLoaders.add(classLoader);
   }
 
   @Override
-  public Set<ClassLoader> getDynamicClassLoaders() {
+  public Set<ClassLoader> getAttachedClassLoaders() {
     return dynamicClassLoaders;
   }
 }
