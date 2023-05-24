@@ -24,8 +24,7 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
     registerAsParallelCapable();
   }
 
-  private final Set<ClassLoader> dynamicClassLoaders = new HashSet<>();
-
+  private final Set<ClassLoader> attachedClassLoaders = new HashSet<>();
 
   /**
    * Constructs a new {@link MulePluginClassLoader} for the given URLs
@@ -43,11 +42,11 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader implements Wi
 
   @Override
   public void attachClassLoader(ClassLoader classLoader) {
-    dynamicClassLoaders.add(classLoader);
+    attachedClassLoaders.add(classLoader);
   }
 
   @Override
   public Set<ClassLoader> getAttachedClassLoaders() {
-    return dynamicClassLoaders;
+    return attachedClassLoaders;
   }
 }
