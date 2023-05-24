@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 
 import java.util.Set;
 

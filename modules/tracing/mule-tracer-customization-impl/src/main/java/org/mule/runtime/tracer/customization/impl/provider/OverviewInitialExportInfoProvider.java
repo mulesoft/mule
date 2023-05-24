@@ -9,7 +9,7 @@ package org.mule.runtime.tracer.customization.impl.provider;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 import org.mule.runtime.tracer.customization.impl.export.AbstractInitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 

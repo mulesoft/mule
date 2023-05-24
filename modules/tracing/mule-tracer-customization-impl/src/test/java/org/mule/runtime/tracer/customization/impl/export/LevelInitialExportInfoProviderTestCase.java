@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.DebugInitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.provider.OverviewInitialExportInfoProvider;

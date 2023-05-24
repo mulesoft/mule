@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.tracer.customization.impl.export;
+package org.mule.runtime.tracer.customization.api;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;

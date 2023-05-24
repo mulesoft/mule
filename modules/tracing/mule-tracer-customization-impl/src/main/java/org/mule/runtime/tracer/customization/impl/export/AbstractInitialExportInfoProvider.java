@@ -13,9 +13,9 @@ import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.customization.api.InternalSpanNames;
-import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 
 import java.util.HashMap;
 import java.util.Map;
