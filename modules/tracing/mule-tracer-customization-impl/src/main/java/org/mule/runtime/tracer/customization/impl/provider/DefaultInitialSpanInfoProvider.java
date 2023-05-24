@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.customization.impl.provider;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -38,7 +39,6 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   @Inject
   TracingLevelConfiguration tracingLevelConfiguration;
 
-  private InitialExportInfoProvider initialExportInfoProvider;
   private String apiId;
   private boolean initialisedAttributes;
 
@@ -49,7 +49,8 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider());
+    String location = getLocationAsString(component.getLocation());
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(location));
   }
 
   @Override
@@ -59,7 +60,8 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(), null, suffix);
+    String location = getLocationAsString(component.getLocation());
+    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(location), null, suffix);
   }
 
   @Override
@@ -69,7 +71,8 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getInitialExportInfoProvider());
+    String location = getLocationAsString(component.getLocation());
+    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getInitialExportInfoProvider(location));
   }
 
   public void initialiseAttributes() {
@@ -78,25 +81,19 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
   }
 
-  private InitialExportInfoProvider getInitialExportInfoProvider() {
-    if (initialExportInfoProvider == null) {
-      TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
-      resolveInitialExportInfoProvider(tracingLevel);
-    }
-
-    return initialExportInfoProvider;
+  private InitialExportInfoProvider getInitialExportInfoProvider(String location) {
+    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel(location);
+    return resolveInitialExportInfoProvider(tracingLevel);
   }
 
-  private void resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
+  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
     switch (tracingLevel) {
       case OVERVIEW:
-        initialExportInfoProvider = new OverviewInitialExportInfoProvider();
-        break;
+        return new OverviewInitialExportInfoProvider();
       case DEBUG:
-        initialExportInfoProvider = new DebugInitialExportInfoProvider();
-        break;
+        return new DebugInitialExportInfoProvider();
       default:
-        initialExportInfoProvider = new MonitoringInitialExportInfoProvider();
+        return new MonitoringInitialExportInfoProvider();
     }
   }
 }
