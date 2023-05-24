@@ -96,6 +96,10 @@
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
 
         <!--Test Dependencies-->
         <dependency>

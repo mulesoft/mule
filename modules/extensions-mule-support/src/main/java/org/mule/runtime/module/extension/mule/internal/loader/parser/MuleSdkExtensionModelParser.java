@@ -7,8 +7,12 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
+import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_11;
+import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_17;
+import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
@@ -17,6 +21,7 @@ import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -34,9 +39,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -49,6 +56,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final TypeLoader typeLoader;
   private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
+  private Set<String> supportedJavaVersions;
 
   public MuleSdkExtensionModelParser(ArtifactAst ast,
                                      TypeLoader typeLoader,
@@ -60,6 +68,13 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
 
   protected void init(ArtifactAst ast) {
     operationModelParsers = computeOperationModelParsers(ast);
+    List<String> javaVersions = asList(JAVA_VERSION_8, JAVA_VERSION_11, JAVA_VERSION_17);
+    for (ExtensionModel extensionModel : ast.dependencies()) {
+      javaVersions.retainAll(extensionModel.getSupportedJavaVersions());
+    }
+
+    supportedJavaVersions = new LinkedHashSet<>(javaVersions.size());
+    supportedJavaVersions.addAll(javaVersions);
   }
 
   @Override
@@ -145,6 +160,11 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  @Override
+  public Set<String> getSupportedJavaVersions() {
+    return supportedJavaVersions;
   }
 
   /**
