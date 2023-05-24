@@ -13,13 +13,12 @@ import static java.util.Optional.empty;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
+import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
@@ -51,7 +50,7 @@ public class ServiceResourcesResolver {
 
   public ServiceResourcesResolver(Collection<ArtifactClassificationNode> classificationNodes) {
     serviceDescriptorFactory =
-        new ServiceDescriptorFactory(new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry()),
+        new ServiceDescriptorFactory(new ServiceRegistryDescriptorLoaderRepository(),
                                      ArtifactDescriptorValidatorBuilder.builder()) {
 
           // In the test runner we already have the Maven artifact of the service available,

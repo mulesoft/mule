@@ -4,10 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.deployment.model.internal.artifact;
+package org.mule.runtime.module.artifact.internal.util;
+
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Collections.unmodifiableList;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
@@ -17,11 +22,11 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Provides a {@link DescriptorLoaderRepository} that uses a {@link ServiceRegistry} to detect available implementations of
@@ -29,10 +34,20 @@ import java.util.Map;
  */
 public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoaderRepository {
 
-  private final ServiceRegistry serviceRegistry;
+  private final Function<Class<? extends DescriptorLoader>, Stream<? extends DescriptorLoader>> serviceRegistry;
   private final Class[] descriptorLoaderClasses =
       new Class[] {ClassLoaderConfigurationLoader.class, BundleDescriptorLoader.class};
   private Map<Class, List<DescriptorLoader>> descriptorLoaders;
+
+  public ServiceRegistryDescriptorLoaderRepository() {
+    this(descriptorLoaderClass -> {
+      return stream(((Iterable) () -> load(descriptorLoaderClass,
+                                           ServiceRegistryDescriptorLoaderRepository.class.getClassLoader())
+                                               .iterator())
+                                                   .spliterator(),
+                    false);
+    });
+  }
 
   /**
    * Creates a new repository
@@ -40,7 +55,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
    * @param serviceRegistry provides access to the {@link ClassLoaderConfigurationLoader} that must be tracked on the repository.
    *                        Non null
    */
-  public ServiceRegistryDescriptorLoaderRepository(ServiceRegistry serviceRegistry) {
+  public ServiceRegistryDescriptorLoaderRepository(Function<Class<? extends DescriptorLoader>, Stream<? extends DescriptorLoader>> serviceRegistry) {
     checkArgument(serviceRegistry != null, "serviceRegistry cannot be null");
 
     this.serviceRegistry = serviceRegistry;
@@ -86,14 +101,7 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
   }
 
   private List<DescriptorLoader> findBundleDescriptorLoaders(Class<? extends DescriptorLoader> descriptorLoaderClass) {
-    List<DescriptorLoader> descriptorLoaders = new ArrayList<>();
-    Collection<? extends DescriptorLoader> providers =
-        serviceRegistry.lookupProviders(descriptorLoaderClass, this.getClass().getClassLoader());
-
-    for (DescriptorLoader loader : providers) {
-      descriptorLoaders.add(loader);
-    }
-
-    return descriptorLoaders;
+    return unmodifiableList(serviceRegistry.apply(descriptorLoaderClass)
+        .collect(toList()));
   }
 }

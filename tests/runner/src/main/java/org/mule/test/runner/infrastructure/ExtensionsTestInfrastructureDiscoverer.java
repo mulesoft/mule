@@ -7,21 +7,24 @@
 
 package org.mule.test.runner.infrastructure;
 
-import static com.google.common.collect.ImmutableList.copyOf;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
-import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
@@ -56,7 +59,6 @@ import java.util.jar.Manifest;
  */
 public class ExtensionsTestInfrastructureDiscoverer {
 
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ExtensionManager extensionManager;
 
   /**
@@ -135,16 +137,15 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private List<GeneratedResourceFactory> getResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, currentThread().getContextClassLoader()));
+    return loadGeneratedResourceFactories(currentThread().getContextClassLoader()).collect(toList());
   }
 
   private ExtensionSchemaGenerator getSchemaGenerator() {
-    return copyOf(serviceRegistry.lookupProviders(ExtensionSchemaGenerator.class, currentThread().getContextClassLoader()))
-        .get(0);
+    return loadExtensionSchemaGenerators(currentThread().getContextClassLoader()).findFirst().get();
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(DslResourceFactory.class, currentThread().getContextClassLoader()));
+    return loadDslResourceFactories(currentThread().getContextClassLoader()).collect(toList());
   }
 
   private File createManifestFileIfNecessary(File targetDirectory) {

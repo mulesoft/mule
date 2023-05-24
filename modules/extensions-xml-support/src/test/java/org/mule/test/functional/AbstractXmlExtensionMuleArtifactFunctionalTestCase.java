@@ -7,10 +7,10 @@
 package org.mule.test.functional;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getLoaderById;
 import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCES_PATHS;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_DECLARATION;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
 
 import static java.util.Optional.empty;
 

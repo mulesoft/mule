@@ -12,6 +12,8 @@ import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPE
 import static org.mule.runtime.config.internal.model.ApplicationModel.MULE_PROPERTY_IDENTIFIER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader.resolveContextArtifactPluginClassLoaders;
 
+import static java.util.ServiceLoader.load;
+
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -19,11 +21,11 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.stream.Stream;
@@ -51,10 +53,10 @@ class CommonComponentBeanDefinitionCreator extends CommonBeanBaseDefinitionCreat
   private BeanDefinitionPostProcessor resolvePostProcessor() {
     for (ClassLoader classLoader : resolveContextArtifactPluginClassLoaders()) {
       try {
-        final BeanDefinitionPostProcessor foundProvider =
-            new SpiServiceRegistry().lookupProvider(BeanDefinitionPostProcessor.class, classLoader);
-        if (foundProvider != null) {
-          return foundProvider;
+        final Iterator<BeanDefinitionPostProcessor> loaderIterator =
+            load(BeanDefinitionPostProcessor.class, classLoader).iterator();
+        if (loaderIterator.hasNext()) {
+          return loaderIterator.next();
         }
       } catch (Exception | ServiceConfigurationError e) {
         // Nothing to do, we just don't have compatibility plugin in the app
