@@ -4,6 +4,10 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.6.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "SELECT",
   "xmlDsl": {
     "prefix": "heisenberg",
