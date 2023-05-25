@@ -3,6 +3,10 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "modified-prefix",
@@ -41,13 +45,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-CONTENT-THRU-INTERNAL-SET-PAYLOAD-PARAM-VALUE",
         "namespace": "MODIFIED-PREFIX",
@@ -350,13 +354,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-CONTENT-THRU-INTERNAL-SET-PAYLOAD-USING-CONTENT-PARAMETER",
         "namespace": "MODIFIED-PREFIX",
@@ -659,13 +663,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-HARDCODED-VALUE",
         "namespace": "MODIFIED-PREFIX",
@@ -921,13 +925,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-HARDCODED-VALUE-TWO-TIMES",
         "namespace": "MODIFIED-PREFIX",
@@ -1183,13 +1187,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-PARAM-VALUE",
         "namespace": "MODIFIED-PREFIX",
@@ -1491,13 +1495,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-USING-CONTENT-AND-PRIMARY-AND-SIMPLE-PARAMETER",
         "namespace": "MODIFIED-PREFIX",
@@ -1862,13 +1866,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-USING-CONTENT-PARAMETER",
         "namespace": "MODIFIED-PREFIX",
@@ -2170,13 +2174,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-NESTED-MADNESS",
         "namespace": "MODIFIED-PREFIX",
@@ -2478,13 +2482,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-NESTED-MADNESS-PIPING-IT-THREE-TIMES",
         "namespace": "MODIFIED-PREFIX",
@@ -2786,13 +2790,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-NESTED-MADNESS-PIPING-WITH-FOREACH",
         "namespace": "MODIFIED-PREFIX",
@@ -3094,13 +3098,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-NESTED-MADNESS-PIPING-WITH-NESTED-FOREACHS",
         "namespace": "MODIFIED-PREFIX",
@@ -3402,13 +3406,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "SET-PAYLOAD-THRU-SET-PAYLOAD-THRU-INTERNAL-SET-PAYLOAD-HARDCODED-VALUE",
         "namespace": "MODIFIED-PREFIX",
