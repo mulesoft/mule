@@ -1,15 +1,19 @@
 {
   "name": "vegan",
   "description": "",
-  "version": "@mule.runtime.version@",
+  "version": "4.6.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "vegan",
     "namespace": "http://www.mulesoft.org/schema/mule/vegan",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd",
-    "schemaVersion": "@mule.runtime.version@",
+    "schemaVersion": "4.6.0-SNAPSHOT",
     "xsdFileName": "mule-vegan.xsd"
   },
   "resources": [],
