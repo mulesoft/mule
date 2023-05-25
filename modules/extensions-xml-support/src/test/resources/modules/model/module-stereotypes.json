@@ -3,6 +3,10 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-stereotypes",
@@ -354,13 +358,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CALL-FLOW",
             "namespace": "MODULE-STEREOTYPES",
@@ -725,13 +729,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "DO-SOMETHING",
             "namespace": "MODULE-STEREOTYPES",

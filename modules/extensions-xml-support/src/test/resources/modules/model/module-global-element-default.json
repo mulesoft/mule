@@ -3,6 +3,10 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-global-element-default",
@@ -41,13 +45,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DO-GET-CLIENT",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
@@ -303,13 +307,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DO-GET-CLIENT-WITH-PRIVATE-OPERATION",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
@@ -565,13 +569,13 @@
         "modelProperties": {}
       },
       "transactional": false,
-      "visibility": "PUBLIC",
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
       "errors": [],
       "semanticTerms": [],
+      "visibility": "PUBLIC",
       "stereotype": {
         "type": "DO-GET-PETS",
         "namespace": "MODULE-GLOBAL-ELEMENT-DEFAULT",
