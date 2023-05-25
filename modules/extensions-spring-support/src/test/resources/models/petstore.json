@@ -4,6 +4,10 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "petstore",
