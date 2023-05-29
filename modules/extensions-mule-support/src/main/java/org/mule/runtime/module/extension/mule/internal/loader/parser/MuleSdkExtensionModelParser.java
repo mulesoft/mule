@@ -8,18 +8,17 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getCommonSupportedJavaVersions;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.ExternalLibraryModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
@@ -37,7 +36,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.mule.runtime.module.extension.internal.loader.parser.SourceModelParser;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,33 +63,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected void init(ArtifactAst ast) {
-    List<Set<String>> extensionVersions = ast.dependencies().stream()
-        .map(ExtensionModel::getSupportedJavaVersions)
-        .collect(toList());
-
-    Set<String> commonVersions = new LinkedHashSet<>();
-    Set<String> nonCommonVersions = new LinkedHashSet<>();
-
-    for (int i = 0; i < extensionVersions.size(); i++) {
-      for (String version : extensionVersions.get(i)) {
-        if (commonVersions.contains(version) || nonCommonVersions.contains(version)) {
-          continue;
-        }
-
-        boolean isCommon = true;
-        for (int j = i + 1; j < extensionVersions.size(); j++) {
-          if (!extensionVersions.get(j).contains(version)) {
-            isCommon = false;
-            break;
-          }
-        }
-
-        (isCommon ? commonVersions : nonCommonVersions).add(version);
-      }
-    }
-
-    supportedJavaVersions = unmodifiableSet(commonVersions);
-
+    supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(ast.dependencies()));
     operationModelParsers = computeOperationModelParsers(ast);
   }
 

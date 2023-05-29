@@ -118,7 +118,9 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResult
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -834,5 +836,38 @@ public class MuleExtensionUtils {
 
   public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {
     return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
+  }
+
+  public static Set<String> getCommonSupportedJavaVersions(Collection<ExtensionModel> extensionModels) {
+    List<ExtensionModel> models = extensionModels instanceof List
+        ? (List<ExtensionModel>) extensionModels
+        : new ArrayList<>(extensionModels);
+
+    Set<String> commonVersions = new LinkedHashSet<>();
+    Set<String> nonCommonVersions = new LinkedHashSet<>();
+
+    for (int i = 0; i < models.size(); i++) {
+      for (String version : models.get(i).getSupportedJavaVersions()) {
+        if (commonVersions.contains(version) || nonCommonVersions.contains(version)) {
+          continue;
+        }
+
+        boolean isCommon = true;
+        for (int j = 0; j < models.size(); j++) {
+          if (j == i) {
+            continue;
+          }
+
+          if (!models.get(j).getSupportedJavaVersions().contains(version)) {
+            isCommon = false;
+            break;
+          }
+        }
+
+        (isCommon ? commonVersions : nonCommonVersions).add(version);
+      }
+    }
+
+    return commonVersions;
   }
 }

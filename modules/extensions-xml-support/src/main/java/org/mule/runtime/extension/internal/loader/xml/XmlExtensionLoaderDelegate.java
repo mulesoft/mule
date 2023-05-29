@@ -6,24 +6,6 @@
  */
 package org.mule.runtime.extension.internal.loader.xml;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Math.max;
-import static java.lang.Runtime.getRuntime;
-import static java.lang.String.format;
-import static java.lang.String.join;
-import static java.lang.Thread.currentThread;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
@@ -36,13 +18,35 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
-import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getCommonSupportedJavaVersions;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Math.max;
+import static java.lang.Runtime.getRuntime;
+import static java.lang.String.format;
+import static java.lang.String.join;
+import static java.lang.Thread.currentThread;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.unmodifiableSet;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Sets.newHashSet;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -80,8 +84,8 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -96,11 +100,11 @@ import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentMo
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
 import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
+import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
+import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
@@ -452,6 +456,7 @@ public final class XmlExtensionLoaderDelegate {
 
     final String name = getStringParameter(moduleAst, MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
+    final Set<String> supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(artifactAst.dependencies()));
     final String category = getStringParameter(moduleAst, CATEGORY).orElse("COMMUNITY");
     final String vendor = getStringParameter(moduleAst, VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
@@ -468,8 +473,9 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel));
-    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
+    declarer.supportingJavaVersions(supportedJavaVersions)
+      .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
+      .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
