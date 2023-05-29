@@ -7,16 +7,14 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_11;
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_17;
-import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import org.mule.metadata.api.TypeLoader;
@@ -68,14 +66,34 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected void init(ArtifactAst ast) {
-    operationModelParsers = computeOperationModelParsers(ast);
-    List<String> javaVersions = asList(JAVA_VERSION_8, JAVA_VERSION_11, JAVA_VERSION_17);
-    for (ExtensionModel extensionModel : ast.dependencies()) {
-      javaVersions.retainAll(extensionModel.getSupportedJavaVersions());
+    List<Set<String>> extensionVersions = ast.dependencies().stream()
+        .map(ExtensionModel::getSupportedJavaVersions)
+        .collect(toList());
+
+    Set<String> commonVersions = new LinkedHashSet<>();
+    Set<String> nonCommonVersions = new LinkedHashSet<>();
+
+    for (int i = 0; i < extensionVersions.size(); i++) {
+      for (String version : extensionVersions.get(i)) {
+        if (commonVersions.contains(version) || nonCommonVersions.contains(version)) {
+          continue;
+        }
+
+        boolean isCommon = true;
+        for (int j = i + 1; j < extensionVersions.size(); j++) {
+          if (!extensionVersions.get(j).contains(version)) {
+            isCommon = false;
+            break;
+          }
+        }
+
+        (isCommon ? commonVersions : nonCommonVersions).add(version);
+      }
     }
 
-    supportedJavaVersions = new LinkedHashSet<>(javaVersions.size());
-    supportedJavaVersions.addAll(javaVersions);
+    supportedJavaVersions = unmodifiableSet(commonVersions);
+
+    operationModelParsers = computeOperationModelParsers(ast);
   }
 
   @Override
