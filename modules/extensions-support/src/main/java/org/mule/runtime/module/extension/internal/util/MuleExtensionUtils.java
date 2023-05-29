@@ -120,6 +120,7 @@ import org.mule.sdk.api.tx.SourceTransactionalAction;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -844,11 +845,11 @@ public class MuleExtensionUtils {
         : new ArrayList<>(extensionModels);
 
     Set<String> commonVersions = new LinkedHashSet<>();
-    Set<String> nonCommonVersions = new LinkedHashSet<>();
+    Set<String> processedVersions = new HashSet<>();
 
     for (int i = 0; i < models.size(); i++) {
       for (String version : models.get(i).getSupportedJavaVersions()) {
-        if (commonVersions.contains(version) || nonCommonVersions.contains(version)) {
+        if (!processedVersions.add(version)) {
           continue;
         }
 
@@ -864,7 +865,9 @@ public class MuleExtensionUtils {
           }
         }
 
-        (isCommon ? commonVersions : nonCommonVersions).add(version);
+        if (isCommon) {
+          commonVersions.add(version);
+        }
       }
     }
 
