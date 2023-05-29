@@ -6,7 +6,8 @@
  */
 package org.mule.runtime.module.artifact.internal.descriptor;
 
-import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidator;
 
@@ -27,7 +28,7 @@ public class CompositeArtifactDescriptorValidator implements ArtifactDescriptorV
    * @param validators {@link List} of {@link ArtifactDescriptorValidator validators} to be called. Non null.
    */
   public CompositeArtifactDescriptorValidator(List<ArtifactDescriptorValidator> validators) {
-    checkNotNull(validators, "validators cannot be null");
+    requireNonNull(validators, "validators cannot be null");
     this.validators = validators;
   }
 
