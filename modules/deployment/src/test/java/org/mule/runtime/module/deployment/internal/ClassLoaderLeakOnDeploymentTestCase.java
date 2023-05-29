@@ -13,6 +13,8 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 
 import java.util.List;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Issues;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -25,6 +27,7 @@ import io.qameta.allure.Story;
 @RunWith(Parameterized.class)
 @Feature(LEAK_PREVENTION)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
+@Issues({@Issue("W-13160893"), @Issue("MULE-17311")})
 public class ClassLoaderLeakOnDeploymentTestCase extends ClassLoaderLeakTestCase {
 
   @Parameterized.Parameters(name = "Parallel: {0}, AppName: {1}, Use Plugin: {2}")
