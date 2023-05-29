@@ -16,6 +16,7 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
@@ -49,9 +50,15 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
       } else {
         return withContextClassLoader(this.extensionClassLoader, () -> {
           // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
-          // extension
-          // with the annotations stuff.
-          return addAnnotationsToClass(configurationType);
+          // extension with the annotations stuff.
+          Class<?> annotated = addAnnotationsToClass(configurationType);
+          if (extensionClassLoader instanceof WithAttachedClassLoaders) {
+            // The annotated class is added to a spring cache that has to be cleared later, and for that we'll need the
+            // classloader it was loaded with (or a classloader in the parents' hierarchy).
+            // For the cleaning part, see MuleArtifactContext code.
+            ((WithAttachedClassLoaders) extensionClassLoader).attachClassLoader(annotated.getClassLoader().getParent());
+          }
+          return annotated;
         });
       }
     });

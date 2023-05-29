@@ -47,9 +47,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -87,15 +89,15 @@ import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
@@ -118,7 +120,11 @@ import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.util.DefaultResourceLocator;
+import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
 
 import java.io.IOException;
@@ -132,8 +138,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-
 import org.slf4j.Logger;
+import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -269,7 +275,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
-
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -467,6 +472,31 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         throw new MuleRuntimeException(e);
       }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
+
+      resetCommonCaches();
+      clearSpringSoftReferencesCachesForDynamicClassLoaders();
+    }
+  }
+
+  /**
+   * We use ByteBuddy to enhance classes defined with the Java SDK, in order to make them implement the {@link Component}
+   * interface. The classloader used to load such dynamic classes is being hold by a cache in Spring, and that cache can be
+   * cleared by calling {@link CachedIntrospectionResults#clearClassLoader}. Notice that this method can be called with the
+   * classloader of the class itself, or any of the parents in its hierarchy.
+   * 
+   * @see AnnotatedObjectInvocationHandler#addAnnotationsToClass
+   * @see CachedIntrospectionResults#clearClassLoader
+   */
+  private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
+    RegionClassLoader region = (RegionClassLoader) getRegionClassLoader();
+    clearClassLoader(region.getClassLoader());
+    for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
+      if (pluginClassLoader instanceof WithAttachedClassLoaders) {
+        WithAttachedClassLoaders withAttachedClassLoaders = (WithAttachedClassLoaders) pluginClassLoader;
+        for (ClassLoader dynamicClassLoader : withAttachedClassLoaders.getAttachedClassLoaders()) {
+          clearClassLoader(dynamicClassLoader);
+        }
+      }
     }
   }
 
