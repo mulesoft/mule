@@ -38,6 +38,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final InitialExportInfo initialExportInfo;
 
   private final String name;
+  // TODO: W-13313594 Should remove this property
   private final boolean isPolicySpan;
   private final boolean rootSpan;
   private final String location;

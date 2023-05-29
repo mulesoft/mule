@@ -48,6 +48,7 @@ import static org.mule.runtime.module.extension.internal.util.InterceptorChainUt
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 
@@ -138,7 +139,6 @@ import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionT
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.util.Collection;
@@ -1045,7 +1045,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
                                         coreEventEventTracer,
                                         initialSpanInfoProvider
-                                            .getInitialSpanInfo(this, InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME, ""),
+                                            .getInitialSpanInfo(this, OPERATION_EXECUTION_SPAN_NAME, ""),
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 

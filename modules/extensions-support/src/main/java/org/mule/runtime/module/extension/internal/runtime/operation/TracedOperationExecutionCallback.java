@@ -6,11 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
 import org.mule.runtime.tracer.api.EventTracer;
 
+/**
+ * A composable {@link ExecutorCallback} that allows to close the operation execution {@link Span} after the operation execution.
+ * 
+ * @since 4.5
+ */
 public class TracedOperationExecutionCallback implements ExecutorCallback {
 
   private final EventedExecutionContext<?> eventedExecutionContext;
@@ -32,7 +38,6 @@ public class TracedOperationExecutionCallback implements ExecutorCallback {
 
   @Override
   public void error(Throwable e) {
-    // TODO: Add the ticket ID for the DEBUG level errors task.
     coreEventEventTracer.endCurrentSpan(eventedExecutionContext.getEvent());
     delegate.error(e);
   }

@@ -8,6 +8,7 @@
 package org.mule.runtime.tracer.api.span.exporter;
 
 import static java.util.Collections.emptyMap;
+import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -46,7 +47,7 @@ public interface SpanExporter {
 
     @Override
     public SpanIdentifier getSpanIdentifierBasedOnExport() {
-      return null;
+      return INVALID_SPAN_IDENTIFIER;
     }
   };
 
