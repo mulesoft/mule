@@ -41,10 +41,8 @@ public class SpanMDCUtils {
   /**
    * Removes the current span information from the MDC.
    */
-  public static void removeCurrentTracingInformationFromMdc(InternalSpan internalSpan) {
-    if (!internalSpan.getIdentifier().getId().equals(SpanIdentifier.INVALID_SPAN_ID)) {
-      MDC.remove(SPAN_ID_MDC_KEY);
-      MDC.remove(TRACE_ID_MDC_KEY);
-    }
+  public static void removeCurrentTracingInformationFromMdc() {
+    MDC.remove(SPAN_ID_MDC_KEY);
+    MDC.remove(TRACE_ID_MDC_KEY);
   }
 }

@@ -59,7 +59,7 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
     if (internalSpan.isPresent()) {
       setCurrentTracingInformationToMdc(internalSpan.get());
     } else {
-      removeCurrentTracingInformationFromMdc(internalSpan.get());
+      removeCurrentTracingInformationFromMdc();
     }
   }
 
