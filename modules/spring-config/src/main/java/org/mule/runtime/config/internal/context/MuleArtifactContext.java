@@ -488,7 +488,11 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
    * @see CachedIntrospectionResults#clearClassLoader
    */
   private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
-    RegionClassLoader region = (RegionClassLoader) getRegionClassLoader();
+    ClassLoader regionClassLoader = getRegionClassLoader();
+    if (!(regionClassLoader instanceof RegionClassLoader)) {
+      return;
+    }
+    RegionClassLoader region = (RegionClassLoader) regionClassLoader;
     clearClassLoader(region.getClassLoader());
     for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
       if (pluginClassLoader instanceof WithAttachedClassLoaders) {
