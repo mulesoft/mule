@@ -18,12 +18,12 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
@@ -45,6 +45,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -306,7 +307,7 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
     Set<String> resolved = MuleExtensionUtils.getCommonSupportedJavaVersions(mockExtensionModelsWithSupportedJavaVersions(input));
     if (expected != null) {
       assertThat(resolved.size(), equalTo(expected.length));
-      assertThat(resolved, containsInAnyOrder(expected));
+      assertThat(resolved, contains(expected));
     } else {
       assertThat(resolved, hasSize(0));
     }
@@ -316,7 +317,7 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
     return Stream.of(versions)
         .map(v -> {
           ExtensionModel model = mock(ExtensionModel.class);
-          when(model.getSupportedJavaVersions()).thenReturn(Stream.of(v).collect(toSet()));
+          when(model.getSupportedJavaVersions()).thenReturn(Stream.of(v).collect(toCollection(LinkedHashSet::new)));
 
           return model;
         }).collect(toList());
