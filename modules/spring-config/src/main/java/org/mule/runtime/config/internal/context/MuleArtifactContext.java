@@ -490,6 +490,12 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
     ClassLoader regionClassLoader = getRegionClassLoader();
     if (!(regionClassLoader instanceof RegionClassLoader)) {
+      // The method #getRegionClassLoader() should always return the corresponding RegionClassLoader. However, in the
+      // integration tests (which is an ArtifactFunctionalTestCase), the classloader here is an instance of
+      // TestRegionClassLoader. That class extends RegionClassLoader, but it's loaded with a different classloader, and
+      // then we would be getting a ClassCastException here. That's the only reason for this early-return.
+      LOGGER.debug("Got an instance of '{}' as region classloader. We can't clean the spring soft-references caches.",
+                   regionClassLoader.getClass().getCanonicalName());
       return;
     }
     RegionClassLoader region = (RegionClassLoader) regionClassLoader;
