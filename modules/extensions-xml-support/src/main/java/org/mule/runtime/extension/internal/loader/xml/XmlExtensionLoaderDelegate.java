@@ -474,8 +474,8 @@ public final class XmlExtensionLoaderDelegate {
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
     declarer.supportingJavaVersions(supportedJavaVersions)
-      .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
-      .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
+        .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
+        .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
