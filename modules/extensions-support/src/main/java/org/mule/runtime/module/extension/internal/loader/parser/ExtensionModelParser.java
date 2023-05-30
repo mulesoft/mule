@@ -14,6 +14,7 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
@@ -173,5 +174,10 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
    */
   ExtensionDevelopmentFramework getDevelopmentFramework();
 
+  /**
+   * @return The versions of Java that the extension supports
+   * @since 4.5.0
+   * @see {@link JavaConstants}
+   */
   Set<String> getSupportedJavaVersions();
 }

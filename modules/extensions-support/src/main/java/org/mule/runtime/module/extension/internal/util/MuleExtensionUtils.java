@@ -66,6 +66,7 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -842,6 +843,14 @@ public class MuleExtensionUtils {
     return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
   }
 
+  /**
+   * Returns the version of Java that are supported by <b>ALL</b> the {@code extensionModels}.
+   *
+   * @param extensionModels the {@link ExtensionModel} instances to evaluate
+   * @return a {@link Set} of Java versions or an empty one if the extensions have none in common
+   * @see {@link JavaConstants}
+   * @since 4.5.0
+   */
   public static Set<String> getCommonSupportedJavaVersions(Collection<ExtensionModel> extensionModels) {
     List<ExtensionModel> models = extensionModels instanceof List
         ? (List<ExtensionModel>) extensionModels
@@ -877,6 +886,19 @@ public class MuleExtensionUtils {
     return commonVersions;
   }
 
+  /**
+   * Similar to {@link #getCommonSupportedJavaVersions(Collection)} only that an empty set will never be returned.
+   * <p>
+   * An {@link IllegalModelDefinitionException} is thrown if no common Java version is found.
+   *
+   * @param extensionName The name of the Extension, used to build the exception message
+   * @param extensionType the type of exception (e.g: Module, Extension, etc), used to build the exception message
+   * @param extensions    the {@link ExtensionModel} instances to evaluate
+   * @return the common set of supported Java versions
+   * @throws IllegalModelDefinitionException if no common Java version is found
+   * @see {@link JavaConstants}
+   * @since 4.5.0
+   */
   public static Set<String> getAndValidateCommonSupportedJavaVersions(String extensionName,
                                                                       String extensionType,
                                                                       Collection<ExtensionModel> extensions) {
