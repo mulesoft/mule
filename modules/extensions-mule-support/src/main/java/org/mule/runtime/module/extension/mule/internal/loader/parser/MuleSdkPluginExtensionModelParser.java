@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.lang.String.format;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_SDK;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getXmlDslModel;
@@ -22,6 +21,7 @@ import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslCons
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_VENDOR_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_XML_DSL_ATTRIBUTES_COMPONENT_NAME;
 
+import static java.lang.String.format;
 import static java.util.Locale.getDefault;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -61,7 +61,8 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   private List<ErrorModelParser> errorModelParsers;
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
-    super(ast, typeLoader, extensionModelHelper);
+    super(typeLoader, extensionModelHelper);
+    init(ast);
   }
 
   @Override

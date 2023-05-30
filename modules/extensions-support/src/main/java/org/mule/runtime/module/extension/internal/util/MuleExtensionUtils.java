@@ -28,9 +28,11 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -74,6 +76,7 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -872,5 +875,21 @@ public class MuleExtensionUtils {
     }
 
     return commonVersions;
+  }
+
+  public static Set<String> getAndValidateCommonSupportedJavaVersions(String extensionName,
+                                                                      String extensionType,
+                                                                      Collection<ExtensionModel> extensions) {
+    final Set<String> supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(extensions));
+    if (supportedJavaVersions.isEmpty()) {
+      String summary = extensions.stream()
+          .map(em -> em.getName() + ": " + em.getSupportedJavaVersions())
+          .collect(joining("\n"));
+      throw new IllegalModelDefinitionException(format("%s '%s' depends on Extensions that don't share any common Java "
+          + "version support. Dependencies supported Java versions are:\n%s",
+                                                       extensionType, extensionName, summary));
+    }
+
+    return supportedJavaVersions;
   }
 }

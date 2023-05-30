@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -48,8 +48,9 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
                                                 ArtifactAst ast,
                                                 TypeLoader typeLoader,
                                                 ExtensionModelHelper extensionModelHelper) {
-    super(ast, typeLoader, extensionModelHelper);
+    super(typeLoader, extensionModelHelper);
     this.extensionName = extensionName;
+    init(ast);
   }
 
   @Override
