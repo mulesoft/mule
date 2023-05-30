@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.module.extension.internal.lifecycle.ExtensionOnMuleContextDisposedNotificationListener.registerLifecycleListenerForOnContextDisposed;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
@@ -48,10 +47,6 @@ public class ArtifactExtensionManagerConfigurationBuilder extends AbstractConfig
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     ExtensionManager extensionManager = extensionManagerFactory.create(muleContext);
-    extensionManager.getExtensions()
-        .forEach(extensionModel -> registerLifecycleListenerForOnContextDisposed(muleContext.getNotificationManager(),
-                                                                                 muleContext.getExecutionClassLoader(),
-                                                                                 extensionModel));
 
     muleContext.setExtensionManager(extensionManager);
   }

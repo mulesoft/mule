@@ -15,6 +15,8 @@ import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
 import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 
+import static java.lang.Thread.sleep;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -90,7 +92,7 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
   }
 
   @Test
-  public void whenExtensionIsInDomainThenLifecycleListenerGetsCalledBothOnDomainAndAppUndeploy() throws Exception {
+  public void whenExtensionIsInDomainThenLifecycleListenerGetsCalledOnDomainUndeploy() throws Exception {
     // Prepares a domain that depends on an extension that declares an ArtifactLifecycleListener
     DomainFileBuilder domainFileBuilder = getDomainDependingOnExtensionWithLifecycleListenerFileBuilder();
     addPackedDomainFromBuilder(domainFileBuilder);
@@ -115,15 +117,17 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
     assertThat(appDeploymentListener.isArtifactUndeployed(), is(true));
     assertThat(domainDeploymentListener.isArtifactUndeployed(), is(false));
 
-    // After some time, the application's ClassLoader should be collectable, thanks to the extension's LifecycleListener
-    assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
+    // The LifecycleListener should not have been called
+    assertLifecycleListenerNotExecuted(appDeploymentListener.getPhantomReference());
 
     // Undeploys the domain
     assertThat(removeDomainAnchorFile(domainFileBuilder.getId()), is(true));
     triggerDirectoryWatcher();
     assertThat(domainDeploymentListener.isArtifactUndeployed(), is(true));
 
-    // After some time, the domain's ClassLoader should be collectable, thanks to the extension's LifecycleListener
+    // After some time, both the app's and the domain's ClassLoaders should be collectable, thanks to the extension's
+    // LifecycleListener
+    assertClassLoaderIsCollectable(appDeploymentListener.getPhantomReference());
     assertClassLoaderIsCollectable(domainDeploymentListener.getPhantomReference());
   }
 
@@ -161,6 +165,14 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
       assertThat(classLoaderReference.isEnqueued(), is(true));
       return true;
     }));
+  }
+
+  private void assertLifecycleListenerNotExecuted(PhantomReference<ArtifactClassLoader> classLoaderReference)
+      throws InterruptedException {
+    clearAllLogs();
+    System.gc();
+    sleep(500);
+    assertThat(classLoaderReference.isEnqueued(), is(false));
   }
 
   private ApplicationFileBuilder getApplicationFileBuilder() {
