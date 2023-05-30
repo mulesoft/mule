@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
@@ -319,6 +320,8 @@ public class OperationClient implements Lifecycle {
                                                                                                            supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
+                                                                                getNoopCoreEventTracer(),
+                                                                                null,
                                                                                 false);
 
     try {

@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 public interface SpanContext extends SpanAware {
 
-  static SpanContext emptyDistributedTraceContext() {
+  static SpanContext emptySpanContext() {
     return new SpanContext() {
 
       @Override

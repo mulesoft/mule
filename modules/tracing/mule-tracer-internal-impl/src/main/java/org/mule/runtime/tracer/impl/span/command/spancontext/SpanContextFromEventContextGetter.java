@@ -14,7 +14,7 @@ import org.mule.runtime.tracer.impl.context.EventSpanContext;
 
 import javax.annotation.Nullable;
 
-import static org.mule.runtime.tracer.api.context.SpanContext.emptyDistributedTraceContext;
+import static org.mule.runtime.tracer.api.context.SpanContext.emptySpanContext;
 import static org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter.emptyTraceContextMapGetter;
 
 /**
@@ -48,6 +48,6 @@ public class SpanContextFromEventContextGetter implements SpanContextContextGett
       return spanContext;
     }
 
-    return emptyDistributedTraceContext();
+    return emptySpanContext();
   }
 }

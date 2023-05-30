@@ -8,6 +8,7 @@ package org.mule.runtime.tracer.impl.span.command;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+
 import org.slf4j.MDC;
 
 /**
@@ -20,6 +21,10 @@ public class SpanMDCUtils {
   public static final String SPAN_ID_MDC_KEY = "span-id";
   public static final String TRACE_ID_MDC_KEY = "trace-id";
 
+  private SpanMDCUtils() {
+
+  }
+
   /**
    * Sets the span information to the log4j MDC
    *
@@ -27,7 +32,7 @@ public class SpanMDCUtils {
    */
   public static void setCurrentTracingInformationToMdc(InternalSpan span) {
     SpanIdentifier spanIdentifier = span.getIdentifier();
-    if (spanIdentifier != null) {
+    if (spanIdentifier != null && spanIdentifier != SpanIdentifier.INVALID_SPAN_IDENTIFIER) {
       MDC.put(SPAN_ID_MDC_KEY, spanIdentifier.getId());
       MDC.put(TRACE_ID_MDC_KEY, spanIdentifier.getTraceId());
     }

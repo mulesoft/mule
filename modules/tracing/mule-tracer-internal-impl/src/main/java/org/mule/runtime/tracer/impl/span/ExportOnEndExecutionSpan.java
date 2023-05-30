@@ -174,7 +174,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   @Override
   public void addAttribute(String key, String value) {
-    if (!key.equals(SPAN_KIND) && !key.equals(STATUS)) {
+    if (!key.equals(SPAN_KIND) && !key.equals(STATUS) && !initialSpanInfo.isPolicySpan()) {
       additionalAttributes.put(key, value);
     }
     spanExporter.onAdditionalAttribute(key, value);

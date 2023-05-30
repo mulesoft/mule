@@ -58,7 +58,6 @@ import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultS
 import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -83,7 +82,7 @@ import org.slf4j.Logger;
  * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager} in the
  * {@link MuleContext} to search for the extension that wants to execute the operation from.
  * <p>
- * The concrete execution of the operation is handled by an {@link OperationMessageProcessor} instance.
+ * The concrete execution of the operation is handled by an {@link OperationClient} instance.
  * <p>
  * This implementation can only execute extensions that were built using the SDK, Smart Connectors operations can't be executed.
  *

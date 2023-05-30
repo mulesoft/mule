@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.impl;
 
+import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.exporter.impl.MutableMuleTraceState.getMutableMuleTraceStateFrom;
@@ -236,7 +237,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public SpanIdentifier getSpanIdentifierBasedOnExport() {
-    return new OpentelemetrySpanIdentifier(spanContext.getSpanId(), spanContext.getTraceId());
+    if (spanContext.isValid()) {
+      return new OpentelemetrySpanIdentifier(spanContext.getSpanId(), spanContext.getTraceId());
+    } else {
+      return INVALID_SPAN_IDENTIFIER;
+    }
   }
 
   @Override
@@ -307,12 +312,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void onAdditionalAttribute(String key, String value) {
     if (key.equals(SPAN_KIND)) {
-      spanKind = SpanKind.valueOf(value);
-    }
-
-    if (key.equals(STATUS)) {
+      rootSpan.spanKind = SpanKind.valueOf(value);
+    } else if (key.equals(STATUS)) {
       StatusCode statusCode = StatusCode.valueOf(value);
-      statusData = StatusData.create(statusCode, null);
+      rootSpan.statusData = StatusData.create(statusCode, null);
+    } else if (isPolicySpan) {
+      rootSpan.internalSpan.addAttribute(key, value);
     }
   }
 

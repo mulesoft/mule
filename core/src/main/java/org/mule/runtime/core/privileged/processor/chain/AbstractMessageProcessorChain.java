@@ -55,7 +55,6 @@ import static reactor.core.publisher.Operators.lift;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -98,7 +97,6 @@ import org.mule.runtime.core.internal.util.rx.RxUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,9 +109,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
-import javax.xml.namespace.QName;
 
-import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;

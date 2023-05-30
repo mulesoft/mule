@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+
 import org.mule.runtime.core.internal.execution.IsolateCurrentTransactionInterceptor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
