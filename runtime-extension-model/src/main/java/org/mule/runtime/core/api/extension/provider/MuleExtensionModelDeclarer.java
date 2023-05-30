@@ -95,7 +95,6 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -105,7 +104,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
@@ -117,6 +115,7 @@ import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
+import org.mule.runtime.core.internal.extension.AllowsExpressionWithoutMarkersModelProperty;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
@@ -141,20 +140,8 @@ import com.google.gson.reflect.TypeToken;
 class MuleExtensionModelDeclarer {
 
   static final String DEFAULT_LOG_LEVEL = "INFO";
-  private static final Class<? extends ModelProperty> allowsExpressionWithoutMarkersModelPropertyClass;
   private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
       new ClassValueModel(singletonList(NotificationListener.class.getName()));
-
-  static {
-    Class<? extends ModelProperty> foundClass = null;
-    try {
-      foundClass = (Class<? extends ModelProperty>) Class
-          .forName("org.mule.runtime.module.extension.api.loader.java.property.AllowsExpressionWithoutMarkersModelProperty");
-    } catch (ClassNotFoundException | SecurityException e) {
-      // No custom location processing
-    }
-    allowsExpressionWithoutMarkersModelPropertyClass = foundClass;
-  }
 
   final ErrorModel anyError = newError(ANY).build();
   final ErrorModel routingError = newError(ROUTING).withParent(anyError).build();
@@ -597,21 +584,15 @@ class MuleExtensionModelDeclarer {
     forEach.withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE);
 
-    ParameterDeclarer collectionParam = forEach.onDefaultParameterGroup()
+    forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
         }.getType()))
         .defaultingTo("#[payload]")
         .withExpressionSupport(REQUIRED)
-        .describedAs("Expression that defines the collection to iterate over.");
-    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
-      try {
-        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
-      } catch (InstantiationException | IllegalAccessException e) {
-        // ignore
-      }
-    }
+        .describedAs("Expression that defines the collection to iterate over.")
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty());
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("batchSize")
@@ -668,20 +649,11 @@ class MuleExtensionModelDeclarer {
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
     when.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
-    ParameterDeclarer expressionParam = when.onDefaultParameterGroup()
+    when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
-        .ofType(BOOLEAN_TYPE);
-
-    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
-      try {
-        expressionParam = expressionParam
-            .withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
-      } catch (InstantiationException | IllegalAccessException e) {
-        // ignore
-      }
-    }
-
-    expressionParam.describedAs("The expression to evaluate.");
+        .ofType(BOOLEAN_TYPE)
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
+        .describedAs("The expression to evaluate.");
     choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
@@ -812,7 +784,7 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
 
-    ParameterDeclarer collectionParam = parallelForeach.onDefaultParameterGroup()
+    parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
         .ofType(typeLoader.load(new TypeToken<Iterable<Object>>() {
 
@@ -820,14 +792,8 @@ class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withExpressionSupport(REQUIRED)
         .defaultingTo("#[payload]")
+        .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         .describedAs("Expression that defines the collection of parts to be processed in parallel.");
-    if (allowsExpressionWithoutMarkersModelPropertyClass != null) {
-      try {
-        collectionParam.withModelProperty(allowsExpressionWithoutMarkersModelPropertyClass.newInstance());
-      } catch (InstantiationException | IllegalAccessException e) {
-        // ignore
-      }
-    }
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
