@@ -9,21 +9,18 @@ package org.mule.test.infrastructure.process;
 import java.io.File;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 public class VerifyLogWithMatcher extends TypeSafeMatcher<MuleProcessController> {
 
   private String app;
-  private Matcher<File> fileMatcher;
+  private final Matcher<File> fileMatcher;
 
-  @Factory
   public static Matcher<MuleProcessController> log(Matcher<File> matcher) {
     return new VerifyLogWithMatcher(matcher);
   }
 
-  @Factory
   public static Matcher<MuleProcessController> log(String appName, Matcher<File> matcher) {
     return new VerifyLogWithMatcher(appName, matcher);
   }

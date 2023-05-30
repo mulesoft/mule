@@ -10,23 +10,22 @@ package org.mule.test.infrastructure;
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
 import static java.nio.file.Files.newBufferedReader;
-import static org.junit.Assert.fail;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 
 public class FileContainsInLine extends TypeSafeMatcher<File> {
 
   private final Matcher<String> stringMatcher;
 
-  @Factory
   public static Matcher<File> hasLine(Matcher<String> matcher) {
     return new FileContainsInLine(matcher);
   }

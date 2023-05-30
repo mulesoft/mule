@@ -7,20 +7,18 @@
 package org.mule.test.infrastructure;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 
 public class HasRegex extends TypeSafeMatcher<String> {
 
-  private String regex;
+  private final String regex;
 
   private HasRegex(String regex) {
     this.regex = regex;
   }
 
-  @Factory
   public static Matcher<String> hasRegex(String regex) {
     return new HasRegex(regex);
   }
