@@ -28,6 +28,7 @@ module org.mule.runtime.extension.model {
   
   requires javax.inject;
 
+  requires com.google.common;
   requires com.google.gson;
 
   exports org.mule.runtime.core.api.error;

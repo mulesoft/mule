@@ -19,8 +19,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.core.internal.extension.CustomLocationPartModelProperty;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty;
 
 /**
  * An {@link ExtensionDeclarer} for test Policy components
