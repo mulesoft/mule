@@ -282,6 +282,18 @@
             </testResource>
         </testResources>
         <plugins>
+            <!-- Required by mule-extension-ast-loader -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -305,19 +317,10 @@
                                     <shadedPattern>org.mule.springframework</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <!-- Required by mule-extension-ast-loader -->
+                            <shadeTestJar>true</shadeTestJar>
                             <minimizeJar>true</minimizeJar>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
