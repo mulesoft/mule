@@ -38,7 +38,7 @@ import java.util.Optional;
  */
 public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader {
 
-  private static final boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
+  private static boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
 
   private final List<ExtensionModelValidator> validators = unmodifiableList(asList(
@@ -46,6 +46,14 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
                                                                                    new JavaConnectionProviderModelValidator(),
                                                                                    new DeprecationModelValidator(),
                                                                                    new ParameterPluralNameModelValidator()));
+
+  public static boolean getIgnoreDisabled() {
+    return IGNORE_DISABLED;
+  }
+
+  public static void setIgnoreDisabled(boolean value) {
+    IGNORE_DISABLED = value;
+  }
 
   /**
    * {@inheritDoc}
