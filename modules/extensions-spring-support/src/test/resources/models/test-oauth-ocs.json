@@ -13,7 +13,7 @@
     "prefix": "test-oauth",
     "namespace": "http://www.mulesoft.org/schema/mule/test-oauth",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/test-oauth/current/mule-test-oauth.xsd",
-    "schemaVersion": "4.6.0-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-test-oauth.xsd"
   },
   "resources": [],

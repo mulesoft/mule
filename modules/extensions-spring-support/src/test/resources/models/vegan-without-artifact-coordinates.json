@@ -13,7 +13,7 @@
     "prefix": "vegan",
     "namespace": "http://www.mulesoft.org/schema/mule/vegan",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/vegan/current/mule-vegan.xsd",
-    "schemaVersion": "4.6.0-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-vegan.xsd"
   },
   "resources": [],
