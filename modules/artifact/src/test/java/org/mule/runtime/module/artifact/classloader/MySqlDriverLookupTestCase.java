@@ -7,6 +7,10 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
+import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
 import static java.lang.Thread.currentThread;
 
@@ -26,6 +30,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.IOException;
 import java.net.URL;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +44,8 @@ import org.junit.runners.Parameterized;
  * MySql's resource cleaner test. The mysql-driver-v5/8.jar files where created to mock the cleanup thread package in both
  * versions.
  */
+@Features({@Feature(LEAK_PREVENTION), @Feature(JAVA_SDK)})
+@Stories({@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY), @Story(ARTIFACT_LIFECYCLE_LISTENER)})
 @RunWith(Parameterized.class)
 public class MySqlDriverLookupTestCase extends AbstractMuleTestCase {
 

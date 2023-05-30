@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.lifecycle;
 
+import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
 
@@ -87,10 +88,8 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
   private boolean isOwnedClassLoader(ArtifactClassLoader ownerClassLoader, ClassLoader classLoader) {
     // Traverse the hierarchy for this ClassLoader searching for a matching artifact ID.
     while (classLoader != null) {
-      if (classLoader instanceof ArtifactClassLoader) {
-        String artifactId = ((ArtifactClassLoader) classLoader).getArtifactId();
-        if (ownerClassLoader.getArtifactId().equals(artifactId))
-          return true;
+      if (classLoader == ownerClassLoader.getClassLoader()) {
+        return true;
       } else if (classLoader instanceof CompositeClassLoader) {
         // For CompositeClassLoaders we want to search through all its delegates
         for (ClassLoader delegate : ((CompositeClassLoader) classLoader).getDelegates()) {
@@ -111,10 +110,9 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
         threadGroup = threadGroup.getParent();
       } catch (SecurityException e) {
         LOGGER
-            .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Parent Thread Group is not accessible. Some threads may not be cleaned up.",
-                  artifactClassLoader.getArtifactId(),
-                  extensionClassLoader.getArtifactId(),
-                  e);
+            .debug(format("An error occurred trying to obtain the active Threads for artifact [%s], and extension [%s]. Parent Thread Group is not accessible. Some threads may not be cleaned up.",
+                          artifactClassLoader.getArtifactId(), extensionClassLoader.getArtifactId()),
+                   e);
         return threadGroup;
       }
     }
@@ -130,9 +128,9 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
       return stream(allThreads);
     } catch (SecurityException e) {
       LOGGER
-          .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Thread cleanup will be skipped.",
-                artifactClassLoader.getArtifactId(),
-                extensionClassLoader.getArtifactId(),
+          .warn(format("An error occurred trying to obtain the active Threads for artifact [%s], and extension [%s]. Thread cleanup will be skipped.",
+                       artifactClassLoader.getArtifactId(),
+                       extensionClassLoader.getArtifactId()),
                 e);
       return Stream.empty();
     }

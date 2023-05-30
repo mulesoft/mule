@@ -91,14 +91,14 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     // Non-child ArtifactClassLoader with the ID of the Artifact
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader(artifactClassLoader.getArtifactId(), this.getClass().getClassLoader())) {
-      assertArtifactOwnedClassLoader(childClassLoader.getClassLoader());
-      assertArtifactChildClassLoaders((ArtifactClassLoader) childClassLoader);
+      assertNotOwnedClassLoader(childClassLoader.getClassLoader());
+      assertChildClassLoaders((ArtifactClassLoader) childClassLoader, this::assertNotOwnedClassLoader);
     }
     // Non-child ArtifactClassLoader with the ID of the Extension
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader(extensionClassLoader.getArtifactId(), this.getClass().getClassLoader())) {
-      assertExtensionOwnedClassLoader(childClassLoader.getClassLoader());
-      assertExtensionChildClassLoaders((ArtifactClassLoader) childClassLoader);
+      assertNotOwnedClassLoader(childClassLoader.getClassLoader());
+      assertChildClassLoaders((ArtifactClassLoader) childClassLoader, this::assertNotOwnedClassLoader);
     }
   }
 
@@ -237,6 +237,11 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
   private void assertExtensionOwnedClassLoader(ClassLoader classLoader) {
     assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(classLoader), is(false));
     assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(classLoader), is(true));
+  }
+
+  private void assertNotOwnedClassLoader(ClassLoader classLoader) {
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(classLoader), is(false));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(classLoader), is(false));
   }
 
   private Thread startThreadWithClassLoader(ArtifactClassLoader artifactClassLoader) {

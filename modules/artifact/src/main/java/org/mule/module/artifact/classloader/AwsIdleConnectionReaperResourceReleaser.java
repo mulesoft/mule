@@ -56,11 +56,9 @@ public class AwsIdleConnectionReaperResourceReleaser implements ResourceReleaser
         for (Object connectionManager : httpClientConnectionManagers) {
           boolean removed = (boolean) removeConnectionManager.invoke(null, connectionManager);
           if (!removed && LOGGER.isDebugEnabled()) {
-            // TODO W-13222647: check if this should be warn or even error. Also check if the connection manager or client have a
-            // name or something that can help in identifying it
             LOGGER
-                .debug(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
-                              connectionManager));
+                .warn(format("Unable to unregister HttpClientConnectionManager instance [%s] associated to AWS's IdleConnectionReaperThread",
+                             connectionManager));
           }
         }
 
@@ -71,10 +69,11 @@ public class AwsIdleConnectionReaperResourceReleaser implements ResourceReleaser
 
     } catch (ClassNotFoundException | NoSuchMethodException | IllegalArgumentException e) {
       // If the class or method is not found, there is nothing to dispose
-    } catch (SecurityException | IllegalAccessException | InvocationTargetException e) {
-      // TODO W-13222647: InvocationTargetException should be treated differently, logging the target exception (cause) message
-      // and stack trace
+    } catch (SecurityException | IllegalAccessException e) {
       LOGGER.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getMessage(), e);
+    } catch (InvocationTargetException e) {
+      LOGGER.warn("Unable to shutdown AWS's IdleConnectionReaperThread, an error occurred: " + e.getCause().getMessage(),
+                  e.getCause());
     }
   }
 }
