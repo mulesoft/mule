@@ -58,4 +58,6 @@ public interface InitialExportInfo {
   default Set<String> noExportUntil() {
     return emptySet();
   }
+
+  default void propagateInitialExportInfo(InitialExportInfo initialExportInfo) {}
 }

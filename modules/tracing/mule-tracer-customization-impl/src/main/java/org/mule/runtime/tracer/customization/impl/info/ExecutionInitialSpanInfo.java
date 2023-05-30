@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.ExecutionInitialExportInfo;
 
 import java.util.function.BiConsumer;
 
@@ -33,7 +34,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
-  public static final String NO_LOCATION = "no-location";
 
   private final InitialExportInfo initialExportInfo;
 
@@ -59,10 +59,10 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
     if (overriddenName == null) {
       name = getSpanName(component.getIdentifier()) + spanNameSuffix;
-      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
+      initialExportInfo = new ExecutionInitialExportInfo(initialExportInfoProvider, component);
     } else {
       name = overriddenName;
-      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name);
+      initialExportInfo = new ExecutionInitialExportInfo(initialExportInfoProvider, name);
     }
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);

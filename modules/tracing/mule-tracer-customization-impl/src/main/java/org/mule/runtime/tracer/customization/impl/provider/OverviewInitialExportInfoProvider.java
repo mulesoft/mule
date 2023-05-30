@@ -36,6 +36,8 @@ import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUti
  */
 public class OverviewInitialExportInfoProvider extends AbstractInitialExportInfoProvider {
 
+  private boolean isOverride = false;
+
   private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
 
     {
@@ -53,6 +55,15 @@ public class OverviewInitialExportInfoProvider extends AbstractInitialExportInfo
     }
   };
 
+  public OverviewInitialExportInfoProvider() {
+    super();
+  }
+
+  public OverviewInitialExportInfoProvider(boolean isOverride) {
+    super();
+    this.isOverride = isOverride;
+  }
+
   @Override
   protected InitialExportInfo doGetInitialExportInfoForDebugLevel() {
     return NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
@@ -66,5 +77,10 @@ public class OverviewInitialExportInfoProvider extends AbstractInitialExportInfo
   @Override
   protected Map<String, InitialExportInfo> getInitialExportInfoMapByName() {
     return initialExportInfoMapByName;
+  }
+
+  @Override
+  public boolean isOverride() {
+    return isOverride;
   }
 }

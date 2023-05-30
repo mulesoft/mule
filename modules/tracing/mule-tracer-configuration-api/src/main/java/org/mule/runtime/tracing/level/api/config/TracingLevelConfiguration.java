@@ -14,6 +14,7 @@ package org.mule.runtime.tracing.level.api.config;
  */
 public interface TracingLevelConfiguration {
 
-  TracingLevel getTracingLevel(String location);
+  TracingLevel getTracingLevel();
 
+  TracingLevel getTracingLevelOverride(String location);
 }

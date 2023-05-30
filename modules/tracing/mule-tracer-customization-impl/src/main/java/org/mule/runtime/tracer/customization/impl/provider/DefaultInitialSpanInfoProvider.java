@@ -82,18 +82,22 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   private InitialExportInfoProvider getInitialExportInfoProvider(String location) {
-    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel(location);
-    return resolveInitialExportInfoProvider(tracingLevel);
+    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
+    TracingLevel tracingLevelOverride = tracingLevelConfiguration.getTracingLevelOverride(location);
+    if (!tracingLevelOverride.equals(tracingLevel)) {
+      return resolveInitialExportInfoProvider(tracingLevelOverride, true);
+    }
+    return resolveInitialExportInfoProvider(tracingLevel, false);
   }
 
-  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
+  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel, boolean isOverride) {
     switch (tracingLevel) {
       case OVERVIEW:
-        return new OverviewInitialExportInfoProvider();
+        return new OverviewInitialExportInfoProvider(isOverride);
       case DEBUG:
-        return new DebugInitialExportInfoProvider();
+        return new DebugInitialExportInfoProvider(isOverride);
       default:
-        return new MonitoringInitialExportInfoProvider();
+        return new MonitoringInitialExportInfoProvider(isOverride);
     }
   }
 }
