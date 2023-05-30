@@ -25,7 +25,7 @@ import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getCommonSupportedJavaVersions;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAndValidateCommonSupportedJavaVersions;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
@@ -36,7 +36,6 @@ import static java.lang.Thread.currentThread;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -456,7 +455,6 @@ public final class XmlExtensionLoaderDelegate {
 
     final String name = getStringParameter(moduleAst, MODULE_NAME).orElse(null);
     final String version = "4.0.0"; // TODO(fernandezlautaro): MULE-11010 remove version from ExtensionModel
-    final Set<String> supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(artifactAst.dependencies()));
     final String category = getStringParameter(moduleAst, CATEGORY).orElse("COMMUNITY");
     final String vendor = getStringParameter(moduleAst, VENDOR).orElse("MuleSoft");
     final XmlDslModel xmlDslModel = comesFromTNS
@@ -473,9 +471,10 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.supportingJavaVersions(supportedJavaVersions)
+    declarer
         .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
-        .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
+        .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK))
+        .supportingJavaVersions(getAndValidateCommonSupportedJavaVersions(name, "Module", artifactAst.dependencies()));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations

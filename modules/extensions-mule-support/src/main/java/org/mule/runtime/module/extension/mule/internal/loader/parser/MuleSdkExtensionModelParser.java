@@ -8,11 +8,10 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getCommonSupportedJavaVersions;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAndValidateCommonSupportedJavaVersions;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -54,16 +53,13 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final ExtensionModelHelper extensionModelHelper;
   private Set<String> supportedJavaVersions;
 
-  public MuleSdkExtensionModelParser(ArtifactAst ast,
-                                     TypeLoader typeLoader,
-                                     ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkExtensionModelParser(TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    init(ast);
   }
 
   protected void init(ArtifactAst ast) {
-    supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(ast.dependencies()));
+    supportedJavaVersions = getAndValidateCommonSupportedJavaVersions(getName(), "Extension", ast.dependencies());
     operationModelParsers = computeOperationModelParsers(ast);
   }
 
