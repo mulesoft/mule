@@ -25,15 +25,15 @@ public class LifecycleListener implements ArtifactLifecycleListener {
 
     // With this we make sure the ClassLoaders are still usable inside the listener code.
     assertClassCanBeLoadedWith(disposalContext.getArtifactClassLoader(), "org.foo.EchoTest");
-    assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakingThread");
+    assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakedThread");
 
     // If one of the avobe failed, the exception will make it skip the disposal code, and the associated test will fail.
 
     // Iterates through the threads that are owned by the artifact being disposed of, calling the graceful stop methods and
     // joining them
     disposalContext.getArtifactOwnedThreads()
-      .filter(LeakingThread.class::isInstance)
-      .map(LeakingThread.class::cast)
+      .filter(LeakedThread.class::isInstance)
+      .map(LeakedThread.class::cast)
       .forEach(t -> {
         t.stopPlease();
         try {

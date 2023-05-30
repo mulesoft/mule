@@ -7,16 +7,11 @@
 package org.foo.withLifecycleListener;
 
 /**
- * Thread that retains a reference to a given {@link ClassLoader} until it finishes executing. For testing purposes.
+ * Thread for testing purposes. The idea is to retain the Thread's Context ClassLoader until the Thread is terminated.
  */
-public class LeakingThread extends Thread {
+public class LeakedThread extends Thread {
 
-  private final ClassLoader classLoaderToLeak;
   private boolean stopRequested = false;
-
-  public LeakingThread(ClassLoader classLoaderToLeak) {
-    this.classLoaderToLeak = classLoaderToLeak;
-  }
 
   public synchronized void run() {
     stopRequested = false;

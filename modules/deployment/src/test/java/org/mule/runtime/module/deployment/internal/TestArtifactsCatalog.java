@@ -260,7 +260,7 @@ public final class TestArtifactsCatalog {
     withLifecycleListenerExtensionJarFile = new CompilerUtils.ExtensionCompiler()
         .compiling(getResourceFile("/org/foo/withLifecycleListener/WithLifecycleListenerExtension.java"),
                    getResourceFile("/org/foo/withLifecycleListener/WithLifecycleListenerOperation.java"),
-                   getResourceFile("/org/foo/withLifecycleListener/LeakingThread.java"),
+                   getResourceFile("/org/foo/withLifecycleListener/LeakedThread.java"),
                    getResourceFile("/org/foo/withLifecycleListener/LifecycleListener.java"))
         .compile("mule-extension-with-lifecycle-listener-1.0-SNAPSHOT.jar", "1.0.0");
 

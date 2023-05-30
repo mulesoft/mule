@@ -38,6 +38,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import io.qameta.allure.Feature;
@@ -75,14 +76,14 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
   public void directClassLoaders() {
     assertThat(artifactDisposalContext.getArtifactClassLoader(), is(sameInstance(artifactClassLoader)));
     assertThat(artifactDisposalContext.getExtensionClassLoader(), is(sameInstance(extensionClassLoader)));
-    assertThat(artifactDisposalContext.isArtifactClassLoader(artifactClassLoader.getClassLoader()), is(true));
-    assertThat(artifactDisposalContext.isArtifactClassLoader(extensionClassLoader.getClassLoader()), is(true));
+    assertArtifactOwnedClassLoader(artifactClassLoader.getClassLoader());
+    assertExtensionOwnedClassLoader(extensionClassLoader.getClassLoader());
   }
 
   @Test
   public void childClassLoaders() throws IOException {
-    assertChildClassLoaders(artifactClassLoader);
-    assertChildClassLoaders(extensionClassLoader);
+    assertArtifactChildClassLoaders(artifactClassLoader);
+    assertExtensionChildClassLoaders(extensionClassLoader);
   }
 
   @Test
@@ -90,14 +91,14 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     // Non-child ArtifactClassLoader with the ID of the Artifact
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader(artifactClassLoader.getArtifactId(), this.getClass().getClassLoader())) {
-      assertThat(artifactDisposalContext.isArtifactClassLoader(childClassLoader.getClassLoader()), is(true));
-      assertChildClassLoaders((ArtifactClassLoader) childClassLoader);
+      assertArtifactOwnedClassLoader(childClassLoader.getClassLoader());
+      assertArtifactChildClassLoaders((ArtifactClassLoader) childClassLoader);
     }
     // Non-child ArtifactClassLoader with the ID of the Extension
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader(extensionClassLoader.getArtifactId(), this.getClass().getClassLoader())) {
-      assertThat(artifactDisposalContext.isArtifactClassLoader(childClassLoader.getClassLoader()), is(true));
-      assertChildClassLoaders((ArtifactClassLoader) childClassLoader);
+      assertExtensionOwnedClassLoader(childClassLoader.getClassLoader());
+      assertExtensionChildClassLoaders((ArtifactClassLoader) childClassLoader);
     }
   }
 
@@ -105,20 +106,23 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
   public void compositeClassLoaders() throws IOException {
     CompositeClassLoader compositeClassLoader;
     compositeClassLoader = from(this.getClass().getClassLoader(), artifactClassLoader.getClassLoader());
-    assertThat(artifactDisposalContext.isArtifactClassLoader(compositeClassLoader), is(true));
-    assertChildClassLoaders(compositeClassLoader);
+    assertArtifactOwnedClassLoader(compositeClassLoader);
+    assertArtifactChildClassLoaders(compositeClassLoader);
 
     compositeClassLoader = from(this.getClass().getClassLoader(), extensionClassLoader.getClassLoader());
-    assertThat(artifactDisposalContext.isArtifactClassLoader(compositeClassLoader), is(true));
-    assertChildClassLoaders(compositeClassLoader);
+    assertExtensionOwnedClassLoader(compositeClassLoader);
+    assertExtensionChildClassLoaders(compositeClassLoader);
   }
 
   @Test
   public void unrelatedClassLoaders() {
-    assertThat(artifactDisposalContext.isArtifactClassLoader(unrelatedArtifactClassLoader.getClassLoader()), is(false));
-    assertThat(artifactDisposalContext.isArtifactClassLoader(this.getClass().getClassLoader()), is(false));
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(unrelatedArtifactClassLoader.getClassLoader()), is(false));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(unrelatedArtifactClassLoader.getClassLoader()), is(false));
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(this.getClass().getClassLoader()), is(false));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(this.getClass().getClassLoader()), is(false));
     CompositeClassLoader compositeClassLoader = from(this.getClass().getClassLoader());
-    assertThat(artifactDisposalContext.isArtifactClassLoader(compositeClassLoader), is(false));
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(compositeClassLoader), is(false));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(compositeClassLoader), is(false));
   }
 
   @Test
@@ -126,8 +130,10 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     // Control test to verify that there are threads running in the current group
     assertThat(activeCount(), is(not(0)));
 
-    assertThat("Expected no threads owned by either the artifact or the extension",
+    assertThat("Expected no threads owned by the artifact",
                artifactDisposalContext.getArtifactOwnedThreads().count(), is(0L));
+    assertThat("Expected no threads owned by the extension",
+               artifactDisposalContext.getExtensionOwnedThreads().count(), is(0L));
   }
 
   @Test
@@ -136,27 +142,34 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     // Control test to verify that there are threads running in the current group
     assertThat(activeCount(), is(not(0)));
 
-    assertThat("Expected no threads owned by either the artifact or the extension",
+    assertThat("Expected no threads owned by the artifact",
                artifactDisposalContext.getArtifactOwnedThreads().count(), is(0L));
+    assertThat("Expected no threads owned by the extension",
+               artifactDisposalContext.getExtensionOwnedThreads().count(), is(0L));
   }
 
   @Test
   public void whenArtifactHasActiveThreadThenItIsReturned() {
     Thread thread = startThreadWithClassLoader(artifactClassLoader);
-    assertOwnedThreads(thread);
+    assertArtifactOwnedThreads(thread);
+    assertThat("Expected no threads owned by the extension",
+               artifactDisposalContext.getExtensionOwnedThreads().count(), is(0L));
   }
 
   @Test
   public void whenExtensionHasActiveThreadThenItIsReturned() {
     Thread thread = startThreadWithClassLoader(extensionClassLoader);
-    assertOwnedThreads(thread);
+    assertExtensionOwnedThreads(thread);
+    assertThat("Expected no threads owned by the artifact",
+               artifactDisposalContext.getArtifactOwnedThreads().count(), is(0L));
   }
 
   @Test
   public void whenArtifactAndExtensionHaveActiveThreadsThenTheyAreReturned() {
     Thread artifactThread = startThreadWithClassLoader(artifactClassLoader);
     Thread extensionThread = startThreadWithClassLoader(extensionClassLoader);
-    assertOwnedThreads(artifactThread, extensionThread);
+    assertArtifactOwnedThreads(artifactThread);
+    assertExtensionOwnedThreads(extensionThread);
   }
 
   @Test
@@ -164,7 +177,8 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     ThreadGroup threadGroup = new ThreadGroup("Test Thread Group");
     Thread artifactThread = startThreadWithClassLoader(artifactClassLoader, threadGroup);
     Thread extensionThread = startThreadWithClassLoader(extensionClassLoader, threadGroup);
-    assertOwnedThreads(artifactThread, extensionThread);
+    assertArtifactOwnedThreads(artifactThread);
+    assertExtensionOwnedThreads(extensionThread);
   }
 
   @Test
@@ -172,28 +186,57 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     ThreadGroup threadGroup = new ThreadGroup(currentThread().getThreadGroup().getParent(), "Test Thread Group");
     Thread artifactThread = startThreadWithClassLoader(artifactClassLoader, threadGroup);
     Thread extensionThread = startThreadWithClassLoader(extensionClassLoader, threadGroup);
-    assertOwnedThreads(artifactThread, extensionThread);
+    assertArtifactOwnedThreads(artifactThread);
+    assertExtensionOwnedThreads(extensionThread);
   }
 
-  private void assertChildClassLoaders(ArtifactClassLoader someArtifactClassLoader) throws IOException {
+  private void assertArtifactChildClassLoaders(ArtifactClassLoader someArtifactClassLoader) throws IOException {
+    assertChildClassLoaders(someArtifactClassLoader, this::assertArtifactOwnedClassLoader);
+  }
+
+  private void assertExtensionChildClassLoaders(ArtifactClassLoader someArtifactClassLoader) throws IOException {
+    assertChildClassLoaders(someArtifactClassLoader, this::assertExtensionOwnedClassLoader);
+  }
+
+  private void assertArtifactChildClassLoaders(ClassLoader someClassLoader) throws IOException {
+    assertChildClassLoaders(someClassLoader, this::assertArtifactOwnedClassLoader);
+  }
+
+  private void assertExtensionChildClassLoaders(ClassLoader someClassLoader) throws IOException {
+    assertChildClassLoaders(someClassLoader, this::assertExtensionOwnedClassLoader);
+  }
+
+  private void assertChildClassLoaders(ArtifactClassLoader someArtifactClassLoader, Consumer<ClassLoader> classLoaderAsserter)
+      throws IOException {
     // Child ArtifactClassLoader with same ID
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader(someArtifactClassLoader.getArtifactId(), someArtifactClassLoader.getClassLoader())) {
-      assertThat(artifactDisposalContext.isArtifactClassLoader(childClassLoader.getClassLoader()), is(true));
+      classLoaderAsserter.accept(childClassLoader);
     }
-    assertChildClassLoaders(someArtifactClassLoader.getClassLoader());
+    assertChildClassLoaders(someArtifactClassLoader.getClassLoader(), classLoaderAsserter);
   }
 
-  private void assertChildClassLoaders(ClassLoader someClassLoader) throws IOException {
+  private void assertChildClassLoaders(ClassLoader someClassLoader, Consumer<ClassLoader> classLoaderAsserter)
+      throws IOException {
     // Child non-artifact ClassLoader
     try (URLClassLoader childClassLoader = new URLClassLoader(new URL[] {}, someClassLoader)) {
-      assertThat(artifactDisposalContext.isArtifactClassLoader(childClassLoader), is(true));
+      classLoaderAsserter.accept(childClassLoader);
     }
     // Child ArtifactClassLoader with different ID
     try (TestArtifactClassLoader childClassLoader =
         new TestArtifactClassLoader("Child Artifact", someClassLoader)) {
-      assertThat(artifactDisposalContext.isArtifactClassLoader(childClassLoader.getClassLoader()), is(true));
+      classLoaderAsserter.accept(childClassLoader);
     }
+  }
+
+  private void assertArtifactOwnedClassLoader(ClassLoader classLoader) {
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(classLoader), is(true));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(classLoader), is(false));
+  }
+
+  private void assertExtensionOwnedClassLoader(ClassLoader classLoader) {
+    assertThat(artifactDisposalContext.isArtifactOwnedClassLoader(classLoader), is(false));
+    assertThat(artifactDisposalContext.isExtensionOwnedClassLoader(classLoader), is(true));
   }
 
   private Thread startThreadWithClassLoader(ArtifactClassLoader artifactClassLoader) {
@@ -208,19 +251,36 @@ public class DefaultArtifactDisposalContextTestCase extends AbstractMuleTestCase
     return thread;
   }
 
-  private void assertOwnedThreads(Thread... threads) {
+  private void assertArtifactOwnedThreads(Thread... threads) {
     List<Thread> artifactOwnedThreads = artifactDisposalContext.getArtifactOwnedThreads().collect(toList());
     assertThat(artifactOwnedThreads, containsInAnyOrder(threads));
     for (Thread thread : threads) {
       assertThat(artifactDisposalContext.isArtifactOwnedThread(thread), is(true));
+      assertThat(artifactDisposalContext.isExtensionOwnedThread(thread), is(false));
     }
 
     // Also checks that the result is the same as the one from the getAllStackTraces method
-    assertThat(artifactOwnedThreads, containsInAnyOrder(getOwnedThreadsFromStackTraces()));
+    assertThat(artifactOwnedThreads, containsInAnyOrder(getArtifactOwnedThreadsFromStackTraces()));
   }
 
-  private Thread[] getOwnedThreadsFromStackTraces() {
+  private void assertExtensionOwnedThreads(Thread... threads) {
+    List<Thread> extensionOwnedThreads = artifactDisposalContext.getExtensionOwnedThreads().collect(toList());
+    assertThat(extensionOwnedThreads, containsInAnyOrder(threads));
+    for (Thread thread : threads) {
+      assertThat(artifactDisposalContext.isArtifactOwnedThread(thread), is(false));
+      assertThat(artifactDisposalContext.isExtensionOwnedThread(thread), is(true));
+    }
+
+    // Also checks that the result is the same as the one from the getAllStackTraces method
+    assertThat(extensionOwnedThreads, containsInAnyOrder(getExtensionOwnedThreadsFromStackTraces()));
+  }
+
+  private Thread[] getArtifactOwnedThreadsFromStackTraces() {
     return getAllStackTraces().keySet().stream().filter(artifactDisposalContext::isArtifactOwnedThread).toArray(Thread[]::new);
+  }
+
+  private Thread[] getExtensionOwnedThreadsFromStackTraces() {
+    return getAllStackTraces().keySet().stream().filter(artifactDisposalContext::isExtensionOwnedThread).toArray(Thread[]::new);
   }
 
   private static class TestArtifactClassLoader extends MuleArtifactClassLoader {

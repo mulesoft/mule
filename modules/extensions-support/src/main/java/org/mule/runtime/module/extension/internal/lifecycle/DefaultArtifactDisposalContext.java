@@ -55,34 +55,46 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
   }
 
   @Override
-  public Stream<Thread> getArtifactOwnedThreads() {
-    try {
-      ThreadGroup threadGroup = getTopLevelThreadGroup();
-      Thread[] allThreads = new Thread[threadGroup.activeCount()];
-      threadGroup.enumerate(allThreads);
-      return stream(allThreads).filter(this::isArtifactOwnedThread);
-    } catch (SecurityException e) {
-      LOGGER
-          .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Thread cleanup will be skipped.",
-                artifactClassLoader.getArtifactId(),
-                extensionClassLoader.getArtifactId(),
-                e);
-      return Stream.empty();
-    }
+  public boolean isExtensionOwnedClassLoader(ClassLoader classLoader) {
+    return isOwnedClassLoader(extensionClassLoader, classLoader);
   }
 
   @Override
-  public boolean isArtifactClassLoader(ClassLoader classLoader) {
+  public boolean isArtifactOwnedClassLoader(ClassLoader classLoader) {
+    return isOwnedClassLoader(artifactClassLoader, classLoader);
+  }
+
+  @Override
+  public Stream<Thread> getExtensionOwnedThreads() {
+    return getAllThreads().filter(this::isExtensionOwnedThread);
+  }
+
+  @Override
+  public Stream<Thread> getArtifactOwnedThreads() {
+    return getAllThreads().filter(this::isArtifactOwnedThread);
+  }
+
+  @Override
+  public boolean isExtensionOwnedThread(Thread thread) {
+    return isExtensionOwnedClassLoader(thread.getContextClassLoader());
+  }
+
+  @Override
+  public boolean isArtifactOwnedThread(Thread thread) {
+    return isArtifactOwnedClassLoader(thread.getContextClassLoader());
+  }
+
+  private boolean isOwnedClassLoader(ArtifactClassLoader ownerClassLoader, ClassLoader classLoader) {
     // Traverse the hierarchy for this ClassLoader searching for a matching artifact ID.
     while (classLoader != null) {
       if (classLoader instanceof ArtifactClassLoader) {
         String artifactId = ((ArtifactClassLoader) classLoader).getArtifactId();
-        if (artifactClassLoader.getArtifactId().equals(artifactId) || extensionClassLoader.getArtifactId().equals(artifactId))
+        if (ownerClassLoader.getArtifactId().equals(artifactId))
           return true;
       } else if (classLoader instanceof CompositeClassLoader) {
         // For CompositeClassLoaders we want to search through all its delegates
         for (ClassLoader delegate : ((CompositeClassLoader) classLoader).getDelegates()) {
-          if (isArtifactClassLoader(delegate)) {
+          if (isOwnedClassLoader(ownerClassLoader, delegate)) {
             return true;
           }
         }
@@ -90,11 +102,6 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
       classLoader = classLoader.getParent();
     }
     return false;
-  }
-
-  @Override
-  public boolean isArtifactOwnedThread(Thread thread) {
-    return isArtifactClassLoader(thread.getContextClassLoader());
   }
 
   private ThreadGroup getTopLevelThreadGroup() {
@@ -113,5 +120,21 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
     }
 
     return threadGroup;
+  }
+
+  private Stream<Thread> getAllThreads() {
+    try {
+      ThreadGroup threadGroup = getTopLevelThreadGroup();
+      Thread[] allThreads = new Thread[threadGroup.activeCount()];
+      threadGroup.enumerate(allThreads);
+      return stream(allThreads);
+    } catch (SecurityException e) {
+      LOGGER
+          .warn("An error occurred trying to obtain the active Threads for artifact [{}], and extension [{}]. Thread cleanup will be skipped.",
+                artifactClassLoader.getArtifactId(),
+                extensionClassLoader.getArtifactId(),
+                e);
+      return Stream.empty();
+    }
   }
 }

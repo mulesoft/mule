@@ -7,6 +7,8 @@
 
 package org.foo.withLifecycleListener;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import org.mule.runtime.core.api.MuleContext;
 
 import javax.inject.Inject;
@@ -17,8 +19,7 @@ public class WithLifecycleListenerOperation {
     private MuleContext muleContext;
 
     public void leak() {
-        // Leaks both the execution ClassLoader and the Extension's.
-        new LeakingThread(muleContext.getExecutionClassLoader()).start();
-        new LeakingThread(this.getClass().getClassLoader()).start();
+        // Leaks a Thread that will have the Execution ClassLoader as its TCCL.
+        new LeakedThread().start();
     }
 }
