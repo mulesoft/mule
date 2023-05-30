@@ -203,6 +203,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       @Override
       public Map<String, Object> getAttributes() {
         Map<String, Object> events = new HashMap<>();
+        // Support for extra value types (int, double, bool...) can be added if needed.
         eventData.getAttributes().asMap()
             .forEach((attributeKey, attributeValue) -> events.put(attributeKey.getKey(), valueOf(attributeValue)));
         return events;
