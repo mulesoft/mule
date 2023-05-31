@@ -7,7 +7,6 @@
 package org.mule.runtime.tracer.api;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;

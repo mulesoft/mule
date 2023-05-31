@@ -59,7 +59,7 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
+public class CoreEventTracer implements EventTracer<CoreEvent> {
 
   private final boolean propagateTracingExceptions = getBoolean(ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING);
 
@@ -81,11 +81,13 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   public static final String ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE =
       "Error on executing core event get distributed context span command";
 
-  @Inject
   private EventSpanFactory eventSpanFactory;
-
-  @Inject
   FeatureFlaggingService featureFlaggingService;
+
+  public CoreEventTracer(EventSpanFactory eventSpanFactory, FeatureFlaggingService featureFlaggingService) {
+    this.eventSpanFactory = eventSpanFactory;
+    this.featureFlaggingService = featureFlaggingService;
+  }
 
   private EventContextStartSpanCommand startCommand;
 
@@ -164,7 +166,6 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
     return eventContextGetDistributedTraceContextMap.execute(event.getContext());
   }
 
-  @Override
   public void initialise() throws InitialisationException {
     boolean enablePutTraceIdAndSpanIdInMdc = featureFlaggingService.isEnabled(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC);
     startCommand = getEventContextStartSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE,
@@ -191,4 +192,5 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
                                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE,
                                                                                                     propagateTracingExceptions);
   }
+
 }
