@@ -14,18 +14,18 @@ public class ExecutionInitialExportInfo implements InitialExportInfo {
 
   private InitialExportInfoProvider initialExportInfoProvider;
   private boolean exportable;
-  private final Object identifier;
+  private final Object spanIdentifier;
 
   public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, Component component) {
     this.initialExportInfoProvider = initialExportInfoProvider;
     this.exportable = initialExportInfoProvider.getInitialExportInfo(component).isExportable();
-    this.identifier = component;
+    this.spanIdentifier = component;
   }
 
   public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, String name) {
     this.initialExportInfoProvider = initialExportInfoProvider;
     this.exportable = initialExportInfoProvider.getInitialExportInfo(name).isExportable();
-    this.identifier = name;
+    this.spanIdentifier = name;
   }
 
   @Override
@@ -34,14 +34,17 @@ public class ExecutionInitialExportInfo implements InitialExportInfo {
   }
 
   @Override
-  public void propagateInitialExportInfo(InitialExportInfo initialExportInfo) {
-    if (!this.initialExportInfoProvider.isOverride()) {
-      this.initialExportInfoProvider = ((ExecutionInitialExportInfo) initialExportInfo).getInitialExportInfoProvider();
+  public void propagateInitialExportInfo(InitialExportInfo parentInitialExportInfo) {
+    InitialExportInfoProvider parentInitialExportInfoProvider =
+        ((ExecutionInitialExportInfo) parentInitialExportInfo).getInitialExportInfoProvider();
 
-      if (this.identifier instanceof Component) {
-        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((Component) this.identifier)).isExportable();
+    if (parentInitialExportInfoProvider.isOverride() && !this.initialExportInfoProvider.isOverride()) {
+      this.initialExportInfoProvider = parentInitialExportInfoProvider;
+
+      if (this.spanIdentifier instanceof Component) {
+        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).isExportable();
       } else {
-        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((String) this.identifier)).isExportable();
+        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).isExportable();
       }
     }
   }
