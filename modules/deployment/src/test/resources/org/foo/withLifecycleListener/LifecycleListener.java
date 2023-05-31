@@ -13,6 +13,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactDisposalContext;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 
 public class LifecycleListener implements ArtifactLifecycleListener {
@@ -24,7 +26,7 @@ public class LifecycleListener implements ArtifactLifecycleListener {
     assertThisClassIsLoadedWithExtensionClassLoader(disposalContext);
 
     // With this we make sure the ClassLoaders are still usable inside the listener code.
-    assertClassCanBeLoadedWith(disposalContext.getArtifactClassLoader(), "org.foo.EchoTest");
+    callArtifactDisposalCallback(disposalContext);
     assertClassCanBeLoadedWith(disposalContext.getExtensionClassLoader(), "org.foo.withLifecycleListener.LeakedThread");
 
     // If one of the avobe failed, the exception will make it skip the disposal code, and the associated test will fail.
@@ -42,6 +44,17 @@ public class LifecycleListener implements ArtifactLifecycleListener {
           // Does nothing
         }
       });
+  }
+
+  private void callArtifactDisposalCallback(ArtifactDisposalContext artifactDisposalContext) {
+    try {
+      Class<?> artifactDisposalTrackerClass = artifactDisposalContext.getArtifactClassLoader().loadClass("org.foo.ArtifactDisposalTracker");
+      artifactDisposalTrackerClass
+        .getMethod("onArtifactDisposal", ArtifactDisposalContext.class)
+        .invoke(null, artifactDisposalContext);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void assertClassCanBeLoadedWith(ClassLoader classLoader, String className) {
