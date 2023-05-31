@@ -8,6 +8,10 @@ package org.mule.runtime.module.extension.internal.lifecycle;
 
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_DISPOSED;
 
+import static java.lang.String.format;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.NotificationListener;
@@ -23,6 +27,8 @@ import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.slf4j.Logger;
+
 /**
  * A {@link NotificationListener} implementation to catch artifact context disposal events and dispatch to the corresponding
  * extension's {@link ArtifactLifecycleListener} callback.
@@ -31,6 +37,8 @@ import java.util.function.Predicate;
  */
 public class ExtensionOnMuleContextDisposedNotificationListener
     implements MuleContextNotificationListener<MuleContextNotification> {
+
+  private static final Logger LOGGER = getLogger(ExtensionOnMuleContextDisposedNotificationListener.class);
 
   private static final Predicate<MuleContextNotification> ON_CONTEXT_DISPOSED_SELECTOR =
       notification -> new IntegerAction(CONTEXT_DISPOSED).equals(notification.getAction());
@@ -56,8 +64,13 @@ public class ExtensionOnMuleContextDisposedNotificationListener
         && executionClassLoader instanceof ArtifactClassLoader) {
       ArtifactDisposalContext context = new DefaultArtifactDisposalContext((ArtifactClassLoader) executionClassLoader,
                                                                            (ArtifactClassLoader) extensionClassLoader.get());
+
+      String artifactId = ((ArtifactClassLoader) executionClassLoader).getArtifactId();
+      String extensionId = ((ArtifactClassLoader) extensionClassLoader.get()).getArtifactId();
       serverNotificationManager
-          .addListenerSubscription(new ExtensionOnMuleContextDisposedNotificationListener(artifactLifecycleListener.get(),
+          .addListenerSubscription(new ExtensionOnMuleContextDisposedNotificationListener(artifactId,
+                                                                                          extensionId,
+                                                                                          artifactLifecycleListener.get(),
                                                                                           context),
                                    ON_CONTEXT_DISPOSED_SELECTOR);
     }
@@ -73,17 +86,32 @@ public class ExtensionOnMuleContextDisposedNotificationListener
         .map(ClassLoaderModelProperty::getClassLoader);
   }
 
+  private final String artifactId;
+  private final String extensionId;
   private final ArtifactLifecycleListener artifactLifecycleListener;
   private final ArtifactDisposalContext artifactDisposalContext;
 
-  private ExtensionOnMuleContextDisposedNotificationListener(ArtifactLifecycleListener artifactLifecycleListener,
+  private ExtensionOnMuleContextDisposedNotificationListener(String artifactId,
+                                                             String extensionId,
+                                                             ArtifactLifecycleListener artifactLifecycleListener,
                                                              ArtifactDisposalContext artifactDisposalContext) {
+    this.artifactId = artifactId;
+    this.extensionId = extensionId;
     this.artifactLifecycleListener = artifactLifecycleListener;
     this.artifactDisposalContext = artifactDisposalContext;
   }
 
   @Override
   public void onNotification(MuleContextNotification notification) {
-    artifactLifecycleListener.onArtifactDisposal(artifactDisposalContext);
+    try {
+      artifactLifecycleListener.onArtifactDisposal(artifactDisposalContext);
+    } catch (Throwable t) {
+      String message =
+          format("Error executing (%s)'s #onArtifactDisposal from extension '%s' on artifact '%s'. This can cause a resource leak",
+                 artifactLifecycleListener,
+                 extensionId,
+                 artifactId);
+      LOGGER.error(message, t);
+    }
   }
 }
