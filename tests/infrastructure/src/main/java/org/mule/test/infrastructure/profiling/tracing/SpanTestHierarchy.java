@@ -7,29 +7,28 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static org.hamcrest.Matchers.in;
-import static org.junit.Assert.fail;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
+import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.withType;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.withType;
+import static org.junit.Assert.fail;
 
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
 import org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
