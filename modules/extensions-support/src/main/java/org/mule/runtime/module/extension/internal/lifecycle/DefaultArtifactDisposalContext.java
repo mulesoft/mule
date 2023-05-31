@@ -86,7 +86,7 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
   }
 
   private boolean isOwnedClassLoader(ArtifactClassLoader ownerClassLoader, ClassLoader classLoader) {
-    // Traverse the hierarchy for this ClassLoader searching for a matching artifact ID.
+    // Traverse the hierarchy for this ClassLoader searching for the same instance of the ownerClassLoader.
     while (classLoader != null) {
       if (classLoader == ownerClassLoader.getClassLoader()) {
         return true;
