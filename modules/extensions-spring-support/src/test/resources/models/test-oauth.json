@@ -68906,6 +68906,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
+        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -68917,8 +68918,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "#root:shiporder"
+        }
       },
       "fields": [
         {
@@ -69069,6 +69069,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69081,7 +69082,6 @@
           "genericTypes": [],
           "isMap": false
         },
-        "typeId": "http://example.com/example.json",
         "label": "Person"
       },
       "open": {
