@@ -8,6 +8,7 @@
 package org.mule.runtime.tracer.exporter.impl.capturer;
 
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
@@ -154,8 +155,8 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       @Override
       public String toString() {
-        return String.format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
-                             getParentSpanId());
+        return format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
+                      getParentSpanId());
       }
 
       @Override
@@ -207,6 +208,15 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
         eventData.getAttributes().asMap()
             .forEach((attributeKey, attributeValue) -> events.put(attributeKey.getKey(), valueOf(attributeValue)));
         return events;
+      }
+
+      @Override
+      public String toString() {
+        String attributes = eventData.getAttributes().asMap().entrySet().stream()
+            .map(attributeKeyObjectEntry -> format(", %s:\"%s\"", attributeKeyObjectEntry.getKey(),
+                                                   attributeKeyObjectEntry.getValue()))
+            .reduce("", String::concat);
+        return format("event: {name: \"%s\"%s}", eventData.getName(), attributes);
       }
     }
   }

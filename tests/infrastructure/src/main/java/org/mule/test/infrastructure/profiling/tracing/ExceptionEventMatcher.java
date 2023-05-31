@@ -7,16 +7,12 @@
 
 package org.mule.test.infrastructure.profiling.tracing;
 
-import static java.lang.String.format;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.emptyOrNullString;
 
-import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.tracer.api.sniffer.CapturedEventData;
-import org.mule.tck.junit4.matcher.ErrorTypeMatcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -34,65 +30,46 @@ public class ExceptionEventMatcher extends TypeSafeMatcher<CapturedEventData> {
   public static final String OTEL_EXCEPTION_ESCAPED_KEY = "exception.escaped";
 
   private final Matcher<String> eventNameMatcher = equalTo(OTEL_EXCEPTION_EVENT_NAME);
-  private final ErrorTypeMatcher errorTypeMatcher;
-  private Matcher<String> errorDescriptionMatcher;
-  private final Matcher<String> errorEscapedMatcher = equalTo("true");
-  private Matcher<String> errorStackTraceMatcher = not(emptyOrNullString());
+  private final Matcher<String> exceptionTypeMatcher;
+  private Matcher<String> exceptionDescriptionMatcher;
+  private final Matcher<String> exceptionEscapedMatcher = equalTo("true");
+  private Matcher<String> exceptionStackTraceMatcher = not(emptyOrNullString());
 
   private ExceptionEventMatcher(String errorType) {
-    String[] errorTypeComponents = errorType.split(":");
-    if (errorTypeComponents.length != 2) {
-      throw new IllegalArgumentException(format("Wrong error type: %s", errorType));
-    }
-    this.errorTypeMatcher = ErrorTypeMatcher.errorType(errorTypeComponents[0], errorTypeComponents[1]);
-    this.errorDescriptionMatcher = any(String.class);
+    this.exceptionTypeMatcher = equalTo(errorType);
+    this.exceptionDescriptionMatcher = any(String.class);
   }
 
-  public static ExceptionEventMatcher errorType(String errorType) {
-    return new ExceptionEventMatcher(errorType);
+  public static ExceptionEventMatcher withType(String type) {
+    return new ExceptionEventMatcher(type);
   }
 
-  public ExceptionEventMatcher stackTrace(String stackTrace) {
-    this.errorStackTraceMatcher = equalTo(stackTrace);
+  public ExceptionEventMatcher withStackTrace(String stackTrace) {
+    this.exceptionStackTraceMatcher = equalTo(stackTrace);
     return this;
   }
 
-  public ExceptionEventMatcher errorDescription(String errorDescription) {
-    this.errorDescriptionMatcher = equalTo(errorDescription);
+  public ExceptionEventMatcher withDescription(String description) {
+    this.exceptionDescriptionMatcher = equalTo(description);
     return this;
   }
 
   @Override
   protected boolean matchesSafely(CapturedEventData event) {
     return eventNameMatcher.matches(event.getName())
-        && errorDescriptionMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_MESSAGE_KEY))
-        && errorEscapedMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_ESCAPED_KEY))
-        && errorStackTraceMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_STACK_TRACE_KEY))
-        && errorTypeMatcher.matches(new ErrorType() {
-
-          @Override
-          public String getIdentifier() {
-            return event.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY) != null
-                ? event.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY).toString().split(":")[1]
-                : "";
-          }
-
-          @Override
-          public String getNamespace() {
-            return event.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY) != null
-                ? event.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY).toString().split(":")[0]
-                : "";
-          }
-
-          @Override
-          public ErrorType getParentErrorType() {
-            return null;
-          }
-        });
+        && exceptionDescriptionMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_MESSAGE_KEY))
+        && exceptionEscapedMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_ESCAPED_KEY))
+        && exceptionStackTraceMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_STACK_TRACE_KEY))
+        && exceptionTypeMatcher.matches(event.getAttributes().get(OTEL_EXCEPTION_TYPE_KEY));
   }
 
   @Override
   public void describeTo(Description description) {
-
+    description
+        .appendText("event: {name: \"exception\", type: ").appendDescriptionOf(exceptionTypeMatcher)
+        .appendText(", description: ").appendDescriptionOf(exceptionDescriptionMatcher)
+        .appendText(", stacktrace: ").appendDescriptionOf(exceptionStackTraceMatcher)
+        .appendText(", escaped: ").appendDescriptionOf(exceptionEscapedMatcher)
+        .appendText("}");
   }
 }
