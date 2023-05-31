@@ -342,12 +342,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   }
 
   protected void reportPossibleLeak(Throwable t, String artifactId) {
-    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message, artifactId, t);
-    } else {
-      LOGGER.error(message, artifactId);
-    }
+    LOGGER.error(format("Error disposing classloader for '%s'. This can cause a memory leak", artifactId), t);
   }
 
   private void shutdownListeners() {

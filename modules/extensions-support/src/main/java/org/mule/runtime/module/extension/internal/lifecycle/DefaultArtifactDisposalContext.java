@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.lifecycle;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.stream;
+import static java.util.stream.Stream.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -132,7 +133,7 @@ public class DefaultArtifactDisposalContext implements ArtifactDisposalContext {
                        artifactClassLoader.getArtifactId(),
                        extensionClassLoader.getArtifactId()),
                 e);
-      return Stream.empty();
+      return empty();
     }
   }
 }
