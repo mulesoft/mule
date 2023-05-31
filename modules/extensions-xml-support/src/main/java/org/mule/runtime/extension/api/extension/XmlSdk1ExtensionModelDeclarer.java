@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.INTEGER_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider.ID;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
@@ -65,7 +64,6 @@ public class XmlSdk1ExtensionModelDeclarer {
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(SELECT)
-        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(MODULE_DSL_NAMESPACE)

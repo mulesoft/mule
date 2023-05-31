@@ -12,7 +12,6 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
-import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -37,7 +36,6 @@ class TestPolicyExtensionModelDeclarer {
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(SELECT)
-        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(TEST_POLICY_PREFIX)

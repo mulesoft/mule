@@ -20,7 +20,6 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
-import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.DEPRECATED_STEREOTYPE;
@@ -96,7 +95,6 @@ public class MuleOperationExtensionModelDeclarer {
         .describedAs("DSL for declaring Mule Operation")
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)
-        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()

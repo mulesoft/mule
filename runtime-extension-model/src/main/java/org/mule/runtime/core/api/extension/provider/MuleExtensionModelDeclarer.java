@@ -57,7 +57,6 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.TYPE_LOADER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
-import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.DYNAMIC_CONFIG_EXPIRATION_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -157,7 +156,6 @@ class MuleExtensionModelDeclarer {
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)
         .withCategory(COMMUNITY)
-        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(CORE_PREFIX)

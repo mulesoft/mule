@@ -61,8 +61,7 @@ public class MuleSdkPluginExtensionModelParser extends MuleSdkExtensionModelPars
   private List<ErrorModelParser> errorModelParsers;
 
   public MuleSdkPluginExtensionModelParser(ArtifactAst ast, TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
-    super(typeLoader, extensionModelHelper);
-    init(ast);
+    super(ast, typeLoader, extensionModelHelper);
   }
 
   @Override

@@ -25,7 +25,6 @@ import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAndValidateCommonSupportedJavaVersions;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
@@ -471,10 +470,8 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer
-        .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
-        .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK))
-        .supportingJavaVersions(getAndValidateCommonSupportedJavaVersions(name, "Module", artifactAst.dependencies()));
+    declarer.withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel));
+    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations

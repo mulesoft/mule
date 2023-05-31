@@ -4,11 +4,6 @@
   "version": "1.2.3",
   "vendor": "Extension Producers Inc.",
   "minMuleVersion": "4.5.0",
-  "supportedJavaVersions": [
-    "1.8",
-    "11",
-    "17"
-  ],
   "category": "PREMIUM",
   "xmlDsl": {
     "prefix": "fully-param",

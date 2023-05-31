@@ -28,11 +28,9 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -66,7 +64,6 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
-import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -77,7 +74,6 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -122,10 +118,7 @@ import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResult
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -841,77 +834,5 @@ public class MuleExtensionUtils {
 
   public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {
     return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
-  }
-
-  /**
-   * Returns the version of Java that are supported by <b>ALL</b> the {@code extensionModels}.
-   *
-   * @param extensionModels the {@link ExtensionModel} instances to evaluate
-   * @return a {@link Set} of Java versions or an empty one if the extensions have none in common
-   * @see {@link JavaConstants}
-   * @since 4.5.0
-   */
-  public static Set<String> getCommonSupportedJavaVersions(Collection<ExtensionModel> extensionModels) {
-    List<ExtensionModel> models = extensionModels instanceof List
-        ? (List<ExtensionModel>) extensionModels
-        : new ArrayList<>(extensionModels);
-
-    Set<String> commonVersions = new LinkedHashSet<>();
-    Set<String> processedVersions = new HashSet<>();
-
-    for (int i = 0; i < models.size(); i++) {
-      for (String version : models.get(i).getSupportedJavaVersions()) {
-        if (!processedVersions.add(version)) {
-          continue;
-        }
-
-        boolean isCommon = true;
-        for (int j = 0; j < models.size(); j++) {
-          if (j == i) {
-            continue;
-          }
-
-          if (!models.get(j).getSupportedJavaVersions().contains(version)) {
-            isCommon = false;
-            break;
-          }
-        }
-
-        if (isCommon) {
-          commonVersions.add(version);
-        }
-      }
-    }
-
-    return commonVersions;
-  }
-
-  /**
-   * Similar to {@link #getCommonSupportedJavaVersions(Collection)} only that an empty set will never be returned.
-   * <p>
-   * An {@link IllegalModelDefinitionException} is thrown if no common Java version is found.
-   *
-   * @param extensionName The name of the Extension, used to build the exception message
-   * @param extensionType the type of exception (e.g: Module, Extension, etc), used to build the exception message
-   * @param extensions    the {@link ExtensionModel} instances to evaluate
-   * @return the common set of supported Java versions
-   * @throws IllegalModelDefinitionException if no common Java version is found
-   * @see {@link JavaConstants}
-   * @since 4.5.0
-   */
-  public static Set<String> getAndValidateCommonSupportedJavaVersions(String extensionName,
-                                                                      String extensionType,
-                                                                      Collection<ExtensionModel> extensions) {
-    final Set<String> supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(extensions));
-    if (supportedJavaVersions.isEmpty()) {
-      String summary = extensions.stream()
-          .map(em -> em.getName() + ": " + em.getSupportedJavaVersions())
-          .collect(joining("\n"));
-      throw new IllegalModelDefinitionException(format("%s '%s' depends on Extensions that don't share any common Java "
-          + "version support. Dependencies supported Java versions are:\n%s",
-                                                       extensionType, extensionName, summary));
-    }
-
-    return supportedJavaVersions;
   }
 }

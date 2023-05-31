@@ -14,7 +14,6 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
-import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
@@ -26,7 +25,6 @@ import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Parses the syntactic definition of an {@link ExtensionModel} so that the semantics reflected in it can be extracted in a
@@ -149,7 +147,7 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   /**
    * The extension's subtype mappings.
    *
-   * @return a {@link Map} which keys represent the base types and each value represents the list of known subtypes
+   * @return a {@link Map} wihich keys represent the base types and each value represents the list of known subtypes
    */
   Map<MetadataType, List<MetadataType>> getSubTypes();
 

@@ -48,9 +48,8 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
                                                 ArtifactAst ast,
                                                 TypeLoader typeLoader,
                                                 ExtensionModelHelper extensionModelHelper) {
-    super(typeLoader, extensionModelHelper);
+    super(ast, typeLoader, extensionModelHelper);
     this.extensionName = extensionName;
-    init(ast);
   }
 
   @Override
