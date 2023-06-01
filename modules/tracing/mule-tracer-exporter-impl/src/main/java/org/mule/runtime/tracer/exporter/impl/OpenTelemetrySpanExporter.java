@@ -255,6 +255,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       OpenTelemetrySpanExporter childOpenTelemetrySpanExporter = (OpenTelemetrySpanExporter) childSpanExporter;
       muleTraceState.propagateRemoteContext(childOpenTelemetrySpanExporter.muleTraceState);
       childOpenTelemetrySpanExporter.initialExportInfo.propagateInitialExportInfo(this.initialExportInfo);
+      childOpenTelemetrySpanExporter.update();
 
       // If it isn't exportable propagate the traceId and spanId
       if (!childOpenTelemetrySpanExporter.exportable) {
@@ -294,6 +295,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         childOpenTelemetrySpanExporter.parentSpanContext = spanContext;
       }
     }
+  }
+
+  private void update() {
+    this.exportable = this.initialExportInfo.isExportable();
+    this.noExportUntil = this.initialExportInfo.noExportUntil();
   }
 
   @Override
