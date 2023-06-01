@@ -25,13 +25,7 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-
-import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -77,9 +71,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfigurat
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.ExportInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEnterpriseLicenseInfo;
 import org.mule.runtime.module.extension.internal.loader.parser.java.info.RequiresEntitlementInfo;
-import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
-import org.mule.sdk.api.annotation.JavaVersionSupport;
-import org.mule.sdk.api.meta.JavaVersion;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
 import org.mule.sdk.api.annotation.OnArtifactLifecycle;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
@@ -411,11 +402,6 @@ public class JavaExtensionModelParser extends AbstractJavaModelParser implements
   @Override
   public ExtensionDevelopmentFramework getDevelopmentFramework() {
     return JAVA_SDK;
-  }
-
-  @Override
-  public Set<String> getSupportedJavaVersions() {
-    return supportedJavaVersions;
   }
 
   @Override

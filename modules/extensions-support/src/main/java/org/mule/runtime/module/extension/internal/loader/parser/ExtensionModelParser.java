@@ -175,13 +175,6 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   ExtensionDevelopmentFramework getDevelopmentFramework();
 
   /**
-   * @return The versions of Java that the extension supports
-   * @since 4.5.0
-   * @see {@link JavaConstants}
-   */
-  Set<String> getSupportedJavaVersions();
-
-  /**
    * @return an {@link Optional} {@link ArtifactLifecycleListenerModelProperty} if an {@link ArtifactLifecycleListener} was
    *         defined at the extension level.
    *

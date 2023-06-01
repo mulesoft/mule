@@ -149,11 +149,6 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   @Override
-  public Set<String> getSupportedJavaVersions() {
-    return supportedJavaVersions;
-  }
-
-  @Override
   public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
     return empty();
   }
