@@ -10,12 +10,14 @@ package org.mule.runtime.core.internal.routing;
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static reactor.core.publisher.Flux.fromIterable;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -58,7 +60,11 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   @Override
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
-    return fromIterable(routes).map(route -> of(event, route));
+    return fromIterable(routes).map(route -> {
+      InternalEvent copy = (InternalEvent) CoreEvent.builder(event).build();
+      setSourcePolicyChildContext(copy);
+      return of(copy, route);
+    });
   }
 
   @Override
