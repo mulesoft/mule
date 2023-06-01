@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
 import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
+import static org.mule.runtime.module.extension.internal.lifecycle.ExtensionOnMuleContextDisposedNotificationListener.registerLifecycleListenerForOnContextDisposed;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSubtypeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -62,6 +63,9 @@ public final class ExtensionActivator implements Startable, Stoppable {
   void activateExtension(ExtensionModel extensionModel) {
     registerEnumTransformers(extensionModel);
     registerAsModuleDefinition(extensionModel);
+    registerLifecycleListenerForOnContextDisposed(muleContext.getNotificationManager(),
+                                                  muleContext.getExecutionClassLoader(),
+                                                  extensionModel);
   }
 
   private void registerEnumTransformers(ExtensionModel extensionModel) {

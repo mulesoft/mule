@@ -993,6 +993,12 @@ public interface AllureConstants {
 
     }
 
+    interface ArtifactLifecycleListener {
+
+      String ARTIFACT_LIFECYCLE_LISTENER = "Listeners for Artifact lifecycle events";
+
+    }
+
   }
 
   interface XmlSdk {

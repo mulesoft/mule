@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
@@ -74,38 +75,7 @@ public class ClassLoaderDisposeErrorTestCase extends AbstractMuleTestCase {
   private static class TestArtifactClassLoader extends MuleArtifactClassLoader {
 
     public TestArtifactClassLoader(ClassLoader parentCl) {
-      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, new ClassLoaderLookupPolicy() {
-
-        @Override
-        public LookupStrategy getClassLookupStrategy(String className) {
-          return PARENT_FIRST;
-        }
-
-        @Override
-        public LookupStrategy getPackageLookupStrategy(String packageName) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-          return null;
-        }
-
-        @Override
-        public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
-          return null;
-        }
-      });
+      super("testId", new ArtifactDescriptor("test"), new URL[0], parentCl, PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY);
     }
 
     @Override
