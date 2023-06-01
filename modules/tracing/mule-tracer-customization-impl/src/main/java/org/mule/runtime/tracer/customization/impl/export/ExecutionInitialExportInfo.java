@@ -10,27 +10,37 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 
+import java.util.Set;
+
 public class ExecutionInitialExportInfo implements InitialExportInfo {
 
   private InitialExportInfoProvider initialExportInfoProvider;
   private boolean exportable;
+  private Set<String> resetSpans;
   private final Object spanIdentifier;
 
   public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, Component component) {
     this.initialExportInfoProvider = initialExportInfoProvider;
     this.exportable = initialExportInfoProvider.getInitialExportInfo(component).isExportable();
+    this.resetSpans = initialExportInfoProvider.getInitialExportInfo(component).noExportUntil();
     this.spanIdentifier = component;
   }
 
   public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, String name) {
     this.initialExportInfoProvider = initialExportInfoProvider;
     this.exportable = initialExportInfoProvider.getInitialExportInfo(name).isExportable();
+    this.resetSpans = initialExportInfoProvider.getInitialExportInfo(name).noExportUntil();
     this.spanIdentifier = name;
   }
 
   @Override
   public boolean isExportable() {
     return this.exportable;
+  }
+
+  @Override
+  public Set<String> noExportUntil() {
+    return resetSpans;
   }
 
   @Override
@@ -42,9 +52,11 @@ public class ExecutionInitialExportInfo implements InitialExportInfo {
       this.initialExportInfoProvider = parentInitialExportInfoProvider;
 
       if (this.spanIdentifier instanceof Component) {
-        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).isExportable();
+        this.exportable = parentInitialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).isExportable();
+        this.resetSpans = parentInitialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).noExportUntil();
       } else {
-        this.exportable = this.initialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).isExportable();
+        this.exportable = parentInitialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).isExportable();
+        this.resetSpans = parentInitialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).noExportUntil();
       }
     }
   }
