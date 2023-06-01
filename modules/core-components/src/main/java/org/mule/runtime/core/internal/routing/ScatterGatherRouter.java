@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPai
 import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static reactor.core.publisher.Flux.fromIterable;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
@@ -53,6 +54,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   @Inject
   InitialSpanInfoProvider initialSpanInfoProvider;
 
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
+
   @Override
   protected Consumer<CoreEvent> onEvent() {
     return event -> validateMessageIsNotConsumable(event.getMessage());
@@ -68,7 +72,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
       return event;
     }
     InternalEvent copy = (InternalEvent) CoreEvent.builder(event).build();
-    setSourcePolicyChildContext(copy);
+    setSourcePolicyChildContext(copy, featureFlaggingService);
     return copy;
   }
 

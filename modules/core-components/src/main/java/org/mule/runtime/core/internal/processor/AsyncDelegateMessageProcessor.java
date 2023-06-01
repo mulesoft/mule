@@ -36,6 +36,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -101,6 +102,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   @Inject
   InitialSpanInfoProvider initialSpanInfoProvider;
@@ -259,7 +262,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     InternalEvent copy = (InternalEvent) PrivilegedEvent
         .builder(child((event.getContext()), ofNullable(getLocation()), LoggingExceptionHandler.getInstance()), event)
         .session(new DefaultMuleSession(event.getSession())).build();
-    setSourcePolicyChildContext(copy);
+    setSourcePolicyChildContext(copy, featureFlaggingService);
     return copy;
   }
 

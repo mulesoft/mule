@@ -29,9 +29,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.policy.SourcePolicyContext;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.split.SplittingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -97,7 +95,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
             .message(createMessage(partTypedValue, event))
             .build())
         .cast(InternalEvent.class)
-        .doOnNext(RoutingUtils::setSourcePolicyChildContext)
+        .doOnNext(evt -> setSourcePolicyChildContext(evt, featureFlaggingService))
         .map(partEvent -> of(partEvent, nestedChain));
   }
 

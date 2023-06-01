@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicyContext;
@@ -16,7 +17,7 @@ public final class RoutingUtils {
 
   }
 
-  public static void setSourcePolicyChildContext(InternalEvent event) {
+  public static void setSourcePolicyChildContext(InternalEvent event, FeatureFlaggingService featureFlaggingService) {
     EventInternalContext<?> context = event.getSourcePolicyContext();
     SourcePolicyContext policyContext = (SourcePolicyContext) context;
     if (context != null) {
