@@ -36,7 +36,6 @@ public class FileTracingLevelConfigurationTestCase {
   private static final String WRONG_LEVEL_CONF = "wrong-level.conf";
   private static final String LOCATION_1 = "location1";
   private static final String LOCATION_2 = "location2";
-  private static final String EMPTY_LOCATION = "";
   private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
 
   @Test

@@ -30,7 +30,7 @@ public class ExecutionInitialExportInfo implements InitialExportInfo {
 
   @Override
   public boolean isExportable() {
-    return exportable;
+    return this.exportable;
   }
 
   @Override
