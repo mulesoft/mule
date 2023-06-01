@@ -15,14 +15,6 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.javaee</javaModuleName>
-        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
-        <javax.jaxb-api.version>2.3.1</javax.jaxb-api.version>
-        <javax.jaxws-api.version>2.3.1</javax.jaxws-api.version>
-        <javax.jws-api.version>1.1</javax.jws-api.version>
-        <javax.transaction-api.version>1.3</javax.transaction-api.version>
-        <javax.xml.soap-api.version>1.4.0</javax.xml.soap-api.version>
-        <jaxb-core.version>2.3.0.1</jaxb-core.version>
-        <jaxb-impl.version>2.3.1-MULE-001</jaxb-impl.version>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -47,42 +39,26 @@
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
-            <version>${javax.annotation-api.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.jws</groupId>
             <artifactId>javax.jws-api</artifactId>
-            <version>${javax.jws-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.transaction</groupId>
-            <artifactId>javax.transaction-api</artifactId>
-            <version>${javax.transaction-api.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>${javax.jaxb-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb-impl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>${jaxb-core.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.soap</groupId>
             <artifactId>javax.xml.soap-api</artifactId>
-            <version>${javax.xml.soap-api.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
-            <version>${javax.jaxws-api.version}</version>
         </dependency>
     </dependencies>
 
