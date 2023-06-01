@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.extension.api.extension;
 
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
@@ -22,6 +21,8 @@ import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
 import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;
+
+import static java.util.Collections.emptyList;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.java.api.JavaTypeLoader;
