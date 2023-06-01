@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAndValidateCommonSupportedJavaVersions;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -50,16 +52,15 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final TypeLoader typeLoader;
   private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
+  private Set<String> supportedJavaVersions;
 
-  public MuleSdkExtensionModelParser(ArtifactAst ast,
-                                     TypeLoader typeLoader,
-                                     ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkExtensionModelParser(TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    init(ast);
   }
 
   protected void init(ArtifactAst ast) {
+    supportedJavaVersions = getAndValidateCommonSupportedJavaVersions(getName(), "Extension", ast.dependencies());
     operationModelParsers = computeOperationModelParsers(ast);
   }
 
@@ -151,6 +152,11 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   @Override
   public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
     return empty();
+  }
+
+  @Override
+  public Set<String> getSupportedJavaVersions() {
+    return supportedJavaVersions;
   }
 
   /**

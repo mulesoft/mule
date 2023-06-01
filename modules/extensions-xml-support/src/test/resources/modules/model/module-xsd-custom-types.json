@@ -4,6 +4,10 @@
   "version": "4.0.0",
   "vendor": "MuleSoft",
   "category": "COMMUNITY",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "xmlDsl": {
     "prefix": "module-xsd-custom-types",
     "namespace": "http://www.mulesoft.org/schema/mule/module-xsd-custom-types",

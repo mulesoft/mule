@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -44,6 +45,7 @@ class TlsExtensionModelDeclarer {
         .describedAs("Mule Runtime and Integration Platform: TLS components")
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
