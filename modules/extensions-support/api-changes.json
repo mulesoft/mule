@@ -19,13 +19,7 @@
           "package": "org.mule.runtime.module.extension.api.loader.java.property",
           "elementKind": "class",
           "justification": "W-13216278: Added for backwards compatibility"
-        }
-      ]
-    }
-  },
-  "4.5.0": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "code": "java.method.removed",
           "old": "method org.mule.runtime.core.api.management.stats.CursorComponentDecoratorFactory org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter<M extends org.mule.runtime.api.meta.model.ComponentModel>::getComponentDecoratorFactory()",

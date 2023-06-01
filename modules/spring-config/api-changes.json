@@ -1,7 +1,89 @@
 {
-  "4.5.0": {
+  "4.6.0": {
     "revapi": {
       "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classSimpleName": "ResourceProvider",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProvider",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.config.api.dsl.model.ResourceProvider===)",
+          "new": "parameter org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.properties.api.ResourceProvider===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "newType": "org.mule.runtime.properties.api.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "new": "method org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.properties.api.ResourceProvider)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "newType": "org.mule.runtime.properties.api.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "elementKind": "method",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "ConfigurationProperty",
+          "elementKind": "interface",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProvider",
+          "elementKind": "class",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.config.api.dsl.model.ResourceProvider===)",
+          "new": "parameter org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, ===org.mule.runtime.properties.api.ResourceProvider===)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.ResourceProvider",
+          "newType": "org.mule.runtime.properties.api.ResourceProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "parameterIndex": "1",
+          "elementKind": "parameter",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.config.api.dsl.model.ResourceProvider)",
+          "new": "method org.mule.runtime.properties.api.ConfigurationPropertiesProvider org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory::createProvider(org.mule.runtime.config.api.dsl.model.ConfigurationParameters, org.mule.runtime.properties.api.ResourceProvider)",
+          "oldType": "org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider",
+          "newType": "org.mule.runtime.properties.api.ConfigurationPropertiesProvider",
+          "package": "org.mule.runtime.config.api.dsl.model.properties",
+          "classSimpleName": "DefaultConfigurationPropertiesProviderFactory",
+          "methodName": "createProvider",
+          "elementKind": "method",
+          "justification": "W-12967303: Split packages between mule-module-properties-config and mule-module-spring-config"
+        },
         {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T extends java.lang.Object>",
