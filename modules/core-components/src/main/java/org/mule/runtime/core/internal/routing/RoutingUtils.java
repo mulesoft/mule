@@ -19,7 +19,9 @@ public final class RoutingUtils {
   public static void setSourcePolicyChildContext(InternalEvent event) {
     EventInternalContext<?> context = event.getSourcePolicyContext();
     SourcePolicyContext policyContext = (SourcePolicyContext) context;
-    event.setSourcePolicyContext(policyContext.childContext());
+    if (context != null) {
+      event.setSourcePolicyContext(policyContext.childContext());
+    }
   }
 
 }

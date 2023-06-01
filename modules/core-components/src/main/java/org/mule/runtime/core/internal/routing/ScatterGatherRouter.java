@@ -60,11 +60,16 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   @Override
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
-    return fromIterable(routes).map(route -> {
-      InternalEvent copy = (InternalEvent) CoreEvent.builder(event).build();
-      setSourcePolicyChildContext(copy);
-      return of(copy, route);
-    });
+    return fromIterable(routes).map(route -> of(eventForRoute(event), route));
+  }
+
+  private CoreEvent eventForRoute(CoreEvent event) {
+    if (!(event instanceof InternalEvent)) {
+      return event;
+    }
+    InternalEvent copy = (InternalEvent) CoreEvent.builder(event).build();
+    setSourcePolicyChildContext(copy);
+    return copy;
   }
 
   @Override
