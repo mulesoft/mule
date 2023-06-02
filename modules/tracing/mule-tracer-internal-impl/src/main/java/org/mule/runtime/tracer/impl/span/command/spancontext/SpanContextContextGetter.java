@@ -9,8 +9,6 @@ package org.mule.runtime.tracer.impl.span.command.spancontext;
 
 import org.mule.runtime.tracer.api.context.SpanContext;
 
-import javax.annotation.Nullable;
-
 /**
  * A getter for the distributed trace context.
  *
@@ -23,6 +21,5 @@ public interface SpanContextContextGetter<T> {
    *
    * @return the {@link SpanContext}.
    */
-  @Nullable
   SpanContext get(T carrier);
 }

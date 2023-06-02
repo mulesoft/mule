@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.metadata;
 
-import static com.google.common.base.Throwables.propagateIfPossible;
-import static java.lang.String.format;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -15,6 +13,10 @@ import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import static java.lang.String.format;
+
+import static com.google.common.base.Throwables.propagateIfPossible;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -30,10 +32,10 @@ import org.mule.runtime.app.declaration.api.ComponentElementDeclaration;
 import org.mule.runtime.app.declaration.api.ElementDeclaration;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
-import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
+import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
@@ -44,7 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +164,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
                                   });
   }
 
-  private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(@Nonnull MetadataResult<InputMetadataDescriptor> inputMetadataResult,
+  private MetadataResult<ComponentMetadataTypesDescriptor> collectMetadata(MetadataResult<InputMetadataDescriptor> inputMetadataResult,
                                                                            MetadataResult<OutputMetadataDescriptor> outputMetadataResult) {
     if (inputMetadataResult.isSuccess() && (outputMetadataResult == null || outputMetadataResult.isSuccess())) {
       ComponentMetadataTypesDescriptor.ComponentMetadataTypesDescriptorBuilder builder =
