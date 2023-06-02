@@ -14,13 +14,11 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.util.ReflectionUtils.findMethod;
 
 import org.mule.test.runner.api.DependencyResolver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.HashMap;
@@ -53,11 +51,11 @@ import net.bytebuddy.description.modifier.SyntheticState;
 import net.bytebuddy.description.modifier.TypeManifestation;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.PackageDescription;
-import net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape;
 import net.bytebuddy.description.type.RecordComponentList;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
+import net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.bytecode.StackSize;
 
@@ -130,16 +128,6 @@ public final class RunnerModuleUtils {
             .resolveArtifact(getDefaultSdkApiArtifact(), repositories)
             .getArtifact()
             .getFile().getAbsoluteFile().toURL();
-
-        Method method = findMethod(extensionClassLoader.getClass(), "addURL", URL.class);
-
-        // Until Java8, this will be the path taken.
-        if (method != null) {
-          method.setAccessible(true);
-          method.invoke(extensionClassLoader, sdkApiUrl);
-          return;
-        }
-
 
         // For Java 9+ Use bytebuddy to add dynamically all classes from the Jar
         addSdkApiClassesDynamically(extensionClassLoader, sdkApiUrl);
