@@ -981,6 +981,11 @@ public interface AllureConstants {
 
     }
 
+    interface SupportedJavaVersions {
+
+      String JAVA_VERSIONS_IN_EXTENSION_MODEL = "Supported Java Versions are reflected in the ExtensionModel";
+    }
+
   }
 
   interface JavaSdk {

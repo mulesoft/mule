@@ -851,12 +851,14 @@ public class MuleExtensionUtils {
    * @see {@link JavaConstants}
    * @since 4.5.0
    */
-  public static Set<String> getCommonSupportedJavaVersions(Collection<ExtensionModel> extensionModels) {
+  public static Set<String> getJavaVersionsIntersection(Collection<ExtensionModel> extensionModels) {
     List<ExtensionModel> models = extensionModels instanceof List
         ? (List<ExtensionModel>) extensionModels
         : new ArrayList<>(extensionModels);
 
-    Set<String> commonVersions = new LinkedHashSet<>();
+    Set<String> intersection = new LinkedHashSet<>();
+
+    // to avoid cartesian product
     Set<String> processedVersions = new HashSet<>();
 
     for (int i = 0; i < models.size(); i++) {
@@ -878,16 +880,16 @@ public class MuleExtensionUtils {
         }
 
         if (isCommon) {
-          commonVersions.add(version);
+          intersection.add(version);
         }
       }
     }
 
-    return commonVersions;
+    return intersection;
   }
 
   /**
-   * Similar to {@link #getCommonSupportedJavaVersions(Collection)} only that an empty set will never be returned.
+   * Similar to {@link #getJavaVersionsIntersection(Collection)} only that an empty set will never be returned.
    * <p>
    * An {@link IllegalModelDefinitionException} is thrown if no common Java version is found.
    *
@@ -899,11 +901,11 @@ public class MuleExtensionUtils {
    * @see {@link JavaConstants}
    * @since 4.5.0
    */
-  public static Set<String> getAndValidateCommonSupportedJavaVersions(String extensionName,
-                                                                      String extensionType,
-                                                                      Collection<ExtensionModel> extensions) {
-    final Set<String> supportedJavaVersions = unmodifiableSet(getCommonSupportedJavaVersions(extensions));
-    if (supportedJavaVersions.isEmpty()) {
+  public static Set<String> getValidatedJavaVersionsIntersection(String extensionName,
+                                                                 String extensionType,
+                                                                 Collection<ExtensionModel> extensions) {
+    final Set<String> intersection = unmodifiableSet(getJavaVersionsIntersection(extensions));
+    if (intersection.isEmpty()) {
       String summary = extensions.stream()
           .map(em -> em.getName() + ": " + em.getSupportedJavaVersions())
           .collect(joining("\n"));
@@ -912,6 +914,6 @@ public class MuleExtensionUtils {
                                                        extensionType, extensionName, summary));
     }
 
-    return supportedJavaVersions;
+    return intersection;
   }
 }

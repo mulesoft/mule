@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getAndValidateCommonSupportedJavaVersions;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -60,7 +60,7 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   }
 
   protected void init(ArtifactAst ast) {
-    supportedJavaVersions = getAndValidateCommonSupportedJavaVersions(getName(), "Extension", ast.dependencies());
+    supportedJavaVersions = getValidatedJavaVersionsIntersection(getName(), "Extension", ast.dependencies());
     operationModelParsers = computeOperationModelParsers(ast);
   }
 

@@ -10,8 +10,8 @@ package org.mule.runtime.module.extension.internal.util;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
-import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
+import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.JAVA_VERSIONS_IN_EXTENSION_MODEL;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -59,8 +59,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Feature(ARTIFACT_AST)
-@Story(PARAMETER_AST)
+@Feature(SDK)
 public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
 
   private static final String PAYLOAD_EXPRESSION = "#[payload]";
@@ -268,7 +267,8 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void getCommonSupportedJavaVersions() {
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  public void getJavaVersionsIntersection() {
     assertJavaVersions(new String[][] {
         {"1.8", "11", "17"},
         {"1.8", "11"},
@@ -304,7 +304,7 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private void assertJavaVersions(String[][] input, String... expected) {
-    Set<String> resolved = MuleExtensionUtils.getCommonSupportedJavaVersions(mockExtensionModelsWithSupportedJavaVersions(input));
+    Set<String> resolved = MuleExtensionUtils.getJavaVersionsIntersection(mockExtensionModelsWithSupportedJavaVersions(input));
     if (expected != null) {
       assertThat(resolved.size(), equalTo(expected.length));
       assertThat(resolved, contains(expected));
