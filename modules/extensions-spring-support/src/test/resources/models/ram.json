@@ -3,6 +3,10 @@
   "description": "",
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
+  "supportedJavaVersions": [
+    "1.8",
+    "11"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "ram",

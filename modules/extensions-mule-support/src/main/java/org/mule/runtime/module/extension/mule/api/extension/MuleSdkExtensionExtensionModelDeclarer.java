@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.annotation.Extension.MULESOFT;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE_URI;
@@ -63,6 +64,7 @@ public class MuleSdkExtensionExtensionModelDeclarer {
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)
         .withCategory(COMMUNITY)
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(MULE_SDK_EXTENSION_DSL_NAMESPACE)

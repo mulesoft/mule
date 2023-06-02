@@ -95,6 +95,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
         context.getExtensionDeclarer()
             .named(parser.getName())
             .onVersion(version)
+            .supportingJavaVersions(parser.getSupportedJavaVersions())
             .fromVendor(parser.getVendor())
             .withCategory(parser.getCategory())
             .withModelProperty(parser.getLicenseModelProperty())
