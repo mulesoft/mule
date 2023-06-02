@@ -6,23 +6,15 @@
  */
 package org.mule.module.scripting;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
-
 import org.mule.api.MuleEvent;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.util.MuleUrlStreamHandlerFactory;
-import org.mule.util.StringUtils;
-import org.mule.util.SystemUtils;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Map;
-
-public class SRubyTestCase extends FunctionalTestCase
+public class JRubyTestCase extends FunctionalTestCase
 {
 
     @Override
@@ -33,23 +25,15 @@ public class SRubyTestCase extends FunctionalTestCase
 
     @Rule
     public SystemProperty jRubyGlobalVar =
-            new SystemProperty("org.jruby.embed.localvariable.behavior", "global");
+      new SystemProperty("org.jruby.embed.localvariable.behavior", "global");
 
-    @Rule
-    public TestRule globalTimeout = createTestTimeoutRule();
 
     private final String key = "message";
     private final String value = "myMessage";
 
-    @Before
-    public void setup() {
-        setDisposeContextPerClass(false);
-    }
-
     @Test
     public void testJRuby() throws Exception
     {
-        System.out.println("system org.jruby.embed.localvariable.behavior:-" + System.getProperty("org.jruby.embed.localvariable.behavior"));
         MuleEvent event = getTestEvent(key);
         event.setFlowVariable(key, value);
 
