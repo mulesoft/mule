@@ -13,6 +13,9 @@
 
     <properties>
         <javaModuleName>org.mule.test.runner</javaModuleName>
+        
+        <javassist.version>3.28.0-GA</javassist.version>
+         
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -23,30 +26,6 @@
                 <filtering>true</filtering>        
             </resource>
         </resources>
-    
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <configuration>
-                    <minimizeJar>true</minimizeJar>
-                    <artifactSet>
-                        <includes>
-                            <!-- Shade spring so it doesn't end as libraries in the APP for testing -->
-                            <include>org.springframework:*</include>
-                        </includes>
-                    </artifactSet>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <dependencies>
@@ -107,8 +86,13 @@
 
         <!-- 3rd party dependencies -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
         </dependency>
 
         <dependency>

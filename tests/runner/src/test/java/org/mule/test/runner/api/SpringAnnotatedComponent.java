@@ -7,12 +7,9 @@
 
 package org.mule.test.runner.api;
 
-import org.springframework.stereotype.Component;
-
 /**
  * Just a class for testing class path scanning.
  */
-@Component
 public class SpringAnnotatedComponent {
 
 }

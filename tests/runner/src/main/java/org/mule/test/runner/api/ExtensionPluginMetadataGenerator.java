@@ -7,7 +7,6 @@
 
 package org.mule.test.runner.api;
 
-import static java.lang.System.getProperty;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.test.runner.api.MulePluginBasedLoaderFinder.META_INF_MULE_PLUGIN;
 import static org.mule.test.runner.utils.RunnerModuleUtils.assureSdkApiInClassLoader;
@@ -15,8 +14,8 @@ import static org.mule.test.runner.utils.TroubleshootingUtils.getLastModifiedDat
 import static org.mule.test.runner.utils.TroubleshootingUtils.getMD5FromFile;
 
 import static java.io.File.separator;
+import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -26,7 +25,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
-import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
@@ -49,11 +47,12 @@ import java.util.Set;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * Generates the {@link Extension} manifest and DSL resources.
@@ -186,20 +185,21 @@ class ExtensionPluginMetadataGenerator {
                 "found. It will pick up the first one, found: {}", plugin, extensionsAnnotatedClasses);
       }
 
-      return extensionsAnnotatedClasses.get(0);
+      return extensionsAnnotatedClasses.iterator().next();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
   }
 
   private Set<String> findUrlClassNames(URL firstURL) throws IOException {
-    ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
-    scanner.addIncludeFilter((mr, mrf) -> true);
-    try (URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
-      scanner.setResourceLoader(new PathMatchingResourcePatternResolver(classLoader));
-      Set<BeanDefinition> extensionsAnnotatedClasses = scanner.findCandidateComponents("");
+    try (final URLClassLoader classLoader = new URLClassLoader(new URL[] {firstURL}, null)) {
+      final ConfigurationBuilder reflectionsConfigBuilder = new ConfigurationBuilder()
+          .setUrls(firstURL)
+          .setScanners(new SubTypesScanner(false), new TypeAnnotationsScanner());
+      reflectionsConfigBuilder.setClassLoaders(new ClassLoader[] {classLoader});
+      Reflections reflections = new Reflections(reflectionsConfigBuilder);
 
-      return extensionsAnnotatedClasses.stream().map(BeanDefinition::getBeanClassName).collect(toSet());
+      return reflections.getAllTypes();
     }
   }
 
