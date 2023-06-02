@@ -125,14 +125,6 @@ public class Flow extends AbstractPipeline implements MessageProcessor, StageNam
         catch (MessagingException e)
         {
             e.setProcessedEvent(createReturnEventForParentFlowConstruct(e.getEvent(), event));
-            StackTraceElement[] stackTraces = e.getStackTrace();
-            for(StackTraceElement element : stackTraces) {
-                System.out.println("===================");
-                System.out.println("Exception occurred in file: " + element.getFileName());
-                System.out.println("At line number: " + element.getLineNumber());
-                System.out.println("In method: " + element.getMethodName() );
-                System.out.println("===================");
-            }
             throw e;
         }
         catch (Exception e)
