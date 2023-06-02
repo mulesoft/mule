@@ -71,7 +71,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
     if (!(event instanceof InternalEvent)) {
       return event;
     }
-    InternalEvent copy = (InternalEvent) CoreEvent.builder(event).build();
+    InternalEvent copy = (InternalEvent) CoreEvent.builder(event).message(event.getMessage()).build();
     setSourcePolicyChildContext(copy, featureFlaggingService);
     return copy;
   }
