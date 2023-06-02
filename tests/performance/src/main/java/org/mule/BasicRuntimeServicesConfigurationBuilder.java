@@ -8,6 +8,7 @@ package org.mule;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+import static org.mule.tck.config.WeaveExpressionLanguageFactoryServiceProvider.provideDefaultExpressionLanguageFactoryService;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleException;
@@ -16,7 +17,6 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 /**
  * Provides the basic {@link Service}s infrastructure required by the Mule runtime to start in embedded mode.
@@ -37,7 +37,7 @@ public class BasicRuntimeServicesConfigurationBuilder extends AbstractConfigurat
       throw new MuleRuntimeException(e);
     }
 
-    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
+    DefaultExpressionLanguageFactoryService weaveExpressionExecutor = provideDefaultExpressionLanguageFactoryService();
     registerObject(muleContext, weaveExpressionExecutor.getName(), weaveExpressionExecutor);
   }
 }
