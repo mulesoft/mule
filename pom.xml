@@ -116,7 +116,7 @@
         <skipPerformanceTests>true</skipPerformanceTests>
         <skipArchetypeTests>true</skipArchetypeTests>
 
-        <skipDistributions>false</skipDistributions>
+        <skipDistributions>true</skipDistributions>
         <skipVerifications>false</skipVerifications>
         <skipInstalls>false</skipInstalls>
 
