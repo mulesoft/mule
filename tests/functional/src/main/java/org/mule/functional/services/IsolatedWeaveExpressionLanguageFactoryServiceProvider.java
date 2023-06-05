@@ -113,7 +113,7 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
   private DefaultExpressionLanguageFactoryService instantiateService(ClassLoader serviceClassLoader) {
     try {
       Class<DefaultExpressionLanguageFactoryService> weaveServiceClass =
-          (Class<DefaultExpressionLanguageFactoryService>) forName(WeaveDefaultExpressionLanguageFactoryService.class.getName(),
+          (Class<DefaultExpressionLanguageFactoryService>) forName("org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService",
                                                                    false, serviceClassLoader);
 
       final Constructor<DefaultExpressionLanguageFactoryService> constructor =
