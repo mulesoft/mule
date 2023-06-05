@@ -57,6 +57,7 @@
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
+            <version>3.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -98,9 +99,9 @@
             <artifactId>allure-junit4</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <classifier>indy</classifier>
+            <version>${groovyVersionBuild}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
