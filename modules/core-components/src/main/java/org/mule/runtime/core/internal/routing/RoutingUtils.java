@@ -11,18 +11,31 @@ import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicyContext;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
+
+/**
+ * Util class for routers
+ */
 public final class RoutingUtils {
 
   private RoutingUtils() {
 
   }
 
+  /**
+   * Changes the {@link SourcePolicyContext} of the given event with a new instance (copy).
+   * 
+   * @param event                  the event to change the {@link SourcePolicyContext}
+   * @param featureFlaggingService The service to check if this change should be performed at all.
+   */
   public static void setSourcePolicyChildContext(InternalEvent event, FeatureFlaggingService featureFlaggingService) {
     EventInternalContext<?> context = event.getSourcePolicyContext();
-    SourcePolicyContext policyContext = (SourcePolicyContext) context;
-    if (context != null) {
-      event.setSourcePolicyContext(policyContext.childContext());
+    if (!(context instanceof SourcePolicyContext)
+        || !featureFlaggingService.isEnabled(CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES)) {
+      return;
     }
+    SourcePolicyContext policyContext = (SourcePolicyContext) context;
+    event.setSourcePolicyContext(policyContext.childContext());
   }
 
 }
