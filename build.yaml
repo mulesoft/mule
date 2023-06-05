@@ -1,3 +1,4 @@
+agentLabel: "windows2019-heavy"
 upstreamProjects:
   Mule-runtime/metadata-model-api/master,
   Mule-runtime/mule-profiling-api/master,
@@ -10,7 +11,6 @@ upstreamProjects:
 # Comment public setting to get oldMuleArtifact 4.2.1 from private repo till we move them to the public Repo
 # Uncomment it after they are copied
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
-agentLabel: "windows2019-heavy"
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
