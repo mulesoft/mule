@@ -8,7 +8,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
@@ -179,7 +179,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
     prepareScenario(applicationFileBuilder, mockDeploymentListener, redeploymentSuccessThrown);
 
-    File configFile = new File(appsDir + "/" + applicationFileBuilder.getDeployedPath(),
+    File configFile = new File(new File(appsDir, applicationFileBuilder.getDeployedPath()),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
     triggerDirectoryWatcher();

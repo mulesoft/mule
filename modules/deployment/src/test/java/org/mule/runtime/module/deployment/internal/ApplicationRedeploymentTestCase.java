@@ -7,15 +7,14 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.callbackExtensionPlugin;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 
-import static java.io.File.separator;
 import static java.util.Arrays.asList;
 
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -38,12 +37,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 /**
  * Contains test for application re-deployment on the default domain
@@ -151,7 +151,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + separator + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File configFile = new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
@@ -170,7 +170,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     reset(applicationDeploymentListener);
 
     File configFile =
-        new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
+        new File(new File(appsDir, emptyAppFileBuilder.getDeployedPath()), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat("Configuration file does not exists", configFile.exists(), is(true));
     assertThat("Could not update last updated time in configuration file",
                configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS), is(true));
@@ -195,7 +195,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     final ReentrantLock lock = deploymentService.getLock();
     lock.lock();
     try {
-      File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+      File configFile = new File(new File(appsDir, incompleteAppFileBuilder.getDeployedPath()),
                                  getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
       assertThat(configFile.exists(), is(true));
       configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
@@ -220,7 +220,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+    File configFile = new File(new File(appsDir, incompleteAppFileBuilder.getDeployedPath()),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     updateFileModifiedTime(configFile.lastModified(), configFile);
 
@@ -239,12 +239,12 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File originalConfigFile = new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                                        getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    deleteQuietly(new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                            getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
     assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
@@ -261,13 +261,13 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File originalConfigFile = new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                                        getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(BROKEN_CONFIG_XML);
     File newConfigFile = new File(url.toURI());
     copyFile(newConfigFile, originalConfigFile);
-    deleteQuietly(new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    deleteQuietly(new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                            getConfigFilePathWithinArtifact(SERIALIZED_ARTIFACT_AST_LOCATION)));
 
     assertApplicationRedeploymentFailure(dummyAppDescriptorFileBuilder.getId());
@@ -283,7 +283,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+    File originalConfigFile = new File(new File(appsDir, incompleteAppFileBuilder.getDeployedPath()),
                                        getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     assertThat(originalConfigFile.exists(), is(true));
     URL url = getClass().getResource(EMPTY_APP_CONFIG_XML);
@@ -310,7 +310,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     ReentrantLock deploymentLock = deploymentService.getLock();
     deploymentLock.lock();
     try {
-      File originalConfigFile = new File(appsDir + "/" + incompleteAppFileBuilder.getDeployedPath(),
+      File originalConfigFile = new File(new File(appsDir, incompleteAppFileBuilder.getDeployedPath()),
                                          getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
       URL url = getClass().getResource(EMPTY_DOMAIN_CONFIG_XML);
       File newConfigFile = new File(url.toURI());
@@ -341,7 +341,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
     reset(applicationDeploymentListener);
 
-    File configFile = new File(appsDir + "/" + dummyAppDescriptorFileBuilder.getDeployedPath(),
+    File configFile = new File(new File(appsDir, dummyAppDescriptorFileBuilder.getDeployedPath()),
                                getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 

@@ -15,9 +15,9 @@ import static org.mule.runtime.deployment.model.api.application.ApplicationStatu
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.DESTROYED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STARTED;
 import static org.mule.runtime.deployment.model.api.application.ApplicationStatus.STOPPED;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_CONFIGURATION_RESOURCE;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -99,13 +99,13 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
-import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.sdk.api.runtime.process.CompletionCallback;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.BufferedReader;
@@ -125,12 +125,13 @@ import java.util.concurrent.ExecutorService;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 /**
  * Contains test for domain deployment
@@ -192,7 +193,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     // change shared config name to use a wrong name
     File domainConfigFile =
-        new File(domainsDir + "/" + sharedBundleDomainFileBuilder.getDeployedPath(),
+        new File(new File(appsDir, sharedBundleDomainFileBuilder.getDeployedPath()),
                  Paths.get("mule", DEFAULT_CONFIGURATION_RESOURCE).toString());
     String correctDomainConfigContent = IOUtils.toString(new FileInputStream(domainConfigFile));
     String wrongDomainFileContext = correctDomainConfigContent.replace("test-shared-config", "test-shared-config-wrong");
@@ -1858,8 +1859,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
     reset(applicationDeploymentListener);
 
-    File originalConfigFile =
-        new File(appsDir + "/" + emptyAppFileBuilder.getDeployedPath(), getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
+    File originalConfigFile = new File(new File(appsDir, emptyAppFileBuilder.getDeployedPath()),
+                                       getConfigFilePathWithinArtifact(MULE_CONFIG_XML_FILE));
     forceDelete(originalConfigFile);
 
     assertDeploymentFailure(applicationDeploymentListener, emptyAppFileBuilder.getId());
