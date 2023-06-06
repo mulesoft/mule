@@ -50,7 +50,7 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
     // Search for DW service in the classpath
     String classPath = getProperty("java.class.path");
     String modulePath = getProperty("jdk.module.path");
-    String pathSeparator = getProperty("path.separator");;
+    String pathSeparator = getProperty("path.separator");
 
     return (modulePath != null
         ? concat(Stream.of(classPath.split(pathSeparator)),
