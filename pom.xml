@@ -156,7 +156,7 @@
 
         <muleBomVersion>4.5.0-SNAPSHOT</muleBomVersion>
 
-        <activemqVersion>5.15.12</activemqVersion>
+        <activemqVersion>5.15.15</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
         <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
