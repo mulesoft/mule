@@ -10,6 +10,7 @@ public final class ExpressionUtils {
 
   private static final String DEFAULT_EXPRESSION_PREFIX = "#[";
   private static final String DEFAULT_EXPRESSION_SUFFIX = "]";
+  private static final String DEFAULT_EXPRESSION_SUFFIX_ADDITIONAL = "]";
 
   private ExpressionUtils() {
     // Empty constructor in order to prevent this class from being accidentally instantiated.

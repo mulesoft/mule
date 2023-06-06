@@ -7,7 +7,7 @@ At the simplest level, Mule applications accept and process messages through sev
 Receive
 =======
 Based on the concept of Event Driven Architecture (EDA), Mule works by responding to messages initiated by external resources (i.e. events). For example, a message can be initiated by an event such as a consumer request from a mobile device, or a change to data in a database, or the creation of a new customer ID in a SaaS application. 
- In every flow, there must be a receiver to accept new messages for processing. Mule uses a message source element to receive messages from one or more external sources, thus triggering the execution of a flow. A transport carries the message along as it passes through the integration and application levels for processing.
+In every flow, there must be a receiver to accept new messages for processing. Mule uses a message source element to receive messages from one or more external sources, thus triggering the execution of a flow. A transport carries the message along as it passes through the integration and application levels for processing.
 
 Transform
 =========
@@ -27,8 +27,8 @@ Get Started
 1. Confirm that you have a [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html) on your local drive, Java SE 8 Update 152.
 
 1. Launch Mule Studio by double-clicking AnypointStudio.app (Mac) or AnypointStudio.exe (Windows).  
-     Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
-     Refer to the [Mule Installation Guide](https://docs.mulesoft.com/mule-runtime/4.1/mule-standalone) for more details. 
+    Launch Mule as a standalone from the command line by executing ./bin/mule (Mac) or mule.bat (Windows). 
+    Refer to the [Mule Installation Guide](https://docs.mulesoft.com/mule-runtime/4.1/mule-standalone) for more details. 
 
 Mule is up and kicking! Check out [Anypoint Exchange](https://www.mulesoft.com/exchange) to explore the potential of Mule.
 
