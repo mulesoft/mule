@@ -24,7 +24,8 @@ public interface WeaveExpressionLanguageFactoryServiceProvider {
 
   public static DefaultExpressionLanguageFactoryService provideDefaultExpressionLanguageFactoryService() {
     final Iterator<WeaveExpressionLanguageFactoryServiceProvider> iterator =
-        load(WeaveExpressionLanguageFactoryServiceProvider.class).iterator();
+        load(WeaveExpressionLanguageFactoryServiceProvider.class,
+             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader()).iterator();
 
     if (iterator.hasNext()) {
       return iterator.next().createDefaultExpressionLanguageFactoryService();
@@ -35,7 +36,8 @@ public interface WeaveExpressionLanguageFactoryServiceProvider {
 
   public static ExpressionLanguageMetadataService provideExpressionLanguageMetadataService() {
     final Iterator<WeaveExpressionLanguageFactoryServiceProvider> iterator =
-        load(WeaveExpressionLanguageFactoryServiceProvider.class).iterator();
+        load(WeaveExpressionLanguageFactoryServiceProvider.class,
+             WeaveExpressionLanguageFactoryServiceProvider.class.getClassLoader()).iterator();
 
     if (iterator.hasNext()) {
       return iterator.next().createExpressionLanguageMetadataService();

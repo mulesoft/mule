@@ -8,6 +8,7 @@ package org.mule.functional.services;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 
 import static java.lang.Class.forName;
 import static java.lang.System.getProperty;
@@ -22,7 +23,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
-import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 import org.mule.tck.config.WeaveExpressionLanguageFactoryServiceProvider;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
@@ -96,18 +96,23 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
       throw new IllegalStateException("Couldn't unpack mule-service-weave", e);
     }
 
-    final ClassLoaderConfiguration serviceClassLaoderConfiguration;
-    try {
-      serviceClassLaoderConfiguration =
-          new LibFolderClassLoaderConfigurationLoader().load(serviceExplodedDir, emptyMap(), SERVICE);
-    } catch (InvalidDescriptorLoaderException e) {
-      throw new IllegalStateException("Couldn't create descriptor for mule-service-weave", e);
-    }
+    final ClassLoaderConfiguration serviceClassLaoderConfiguration = getClassLoaderConfiguration(serviceExplodedDir);
 
     ServiceDescriptor descriptor = new ServiceDescriptor("mule-service-weave");
     descriptor.setClassLoaderConfiguration(serviceClassLaoderConfiguration);
 
     return createServiceClassLoader(descriptor);
+  }
+
+  private static ClassLoaderConfiguration getClassLoaderConfiguration(File serviceExplodedDir) {
+    final ClassLoaderConfiguration serviceClassLaoderConfiguration;
+    try {
+      serviceClassLaoderConfiguration =
+          serviceClassLoaderConfigurationLoader().load(serviceExplodedDir, emptyMap(), SERVICE);
+    } catch (InvalidDescriptorLoaderException e) {
+      throw new IllegalStateException("Couldn't create descriptor for mule-service-weave", e);
+    }
+    return serviceClassLaoderConfiguration;
   }
 
   private static ClassLoader createServiceClassLoader(ServiceDescriptor descriptor) {

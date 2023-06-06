@@ -7,8 +7,10 @@
 
 package org.mule.test.runner.api;
 
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.loadServiceModel;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -19,7 +21,6 @@ import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
-import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 
 import java.io.File;
@@ -30,7 +31,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -55,6 +55,7 @@ public class ServiceResourcesResolver {
 
           // In the test runner we already have the Maven artifact of the service available,
           // no need to use a loader to get that again.
+          @Override
           protected BundleDescriptor getBundleDescriptor(File serviceFolder,
                                                          MuleServiceModel artifactModel,
                                                          Optional<Properties> deploymentProperties) {
@@ -84,8 +85,8 @@ public class ServiceResourcesResolver {
                                                                          MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
                                                                          BundleDescriptor bundleDescriptor) {
             try {
-              return new LibFolderClassLoaderConfigurationLoader().load(serviceFolder, Collections.emptyMap(),
-                                                                        getArtifactType());
+              return serviceClassLoaderConfigurationLoader().load(serviceFolder, emptyMap(),
+                                                                  getArtifactType());
             } catch (InvalidDescriptorLoaderException e) {
               throw new IllegalArgumentException(e);
             }
