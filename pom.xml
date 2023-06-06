@@ -161,7 +161,6 @@
         <derbyVersion>10.14.2.0</derbyVersion>
         <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
-        <awaitilityVersion>1.7.0</awaitilityVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
