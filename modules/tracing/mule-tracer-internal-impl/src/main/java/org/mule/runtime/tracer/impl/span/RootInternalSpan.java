@@ -15,7 +15,6 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.impl.context.DeferredEndSpanWrapper;
 
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public SpanIdentifier getIdentifier() {
-    return null;
+    return SpanIdentifier.INVALID_SPAN_IDENTIFIER;
   }
 
   @Override
@@ -88,11 +87,6 @@ public class RootInternalSpan implements InternalSpan {
   }
 
   @Override
-  public SpanExporter getSpanExporter() {
-    return null;
-  }
-
-  @Override
   public int getAttributesCount() {
     return attributes.size();
   }
@@ -102,21 +96,19 @@ public class RootInternalSpan implements InternalSpan {
     return emptyMap();
   }
 
-
   @Override
-  public InternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
+  public InternalSpan onChild(InternalSpan child) {
     if (!ROOT_SPAN.equals(name)) {
-      internalSpan.updateRootName(name);
-      attributes.forEach(internalSpan::setRootAttribute);
+      child.updateRootName(name);
+      attributes.forEach(child::setRootAttribute);
     }
-
-    if (managedChildSpan) {
-      internalSpan.getSpanExporter().updateParentSpanFrom(serializeAsMap());
-      managedSpan = new DeferredEndSpanWrapper(internalSpan);
+    if (managedChildSpan && child instanceof ExportOnEndExecutionSpan) {
+      ((ExportOnEndExecutionSpan) child).getSpanExporter().updateParentSpanFrom(serializeAsMap());
+      managedSpan = new DeferredEndSpanWrapper(child);
       return managedSpan;
+    } else {
+      return child;
     }
-
-    return internalSpan;
   }
 
   @Override

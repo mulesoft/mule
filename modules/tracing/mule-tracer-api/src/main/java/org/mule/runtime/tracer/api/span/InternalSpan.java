@@ -14,7 +14,6 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.List;
 import java.util.Map;
@@ -81,21 +80,6 @@ public interface InternalSpan extends Span {
 
 
   /**
-   * Gets the span exporter
-   *
-   * @return the span exporter.
-   */
-  SpanExporter getSpanExporter();
-
-
-  /**
-   * Updates the child {@link InternalSpan}.
-   *
-   * @param childInternalSpan the child {@link InternalSpan}.
-   */
-  InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan);
-
-  /**
    * Performs the {@param biConsumer} operation on each key/value
    *
    * @param biConsumer the operation to apply.
@@ -133,6 +117,7 @@ public interface InternalSpan extends Span {
    */
   int getAttributesCount();
 
+  InternalSpan onChild(InternalSpan child);
 
   /**
    * A wrapper as InternalSpan for other type of {@link Span}
@@ -196,16 +181,6 @@ public interface InternalSpan extends Span {
     }
 
     @Override
-    public SpanExporter getSpanExporter() {
-      return null;
-    }
-
-    @Override
-    public InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
-      return childInternalSpan;
-    }
-
-    @Override
     public void forEachAttribute(BiConsumer<String, String> biConsumer) {
       // Nothing to do.
     }
@@ -218,6 +193,11 @@ public interface InternalSpan extends Span {
     @Override
     public int getAttributesCount() {
       return 0;
+    }
+
+    @Override
+    public InternalSpan onChild(InternalSpan child) {
+      return child;
     }
   }
 }

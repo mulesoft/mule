@@ -47,7 +47,7 @@ public interface SpanExporter {
     }
 
     @Override
-    public SpanIdentifier getSpanIdentifierBasedOnExport() {
+    public SpanIdentifier getSpanIdentifier() {
       return INVALID_SPAN_IDENTIFIER;
     }
   };
@@ -125,5 +125,5 @@ public interface SpanExporter {
   /**
    * @return a {@link SpanIdentifier} based on the export.
    */
-  SpanIdentifier getSpanIdentifierBasedOnExport();
+  SpanIdentifier getSpanIdentifier();
 }

@@ -105,7 +105,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private List<EventData> errorEvents = emptyList();
   private String overriddenSpanName;
   private Set<String> noExportUntil;
-  private OpenTelemetrySpanExporter rootSpan = this;
+  private OpenTelemetrySpanExporter rootSpanExporter = this;
   private String rootName;
   private String endThreadNameValue;
 
@@ -185,8 +185,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void updateNameForExport(String newName) {
-    if (rootSpan != this) {
-      rootSpan.updateNameForExport(newName);
+    if (rootSpanExporter != this) {
+      rootSpanExporter.updateNameForExport(newName);
     } else {
       overriddenSpanName = newName;
     }
@@ -233,7 +233,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   }
 
   @Override
-  public SpanIdentifier getSpanIdentifierBasedOnExport() {
+  public SpanIdentifier getSpanIdentifier() {
     if (spanContext.isValid()) {
       return new OpentelemetrySpanIdentifier(spanContext.getSpanId(), spanContext.getTraceId());
     } else {
@@ -253,7 +253,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       if (!childOpenTelemetrySpanExporter.exportable) {
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.setRootName(rootName);
         return;
@@ -262,7 +262,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       // If it is a policy span, propagate the rootSpan.
       if (childOpenTelemetrySpanExporter.isPolicySpan) {
         childOpenTelemetrySpanExporter.setRootName(rootName);
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
       }
 
       // Propagates the root name until it finds a root.
@@ -279,7 +279,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
         childOpenTelemetrySpanExporter.exportable = false;
       }
 
@@ -326,12 +326,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void onAdditionalAttribute(String key, String value) {
     if (key.equals(SPAN_KIND)) {
-      rootSpan.spanKind = SpanKind.valueOf(value);
+      rootSpanExporter.spanKind = SpanKind.valueOf(value);
     } else if (key.equals(STATUS)) {
       StatusCode statusCode = StatusCode.valueOf(value);
-      rootSpan.statusData = StatusData.create(statusCode, null);
-    } else if (isPolicySpan && !rootSpan.equals(this)) {
-      rootSpan.internalSpan.addAttribute(key, value);
+      rootSpanExporter.statusData = StatusData.create(statusCode, null);
+    } else if (isPolicySpan  && !rootSpanExporter.equals(this)) {
+      rootSpanExporter.internalSpan.addAttribute(key, value);
     }
   }
 

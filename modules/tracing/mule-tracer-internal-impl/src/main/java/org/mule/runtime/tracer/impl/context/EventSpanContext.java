@@ -65,8 +65,9 @@ public class EventSpanContext implements SpanContext {
 
   @Override
   public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
+    // TODO: W-13222794 Migrate this assertion away from this context.
     assertion.assertOnSpan(currentSpan);
-    this.currentSpan = currentSpan.updateChildSpanExporter(span);
+    this.currentSpan = span;
   }
 
   @Override
