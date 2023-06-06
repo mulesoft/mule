@@ -31,11 +31,8 @@ public class TracingLevelExportInfo {
     this.spanIdentifier = spanIdentifier;
   }
 
-  private InitialExportInfo getInitialExportInfo() {
-    if (this.spanIdentifier instanceof Component) {
-      return this.initialExportInfoProvider.getInitialExportInfo((Component) spanIdentifier);
-    }
-    return this.initialExportInfoProvider.getInitialExportInfo((String) spanIdentifier);
+  public boolean isOverride() {
+    return this.isOverride;
   }
 
   public boolean isExportable() {
@@ -46,8 +43,11 @@ public class TracingLevelExportInfo {
     return getInitialExportInfo().noExportUntil();
   }
 
-  public boolean isOverride() {
-    return this.isOverride;
+  private InitialExportInfo getInitialExportInfo() {
+    if (this.spanIdentifier instanceof Component) {
+      return this.initialExportInfoProvider.getInitialExportInfo((Component) spanIdentifier);
+    }
+    return this.initialExportInfoProvider.getInitialExportInfo((String) spanIdentifier);
   }
 
   public void propagateExportInfo(TracingLevelExportInfo tracingLevelExportInfo) {
