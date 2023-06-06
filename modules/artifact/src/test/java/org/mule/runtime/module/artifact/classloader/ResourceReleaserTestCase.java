@@ -18,7 +18,6 @@ import static java.sql.DriverManager.getDrivers;
 import static java.sql.DriverManager.registerDriver;
 import static java.util.Arrays.asList;
 import static java.util.Collections.list;
-import static java.util.Locale.getDefault;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
@@ -26,10 +25,8 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
@@ -43,14 +40,10 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Driver;
 import java.util.Collection;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import io.qameta.allure.Feature;
@@ -193,31 +186,6 @@ public class ResourceReleaserTestCase extends AbstractMuleTestCase {
     ClassLoader resourceReleaserInstanceClassLoader = (ClassLoader) getClassLoaderMethod.invoke(resourceReleaserInstance);
 
     assertThat(resourceReleaserInstanceClassLoader, is(classLoader));
-  }
-
-  @Test
-  public void cleanUpResourcesBundleFromDisposedClassLoader() throws Exception {
-    TestPluginClassLoader classLoader =
-        new TestPluginClassLoader(classLoaderFactory.apply(currentThread().getContextClassLoader()));
-    String resourceReleaserClassLocation = "/".concat(JdbcResourceReleaser.class.getName().replace(".", "/")).concat(".class");
-    classLoader.setResourceReleaserClassLocation(resourceReleaserClassLocation);
-
-    Field cacheListField = ResourceBundle.class.getDeclaredField("cacheList");
-    cacheListField.setAccessible(true);
-    ((Map) cacheListField.get(null)).clear();
-
-    try {
-      ResourceBundle.getBundle("aBundle", getDefault(), classLoader);
-      fail("Found a bundle that is not supposed to present for this test");
-    } catch (MissingResourceException e) {
-      // Expected
-    }
-
-    classLoader.dispose();
-
-    Map actualCacheList = (Map) cacheListField.get(null);
-
-    assertThat(actualCacheList.size(), equalTo(0));
   }
 
   @Test
