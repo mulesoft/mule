@@ -10,6 +10,7 @@ package org.mule.runtime.core.internal.routing;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
+import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
@@ -28,6 +29,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.split.SplittingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -92,6 +94,8 @@ public class ParallelForEach extends AbstractForkJoinRouter {
         .map(partTypedValue -> CoreEvent.builder(event)
             .message(createMessage(partTypedValue, event))
             .build())
+        .cast(InternalEvent.class)
+        .doOnNext(evt -> setSourcePolicyChildContext(evt, featureFlaggingService))
         .map(partEvent -> of(partEvent, nestedChain));
   }
 
