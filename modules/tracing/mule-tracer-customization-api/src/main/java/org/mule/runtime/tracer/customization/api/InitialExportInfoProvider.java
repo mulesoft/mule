@@ -41,6 +41,4 @@ public interface InitialExportInfoProvider {
    * @return {@link InitialExportInfo} for a component.
    */
   InitialExportInfo getInitialExportInfo(String spanName, boolean debugLevel);
-
-  boolean isOverride();
 }

@@ -6,63 +6,36 @@
  */
 package org.mule.runtime.tracer.customization.impl.export;
 
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
-import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 
 import java.util.Set;
 
 public class ExecutionInitialExportInfo implements InitialExportInfo {
 
-  private InitialExportInfoProvider initialExportInfoProvider;
-  private boolean exportable;
-  private Set<String> resetSpans;
-  private final Object spanIdentifier;
+  private final TracingLevelExportInfo tracingLevelExportInfo;
 
-  public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, Component component) {
-    this.initialExportInfoProvider = initialExportInfoProvider;
-    this.exportable = initialExportInfoProvider.getInitialExportInfo(component).isExportable();
-    this.resetSpans = initialExportInfoProvider.getInitialExportInfo(component).noExportUntil();
-    this.spanIdentifier = component;
-  }
-
-  public ExecutionInitialExportInfo(InitialExportInfoProvider initialExportInfoProvider, String name) {
-    this.initialExportInfoProvider = initialExportInfoProvider;
-    this.exportable = initialExportInfoProvider.getInitialExportInfo(name).isExportable();
-    this.resetSpans = initialExportInfoProvider.getInitialExportInfo(name).noExportUntil();
-    this.spanIdentifier = name;
+  public ExecutionInitialExportInfo(TracingLevelExportInfo tracingLevelExportInfo) {
+    this.tracingLevelExportInfo = tracingLevelExportInfo;
   }
 
   @Override
   public boolean isExportable() {
-    return this.exportable;
+    return this.tracingLevelExportInfo.isExportable();
   }
 
   @Override
   public Set<String> noExportUntil() {
-    return resetSpans;
+    return this.tracingLevelExportInfo.noExportUntil();
   }
 
   @Override
   public void propagateInitialExportInfo(InitialExportInfo parentInitialExportInfo) {
-    InitialExportInfoProvider parentInitialExportInfoProvider =
-        ((ExecutionInitialExportInfo) parentInitialExportInfo).getInitialExportInfoProvider();
-
-    if (parentInitialExportInfoProvider.isOverride() && !this.initialExportInfoProvider.isOverride()) {
-      this.initialExportInfoProvider = parentInitialExportInfoProvider;
-
-      if (this.spanIdentifier instanceof Component) {
-        this.exportable = parentInitialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).isExportable();
-        this.resetSpans = parentInitialExportInfoProvider.getInitialExportInfo(((Component) this.spanIdentifier)).noExportUntil();
-      } else {
-        this.exportable = parentInitialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).isExportable();
-        this.resetSpans = parentInitialExportInfoProvider.getInitialExportInfo(((String) this.spanIdentifier)).noExportUntil();
-      }
-    }
+    ExecutionInitialExportInfo parentExecutionInitialExportInfo = ((ExecutionInitialExportInfo) parentInitialExportInfo);
+    this.tracingLevelExportInfo.propagateExportInfo(parentExecutionInitialExportInfo.getTracingLevelExportInfo());
   }
 
-  public InitialExportInfoProvider getInitialExportInfoProvider() {
-    return this.initialExportInfoProvider;
+  public TracingLevelExportInfo getTracingLevelExportInfo() {
+    return this.tracingLevelExportInfo;
   }
 
 }

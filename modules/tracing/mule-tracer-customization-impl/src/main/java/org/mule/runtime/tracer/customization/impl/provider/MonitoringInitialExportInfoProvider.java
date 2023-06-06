@@ -38,8 +38,6 @@ import java.util.Map;
  */
 public class MonitoringInitialExportInfoProvider extends AbstractInitialExportInfoProvider {
 
-  private boolean isOverride = false;
-
   private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
 
     {
@@ -58,15 +56,6 @@ public class MonitoringInitialExportInfoProvider extends AbstractInitialExportIn
     }
   };
 
-  public MonitoringInitialExportInfoProvider() {
-    super();
-  }
-
-  public MonitoringInitialExportInfoProvider(boolean isOverride) {
-    super();
-    this.isOverride = isOverride;
-  }
-
   @Override
   protected InitialExportInfo doGetInitialExportInfoForDebugLevel() {
     return NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
@@ -80,10 +69,5 @@ public class MonitoringInitialExportInfoProvider extends AbstractInitialExportIn
   @Override
   protected Map<String, InitialExportInfo> getInitialExportInfoMapByName() {
     return initialExportInfoMapByName;
-  }
-
-  @Override
-  public boolean isOverride() {
-    return isOverride;
   }
 }

@@ -16,6 +16,7 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
+import org.mule.runtime.tracer.customization.impl.export.TracingLevelExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
@@ -50,7 +51,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialisedAttributes = true;
     }
     String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(location));
+    return new ExecutionInitialSpanInfo(component, apiId, getTracingLevelExportInfo(location));
   }
 
   @Override
@@ -61,7 +62,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialisedAttributes = true;
     }
     String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, getInitialExportInfoProvider(location), null, suffix);
+    return new ExecutionInitialSpanInfo(component, apiId, getTracingLevelExportInfo(location), null, suffix);
   }
 
   @Override
@@ -72,7 +73,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialisedAttributes = true;
     }
     String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getInitialExportInfoProvider(location));
+    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getTracingLevelExportInfo(location));
   }
 
   public void initialiseAttributes() {
@@ -81,23 +82,23 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
   }
 
-  private InitialExportInfoProvider getInitialExportInfoProvider(String location) {
+  private TracingLevelExportInfo getTracingLevelExportInfo(String location) {
     TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
     TracingLevel tracingLevelOverride = tracingLevelConfiguration.getTracingLevelOverride(location);
     if (!tracingLevelOverride.equals(tracingLevel)) {
-      return resolveInitialExportInfoProvider(tracingLevelOverride, true);
+      return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevelOverride), true);
     }
-    return resolveInitialExportInfoProvider(tracingLevel, false);
+    return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevel), false);
   }
 
-  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel, boolean isOverride) {
+  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
     switch (tracingLevel) {
       case OVERVIEW:
-        return new OverviewInitialExportInfoProvider(isOverride);
+        return new OverviewInitialExportInfoProvider();
       case DEBUG:
-        return new DebugInitialExportInfoProvider(isOverride);
+        return new DebugInitialExportInfoProvider();
       default:
-        return new MonitoringInitialExportInfoProvider(isOverride);
+        return new MonitoringInitialExportInfoProvider();
     }
   }
 }
