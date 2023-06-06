@@ -6,9 +6,10 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static com.jayway.awaitility.Awaitility.await;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+
+import static org.awaitility.Awaitility.await;
 
 import java.io.Closeable;
 import java.io.File;
@@ -20,10 +21,11 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.drda.NetworkServerControl;
-import org.junit.rules.ExternalResource;
-import org.junit.rules.TestRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.junit.rules.ExternalResource;
+import org.junit.rules.TestRule;
 
 /**
  * A {@link TestRule} which starts an apache {@link NetworkServerControl}.
@@ -62,7 +64,7 @@ public class DerbyServer extends ExternalResource implements Closeable {
   private static final String HOST = "127.0.0.1";
   private static Logger logger = LoggerFactory.getLogger(DerbyServer.class);
   private NetworkServerControl server;
-  private int port;
+  private final int port;
 
   public DerbyServer(int port) {
     setProperty(DERBY_SYSTEM_HOME, DERBY_HOME);
