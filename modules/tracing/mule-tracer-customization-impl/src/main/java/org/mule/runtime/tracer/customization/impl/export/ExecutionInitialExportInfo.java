@@ -10,6 +10,12 @@ import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 
 import java.util.Set;
 
+/**
+ * An implementation of {@link InitialExportInfo} for the execution. It manages the tracing level export information necessary and
+ * can propagate the export information from its parent's InitialExportInfo.
+ *
+ * @since 4.5.0
+ */
 public class ExecutionInitialExportInfo implements InitialExportInfo {
 
   private final TracingLevelExportInfo tracingLevelExportInfo;
