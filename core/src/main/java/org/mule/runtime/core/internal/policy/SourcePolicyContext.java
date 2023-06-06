@@ -18,6 +18,7 @@ import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,6 +64,22 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
   @Override
   public SourcePolicyContext copy() {
     return this;
+  }
+
+  public SourcePolicyContext childContext() {
+    SourcePolicyContext child = new SourcePolicyContext(pointcutParameters);
+    child.variables.putAll(this.variables);
+    child.parametersTransformer = this.parametersTransformer;
+    if (this.originalFailureResponseParameters != null) {
+      child.originalResponseParameters = new HashMap<>();
+      child.originalResponseParameters.putAll(this.originalFailureResponseParameters);
+    }
+    if (this.originalFailureResponseParameters != null) {
+      child.originalFailureResponseParameters = new HashMap<>();
+      child.originalFailureResponseParameters.putAll(this.originalFailureResponseParameters);
+    }
+    child.originalEvent = this.originalEvent;
+    return child;
   }
 
   public PolicyPointcutParameters getPointcutParameters() {

@@ -22,6 +22,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.core.internal.util.rx.Operators.requestUnbounded;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
@@ -32,6 +33,7 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -56,6 +58,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultMuleSession;
@@ -95,6 +98,8 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private SchedulerService schedulerService;
   @Inject
   private ConfigurationComponentLocator componentLocator;
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -217,7 +222,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
         .doOnNext(request -> {
 
           Flux<CoreEvent> asyncPublisher = just(request)
-              .map(event -> asyncEvent(event));
+              .map(this::asyncEvent);
 
           if (isTransactionActive() && !processingStrategy.isSynchronous()) {
             asyncPublisher = asyncPublisher.publishOn(fromExecutorService(reactorScheduler));
@@ -243,10 +248,12 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   }
 
   private CoreEvent asyncEvent(PrivilegedEvent event) {
-    // Clone event, make it async and remove ReplyToHandler
-    return PrivilegedEvent
+    // Clone event, make it async, remove ReplyToHandler and set child SourcePolicyContext
+    InternalEvent copy = (InternalEvent) PrivilegedEvent
         .builder(child((event.getContext()), ofNullable(getLocation()), LoggingExceptionHandler.getInstance()), event)
         .session(new DefaultMuleSession(event.getSession())).build();
+    setSourcePolicyChildContext(copy, featureFlaggingService);
+    return copy;
   }
 
   private ReactiveProcessor processAsyncChainFunction() {

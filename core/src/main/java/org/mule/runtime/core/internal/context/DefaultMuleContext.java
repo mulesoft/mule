@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
@@ -327,6 +328,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureRethrowExceptionsInIdempotentMessageValidator();
       configureHonourInsecureTlsConfiguration();
       configureUseTransactionSinkIndex();
+      configureCreateChildPolicyContextForParallelScopes();
     }
   }
 
@@ -1417,6 +1419,16 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
                                                 minMuleVersion("4.5.0"));
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES} feature flag.
+   *
+   * @since 4.5.0, 4.4.0-202406
+   */
+  private static void configureCreateChildPolicyContextForParallelScopes() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES, minMuleVersion("4.5.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
