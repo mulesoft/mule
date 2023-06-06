@@ -282,7 +282,7 @@ public final class ExtensionsOAuthUtils {
     }
 
     OAuthConnectionProviderWrapper oauthConnectionProvider = getOAuthConnectionProvider(connectionProvider);
-    if (connectionProvider == null) {
+    if (oauthConnectionProvider == null) {
       return false;
     }
 
