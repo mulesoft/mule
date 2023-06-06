@@ -9,7 +9,9 @@ package org.mule.tck.config;
 import static java.util.ServiceLoader.load;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
+import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.util.Iterator;
 
@@ -31,6 +33,19 @@ public interface WeaveExpressionLanguageFactoryServiceProvider {
     }
   }
 
+  public static ExpressionLanguageMetadataService provideExpressionLanguageMetadataService() {
+    final Iterator<WeaveExpressionLanguageFactoryServiceProvider> iterator =
+        load(WeaveExpressionLanguageFactoryServiceProvider.class).iterator();
+
+    if (iterator.hasNext()) {
+      return iterator.next().createExpressionLanguageMetadataService();
+    } else {
+      return new WeaveExpressionLanguageMetadataServiceImpl();
+    }
+  }
+
   DefaultExpressionLanguageFactoryService createDefaultExpressionLanguageFactoryService();
+
+  ExpressionLanguageMetadataService createExpressionLanguageMetadataService();
 
 }
