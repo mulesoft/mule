@@ -16,7 +16,7 @@ public class TracingLevelExportInfo {
 
   private InitialExportInfoProvider initialExportInfoProvider;
   private Object spanIdentifier;
-  private final boolean isOverride;
+  private boolean isOverride;
 
   public TracingLevelExportInfo(InitialExportInfoProvider initialExportInfoProvider, boolean isOverride) {
     this.initialExportInfoProvider = initialExportInfoProvider;
@@ -53,6 +53,7 @@ public class TracingLevelExportInfo {
   public void propagateExportInfo(TracingLevelExportInfo tracingLevelExportInfo) {
     if (!isOverride() && tracingLevelExportInfo.isOverride()) {
       this.initialExportInfoProvider = tracingLevelExportInfo.getInitialExportInfoProvider();
+      this.isOverride = true;
     }
   }
 
