@@ -76,6 +76,9 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private final boolean addToolingObjectsToRegistry;
   private final boolean ignoreCaches;
 
+  // ignoreCachesService is something new
+  private final boolean ignoreCachesService;
+
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
 
   private ArtifactDeclaration artifactDeclaration;

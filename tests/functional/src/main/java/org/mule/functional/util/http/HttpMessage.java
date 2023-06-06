@@ -33,8 +33,8 @@ public class HttpMessage {
     queryParams = queryToMap(httpExchange.getRequestURI().getQuery());
   }
 
-  public byte[] getBody() {
-    return body;
+  public byte[] getPath2() {
+    return path;
   }
 
   public Multimap<String, String> getHeaders() {

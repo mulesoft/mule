@@ -31,9 +31,6 @@ module org.mule.runtime.extension.model {
   requires com.google.common;
   requires com.google.gson;
 
-  exports org.mule.runtime.core.api.error;
-  exports org.mule.runtime.core.api.extension.provider;
-
   provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
       org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
 
