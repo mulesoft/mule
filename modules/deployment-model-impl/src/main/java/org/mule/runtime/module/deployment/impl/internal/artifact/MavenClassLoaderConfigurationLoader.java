@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
@@ -21,7 +23,6 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationL
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderConfigurationLoader;
-import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
 import java.io.File;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
 
   private DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader;
   private PluginMavenClassLoaderConfigurationLoader pluginMavenClassLoaderConfigurationLoader;
-  private LibFolderClassLoaderConfigurationLoader libFolderClassLoaderConfigurationLoader;
+  private ClassLoaderConfigurationLoader libFolderClassLoaderConfigurationLoader;
   private volatile MavenConfiguration mavenRuntimeConfig;
 
   private final StampedLock lock = new StampedLock();
@@ -72,7 +73,7 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
     deployableMavenClassLoaderConfigurationLoader = new DeployableMavenClassLoaderConfigurationLoader(mavenClient);
     pluginMavenClassLoaderConfigurationLoader = new PluginMavenClassLoaderConfigurationLoader(mavenClient);
 
-    libFolderClassLoaderConfigurationLoader = new LibFolderClassLoaderConfigurationLoader();
+    libFolderClassLoaderConfigurationLoader = serviceClassLoaderConfigurationLoader();
   }
 
   @Override

@@ -14,6 +14,9 @@ import static java.lang.System.getProperty;
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +31,10 @@ import org.slf4j.LoggerFactory;
 public class ServiceClassLoaderFactoryProvider {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassLoaderFactoryProvider.class);
+
+  public static ClassLoaderConfigurationLoader serviceClassLoaderConfigurationLoader() {
+    return new LibFolderClassLoaderConfigurationLoader();
+  }
 
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
     if (useModuleLayer()) {

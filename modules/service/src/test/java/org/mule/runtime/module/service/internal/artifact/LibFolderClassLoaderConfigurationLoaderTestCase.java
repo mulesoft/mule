@@ -7,35 +7,40 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+import static org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader.LIB_FOLDER;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
+
 import static java.util.Collections.emptyMap;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.ArrayMatching.hasItemInArray;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader.LIB_FOLDER;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
 import java.net.URL;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Stories({@Story(CLASSLOADER_CONFIGURATION_LOADER), @Story(CLASSLOADER_CONFIGURATION)})
@@ -45,7 +50,7 @@ public class LibFolderClassLoaderConfigurationLoaderTestCase extends AbstractMul
 
   @Rule
   public TemporaryFolder serviceFolder = new TemporaryFolder();
-  private LibFolderClassLoaderConfigurationLoader classLoaderConfigurationLoader = new LibFolderClassLoaderConfigurationLoader();
+  private final ClassLoaderConfigurationLoader classLoaderConfigurationLoader = serviceClassLoaderConfigurationLoader();
   private ServiceDescriptor descriptor;
 
   @Before

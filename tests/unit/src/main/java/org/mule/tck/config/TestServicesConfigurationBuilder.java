@@ -10,6 +10,7 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SCHEDULER_BASE_CONFIG;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.tck.config.WeaveExpressionLanguageFactoryServiceProvider.provideDefaultExpressionLanguageFactoryService;
 
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
@@ -40,7 +41,6 @@ import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.HttpServerFactory;
 import org.mule.runtime.http.api.server.ServerCreationException;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -156,7 +156,7 @@ public class TestServicesConfigurationBuilder extends AbstractConfigurationBuild
     // Still have to recreate ever once in a while so global bindings added for each test are accumulated.
     if (cachedExprLanguageFactory == null || cachedExprLanguageFactoryCounter > 20) {
       cachedExprLanguageFactoryCounter = 0;
-      final DefaultExpressionLanguageFactoryService exprExecutor = new WeaveDefaultExpressionLanguageFactoryService(null);
+      final DefaultExpressionLanguageFactoryService exprExecutor = provideDefaultExpressionLanguageFactoryService();
       ExpressionLanguage exprLanguage = exprExecutor.create();
       // Force initialization of internal DataWeave stuff
       // This way we avoid doing some heavy initialization on the test itself,
