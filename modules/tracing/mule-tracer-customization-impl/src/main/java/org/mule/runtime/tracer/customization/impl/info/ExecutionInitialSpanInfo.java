@@ -39,7 +39,12 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   private final String name;
   // TODO: W-13313594 Should remove this property
+
+  // This is true when the span is a component "root" span this means, the first span of the hierarchy created as a consequence of
+  // a component's execution.
   private final boolean isPolicySpan;
+
+  // This is true when the span in question is a Flow span
   private final boolean rootSpan;
   private final String location;
   private final String apiId;

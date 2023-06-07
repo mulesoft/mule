@@ -264,7 +264,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
       // If it is a policy span, propagate the rootSpan.
       if (childOpenTelemetrySpanExporter.isPolicySpan) {
-        childOpenTelemetrySpanExporter.setRootName(rootName);
         childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
       }
 
