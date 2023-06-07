@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -45,6 +46,7 @@ import static org.slf4j.event.Level.INFO;
 import static org.slf4j.event.Level.WARN;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -63,6 +65,7 @@ import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
@@ -316,6 +319,20 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.initialise();
     messageSource.start();
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(2)).onStart(sourceCallback);
+      verify(source, times(1)).onStop();
+      return true;
+    }));
+  }
+
+  @Test
+  public void failOnExceptionWithAccessTokenExpiredExceptionInConnectionExceptionAndGetsReconnected() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(mock(ConnectionProvider.class)));
+    messageSource.onException(new ConnectionException(new AccessTokenExpiredException(ERROR_MESSAGE)));
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verify(source, times(2)).onStart(sourceCallback);
