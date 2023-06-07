@@ -7,7 +7,6 @@
 package org.mule.runtime.tracer.impl.span;
 
 import static java.util.Objects.requireNonNull;
-import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import static java.util.Collections.emptyList;
@@ -38,7 +37,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
   private final InitialSpanInfo initialSpanInfo;
-  private SpanExporter spanExporter = NOOP_EXPORTER;
+  private final SpanExporter spanExporter;
   private SpanError lastError;
   private final InternalSpan parent;
   private final Long startTime;
