@@ -35,6 +35,8 @@
                             <artifactSet>
                                 <includes>
                                     <includes>org.apache.activemq:*</includes>
+                                    <includes>org.fusesource.hawtbuf:hawtbuf</includes>
+                                    <includes>jakarta.management.j2ee:jakarta.management.j2ee-api</includes>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -76,6 +78,12 @@
             <groupId>org.fusesource.hawtbuf</groupId>
             <artifactId>hawtbuf</artifactId>
             <version>${hawtbufVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.management.j2ee</groupId>
+            <artifactId>jakarta.management.j2ee-api</artifactId>
+            <version>1.1.4</version>
         </dependency>
     </dependencies>
 </project>
