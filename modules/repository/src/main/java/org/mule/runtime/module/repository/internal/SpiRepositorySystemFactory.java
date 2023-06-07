@@ -7,10 +7,8 @@
 package org.mule.runtime.module.repository.internal;
 
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
-import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.DefaultVersionRangeResolver;
 import org.apache.maven.repository.internal.DefaultVersionResolver;
-import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
@@ -38,7 +36,6 @@ public class SpiRepositorySystemFactory implements RepositorySystemFactory {
     locator.addService(VersionResolver.class, DefaultVersionResolver.class);
     locator.addService(VersionRangeResolver.class, DefaultVersionRangeResolver.class);
     locator.addService(ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class);
-    locator.addService(ModelCacheFactory.class, DefaultModelCacheFactory.class);
     locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
 
       @Override
