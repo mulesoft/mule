@@ -60,12 +60,17 @@
             <artifactId>commons-exec</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.jayway.awaitility</groupId>
+            <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+            <version>${awaitilityVersion}</version>
             <exclusions>
                <exclusion>
-                   <groupId>cglib</groupId>
-                   <artifactId>cglib-nodep</artifactId>
+                   <groupId>org.hamcrest</groupId>
+                   <artifactId>hamcrest-library</artifactId>
+               </exclusion>
+               <exclusion>
+                   <groupId>org.hamcrest</groupId>
+                   <artifactId>hamcrest-core</artifactId>
                </exclusion>
             </exclusions>
         </dependency>

@@ -15,9 +15,8 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matcher that allows to validate if a regex matches the content of a file.
@@ -26,7 +25,6 @@ public class FileContainsRegex extends TypeSafeMatcher<File> {
 
   private final Pattern pattern;
 
-  @Factory
   public static Matcher<File> matchesRegex(String fileLocation) {
     return new FileContainsRegex(fileLocation);
   }

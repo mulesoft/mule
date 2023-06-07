@@ -9,6 +9,7 @@ package org.mule.test.infrastructure;
 
 import static java.lang.String.format;
 import static java.nio.charset.Charset.defaultCharset;
+
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -19,18 +20,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 
 public class FileContainsFileText extends TypeSafeMatcher<File> {
 
   private final File fileContentToMatch;
-  private List<String> fileToMatchContent = new ArrayList<>();
+  private final List<String> fileToMatchContent = new ArrayList<>();
   private int lineToMatchIndex = 0;
 
-  @Factory
   public static Matcher<File> hasFileContent(String fileLocation) {
     return new FileContainsFileText(fileLocation);
   }

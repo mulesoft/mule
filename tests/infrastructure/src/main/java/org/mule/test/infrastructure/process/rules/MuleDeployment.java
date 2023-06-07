@@ -6,17 +6,19 @@
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static com.jayway.awaitility.Awaitility.await;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
+
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
+import static org.awaitility.Awaitility.await;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
@@ -35,12 +37,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import io.qameta.allure.Attachment;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
+import io.qameta.allure.Attachment;
 
 /**
  * JUnit rule to deploy a Mule application for testing in a local Mule server. Usage:
@@ -101,14 +105,14 @@ public class MuleDeployment extends MuleInstallation {
   private static PollingProber prober;
   private String locationSuffix = "";
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
-  private List<String> applications = new ArrayList<>();
-  private List<String> domains = new ArrayList<>();
-  private List<String> domainBundles = new ArrayList<>();
-  private List<String> libraries = new ArrayList<>();
+  private final List<String> applications = new ArrayList<>();
+  private final List<String> domains = new ArrayList<>();
+  private final List<String> domainBundles = new ArrayList<>();
+  private final List<String> libraries = new ArrayList<>();
   private MuleProcessController mule;
-  private Map<String, String> properties = new HashMap<>();
-  private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
-  private List<String> parameters = new ArrayList<>();
+  private final Map<String, String> properties = new HashMap<>();
+  private final Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
+  private final List<String> parameters = new ArrayList<>();
 
   private final Thread shutdownHookThread = new Thread(this::after);
 
@@ -316,6 +320,7 @@ public class MuleDeployment extends MuleInstallation {
     };
   }
 
+  @Override
   protected void before() throws Throwable {
     super.before();
     prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
@@ -434,6 +439,7 @@ public class MuleDeployment extends MuleInstallation {
     });
   }
 
+  @Override
   protected void after() {
     if (STOP_ON_EXIT) {
       stopMule();
