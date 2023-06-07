@@ -12,8 +12,10 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
+
+import static java.util.concurrent.TimeUnit.*;
+
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.util.queue.DualRandomAccessFileQueueStoreDelegate;
 import org.mule.tck.MuleTestUtils;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -24,13 +26,16 @@ import java.io.RandomAccessFile;
 
 import org.hamcrest.core.Is;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.rules.Timeout;
 
 @SmallTest
 public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public Timeout timeout = new Timeout(120000, MILLISECONDS);
 
   private static final int MAXIMUM_NUMBER_OF_BYTES = 100;
   public static final String TEST_QUEUE_NAME = "test-queue";
