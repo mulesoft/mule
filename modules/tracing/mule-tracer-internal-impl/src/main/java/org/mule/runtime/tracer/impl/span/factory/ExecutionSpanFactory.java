@@ -12,10 +12,9 @@ import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
+import org.mule.runtime.tracer.impl.span.ExportOnEndExecutionSpan;
 
 import javax.inject.Inject;
-
-import static org.mule.runtime.tracer.impl.span.ExportOnEndExecutionSpan.getExecutionSpanBuilder;
 
 public class ExecutionSpanFactory implements EventSpanFactory {
 
@@ -25,11 +24,8 @@ public class ExecutionSpanFactory implements EventSpanFactory {
   @Override
   public InternalSpan getSpan(SpanContext spanContext,
                               InitialSpanInfo initialSpanInfo) {
-    return getExecutionSpanBuilder()
-        .withStartSpanInfo(initialSpanInfo)
-        .withParentSpan(spanContext.getSpan().orElse(null))
-        .withSpanExporterFactory(spanExporterFactory)
-        .build();
+    return ExportOnEndExecutionSpan.createExportOnEndExecutionSpan(spanExporterFactory, spanContext.getSpan().orElse(null),
+                                                                   initialSpanInfo);
   }
 
   @Override

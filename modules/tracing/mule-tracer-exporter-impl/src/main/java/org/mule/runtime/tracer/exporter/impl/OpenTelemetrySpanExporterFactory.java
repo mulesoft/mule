@@ -86,9 +86,9 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   }
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
+  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
     return builder()
-        .withStartSpanInfo(initialExportInfo)
+        .withStartSpanInfo(initialSpanInfo)
         .withArtifactId(artifactId)
         .withResource(resource)
         .addMuleAncestorSpanId(addMuleAncestorSpanId)

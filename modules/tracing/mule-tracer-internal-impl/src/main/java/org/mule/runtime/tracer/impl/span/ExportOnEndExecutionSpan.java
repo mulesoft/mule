@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
@@ -44,15 +45,22 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   private Long endTime;
   private final Map<String, String> additionalAttributes = new HashMap<>();
 
-  public static ExecutionSpanBuilder getExecutionSpanBuilder() {
-    return new ExecutionSpanBuilder();
-  }
-
-  private ExportOnEndExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
+  private ExportOnEndExecutionSpan(SpanExporterFactory spanExporterFactory, InitialSpanInfo initialSpanInfo, Long startTime,
                                    InternalSpan parent) {
     this.initialSpanInfo = initialSpanInfo;
     this.startTime = startTime;
     this.parent = parent;
+    this.spanExporter = spanExporterFactory.getSpanExporter(this, initialSpanInfo);
+  }
+
+  public static InternalSpan createExportOnEndExecutionSpan(SpanExporterFactory spanExporterFactory, InternalSpan parentSpan,
+                                                            InitialSpanInfo initialSpanInfo) {
+    requireNonNull(spanExporterFactory);
+    requireNonNull(initialSpanInfo);
+    ExportOnEndExecutionSpan exportOnEndExecutionSpan = new ExportOnEndExecutionSpan(spanExporterFactory, initialSpanInfo,
+                                                                                     getDefault().now(),
+                                                                                     parentSpan);
+    return parentSpan.onChild(exportOnEndExecutionSpan);
   }
 
   public SpanExporter getSpanExporter() {
@@ -156,7 +164,6 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
    */
   private static class DefaultSpanDuration implements SpanDuration {
 
-
     private final Long startTime;
     private final Long endTime;
 
@@ -182,55 +189,6 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
       additionalAttributes.put(key, value);
     }
     spanExporter.onAdditionalAttribute(key, value);
-  }
-
-
-
-  /**
-   * A Builder for {@link ExportOnEndExecutionSpan}
-   *
-   * @since 4.5.0
-   */
-  public static class ExecutionSpanBuilder {
-
-    public static final String THERE_IS_NO_SPAN_FACTORY_MESSAGE = "there is no span factory";
-
-    private InternalSpan parent;
-    private Long startTime;
-    private SpanExporterFactory spanExporterFactory;
-    private InitialSpanInfo initialSpanInfo;
-
-    private ExecutionSpanBuilder() {}
-
-    public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
-      this.initialSpanInfo = spanCustomizationInfo;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withParentSpan(InternalSpan parent) {
-      this.parent = parent;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withSpanExporterFactory(SpanExporterFactory spanExporterFactory) {
-      this.spanExporterFactory = spanExporterFactory;
-      return this;
-    }
-
-    public InternalSpan build() {
-      if (startTime == null) {
-        startTime = getDefault().now();
-      }
-      if (spanExporterFactory == null) {
-        throw new IllegalArgumentException(THERE_IS_NO_SPAN_FACTORY_MESSAGE);
-      }
-      ExportOnEndExecutionSpan exportOnEndExecutionSpan = new ExportOnEndExecutionSpan(initialSpanInfo,
-                                                                                       startTime,
-                                                                                       parent);
-      exportOnEndExecutionSpan.spanExporter =
-          spanExporterFactory.getSpanExporter(exportOnEndExecutionSpan, initialSpanInfo);
-      return parent.onChild(exportOnEndExecutionSpan);
-    }
   }
 
 }
