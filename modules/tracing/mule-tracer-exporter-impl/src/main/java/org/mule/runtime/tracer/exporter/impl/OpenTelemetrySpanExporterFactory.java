@@ -9,7 +9,6 @@ package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
-import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporter.builder;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
 import static java.lang.Boolean.parseBoolean;
@@ -87,15 +86,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   @Override
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
-    return builder()
-        .withStartSpanInfo(initialSpanInfo)
-        .withArtifactId(artifactId)
-        .withResource(resource)
-        .addMuleAncestorSpanId(addMuleAncestorSpanId)
-        .withArtifactType(artifactType)
-        .withSpanProcessor(spanProcessor.get())
-        .withInternalSpan(internalSpan)
-        .build();
+    return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor.get(),
+                                         addMuleAncestorSpanId, resource);
   }
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {

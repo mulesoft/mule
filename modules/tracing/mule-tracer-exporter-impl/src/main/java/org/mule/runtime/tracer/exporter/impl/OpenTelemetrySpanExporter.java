@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.impl;
 
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
@@ -111,13 +112,19 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private MutableMuleTraceState muleTraceState;
 
-  private OpenTelemetrySpanExporter(InternalSpan internalSpan,
-                                    InitialSpanInfo initialSpanInfo,
-                                    String artifactId,
-                                    String artifactType,
-                                    SpanProcessor spanProcessor,
-                                    boolean enableMuleAncestorIdManagement,
-                                    Resource resource) {
+  public OpenTelemetrySpanExporter(InternalSpan internalSpan,
+                                   InitialSpanInfo initialSpanInfo,
+                                   String artifactId,
+                                   String artifactType,
+                                   SpanProcessor spanProcessor,
+                                   boolean addMuleAncestorSpanId,
+                                   Resource resource) {
+    requireNonNull(internalSpan);
+    requireNonNull(initialSpanInfo);
+    requireNonNull(artifactId);
+    requireNonNull(artifactType);
+    requireNonNull(spanProcessor);
+    requireNonNull(resource);
     this.internalSpan = internalSpan;
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
     this.isRootSpan = initialSpanInfo.isRootSpan();
@@ -163,10 +170,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     Map<AttributeKey<?>, Object> attributes = new HashMap<>();
     forEach(attributes::put);
     return attributes;
-  }
-
-  public static OpenTelemetrySpanExportBuilder builder() {
-    return new OpenTelemetrySpanExportBuilder();
   }
 
   @Override
@@ -463,81 +466,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   public MutableMuleTraceState getTraceState() {
     return muleTraceState;
-  }
-
-  /**
-   * Builder
-   */
-  public static class OpenTelemetrySpanExportBuilder {
-
-    private InitialSpanInfo initialSpanInfo;
-    private InternalSpan internalSpan;
-    private String artifactId;
-    private String artifactType;
-    private Resource resource;
-    private SpanProcessor spanProcessor;
-    private boolean isAddMuleAncestorSpanId;
-
-    public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
-      this.initialSpanInfo = initialSpanInfo;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withInternalSpan(InternalSpan internalSpan) {
-      this.internalSpan = internalSpan;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withArtifactId(String artifactId) {
-      this.artifactId = artifactId;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withArtifactType(String artifactType) {
-      this.artifactType = artifactType;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withSpanProcessor(SpanProcessor spanProcessor) {
-      this.spanProcessor = spanProcessor;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withResource(Resource resource) {
-      this.resource = resource;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder addMuleAncestorSpanId(boolean addMuleAncestorSpanId) {
-      this.isAddMuleAncestorSpanId = addMuleAncestorSpanId;
-      return this;
-    }
-
-    public OpenTelemetrySpanExporter build() {
-
-      if (initialSpanInfo == null) {
-        throw new IllegalArgumentException("Start span info is null");
-      }
-
-      if (artifactId == null) {
-        throw new IllegalArgumentException("Artifact id is null");
-      }
-
-      if (artifactType == null) {
-        throw new IllegalArgumentException("Artifact type is null");
-      }
-
-      if (spanProcessor == null) {
-        throw new IllegalArgumentException("Artifact type is null");
-      }
-
-      if (resource == null) {
-        throw new IllegalArgumentException("Resource is null");
-      }
-
-      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
-                                           isAddMuleAncestorSpanId, resource);
-    }
   }
 
 }
