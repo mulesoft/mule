@@ -50,9 +50,9 @@ public class TracingLevelExportInfo {
     return this.initialExportInfoProvider.getInitialExportInfo((String) spanIdentifier);
   }
 
-  public void propagateExportInfo(TracingLevelExportInfo tracingLevelExportInfo) {
-    if (!isOverride() && tracingLevelExportInfo.isOverride()) {
-      this.initialExportInfoProvider = tracingLevelExportInfo.getInitialExportInfoProvider();
+  public void propagateExportInfo(TracingLevelExportInfo parentTracingLevelExportInfo) {
+    if (!isOverride() && parentTracingLevelExportInfo.isOverride()) {
+      this.initialExportInfoProvider = parentTracingLevelExportInfo.getInitialExportInfoProvider();
       this.isOverride = true;
     }
   }
