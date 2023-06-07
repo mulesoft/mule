@@ -1424,7 +1424,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * Configures the {@link MuleRuntimeFeature#CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES} feature flag.
    *
-   * @since 4.5.0, 4.4.0-202406
+   * @since 4.5.0, 4.4.0-202306
    */
   private static void configureCreateChildPolicyContextForParallelScopes() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
