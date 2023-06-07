@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
-import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
@@ -37,9 +36,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
-
   private final InitialSpanInfo initialSpanInfo;
-  private SpanIdentifier identifier = INVALID_SPAN_IDENTIFIER;
   private SpanExporter spanExporter = NOOP_EXPORTER;
   private SpanError lastError;
   private final InternalSpan parent;
