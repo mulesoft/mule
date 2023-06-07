@@ -29,6 +29,7 @@ import static org.mule.runtime.tracer.exporter.impl.OpenTelemetryTraceIdUtils.ex
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
@@ -133,7 +134,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
-    this.enableMuleAncestorIdManagement = enableMuleAncestorIdManagement;
+    this.enableMuleAncestorIdManagement = addMuleAncestorSpanId;
     this.resource = resource;
     this.muleTraceState = getMutableMuleTraceStateFrom(emptyMap(), enableMuleAncestorIdManagement);
     this.initialExportInfo = initialSpanInfo.getInitialExportInfo();

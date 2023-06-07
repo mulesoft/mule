@@ -7,11 +7,11 @@
 
 package org.mule.runtime.tracer.api.span.info;
 
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.api.event.Event;
 
 import java.util.Set;
-
-import static java.util.Collections.emptySet;
 
 /**
  * The export information when starting a {@link org.mule.runtime.tracer.api.span.InternalSpan}.

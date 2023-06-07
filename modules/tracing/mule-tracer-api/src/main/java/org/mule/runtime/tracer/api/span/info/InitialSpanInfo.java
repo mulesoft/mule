@@ -7,9 +7,9 @@
 
 package org.mule.runtime.tracer.api.span.info;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
-
 import static java.util.Collections.emptyMap;
+
+import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
