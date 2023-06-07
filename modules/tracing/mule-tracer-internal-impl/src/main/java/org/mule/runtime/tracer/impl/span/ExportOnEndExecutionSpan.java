@@ -64,7 +64,6 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   @Override
   public InternalSpan onChild(InternalSpan child) {
-    // TODO: I hate this instance off
     if (child instanceof ExportOnEndExecutionSpan) {
       spanExporter.updateChildSpanExporter(((ExportOnEndExecutionSpan) child).getSpanExporter());
     }

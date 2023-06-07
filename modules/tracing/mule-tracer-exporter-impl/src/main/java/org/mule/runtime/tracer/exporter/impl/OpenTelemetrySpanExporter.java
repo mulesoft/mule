@@ -111,7 +111,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private MutableMuleTraceState muleTraceState;
 
-
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
                                     InitialSpanInfo initialSpanInfo,
                                     String artifactId,
