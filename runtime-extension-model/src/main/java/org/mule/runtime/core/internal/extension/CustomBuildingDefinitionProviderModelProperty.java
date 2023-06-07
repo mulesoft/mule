@@ -22,6 +22,31 @@ public class CustomBuildingDefinitionProviderModelProperty implements ModelPrope
   }
 
   @Override
+  public String getName() {
+    return "customBuildingDefinition";
+  }
+
+  @Override
+  public String getName() {
+    return "customBuildingDefinition";
+  }
+
+  @Override
+  public String getName() {
+    return "customBuildingDefinition";
+  }
+
+  @Override
+  public String getName() {
+    return "customBuildingDefinition";
+  }
+
+  @Override
+  public String getName() {
+    return "customBuildingDefinition";
+  }
+
+  @Override
   public boolean isPublic() {
     return false;
   }
