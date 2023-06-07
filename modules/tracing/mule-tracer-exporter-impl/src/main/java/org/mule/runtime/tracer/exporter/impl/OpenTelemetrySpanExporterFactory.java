@@ -54,7 +54,6 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
-
   private SpanExporterConfiguration privilegedConfiguration =
       new OpenTelemetryAutoConfigurableSpanExporterConfiguration(key -> null);
 
