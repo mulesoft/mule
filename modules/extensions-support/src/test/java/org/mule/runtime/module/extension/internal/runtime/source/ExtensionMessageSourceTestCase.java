@@ -56,7 +56,7 @@ import org.mule.runtime.core.api.util.ExceptionUtils;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
+import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
