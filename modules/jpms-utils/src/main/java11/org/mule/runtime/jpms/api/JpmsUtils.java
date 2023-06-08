@@ -7,12 +7,15 @@
 package org.mule.runtime.jpms.api;
 
 import static java.lang.Boolean.getBoolean;
+import static java.lang.ModuleLayer.boot;
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
+import static java.lang.module.ModuleFinder.ofSystem;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utilities related to how Mule uses the Java Module system.
@@ -29,9 +32,8 @@ public final class JpmsUtils {
 
   private static final String REQUIRED_ADD_MODULES =
       "--add-modules="
+          + "java.se,"
           + "org.mule.runtime.jpms.utils,"
-          + "java.scripting,"
-          + "java.sql,"
           + "com.fasterxml.jackson.core";
   private static final String REQUIRED_CE_BOOT_ADD_EXPORTS =
       "--add-exports=org.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
@@ -78,6 +80,19 @@ public final class JpmsUtils {
   }
 
   /**
+   * Search for packages using the JRE's module architecture. (Java 9 and above).
+   *
+   * @param packages where to add new found packages
+   */
+  public static void exploreJdkModules(Set<String> packages) {
+    ofSystem().findAll()
+        .stream()
+        // Only expose standard java modules
+        .filter(moduleRef -> moduleRef.descriptor().name().startsWith("java."))
+        .forEach(moduleRef -> packages.addAll(moduleRef.descriptor().packages()));
+  }
+
+  /**
    * 
    * @param layer          the layer containing the module to open the {@code packages} to.
    * @param moduleName     the name of the module within {@code layer} to open the {@code packages} to.
@@ -93,7 +108,7 @@ public final class JpmsUtils {
 
     layer.findModule(moduleName)
         .ifPresent(module -> {
-          Module bootModule = ModuleLayer.boot()
+          Module bootModule = boot()
               .findModule(bootModuleName).get();
 
           for (String pkg : packages) {
