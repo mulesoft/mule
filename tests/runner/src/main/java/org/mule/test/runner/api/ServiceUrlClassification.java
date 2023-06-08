@@ -20,7 +20,7 @@ import java.util.List;
  * Defines the result of the classification process for a {@link Service}. It contains a {@link ServiceDescriptor}, {@link List}
  * of {@link URL}s for its {@link ArtifactClassLoader}.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class ServiceUrlClassification {
 

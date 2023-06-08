@@ -124,7 +124,7 @@ public class ReconnectionUtils {
    * @param componentModel  the {@link ComponentModel}
    * @param reflectionCache a {@link ReflectionCache}
    * @return a potentially updated {@link InterceptorChain.Builder}
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static InterceptorChain.Builder addCursorResetInterceptorsIfRequired(InterceptorChain.Builder chainBuilder,
                                                                               ExtensionModel extensionModel,

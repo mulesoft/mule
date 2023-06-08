@@ -14,7 +14,7 @@ import org.slf4j.MDC;
 /**
  * Utils for managing span information in the log4j MDC
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class SpanMDCUtils {
 

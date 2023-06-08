@@ -12,7 +12,7 @@ import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 /**
  * Builder class for {@link LongUpDownCounter}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public interface LongUpDownCounterBuilder {
 

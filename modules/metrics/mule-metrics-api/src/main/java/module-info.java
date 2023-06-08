@@ -9,7 +9,7 @@
  * Definitions for Mule Metrics.
  * 
  * @moduleGraph
- * @since 4.6
+ * @since 4.5
  */
 module org.mule.runtime.metrics.api {
 

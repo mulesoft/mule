@@ -64,7 +64,7 @@ import org.slf4j.Logger;
 /**
  * {@link ExtensionsClient} delegate class for creating and operating message sources
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class SourceClient<T, A> implements Lifecycle {
 

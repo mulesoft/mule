@@ -172,7 +172,7 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   /**
    * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   ExtensionDevelopmentFramework getDevelopmentFramework();
 

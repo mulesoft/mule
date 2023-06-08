@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * A {@link ModuleRepository} that enables to change discovered modules to enable testing privileged API scenarios.
  *
- * @since 4.6
+ * @since 4.5
  */
 public final class TestPrivilegedApiModuleRepository implements ModuleRepository {
 

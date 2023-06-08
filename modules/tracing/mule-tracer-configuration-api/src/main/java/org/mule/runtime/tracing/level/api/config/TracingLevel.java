@@ -10,7 +10,7 @@ package org.mule.runtime.tracing.level.api.config;
 /**
  * Set of hierarchical levels that group and define different types of generation of traces.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public enum TracingLevel {
   /**

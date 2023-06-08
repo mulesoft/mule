@@ -11,7 +11,7 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 /**
  * Indicates that the classes that implement this interface rely on an ExtensionParameter
  *
- * @since 4.6
+ * @since 4.5
  */
 public interface HasExtensionParameter {
 

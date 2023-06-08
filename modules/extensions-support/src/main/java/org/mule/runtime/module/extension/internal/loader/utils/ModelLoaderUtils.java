@@ -119,7 +119,7 @@ public final class ModelLoaderUtils {
    * @param keyIdResolverModelParser      parser with the key id metadata
    * @param requiresConnection            indicates if the resolution of metadata requieres a connecion and configuration
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static void declareTypeResolversInformationModelProperty(BaseDeclaration baseDeclaration,
                                                                   Optional<OutputResolverModelParser> outputResolverModelParser,
@@ -175,7 +175,7 @@ public final class ModelLoaderUtils {
    * @param inputResolverModelParsers     parser with the input metadata
    * @param keyIdResolverModelParser      parser with the key id metadata
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static void declareMetadataResolverFactoryModelProperty(BaseDeclaration baseDeclaration,
                                                                  Optional<OutputResolverModelParser> outputResolverModelParser,
@@ -223,7 +223,7 @@ public final class ModelLoaderUtils {
    *
    * @return the category name of the resolvers if present, null otherwise
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static String getCategoryName(MetadataKeyModelParser metadataKeyModelParser,
                                        List<InputResolverModelParser> inputResolverModelParsers,

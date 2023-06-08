@@ -23,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Default implementation of {@link InitialSpanInfoProvider}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 

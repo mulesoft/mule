@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This is to be overridden when running in a JVM that supports JPMS (9+).
  * 
- * @since 4.6
+ * @since 4.5
  */
 public class ServiceClassLoaderFactoryProvider {
 

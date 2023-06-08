@@ -50,7 +50,7 @@ public final class CronScheduler extends PeriodicScheduler implements CronSchedu
   /**
    * Creates a new instance
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public CronScheduler(String expression, String timeZone) {
     this.expression = expression;

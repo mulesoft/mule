@@ -12,7 +12,7 @@ import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 /**
  * A provider for builders for {@link InitialSpanInfo}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public interface InitialSpanInfoProvider {
 

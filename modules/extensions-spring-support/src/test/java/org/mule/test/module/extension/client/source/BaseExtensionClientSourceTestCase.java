@@ -15,7 +15,7 @@ import javax.inject.Inject;
 /**
  * Base class for tests about message source support in {@link ExtensionsClient}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 abstract class BaseExtensionClientSourceTestCase extends AbstractExtensionFunctionalTestCase {
 

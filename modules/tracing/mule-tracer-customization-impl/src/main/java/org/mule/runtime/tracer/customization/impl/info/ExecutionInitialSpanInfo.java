@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
 /**
  * An implementation of {@link InitialSpanInfo} for the execution.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 

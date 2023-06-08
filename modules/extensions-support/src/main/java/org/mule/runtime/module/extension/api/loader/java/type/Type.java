@@ -185,13 +185,13 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
 
   /**
    * @return true if this Type represent a Java native array
-   * @since 4.6
+   * @since 4.5
    */
   boolean isArray();
 
   /**
    * @return the component type if this Type represents an array, otherwise empty
-   * @since 4.6
+   * @since 4.5
    */
   Optional<Type> getArrayComponentType();
 }

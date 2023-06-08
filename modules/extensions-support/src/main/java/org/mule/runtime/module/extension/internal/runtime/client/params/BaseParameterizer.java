@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Base implementation of {@link Parameterizer}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public abstract class BaseParameterizer<T extends Parameterizer> implements Parameterizer<T> {
 

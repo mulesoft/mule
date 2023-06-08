@@ -12,7 +12,7 @@ import org.mule.runtime.module.extension.internal.runtime.client.params.BasePara
 /**
  * Default implementation for {@link SourceCallbackParameterizer}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class DefaultSourceCallbackParameterizer extends BaseParameterizer<SourceCallbackParameterizer>
     implements SourceCallbackParameterizer {

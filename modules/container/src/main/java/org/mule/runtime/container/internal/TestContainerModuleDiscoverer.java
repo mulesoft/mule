@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Discovers container modules including both productive and test modules
  *
- * @since 4.6
+ * @since 4.5
  */
 public class TestContainerModuleDiscoverer extends ContainerModuleDiscoverer {
 

@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * A {@link ModuleDiscoverer} that enables to change discovered modules to enable testing privileged API scenarios.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class TestModuleDiscoverer implements ModuleDiscoverer {
 

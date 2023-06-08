@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Implementation of {@link PreFilteredContainerClassLoaderCreator} useful for functional tests.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 

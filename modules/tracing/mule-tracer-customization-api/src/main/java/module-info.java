@@ -9,7 +9,7 @@
  * Definitions for setting configuration for tracing levels and overrides.
  * 
  * @moduleGraph
- * @since 4.6
+ * @since 4.5
  */
 module org.mule.runtime.tracer.customization.api {
 

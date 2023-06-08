@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Creates a container class loader without adding a filter to it.
  *
- * @since 4.6
+ * @since 4.5
  */
 public interface PreFilteredContainerClassLoaderCreator extends AutoCloseable {
 
