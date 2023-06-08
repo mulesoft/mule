@@ -41,4 +41,10 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
+  exports org.mule.runtime.config.internal.validation to
+      com.mulesoft.mule.runtime.ee.extension.model;
+
+  exports org.mule.runtime.core.internal.extension to
+      com.mulesoft.mule.runtime.ee.extension.model;
+
 }
