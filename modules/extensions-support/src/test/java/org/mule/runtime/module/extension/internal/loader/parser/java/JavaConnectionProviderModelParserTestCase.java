@@ -272,7 +272,7 @@ public class JavaConnectionProviderModelParserTestCase {
   @Test
   public void getClassLevelMMVForConnectionProviderWithMMVAnnotation() {
     mockConnectionProviderWithClass(ConnectionProviderWithHigherMMVAnnotation.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
                is("Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.5 because it is the one set at the class level through the @MinMuleVersion annotation."));
   }
