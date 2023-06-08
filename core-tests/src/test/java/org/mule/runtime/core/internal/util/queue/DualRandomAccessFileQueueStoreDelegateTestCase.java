@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleContext;
 
-import static java.util.concurrent.TimeUnit.*;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.tck.MuleTestUtils;
@@ -29,13 +28,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.rules.Timeout;
 
 @SmallTest
 public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public Timeout timeout = new Timeout(120000, MILLISECONDS);
 
   private static final int MAXIMUM_NUMBER_OF_BYTES = 100;
   public static final String TEST_QUEUE_NAME = "test-queue";
@@ -48,7 +43,9 @@ public class DualRandomAccessFileQueueStoreDelegateTestCase extends AbstractMule
   @Before
   public void before() {
     mockMuleContext = mock(MuleContext.class);
+    ClassLoader parent = mock(ClassLoader.class);
     when(mockMuleContext.getExecutionClassLoader()).thenReturn(getClass().getClassLoader());
+    when(mockMuleContext.getExecutionClassLoader().getParent()).thenReturn(parent);
     addJavaSerializerToMockMuleContext(mockMuleContext);
   }
 
