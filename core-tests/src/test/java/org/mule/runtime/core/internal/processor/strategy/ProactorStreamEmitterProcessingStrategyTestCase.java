@@ -75,7 +75,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
-import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -609,9 +608,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      Thread.sleep(5000);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
+      expectedException
+          .expectMessage("Flow \"flow\" is unable to accept new events at this time. Reason: REQUIRED_SCHEDULER_BUSY");
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
