@@ -6,16 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
+import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
+import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.CACHED;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.NONE;
-import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
-import static org.mule.runtime.extension.api.security.CredentialsPlacement.QUERY_PARAMS;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -40,6 +41,10 @@ import org.mule.runtime.module.extension.api.loader.java.type.ConnectionProvider
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.java.property.oauth.OAuthCallbackValuesModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ConnectionProviderTypeWrapper;
+import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.MinMuleVersion;
+import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
+import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -49,10 +54,6 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.sdk.api.annotation.Alias;
-import org.mule.sdk.api.annotation.MinMuleVersion;
-import org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter;
-import org.mule.sdk.api.runtime.parameter.Literal;
 
 public class JavaConnectionProviderModelParserTestCase {
 
@@ -271,9 +272,9 @@ public class JavaConnectionProviderModelParserTestCase {
   @Test
   public void getClassLevelMMVForConnectionProviderWithMMVAnnotation() {
     mockConnectionProviderWithClass(ConnectionProviderWithHigherMMVAnnotation.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.6"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.6 because it is the one set at the class level through the @MinMuleVersion annotation."));
+               is("Connection Provider ConnectionProviderWithHigherMMVAnnotation has min mule version 4.5 because it is the one set at the class level through the @MinMuleVersion annotation."));
   }
 
   @Test
@@ -536,7 +537,7 @@ public class JavaConnectionProviderModelParserTestCase {
 
   }
 
-  @MinMuleVersion("4.6")
+  @MinMuleVersion("4.5.0")
   private class ConnectionProviderWithHigherMMVAnnotation extends SdkConnectionProvider {
 
   }

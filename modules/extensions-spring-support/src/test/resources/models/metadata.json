@@ -3906,7 +3906,7 @@
               }
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -7088,7 +7088,7 @@
               }
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
