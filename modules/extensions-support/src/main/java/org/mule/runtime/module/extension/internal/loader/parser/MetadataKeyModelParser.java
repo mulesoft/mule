@@ -18,7 +18,7 @@ import java.util.Optional;
  * way, regardless of the actual syntax used by the extension developer.
  *
  * @see ExtensionModelParser
- * @since 4.6.0
+ * @since 4.5.0
  */
 public interface MetadataKeyModelParser {
 

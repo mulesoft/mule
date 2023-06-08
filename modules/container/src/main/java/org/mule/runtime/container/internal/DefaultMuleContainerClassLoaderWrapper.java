@@ -13,7 +13,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 /**
  * Default implementation of {@link MuleContainerClassLoaderWrapper}.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class DefaultMuleContainerClassLoaderWrapper implements MuleContainerClassLoaderWrapper {
 

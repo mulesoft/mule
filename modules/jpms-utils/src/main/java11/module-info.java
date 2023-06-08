@@ -9,7 +9,7 @@
  * This module provides JMPS utilities for use within the Mule Runtime.
  * 
  * @moduleGraph
- * @since 1.6
+ * @since 1.5
  */
 module org.mule.runtime.jpms.utils {
 

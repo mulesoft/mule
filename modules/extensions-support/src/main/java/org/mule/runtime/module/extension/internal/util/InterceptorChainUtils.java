@@ -19,7 +19,7 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 /**
  * Utilities related with the creation of interception chains.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class InterceptorChainUtils {
 
@@ -33,7 +33,7 @@ public class InterceptorChainUtils {
    * @param connectionSupplier the connection supplier
    * @param reflectionCache    a {@link ReflectionCache}
    * @return a new {@link InterceptorChain}
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static InterceptorChain createConnectionInterceptorsChain(ExtensionModel extensionModel,
                                                                    ComponentModel componentModel,

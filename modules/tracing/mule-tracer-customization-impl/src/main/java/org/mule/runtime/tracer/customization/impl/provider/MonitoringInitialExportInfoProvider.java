@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * An {@link InitialExportInfoProvider} corresponding to the {@link TracingLevel#MONITORING}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class MonitoringInitialExportInfoProvider extends AbstractInitialExportInfoProvider {
 

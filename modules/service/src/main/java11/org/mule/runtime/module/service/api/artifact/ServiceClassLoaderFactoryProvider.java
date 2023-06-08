@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * This overrides the default class when running in a JVM that supports JPMS (9+), but has a fallback mechanism to provide the
  * previous implementation.
  * 
- * @since 4.6
+ * @since 4.5
  */
 public class ServiceClassLoaderFactoryProvider {
 

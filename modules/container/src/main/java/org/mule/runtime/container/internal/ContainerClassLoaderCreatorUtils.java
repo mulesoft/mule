@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * Utility class to aid in the creation of a container class loader.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class ContainerClassLoaderCreatorUtils {
 

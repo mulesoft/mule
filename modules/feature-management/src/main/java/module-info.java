@@ -9,7 +9,7 @@
  * This module performs feature management for the runtime.
  * 
  * @moduleGraph
- * @since 4.6
+ * @since 4.5
  */
 module org.mule.runtime.featureManagement {
 

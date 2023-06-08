@@ -62,7 +62,7 @@ public class DomainContextBuilder {
    * Controls whether lazy initialization of components is enabled/disabled.
    *
    * @param enableLazyInit whether lazy initialization is enabled.
-   * @since 4.6
+   * @since 4.5
    */
   public DomainContextBuilder setEnableLazyInit(boolean enableLazyInit) {
     isEnableLazyInit = enableLazyInit;
@@ -73,7 +73,7 @@ public class DomainContextBuilder {
    * Controls whether if XML validations should be done over the configuration file.
    *
    * @param disableXmlValidations whether XML validations are disabled.
-   * @since 4.6
+   * @since 4.5
    */
   public DomainContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
     isDisableXmlValidations = disableXmlValidations;

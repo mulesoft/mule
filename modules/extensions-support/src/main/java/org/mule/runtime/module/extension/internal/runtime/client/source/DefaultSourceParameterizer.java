@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Default implementation for {@link SourceParameterizer}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 class DefaultSourceParameterizer extends BaseComponentParameterizer<SourceParameterizer> implements SourceParameterizer {
 

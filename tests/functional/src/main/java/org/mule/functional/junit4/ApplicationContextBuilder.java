@@ -65,7 +65,7 @@ public class ApplicationContextBuilder {
    * Controls whether lazy initialization of components is enabled/disabled.
    *
    * @param enableLazyInit whether lazy initialization is enabled.
-   * @since 4.6
+   * @since 4.5
    */
   public ApplicationContextBuilder setEnableLazyInit(boolean enableLazyInit) {
     isEnableLazyInit = enableLazyInit;
@@ -76,7 +76,7 @@ public class ApplicationContextBuilder {
    * Controls whether if XML validations should be done over the configuration file.
    *
    * @param disableXmlValidations whether XML validations are disabled.
-   * @since 4.6
+   * @since 4.5
    */
   public ApplicationContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
     isDisableXmlValidations = disableXmlValidations;

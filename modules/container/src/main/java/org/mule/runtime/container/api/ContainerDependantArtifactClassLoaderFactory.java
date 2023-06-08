@@ -13,7 +13,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 /**
  * Creates {@link ClassLoader} instances for artifacts that depend directly on the container.
  *
- * @since 4.6
+ * @since 4.5
  */
 @NoImplement
 public interface ContainerDependantArtifactClassLoaderFactory<T extends ArtifactDescriptor> {

@@ -90,7 +90,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   /**
    * @return whether the applications and domains should start in lazy mode. This means that the components will be initialized on
    *         demand.
-   * @since 4.6
+   * @since 4.5
    * @see FunctionalTestCase#enableLazyInit()
    */
   protected boolean enableLazyInit() {
@@ -99,7 +99,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
   /**
    * @return whether the applications and domains should be parsed without XML Validations.
-   * @since 4.6
+   * @since 4.5
    * @see FunctionalTestCase#disableXmlValidations()
    */
   protected boolean disableXmlValidations() {

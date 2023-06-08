@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * Default implementation of {@link PreFilteredContainerClassLoaderCreator}.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class DefaultPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 

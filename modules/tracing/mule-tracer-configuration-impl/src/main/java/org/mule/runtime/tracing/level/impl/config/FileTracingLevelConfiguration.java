@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 /**
  * A {@link TracingLevelConfiguration} based on a file in the conf folder.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class FileTracingLevelConfiguration implements TracingLevelConfiguration {
 

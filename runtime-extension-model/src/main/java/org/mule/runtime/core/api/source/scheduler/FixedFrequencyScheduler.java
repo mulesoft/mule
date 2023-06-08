@@ -49,7 +49,7 @@ public final class FixedFrequencyScheduler extends PeriodicScheduler implements 
   /**
    * Creates a new instance
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public FixedFrequencyScheduler(long frequency, long startDelay, TimeUnit timeUnit) {
     setFrequency(frequency);

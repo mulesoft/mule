@@ -11,7 +11,7 @@ import org.mule.runtime.api.meta.MuleVersion;
 /**
  * Holds information about the minimum {@link MuleVersion} that a component can run on and the reason for that value.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class ResolvedMinMuleVersion {
 

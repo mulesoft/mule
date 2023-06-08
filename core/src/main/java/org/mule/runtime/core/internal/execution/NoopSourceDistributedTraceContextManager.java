@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @see SourceResultAdapter
  *
- * @since 4.6.0.
+ * @since 4.5.0.
  */
 public class NoopSourceDistributedTraceContextManager implements DistributedTraceContextManager {
 

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * An abstract {@link InitialExportInfoProvider} for resolving the {@link InitialExportInfo}.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public abstract class AbstractInitialExportInfoProvider implements InitialExportInfoProvider {
 

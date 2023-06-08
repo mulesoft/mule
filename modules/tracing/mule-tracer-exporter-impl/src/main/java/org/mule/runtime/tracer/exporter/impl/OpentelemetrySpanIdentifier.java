@@ -11,7 +11,7 @@ import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 /**
  * a {@link SpanIdentifier} based on the open telemetry span.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class OpentelemetrySpanIdentifier implements SpanIdentifier {
 

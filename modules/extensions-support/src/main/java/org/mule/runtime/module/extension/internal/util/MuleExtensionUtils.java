@@ -807,7 +807,7 @@ public class MuleExtensionUtils {
    * @param extensionModel an {@link ExtensionModel}
    * @param sourceName     the name of the target source
    * @return optionally an {@link SourceModel}
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static Optional<SourceModel> findSource(ExtensionModel extensionModel, String sourceName) {
     Reference<SourceModel> source = new Reference<>();

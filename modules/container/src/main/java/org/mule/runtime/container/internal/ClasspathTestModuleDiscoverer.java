@@ -12,7 +12,7 @@ import org.mule.runtime.container.api.MuleModule;
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} and {@link #TEST_MODULE_PROPERTIES} files resources
  * available in a given classloader.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class ClasspathTestModuleDiscoverer extends ClasspathModuleDiscoverer {
 

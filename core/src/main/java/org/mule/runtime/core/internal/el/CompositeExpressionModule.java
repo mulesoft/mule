@@ -32,7 +32,7 @@ import java.util.Set;
  * bindings provided by one of them. This class is used to merge two instances of {@link ExpressionModule}, and it's intended to
  * be used in the default {@link BindingContext} implementation.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 class CompositeExpressionModule implements ExpressionModule {
 

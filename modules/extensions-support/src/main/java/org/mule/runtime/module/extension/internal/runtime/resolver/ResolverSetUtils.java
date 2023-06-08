@@ -435,7 +435,7 @@ public class ResolverSetUtils {
    * @param event                 the context event
    * @return a {@link Map} with the evaluation result
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static Map<String, Object> evaluate(ResolverSet resolverSet,
                                              Optional<ConfigurationInstance> configurationInstance,

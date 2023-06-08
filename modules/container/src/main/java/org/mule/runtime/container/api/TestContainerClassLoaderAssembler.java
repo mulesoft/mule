@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * Test utility that allows to manage the container class loader for Mule functional test cases.
  *
- * @since 4.6
+ * @since 4.5
  */
 public interface TestContainerClassLoaderAssembler extends AutoCloseable {
 

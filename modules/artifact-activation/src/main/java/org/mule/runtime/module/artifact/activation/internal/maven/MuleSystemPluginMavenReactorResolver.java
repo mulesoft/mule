@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Resolve the maven pom file for the given artifact.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
 

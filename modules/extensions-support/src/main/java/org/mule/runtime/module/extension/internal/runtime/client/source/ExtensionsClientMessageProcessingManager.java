@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 /**
  * Implementation of {@link MessageProcessingManager} for sources created through the {@link ExtensionsClient}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 class ExtensionsClientMessageProcessingManager<T, A> implements MessageProcessingManager {
 

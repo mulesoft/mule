@@ -9,7 +9,7 @@ package org.mule.runtime.tracer.customization.api;
 /**
  * Names for spans that are created internally. The behavior for this spans will not be configurable.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class InternalSpanNames {
 

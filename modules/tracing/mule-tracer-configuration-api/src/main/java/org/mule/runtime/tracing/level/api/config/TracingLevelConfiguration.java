@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Allows to configure the desired tracing level
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public interface TracingLevelConfiguration {
 

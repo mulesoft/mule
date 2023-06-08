@@ -33,7 +33,7 @@ public class ContainerClassLoaderFactory {
    *
    * @param preFilteredContainerClassLoaderCreator encapsulates the logic for creating the parts needed for the container class
    *                                               loader. Non-null.
-   * @since 4.6
+   * @since 4.5
    */
   public ContainerClassLoaderFactory(PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator) {
     checkArgument(preFilteredContainerClassLoaderCreator != null, "containerClassLoaderCreator cannot be null");
