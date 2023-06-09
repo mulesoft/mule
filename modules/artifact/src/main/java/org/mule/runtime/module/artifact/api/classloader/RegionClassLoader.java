@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
-import static org.mule.runtime.module.artifact.api.classloader.jar.ConditionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
+import static org.mule.runtime.module.artifact.api.classloader.jar.OptionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;

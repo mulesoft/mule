@@ -23,6 +23,11 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This utility class is responsible for loading jars and also creating jar connection. The implementation of load methods is different between
+ * Java 8 and Java 11+ as Java 8 we need to access JDK internal package sun.net.www.protocol.jar. Hence this class will have 2 implementations
+ * and this module will be a MRJAR
+ */
 public class JarLoadingUtils {
   private static final Logger logger = LoggerFactory.getLogger(JarLoadingUtils.class);
 
@@ -30,6 +35,13 @@ public class JarLoadingUtils {
     // utility class only
   }
 
+  /**
+   * Returns a JarURLConnection used in Mule Java 11+ runtime
+   * @return a JarURLConnection
+   *
+   * @throws MalformedURLException in case the schemaURI is malformed
+   * @throws IOException           an IO exception during the jar connection creation
+   */
   public static JarURLConnection getJarConnection(URL possibleUrl) throws MalformedURLException, IOException {
     JarURLConnection jarConnection = (JarURLConnection) possibleUrl.openConnection();
    return jarConnection;

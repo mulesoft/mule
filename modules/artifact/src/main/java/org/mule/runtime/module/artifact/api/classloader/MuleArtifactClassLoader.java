@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.module.artifact.api.classloader.jar.OptionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
@@ -16,7 +17,6 @@ import static java.lang.reflect.Modifier.isAbstract;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.JavaVersion.JAVA_11;
-import static org.apache.commons.lang3.JavaVersion.JAVA_1_8;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.ResourceReleaserExecutor;
-import org.mule.runtime.module.artifact.api.classloader.jar.NonCachingURLStreamHandlerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -201,13 +200,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             // We don't want class loaders in limbo
             synchronized (descriptorMappingLock) {
               if (descriptorMapping.get(matchDescriptor) == null) {
-                URLClassLoader urlClassLoader;
-                if (isJavaVersionAtMost(JAVA_1_8)) {
-                  urlClassLoader =
-                      new URLClassLoader(new URL[] {url}, getSystemClassLoader(), new NonCachingURLStreamHandlerFactory());
-                } else {
-                  urlClassLoader = new URLClassLoader(new URL[] {url});
-                }
+                URLClassLoader urlClassLoader =  new URLClassLoader(new URL[] {url}, getParent(), getCachingURLStreamHandlerFactory());;
                 descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static org.mule.runtime.module.artifact.api.classloader.jar.ConditionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
+import static org.mule.runtime.module.artifact.api.classloader.jar.OptionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;

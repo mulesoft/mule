@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<parent>
-    <groupId>org.mule.runtime</groupId>
-    <artifactId>mule-modules</artifactId>
-    <version>4.5.0-SNAPSHOT</version>
-</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>4.5.0-SNAPSHOT</version>
+    </parent>
 
-<artifactId>mule-jar-handling-utils</artifactId>
-<packaging>jar</packaging>
-<name>Mule jar handling utils</name>
-<description>
-    This is a multi release module that allows handling of JDK internal jar classes needed for Java 8 runtime and a cleaner way in 11+.
-</description>
+    <artifactId>mule-jar-handling-utils</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule jar handling utils</name>
+    <description>
+        This is a multi release module that allows handling of JDK internal jar classes needed for Java 8 runtime and a cleaner way in 11+.
+    </description>
 
-<properties>
-    <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-</properties>
+    <properties>
+        <javaModuleName>org.mule.runtime.jar.handling.utils</javaModuleName>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
     <build>
         <plugins>
         <plugin>
@@ -30,6 +33,7 @@
                         <goal>compile</goal>
                     </goals>
                     <configuration>
+                        <!-- In order to compile with full Java 8 compliance with access to jdk internal classes we need to clear the release 11 setting from parent pom -->
                         <release combine.self="override"></release>
                         <source>${javaVersion}</source>
                         <target>${javaVersion}</target>
@@ -49,19 +53,6 @@
                         <multiReleaseOutput>true</multiReleaseOutput>
                     </configuration>
                 </execution>
-                <execution>
-                    <id>module-info-compile</id>
-                    <goals>
-                        <goal>compile</goal>
-                    </goals>
-                    <configuration>
-                        <release>11</release>
-                        <!-- recompile the module-info.java -->
-                        <includes>
-                            <include>module-info.java</include>
-                        </includes>
-                    </configuration>
-                </execution>
             </executions>
             <configuration>
                 <encoding>ISO-8859-1</encoding>
@@ -75,7 +66,6 @@
                 <archive>
                     <manifestEntries>
                         <Multi-Release>true</Multi-Release>
-                        <Automatic-Module-Name>mule.jar.handling.utils</Automatic-Module-Name>
                     </manifestEntries>
                 </archive>
             </configuration>

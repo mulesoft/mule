@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.artifact.api.classloader.jar;
 
-import org.mule.runtime.module.artifact.api.classloader.jar.NonCachingURLStreamHandlerFactory;
-
-public class ConditionalCachingURLStreamHandlerFactory {
+/**
+ * This class implements a method to return a NonCachingURLStreamHandlerFactory when runtime is Java 8 and a null when running
+ * on Java 11+ as we don't need a NonCachingURLStreamHandlerFactory for those JDKs as there is no file descriptor leaks
+ */
+public class OptionalCachingURLStreamHandlerFactory {
     public static NonCachingURLStreamHandlerFactory getCachingURLStreamHandlerFactory() {
       return null;
     }
