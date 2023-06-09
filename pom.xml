@@ -163,7 +163,7 @@
         <jsonassert.version>1.5.2</jsonassert.version>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.1.0-rc9</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.5.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.5.0-SNAPSHOT</muleHttpPolicyApiVersion>
