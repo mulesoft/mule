@@ -7,12 +7,10 @@
 
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.jpms.api.JpmsUtils.exploreJdkModules;
-
 import static java.io.File.pathSeparatorChar;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
-
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
@@ -21,6 +19,8 @@ import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -34,9 +34,33 @@ public final class JreExplorer {
 
   private static final Logger LOGGER = getLogger(JreExplorer.class);
 
+  private static Object bootLayer;
+  private static Method getModulePackagesMethod;
+  private static Method getLayerModulesMethod;
+  private static boolean isRequiredReflectionDataPresent;
+
   private static final JarExplorer jarExplorer;
 
   static {
+    try {
+      Class moduleLayerClass = Class.forName("java.lang.ModuleLayer");
+      Method getBootLayerMethod = moduleLayerClass.getDeclaredMethod("boot");
+      getLayerModulesMethod = moduleLayerClass.getDeclaredMethod("modules");
+
+      Class moduleClass = Class.forName("java.lang.Module");
+      getModulePackagesMethod = moduleClass.getDeclaredMethod("getPackages");
+
+      bootLayer = getBootLayerMethod.invoke(null);
+
+      isRequiredReflectionDataPresent = true;
+    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug("Error found when trying to access to Java 9+ classes via reflection. If running with Java 8 or older this is the expected behaviour");
+      }
+      isRequiredReflectionDataPresent = false;
+    }
+
     jarExplorer = new FileJarExplorer();
   }
 
@@ -85,12 +109,34 @@ public final class JreExplorer {
    */
   static void explorePaths(final List<String> jdkPaths, final Set<String> packages, Set<String> resources,
                            List<ExportedService> services) {
-    if (jdkPaths == null || jdkPaths.isEmpty()) {
-      throw new IllegalArgumentException("jdkPaths cannot be empty");
-    }
+    checkArgument(jdkPaths != null && !jdkPaths.isEmpty(), "jdkPaths cannot be empty");
 
     for (String jdkPath : jdkPaths) {
       explorePath(packages, resources, services, jdkPath);
+    }
+  }
+
+  /**
+   * Search for packages using the JRE's module architecture. (Java 9 and above).
+   * <p/>
+   * We need to use reflection because we may be running with JDK 8 or older.
+   *
+   * @param packages where to add new found packages
+   */
+  private static void exploreJdkModules(Set<String> packages) {
+    if (isRequiredReflectionDataPresent) {
+      try {
+        Set modules = (Set) getLayerModulesMethod.invoke(bootLayer);
+        modules.stream().forEach(module -> {
+          try {
+            packages.addAll((Set) getModulePackagesMethod.invoke(module));
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new RuntimeException("Error trying to get packages from JDK modules", e);
+      }
     }
   }
 
