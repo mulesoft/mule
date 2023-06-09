@@ -14,8 +14,9 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  *
  * @since 4.3
  */
-@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {"org.apache.activemq:activemq-client",
-    "org.apache.activemq:activemq-broker", "org.apache.activemq:activemq-kahadb-store", "org.fusesource.hawtbuf:hawtbuf"})
+@ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {
+    "org.mule.tests:mule-activemq-broker"
+})
 public abstract class AbstractCeXmlExtensionMuleArtifactFunctionalTestCase
     extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {
 
