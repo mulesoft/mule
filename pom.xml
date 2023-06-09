@@ -161,6 +161,7 @@
         <derbyVersion>10.14.2.0</derbyVersion>
         <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
+        <commonsNet.version>3.9.0</commonsNet.version>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
@@ -307,6 +308,12 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
                 <version>${mockitoVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commonsNet.version}</version>
             </dependency>
         </dependencies>
 
