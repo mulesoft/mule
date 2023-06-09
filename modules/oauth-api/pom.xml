@@ -11,7 +11,7 @@
     <properties>
         <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>2.0.0-SNAPSHOT</muleOAuthClientVersion>
+        <muleOAuthClientVersion>2.0.0-rc9</muleOAuthClientVersion>
     </properties>
 
     <dependencies>
