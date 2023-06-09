@@ -10,7 +10,8 @@ package org.mule.runtime.module.deployment.impl.internal.maven;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.JarUtils.getUrlWithinJar;
 import static org.mule.runtime.core.internal.util.JarUtils.getUrlsWithinJar;
-import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.getJarConnection;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
@@ -58,7 +59,7 @@ public class MavenUtils {
     URL possibleUrl;
     try {
       possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
-      JarURLConnection jarConnection = (JarURLConnection) possibleUrl.openConnection();
+      JarURLConnection jarConnection = getJarConnection(possibleUrl);
       jarConnection.setUseCaches(false);
       try (InputStream ignored = jarConnection.getInputStream()) {
         return possibleUrl;

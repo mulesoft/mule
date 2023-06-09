@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.jar.ConditionalCachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -48,7 +50,7 @@ public class FineGrainedControlClassLoader extends URLClassLoader
   private final boolean verboseLogging;
 
   public FineGrainedControlClassLoader(URL[] urls, ClassLoader parent, ClassLoaderLookupPolicy lookupPolicy) {
-    super(urls, parent);
+    super(urls, parent, getCachingURLStreamHandlerFactory());
     checkArgument(lookupPolicy != null, "Lookup policy cannot be null");
     this.lookupPolicy = lookupPolicy;
     verboseLogging = valueOf(getProperty(MULE_LOG_VERBOSE_CLASSLOADING));

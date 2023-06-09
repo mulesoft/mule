@@ -57,44 +57,6 @@ public final class JarUtils {
   }
 
   /**
-   * Loads the content of a file within a jar into a byte array.
-   * 
-   * @param jarFile  the jar file
-   * @param filePath the path to the file within the jar file
-   * @return the content of the file as byte array or empty if the file does not exists within the jar file.
-   * @throws IOException if there was a problem reading from the jar file.
-   */
-  public static Optional<byte[]> loadFileContentFrom(File jarFile, String filePath) throws IOException {
-    URL jsonDescriptorUrl = getUrlWithinJar(jarFile, filePath);
-    JarURLConnection jarConnection = (JarURLConnection) jsonDescriptorUrl.openConnection();
-    jarConnection.setUseCaches(false);
-    try (InputStream inputStream = jarConnection.getInputStream()) {
-      byte[] byteArray = toByteArray(inputStream);
-      return of(byteArray);
-    } catch (FileNotFoundException e) {
-      return empty();
-    }
-  }
-
-  /**
-   * Loads the content of a file within a jar into a byte array.
-   *
-   * @param jarFile the jar file
-   * @return the content of the file as byte array or empty if the file does not exists within the jar file.
-   * @throws IOException if there was a problem reading from the jar file.
-   */
-  public static Optional<byte[]> loadFileContentFrom(URL jarFile) throws IOException {
-    JarURLConnection jarConnection = (JarURLConnection) jarFile.openConnection();
-    jarConnection.setUseCaches(false);
-    try (InputStream inputStream = jarConnection.getInputStream()) {
-      byte[] byteArray = toByteArray(inputStream);
-      return of(byteArray);
-    } catch (FileNotFoundException e) {
-      return empty();
-    }
-  }
-
-  /**
    * Creates an URL to a path within a jar file.
    *
    * @param jarFile  the jar file

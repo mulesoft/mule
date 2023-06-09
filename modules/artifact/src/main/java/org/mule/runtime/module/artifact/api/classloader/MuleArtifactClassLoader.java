@@ -16,6 +16,7 @@ import static java.lang.reflect.Modifier.isAbstract;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.JavaVersion.JAVA_1_8;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -30,6 +31,7 @@ import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.ResourceReleaserExecutor;
+import org.mule.runtime.module.artifact.api.classloader.jar.NonCachingURLStreamHandlerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -199,7 +201,13 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             // We don't want class loaders in limbo
             synchronized (descriptorMappingLock) {
               if (descriptorMapping.get(matchDescriptor) == null) {
-                URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {url});
+                URLClassLoader urlClassLoader;
+                if (isJavaVersionAtMost(JAVA_1_8)) {
+                  urlClassLoader =
+                      new URLClassLoader(new URL[] {url}, getSystemClassLoader(), new NonCachingURLStreamHandlerFactory());
+                } else {
+                  urlClassLoader = new URLClassLoader(new URL[] {url});
+                }
                 descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }
