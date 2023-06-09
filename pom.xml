@@ -159,7 +159,7 @@
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.6.0-20230609</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
 
         <!-- Mule Snapshot Dependencies -->
