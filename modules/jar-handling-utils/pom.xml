@@ -22,76 +22,72 @@
     </properties>
     <build>
         <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>${mavenCompilerVersion}</version>
-            <executions>
-                <execution>
-                    <id>default-compile</id>
-                    <goals>
-                        <goal>compile</goal>
-                    </goals>
-                    <configuration>
-                        <!-- In order to compile with full Java 8 compliance with access to jdk internal classes we need to clear the release 11 setting from parent pom -->
-                        <release combine.self="override"></release>
-                        <source>${javaVersion}</source>
-                        <target>${javaVersion}</target>
-                        <!-- recompile everything for target VM except the module-info.java -->
-                        <excludes>
-                            <exclude>module-info.java</exclude>
-                        </excludes>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>base-compile</id>
-                    <configuration>
-                        <release>11</release>
-                        <compileSourceRoots>
-                            <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
-                        </compileSourceRoots>
-                        <multiReleaseOutput>true</multiReleaseOutput>
-                    </configuration>
-                </execution>
-            </executions>
-            <configuration>
-                <encoding>ISO-8859-1</encoding>
-                <proc>none</proc>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-                <archive>
-                    <manifestEntries>
-                        <Multi-Release>true</Multi-Release>
-                    </manifestEntries>
-                </archive>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>3.2.0</version>
-            <executions>
-                <execution>
-                    <!-- Add the java 11 sources to the source artifact -->
-                    <id>attach-java11-sources</id>
-                    <!-- This has to run after compilation so it doesn't interfere with it (compler has its own MRJAR configuration) -->
-                    <phase>prepare-package</phase>
-                    <goals>
-                        <goal>add-source</goal>
-                    </goals>
-                    <configuration>
-                        <sources>
-                            <source>src/main/java11</source>
-                        </sources>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${mavenCompilerVersion}</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <!-- In order to compile with full Java 8 compliance with access to jdk internal classes we need to clear the release 11 setting from parent pom -->
+                            <release combine.self="override"></release>
+                            <source>${javaVersion}</source>
+                            <target>${javaVersion}</target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-compile</id>
+                        <configuration>
+                            <release>11</release>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>ISO-8859-1</encoding>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Multi-Release>true</Multi-Release>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <!-- Add the java 11 sources to the source artifact -->
+                        <id>attach-java11-sources</id>
+                        <!-- This has to run after compilation so it doesn't interfere with it (compler has its own MRJAR configuration) -->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java11</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencies>

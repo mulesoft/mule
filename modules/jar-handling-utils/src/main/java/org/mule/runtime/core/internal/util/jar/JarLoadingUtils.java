@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
  * This utility class is responsible for loading jars and also creating jar connection. The implementation of load methods is
  * different between Java 8 and Java 11+ as Java 8 we need to access JDK internal package sun.net.www.protocol.jar. Hence this
  * class will have 2 implementations and this module will be a MRJAR
+ *
+ * @since 4.5
  */
 public final class JarLoadingUtils {
 

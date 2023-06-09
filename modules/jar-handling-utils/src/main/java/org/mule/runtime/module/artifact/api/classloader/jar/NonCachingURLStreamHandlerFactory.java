@@ -16,6 +16,8 @@ import sun.net.www.protocol.jar.Handler;
 
 /**
  * Caching is disabled only for Java 8 and earlier
+ *
+ * @since 4.5
  */
 public class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
