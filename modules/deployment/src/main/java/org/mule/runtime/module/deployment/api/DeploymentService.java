@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.api;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 
@@ -74,6 +75,8 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
    * @param appName name of the application to undeploy
    */
   void undeploy(String appName);
+
+  void deploy(ArtifactAst artifactAst, String appName);
 
   /**
    * Deploys an application bundled as a zip from the given URL to the mule container

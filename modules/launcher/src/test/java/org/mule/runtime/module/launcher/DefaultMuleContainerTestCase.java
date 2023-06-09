@@ -73,7 +73,13 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
   private DefaultMuleContainer createMuleContainer() throws InitialisationException {
     return new DefaultMuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                                    extensionModelLoaderRepository, troubleshootingService);
+                                    extensionModelLoaderRepository, troubleshootingService, null) {
+
+      @Override
+      Map<String, Object> getCommandLineOptions(String[] args) {
+        return commandLineOptions;
+      }
+    };
   }
 
   @Test

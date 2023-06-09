@@ -173,10 +173,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -1353,23 +1350,29 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                      Supplier<SchedulerService> schedulerServiceSupplier) {
-      super(domainFactory, applicationFactory, schedulerServiceSupplier);
+      super(domainFactory, applicationFactory, schedulerServiceSupplier, false, null);
     }
 
     @Override
     protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
                                                                 ArtifactDeployer<Domain> domainMuleDeployer,
                                                                 ObservableList<Domain> domains,
-                                                                DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
+                                                                Optional<DefaultArchiveDeployer<ApplicationDescriptor, Application>> applicationDeployer,
                                                                 CompositeDeploymentListener applicationDeploymentListener,
                                                                 DeploymentListener domainDeploymentListener) {
+      DomainDeploymentTemplate deploymentTemplate;
+      if (applicationDeployer.isPresent()) {
+        deploymentTemplate = new DomainDeploymentTemplate(applicationDeployer.get(),
+                                                          this,
+                                                          applicationDeploymentListener);
+      } else {
+        deploymentTemplate = (DomainDeploymentTemplate) ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+      }
       return new TestDomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                                                        new DomainDeploymentTemplate(applicationDeployer,
-                                                                                                     this,
-                                                                                                     applicationDeploymentListener),
+                                                                        deploymentTemplate,
                                                                         new DeploymentMuleContextListenerFactory(
                                                                                                                  domainDeploymentListener)),
-                                           applicationDeployer, this);
+                                           Optional.ofNullable(applicationDeployer.orElse(null)), this);
 
     }
   }
@@ -1378,7 +1381,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   private static class TestDomainArchiveDeployer extends DomainArchiveDeployer {
 
     public TestDomainArchiveDeployer(ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
-                                     ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
+                                     Optional<ArchiveDeployer<ApplicationDescriptor, Application>> applicationDeployer,
                                      DeploymentService deploymentService) {
       super(domainDeployer, applicationDeployer, deploymentService);
     }

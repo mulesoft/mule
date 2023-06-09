@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.util.Optional.*;
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -19,8 +20,6 @@ import static java.lang.String.format;
 import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 
@@ -36,6 +35,8 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Preconditions;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -47,6 +48,7 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultVoltronFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
@@ -58,11 +60,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
@@ -102,9 +100,10 @@ public class MuleDeploymentService implements DeploymentService {
   private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
   private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
   private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
-  private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
-  private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
-  private final DomainBundleArchiveDeployer domainBundleDeployer;
+  private final DefaultVoltronFactory integrationFactory;
+  private DeploymentDirectoryWatcher deploymentDirectoryWatcher;
+  private DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
+  private DomainBundleArchiveDeployer domainBundleDeployer;
 
   static {
     setWeakHashCaches();
@@ -133,7 +132,9 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
+                               Supplier<SchedulerService> artifactStartExecutorSupplier, boolean voltronMode,
+                               DefaultVoltronFactory integrationFactory) {
+
     artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
         .customScheduler(config()
             .withName("ArtifactDeployer.start")
@@ -141,37 +142,50 @@ public class MuleDeploymentService implements DeploymentService {
                          MAX_QUEUED_STARTING_ARTIFACTS));
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
-    ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
     ArtifactDeployer<Domain> domainMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
+    this.integrationFactory = integrationFactory;
 
-    this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
-                                                            NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
-                                                            new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
-    this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
-    this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, applicationDeployer,
-                                                      applicationDeploymentListener, domainDeploymentListener);
-    this.domainDeployer.setDeploymentListener(domainDeploymentListener);
+    if (voltronMode) {
+      this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, empty(),
+                                                        applicationDeploymentListener, domainDeploymentListener);
 
-    this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
-                                                                applicationDeployer, applications, domainDeploymentListener,
-                                                                applicationDeploymentListener, this);
-
-    if (useParallelDeployment()) {
-      if (isDeployingSelectedAppsInOrder()) {
-        throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
-                                                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
-      }
-      LOGGER.info("Using parallel deployment");
-      this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
-                                                 applications,
-                                                 artifactStartExecutorSupplier, deploymentLock);
     } else {
-      this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         artifactStartExecutorSupplier,
-                                         deploymentLock);
+      ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
+      this.applicationDeployer = new DefaultArchiveDeployer<>(applicationMuleDeployer, applicationFactory, applications,
+                                                              NOP_ARTIFACT_DEPLOYMENT_TEMPLATE,
+                                                              new DeploymentMuleContextListenerFactory(applicationDeploymentListener));
+      this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
+      this.domainDeployer = createDomainArchiveDeployer(domainFactory, domainMuleDeployer, domains, of(applicationDeployer),
+                                                        applicationDeploymentListener, domainDeploymentListener);
+      this.domainDeployer.setDeploymentListener(domainDeploymentListener);
+      // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
+      // artifact plugins.
+
+      this.domainDeployer.setDeploymentListener(domainDeploymentListener);
+
+      this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
+              applicationDeployer, applications, domainDeploymentListener,
+              applicationDeploymentListener, this);
+
+      if (useParallelDeployment()) {
+        if (isDeployingSelectedAppsInOrder()) {
+          throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
+                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+        }
+        LOGGER.info("Using parallel deployment");
+        this.deploymentDirectoryWatcher =
+                new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                        applications,
+                        artifactStartExecutorSupplier, deploymentLock);
+      } else {
+        this.deploymentDirectoryWatcher =
+                new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
+                        artifactStartExecutorSupplier,
+                        deploymentLock);
+      }
     }
+    // TODO we may need to set this just after creating domain deployer
+    this.domainDeployer.setDeploymentListener(domainDeploymentListener);
   }
 
   static boolean useParallelDeployment() {
@@ -291,6 +305,8 @@ public class MuleDeploymentService implements DeploymentService {
     executeSynchronized(() -> applicationDeployer.undeployArtifact(appName));
   }
 
+
+
   @Override
   public void deploy(URI appArchiveUri) throws IOException {
     deploy(appArchiveUri, empty());
@@ -405,6 +421,11 @@ public class MuleDeploymentService implements DeploymentService {
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 
+  public void initializeVoltron() {
+    // For now we will look for a default domain that should exists to use as parent of all other artifacts created on-demand
+    domainDeployer.deployExplodedArtifact("default", empty());
+  }
+
   private interface SynchronizedDeploymentAction {
 
     void execute();
@@ -504,17 +525,35 @@ public class MuleDeploymentService implements DeploymentService {
   protected DomainArchiveDeployer createDomainArchiveDeployer(DefaultDomainFactory domainFactory,
                                                               ArtifactDeployer<Domain> domainMuleDeployer,
                                                               ObservableList<Domain> domains,
-                                                              DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
+                                                              Optional<DefaultArchiveDeployer<ApplicationDescriptor, Application>> applicationDeployer,
                                                               CompositeDeploymentListener applicationDeploymentListener,
                                                               DeploymentListener domainDeploymentListener) {
+    ArtifactDeploymentTemplate deploymentTemplate;
+    if (applicationDeployer.isPresent()) {
+      deploymentTemplate = new DomainDeploymentTemplate(applicationDeployer.get(), this, applicationDeploymentListener);
+    } else {
+      deploymentTemplate = NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+    }
     return new DomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
-                                                                  new DomainDeploymentTemplate(applicationDeployer,
-                                                                                               this,
-                                                                                               applicationDeploymentListener),
+                                                                  deploymentTemplate,
                                                                   new DeploymentMuleContextListenerFactory(
                                                                                                            domainDeploymentListener)),
-                                     applicationDeployer, this);
+                                     Optional.ofNullable(applicationDeployer.orElse(null)), this);
 
+  }
+
+  @Override
+  public void deploy(ArtifactAst artifactAst, String appName) {
+    Properties properties = new Properties();
+    properties.put("ast", artifactAst);
+    Application application = null;
+    try {
+      application = integrationFactory.createArtifact(MuleFoldersUtil.getAppFolder(appName), Optional.of(properties));
+      // TODO review how to properly do this.
+      applications.add(application);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
 }

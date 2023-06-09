@@ -41,7 +41,7 @@ public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
   @Test
   public void startupListenersAddDoesNotResultInConcurrentException() throws Exception {
     MuleDeploymentService deploymentService =
-        new MuleDeploymentService(domainFactory, applicationFactory, schedulerServiceSupplier);
+        new MuleDeploymentService(domainFactory, applicationFactory, schedulerServiceSupplier, false, null);
     List<Thread> listenersSubscribers = new ArrayList<>();
 
     for (int i = 0; i < NUMBER_OF_LISTENER_SUBSCRIBERS; i++) {

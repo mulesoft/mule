@@ -39,10 +39,10 @@ public class DomainArchiveDeployer implements ArchiveDeployer<DomainDescriptor, 
   public static final String DOMAIN_BUNDLE_APPS_FOLDER = "apps";
   private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final DeploymentService deploymentService;
-  private final ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
+  private final Optional<ArchiveDeployer<ApplicationDescriptor, Application>> applicationDeployer;
 
   public DomainArchiveDeployer(ArchiveDeployer<DomainDescriptor, Domain> domainDeployer,
-                               ArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer,
+                               Optional<ArchiveDeployer<ApplicationDescriptor, Application>> applicationDeployer,
                                DeploymentService deploymentService) {
     this.domainDeployer = domainDeployer;
     this.applicationDeployer = applicationDeployer;
@@ -65,9 +65,12 @@ public class DomainArchiveDeployer implements ArchiveDeployer<DomainDescriptor, 
   @Override
   public void undeployArtifact(String artifactId) {
     Collection<Application> domainApplications = findApplicationsAssociated(artifactId);
-    for (Application domainApplication : domainApplications) {
-      applicationDeployer.undeployArtifact(domainApplication.getArtifactName());
+    if (applicationDeployer.isPresent()) {
+      for (Application domainApplication : domainApplications) {
+        applicationDeployer.get().undeployArtifact(domainApplication.getArtifactName());
+      }
     }
+
     domainDeployer.undeployArtifact(artifactId);
   }
 

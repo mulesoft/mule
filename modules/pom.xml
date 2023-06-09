@@ -61,6 +61,7 @@
         <module>metrics</module>
         <module>tooling-support</module>
         <module>observability</module>
+        <module>integration-orchestrator</module>
     </modules>
 
     <build>

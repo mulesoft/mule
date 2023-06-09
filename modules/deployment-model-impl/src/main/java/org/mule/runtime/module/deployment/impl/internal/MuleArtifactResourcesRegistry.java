@@ -78,6 +78,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
+import org.mule.runtime.module.deployment.impl.internal.application.DefaultVoltronFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
@@ -126,6 +127,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
+  private final DefaultVoltronFactory integrationFactory;
   private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
@@ -331,6 +333,15 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
+
+    integrationFactory = new DefaultVoltronFactory(applicationClassLoaderBuilderFactory,
+                                                   domainManager, serviceManager,
+                                                   extensionModelLoaderRepository,
+                                                   artifactClassLoaderManager,
+                                                   licenseValidator,
+                                                   runtimeLockFactory,
+                                                   this.memoryManagementService,
+                                                   artifactConfigurationProcessor);
   }
 
   private FeatureFlaggingService getContainerFeatureFlaggingService() {
@@ -478,4 +489,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     return (SchedulerService) serviceManager.getServices().stream().filter(s -> s instanceof SchedulerService).findFirst().get();
   }
 
+  public DefaultVoltronFactory getIntegrationFactory() {
+    return integrationFactory;
+  }
 }
