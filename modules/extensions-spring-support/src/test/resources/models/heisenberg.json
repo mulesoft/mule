@@ -3,7 +3,7 @@
   "description": "",
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
-  "minMuleVersion": "4.6.0",
+  "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
     "1.8",
     "11"
@@ -1979,7 +1979,7 @@
           "optional": false
         }
       ],
-      "minMuleVersion": "4.6.0",
+      "minMuleVersion": "4.5.0",
       "operations": [
         {
           "blocking": true,
@@ -2541,7 +2541,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -5886,7 +5886,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -6247,7 +6247,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -6661,7 +6661,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8329,7 +8329,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -8707,7 +8707,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -9172,7 +9172,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -10027,7 +10027,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12023,7 +12023,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12423,7 +12423,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -12799,7 +12799,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -13190,7 +13190,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -13801,7 +13801,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -16105,7 +16105,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -20107,7 +20107,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -22407,7 +22407,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -24219,7 +24219,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -26261,7 +26261,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -28594,7 +28594,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -30927,7 +30927,7 @@
             "deprecatedSince": "1.6.0",
             "toRemoveIn": "3.0.0"
           },
-          "minMuleVersion": "4.6.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -31981,7 +31981,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.6.0",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -41406,7 +41406,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.6.0",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -46560,7 +46560,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.6.0",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [
@@ -52991,7 +52991,7 @@
           "namespace": "MULE"
         }
       },
-      "minMuleVersion": "4.6.0",
+      "minMuleVersion": "4.5.0",
       "parameterGroupModels": [
         {
           "parameters": [

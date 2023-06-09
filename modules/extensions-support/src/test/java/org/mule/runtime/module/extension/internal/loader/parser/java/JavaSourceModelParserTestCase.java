@@ -7,21 +7,20 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
-import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.DROP;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAIL;
+import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_ALL_NODES;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.DEFAULT_PRIMARY_NODE_ONLY;
 import static org.mule.sdk.api.annotation.source.SourceClusterSupport.NOT_SUPPORTED;
 
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.execution.OnSuccess;
@@ -34,21 +33,16 @@ import org.mule.runtime.extension.api.annotation.source.ClusterSupport;
 import org.mule.runtime.extension.api.annotation.source.OnBackPressure;
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.source.Source;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
-import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.SourceElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.SourceTypeWrapper;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.execution.OnError;
 import org.mule.sdk.api.annotation.source.EmitsResponse;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.Test;
 import org.mule.sdk.api.connectivity.ConnectionProvider;
 import org.mule.sdk.api.runtime.connectivity.Reconnectable;
 import org.mule.sdk.api.runtime.connectivity.ReconnectionCallback;
@@ -64,7 +58,14 @@ import org.mule.sdk.api.store.ObjectStoreManager;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
+import java.util.List;
+import java.util.Optional;
+
 import javax.inject.Inject;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class JavaSourceModelParserTestCase {
 
@@ -281,9 +282,9 @@ public class JavaSourceModelParserTestCase {
   @Test
   public void getMMVForSourceWithSdkInvalidField() {
     mockSourceWrapperWithClass(SourceWithMMVField.class);
-    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.6"));
+    assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Source SourceWithMMVField has min mule version 4.6 because of its field someField. Field someField has min mule version 4.6 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithMMVField has min mule version 4.5.0 because of its field someField. Field someField has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
@@ -530,7 +531,7 @@ public class JavaSourceModelParserTestCase {
 
   private static class SourceWithMMVField extends TestSource {
 
-    @MinMuleVersion("4.6")
+    @MinMuleVersion("4.5.0")
     String someField;
   }
 
