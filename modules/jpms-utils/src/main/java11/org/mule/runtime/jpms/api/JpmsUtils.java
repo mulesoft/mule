@@ -90,6 +90,9 @@ public final class JpmsUtils {
         // Only expose standard java modules
         .filter(moduleRef -> moduleRef.descriptor().name().startsWith("java."))
         .forEach(moduleRef -> packages.addAll(moduleRef.descriptor().packages()));
+
+    // caffeine 2.x still uses sun.misc.Unsafe. Ref: https://github.com/ben-manes/caffeine/issues/273
+    packages.add("sun.misc");
   }
 
   /**
