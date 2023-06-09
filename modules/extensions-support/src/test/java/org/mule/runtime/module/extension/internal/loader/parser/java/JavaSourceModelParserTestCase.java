@@ -284,7 +284,7 @@ public class JavaSourceModelParserTestCase {
     mockSourceWrapperWithClass(SourceWithMMVField.class);
     assertThat(parser.getResolvedMinMuleVersion().get().getMinMuleVersion().toString(), is("4.5.0"));
     assertThat(parser.getResolvedMinMuleVersion().get().getReason(),
-               is("Source SourceWithMMVField has min mule version 4.5 because of its field someField. Field someField has min mule version 4.5 because it is annotated with @MinMuleVersion."));
+               is("Source SourceWithMMVField has min mule version 4.5.0 because of its field someField. Field someField has min mule version 4.5.0 because it is annotated with @MinMuleVersion."));
   }
 
   @Test
