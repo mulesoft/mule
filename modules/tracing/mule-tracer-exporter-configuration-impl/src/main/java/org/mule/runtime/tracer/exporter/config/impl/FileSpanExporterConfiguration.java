@@ -7,17 +7,18 @@
 
 package org.mule.runtime.tracer.exporter.config.impl;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
@@ -51,16 +52,14 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
 
   private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
-  private final FeatureFlaggingService featureFlaggingService;
 
   private ConfigurationPropertiesResolver propertyResolver;
   private Properties properties;
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
 
-  public FileSpanExporterConfiguration(MuleContext muleContext, FeatureFlaggingService featureFlaggingService) {
+  public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.featureFlaggingService = featureFlaggingService;
   }
 
   @Override
@@ -116,7 +115,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   private Properties getSpanExporterConfigurationProperties() {
-    if (featureFlaggingService.isEnabled(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL)) {
+    if (getBoolean(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY)) {
       try {
         // This will verify first in the app and then in the conf folder.
         InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
