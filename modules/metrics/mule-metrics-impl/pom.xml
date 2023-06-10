@@ -29,6 +29,21 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metrics-exporter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metrics-api</artifactId>
             <version>${project.version}</version>
         </dependency>

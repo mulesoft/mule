@@ -6,17 +6,30 @@
  */
 package org.mule.runtime.metrics.exporter.impl;
 
+import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENDPOINT;
+
+import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.exporter.api.DummyConfiguration;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport;
 
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.ObservableLongCounter;
+import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Objects;
 
+import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
+import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.MeterProvider;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
@@ -24,40 +37,65 @@ import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 
 /**
- * A {@link MeterExporter} that exports metrics using OpenTelemetry.
+ * A {@link MeterExporter} that exports metrics using open telemetry.
  *
  * @since 4.5.0
  */
-public class OpenTelemetryMeterExporter implements MeterExporter {
+public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
-  private MeterProvider meterProvider;
-  private Map<String, Meter> openTelemetryMeters = new HashMap<>();
+  private final List<ObservableLongCounter> counters = new ArrayList<>();
 
-  public OpenTelemetryMeterExporter(DummyConfiguration configuration) {
-    MetricExporter metricExporter =
-        OpenTelemetryMeterExporterTransport.valueOf(configuration.getExporterType()).getMetricExporter();
+  private final List<ObservableLongUpDownCounter> upDownCounters = new ArrayList<>();
+  private final MeterProvider meterProvider;
+  private final Map<String, Meter> openTelemetryMeters = new HashMap<>();
+
+  public OpenTelemetryMeterExporter(DummyConfiguration configuration, Resource resource) {
+    // TODO W-13218993: In this task all the configuration possibilities will be applied.
+    String endpoint = getProperty(METRIC_EXPORTER_ENDPOINT);
+
+    MetricExporter metricExporter = null;
+
+    if (endpoint != null) {
+      metricExporter = OtlpGrpcMetricExporter.builder().setEndpoint(endpoint).build();
+    } else {
+      metricExporter =
+          OpenTelemetryMeterExporterTransport.valueOf(configuration.getExporterType()).getMetricExporter();
+    }
+
     this.meterProvider = SdkMeterProvider.builder()
+        .setResource(resource)
         .registerMetricReader(PeriodicMetricReader.builder(metricExporter)
             .setInterval(configuration.getExportingInterval(), SECONDS).build())
         .build();
   }
 
   @Override
-  public void enableExport(LongCounter longCounter) {
-    Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeterName());
-    openTelemetryMeter.counterBuilder(longCounter.getName())
-        .buildWithCallback(measurement -> measurement.record(longCounter.getValue()));
+  public synchronized void enableExport(LongCounter longCounter) {
+    Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeter().getName());
+    Attributes attributes = new OpentelemetryExporterAttributes(longCounter.getMeter());
+    counters.add(openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription())
+        .setUnit(Objects.toString(longCounter.getUnit(), ""))
+        .buildWithCallback(measurement -> measurement.record(longCounter.getValueAsLong(), attributes)));
   }
 
   @Override
-  public void enableExport(LongUpDownCounter upDownCounter) {
-    Meter openTelemetryMeter = openTelemetryMeters.get(upDownCounter.getMeterName());
-    openTelemetryMeter.upDownCounterBuilder(upDownCounter.getName())
-        .buildWithCallback(measurement -> measurement.record(upDownCounter.getValue()));
+  public synchronized void enableExport(LongUpDownCounter upDownCounter) {
+    Meter openTelemetryMeter = openTelemetryMeters.get(upDownCounter.getMeter().getName());
+    Attributes attributes = new OpentelemetryExporterAttributes(upDownCounter.getMeter());
+    upDownCounters.add(openTelemetryMeter.upDownCounterBuilder(upDownCounter.getName())
+        .setDescription(upDownCounter.getDescription())
+        .setUnit(Objects.toString(upDownCounter.getUnit(), ""))
+        .buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
   }
 
   @Override
-  public void registerMeterToExport(org.mule.runtime.metrics.api.meter.Meter meter) {
+  public synchronized void registerMeterToExport(org.mule.runtime.metrics.api.meter.Meter meter) {
     openTelemetryMeters.put(meter.getName(), meterProvider.meterBuilder(meter.getName()).build());
+  }
+
+  @Override
+  public void dispose() {
+    counters.forEach(ObservableLongCounter::close);
+    upDownCounters.forEach(ObservableLongUpDownCounter::close);
   }
 }

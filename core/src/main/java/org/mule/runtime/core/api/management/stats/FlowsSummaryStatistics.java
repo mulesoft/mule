@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.management.stats;
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.core.api.source.MessageSource;
+import org.mule.runtime.metrics.api.MeterProvider;
 
 /**
  * Provides summary information about the flows in the deployed application.
@@ -79,4 +80,12 @@ public interface FlowsSummaryStatistics extends Statistics {
    */
   int getActiveApikitFlows();
 
+  /**
+   * Tracks using meter provider.
+   *
+   * @param meterProvider the {@link MeterProvider} to use for tracking
+   */
+  default void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
+    // Nothing to do by default
+  }
 }

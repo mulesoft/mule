@@ -17,20 +17,18 @@
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.api</javaModuleName>
-        <opentelemetryVersion>1.20.1</opentelemetryVersion>
         <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
     
     <dependencies>
         <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
-            <version>${opentelemetryVersion}</version>
-        </dependency>
-        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-metrics-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-api</artifactId>
         </dependency>
     </dependencies>
 

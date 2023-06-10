@@ -8,12 +8,18 @@ package org.mule.runtime.metrics.api.meter;
 
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
+import org.mule.runtime.metrics.api.instrument.registration.LongCounterRegistrationHelper;
+import org.mule.runtime.metrics.api.instrument.registration.LongUpDownCounterRegistrationHelper;
+
+import java.util.function.BiConsumer;
 
 /**
  * Provides instruments used to record measurements which are aggregated to metrics.
  *
  * <p>
  * Instruments are obtained through builders provided by this interface.
+ *
+ * @since 4.5.0
  **/
 public interface Meter {
 
@@ -28,15 +34,34 @@ public interface Meter {
   String getDescription();
 
   /**
+   * Applies the consumer for each meter attribute.
+   *
+   * @param biConsumer the {@link BiConsumer} to apply for each attribute.
+   */
+  void forEachAttribute(BiConsumer<String, String> biConsumer);
+
+  /**
    * @param name the name of the instrument.
    *
-   * @return the upDownCounterBuilder
+   * @return the {@link LongUpDownCounterBuilder}
    */
   LongUpDownCounterBuilder upDownCounterBuilder(String name);
 
   /**
    * @param name the name of the instrument.
-   * @return the counter builder
+   * @return the {@link LongCounterBuilder}
    */
   LongCounterBuilder counterBuilder(String name);
+
+  /**
+   * @param counterName the name of the instrument.
+   * @return the {@link LongCounterRegistrationHelper}
+   */
+  LongCounterRegistrationHelper counterRegistrationHelper(String counterName);
+
+  /**
+   * @param counterName the name of the instrument.
+   * @return the {@link LongUpDownCounterRegistrationHelper}
+   */
+  LongUpDownCounterRegistrationHelper upDownCounterRegistrationHelper(String counterName);
 }

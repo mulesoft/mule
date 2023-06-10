@@ -15,7 +15,8 @@ import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
  * @since 4.3
  */
 @ArtifactClassLoaderRunnerConfig(applicationSharedRuntimeLibs = {
-    "org.mule.tests:mule-activemq-broker"
+    "org.mule.tests:mule-activemq-broker",
+    "javax.jms:javax.jms-api"
 })
 public abstract class AbstractCeXmlExtensionMuleArtifactFunctionalTestCase
     extends AbstractXmlExtensionMuleArtifactFunctionalTestCase {

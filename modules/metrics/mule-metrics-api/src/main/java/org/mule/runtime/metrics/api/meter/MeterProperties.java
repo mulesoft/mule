@@ -4,14 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.metrics.api.instrument.builder;
-
-import org.mule.runtime.metrics.api.instrument.LongCounter;
+package org.mule.runtime.metrics.api.meter;
 
 /**
- * Builder class for {@link LongCounter}.
- *
- * @since 4.5.0
+ * Meter properties keys.
  */
-public interface LongCounterBuilder extends InstrumentBuilder<LongCounter> {
+public class MeterProperties {
+
+  /**
+   * A meter attribute for the artifact id.
+   */
+  public static final String MULE_METER_ARTIFACT_ID_ATTRIBUTE = "mule.artifact.id";
 }

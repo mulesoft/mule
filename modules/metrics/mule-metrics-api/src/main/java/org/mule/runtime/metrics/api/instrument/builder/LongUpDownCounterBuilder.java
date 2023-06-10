@@ -6,33 +6,14 @@
  */
 package org.mule.runtime.metrics.api.instrument.builder;
 
-import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 
 /**
- * Builder class for {@link LongUpDownCounter}
+ * Builder class for {@link LongUpDownCounter}.
  *
  * @since 4.5.0
  */
-public interface LongUpDownCounterBuilder {
-
-  /**
-   * Sets the description for the instrument to build.
-   *
-   * @param description The description.
-   *
-   * @return the {@link LongCounterBuilder}
-   */
-  LongUpDownCounterBuilder withDescription(String description);
-
-  /**
-   * Sets the unit for the instrument to build.
-   *
-   * @param unit the unit.
-   *
-   * @@return the {@link LongCounterBuilder}.
-   */
-  LongUpDownCounterBuilder withUnit(String unit);
+public interface LongUpDownCounterBuilder extends InstrumentBuilder<LongUpDownCounter> {
 
   /**
    * Sets the initial value for the instrument to build.
@@ -42,9 +23,4 @@ public interface LongUpDownCounterBuilder {
    * @return the {@link LongCounterBuilder}.
    */
   LongUpDownCounterBuilder withInitialValue(long initialValue);
-
-  /**
-   * @return the {@link LongCounter}.
-   */
-  LongUpDownCounter build();
 }
