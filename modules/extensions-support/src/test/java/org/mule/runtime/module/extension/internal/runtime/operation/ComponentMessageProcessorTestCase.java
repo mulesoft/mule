@@ -56,6 +56,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.qameta.allure.Issue;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.After;
@@ -228,6 +229,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   }
 
   @Test
+  @Issue("W-13563214")
   public void newSubscriptionAfterPreviousPublisherTermination() throws MuleException, InterruptedException {
     final ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
