@@ -1,0 +1,55 @@
+/*
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.extension.internal.runtime.operation;
+
+import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.internal.runtime.TestComponentMessageProcessor;
+
+import java.util.function.BiFunction;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
+import reactor.core.publisher.Flux;
+import reactor.util.context.ContextView;
+
+/**
+ * Specialization of {@link ComponentMessageProcessorTestCase} in which the events go through the inner fluxes.
+ * <p>
+ * This is the case for operations that may complete in a different thread or operations with policies.
+ * <p>
+ * We are intentionally inheriting all the tests from {@link ComponentMessageProcessorTestCase}.
+ *
+ * @see ComponentMessageProcessor#createOuterFlux
+ */
+public class ComponentMessageProcessorInnerFluxesTestCase extends ComponentMessageProcessorTestCase {
+
+  @Override
+  protected ComponentMessageProcessor<ComponentModel> createProcessor() {
+    return new TestComponentMessageProcessor(extensionModel,
+                                             componentModel, null, null, null,
+                                             resolverSet, null, null, null,
+                                             null, extensionManager,
+                                             mockPolicyManager, null, null,
+                                             muleContext.getConfiguration().getShutdownTimeout()) {
+
+      @Override
+      protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
+
+      @Override
+      public ProcessingType getInnerProcessingType() {
+        return ProcessingType.CPU_LITE;
+      }
+
+      @Override
+      protected boolean mayCompleteInDifferentThread() {
+        // For this test case we want all events to be processed asynchronously (through the round-robin of inner fluxes)
+        return true;
+      }
+    };
+  }
+}

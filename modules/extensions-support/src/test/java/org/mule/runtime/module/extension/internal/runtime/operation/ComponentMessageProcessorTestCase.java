@@ -56,61 +56,45 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 
 public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ComponentMessageProcessorTestCase.class);
   @Rule
   public ExpectedException expected = ExpectedException.none();
-  private ComponentMessageProcessor<ComponentModel> processor;
-  private ExtensionModel extensionModel;
-  private ComponentModel componentModel;
-  private ResolverSet resolverSet;
-  private ExtensionManager extensionManager;
-  private PolicyManager mockPolicyManager;
+  protected ComponentMessageProcessor<ComponentModel> processor;
+  protected ExtensionModel extensionModel;
+  protected ComponentModel componentModel;
+  protected ResolverSet resolverSet;
+  protected ExtensionManager extensionManager;
+  protected PolicyManager mockPolicyManager;
 
   @Before
   public void before() throws MuleException {
-    CoreEvent response = testEvent();
-
     extensionModel = mock(ExtensionModel.class);
     when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix("mock").build());
 
     componentModel = mock(ComponentModel.class, withSettings().extraInterfaces(EnrichableModel.class));
     when((componentModel).getModelProperty(CompletableComponentExecutorModelProperty.class))
-        .thenReturn(of(new CompletableComponentExecutorModelProperty((cp, p) -> (ctx, callback) -> callback.complete(response))));
+        .thenReturn(of(new CompletableComponentExecutorModelProperty(IdentityExecutor::create)));
     resolverSet = mock(ResolverSet.class);
 
     extensionManager = mock(ExtensionManager.class);
     mockPolicyManager = mock(PolicyManager.class);
     when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenReturn(noPolicyOperation());
 
-    processor = new TestComponentMessageProcessor(extensionModel,
-                                                  componentModel, null, null, null,
-                                                  resolverSet, null, null, null,
-                                                  null, extensionManager,
-                                                  mockPolicyManager, null, null,
-                                                  muleContext.getConfiguration().getShutdownTimeout()) {
-
-      @Override
-      protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
-
-      @Override
-      public ProcessingType getInnerProcessingType() {
-        return ProcessingType.CPU_LITE;
-      }
-    };
+    processor = createProcessor();
     processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
@@ -127,6 +111,24 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   public void after() throws MuleException {
     stopIfNeeded(processor);
     disposeIfNeeded(processor, LOGGER);
+  }
+
+  protected ComponentMessageProcessor<ComponentModel> createProcessor() {
+    return new TestComponentMessageProcessor(extensionModel,
+                                             componentModel, null, null, null,
+                                             resolverSet, null, null, null,
+                                             null, extensionManager,
+                                             mockPolicyManager, null, null,
+                                             muleContext.getConfiguration().getShutdownTimeout()) {
+
+      @Override
+      protected void validateOperationConfiguration(ConfigurationProvider configurationProvider) {}
+
+      @Override
+      public ProcessingType getInnerProcessingType() {
+        return ProcessingType.CPU_LITE;
+      }
+    };
   }
 
   @Test
@@ -191,6 +193,49 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     verify(routeBuilderValueResolver, times(1)).start();
   }
 
+  @Test
+  public void happyPathFluxPublisher() throws MuleException, InterruptedException {
+    final ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
+    when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
+
+    subscribeToParallelPublisherAndAwait(3);
+  }
+
+  @Test
+  public void multipleUpstreamPublishers() throws MuleException, InterruptedException {
+    final ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
+    when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
+
+    InfiniteEmitter<CoreEvent> eventsEmitter = new InfiniteEmitter<>(this::newEvent);
+    InfiniteEmitter<CoreEvent> eventsEmitter2 = new InfiniteEmitter<>(this::newEvent);
+    ItemsConsumer<CoreEvent> eventsConsumer = new ItemsConsumer<>(10);
+    ItemsConsumer<CoreEvent> eventsConsumer2 = new ItemsConsumer<>(3);
+
+    Flux.create(eventsEmitter)
+        .transform(processor)
+        .subscribe(eventsConsumer);
+
+    Flux.create(eventsEmitter2)
+        .transform(processor)
+        .subscribe(eventsConsumer2);
+
+    eventsEmitter.start();
+    eventsEmitter2.start();
+    eventsConsumer.await();
+    eventsEmitter.stop();
+    eventsConsumer2.await();
+    eventsEmitter2.stop();
+  }
+
+  @Test
+  public void newSubscriptionAfterPreviousPublisherTermination() throws MuleException, InterruptedException {
+    final ResolverSetResult resolverSetResult = mock(ResolverSetResult.class);
+    when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(resolverSetResult);
+
+    subscribeToParallelPublisherAndAwait(5);
+    subscribeToParallelPublisherAndAwait(4);
+  }
+
   private void expectWrapped(Exception expect) {
     expected.expect(new BaseMatcher<Exception>() {
 
@@ -208,6 +253,20 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
         description.appendText("condition not met");
       }
     });
+  }
+
+  private void subscribeToParallelPublisherAndAwait(int numEvents) throws InterruptedException {
+    InfiniteEmitter<CoreEvent> eventsEmitter = new InfiniteEmitter<>(this::newEvent);
+    ItemsConsumer<CoreEvent> eventsConsumer = new ItemsConsumer<>(numEvents);
+
+    Flux.create(eventsEmitter)
+        .transform(processor)
+        .doOnNext(Assert::assertNotNull)
+        .subscribe(eventsConsumer);
+
+    eventsEmitter.start();
+    eventsConsumer.await();
+    eventsEmitter.stop();
   }
 
 }
