@@ -23,7 +23,7 @@ import reactor.core.publisher.FluxSink;
 class InfiniteEmitter<T> implements Consumer<FluxSink<T>> {
 
   /**
-   * The items supplier interface, which is like a regular {@link Supplier, except this one can throw {@link Exception}.
+   * The items supplier interface, which is like a regular {@link Supplier}, except this one can throw {@link Exception}.
    *
    * @param <ItemType> the item type.
    */
