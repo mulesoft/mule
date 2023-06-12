@@ -35,6 +35,8 @@
                             <artifactSet>
                                 <includes>
                                     <includes>org.apache.activemq:*</includes>
+                                    <includes>org.apache.activemq.protobuf:*</includes>
+                                    <includes>com.fasterxml.jackson.core:*</includes>
                                     <includes>org.fusesource.hawtbuf:hawtbuf</includes>
                                     <includes>jakarta.management.j2ee:jakarta.management.j2ee-api</includes>
                                 </includes>
@@ -64,16 +66,16 @@
             <version>${activemqVersion}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq.protobuf</groupId>
-            <artifactId>activemq-protobuf</artifactId>
-            <version>${activemqProtobuf}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-jaas</artifactId>
             <version>${activemqVersion}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.activemq.protobuf</groupId>
+            <artifactId>activemq-protobuf</artifactId>
+            <version>${activemqProtobuf}</version>
+        </dependency>
         <dependency>
             <groupId>org.fusesource.hawtbuf</groupId>
             <artifactId>hawtbuf</artifactId>
