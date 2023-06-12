@@ -12,18 +12,35 @@ import static org.mule.runtime.module.deployment.internal.util.Utils.getResource
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 
 import static java.lang.String.format;
-import static java.lang.Thread.sleep;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
+import org.mule.functional.api.flow.TestEventBuilder;
+import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
+import org.mule.runtime.core.internal.policy.OperationPolicy;
+import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.policy.api.PolicyPointcut;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 
 import io.qameta.allure.Description;
@@ -112,10 +129,12 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
 
     assertManualExecutionsCount(2);
 
+    Reference<OperationPolicy> operationPolicyRef = getPrintMessageOperationPolicyRef(applicationFileBuilder.getId());
+
     policyManager.removePolicy(applicationFileBuilder.getId(), policyToRedeployFileBuilder.getArtifactId());
 
-    // TODO: actually wait until the stale policy is disposed to avoid a source of test flakiness
-    sleep(2000);
+    // Waits for the disposal of the composite policy instance (not the policy artifact itself)
+    waitEnqueued(operationPolicyRef);
 
     assertManualExecutionsCount(3);
 
@@ -123,6 +142,38 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
                             policyToRedeployParametrization);
 
     assertManualExecutionsCount(5);
+  }
+
+  private Reference<OperationPolicy> getPrintMessageOperationPolicyRef(String applicationId) {
+    ArtifactContext applicationContext = findApp(applicationId, 1).getArtifactContext();
+    ComponentIdentifier componentIdentifier = ComponentIdentifier.buildFromStringRepresentation("hello:print-message");
+
+    Component operation = applicationContext.getMuleContext().getConfigurationComponentLocator().find(componentIdentifier).get(0);
+    Registry registry = applicationContext.getRegistry();
+    FlowConstruct flowConstruct = (FlowConstruct) registry.lookupByName(operation.getLocation().getRootContainerName()).get();
+    PolicyManager appPolicyManager = registry.lookupByType(PolicyManager.class).get();
+
+    // Here we are relying on the fact that there is caching involved when creating an operation policy
+    OperationPolicy operationPolicy = appPolicyManager.createOperationPolicy(operation,
+                                                                             new TestEventBuilder().build(flowConstruct),
+                                                                             Collections::emptyMap);
+    OperationPolicy operationPolicy2 = appPolicyManager.createOperationPolicy(operation,
+                                                                              new TestEventBuilder().build(flowConstruct),
+                                                                              Collections::emptyMap);
+    // Control test to make sure there is caching
+    assertThat("Operation policies are not cached, so the test can give false positives",
+               operationPolicy,
+               is(sameInstance(operationPolicy2)));
+
+    return new PhantomReference<>(operationPolicy, new ReferenceQueue<>());
+  }
+
+  private void waitEnqueued(Reference<?> reference) {
+    new PollingProber(5000, 100).check(new JUnitLambdaProbe(() -> {
+      System.gc();
+      assertThat(reference.isEnqueued(), is(true));
+      return true;
+    }));
   }
 
   private PolicyParametrization getParametrization(PolicyFileBuilder policyFileBuilder, int order) throws URISyntaxException {
