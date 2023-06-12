@@ -200,7 +200,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             // We don't want class loaders in limbo
             synchronized (descriptorMappingLock) {
               if (descriptorMapping.get(matchDescriptor) == null) {
-                URLClassLoader urlClassLoader =  new URLClassLoader(new URL[] {url}, getSystemClassLoader(), getCachingURLStreamHandlerFactory());;
+                URLClassLoader urlClassLoader =
+                    new URLClassLoader(new URL[] {url}, getSystemClassLoader(), getCachingURLStreamHandlerFactory());;
                 descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }
