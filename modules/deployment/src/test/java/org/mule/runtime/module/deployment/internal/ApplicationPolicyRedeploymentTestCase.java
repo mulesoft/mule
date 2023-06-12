@@ -42,7 +42,7 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
 
   private static final String OS_POLICY_NAME = "object-store-policy";
   private static final String POLICY_WITH_OPERATION_NAME = "appPluginPolicy";
-  private static final String POLICY_WITH_ASYNC_OPERATION_NAME = "policyWithAsyncOperation";
+  private static final String POLICY_WITH_NON_BLOCKING_OPERATION_NAME = "policyWithNonBlockingOperation";
 
   private static final String FLOW_NAME = "main";
 
@@ -86,12 +86,12 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
 
   @Test
   @Issue("W-13563214")
-  @Description("There was an issue with the inner fluxes of an async operation in a policy being disposed (and never rebuilt) after another operation policy was undeployed/redeployed and the CompositeOperationPolicy sinks were completed")
-  public void whenRedeployingOperationPolicyThenOtherOperationPoliciesWithAsyncOperationsStillWork() throws Exception {
+  @Description("There was an issue with the inner fluxes of a non-blocking operation in a policy being disposed (and never rebuilt) after another operation policy was undeployed/redeployed and the CompositeOperationPolicy sinks were completed")
+  public void whenRedeployingOperationPolicyThenOtherOperationPoliciesWithNonBlockingOperationsStillWork() throws Exception {
     // We will be deploying two policies and redeploying one of them
-    // It is important that the policy that remains deployed has an asynchronous operation in order to reproduce the issue
+    // It is important that the policy that remains deployed has a non-blocking operation in order to reproduce the issue
     PolicyFileBuilder policyToRedeployFileBuilder = createPolicyFileBuilder(POLICY_WITH_OPERATION_NAME);
-    PolicyFileBuilder policyToKeepFileBuilder = createPolicyFileBuilder(POLICY_WITH_ASYNC_OPERATION_NAME);
+    PolicyFileBuilder policyToKeepFileBuilder = createPolicyFileBuilder(POLICY_WITH_NON_BLOCKING_OPERATION_NAME);
 
     PolicyParametrization policyToRedeployParametrization = getParametrization(policyToRedeployFileBuilder, 1);
     PolicyParametrization policyToKeepParametrization = getParametrization(policyToKeepFileBuilder, 2);

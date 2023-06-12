@@ -47,7 +47,8 @@ public class ComponentMessageProcessorInnerFluxesTestCase extends ComponentMessa
 
       @Override
       protected boolean mayCompleteInDifferentThread() {
-        // For this test case we want all events to be processed asynchronously (through the round-robin of inner fluxes)
+        // For this test case we want all events to be processed as if the processor was non-blocking (through the round-robin of
+        // inner fluxes)
         return true;
       }
     };

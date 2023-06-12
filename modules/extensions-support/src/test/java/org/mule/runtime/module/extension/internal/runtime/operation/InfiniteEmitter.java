@@ -16,7 +16,7 @@ import reactor.core.publisher.FluxSink;
 /**
  * Publisher source which emits an unlimited number of items.
  * <p>
- * Additionally, the items are served from a different thread, simulating an asynchronous source.
+ * Additionally, the items are served from a different thread, simulating a parallel source.
  *
  * @param <T> the type of items to emit.
  */

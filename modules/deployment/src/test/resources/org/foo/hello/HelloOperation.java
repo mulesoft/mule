@@ -25,16 +25,16 @@ public class HelloOperation {
   }
 
   /**
-   * This is just the same as {@link #printMessage(HelloExtension)} with the only difference that it is declared as asynchronous.
+   * This is just the same as {@link #printMessage(HelloExtension)} with the only difference that it is declared as non-blocking.
    * <p>
-   * Note that the implementation may not be trully asynchronous, it is just used for testing purposes, simulating an asynchronous
+   * Note that the implementation may not be trully non-blocking, it is just used for testing purposes, simulating a non-blocking
    * operation.
    *
    * @param config the config for the operation.
    * @param callback the completion callback.
    */
   @MediaType(value = TEXT_PLAIN, strict = false)
-  public void asyncPrintMessage(@Config HelloExtension config, CompletionCallback<String, Void> callback) {
+  public void nonBlockingPrintMessage(@Config HelloExtension config, CompletionCallback<String, Void> callback) {
     System.out.println("Test plugin extension says: " + config.getMessage());
     Result<String, Void> result = Result.<String, Void>builder()
       .output(config.getMessage())

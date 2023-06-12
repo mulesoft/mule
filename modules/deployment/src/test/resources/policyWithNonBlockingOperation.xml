@@ -11,7 +11,7 @@
 
     <test-policy:proxy name="policy">
         <test-policy:operation>
-            <hello:async-print-message config-ref="default"/>
+            <hello:non-blocking-print-message config-ref="default"/>
             <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
             <test-policy:execute-next/>
         </test-policy:operation>
