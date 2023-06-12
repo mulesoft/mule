@@ -642,6 +642,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void startInnerFluxUnsafe() {
     if (fluxSupplier != null) {
+      LOGGER.debug("Skipping creation of inner flux supplier for processor '{}' because it is already created.",
+                   this.getLocation());
       return;
     }
 

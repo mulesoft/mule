@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUTION_ENGINE;
+import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.REACTOR;
+
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.TestComponentMessageProcessor;
 
-import java.util.function.BiFunction;
-
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
-import reactor.core.publisher.Flux;
-import reactor.util.context.ContextView;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 /**
  * Specialization of {@link ComponentMessageProcessorTestCase} in which the events go through the inner fluxes.
@@ -26,6 +26,9 @@ import reactor.util.context.ContextView;
  *
  * @see ComponentMessageProcessor#createOuterFlux
  */
+@Feature(EXECUTION_ENGINE)
+@Story(REACTOR)
+@Issue("W-13563214")
 public class ComponentMessageProcessorInnerFluxesTestCase extends ComponentMessageProcessorTestCase {
 
   @Override
