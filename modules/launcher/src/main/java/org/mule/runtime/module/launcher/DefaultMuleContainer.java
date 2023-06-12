@@ -78,6 +78,13 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultMuleContainer implements MuleContainer {
 
+  public static final String[][] CLI_OPTIONS =
+      {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
+          {"idle", "false", "Whether to run in idle (unconfigured) mode"}, {"main", "true", "Main Class"},
+          {"mode", "true", "Run Mode"}, {"props", "true", "Startup Properties"}, {"production", "false", "Production Mode"},
+          {"debug", "false", "Configure Mule for JPDA remote debugging."}, {"app", "true", "Application to start"},
+          {"voltronMode", "false", "Configure Mule to run as integration orchestrator for Voltron."}};
+
   /**
    * logger used by this class
    */

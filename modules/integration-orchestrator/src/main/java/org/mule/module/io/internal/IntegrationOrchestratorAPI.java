@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -70,56 +71,70 @@ public class IntegrationOrchestratorAPI {
   public void start() {
     this.deploymentService.initializeVoltron();
     try {
+      String runtimeConfigurationServiceUrl = System.getenv("IO_RCS_URL");
+      String ioAPIHost = getEnvWithDefault("IO_API_HOST", "localhost");
+      int ioAPIPort = Integer.valueOf(getEnvWithDefault("IO_API_PORT", "10101"));
+
       ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
       HttpServer httpServer = httpServicexSupplier.get().getServerFactory().create(new HttpServerConfiguration.Builder()
-          .setPort(9090)
+          .setName("integration-orchestrator-api")
+          .setPort(ioAPIPort)
+          .setHost(ioAPIHost)
           .setReadTimeout(10000)
           .setUsePersistentConnections(true)
           .build());
 
-      HttpClientConfiguration httpClientConfiguration = new HttpClientConfiguration.Builder().build();
+      HttpClientConfiguration httpClientConfiguration =
+          new HttpClientConfiguration.Builder().setName("integration-orchestrator-client").build();
 
       HttpClient httpClient = httpServicexSupplier.get().getClientFactory().create(httpClientConfiguration);
 
       httpServer.addRequestHandler(Collections.singleton("POST"), "/", new RequestHandler() {
+
         @Override
         public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
           String hostValue = requestContext.getRequest().getHeaderValue("Host");
-          //TODO make configuration parameterizable
-          //TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
+          // TODO make configuration parameterizable
+          // TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
           try {
 
             String integrationName = hostValue;
             Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(hostValue);
             if (application == null) {
+              String runtimeConfigurationUrlForFetchingIntegrationConfig =
+                  String.format("%s/integration/%s", runtimeConfigurationServiceUrl, hostValue);
               HttpResponse httpResponse = httpClient.send(HttpRequest.builder()
-                      .uri(String.format("http://runtime-configuration-service.rcs.svc.cluster.local:8080/integration/%s", hostValue))
-                      .build());
+                  .uri(runtimeConfigurationUrlForFetchingIntegrationConfig)
+                  .build());
               ByteArrayInputStream flowsConfiguration = new ByteArrayInputStream(httpResponse.getEntity().getBytes());
               ArtifactAst artifactAst = defaultArtifactAstDeserializer.deserialize(flowsConfiguration, extensionModelResolver);
 
               IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationName);
               application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationName);
             }
-            //TODO harding name of the flow for now until we can discover the exact flow to execute
+            // TODO harding name of the flow for now until we can discover the exact flow to execute
             Optional<Flow> flow = application.getRegistry().lookupByName("flow");
 
-            //TODO use proper encoding from MuleContext.getEncoding(..)
-            //TODO properly configure base path and listener path.
-            //TODO we need to refactor de mule-http-connector so we can use the same logic for creating the message
-            Result<InputStream, HttpRequestAttributes> requestData = HttpRequestToResult.transform(requestContext, Charset.defaultCharset(), new ListenerPath(null, "/"));
-            DataTypeParamsBuilder payloadDataType = DataType.builder().mediaType(requestData.getAttributes().get().getHeaders().get("content-type"));
-            TypedValue<InputStream> payloadTypedValue = new TypedValue<>(requestData.getOutput(), payloadDataType.build(), requestData.getLength());
-            Message message = Message.builder().payload(payloadTypedValue).attributes(TypedValue.of(requestData.getAttributes().get())).build();
+            // TODO use proper encoding from MuleContext.getEncoding(..)
+            // TODO properly configure base path and listener path.
+            // TODO we need to refactor de mule-http-connector so we can use the same logic for creating the message
+            Result<InputStream, HttpRequestAttributes> requestData =
+                HttpRequestToResult.transform(requestContext, Charset.defaultCharset(), new ListenerPath(null, "/"));
+            DataTypeParamsBuilder payloadDataType =
+                DataType.builder().mediaType(requestData.getAttributes().get().getHeaders().get("content-type"));
+            TypedValue<InputStream> payloadTypedValue =
+                new TypedValue<>(requestData.getOutput(), payloadDataType.build(), requestData.getLength());
+            Message message =
+                Message.builder().payload(payloadTypedValue).attributes(TypedValue.of(requestData.getAttributes().get())).build();
             CompletableFuture<ExecutionResult> flowResultFuture = flow.get().execute(InputEvent.create()
-                    .message(message));
+                .message(message));
 
             ExecutionResult executionResult = flowResultFuture.get();
             Event executionResultEvent = executionResult.getEvent();
             TypedValue<Object> responsePayloadTypedValue = executionResultEvent.getMessage().getPayload();
 
             HttpResponseBuilder httpResponseBuilder = HttpResponse.builder()
-                    .statusCode(200);
+                .statusCode(200);
             if (responsePayloadTypedValue != null) {
               if (responsePayloadTypedValue.getDataType().isStreamType()) {
                 httpResponseBuilder.entity(new InputStreamHttpEntity((InputStream) responsePayloadTypedValue.getValue()));
@@ -131,6 +146,7 @@ public class IntegrationOrchestratorAPI {
             }
             HttpResponse httpResponse = httpResponseBuilder.build();
             responseCallback.responseReady(httpResponse, new ResponseStatusCallback() {
+
               @Override
               public void responseSendFailure(Throwable throwable) {
                 logger.warn("responseSendFailure invoking flow through HTTP", throwable);
@@ -142,14 +158,22 @@ public class IntegrationOrchestratorAPI {
               }
             });
           } catch (Exception e) {
-
+            logger.error("Error processing http request to trigger flow execution", e);
           }
 
         }
       });
-    } catch (ServerCreationException e) {
+
+      httpClient.start();
+      httpServer.start();
+    } catch (ServerCreationException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static String getEnvWithDefault(String key, String defValue) {
+    String value = System.getenv("IO_API_PORT");
+    return value != null ? value : defValue;
   }
 
   // TODO implement graceful shutdown

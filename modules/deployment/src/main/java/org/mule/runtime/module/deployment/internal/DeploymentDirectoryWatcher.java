@@ -57,6 +57,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.io.filefilter.AndFileFilter;
@@ -97,16 +99,22 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
+  private final BiFunction<String, ObservableList<? extends Artifact>, ? extends Artifact> artifactFinder;
   private ScheduledExecutorService artifactDirMonitorTimer;
 
   protected volatile boolean dirty;
 
-  public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
-                                    final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
-                                    final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
-                                    ObservableList<Domain> domains,
-                                    ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
-                                    final ReentrantLock deploymentLock) {
+  // <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
+  // ObservableList<T> artifacts
+
+  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                                                                                    final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                                                                                    final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
+                                                                                                    ObservableList<Domain> domains,
+                                                                                                    ObservableList<Application> applications,
+                                                                                                    Supplier<SchedulerService> schedulerServiceSupplier,
+                                                                                                    final ReentrantLock deploymentLock,
+                                                                                                    final BiFunction<String, ObservableList<? extends Artifact>, ? extends Artifact> artifactFinder) {
     this.domainBundleDeployer = domainBundleDeployer;
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
@@ -115,6 +123,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     this.applicationArchiveDeployer = applicationArchiveDeployer;
     this.applications = applications;
     this.domains = domains;
+    this.artifactFinder = artifactFinder;
     applications.addPropertyChangeListener(e -> {
       if (e instanceof ElementAddedEvent || e instanceof ElementRemovedEvent) {
         if (logger.isDebugEnabled()) {
@@ -356,13 +365,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     return files;
   }
 
-  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
-                                                                                        ObservableList<T> artifacts) {
-    return artifacts.stream()
-        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
-        .findFirst()
-        .orElse(null);
-  }
 
   private void undeployRemovedDomains() {
     undeployRemovedArtifacts(domainsDir, domains, domainArchiveDeployer);
@@ -403,7 +405,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     for (String deletedAnchor : deletedAnchors) {
       String artifactName = removeEnd(deletedAnchor, ARTIFACT_ANCHOR_SUFFIX);
       try {
-        if (findArtifact(artifactName, artifacts) != null) {
+        if (artifactFinder.apply(artifactName, artifacts) != null) {
           archiveDeployer.undeployArtifact(artifactName);
         } else if (logger.isDebugEnabled()) {
           logger.debug(format("Artifact [%s] has already been undeployed via API", artifactName));

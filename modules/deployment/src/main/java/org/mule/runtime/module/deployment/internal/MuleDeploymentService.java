@@ -37,6 +37,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.container.api.MuleFoldersUtil;
+import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -101,6 +102,7 @@ public class MuleDeploymentService implements DeploymentService {
   private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
   private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
   private final DefaultVoltronFactory integrationFactory;
+  private final boolean voltronMode;
   private DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private DomainBundleArchiveDeployer domainBundleDeployer;
@@ -135,6 +137,7 @@ public class MuleDeploymentService implements DeploymentService {
                                Supplier<SchedulerService> artifactStartExecutorSupplier, boolean voltronMode,
                                DefaultVoltronFactory integrationFactory) {
 
+    this.voltronMode = voltronMode;
     artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
         .customScheduler(config()
             .withName("ArtifactDeployer.start")
@@ -198,7 +201,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void start() {
-    start(true);
+    start(!this.voltronMode);
   }
 
   /**
@@ -253,12 +256,20 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public Domain findDomain(String domainName) {
-    return deploymentDirectoryWatcher.findArtifact(domainName, domains);
+    return findArtifact(domainName, domains);
   }
 
   @Override
   public Application findApplication(String appName) {
-    return deploymentDirectoryWatcher.findArtifact(appName, applications);
+    return findArtifact(appName, applications);
+  }
+
+  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
+                                                                                        ObservableList<T> artifacts) {
+    return artifacts.stream()
+        .filter(artifact -> artifact.getArtifactName().equals(artifactName))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
