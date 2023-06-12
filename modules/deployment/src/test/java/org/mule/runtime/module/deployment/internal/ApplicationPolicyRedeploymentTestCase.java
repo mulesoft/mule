@@ -7,34 +7,33 @@
 
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 
-import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
-import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
-import org.mule.runtime.api.deployment.meta.Product;
+import static java.lang.String.format;
+import static java.lang.Thread.sleep;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
+import org.mule.runtime.policy.api.PolicyPointcut;
 
-import java.util.HashMap;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import io.qameta.allure.Feature;
-
 /**
- * Contains test for application deployment with policies on the default domain
+ * Contains test for policy redeployment
  */
 @Feature(POLICY_DEPLOYMENT)
 public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTestCase {
@@ -42,13 +41,17 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
   private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-flow-config.xml";
 
   private static final String OS_POLICY_NAME = "object-store-policy";
-  private static final String OS_POLICY_ID = "object-store-policy";
-  public static final String FLOW_NAME = "main";
+  private static final String POLICY_WITH_OPERATION_NAME = "appPluginPolicy";
+  private static final String POLICY_WITH_ASYNC_OPERATION_NAME = "policyWithAsyncOperation";
+
+  private static final String FLOW_NAME = "main";
+
+  private static final PolicyPointcut ALWAYS_APPLIED_POLICY_POINTCUT = parameters -> true;
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
-    return asList(false);
+    return singletonList(false);
   }
 
   public ApplicationPolicyRedeploymentTestCase(boolean parallelDeployment) {
@@ -57,7 +60,9 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
 
   @Test
   public void objectStoreSamePartitionWorksAfterRedeployingPolicy() throws Exception {
-    policyManager.registerPolicyTemplate(policyWithPlugin().getArtifactFile());
+    PolicyFileBuilder policy = createPolicyFileBuilder(OS_POLICY_NAME, singletonMap("store", ""));
+    PolicyParametrization policyParametrization = getParametrization(policy, 1);
+    policyManager.registerPolicyTemplate(policy.getArtifactFile());
 
     ApplicationFileBuilder applicationFileBuilder =
         createExtensionApplicationWithServices(APP_WITH_SIMPLE_EXTENSION_CONFIG, helloExtensionV1Plugin);
@@ -66,11 +71,7 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
     startDeployment();
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
-    PolicyFileBuilder policy = policyWithPlugin();
-
-    policyManager.addPolicy(applicationFileBuilder.getId(), policy.getArtifactId(),
-                            new PolicyParametrization(OS_POLICY_ID, poinparameters -> true, 1, emptyMap(),
-                                                      getResourceFile(format("/%s.xml", OS_POLICY_NAME)), emptyList()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), policy.getArtifactId(), policyParametrization);
 
     executeApplicationFlow(FLOW_NAME);
 
@@ -78,25 +79,60 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
 
     executeApplicationFlow(FLOW_NAME);
 
-    policyManager.addPolicy(applicationFileBuilder.getId(), policy.getArtifactId(),
-                            new PolicyParametrization(OS_POLICY_ID, poinparameters -> true, 1, emptyMap(),
-                                                      getResourceFile(format("/%s.xml", OS_POLICY_NAME)), emptyList()));
+    policyManager.addPolicy(applicationFileBuilder.getId(), policy.getArtifactId(), policyParametrization);
 
     executeApplicationFlow(FLOW_NAME);
   }
 
-  private PolicyFileBuilder policyWithPlugin() {
-    Map<String, Object> map = new HashMap<>();
-    map.put("store", "");
-    MulePolicyModelBuilder mulePolicyModelBuilder = new MulePolicyModelBuilder()
-        .setMinMuleVersion(MIN_MULE_VERSION).setName(OS_POLICY_NAME)
-        .setRequiredProduct(Product.MULE)
-        .withBundleDescriptorLoader(createBundleDescriptorLoader(OS_POLICY_NAME, MULE_POLICY_CLASSIFIER,
-                                                                 PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID))
-        .withClassLoaderModelDescriptorLoader(new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, map));
+  @Test
+  @Issue("W-13563214")
+  @Description("There was an issue with the inner fluxes of an async operation in a policy being disposed (and never rebuilt) after another operation policy was undeployed/redeployed and the CompositeOperationPolicy sinks were completed")
+  public void whenRedeployingOperationPolicyThenOtherOperationPoliciesWithAsyncOperationsStillWork() throws Exception {
+    // We will be deploying two policies and redeploying one of them
+    // It is important that the policy that remains deployed has an asynchronous operation in order to reproduce the issue
+    PolicyFileBuilder policyToRedeployFileBuilder = createPolicyFileBuilder(POLICY_WITH_OPERATION_NAME);
+    PolicyFileBuilder policyToKeepFileBuilder = createPolicyFileBuilder(POLICY_WITH_ASYNC_OPERATION_NAME);
 
-    return new PolicyFileBuilder(OS_POLICY_NAME)
-        .describedBy(mulePolicyModelBuilder.build());
+    PolicyParametrization policyToRedeployParametrization = getParametrization(policyToRedeployFileBuilder, 1);
+    PolicyParametrization policyToKeepParametrization = getParametrization(policyToKeepFileBuilder, 2);
+
+    policyManager.registerPolicyTemplate(policyToRedeployFileBuilder.getArtifactFile());
+    policyManager.registerPolicyTemplate(policyToKeepFileBuilder.getArtifactFile());
+
+    ApplicationFileBuilder applicationFileBuilder = createExtensionApplicationWithServices(APP_WITH_EXTENSION_PLUGIN_CONFIG,
+                                                                                           helloExtensionV1Plugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+    assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyToRedeployFileBuilder.getArtifactId(),
+                            policyToRedeployParametrization);
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyToKeepFileBuilder.getArtifactId(), policyToKeepParametrization);
+
+    assertManualExecutionsCount(2);
+
+    policyManager.removePolicy(applicationFileBuilder.getId(), policyToRedeployFileBuilder.getArtifactId());
+
+    // TODO: actually wait until the stale policy is disposed to avoid a source of test flakiness
+    sleep(2000);
+
+    assertManualExecutionsCount(3);
+
+    policyManager.addPolicy(applicationFileBuilder.getId(), policyToRedeployFileBuilder.getArtifactId(),
+                            policyToRedeployParametrization);
+
+    assertManualExecutionsCount(5);
+  }
+
+  private PolicyParametrization getParametrization(PolicyFileBuilder policyFileBuilder, int order) throws URISyntaxException {
+    // Notice that the policy's artifactId needs to match with the resource file name for this to work
+    return new PolicyParametrization(policyFileBuilder.getArtifactId(),
+                                     ALWAYS_APPLIED_POLICY_POINTCUT,
+                                     order,
+                                     emptyMap(),
+                                     getResourceFile(format("/%s.xml", policyFileBuilder.getArtifactId())),
+                                     emptyList());
   }
 }
 
