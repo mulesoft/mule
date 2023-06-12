@@ -9,6 +9,8 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.module.deployment.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.internal.util.Utils.getResourceFile;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.POLICY_DEPLOYMENT;
 
 import static java.lang.String.format;
@@ -33,8 +35,6 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.policy.api.PolicyPointcut;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
@@ -55,6 +55,7 @@ import org.junit.runners.Parameterized;
 @Feature(POLICY_DEPLOYMENT)
 public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTestCase {
 
+  private static final long REF_ENQUEUED_TIMEOUT_MILLIS = 5000;
   private static final String APP_WITH_SIMPLE_EXTENSION_CONFIG = "app-with-simple-flow-config.xml";
 
   private static final String OS_POLICY_NAME = "object-store-policy";
@@ -169,11 +170,11 @@ public class ApplicationPolicyRedeploymentTestCase extends AbstractDeploymentTes
   }
 
   private void waitEnqueued(Reference<?> reference) {
-    new PollingProber(5000, 100).check(new JUnitLambdaProbe(() -> {
+    probe(REF_ENQUEUED_TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL, () -> {
       System.gc();
       assertThat(reference.isEnqueued(), is(true));
       return true;
-    }));
+    }, () -> "Expected reference to be enqueued already");
   }
 
   private PolicyParametrization getParametrization(PolicyFileBuilder policyFileBuilder, int order) throws URISyntaxException {
