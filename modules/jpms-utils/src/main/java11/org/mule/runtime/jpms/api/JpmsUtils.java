@@ -7,14 +7,12 @@
 package org.mule.runtime.jpms.api;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.ModuleLayer.boot;
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Utilities related to how Mule uses the Java Module system.
@@ -31,8 +29,9 @@ public final class JpmsUtils {
 
   private static final String REQUIRED_ADD_MODULES =
       "--add-modules="
-          + "java.se,"
           + "org.mule.runtime.jpms.utils,"
+          + "java.scripting,"
+          + "java.sql,"
           + "com.fasterxml.jackson.core";
   private static final String REQUIRED_CE_BOOT_ADD_EXPORTS =
       "--add-exports=org.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
@@ -76,29 +75,6 @@ public final class JpmsUtils {
       throw new IllegalArgumentException("Invalid module tweaking options passed to the JVM running the Mule Runtime: "
           + illegalArguments);
     }
-  }
-
-  /**
-   * 
-   * Search for packages using the JRE's module architecture. (Java 9 and above).
-   *
-   * @param packages where to add new found packages
-   */
-  public static void exploreJdkModules(Set<String> packages) {
-    boot().modules()
-        .stream()
-        .filter(module -> {
-          final String moduleName = module.getName();
-
-          // Original intention is to only expose standard java modules...
-          return moduleName.startsWith("java.")
-              // ... but because we need to keep compatibility with Java 8, older verion of some libraries use internal jdk
-              // modules packages:
-              // * caffeine 2.x still uses sun.misc.Unsafe. Ref: https://github.com/ben-manes/caffeine/issues/273
-              // * obgenesis SunReflectionFactoryHelper, used by Mockito
-              || moduleName.startsWith("jdk.");
-        })
-        .forEach(module -> packages.addAll(module.getPackages()));
   }
 
   /**
