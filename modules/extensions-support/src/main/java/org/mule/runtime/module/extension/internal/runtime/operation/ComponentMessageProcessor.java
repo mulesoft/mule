@@ -144,6 +144,7 @@ import org.mule.sdk.api.tx.OperationTransactionalAction;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -200,9 +201,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private final boolean hasNestedChain;
   private final long outerFluxTerminationTimeout;
   private final Object fluxSupplierLock = new Object();
-  private final Object activeOuterPublisherCountLock = new Object();
 
-  private int activeOuterPublishersCount = 0;
+  private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
@@ -1015,8 +1015,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     // that is why an AtomicInteger is not enough, we need to hold the lock of the counter while we restart the inner flux
     // that way we ensure the inner flux is available if and only if there are active publishers...
     // ...unless ComponentMessageProcessor#stop is called, which is a different story
-    synchronized (activeOuterPublisherCountLock) {
-      if (activeOuterPublishersCount++ == 0) {
+    synchronized (activeOuterPublishersCount) {
+      // This doesn't need to be an AtomicInteger as long as it happens inside a synchronized block, but it is preferred for
+      // readability.
+      if (activeOuterPublishersCount.getAndIncrement() == 0) {
         startInnerFlux();
       }
     }
@@ -1024,8 +1026,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private void outerPublisherTerminated() {
     // See the comment in #outerPublisherSubscribedTo
-    synchronized (activeOuterPublisherCountLock) {
-      if (--activeOuterPublishersCount == 0) {
+    synchronized (activeOuterPublishersCount) {
+      if (activeOuterPublishersCount.decrementAndGet() == 0) {
         stopInnerFlux();
       }
     }
