@@ -45,6 +45,6 @@ public class MuleTogglzRuntimeFeatureStateResolver implements MuleTogglzFeatureS
 
   @Override
   public void removeFeatureFeature(MuleTogglzFeatureState muleFeatureState) {
-    featureStates.remove(muleFeatureState);
+    this.featureStates.remove(muleFeatureState.getFeature());
   }
 }
