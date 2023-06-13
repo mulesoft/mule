@@ -19,7 +19,6 @@
         <surefire.args>${surefire.test.unit.open.args}</surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.xml.support</javaModuleName>
-        <activemq.version>5.15.12</activemq.version>
         <javaxJmsApiVersion>2.0.1</javaxJmsApiVersion>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -177,30 +176,10 @@
 
         <!-- ActiveMQ Dependencies-->
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-client</artifactId>
-            <version>${activemq.version}</version>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-activemq-broker</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <!-- Used for in memory broker -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <version>${activemq.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- Used by ActiveMQ if persistent=true -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
-            <version>${activemq.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.fusesource.hawtbuf</groupId>
-            <artifactId>hawtbuf</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>

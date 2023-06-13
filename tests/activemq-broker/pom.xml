@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.mule.tests</groupId>
+		<artifactId>mule-tests</artifactId>
+		<version>4.5.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>mule-activemq-broker</artifactId>
+	<name>ActiveMQ :: Broker</name>
+	<description>Shaded MuleBroker with its activeMQ transitive dependencies to avoid split packages.</description>
+	<packaging>jar</packaging>
+
+    <properties>
+        <hawtbufVersion>1.1</hawtbufVersion>
+        <activemqProtobuf>1.1</activemqProtobuf>
+
+        <javaModuleName>org.mule.test.activemq.broker</javaModuleName>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <includes>org.apache.activemq:*</includes>
+                                    <includes>org.apache.activemq.protobuf:*</includes>
+                                    <includes>com.fasterxml.jackson.core:*</includes>
+                                    <includes>org.fusesource.hawtbuf:hawtbuf</includes>
+                                    <includes>jakarta.management.j2ee:jakarta.management.j2ee-api</includes>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+	<dependencies>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemqVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemqVersion}</version>
+        </dependency>
+        <!-- Used by ActiveMQ if persistent=true -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${activemqVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jaas</artifactId>
+            <version>${activemqVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq.protobuf</groupId>
+            <artifactId>activemq-protobuf</artifactId>
+            <version>${activemqProtobuf}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.hawtbuf</groupId>
+            <artifactId>hawtbuf</artifactId>
+            <version>${hawtbufVersion}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.management.j2ee</groupId>
+            <artifactId>jakarta.management.j2ee-api</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+    </dependencies>
+</project>
