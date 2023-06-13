@@ -17,7 +17,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BO
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
@@ -349,7 +348,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureHonourInsecureTlsConfiguration();
       configureUseTransactionSinkIndex();
       configurePutTraceIdAndSpanIdInMdc();
-      configureEnableTracerConfigurationAtApplicationLevel();
       configureAddMuleSpecificTracingInformationInTraceState();
       configureCreateChildPolicyContextForParallelScopes();
     }
@@ -1508,17 +1506,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(HONOUR_INSECURE_TLS_CONFIGURATION,
                                                 minMuleVersion("4.5.0"));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL} feature flag.
-   *
-   * @since 4.5.0
-   */
-  private static void configureEnableTracerConfigurationAtApplicationLevel() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL,
-                                                featureContext -> true);
   }
 
   /**

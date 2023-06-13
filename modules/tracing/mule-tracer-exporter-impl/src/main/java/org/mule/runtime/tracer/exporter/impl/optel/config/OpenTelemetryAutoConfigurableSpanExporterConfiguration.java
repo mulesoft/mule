@@ -36,9 +36,6 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   @Inject
   private MuleContext muleContext;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   private static final String DEFAULT_BACKOFF_MULTIPLIER = "1.5";
   private static final String DEFAULT_INITIAL_BACKOFF = "1";
   private static final String DEFAULT_MAXIMUM_BACKOFF = "5";
@@ -70,7 +67,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   public String getStringValue(String key) {
     try {
       if (delegate == null) {
-        this.delegate = new FileSpanExporterConfiguration(muleContext, featureFlaggingService);
+        this.delegate = new FileSpanExporterConfiguration(muleContext);
         initialiseDefaultConfigurationValues();
       }
       return delegate.getStringValue(key, defaultConfigurationValues.get(key));
