@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -132,8 +135,14 @@ public class TypeWrapper implements Type {
   public List<FieldElement> getFields() {
     return IntrospectionUtils.getFields(aClass).stream()
         .filter(field -> !field.getDeclaringClass().getPackage().getName().startsWith("java."))
+        .filter(field -> !isPrivateStaticFinal(field))
         .map((Field field) -> new FieldWrapper(field, typeLoader))
         .collect(toList());
+  }
+
+  private static boolean isPrivateStaticFinal(Field field) {
+    int modifiers = field.getModifiers();
+    return isPrivate(modifiers) && isStatic(modifiers) && isFinal(modifiers);
   }
 
   @Override
