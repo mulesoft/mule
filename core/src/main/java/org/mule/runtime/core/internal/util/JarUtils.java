@@ -58,7 +58,7 @@ public final class JarUtils {
 
   /**
    * Loads the content of a file within a jar into a byte array.
-   * 
+   *
    * @param jarFile  the jar file
    * @param filePath the path to the file within the jar file
    * @return the content of the file as byte array or empty if the file does not exists within the jar file.

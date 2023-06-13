@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.plugin;
 
-import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 

@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;

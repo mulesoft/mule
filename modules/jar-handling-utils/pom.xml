@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>4.5.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>mule-jar-handling-utils</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule jar handling utils</name>
+    <description>
+        This is a multi release module that allows handling of JDK internal jar classes needed for Java 8 runtime and a cleaner way in 11+.
+    </description>
+
+    <properties>
+        <javaModuleName>org.mule.runtime.jar.handling.utils</javaModuleName>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${mavenCompilerVersion}</version>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <!-- In order to compile with full Java 8 compliance with access to jdk internal classes we need to clear the release 11 setting from parent pom -->
+                            <release combine.self="override"></release>
+                            <source>${javaVersion}</source>
+                            <target>${javaVersion}</target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-compile</id>
+                        <configuration>
+                            <release>11</release>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>ISO-8859-1</encoding>
+                    <proc>none</proc>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Multi-Release>true</Multi-Release>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <!-- Add the java 11 sources to the source artifact -->
+                        <id>attach-java11-sources</id>
+                        <!-- This has to run after compilation so it doesn't interfere with it (compler has its own MRJAR configuration) -->
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/java11</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+</project>
