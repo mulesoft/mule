@@ -154,8 +154,8 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void setRootAttribute(String s, String s1) {
-    spanExporter.setRootAttribute(s, s1);
+  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
+    spanExporter.setRootAttribute(rootAttributeKey, rootAttributeValue);
   }
 
   /**

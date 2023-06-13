@@ -38,7 +38,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final InitialExportInfo initialExportInfo;
 
   private final String name;
-  // TODO: W-13313594 Should remove this property
 
   // This is true when the span is a component "root" span this means, the first span of the hierarchy created as a consequence of
   // a component's execution.

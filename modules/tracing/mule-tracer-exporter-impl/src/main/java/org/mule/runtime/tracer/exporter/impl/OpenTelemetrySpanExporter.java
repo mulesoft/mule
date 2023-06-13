@@ -332,7 +332,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     } else if (key.equals(STATUS)) {
       StatusCode statusCode = StatusCode.valueOf(value);
       rootSpanExporter.statusData = StatusData.create(statusCode, null);
-    } else if (isPolicySpan  && !rootSpanExporter.equals(this)) {
+    } else if (isPolicySpan && !rootSpanExporter.equals(this)) {
       rootSpanExporter.internalSpan.addAttribute(key, value);
     }
   }
