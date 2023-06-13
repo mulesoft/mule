@@ -6,16 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -45,9 +48,6 @@ import javax.lang.model.element.TypeElement;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.core.ResolvableType;
-import static java.lang.reflect.Modifier.isFinal;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.lang.reflect.Modifier.isPrivate;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
