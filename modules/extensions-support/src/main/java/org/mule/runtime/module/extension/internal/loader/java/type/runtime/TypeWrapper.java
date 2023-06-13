@@ -45,6 +45,9 @@ import javax.lang.model.element.TypeElement;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.core.ResolvableType;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.lang.reflect.Modifier.isPrivate;
 
 /**
  * Wrapper for {@link Class} that provide utility methods to facilitate the introspection of a {@link Class}
@@ -132,8 +135,14 @@ public class TypeWrapper implements Type {
   public List<FieldElement> getFields() {
     return IntrospectionUtils.getFields(aClass).stream()
         .filter(field -> !field.getDeclaringClass().getPackage().getName().startsWith("java."))
+        .filter(field -> !isPrivateStaticFinal(field))
         .map((Field field) -> new FieldWrapper(field, typeLoader))
         .collect(toList());
+  }
+
+  private static boolean isPrivateStaticFinal(Field field) {
+    int modifiers = field.getModifiers();
+    return isPrivate(modifiers) && isStatic(modifiers) && isFinal(modifiers);
   }
 
   @Override
