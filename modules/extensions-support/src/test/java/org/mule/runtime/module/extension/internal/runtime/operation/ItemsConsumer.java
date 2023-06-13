@@ -8,10 +8,9 @@ package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import java.util.concurrent.CountDownLatch;
 
-import javax.annotation.Nonnull;
-
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+
 import reactor.core.publisher.BaseSubscriber;
 
 /**
@@ -54,12 +53,12 @@ class ItemsConsumer<T> extends BaseSubscriber<T> {
   }
 
   @Override
-  protected void hookOnNext(@Nonnull T value) {
+  protected void hookOnNext(T value) {
     expectedItemsConsumedCountDownLatch.countDown();
   }
 
   @Override
-  protected void hookOnError(@Nonnull Throwable throwable) {
+  protected void hookOnError(Throwable throwable) {
     error = throwable;
     while (expectedItemsConsumedCountDownLatch.getCount() > 0) {
       expectedItemsConsumedCountDownLatch.countDown();
