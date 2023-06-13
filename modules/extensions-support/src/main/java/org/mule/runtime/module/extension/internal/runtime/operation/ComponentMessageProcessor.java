@@ -200,7 +200,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private final ResultTransformer resultTransformer;
   private final boolean hasNestedChain;
   private final long outerFluxTerminationTimeout;
-  private final Object fluxSupplierDisposeLock = new Object();
+  private final Object fluxSupplierLock = new Object();
 
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
@@ -238,7 +238,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ProcessingStrategy processingStrategy;
   private boolean ownedProcessingStrategy = false;
-  private FluxSinkSupplier<CoreEvent> fluxSupplier;
+  private volatile FluxSinkSupplier<CoreEvent> fluxSupplier;
 
   private Scheduler outerFluxCompletionScheduler;
 
@@ -633,6 +633,20 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void startInnerFlux() {
+    if (fluxSupplier == null) {
+      synchronized (fluxSupplierLock) {
+        startInnerFluxUnsafe();
+      }
+    }
+  }
+
+  private void startInnerFluxUnsafe() {
+    if (fluxSupplier != null) {
+      LOGGER.debug("Skipping creation of inner flux supplier for processor '{}' because it is already created.",
+                   this.getLocation());
+      return;
+    }
+
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
     // This is a round-robin, so it can handle concurrent events and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
@@ -997,18 +1011,31 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void outerPublisherSubscribedTo() {
-    activeOuterPublishersCount.getAndIncrement();
+    // We don't want a potentially concurrent publisher termination to stop the fluxes after we start them
+    // that is why an AtomicInteger is not enough, we need to hold the lock of the counter while we restart the inner flux
+    // that way we ensure the inner flux is available if and only if there are active publishers...
+    // ...unless ComponentMessageProcessor#stop is called, which is a different story
+    synchronized (activeOuterPublishersCount) {
+      // This doesn't need to be an AtomicInteger as long as it happens inside a synchronized block, but it is preferred for
+      // readability.
+      if (activeOuterPublishersCount.getAndIncrement() == 0) {
+        startInnerFlux();
+      }
+    }
   }
 
   private void outerPublisherTerminated() {
-    if (activeOuterPublishersCount.decrementAndGet() == 0) {
-      stopInnerFlux();
+    // See the comment in #outerPublisherSubscribedTo
+    synchronized (activeOuterPublishersCount) {
+      if (activeOuterPublishersCount.decrementAndGet() == 0) {
+        stopInnerFlux();
+      }
     }
   }
 
   private void stopInnerFlux() {
     if (fluxSupplier != null) {
-      synchronized (fluxSupplierDisposeLock) {
+      synchronized (fluxSupplierLock) {
         if (fluxSupplier != null) {
           fluxSupplier.dispose();
           fluxSupplier = null;
