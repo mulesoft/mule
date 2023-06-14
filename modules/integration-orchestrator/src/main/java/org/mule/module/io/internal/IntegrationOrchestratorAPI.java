@@ -6,9 +6,10 @@
  */
 package org.mule.module.io.internal;
 
-import org.mule.extension.http.api.HttpRequestAttributes;
-import org.mule.extension.http.internal.listener.HttpRequestToResult;
-import org.mule.extension.http.internal.listener.ListenerPath;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import org.apache.commons.io.IOUtils;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.event.Event;
@@ -17,17 +18,20 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeParamsBuilder;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.SchedulerService;
+import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.serialization.ArtifactAstDeserializer;
 import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
-import org.mule.runtime.ast.api.serialization.ExtensionModelResolver;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.deployment.model.api.application.Application;
-import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.deployment.model.api.domain.Domain;
+import org.mule.runtime.http.api.HttpHeaders;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
 import org.mule.runtime.http.api.client.HttpClientConfiguration;
 import org.mule.runtime.http.api.domain.entity.ByteArrayHttpEntity;
+import org.mule.runtime.http.api.domain.entity.EmptyHttpEntity;
 import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
@@ -47,11 +51,14 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+
+import static org.mule.sdk.api.annotation.param.MediaType.APPLICATION_JSON;
 
 public class IntegrationOrchestratorAPI {
 
@@ -60,8 +67,6 @@ public class IntegrationOrchestratorAPI {
   private final Supplier<HttpService> httpServicexSupplier;
   private final MuleDeploymentService deploymentService;
   private SchedulerService schedulerService;
-
-  private ExtensionModelResolver extensionModelResolver;
 
   public IntegrationOrchestratorAPI(Supplier<HttpService> httpServiceSupplier, DeploymentService deploymentService) {
     this.httpServicexSupplier = httpServiceSupplier;
@@ -74,6 +79,7 @@ public class IntegrationOrchestratorAPI {
       String runtimeConfigurationServiceUrl = System.getenv("IO_RCS_URL");
       String ioAPIHost = getEnvWithDefault("IO_API_HOST", "localhost");
       int ioAPIPort = Integer.valueOf(getEnvWithDefault("IO_API_PORT", "10101"));
+
 
       ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
       HttpServer httpServer = httpServicexSupplier.get().getServerFactory().create(new HttpServerConfiguration.Builder()
@@ -94,23 +100,52 @@ public class IntegrationOrchestratorAPI {
         @Override
         public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
           String hostValue = requestContext.getRequest().getHeaderValue("Host");
+          String integrationId = getIntegrationIdForHost(hostValue);
           // TODO make configuration parameterizable
           // TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
           try {
 
-            String integrationName = hostValue;
-            Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(hostValue);
-            if (application == null) {
+             Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
+             if (application == null) {
               String runtimeConfigurationUrlForFetchingIntegrationConfig =
-                  String.format("%s/integration/%s", runtimeConfigurationServiceUrl, hostValue);
+                  String.format("%s/config/integration/%s", runtimeConfigurationServiceUrl, integrationId);
+
+              long initialTime = System.currentTimeMillis();
               HttpResponse httpResponse = httpClient.send(HttpRequest.builder()
                   .uri(runtimeConfigurationUrlForFetchingIntegrationConfig)
+                  .addHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON)
                   .build());
-              ByteArrayInputStream flowsConfiguration = new ByteArrayInputStream(httpResponse.getEntity().getBytes());
-              ArtifactAst artifactAst = defaultArtifactAstDeserializer.deserialize(flowsConfiguration, extensionModelResolver);
+              logger.error("Time to fetch integration config in millis: " + (System.currentTimeMillis() - initialTime));
 
-              IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationName);
-              application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationName);
+              if (httpResponse.getStatusCode() != 200) {
+                String message = "failed getting configuration. Status code is: " + httpResponse.getStatusCode();
+                if (httpResponse.getEntity() != null) {
+                  message = message + ". Response body: " + IOUtils.toString(httpResponse.getEntity().getBytes());
+                }
+                throw new RuntimeException(message);
+              }
+
+              initialTime = System.currentTimeMillis();
+              ByteArrayInputStream integrationConfigResponse = new ByteArrayInputStream(httpResponse.getEntity().getBytes());
+              Gson gson = new Gson();
+
+              JsonElement jsonElement = JsonParser.parseString(IOUtils.toString(integrationConfigResponse));
+              // String integrationId = jsonElement.getAsJsonObject().get("id").getAsString();
+              String configValue = jsonElement.getAsJsonObject().get("config").getAsString();
+
+              byte[] configBytes = Base64.getDecoder().decode(configValue);
+              // TODO we need to extract the
+              Domain domain = deploymentService.findDomain("io-domain");
+              ExtensionManager extensionModelResolver =
+                  domain.getRegistry().lookupByType(ExtensionManager.class).get();
+              ArtifactAst artifactAst =
+                  defaultArtifactAstDeserializer
+                      .deserialize(new ByteArrayInputStream(configBytes),
+                                   extensionName -> extensionModelResolver.getExtension(extensionName).orElse(null));
+
+              IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationId);
+              application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
+              logger.error("Time to load integration in millis: " + (System.currentTimeMillis() - initialTime));
             }
             // TODO harding name of the flow for now until we can discover the exact flow to execute
             Optional<Flow> flow = application.getRegistry().lookupByName("flow");
@@ -118,14 +153,19 @@ public class IntegrationOrchestratorAPI {
             // TODO use proper encoding from MuleContext.getEncoding(..)
             // TODO properly configure base path and listener path.
             // TODO we need to refactor de mule-http-connector so we can use the same logic for creating the message
-            Result<InputStream, HttpRequestAttributes> requestData =
-                HttpRequestToResult.transform(requestContext, Charset.defaultCharset(), new ListenerPath(null, "/"));
+            String requestContentType = requestContext.getRequest().getHeaderValue("content-type");
+            InputStream requestContent = requestContext.getRequest().getEntity().getContent();
             DataTypeParamsBuilder payloadDataType =
-                DataType.builder().mediaType(requestData.getAttributes().get().getHeaders().get("content-type"));
+                DataType.builder().mediaType(requestContentType);
+            String contentLength = requestContext.getRequest().getHeaderValue("content-length");
+            OptionalLong requestLength =
+                contentLength != null ? OptionalLong.of(Long.valueOf(contentLength)) : OptionalLong.empty();
             TypedValue<InputStream> payloadTypedValue =
-                new TypedValue<>(requestData.getOutput(), payloadDataType.build(), requestData.getLength());
+                new TypedValue<>(requestContent, payloadDataType.build(), requestLength);
             Message message =
-                Message.builder().payload(payloadTypedValue).attributes(TypedValue.of(requestData.getAttributes().get())).build();
+                Message.builder().payload(payloadTypedValue).build();
+            // Message message =
+            // Message.builder().payload(payloadTypedValue).attributes(TypedValue.of(requestData.getAttributes().get())).build();
             CompletableFuture<ExecutionResult> flowResultFuture = flow.get().execute(InputEvent.create()
                 .message(message));
 
@@ -135,29 +175,45 @@ public class IntegrationOrchestratorAPI {
 
             HttpResponseBuilder httpResponseBuilder = HttpResponse.builder()
                 .statusCode(200);
-            if (responsePayloadTypedValue != null) {
-              if (responsePayloadTypedValue.getDataType().isStreamType()) {
-                httpResponseBuilder.entity(new InputStreamHttpEntity((InputStream) responsePayloadTypedValue.getValue()));
-              } else if (responsePayloadTypedValue.getDataType().getType().isAssignableFrom(Byte[].class)) {
-                httpResponseBuilder.entity(new ByteArrayHttpEntity((byte[]) responsePayloadTypedValue.getValue()));
-              } else {
-                throw new RuntimeException("unknown response type " + responsePayloadTypedValue.getDataType().getType());
-              }
+            if (executionResultEvent.getMessage().getPayload() == null) {
+              httpResponseBuilder.entity(new EmptyHttpEntity());
+            } else {
+              TransformationService transformationService =
+                  application.getRegistry().lookupByType(TransformationService.class).get();
+              Object jsonValue = transformationService.transform(executionResultEvent.getMessage(), DataType.JSON_STRING)
+                  .getPayload().getValue();
+              httpResponseBuilder.entity(new ByteArrayHttpEntity(jsonValue.toString().getBytes()));
+              httpResponseBuilder.addHeader(HttpHeaders.Names.CONTENT_TYPE, APPLICATION_JSON);
             }
+
             HttpResponse httpResponse = httpResponseBuilder.build();
             responseCallback.responseReady(httpResponse, new ResponseStatusCallback() {
 
               @Override
               public void responseSendFailure(Throwable throwable) {
-                logger.warn("responseSendFailure invoking flow through HTTP", throwable);
+                logger.warn("responseSendFailure - invoking flow through HTTP", throwable);
               }
 
               @Override
               public void responseSendSuccessfully() {
-                logger.info("responseSendSuccessfully invoking flow through HTTP");
+                logger.info("responseSendSuccessfully - invoking flow through HTTP");
               }
             });
           } catch (Exception e) {
+            // TODO remove
+            e.printStackTrace();
+            responseCallback.responseReady(HttpResponse.builder().statusCode(500).build(), new ResponseStatusCallback() {
+
+              @Override
+              public void responseSendFailure(Throwable throwable) {
+                logger.warn("responseSendFailure but after error - invoking flow through HTTP", throwable);
+              }
+
+              @Override
+              public void responseSendSuccessfully() {
+                logger.info("responseSendSuccessfully but after error - invoking flow through HTTP");
+              }
+            });
             logger.error("Error processing http request to trigger flow execution", e);
           }
 
@@ -169,6 +225,11 @@ public class IntegrationOrchestratorAPI {
     } catch (ServerCreationException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static String getIntegrationIdForHost(String hostValue) {
+    // TODO hardcoding to data stored
+    return System.getProperty("io.integration.id");
   }
 
   private static String getEnvWithDefault(String key, String defValue) {

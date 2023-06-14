@@ -61,7 +61,12 @@ public class MuleApplicationClassLoader extends NativeLibraryLoaderMuleDeployabl
     // Always the first element corresponds to the application's classes folder
     ClassLoaderConfiguration classLoaderConfiguration =
         this.<ApplicationDescriptor>getArtifactDescriptor().getClassLoaderConfiguration();
-    return new String[] {toFile(classLoaderConfiguration.getUrls()[0]).getPath()};
+    if (classLoaderConfiguration.getUrls() != null && classLoaderConfiguration.getUrls().length > 0) {
+      return new String[] {toFile(classLoaderConfiguration.getUrls()[0]).getPath()};
+    } else {
+      // TODO voltron case
+      return new String[0];
+    }
   }
 
 

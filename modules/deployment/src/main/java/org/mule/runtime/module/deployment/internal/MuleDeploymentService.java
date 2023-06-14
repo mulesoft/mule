@@ -434,7 +434,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   public void initializeVoltron() {
     // For now we will look for a default domain that should exists to use as parent of all other artifacts created on-demand
-    domainDeployer.deployExplodedArtifact("default", empty());
+    domainDeployer.deployExplodedArtifact("io-domain", empty());
   }
 
   private interface SynchronizedDeploymentAction {
@@ -555,13 +555,15 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void deploy(ArtifactAst artifactAst, String appName) {
-    Properties properties = new Properties();
-    properties.put("ast", artifactAst);
     Application application = null;
     try {
-      application = integrationFactory.createArtifact(MuleFoldersUtil.getAppFolder(appName), Optional.of(properties));
+      application = integrationFactory.createArtifact(MuleFoldersUtil.getAppFolder(appName), artifactAst);
       // TODO review how to properly do this.
       applications.add(application);
+      // TODO apply all this logic in the same way it's being applied for regular Mule Apps.
+      // application.install();
+      application.init();
+      application.start();
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }

@@ -53,31 +53,35 @@ public class SerializedAstArtifactConfigurationProcessor extends AbstractAstConf
           + muleContext.getConfiguration().getId() + "'");
     }
 
-    return seralizedAstStream != null;
+    return seralizedAstStream != null || artifactContextConfiguration.getArtifactAst() != null;
   }
 
   @Override
   protected ArtifactAst obtainArtifactAst(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
     try {
-      MuleContext muleContext = artifactContextConfiguration.getMuleContext();
-      ArtifactAst deserializedArtifactAst = defaultArtifactAstDeserializer
-          .deserialize(muleContext.getExecutionClassLoader()
-              .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
-                       name -> getExtensions(muleContext.getExtensionManager())
-                           .stream()
-                           .filter(x -> x.getName().equals(name))
-                           .findFirst()
-                           .orElse(null));
-
-      if (!isEquivalentAstArtifactType(artifactContextConfiguration.getArtifactType(),
-                                       deserializedArtifactAst.getArtifactType())) {
-        throw new IllegalStateException(format("Expected artifact type '%s' but serialized ast was '%s'",
-                                               artifactContextConfiguration.getArtifactType(),
-                                               deserializedArtifactAst.getArtifactType()));
+      ArtifactAst artifactAst = artifactContextConfiguration.getArtifactAst();
+      if (artifactAst == null) {
+        MuleContext muleContext = artifactContextConfiguration.getMuleContext();
+        artifactAst = defaultArtifactAstDeserializer
+            .deserialize(muleContext.getExecutionClassLoader()
+                .getResourceAsStream(SERIALIZED_ARTIFACT_AST_LOCATION),
+                         name -> getExtensions(muleContext.getExtensionManager())
+                             .stream()
+                             .filter(x -> x.getName().equals(name))
+                             .findFirst()
+                             .orElse(null));
       }
 
-      return deserializedArtifactAst;
+
+      if (!isEquivalentAstArtifactType(artifactContextConfiguration.getArtifactType(),
+                                       artifactAst.getArtifactType())) {
+        throw new IllegalStateException(format("Expected artifact type '%s' but serialized ast was '%s'",
+                                               artifactContextConfiguration.getArtifactType(),
+                                               artifactAst.getArtifactType()));
+      }
+
+      return artifactAst;
     } catch (Exception e) {
       throw new ConfigurationException(e);
     }

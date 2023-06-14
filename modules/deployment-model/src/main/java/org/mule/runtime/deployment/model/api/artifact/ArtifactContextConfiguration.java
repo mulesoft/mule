@@ -17,6 +17,7 @@ import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
@@ -48,6 +49,7 @@ public final class ArtifactContextConfiguration {
   private LockFactory runtimeLockFactory;
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
+  private ArtifactAst artifactAst;
 
   private ArtifactContextConfiguration() {}
 
@@ -164,6 +166,10 @@ public final class ArtifactContextConfiguration {
 
   public ExpressionLanguageMetadataService getExpressionLanguageMetadataService() {
     return expressionLanguageMetadataService;
+  }
+
+  public ArtifactAst getArtifactAst() {
+    return artifactAst;
   }
 
   /**
@@ -323,6 +329,11 @@ public final class ArtifactContextConfiguration {
 
     public ArtifactContextConfigurationBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
       artifactContextConfiguration.expressionLanguageMetadataService = expressionLanguageMetadataService;
+      return this;
+    }
+
+    public ArtifactContextConfigurationBuilder setArtifactAst(ArtifactAst artifactAst) {
+      artifactContextConfiguration.artifactAst = artifactAst;
       return this;
     }
   }

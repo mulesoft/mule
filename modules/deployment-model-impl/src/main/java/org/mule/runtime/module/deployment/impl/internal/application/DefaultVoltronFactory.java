@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.application;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -47,8 +48,7 @@ import java.util.*;
 
 import static com.google.common.collect.Maps.fromProperties;
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -95,15 +95,14 @@ public class DefaultVoltronFactory extends AbstractDeployableArtifactFactory<App
     this.licenseValidator = licenseValidator;
   }
 
-  @Override
-  protected Application doCreateArtifact(File artifactDir, Optional<Properties> properties) throws IOException {
+  protected Application doCreateArtifact(File artifactDir, ArtifactAst artifactAst) throws IOException {
     String appName = artifactDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = createArtifactDescriptor(artifactDir, properties);
-    return createArtifact(descriptor);
+    final ApplicationDescriptor descriptor = createArtifactDescriptor(artifactDir, Optional.empty());
+    return createArtifact(descriptor, artifactAst);
   }
 
   @Override
@@ -112,17 +111,40 @@ public class DefaultVoltronFactory extends AbstractDeployableArtifactFactory<App
   }
 
   @Override
+  protected Application doCreateArtifact(File artifactDir, Optional<Properties> properties) throws IOException {
+    // TODO fix this
+    throw new NotImplementedException("method call not expected");
+  }
+
+  @Override
   public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, Optional<Properties> deploymentProperties) {
+    // TODO do not call createDeployableProjectModel, hardcode values
     return createArtifactDescriptor(artifactLocation, createDeployableProjectModel(artifactLocation, false),
                                     deploymentProperties);
   }
 
-  public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, DeployableProjectModel model,
-                                                        Optional<Properties> deploymentProperties) {
-    return new ApplicationDescriptor(artifactLocation.getName(), deploymentProperties);
+
+  @Override
+  protected DeployableProjectModel createDeployableProjectModel(File artifactLocation, boolean isDomain) {
+    // TODO remove this fake bundle descriptor
+    BundleDescriptor fakeBundleDescriptor = new BundleDescriptor.Builder()
+        .setGroupId("fake")
+        .setArtifactId("fake")
+        .setVersion("1.0.0")
+        .build();
+
+    return new DeployableProjectModel(emptyList(), emptyList(), emptyList(), fakeBundleDescriptor, () -> null, artifactLocation,
+                                      emptyList(), emptySet(), emptyMap());
   }
 
-  public Application createArtifact(ApplicationDescriptor descriptor) throws IOException {
+  public ApplicationDescriptor createArtifactDescriptor(File artifactLocation, DeployableProjectModel model,
+                                                        Optional<Properties> deploymentProperties) {
+    ApplicationDescriptor applicationDescriptor = new ApplicationDescriptor(artifactLocation.getName(), deploymentProperties);
+    applicationDescriptor.setArtifactLocation(artifactLocation);
+    return applicationDescriptor;
+  }
+
+  public Application createArtifact(ApplicationDescriptor descriptor, ArtifactAst artifactAst) throws IOException {
     Domain domain = getDomain();
 
     ApplicationClassLoaderBuilder artifactClassLoaderBuilder =
@@ -140,15 +162,19 @@ public class DefaultVoltronFactory extends AbstractDeployableArtifactFactory<App
                                       classLoaderRepository, null, getRuntimeLockFactory(),
                                       new ArtifactMemoryManagementService(getMemoryManagementService()),
                                       getArtifactConfigurationProcessor(),
-                                      (ArtifactAst) descriptor.getDeploymentProperties().get().get("ast"));
+                                      artifactAst);
 
     return new ApplicationWrapper(delegate);
+  }
+
+  public Application createArtifact(File artifactDir, ArtifactAst artifactAst) throws IOException {
+    return doCreateArtifact(artifactDir, artifactAst);
   }
 
   private Domain getDomain() {
     Domain domain;
     try {
-      domain = domainRepository.getDomain("default");
+      domain = domainRepository.getDomain("io-domain");
     } catch (DomainNotFoundException e) {
       throw new RuntimeException(e);
     }

@@ -30,11 +30,11 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
   @Override
   public ArtifactContext createArtifactContext(ArtifactContextConfiguration artifactContextConfiguration)
       throws ConfigurationException {
-    if (isEmpty(artifactContextConfiguration.getConfigResources())) {
+    if (isEmpty(artifactContextConfiguration.getConfigResources()) && !(artifactContextConfiguration.getArtifactAst() != null)) {
       return contextForEmptyArtifact(artifactContextConfiguration);
     }
 
-    ArtifactAst artifactAst = obtainArtifactAst(artifactContextConfiguration);
+yur    ArtifactAst artifactAst = obtainArtifactAst(artifactContextConfiguration);
 
     ArtifactAstConfigurationBuilder configurationBuilder =
         new ArtifactAstConfigurationBuilder(artifactAst,

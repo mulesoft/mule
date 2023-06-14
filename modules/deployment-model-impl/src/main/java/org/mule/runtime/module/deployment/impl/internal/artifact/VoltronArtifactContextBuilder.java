@@ -17,6 +17,7 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
+import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -27,6 +28,7 @@ import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.api.context.MuleContextBuilder;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.policy.PolicyProvider;
+import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -101,6 +103,7 @@ public class VoltronArtifactContextBuilder {
   private LockFactory runtimeLockFactory;
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
+  private ArtifactAst artifactAst;
 
   private VoltronArtifactContextBuilder() {}
 
@@ -305,6 +308,9 @@ public class VoltronArtifactContextBuilder {
     try {
       return withContextClassLoader(executionClassLoader, () -> {
         List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
+        builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(emptyList()));
+        // TODO review if this is enough - in this order it doesn't work. We can compare with ArtifactContextBuilder.
+        // builders.add(ConfigurationBuilder.getMinimalConfigurationBuilder());
         // TODO review if we need this based on the plugins shipped with integration orchestartor
         // builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
@@ -339,12 +345,13 @@ public class VoltronArtifactContextBuilder {
               // MuleContext
               serviceConfigurators.add(new ContainerServiceConfigurator(serviceRepository.getServices()));
             }
-            // if (classLoaderRepository != null) {
-            // serviceConfigurators.add(customizationService -> customizationService
-            // .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository));
-            // }
+            if (classLoaderRepository != null) {
+              serviceConfigurators.add(customizationService -> customizationService
+                  .registerCustomServiceImpl(OBJECT_CLASSLOADER_REPOSITORY, classLoaderRepository));
+            }
             ArtifactContextConfiguration.ArtifactContextConfigurationBuilder artifactContextConfigurationBuilder =
                 ArtifactContextConfiguration.builder()
+                    .setArtifactAst(artifactAst)
                     .setMuleContext(muleContext)
                     .setArtifactProperties(merge(artifactProperties, muleContext.getDeploymentProperties()))
                     .setArtifactType(APP)
@@ -369,6 +376,7 @@ public class VoltronArtifactContextBuilder {
             // Nothing to do
           }
         });
+        // builders.add(ConfigurationBuilder.getMinimalConfigurationBuilder());
         DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
         if (muleContextListener != null) {
           muleContextFactory.addListener(muleContextListener);
@@ -378,12 +386,7 @@ public class VoltronArtifactContextBuilder {
         ArtifactObjectSerializer objectSerializer = new ArtifactObjectSerializer(classLoaderRepository);
         muleContextBuilder.setObjectSerializer(objectSerializer);
         muleContextBuilder.setDeploymentProperties(properties);
-
-        if (parentArtifact != null) {
-          builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
-        } else {
-          builders.add(new ConnectionManagerConfigurationBuilder());
-        }
+        builders.add(new ConnectionManagerConfigurationBuilder(parentArtifact));
 
         try {
           muleContextFactory.createMuleContext(builders, muleContextBuilder);
@@ -422,6 +425,11 @@ public class VoltronArtifactContextBuilder {
 
   public VoltronArtifactContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+    return this;
+  }
+
+  public VoltronArtifactContextBuilder setArtifactAst(ArtifactAst artifactAst) {
+    this.artifactAst = artifactAst;
     return this;
   }
 }

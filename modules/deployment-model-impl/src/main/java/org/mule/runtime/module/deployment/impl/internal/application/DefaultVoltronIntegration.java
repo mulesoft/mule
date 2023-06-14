@@ -211,6 +211,7 @@ public class DefaultVoltronIntegration extends AbstractDeployableArtifact<Applic
       VoltronArtifactContextBuilder artifactBuilder =
           VoltronArtifactContextBuilder
               .newBuilder()
+              .setArtifactAst(artifactAst)
               .setArtifactProperties(merge(descriptor.getAppProperties(), getProperties()))
               .setArtifactConfigurationProcessor(null)
               .setDataFolderName(descriptor.getDataFolderName())
@@ -227,7 +228,7 @@ public class DefaultVoltronIntegration extends AbstractDeployableArtifact<Applic
               .setMemoryManagementService(memoryManagementService)
               .setExpressionLanguageMetadataService(expressionLanguageMetadataService);
 
-      Domain domain = getApplicationDomain(domainRepository, descriptor);
+      Domain domain = getDomain();
       if (domain.getArtifactContext() != null) {
         artifactBuilder.setParentArtifact(domain);
       }
@@ -418,28 +419,7 @@ public class DefaultVoltronIntegration extends AbstractDeployableArtifact<Applic
 
   private static Domain resolveApplicationDomain(DomainRepository domainRepository, ApplicationDescriptor descriptor)
       throws DomainNotFoundException, IncompatibleDomainException, AmbiguousDomainReferenceException {
-    String configuredDomainName = descriptor.getDomainName();
-    Optional<BundleDescriptor> domainBundleDescriptor = descriptor.getDomainDescriptor();
-
-    boolean shouldUseDefaultDomain = (configuredDomainName == null) || DEFAULT_DOMAIN_NAME.equals(configuredDomainName);
-    if (!shouldUseDefaultDomain && !domainBundleDescriptor.isPresent()) {
-      throw new IllegalStateException(format("Dependency for domain '%s' was not declared", configuredDomainName));
-    }
-
-    if (!domainBundleDescriptor.isPresent()) {
-      return domainRepository.getDomain(DEFAULT_DOMAIN_NAME);
-    }
-
-    if (configuredDomainName != null) {
-      Domain foundDomain = domainRepository.getDomain(configuredDomainName);
-      if (isCompatibleBundle(foundDomain.getDescriptor().getBundleDescriptor(), domainBundleDescriptor.get())) {
-        return foundDomain;
-      } else {
-        throw new IncompatibleDomainException(configuredDomainName, foundDomain);
-      }
-    }
-
-    return domainRepository.getCompatibleDomain(domainBundleDescriptor.get());
+    return domainRepository.getDomain("io-domain");
   }
 
 }
