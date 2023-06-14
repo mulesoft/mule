@@ -112,7 +112,8 @@ public class GroovyResourceReleaser implements ResourceReleaser {
           }
         }
       }
-    } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+    } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException | InvocationTargetException
+        | IllegalAccessException e) {
       LOGGER.warn("Error trying to unregister the Groovy's Scripting Engine", e);
     }
   }
