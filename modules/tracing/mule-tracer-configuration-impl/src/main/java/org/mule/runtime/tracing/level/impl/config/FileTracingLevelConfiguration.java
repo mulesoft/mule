@@ -89,8 +89,16 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   }
 
   @Override
-  public HashMap<String, TracingLevel> getTracingLevelOverrides() {
-    return tracingLevelOverrides;
+  public TracingLevel getTracingLevelOverride(String location) {
+    TracingLevel tracingLevelOverride = getTracingLevelOverrideFrom(location);
+    if (tracingLevelOverride != null) {
+      return tracingLevelOverride;
+    }
+    return tracingLevel;
+  }
+
+  private TracingLevel getTracingLevelOverrideFrom(String location) {
+    return tracingLevelOverrides.get(location);
   }
 
   private Properties getTracingLevelProperties() {

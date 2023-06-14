@@ -58,4 +58,11 @@ public interface InitialExportInfo {
   default Set<String> noExportUntil() {
     return emptySet();
   }
+
+  /**
+   * Propagates the export information from its parent's InitialExportInfo.
+   *
+   * @param initialExportInfo is the parent's InitialExportInfo.
+   */
+  default void propagateInitialExportInfo(InitialExportInfo initialExportInfo) {}
 }

@@ -24,7 +24,7 @@ import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUti
 
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.impl.export.AbstractInitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
@@ -70,5 +70,4 @@ public class MonitoringInitialExportInfoProvider extends AbstractInitialExportIn
   protected Map<String, InitialExportInfo> getInitialExportInfoMapByName() {
     return initialExportInfoMapByName;
   }
-
 }

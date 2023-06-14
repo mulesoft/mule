@@ -12,16 +12,11 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
-
-import java.util.HashMap;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -72,62 +67,27 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenNoFileExistsTracingLevelOverridesIsEmpty() {
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertTrue(fileTracingLevelConfiguration.getTracingLevelOverrides().isEmpty());
-  }
-
-  @Test
-  public void whenNoPropertyIsInTheFileTracingLevelOverridesIsEmpty() {
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertTrue(fileTracingLevelConfiguration.getTracingLevelOverrides().isEmpty());
-  }
-
-  @Test
-  public void whenOnlyTheLevelIsSpecifiedInTheFileTracingLevelOverridesIsEmpty() {
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertTrue(fileTracingLevelConfiguration.getTracingLevelOverrides().isEmpty());
-  }
-
-  @Test
   public void whenALocationOverrideIsSpecifiedInTheFileTheOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class));
-    HashMap<String, TracingLevel> tracingLevelOverrides = fileTracingLevelConfiguration.getTracingLevelOverrides();
-
-    assertFalse(tracingLevelOverrides.isEmpty());
-    assertTrue(tracingLevelOverrides.containsKey(LOCATION_1));
-    assertEquals(TracingLevel.MONITORING, tracingLevelOverrides.get(LOCATION_1));
-    assertTrue(tracingLevelOverrides.containsKey(LOCATION_2));
-    assertEquals(TracingLevel.DEBUG, tracingLevelOverrides.get(LOCATION_2));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.MONITORING));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
 
   @Test
-  public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheOverrideIsNotReturned() {
+  public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class));
-    HashMap<String, TracingLevel> tracingLevelOverrides = fileTracingLevelConfiguration.getTracingLevelOverrides();
-
-    assertFalse(tracingLevelOverrides.isEmpty());
-    assertFalse(tracingLevelOverrides.containsKey(LOCATION_1));
-    assertTrue(tracingLevelOverrides.containsKey(LOCATION_2));
-    assertEquals(TracingLevel.DEBUG, tracingLevelOverrides.get(LOCATION_2));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.OVERVIEW));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
 
   @Test
   public void whenALocationOverrideIsSpecifiedAndDuplicatedInTheFileTheLastOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class));
-    HashMap<String, TracingLevel> tracingLevelOverrides = fileTracingLevelConfiguration.getTracingLevelOverrides();
-
-    assertFalse(tracingLevelOverrides.isEmpty());
-    assertTrue(tracingLevelOverrides.containsKey(LOCATION_1));
-    assertEquals(TracingLevel.DEBUG, tracingLevelOverrides.get(LOCATION_1));
-    assertTrue(tracingLevelOverrides.containsKey(LOCATION_2));
-    assertEquals(TracingLevel.DEBUG, tracingLevelOverrides.get(LOCATION_2));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.DEBUG));
+    assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
 
   /**

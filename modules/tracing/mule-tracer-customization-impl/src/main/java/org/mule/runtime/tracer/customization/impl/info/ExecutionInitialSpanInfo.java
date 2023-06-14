@@ -14,7 +14,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.ExecutionInitialExportInfo;
+import org.mule.runtime.tracer.customization.impl.export.TracingLevelExportInfo;
 
 import java.util.function.BiConsumer;
 
@@ -33,7 +34,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
-  public static final String NO_LOCATION = "no-location";
 
   private final InitialExportInfo initialExportInfo;
 
@@ -45,25 +45,26 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String apiId;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, apiId, initialExportInfoProvider, null, "");
+  public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelExportInfo tracingLevelExportInfo) {
+    this(component, apiId, tracingLevelExportInfo, null, "");
   }
 
   public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName,
-                                  InitialExportInfoProvider initialExportInfoProvider) {
-    this(component, apiId, initialExportInfoProvider, overriddenName, "");
+                                  TracingLevelExportInfo tracingLevelExportInfo) {
+    this(component, apiId, tracingLevelExportInfo, overriddenName, "");
   }
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, InitialExportInfoProvider initialExportInfoProvider,
+  public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelExportInfo tracingLevelExportInfo,
                                   String overriddenName, String spanNameSuffix) {
 
     if (overriddenName == null) {
       name = getSpanName(component.getIdentifier()) + spanNameSuffix;
-      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(component);
+      tracingLevelExportInfo.setSpanIdentifier(component);
     } else {
       name = overriddenName;
-      initialExportInfo = initialExportInfoProvider.getInitialExportInfo(name);
+      tracingLevelExportInfo.setSpanIdentifier(name);
     }
+    this.initialExportInfo = new ExecutionInitialExportInfo(tracingLevelExportInfo);
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);
     this.rootSpan = isComponentOfName(component, FLOW);
