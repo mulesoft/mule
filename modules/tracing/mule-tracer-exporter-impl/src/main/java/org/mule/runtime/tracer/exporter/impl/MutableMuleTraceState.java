@@ -27,32 +27,52 @@ public class MutableMuleTraceState implements TraceState {
   public static final String TRACE_STATE_KEY = "tracestate";
 
   public static final String ANCESTOR_MULE_SPAN_ID = "ancestor-mule-span-id";
-  private String ancestorMuleSpanId;
+  private final boolean addAncestorMuleSpanIdToTraceState;
+  private final boolean propagateAllRemoteTraceContext;
+
+  private String currentSpanId;
 
   private Map<String, String> remoteState;
 
   /**
    * Returns a {@link MutableMuleTraceState} from the representation as a serialized map.
    *
-   * @param serializeAsMap the serialized trace state
+   * @param serializeAsMap                 the serialized trace state
+   * @param enableMuleAncestorIdManagement enables mule ancestor id management.
    * @return the resulting {@link MutableMuleTraceState}
    */
-  public static MutableMuleTraceState getMutableMuleTraceStateFrom(Map<String, String> serializeAsMap) {
+  public static MutableMuleTraceState getMutableMuleTraceStateFrom(Map<String, String> serializeAsMap,
+                                                                   boolean enableMuleAncestorIdManagement) {
     TraceState remoteTraceState = TraceState.getDefault();
     String traceState = serializeAsMap.get(TRACE_STATE_KEY);
     if (!StringUtils.isEmpty(traceState)) {
       remoteTraceState = W3CTraceContextEncoding.decodeTraceState(traceState);
     }
-    return new MutableMuleTraceState(remoteTraceState.asMap(), remoteTraceState.get(ANCESTOR_MULE_SPAN_ID));
+
+    // If enableMuleAncestorIdManagement is false, we will set in the trace state all the key/value's from the remote trace
+    // context,
+    // including the ancestor mule span id if exists.
+    // If enableMuleAncestorIdManagement is true, we will use all the key/value's from the remote trace context except
+    // the ancestor mule span id and when there there is a current span id to set as ancestor mule span id, we will
+    // also include it in the state.
+    return new MutableMuleTraceState(remoteTraceState.asMap(), remoteTraceState.get(ANCESTOR_MULE_SPAN_ID),
+                                     !enableMuleAncestorIdManagement, enableMuleAncestorIdManagement);
   }
 
-  public MutableMuleTraceState(Map<String, String> remoteState, String ancestorMuleSpanId) {
+  /**
+   * @param remoteState                       the remote trace state. This state came through an endpoint and should be propagated
+   *                                          into the mule context.
+   * @param currentSpanId                     the current span id to add in the trace state.
+   * @param propagateAllRemoteTraceContext    whether all the remote context has to be propagated or we should to take into
+   *                                          account the key/value's that belong to mule as vendor.
+   * @param addAncestorMuleSpanIdToTraceState whether the set ancestorMuleSpanId has to be set in the trace state.
+   */
+  private MutableMuleTraceState(Map<String, String> remoteState, String currentSpanId,
+                                boolean propagateAllRemoteTraceContext, boolean addAncestorMuleSpanIdToTraceState) {
     this.remoteState = remoteState;
-    this.ancestorMuleSpanId = ancestorMuleSpanId;
-  }
-
-  public MutableMuleTraceState() {
-    this.remoteState = new HashMap<>();
+    this.currentSpanId = currentSpanId;
+    this.propagateAllRemoteTraceContext = propagateAllRemoteTraceContext;
+    this.addAncestorMuleSpanIdToTraceState = addAncestorMuleSpanIdToTraceState;
   }
 
   @Nullable
@@ -68,7 +88,7 @@ public class MutableMuleTraceState implements TraceState {
 
   @Override
   public boolean isEmpty() {
-    if (ancestorMuleSpanId != null) {
+    if (currentSpanId != null) {
       return false;
     }
     return remoteState.isEmpty();
@@ -76,15 +96,19 @@ public class MutableMuleTraceState implements TraceState {
 
   @Override
   public void forEach(BiConsumer<String, String> biConsumer) {
-    // From the remote state we don't export the ancestor.
+    // we don't propagate the remote mule ancestor span id
+    // from the remote context unless we indicate to propagate the it
+    // in an explicit way.
     remoteState.forEach((key, value) -> {
-      if (!key.equals(ANCESTOR_MULE_SPAN_ID)) {
+      if (propagateAllRemoteTraceContext || !key.equals(ANCESTOR_MULE_SPAN_ID)) {
         biConsumer.accept(key, value);
       }
     });
 
-    if (ancestorMuleSpanId != null) {
-      biConsumer.accept(ANCESTOR_MULE_SPAN_ID, ancestorMuleSpanId);
+    // If we indicate in an explicit way that the ancestor mule span id
+    // has to be in this trace state, we add it.
+    if (currentSpanId != null && addAncestorMuleSpanIdToTraceState) {
+      biConsumer.accept(ANCESTOR_MULE_SPAN_ID, currentSpanId);
     }
   }
 
@@ -110,7 +134,8 @@ public class MutableMuleTraceState implements TraceState {
    * @return the trace state with the ancestor key/value.
    */
   public TraceState withAncestor(String ancestorSpanId) {
-    return new MutableMuleTraceState(remoteState, ancestorSpanId);
+    return new MutableMuleTraceState(remoteState, ancestorSpanId, propagateAllRemoteTraceContext,
+                                     addAncestorMuleSpanIdToTraceState);
   }
 
   /**

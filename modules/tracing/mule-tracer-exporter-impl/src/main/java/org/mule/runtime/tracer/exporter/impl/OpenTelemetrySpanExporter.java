@@ -26,6 +26,7 @@ import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUti
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetryTraceIdUtils.extractContextFromTraceParent;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
@@ -43,6 +44,14 @@ import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.annotation.Nullable;
+
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
@@ -59,14 +68,6 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-
-import javax.annotation.Nullable;
 
 /**
  * A {@link SpanExporter} that exports the spans as Open Telemetry Spans.
@@ -92,7 +93,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private final Map<String, String> rootAttributes = new HashMap<>();
   private final SpanProcessor spanProcessor;
   private final Resource resource;
-  private final boolean addMuleAncestorSpanId;
+  private final boolean enableMuleAncestorIdManagement;
 
   private boolean exportable;
   private SpanContext spanContext = getInvalid();
@@ -106,7 +107,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private String rootName;
   private String endThreadNameValue;
 
-  private MutableMuleTraceState muleTraceState = new MutableMuleTraceState();
+  private MutableMuleTraceState muleTraceState;
 
 
   private OpenTelemetrySpanExporter(InternalSpan internalSpan,
@@ -114,7 +115,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
                                     String artifactId,
                                     String artifactType,
                                     SpanProcessor spanProcessor,
-                                    boolean addMuleAncestorSpanId,
+                                    boolean enableMuleAncestorIdManagement,
                                     Resource resource) {
     this.internalSpan = internalSpan;
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
@@ -124,8 +125,9 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
-    this.addMuleAncestorSpanId = addMuleAncestorSpanId;
+    this.enableMuleAncestorIdManagement = enableMuleAncestorIdManagement;
     this.resource = resource;
+    this.muleTraceState = getMutableMuleTraceStateFrom(emptyMap(), enableMuleAncestorIdManagement);
 
     // Generates the span id so that the opentelemetry spans can be lazily initialised if it is exportable
     if (exportable) {
@@ -197,7 +199,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public Map<String, String> exportedSpanAsMap() {
-    return OpenTelemetryTraceIdUtils.getDistributedTraceContext(this, addMuleAncestorSpanId);
+    return OpenTelemetryTraceIdUtils.getDistributedTraceContext(this, enableMuleAncestorIdManagement);
   }
 
   @Override
@@ -221,7 +223,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get(TRACE_PARENT_KEY));
-    muleTraceState = getMutableMuleTraceStateFrom(serializeAsMap);
+    muleTraceState = getMutableMuleTraceStateFrom(serializeAsMap, enableMuleAncestorIdManagement);
     if (parentSpanContext.isValid()) {
       if (!exportable) {
         // if it not exportable, we set the parent span context so that it is eventually
