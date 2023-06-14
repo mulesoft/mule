@@ -28,8 +28,11 @@ import io.qameta.allure.Story;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.validation.Assertion;
+import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +70,61 @@ public class EventSpanContextTestCase {
     assertThat(serializeAsMap, aMapWithSize(2));
     assertThat(serializeAsMap, Matchers.hasEntry(TRACEPARENT, TRACEPARENT_VALUE));
     assertThat(serializeAsMap, Matchers.hasEntry(TRACESTATE, TRACESTATE_VALUE));
+  }
+
+  @Test(expected = AssertionFailedException.class)
+  public void testEndSpanUnsuccessfulAssertion() {
+    InternalSpan mockedSpan = mock(InternalSpan.class);
+    when(mockedSpan.getName()).thenReturn("mockedSpan");
+
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    EventSpanContext spanContext =
+        EventSpanContext.builder().withGetter(distributedTraceContextGetter).build();
+
+    spanContext.setSpan(mockedSpan, Assertion.SUCCESSFUL_ASSERTION);
+    spanContext.endSpan(new SpanNameAssertion("thisShouldFail"));
+  }
+
+  @Test
+  public void testEndSpanSuccessfulAssertion() {
+    InternalSpan mockedSpan = mock(InternalSpan.class);
+    when(mockedSpan.getName()).thenReturn("mockedSpan");
+
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    EventSpanContext spanContext =
+        EventSpanContext.builder().withGetter(distributedTraceContextGetter).build();
+
+    spanContext.setSpan(mockedSpan, Assertion.SUCCESSFUL_ASSERTION);
+    spanContext.endSpan(new SpanNameAssertion("mockedSpan"));
+  }
+
+  @Test(expected = AssertionFailedException.class)
+  public void testStartSpanUnsuccessfulAssertion() {
+    InternalSpan mockedSpan = mock(InternalSpan.class);
+    when(mockedSpan.getName()).thenReturn("mockedSpan");
+
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    EventSpanContext spanContext =
+        EventSpanContext.builder().withGetter(distributedTraceContextGetter).build();
+
+    spanContext.setSpan(mockedSpan, new SpanNameAssertion("thisShouldFail"));
+  }
+
+  @Test
+  public void testStartSpanSuccessfulAssertion() {
+    InternalSpan mockedSpan = mock(InternalSpan.class);
+    when(mockedSpan.getName()).thenReturn("mockedSpan");
+
+    DistributedTraceContextGetter distributedTraceContextGetter = mock(DistributedTraceContextGetter.class);
+    when(distributedTraceContextGetter.get(any(String.class))).thenReturn(empty());
+    EventSpanContext spanContext =
+        EventSpanContext.builder().withGetter(distributedTraceContextGetter).build();
+
+    spanContext.setSpan(mockedSpan, Assertion.SUCCESSFUL_ASSERTION);
+    spanContext.endSpan(new SpanNameAssertion("mockedSpan"));
   }
 
 }
