@@ -36,7 +36,6 @@
                                 <includes>
                                     <includes>org.apache.activemq:*</includes>
                                     <includes>org.apache.activemq.protobuf:*</includes>
-                                    <includes>com.fasterxml.jackson.core:*</includes>
                                     <includes>org.fusesource.hawtbuf:hawtbuf</includes>
                                     <includes>jakarta.management.j2ee:jakarta.management.j2ee-api</includes>
                                 </includes>
