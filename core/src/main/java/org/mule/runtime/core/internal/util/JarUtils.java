@@ -55,7 +55,7 @@ public final class JarUtils {
   private JarUtils() {
     // utility class only
   }
-  
+
   /**
    * Creates an URL to a path within a jar file.
    *
