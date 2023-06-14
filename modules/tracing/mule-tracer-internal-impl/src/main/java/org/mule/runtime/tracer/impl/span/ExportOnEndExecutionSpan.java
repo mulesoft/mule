@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.tracer.impl.span;
 
-import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
+import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.tracer.impl.clock.Clock.getDefault;
 
 import static java.util.Collections.emptyList;
@@ -36,76 +36,47 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
 
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
-
   private final InitialSpanInfo initialSpanInfo;
-  private SpanIdentifier identifier;
-  private SpanExporter spanExporter = NOOP_EXPORTER;
+  private final SpanExporter spanExporter;
   private SpanError lastError;
-
-  public static ExecutionSpanBuilder getExecutionSpanBuilder() {
-    return new ExecutionSpanBuilder();
-  }
-
   private final InternalSpan parent;
   private final Long startTime;
   private Long endTime;
   private final Map<String, String> additionalAttributes = new HashMap<>();
 
-  private ExportOnEndExecutionSpan(InitialSpanInfo initialSpanInfo, Long startTime,
+  private ExportOnEndExecutionSpan(SpanExporterFactory spanExporterFactory, InitialSpanInfo initialSpanInfo, Long startTime,
                                    InternalSpan parent) {
     this.initialSpanInfo = initialSpanInfo;
     this.startTime = startTime;
     this.parent = parent;
+    this.spanExporter = spanExporterFactory.getSpanExporter(this, initialSpanInfo);
+  }
+
+  public static InternalSpan createExportOnEndExecutionSpan(SpanExporterFactory spanExporterFactory, InternalSpan parentSpan,
+                                                            InitialSpanInfo initialSpanInfo) {
+    requireNonNull(spanExporterFactory);
+    requireNonNull(initialSpanInfo);
+    ExportOnEndExecutionSpan exportOnEndExecutionSpan = new ExportOnEndExecutionSpan(spanExporterFactory, initialSpanInfo,
+                                                                                     getDefault().now(),
+                                                                                     parentSpan);
+    return parentSpan.onChild(exportOnEndExecutionSpan);
+  }
+
+  public SpanExporter getSpanExporter() {
+    return spanExporter;
   }
 
   @Override
-  public Span getParent() {
-    return parent;
-  }
-
-  @Override
-  public SpanIdentifier getIdentifier() {
-    return identifier;
-  }
-
-  @Override
-  public String getName() {
-    return initialSpanInfo.getName();
-  }
-
-  @Override
-  public SpanDuration getDuration() {
-    return new DefaultSpanDuration(startTime, endTime);
-  }
-
-  @Override
-  public List<SpanError> getErrors() {
-    if (lastError != null) {
-      return singletonList(lastError);
+  public InternalSpan onChild(InternalSpan child) {
+    if (child instanceof ExportOnEndExecutionSpan) {
+      spanExporter.updateChildSpanExporter(((ExportOnEndExecutionSpan) child).getSpanExporter());
     }
-
-    return emptyList();
+    return child;
   }
-
-  @Override
-  public void setRootAttribute(String s, String s1) {
-    spanExporter.setRootAttribute(s, s1);
-  }
-
-  @Override
-  public int getAttributesCount() {
-    return initialSpanInfo.getInitialAttributesCount() + additionalAttributes.size();
-  }
-
 
   @Override
   public void updateRootName(String name) {
     spanExporter.setRootName(name);
-  }
-
-  @Override
-  public boolean hasErrors() {
-    return lastError != null;
   }
 
   @Override
@@ -131,11 +102,6 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public SpanExporter getSpanExporter() {
-    return spanExporter;
-  }
-
-  @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     initialSpanInfo.forEachAttribute(biConsumer);
     if (!additionalAttributes.isEmpty()) {
@@ -146,6 +112,50 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   @Override
   public Map<String, String> serializeAsMap() {
     return spanExporter.exportedSpanAsMap();
+  }
+
+  @Override
+  public boolean hasErrors() {
+    return lastError != null;
+  }
+
+  @Override
+  public Span getParent() {
+    return parent;
+  }
+
+  @Override
+  public SpanIdentifier getIdentifier() {
+    return getSpanExporter().getSpanIdentifier();
+  }
+
+  @Override
+  public String getName() {
+    return initialSpanInfo.getName();
+  }
+
+  @Override
+  public SpanDuration getDuration() {
+    return new DefaultSpanDuration(startTime, endTime);
+  }
+
+  @Override
+  public List<SpanError> getErrors() {
+    if (lastError != null) {
+      return singletonList(lastError);
+    }
+
+    return emptyList();
+  }
+
+  @Override
+  public int getAttributesCount() {
+    return initialSpanInfo.getInitialAttributesCount() + additionalAttributes.size();
+  }
+
+  @Override
+  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
+    spanExporter.setRootAttribute(rootAttributeKey, rootAttributeValue);
   }
 
   /**
@@ -180,67 +190,5 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
     spanExporter.onAdditionalAttribute(key, value);
   }
 
-  @Override
-  public InternalSpan updateChildSpanExporter(InternalSpan internalSpan) {
-    spanExporter.updateChildSpanExporter(internalSpan.getSpanExporter());
-    return internalSpan;
-  }
-
-  private void updateIdentifierBasedOnExporter() {
-    this.identifier = spanExporter.getSpanIdentifierBasedOnExport();
-  }
-
-  /**
-   * x A Builder for {@link ExportOnEndExecutionSpan}
-   *
-   * @since 4.5.0
-   */
-  public static class ExecutionSpanBuilder {
-
-    public static final String THERE_IS_NO_SPAN_FACTORY_MESSAGE = "there is no span factory";
-
-    private InternalSpan parent;
-    private Long startTime;
-    private SpanExporterFactory spanExporterFactory;
-    private InitialSpanInfo initialSpanInfo;
-
-    private ExecutionSpanBuilder() {}
-
-    public ExecutionSpanBuilder withStartSpanInfo(InitialSpanInfo spanCustomizationInfo) {
-      this.initialSpanInfo = spanCustomizationInfo;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withParentSpan(InternalSpan parent) {
-      this.parent = parent;
-      return this;
-    }
-
-    public ExecutionSpanBuilder withSpanExporterFactory(SpanExporterFactory spanExporterFactory) {
-      this.spanExporterFactory = spanExporterFactory;
-      return this;
-    }
-
-    public ExportOnEndExecutionSpan build() {
-      if (startTime == null) {
-        startTime = getDefault().now();
-      }
-
-      if (spanExporterFactory == null) {
-        throw new IllegalArgumentException(THERE_IS_NO_SPAN_FACTORY_MESSAGE);
-      }
-
-      ExportOnEndExecutionSpan exportOnEndExecutionSpan = new ExportOnEndExecutionSpan(initialSpanInfo,
-                                                                                       startTime,
-                                                                                       parent);
-
-
-      exportOnEndExecutionSpan.spanExporter = spanExporterFactory.getSpanExporter(exportOnEndExecutionSpan, initialSpanInfo);
-      exportOnEndExecutionSpan.updateIdentifierBasedOnExporter();
-
-      return exportOnEndExecutionSpan;
-    }
-
-  }
 }
 

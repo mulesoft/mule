@@ -28,6 +28,7 @@ import static org.mule.runtime.tracer.exporter.impl.OpenTelemetryTraceIdUtils.ex
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
@@ -105,20 +106,25 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private List<EventData> errorEvents = emptyList();
   private String overriddenSpanName;
   private Set<String> noExportUntil;
-  private OpenTelemetrySpanExporter rootSpan = this;
+  private OpenTelemetrySpanExporter rootSpanExporter = this;
   private String rootName;
   private String endThreadNameValue;
 
   private MutableMuleTraceState muleTraceState;
 
-
-  private OpenTelemetrySpanExporter(InternalSpan internalSpan,
-                                    InitialSpanInfo initialSpanInfo,
-                                    String artifactId,
-                                    String artifactType,
-                                    SpanProcessor spanProcessor,
-                                    boolean enableMuleAncestorIdManagement,
-                                    Resource resource) {
+  public OpenTelemetrySpanExporter(InternalSpan internalSpan,
+                                   InitialSpanInfo initialSpanInfo,
+                                   String artifactId,
+                                   String artifactType,
+                                   SpanProcessor spanProcessor,
+                                   boolean enableMuleAncestorIdManagement,
+                                   Resource resource) {
+    requireNonNull(internalSpan);
+    requireNonNull(initialSpanInfo);
+    requireNonNull(artifactId);
+    requireNonNull(artifactType);
+    requireNonNull(spanProcessor);
+    requireNonNull(resource);
     this.internalSpan = internalSpan;
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
     this.isRootSpan = initialSpanInfo.isRootSpan();
@@ -166,10 +172,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     return attributes;
   }
 
-  public static OpenTelemetrySpanExportBuilder builder() {
-    return new OpenTelemetrySpanExportBuilder();
-  }
-
   @Override
   public AttributesBuilder toBuilder() {
     throw new UnsupportedOperationException();
@@ -185,8 +187,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void updateNameForExport(String newName) {
-    if (rootSpan != this) {
-      rootSpan.updateNameForExport(newName);
+    if (rootSpanExporter != this) {
+      rootSpanExporter.updateNameForExport(newName);
     } else {
       overriddenSpanName = newName;
     }
@@ -233,7 +235,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   }
 
   @Override
-  public SpanIdentifier getSpanIdentifierBasedOnExport() {
+  public SpanIdentifier getSpanIdentifier() {
     if (spanContext.isValid()) {
       return new OpentelemetrySpanIdentifier(spanContext.getSpanId(), spanContext.getTraceId());
     } else {
@@ -253,7 +255,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       if (!childOpenTelemetrySpanExporter.exportable) {
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.setRootName(rootName);
         return;
@@ -261,8 +263,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
       // If it is a policy span, propagate the rootSpan.
       if (childOpenTelemetrySpanExporter.isPolicySpan) {
-        childOpenTelemetrySpanExporter.setRootName(rootName);
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
       }
 
       // Propagates the root name until it finds a root.
@@ -279,7 +280,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
-        childOpenTelemetrySpanExporter.rootSpan = rootSpan;
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
         childOpenTelemetrySpanExporter.exportable = false;
       }
 
@@ -326,12 +327,12 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void onAdditionalAttribute(String key, String value) {
     if (key.equals(SPAN_KIND)) {
-      rootSpan.spanKind = SpanKind.valueOf(value);
+      rootSpanExporter.spanKind = SpanKind.valueOf(value);
     } else if (key.equals(STATUS)) {
       StatusCode statusCode = StatusCode.valueOf(value);
-      rootSpan.statusData = StatusData.create(statusCode, null);
-    } else if (isPolicySpan && !rootSpan.equals(this)) {
-      rootSpan.internalSpan.addAttribute(key, value);
+      rootSpanExporter.statusData = StatusData.create(statusCode, null);
+    } else if (isPolicySpan && !rootSpanExporter.equals(this)) {
+      rootSpanExporter.internalSpan.addAttribute(key, value);
     }
   }
 
@@ -464,81 +465,6 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   public MutableMuleTraceState getTraceState() {
     return muleTraceState;
-  }
-
-  /**
-   * Builder
-   */
-  public static class OpenTelemetrySpanExportBuilder {
-
-    private InitialSpanInfo initialSpanInfo;
-    private InternalSpan internalSpan;
-    private String artifactId;
-    private String artifactType;
-    private Resource resource;
-    private SpanProcessor spanProcessor;
-    private boolean isAddMuleAncestorSpanId;
-
-    public OpenTelemetrySpanExportBuilder withStartSpanInfo(InitialSpanInfo initialSpanInfo) {
-      this.initialSpanInfo = initialSpanInfo;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withInternalSpan(InternalSpan internalSpan) {
-      this.internalSpan = internalSpan;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withArtifactId(String artifactId) {
-      this.artifactId = artifactId;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withArtifactType(String artifactType) {
-      this.artifactType = artifactType;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withSpanProcessor(SpanProcessor spanProcessor) {
-      this.spanProcessor = spanProcessor;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder withResource(Resource resource) {
-      this.resource = resource;
-      return this;
-    }
-
-    public OpenTelemetrySpanExportBuilder addMuleAncestorSpanId(boolean addMuleAncestorSpanId) {
-      this.isAddMuleAncestorSpanId = addMuleAncestorSpanId;
-      return this;
-    }
-
-    public OpenTelemetrySpanExporter build() {
-
-      if (initialSpanInfo == null) {
-        throw new IllegalArgumentException("Start span info is null");
-      }
-
-      if (artifactId == null) {
-        throw new IllegalArgumentException("Artifact id is null");
-      }
-
-      if (artifactType == null) {
-        throw new IllegalArgumentException("Artifact type is null");
-      }
-
-      if (spanProcessor == null) {
-        throw new IllegalArgumentException("Artifact type is null");
-      }
-
-      if (resource == null) {
-        throw new IllegalArgumentException("Resource is null");
-      }
-
-      return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
-                                           isAddMuleAncestorSpanId, resource);
-    }
   }
 
 }

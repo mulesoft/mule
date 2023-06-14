@@ -32,7 +32,7 @@ public class SpanMDCUtils {
    */
   public static void setCurrentTracingInformationToMdc(InternalSpan span) {
     SpanIdentifier spanIdentifier = span.getIdentifier();
-    if (spanIdentifier != null && spanIdentifier != SpanIdentifier.INVALID_SPAN_IDENTIFIER) {
+    if (spanIdentifier != null && spanIdentifier.isValid()) {
       MDC.put(SPAN_ID_MDC_KEY, spanIdentifier.getId());
       MDC.put(TRACE_ID_MDC_KEY, spanIdentifier.getTraceId());
     }

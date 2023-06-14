@@ -14,7 +14,6 @@ import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.List;
 import java.util.Map;
@@ -32,11 +31,6 @@ public class DeferredEndSpanWrapper implements InternalSpan {
 
   public DeferredEndSpanWrapper(InternalSpan delegate) {
     this.delegate = delegate;
-  }
-
-  @Override
-  public InternalSpan updateChildSpanExporter(InternalSpan childInternalSpan) {
-    return this.delegate.updateChildSpanExporter(childInternalSpan);
   }
 
   @Override
@@ -70,11 +64,6 @@ public class DeferredEndSpanWrapper implements InternalSpan {
   }
 
   @Override
-  public SpanExporter getSpanExporter() {
-    return delegate.getSpanExporter();
-  }
-
-  @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     delegate.forEachAttribute(biConsumer);
   }
@@ -87,6 +76,11 @@ public class DeferredEndSpanWrapper implements InternalSpan {
   @Override
   public int getAttributesCount() {
     return delegate.getAttributesCount();
+  }
+
+  @Override
+  public InternalSpan onChild(InternalSpan child) {
+    return delegate.onChild(child);
   }
 
   @Override

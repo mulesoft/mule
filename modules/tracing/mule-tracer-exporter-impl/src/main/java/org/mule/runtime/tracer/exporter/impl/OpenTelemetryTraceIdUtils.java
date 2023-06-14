@@ -14,7 +14,6 @@ import static java.util.Collections.emptyMap;
 import static io.opentelemetry.api.trace.propagation.internal.W3CTraceContextEncoding.encodeTraceState;
 
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -144,30 +143,18 @@ public class OpenTelemetryTraceIdUtils {
     return fromLong(id);
   }
 
-  public static String generateTraceId(InternalSpan parentInternalSpan) {
-    if (parentInternalSpan != null && parentInternalSpan.getSpanExporter() instanceof OpenTelemetrySpanExporter
-        && !parentSpanContextIsValid(parentInternalSpan)) {
-      return ((OpenTelemetrySpanExporter) parentInternalSpan.getSpanExporter()).getTraceId();
+  public static String generateTraceId(InternalSpan parentSpan) {
+    if (parentSpan != null && parentSpan.getIdentifier().isValid()) {
+      return parentSpan.getIdentifier().getTraceId();
+    } else {
+      Random random = randomSupplier.get();
+      long idHi = random.nextLong();
+      long idLo;
+      do {
+        idLo = random.nextLong();
+      } while (idLo == INVALID_ID);
+      return fromLongs(idHi, idLo);
     }
-
-    Random random = randomSupplier.get();
-    long idHi = random.nextLong();
-    long idLo;
-    do {
-      idLo = random.nextLong();
-    } while (idLo == INVALID_ID);
-    return fromLongs(idHi, idLo);
-  }
-
-  private static boolean parentSpanContextIsValid(InternalSpan parentInternalSpan) {
-    SpanExporter spanExporter = parentInternalSpan.getSpanExporter();
-
-    if (spanExporter instanceof OpenTelemetrySpanExporter) {
-      return ((OpenTelemetrySpanExporter) spanExporter).getSpanContext().getSpanId()
-          .equals(getInvalid());
-    }
-
-    return false;
   }
 
   /**
