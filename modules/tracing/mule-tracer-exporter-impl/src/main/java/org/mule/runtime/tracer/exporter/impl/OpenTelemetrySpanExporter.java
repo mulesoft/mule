@@ -297,7 +297,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private void createSpanContext() {
     // Generates the span id so that the OpenTelemetry spans can be lazily initialised if it is exportable
-    if (this.exportable) {
+    if (this.exportable && !this.spanContext.isValid()) {
       String spanId = OpenTelemetryTraceIdUtils.generateSpanId();
       String traceId = OpenTelemetryTraceIdUtils.generateTraceId(getAsInternalSpan(internalSpan.getParent()));
       this.spanContext = SpanContext.create(traceId, spanId, TraceFlags.getSampled(), muleTraceState);
