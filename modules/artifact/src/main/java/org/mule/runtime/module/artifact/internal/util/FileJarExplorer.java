@@ -11,6 +11,7 @@ import static java.io.File.separator;
 import static java.io.File.separatorChar;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
+
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
@@ -42,6 +43,27 @@ public class FileJarExplorer implements JarExplorer {
 
   private static final Pattern SLASH_PATTERN = compile("/");
   private static final Pattern SEPARATOR_PATTERN = compile(quote(separator));
+
+  private final boolean runtimeModeForServices;
+
+  /**
+   * Creates a {@link FileJarExplorer} defining whether services should be considered as resources.
+   *
+   * @param runtimeModeForServices if {@code false}, services will be considered as resources, otherwise they will be considered
+   *                               as {@link ExportedService exported services}.
+   *
+   * @since 4.3.1
+   */
+  public FileJarExplorer(boolean runtimeModeForServices) {
+    this.runtimeModeForServices = runtimeModeForServices;
+  }
+
+  /**
+   * Creates a {@link FileJarExplorer} that considers the services as {@link ExportedService exported services}.
+   */
+  public FileJarExplorer() {
+    this(true);
+  }
 
   @Override
   public JarInfo explore(URI library) {
@@ -81,7 +103,7 @@ public class FileJarExplorer implements JarExplorer {
 
               if (entry.isDirectory()) {
                 continue;
-              } else if (name.startsWith(META_INF_SERVICES_PATH)) {
+              } else if (runtimeModeForServices && name.startsWith(META_INF_SERVICES_PATH)) {
                 String serviceInterface = name.substring(META_INF_SERVICES_PATH.length());
                 URL resource = getServiceResourceUrl(libraryFile.toURI().toURL(), name);
 
