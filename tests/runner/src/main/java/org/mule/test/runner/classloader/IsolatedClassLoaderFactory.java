@@ -213,7 +213,7 @@ public class IsolatedClassLoaderFactory {
   private JarInfo getLibraryPackages(List<URL> libraries) {
     Set<String> packages = new TreeSet<>();
     Set<String> resources = new TreeSet<>();
-    final JarExplorer jarExplorer = new FileJarExplorer();
+    final JarExplorer jarExplorer = new FileJarExplorer(false);
 
     for (URL library : libraries) {
       try {

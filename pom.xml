@@ -162,6 +162,8 @@
         <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
+        <sshdCoreVersion>1.4.0</sshdCoreVersion>
+        <ftpServerVersion>1.0.6</ftpServerVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
@@ -238,7 +240,7 @@
         <surefire.test.unit.open.args>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.lang=ALL-UNNAMED ${surefire.args.base}</surefire.test.unit.open.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <!-- this groovy version is to be used during the build process, not bundled in the distro -->
+        <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
@@ -309,14 +311,60 @@
                 <artifactId>mockito-inline</artifactId>
                 <version>${mockitoVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitilityVersion}</version>
+                <exclusions>
+                   <exclusion>
+                       <groupId>org.hamcrest</groupId>
+                       <artifactId>hamcrest-library</artifactId>
+                   </exclusion>
+                   <exclusion>
+                       <groupId>org.hamcrest</groupId>
+                       <artifactId>hamcrest-core</artifactId>
+                   </exclusion>
+                </exclusions>
+            </dependency>
+            
+            <!-- Other deps used in testing -->
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbynet</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbyshared</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbytools</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
 
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commonsNet.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpServerVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshdCoreVersion}</version>
+            </dependency>
         </dependencies>
-
     </dependencyManagement>
 
     <distributionManagement>
