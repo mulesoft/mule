@@ -7,7 +7,6 @@
 
 package org.mule.runtime.tracer.exporter.impl;
 
-import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
@@ -134,7 +133,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.artifactId = artifactId;
     this.artifactType = artifactType;
     this.spanProcessor = spanProcessor;
-    this.enableMuleAncestorIdManagement = addMuleAncestorSpanId;
+    this.enableMuleAncestorIdManagement = enableMuleAncestorIdManagement;
     this.resource = resource;
     this.muleTraceState = getMutableMuleTraceStateFrom(emptyMap(), enableMuleAncestorIdManagement);
     this.initialExportInfo = initialSpanInfo.getInitialExportInfo();
