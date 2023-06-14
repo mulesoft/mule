@@ -118,7 +118,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
                                    String artifactId,
                                    String artifactType,
                                    SpanProcessor spanProcessor,
-                                   boolean addMuleAncestorSpanId,
+                                   boolean enableMuleAncestorIdManagement,
                                    Resource resource) {
     requireNonNull(internalSpan);
     requireNonNull(initialSpanInfo);
