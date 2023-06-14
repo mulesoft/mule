@@ -1,4 +1,4 @@
-Couldn't find resource: domain-config.yaml neither on classpath or in file system 
+Couldn't read from file domain-config.yaml: Couldn't find resource: domain-config.yaml neither on classpath or in file system 
  ------------------------
 | Runtime Class Loader |
 ------------------------
