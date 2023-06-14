@@ -21,6 +21,7 @@
         <module>component-plugin</module>
         <module>functional</module>
         <module>activemq-broker</module>
+        <module>derby-all</module>
         <module>infrastructure</module>
         <module>performance</module>
         <module>test-extensions</module>

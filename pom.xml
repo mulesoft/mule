@@ -340,11 +340,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.derby</groupId>
-                <artifactId>derbyshared</artifactId>
-                <version>${derbyVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.derby</groupId>
                 <artifactId>derbytools</artifactId>
                 <version>${derbyVersion}</version>
             </dependency>
