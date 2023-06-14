@@ -7,7 +7,12 @@
 
 package org.mule.test.runner.classloader;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
+import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
@@ -16,12 +21,9 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.container.internal.ContainerClassLoaderFactory.SYSTEM_PACKAGES;
-import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -212,7 +214,7 @@ public class IsolatedClassLoaderFactory {
   private JarInfo getLibraryPackages(List<URL> libraries) {
     Set<String> packages = new TreeSet<>();
     Set<String> resources = new TreeSet<>();
-    final JarExplorer jarExplorer = new FileJarExplorer();
+    final JarExplorer jarExplorer = new FileJarExplorer(false);
 
     for (URL library : libraries) {
       try {
