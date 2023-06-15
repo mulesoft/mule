@@ -10,9 +10,12 @@ package org.mule.tck.util;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
 
-import static java.io.File.pathSeparator;
+import static java.lang.System.getProperty;
 import static java.nio.file.Files.createTempDirectory;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -29,11 +32,11 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -54,6 +57,22 @@ public class CompilerUtils {
   // a jar is compiled as an extension.
   private static final String EXTENSION_ANNOTATION_PROCESSOR_CLASSNAME =
       "org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor";
+
+  private static final List<String> CLASS_PATH_ENTRIES;
+  private static final String PATH_SEPARATOR;
+
+  static {
+    String classPath = getProperty("java.class.path");
+    String modulePath = getProperty("jdk.module.path");
+    PATH_SEPARATOR = getProperty("path.separator");
+
+    CLASS_PATH_ENTRIES = (modulePath != null
+        ? concat(Stream.of(classPath.split(PATH_SEPARATOR)),
+                 Stream.of(modulePath.split(PATH_SEPARATOR)))
+        : Stream.of(classPath.split(PATH_SEPARATOR)))
+            .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+            .collect(toList());
+  }
 
   /**
    * Base class to create compiler utilities.
@@ -438,15 +457,18 @@ public class CompilerUtils {
         options.add(target.getAbsolutePath());
       }
 
+      // Adds same classpath as the one used on the runner
+      String fullClassPath;
       if (jarFiles.length > 0) {
-        // Adds same classpath as the one used on the runner
-        String classPath = System.getProperty("java.class.path");
         // Adds extra jars files required to compile the source classes
-        for (File jarFile : jarFiles) {
-          classPath = classPath + pathSeparator + jarFile.getAbsolutePath();
-        }
-        options.addAll(Arrays.asList("-classpath", classPath));
+        fullClassPath = concat(CLASS_PATH_ENTRIES.stream(), Stream.of(jarFiles).map(File::getAbsolutePath))
+            .collect(joining(PATH_SEPARATOR));
+      } else {
+        fullClassPath = CLASS_PATH_ENTRIES.stream()
+            .collect(joining(PATH_SEPARATOR));
       }
+
+      options.addAll(asList("-classpath", fullClassPath));
 
       options.addAll(processProperties);
 
@@ -454,7 +476,7 @@ public class CompilerUtils {
       if (!System.getProperty("java.version").startsWith("1.")) {
         // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing what
         // happens when deploying.
-        options.addAll(Arrays.asList("--release", "8"));
+        options.addAll(asList("--release", "8"));
       }
 
       return options;

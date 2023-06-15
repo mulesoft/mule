@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.builder;
 import static org.mule.maven.pom.parser.api.model.BundleScope.COMPILE;
 import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.Optional.empty;
@@ -44,7 +43,8 @@ import java.util.Set;
  */
 public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
 
-  private static final String MULE_MAVEN_PLUGIN_VERSION = "1.0.0";
+  private static final String MULE_PLUGIN_CLASSIFIER = "mule-plugin";
+
   private final String artifactId;
   private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
   private final List<AbstractDependencyFileBuilder> sharedLibraries = new ArrayList<>();
