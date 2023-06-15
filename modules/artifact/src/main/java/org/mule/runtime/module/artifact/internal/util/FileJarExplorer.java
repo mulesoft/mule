@@ -51,7 +51,7 @@ public class FileJarExplorer implements JarExplorer {
    * @param runtimeModeForServices if {@code false}, services will be considered as resources, otherwise they will be considered
    *                               as {@link ExportedService exported services}.
    *
-   * @since 4.5
+   * @since 4.4.1
    */
   public FileJarExplorer(boolean runtimeModeForServices) {
     this.runtimeModeForServices = runtimeModeForServices;
