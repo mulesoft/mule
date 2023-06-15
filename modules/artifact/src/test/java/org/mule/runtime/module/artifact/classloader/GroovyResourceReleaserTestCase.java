@@ -148,10 +148,10 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private String runScript() throws ClassNotFoundException,
       NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    String[] roots = new String[] {"src/test/resources/groovy/"};
+    URL[] roots = new URL[] {artifactClassLoader.getResource("groovy/example.groovy")};
     Class<?> groovyScriptEngineClass = forName(GROOVY_SCRIPT_ENGINE, true, artifactClassLoader);
     Object scriptEngine =
-        groovyScriptEngineClass.getConstructor(String[].class, ClassLoader.class).newInstance(roots, artifactClassLoader);
+        groovyScriptEngineClass.getConstructor(URL[].class, ClassLoader.class).newInstance(roots, artifactClassLoader);
     Class<?> groovyBinding = forName(GROOVY_LANG_BINDING, true, artifactClassLoader);
     Method runMethod = groovyScriptEngineClass.getMethod("run", String.class, groovyBinding);
     String scriptBody = "example.groovy";
