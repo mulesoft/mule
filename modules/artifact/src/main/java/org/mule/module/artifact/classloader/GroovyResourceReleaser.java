@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
+
 /**
  * A utility class to release all resources associated to Groovy Dependency on un-deployment to prevent classloader leaks.
  *
@@ -68,7 +69,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
             clazz = getTheClassMethod.invoke(classInfo);
             removeClassMethod.invoke(null, clazz);
           } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
-            String className = clazz instanceof Class ? ((Class) clazz).getName(): "Unknown";
+            String className = clazz instanceof Class ? ((Class) clazz).getName() : "Unknown";
             LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
           }
         }
@@ -95,7 +96,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
           Class<?> configurationClass = loadClass(LOGGER_CONFIGURATION, this.classLoader);
           Method getScriptManagerMethod = configurationClass.getMethod("getScriptManager");
           Object scriptManager = getScriptManagerMethod.invoke(configuration);
-          if(scriptManager!=null) {
+          if (scriptManager != null) {
             Object manager = getFieldValue(scriptManager, "manager", true);
             HashSet engineSpis = getFieldValue(manager, "engineSpis", true);
             Class groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);

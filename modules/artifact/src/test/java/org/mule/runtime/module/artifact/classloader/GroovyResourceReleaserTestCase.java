@@ -138,24 +138,26 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void runGroovyScriptAndDispose() throws ClassNotFoundException,
-          NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-      assertFalse(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
-      assertEquals("TEST", runScript());
-      assertTrue(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
-      artifactClassLoader.dispose();
-      gc();
+      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    assertFalse(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
+    assertEquals("TEST", runScript());
+    assertTrue(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
+    artifactClassLoader.dispose();
+    gc();
   }
 
   private String runScript() throws ClassNotFoundException,
-          NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-    String[] roots = new String[]{"src/test/resources/groovy/"};
+      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    String[] roots = new String[] {"src/test/resources/groovy/"};
     Class<?> groovyScriptEngineClass = forName(GROOVY_SCRIPT_ENGINE, true, artifactClassLoader);
-    Object scriptEngine = groovyScriptEngineClass.getConstructor(String[].class, ClassLoader.class).newInstance(roots, artifactClassLoader);
+    Object scriptEngine =
+        groovyScriptEngineClass.getConstructor(String[].class, ClassLoader.class).newInstance(roots, artifactClassLoader);
     Class<?> groovyBinding = forName(GROOVY_LANG_BINDING, true, artifactClassLoader);
     Method runMethod = groovyScriptEngineClass.getMethod("run", String.class, groovyBinding);
     String scriptBody = "example.groovy";
     return (String) runMethod.invoke(scriptEngine, scriptBody, groovyBinding.getConstructor().newInstance());
   }
+
   @Test
   @Ignore
   public void releaserCanBeCalledMultipleTimes() {
