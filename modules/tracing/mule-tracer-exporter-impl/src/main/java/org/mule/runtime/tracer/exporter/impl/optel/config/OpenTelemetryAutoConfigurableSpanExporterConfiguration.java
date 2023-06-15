@@ -58,7 +58,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
-  private Runnable doOnChange;
+  private SetteableRunnable doOnChange = new SetteableRunnable();
 
   /**
    * This constructor is needed for injection in the registry.
@@ -105,13 +105,29 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   @Override
   public void doOnChange(Runnable doOnChange) {
-    this.doOnChange = doOnChange;
+    this.doOnChange.setRunnable(doOnChange);
   }
 
   @Override
   public void dispose() {
     if (delegate != null) {
       disposeIfNeeded(delegate, LOGGER);
+    }
+  }
+
+  private class SetteableRunnable implements Runnable {
+
+    private Runnable runnable;
+
+    @Override
+    public void run() {
+      if (runnable != null) {
+        runnable.run();
+      }
+    }
+
+    void setRunnable(Runnable runnable) {
+      this.runnable = runnable;
     }
   }
 }

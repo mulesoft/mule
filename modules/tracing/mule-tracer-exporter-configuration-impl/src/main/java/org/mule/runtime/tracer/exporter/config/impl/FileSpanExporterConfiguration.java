@@ -21,6 +21,7 @@ import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
 import static java.lang.System.getProperty;
 
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -42,6 +43,8 @@ import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
@@ -56,8 +59,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   private final MuleContext muleContext;
 
-  private static String MULE_TRACING_CONFIGURATION_PATH = SYSTEM_PROPERTY_PREFIX + "tracer.config.path";
-  private static final String PROPERTIES_FILE_NAME = getProperty(MULE_TRACING_CONFIGURATION_PATH, "tracer-exporter.conf");
+  public final static String MULE_TRACING_CONFIGURATION_PATH = SYSTEM_PROPERTY_PREFIX + "tracer.config.path";
+  private final String PROPERTIES_FILE_NAME = getProperty(MULE_TRACING_CONFIGURATION_PATH, "tracer-exporter.conf");
 
   private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
 
@@ -66,8 +69,9 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
   private URL configurationUrl;
-  private Runnable doOnChange;
+  private CompositeRunnable doOnChange = new CompositeRunnable();
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
+  private String resolvedConfigurationFilePath;
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -127,6 +131,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   private Properties getSpanExporterConfigurationProperties() {
     Properties properties = null;
+
     if (getBoolean(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY)) {
       try {
         // This will verify first in the app and then in the conf folder.
@@ -140,7 +145,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       }
     } else {
       try {
-        String resourcePath = getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName();
+        String resourcePath = resolveConfigurationFilePath();
         InputStream is = getResourceAsStream(resourcePath, FileSpanExporterConfiguration.class);
         properties = loadProperties(is);
         configurationUrl = getResourceAsUrl(resourcePath, FileSpanExporterConfiguration.class, true, true);
@@ -152,6 +157,16 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     }
 
     return properties;
+  }
+
+  private String resolveConfigurationFilePath() {
+    if (resolvedConfigurationFilePath != null) {
+      return resolvedConfigurationFilePath;
+    }
+    resolvedConfigurationFilePath =
+        getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
+                    getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
+    return resolvedConfigurationFilePath;
   }
 
   protected String getConfFolder() {
@@ -183,7 +198,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
-    if (configurationUrl != null && doOnChange != null) {
+    if (configurationUrl != null) {
       tracingConfigurationFileWatcher = new TracingConfigurationFileWatcher(configurationUrl.getFile(), doOnChange);
       tracingConfigurationFileWatcher.start();
     }
@@ -195,13 +210,33 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   @Override
   public void doOnChange(Runnable doOnChange) {
-    this.doOnChange = doOnChange;
+    this.doOnChange.addRunnable(doOnChange);
   }
 
   @Override
   public void dispose() {
     if (tracingConfigurationFileWatcher != null) {
       tracingConfigurationFileWatcher.interrupt();
+    }
+  }
+
+  private class CompositeRunnable implements Runnable {
+
+    private final List<Runnable> runnables = new ArrayList<>();
+
+    CompositeRunnable() {
+      runnables.add(() -> {
+        initialiseProperties();;
+      });
+    }
+
+    @Override
+    public void run() {
+      runnables.forEach(Runnable::run);
+    }
+
+    public void addRunnable(Runnable runnable) {
+      runnables.add(runnable);
     }
   }
 }

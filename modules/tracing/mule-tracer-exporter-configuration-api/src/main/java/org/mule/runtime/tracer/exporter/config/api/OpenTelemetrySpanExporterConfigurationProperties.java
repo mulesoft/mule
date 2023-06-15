@@ -20,6 +20,11 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENABLED = MULE_OPEN_TELEMETRY_EXPORTER + ".enabled";
 
+  public static final String MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH =
+      MULE_OPEN_TELEMETRY_EXPORTER + "tracing.configuration.file.path";
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY =
+      MULE_OPEN_TELEMETRY_EXPORTER + "tracing.configuration.file.watcher.delay";
+
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_TYPE = MULE_OPEN_TELEMETRY_EXPORTER + ".type";
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED = MULE_OPEN_TELEMETRY_EXPORTER + ".tls.enabled";
