@@ -26,7 +26,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
@@ -45,6 +44,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
 import org.slf4j.Logger;
 
 /**
@@ -67,7 +67,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private boolean propertiesInitialised;
   private URL configurationUrl;
   private Runnable doOnChange;
-  private FileWatcher fileWatcher;
+  private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -184,8 +184,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
     if (configurationUrl != null && doOnChange != null) {
-      fileWatcher = new FileWatcher(configurationUrl.getFile(), doOnChange);
-      fileWatcher.start();
+      tracingConfigurationFileWatcher = new TracingConfigurationFileWatcher(configurationUrl.getFile(), doOnChange);
+      tracingConfigurationFileWatcher.start();
     }
   }
 
@@ -200,8 +200,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   @Override
   public void dispose() {
-    if (fileWatcher != null) {
-      fileWatcher.interrupt();
+    if (tracingConfigurationFileWatcher != null) {
+      tracingConfigurationFileWatcher.interrupt();
     }
   }
 }
