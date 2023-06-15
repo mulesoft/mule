@@ -75,7 +75,6 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
-import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -94,7 +93,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -565,7 +563,6 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
-  @Ignore("W-13213862")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
@@ -609,9 +606,10 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      Thread.sleep(1000);
 
-      expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
+      expectedException
+          .expectMessage("Flow \"flow\" is unable to accept new events at this time. Reason: REQUIRED_SCHEDULER_BUSY");
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
@@ -621,6 +619,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         try {
           f.get(RECEIVE_TIMEOUT, MILLISECONDS);
         } catch (Exception e) {
+          // It is possible for the expected exception to be thrown by a future if the processFlow
+          // in the main thread enters in the time window where it can be retried.
           throw new MuleRuntimeException(e);
         }
       });
