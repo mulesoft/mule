@@ -163,7 +163,7 @@
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
         <sshdCoreVersion>1.4.0</sshdCoreVersion>
-        <ftpServerVersion>1.0.6</ftpServerVersion>
+        <ftpServerVersion>1.2.0</ftpServerVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.1.0-SNAPSHOT</mulePropertiesApiVersion>
