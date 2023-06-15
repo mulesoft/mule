@@ -121,11 +121,26 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.resource = getResource(artifactId);
     this.spanProcessor = resolveOpenTelemetrySpanProcessor();
     this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
+    this.configuration.doOnChange(this::doOnConfigurationChanged);
+  }
+
+  private void doOnConfigurationChanged() {
+    SpanProcessor previousSpanProcessor = spanProcessor;
+    spanProcessor = resolveOpenTelemetrySpanProcessor();
+    silentlyShutdown(previousSpanProcessor);
+  }
+
+  private static void silentlyShutdown(SpanProcessor previousSpanProcessor) {
+    try {
+      previousSpanProcessor.shutdown();
+    } catch (Throwable e) {
+      LOGGER.warn("Error in disposing span processor", e);
+    }
   }
 
   @Override
   public void dispose() {
-    spanProcessor.shutdown();
+    silentlyShutdown(spanProcessor);
   }
 
   private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {

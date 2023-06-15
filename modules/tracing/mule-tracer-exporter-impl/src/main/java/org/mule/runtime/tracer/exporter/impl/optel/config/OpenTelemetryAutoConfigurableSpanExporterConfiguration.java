@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.impl.optel.config;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
@@ -20,18 +21,23 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.impl.FileSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration {
+public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements SpanExporterConfiguration, Disposable {
+
+  private static final Logger LOGGER = getLogger(OpenTelemetryAutoConfigurableSpanExporterConfiguration.class);
 
   @Inject
   private MuleContext muleContext;
@@ -52,6 +58,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
+  private Runnable doOnChange;
 
   /**
    * This constructor is needed for injection in the registry.
@@ -68,6 +75,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     try {
       if (delegate == null) {
         this.delegate = new FileSpanExporterConfiguration(muleContext);
+        this.delegate.doOnChange(doOnChange);
         initialiseDefaultConfigurationValues();
       }
       return delegate.getStringValue(key, defaultConfigurationValues.get(key));
@@ -93,5 +101,17 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, DEFAULT_MAX_BATCH_SIZE);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE, DEFAULT_BATCH_QUEUE_SIZE);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY, DEFAULT_SCHEDULED_DELAY);
+  }
+
+  @Override
+  public void doOnChange(Runnable doOnChange) {
+    this.doOnChange = doOnChange;
+  }
+
+  @Override
+  public void dispose() {
+    if (delegate != null) {
+      disposeIfNeeded(delegate, LOGGER);
+    }
   }
 }

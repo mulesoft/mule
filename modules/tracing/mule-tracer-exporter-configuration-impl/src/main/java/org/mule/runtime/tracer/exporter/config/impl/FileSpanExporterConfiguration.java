@@ -8,19 +8,25 @@
 package org.mule.runtime.tracer.exporter.config.impl;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperties;
 import static java.util.Optional.empty;
+import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
@@ -28,7 +34,6 @@ import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigu
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,16 +45,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+
 /**
  * A {@link SpanExporterConfiguration} based on a file in the conf folder.
  *
  * @since 4.5.0
  */
-public class FileSpanExporterConfiguration implements SpanExporterConfiguration {
+public class FileSpanExporterConfiguration implements SpanExporterConfiguration, Disposable {
 
   private final MuleContext muleContext;
 
-  private static final String PROPERTIES_FILE_NAME = "tracer-exporter.conf";
+  private static String MULE_TRACING_CONFIGURATION_PATH = SYSTEM_PROPERTY_PREFIX + "tracer.config.path";
+  private static final String PROPERTIES_FILE_NAME = getProperty(MULE_TRACING_CONFIGURATION_PATH, "tracer-exporter.conf");
 
   private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
 
@@ -57,6 +65,9 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   private Properties properties;
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
+  private URL configurationUrl;
+  private Runnable doOnChange;
+  private FileWatcher fileWatcher;
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -115,11 +126,13 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
   }
 
   private Properties getSpanExporterConfigurationProperties() {
+    Properties properties = null;
     if (getBoolean(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY)) {
       try {
         // This will verify first in the app and then in the conf folder.
         InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
-        return loadProperties(is);
+        properties = loadProperties(is);
+        configurationUrl = getResourceOrFail(getPropertiesFileName(), getExecutionClassLoader(muleContext), true);
       } catch (MuleRuntimeException | IOException e) {
         LOGGER
             .info("No tracer exporter config found in the app or in the conf directory. The config will be retrieved only from the system properties.");
@@ -127,15 +140,18 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
       }
     } else {
       try {
-        InputStream is = getResourceAsStream(getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName(),
-                                             FileSpanExporterConfiguration.class);
-        return loadProperties(is);
+        String resourcePath = getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName();
+        InputStream is = getResourceAsStream(resourcePath, FileSpanExporterConfiguration.class);
+        properties = loadProperties(is);
+        configurationUrl = getResourceAsUrl(resourcePath, FileSpanExporterConfiguration.class, true, true);
       } catch (IOException e) {
         LOGGER
             .info("No tracer exporter config found in the conf directory. The config will be retrieved only from the system properties.");
-        return getProperties();
+        properties = getProperties();
       }
     }
+
+    return properties;
   }
 
   protected String getConfFolder() {
@@ -167,9 +183,25 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration 
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
+    if (configurationUrl != null) {
+      fileWatcher = new FileWatcher(configurationUrl.getFile(), doOnChange);
+      fileWatcher.start();
+    }
   }
 
   protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
     return muleContext.getExecutionClassLoader();
+  }
+
+  @Override
+  public void doOnChange(Runnable doOnChange) {
+    this.doOnChange = doOnChange;
+  }
+
+  @Override
+  public void dispose() {
+    if (fileWatcher != null) {
+      fileWatcher.interrupt();
+    }
   }
 }

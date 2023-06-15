@@ -30,4 +30,11 @@ public interface SpanExporterConfiguration {
 
     return value;
   }
+
+  /**
+   * @param doOnChange to execute on change.
+   */
+  default void doOnChange(Runnable doOnChange) {
+    doOnChange.run();
+  }
 }
