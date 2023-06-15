@@ -6,14 +6,14 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.runtime.core.api.util.ClassUtils.getField;
+import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
+import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -35,13 +35,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   private static final String GROOVY_SCRIPT_ENGINE_FACTORY = "org.codehaus.groovy.jsr223.GroovyScriptEngineFactory";
   private static final String LOGGER_ABSTRACT_MANAGER = "org.apache.logging.log4j.core.appender.AbstractManager";
   private static final String LOGGER_ROLLING_FILE_MANAGER = "org.apache.logging.log4j.core.appender.rolling.RollingFileManager";
-  private static final String LOGGER_OUTPUT_STREAM_MANAGER = "org.apache.logging.log4j.core.appender.OutputStreamManager";
-  private static final String LOGGER_ABSTRACT_LAYOUT = "org.apache.logging.log4j.core.layout.AbstractLayout";
   private static final String LOGGER_CONFIGURATION = "org.apache.logging.log4j.core.config.Configuration";
-  private static final String LOGGER_SCRIPT_MANAGER = "org.apache.logging.log4j.core.script.ScriptManager";
-  private static final String LOGGER_SCRIPT_ENGINE_MANAGER = "javax.script.ScriptEngineManager";
-
-
 
   /**
    * Creates a new Instance of GroovyResourceReleaser
@@ -71,7 +65,8 @@ public class GroovyResourceReleaser implements ResourceReleaser {
           String className = "";
           try {
             Object clazz = getTheClassMethod.invoke(classInfo);
-            className = clazz.getClass().getName();
+            Method getNameMethod = clazz.getClass().getMethod("getName");
+            className = (String) getNameMethod.invoke(clazz);
             removeClassMethod.invoke(null, clazz);
           } catch (IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
@@ -85,7 +80,8 @@ public class GroovyResourceReleaser implements ResourceReleaser {
 
   private void cleanSpisEngines() {
     try {
-      HashMap hashMap = (HashMap) getValue(LOGGER_ABSTRACT_MANAGER, "MAP");
+      Class<?> abstractManager = loadClass(LOGGER_ABSTRACT_MANAGER, this.classLoader);
+      HashMap hashMap = getStaticFieldValue(abstractManager, "MAP", true);
       Iterator it = hashMap.values().iterator();
       Class<?> rollingFileManagerClass = loadClass(LOGGER_ROLLING_FILE_MANAGER, this.classLoader);
       Object rfmInstance = null;
@@ -93,15 +89,15 @@ public class GroovyResourceReleaser implements ResourceReleaser {
         Object o = it.next();
         if (rollingFileManagerClass.isInstance(o)) {
           rfmInstance = o;
-          Object layout = getValue(LOGGER_OUTPUT_STREAM_MANAGER, "layout", rfmInstance);
-          Object configuration = getValue(LOGGER_ABSTRACT_LAYOUT, "configuration", layout);
+          Object layout = getFieldValue(rfmInstance, "layout", true);
+          Object configuration = getFieldValue(layout, "configuration", true);
 
           Class<?> configurationClass = loadClass(LOGGER_CONFIGURATION, this.classLoader);
           Method getScriptManagerMethod = configurationClass.getMethod("getScriptManager");
           Object scriptManager = getScriptManagerMethod.invoke(configuration);
 
-          Object manager = getValue(LOGGER_SCRIPT_MANAGER, "manager", scriptManager);
-          HashSet engineSpis = (HashSet) getValue(LOGGER_SCRIPT_ENGINE_MANAGER, "engineSpis", manager);
+          Object manager = getFieldValue(scriptManager, "manager", true);
+          HashSet engineSpis = (HashSet) getFieldValue(manager, "engineSpis", true);
           Class groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
           Iterator engineSpisIterator = engineSpis.iterator();
           while (engineSpisIterator.hasNext()) {
@@ -116,21 +112,5 @@ public class GroovyResourceReleaser implements ResourceReleaser {
         | IllegalAccessException e) {
       LOGGER.warn("Error trying to unregister the Groovy's Scripting Engine", e);
     }
-  }
-
-  private Object getValue(String classname, String methodName)
-      throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-    return getValue(classname, methodName, null);
-  }
-
-  private Object getValue(String classname, String methodName, Object instance)
-      throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
-    Class<?> knownLevelClass = loadClass(classname, this.classLoader);
-    Field levelObjectField = getField(knownLevelClass, methodName, false);
-    Boolean aux = levelObjectField.isAccessible();
-    levelObjectField.setAccessible(true);
-    Object value = levelObjectField.get(instance);
-    levelObjectField.setAccessible(aux);
-    return value;
   }
 }
