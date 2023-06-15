@@ -22,9 +22,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
-
 /**
- * A utility class to release all resources associated to Groovy Dependency on un-deployment to prevent classloader leaks
+ * A utility class to release all resources associated to Groovy Dependency on un-deployment to prevent classloader leaks.
+ *
+ * @since 4.4.0
  */
 public class GroovyResourceReleaser implements ResourceReleaser {
 
@@ -34,7 +35,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   private static final String GROOVY_INVOKER_HELPER = "org.codehaus.groovy.runtime.InvokerHelper";
   private static final String GROOVY_SCRIPT_ENGINE_FACTORY = "org.codehaus.groovy.jsr223.GroovyScriptEngineFactory";
   private static final String LOGGER_ABSTRACT_MANAGER = "org.apache.logging.log4j.core.appender.AbstractManager";
-  private static final String LOGGER_ROLLING_FILE_MANAGER = "org.apache.logging.log4j.core.appender.rolling.RollingFileManager";
+  private static final String LOGGER_STREAM_MANAGER = "org.apache.logging.log4j.core.appender.OutputStreamManager";
   private static final String LOGGER_CONFIGURATION = "org.apache.logging.log4j.core.config.Configuration";
 
   /**
@@ -62,13 +63,12 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Object classes = getAllClassInfoMethod.invoke(null);
       if (classes != null && classes instanceof Collection) {
         for (Object classInfo : ((Collection) classes)) {
-          String className = "";
+          Object clazz = null;
           try {
-            Object clazz = getTheClassMethod.invoke(classInfo);
-            Method getNameMethod = clazz.getClass().getMethod("getName");
-            className = (String) getNameMethod.invoke(clazz);
+            clazz = getTheClassMethod.invoke(classInfo);
             removeClassMethod.invoke(null, clazz);
-          } catch (IllegalAccessException | InvocationTargetException e) {
+          } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
+            String className = clazz instanceof Class ? ((Class) clazz).getName(): "Unknown";
             LOGGER.warn("Could not remove the {} class from the Groovy's InvokerHelper", className, e);
           }
         }
@@ -83,11 +83,11 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Class<?> abstractManager = loadClass(LOGGER_ABSTRACT_MANAGER, this.classLoader);
       HashMap hashMap = getStaticFieldValue(abstractManager, "MAP", true);
       Iterator it = hashMap.values().iterator();
-      Class<?> rollingFileManagerClass = loadClass(LOGGER_ROLLING_FILE_MANAGER, this.classLoader);
+      Class<?> streamManagerClass = loadClass(LOGGER_STREAM_MANAGER, this.classLoader);
       Object rfmInstance = null;
       while (it.hasNext()) {
         Object o = it.next();
-        if (rollingFileManagerClass.isInstance(o)) {
+        if (streamManagerClass.isInstance(o)) {
           rfmInstance = o;
           Object layout = getFieldValue(rfmInstance, "layout", true);
           Object configuration = getFieldValue(layout, "configuration", true);
@@ -95,15 +95,16 @@ public class GroovyResourceReleaser implements ResourceReleaser {
           Class<?> configurationClass = loadClass(LOGGER_CONFIGURATION, this.classLoader);
           Method getScriptManagerMethod = configurationClass.getMethod("getScriptManager");
           Object scriptManager = getScriptManagerMethod.invoke(configuration);
-
-          Object manager = getFieldValue(scriptManager, "manager", true);
-          HashSet engineSpis = (HashSet) getFieldValue(manager, "engineSpis", true);
-          Class groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
-          Iterator engineSpisIterator = engineSpis.iterator();
-          while (engineSpisIterator.hasNext()) {
-            Object i = engineSpisIterator.next();
-            if (groovy.isInstance(i) && i.getClass().getClassLoader().equals(groovy.getClassLoader())) {
-              engineSpis.remove(i);
+          if(scriptManager!=null) {
+            Object manager = getFieldValue(scriptManager, "manager", true);
+            HashSet engineSpis = getFieldValue(manager, "engineSpis", true);
+            Class groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
+            Iterator engineSpisIterator = engineSpis.iterator();
+            while (engineSpisIterator.hasNext()) {
+              Object i = engineSpisIterator.next();
+              if (groovy.isInstance(i) && i.getClass().getClassLoader().equals(groovy.getClassLoader())) {
+                engineSpis.remove(i);
+              }
             }
           }
         }

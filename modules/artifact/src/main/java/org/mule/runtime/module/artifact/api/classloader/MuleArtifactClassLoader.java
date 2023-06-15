@@ -332,8 +332,12 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (shouldReleaseActiveMQReferences) {
       new ActiveMQResourceReleaser(this).release();
     }
-    if (shouldReleaseGroovyReferences) {
-      new GroovyResourceReleaser(this).release();
+    try {
+      if (shouldReleaseGroovyReferences) {
+        new GroovyResourceReleaser(this).release();
+      }
+    } catch (Exception e) {
+      reportPossibleLeak(e, artifactId);
     }
     super.dispose();
     shutdownListeners();
