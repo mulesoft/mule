@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import javax.annotation.Nullable;
-
 import io.opentelemetry.api.trace.TraceState;
 import io.opentelemetry.api.trace.TraceStateBuilder;
 import io.opentelemetry.api.trace.propagation.internal.W3CTraceContextEncoding;
@@ -75,7 +73,6 @@ public class MutableMuleTraceState implements TraceState {
     this.addAncestorMuleSpanIdToTraceState = addAncestorMuleSpanIdToTraceState;
   }
 
-  @Nullable
   @Override
   public String get(String key) {
     return remoteState.get(key);

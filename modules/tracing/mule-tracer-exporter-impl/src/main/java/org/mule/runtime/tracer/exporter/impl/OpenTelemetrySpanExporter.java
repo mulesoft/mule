@@ -30,11 +30,11 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
+import static io.opentelemetry.api.common.Attributes.of;
+import static io.opentelemetry.api.trace.SpanContext.getInvalid;
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
-import static io.opentelemetry.api.trace.SpanContext.getInvalid;
-import static io.opentelemetry.api.common.Attributes.of;
-import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
@@ -51,8 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-
-import javax.annotation.Nullable;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
@@ -140,9 +138,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     createSpanContext();
   }
 
-  @Nullable
   @Override
-  public <T> T get(@Nullable AttributeKey<T> attributeKey) {
+  public <T> T get(AttributeKey<T> attributeKey) {
     throw new UnsupportedOperationException();
   }
 
@@ -452,9 +449,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     return 0;
   }
 
-  @Nullable
   @Override
-  public <T> T getAttribute(@Nullable AttributeKey<T> attributeKey) {
+  public <T> T getAttribute(AttributeKey<T> attributeKey) {
     throw new UnsupportedOperationException();
   }
 

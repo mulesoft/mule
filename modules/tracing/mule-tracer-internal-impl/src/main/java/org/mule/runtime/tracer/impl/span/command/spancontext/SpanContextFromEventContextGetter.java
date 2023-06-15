@@ -7,15 +7,13 @@
 
 package org.mule.runtime.tracer.impl.span.command.spancontext;
 
-import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.impl.context.EventSpanContext;
-
-import javax.annotation.Nullable;
-
 import static org.mule.runtime.tracer.api.context.SpanContext.emptySpanContext;
 import static org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter.emptyTraceContextMapGetter;
+
+import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.tracer.api.context.SpanContext;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
+import org.mule.runtime.tracer.impl.context.EventSpanContext;
 
 /**
  * A {@link SpanContextContextGetter} that gets the {@link SpanContext} from the {@link EventContext}.
@@ -32,7 +30,6 @@ public class SpanContextFromEventContextGetter implements SpanContextContextGett
 
   private SpanContextFromEventContextGetter() {}
 
-  @Nullable
   @Override
   public SpanContext get(EventContext carrier) {
     if (carrier instanceof SpanContextAware) {
