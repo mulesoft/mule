@@ -183,7 +183,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
-    if (configurationUrl != null) {
+    if (configurationUrl != null && doOnChange != null) {
       fileWatcher = new FileWatcher(configurationUrl.getFile(), doOnChange);
       fileWatcher.start();
     }
