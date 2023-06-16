@@ -17,7 +17,6 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
@@ -51,23 +50,17 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Inject
   private SpanExporterConfiguration configuration;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   private SpanExporterConfiguration privilegedConfiguration =
       new OpenTelemetryAutoConfigurableSpanExporterConfiguration(key -> null);
 
-  @Inject
-  MuleContext muleContext;
-
-  private final LazyValue<SpanProcessor> spanProcessor = new LazyValue<>(this::resolveOpenTelemetrySpanProcessor);
-
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
       new CapturingSpanExporterWrapper(new OpenTelemetryResources.NoOpSpanExporter());
+
+  private FeatureFlaggingService featureFlaggingService;
+  private MuleContext muleContext;
+  private SpanProcessor spanProcessor;
   private Resource resource;
-
   private String artifactId;
-
   private String artifactType;
   private boolean addMuleAncestorSpanId;
 
@@ -83,9 +76,18 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.privilegedConfiguration = privilegedConfiguration;
   }
 
-  @Override
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
   public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
-    return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor.get(),
+    return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
                                          addMuleAncestorSpanId, resource);
   }
 
@@ -117,12 +119,13 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.artifactId = muleContext.getConfiguration().getId();
     this.artifactType = muleContext.getArtifactType().getAsString();
     this.resource = getResource(artifactId);
+    this.spanProcessor = resolveOpenTelemetrySpanProcessor();
     this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
   }
 
   @Override
   public void dispose() {
-    spanProcessor.get().shutdown();
+    spanProcessor.shutdown();
   }
 
   private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {
