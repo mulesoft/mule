@@ -121,7 +121,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.resource = getResource(artifactId);
     this.spanProcessor = resolveOpenTelemetrySpanProcessor();
     this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
-    this.configuration.doOnChange(this::doOnConfigurationChanged);
+    this.configuration.doOnConfigurationChanged(this::doOnConfigurationChanged);
   }
 
   private void doOnConfigurationChanged() {

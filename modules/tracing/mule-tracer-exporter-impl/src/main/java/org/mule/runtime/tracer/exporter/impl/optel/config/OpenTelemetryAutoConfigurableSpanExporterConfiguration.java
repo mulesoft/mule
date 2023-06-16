@@ -75,7 +75,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     try {
       if (delegate == null) {
         this.delegate = new FileSpanExporterConfiguration(muleContext);
-        this.delegate.doOnChange(doOnChange);
+        this.delegate.doOnConfigurationChanged(doOnChange);
         initialiseDefaultConfigurationValues();
       }
       return delegate.getStringValue(key, defaultConfigurationValues.get(key));
@@ -104,7 +104,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   }
 
   @Override
-  public void doOnChange(Runnable doOnChange) {
+  public void doOnConfigurationChanged(Runnable doOnChange) {
     this.doOnChange.setRunnable(doOnChange);
   }
 

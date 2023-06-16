@@ -48,7 +48,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -169,7 +168,7 @@ public class FileSpanExporterConfigurationTestCase {
     final TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
         new TestFileSpanExporterConfiguration(mock(MuleContext.class), "", file.getAbsolutePath());
 
-    testFileSpanExporterConfiguration.doOnChange(() -> {
+    testFileSpanExporterConfiguration.doOnConfigurationChanged(() -> {
       testFileSpanExporterConfiguration.initialiseProperties();
       testFileSpanExporterConfiguration.changed = true;
     });
