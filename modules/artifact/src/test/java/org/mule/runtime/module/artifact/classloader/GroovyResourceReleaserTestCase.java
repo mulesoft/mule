@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
@@ -30,7 +29,6 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.BundleDependency;
 import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -42,7 +40,6 @@ import org.mule.tck.probe.PollingProber;
 import java.io.File;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
@@ -51,7 +48,6 @@ import java.util.function.Supplier;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -63,14 +59,14 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private static final int PROBER_POLLING_INTERVAL = 150;
   private static final int PROBER_POLLING_TIMEOUT = 6000;
-  private final static String GROOVY_ARTIFACT_ID = "groovy";
-  private final static String GROOVY_GROUP_ID = "org.codehaus.groovy";
+  private static final String GROOVY_ARTIFACT_ID = "groovy";
+  private static final String GROOVY_GROUP_ID = "org.codehaus.groovy";
   private static final String GROOVY_SCRIPT_ENGINE = "groovy.util.GroovyScriptEngine";
   private static final String GROOVY_LANG_BINDING = "groovy.lang.Binding";
 
-  String groovyVersion;
+  private final String groovyVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
-  MuleArtifactClassLoader artifactClassLoader = null;
+  private MuleArtifactClassLoader artifactClassLoader = null;
 
   public GroovyResourceReleaserTestCase(String groovyVersion) {
     this.groovyVersion = groovyVersion;
@@ -134,18 +130,15 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void runGroovyScriptAndDispose() throws ClassNotFoundException,
-      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+  public void runGroovyScriptAndDispose() throws ReflectiveOperationException {
     assertFalse(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
     assertEquals("TEST", runScript());
     assertTrue(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
     artifactClassLoader.dispose();
-    artifactClassLoader = null;
-    gc();
+    assertClassLoaderIsEnqueued();
   }
 
-  private String runScript() throws ClassNotFoundException,
-      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+  private String runScript() throws ReflectiveOperationException {
     URL[] roots = new URL[] {artifactClassLoader.getResource("groovy/example.groovy")};
     Class<?> groovyScriptEngineClass = forName(GROOVY_SCRIPT_ENGINE, true, artifactClassLoader);
     Object scriptEngine =
@@ -154,17 +147,6 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     Method runMethod = groovyScriptEngineClass.getMethod("run", String.class, groovyBinding);
     String scriptBody = "example.groovy";
     return (String) runMethod.invoke(scriptEngine, scriptBody, groovyBinding.getConstructor().newInstance());
-  }
-
-  @Test
-  public void releaseClassloader() {
-    try {
-      runScript();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-    artifactClassLoader.dispose();
-    assertClassLoaderIsEnqueued();
   }
 
   private void assertClassLoaderIsEnqueued() {
