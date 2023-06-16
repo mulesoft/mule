@@ -19,8 +19,8 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperties;
-import static java.util.Optional.empty;
 import static java.lang.System.getProperty;
+import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
