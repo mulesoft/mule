@@ -145,7 +145,7 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     }
 
     dancerBuilder
-        .customParameters(config.getCustomParameters())
+        .customParameters(config.getCustomQueryParameters())
         .customHeaders(config.getCustomHeaders())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
@@ -162,6 +162,6 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
 
   private Integer generateId(ClientCredentialsConfig config) {
     return Objects.hash(config.getOwnerConfigName(), config.getClientId(), config.getClientSecret(), config.getTokenUrl(),
-                        config.getScope(), config.getCustomParameters(), config.getCustomHeaders());
+                        config.getScope(), config.getCustomQueryParameters(), config.getCustomHeaders());
   }
 }

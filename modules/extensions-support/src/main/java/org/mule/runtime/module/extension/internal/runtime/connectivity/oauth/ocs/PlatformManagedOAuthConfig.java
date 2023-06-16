@@ -6,26 +6,27 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 import static org.mule.runtime.core.api.util.StringUtils.sanitizeUrl;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_PATH;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_DEFAULT_PATH;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_PATH;
+import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
+
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.CustomOAuthParameters;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 
 import java.nio.charset.Charset;
@@ -104,7 +105,7 @@ public class PlatformManagedOAuthConfig extends OAuthConfig<PlatformManagedOAuth
                                     ExtensionModel extensionModel,
                                     ConnectionProviderModel delegateConnectionProviderModel,
                                     OAuthGrantType delegateGrantType) {
-    super(ownerConfigName, empty(), emptyMultiMap(), emptyMultiMap(), emptyMap());
+    super(ownerConfigName, empty(), new CustomOAuthParameters(), emptyMap());
     this.connectionUri = connectionUri;
     this.serviceUrl = serviceUrl;
     this.platformAuthUrl = platformAuthUrl;

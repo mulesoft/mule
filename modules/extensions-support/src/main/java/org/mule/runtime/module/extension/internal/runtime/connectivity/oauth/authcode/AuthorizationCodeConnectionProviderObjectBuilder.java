@@ -37,6 +37,7 @@ import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.CustomOAuthParameters;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -90,8 +91,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     CustomOAuthParameters customParameters = getCustomParameters(result);
     AuthorizationCodeConfig config = new AuthorizationCodeConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(result),
-                                                                 customParameters.getQueryParams(),
-                                                                 customParameters.getHeaders(),
+                                                                 customParameters,
                                                                  callbackValues,
                                                                  grantType,
                                                                  buildOAuthCallbackConfig(result),
@@ -122,8 +122,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
     CustomOAuthParameters customParameters = getCustomParameters(result);
     AuthorizationCodeConfig config = new AuthorizationCodeConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(context.getEvent()),
-                                                                 customParameters.getQueryParams(),
-                                                                 customParameters.getHeaders(),
+                                                                 customParameters,
                                                                  callbackValues,
                                                                  grantType,
                                                                  buildOAuthCallbackConfig(context.getEvent()),
@@ -196,8 +195,7 @@ public class AuthorizationCodeConnectionProviderObjectBuilder<C> extends BaseOAu
       CustomOAuthParameters customParameters = getCustomParameters(initialiserEvent);
       return new AuthorizationCodeConfig(ownerConfigName,
                                          storeConfig,
-                                         customParameters.getQueryParams(),
-                                         customParameters.getHeaders(),
+                                         customParameters,
                                          callbackValues,
                                          grantType,
                                          callbackConfig,

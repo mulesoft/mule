@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_STORE_CONFIG_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OBJECT_STORE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
-import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.QUERY_PARAMS;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
@@ -165,11 +164,17 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
 
       final MultiMap<String, String> target;
 
-      if (property.getPlacement() == QUERY_PARAMS) {
-        target = params.getQueryParams();
-      } else if (property.getPlacement() == HEADERS) {
-        target = params.getHeaders();
-      } else {
+      switch (property.getPlacement()) {
+        case QUERY_PARAMS:
+          target = params.getQueryParams();
+          break;
+        case HEADERS:
+          target = params.getHeaders();
+          break;
+        case BODY:
+          target = params.getBodyParams();
+          break;
+        default:
         throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
       }
 
@@ -185,17 +190,4 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
     return params;
   }
 
-  protected class CustomOAuthParameters {
-
-    private MultiMap<String, String> queryParams = new MultiMap<>();
-    private MultiMap<String, String> headers = new MultiMap<>();
-
-    public MultiMap<String, String> getQueryParams() {
-      return queryParams;
-    }
-
-    public MultiMap<String, String> getHeaders() {
-      return headers;
-    }
-  }
 }

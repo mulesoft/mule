@@ -22,19 +22,16 @@ public abstract class OAuthConfig<T extends OAuthGrantType> {
 
   private final String ownerConfigName;
   private final Optional<OAuthObjectStoreConfig> storeConfig;
-  private final MultiMap<String, String> customParameters;
-  private final MultiMap<String, String> customHeaders;
+  private final CustomOAuthParameters customOAuthParameters;
   private final Map<Field, String> parameterExtractors;
 
   public OAuthConfig(String ownerConfigName,
                      Optional<OAuthObjectStoreConfig> storeConfig,
-                     MultiMap<String, String> customParameters,
-                     MultiMap<String, String> customHeaders,
+                     CustomOAuthParameters customOAuthParameters,
                      Map<Field, String> parameterExtractors) {
     this.ownerConfigName = ownerConfigName;
     this.storeConfig = storeConfig;
-    this.customParameters = customParameters;
-    this.customHeaders = customHeaders;
+    this.customOAuthParameters = customOAuthParameters;
     this.parameterExtractors = parameterExtractors;
   }
 
@@ -48,12 +45,19 @@ public abstract class OAuthConfig<T extends OAuthGrantType> {
     return storeConfig;
   }
 
-  public MultiMap<String, String> getCustomParameters() {
-    return customParameters;
+  public MultiMap<String, String> getCustomQueryParameters() {
+    return customOAuthParameters.getQueryParams();
+  }
+
+  /**
+   * @since 4.5.0
+   */
+  public MultiMap<String, String> getCustomBodyParameters() {
+    return customOAuthParameters.getBodyParams();
   }
 
   public MultiMap<String, String> getCustomHeaders() {
-    return customHeaders;
+    return customOAuthParameters.getHeaders();
   }
 
   public Map<Field, String> getParameterExtractors() {

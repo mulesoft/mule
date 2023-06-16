@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
-
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -38,7 +36,6 @@ import org.mule.tck.size.SmallTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -71,8 +68,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   public void before() {
     oAuthConfig = new AuthorizationCodeConfig("configName",
                                               empty(),
-                                              emptyMultiMap(),
-                                              emptyMultiMap(),
+                                              new CustomOAuthParameters(),
                                               emptyMap(),
                                               new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                               mock(OAuthCallbackConfig.class),

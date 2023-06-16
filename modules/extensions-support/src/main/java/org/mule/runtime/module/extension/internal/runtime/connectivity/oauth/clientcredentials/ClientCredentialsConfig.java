@@ -7,9 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.api.util.MultiMap;
+
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.security.CredentialsPlacement;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.CustomOAuthParameters;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 
@@ -36,8 +37,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
 
   public ClientCredentialsConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
-                                 MultiMap<String, String> customParameters,
-                                 MultiMap<String, String> customHeaders,
+                                 CustomOAuthParameters customOAuthParameters,
                                  Map<Field, String> parameterExtractors,
                                  String clientId,
                                  String clientSecret,
@@ -45,7 +45,7 @@ public class ClientCredentialsConfig extends OAuthConfig<ClientCredentialsGrantT
                                  String scope,
                                  CredentialsPlacement credentialsPlacement,
                                  ClientCredentialsGrantType grantType) {
-    super(ownerConfigName, storeConfig, customParameters, customHeaders, parameterExtractors);
+    super(ownerConfigName, storeConfig, customOAuthParameters, parameterExtractors);
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.tokenUrl = tokenUrl;
