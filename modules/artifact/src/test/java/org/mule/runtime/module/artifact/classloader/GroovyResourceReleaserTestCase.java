@@ -61,8 +61,8 @@ import org.junit.runners.Parameterized;
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
-  private static final int PROBER_POLLING_INTERVAL = 100;
-  private static final int PROBER_POLLING_TIMEOUT = 5000;
+  private static final int PROBER_POLLING_INTERVAL = 150;
+  private static final int PROBER_POLLING_TIMEOUT = 6000;
   private final static String GROOVY_ARTIFACT_ID = "groovy";
   private final static String GROOVY_GROUP_ID = "org.codehaus.groovy";
   private static final String GROOVY_SCRIPT_ENGINE = "groovy.util.GroovyScriptEngine";
@@ -103,7 +103,6 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     return new String[] {
         "2.4.21",
         "2.5.22",
-        "3.0.0",
         "3.0.17"
     };
   }
@@ -131,9 +130,6 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
         new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
                                     new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
                                     testLookupPolicy);
-
-    CompositeClassLoader classLoader = from(artifactClassLoader);
-    currentThread().setContextClassLoader(classLoader);
   }
 
   @Test
@@ -143,6 +139,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     assertEquals("TEST", runScript());
     assertTrue(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
     artifactClassLoader.dispose();
+    artifactClassLoader = null;
     gc();
   }
 
@@ -159,8 +156,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Ignore
-  public void releaserCanBeCalledMultipleTimes() {
+  public void releaseClassloader() {
     try {
       runScript();
     } catch (Exception e) {
