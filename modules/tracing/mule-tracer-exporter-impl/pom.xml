@@ -25,7 +25,6 @@
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <opentelemetryVersion>1.20.1</opentelemetryVersion>
-        <ioGrpcHelidonVersion>3.2.1</ioGrpcHelidonVersion>
     </properties>
 
     <dependencyManagement>
@@ -82,29 +81,7 @@
         <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
         <dependency>
             <groupId>io.helidon.grpc</groupId>
-            <artifactId>io.grpc</artifactId>
-            <version>${ioGrpcHelidonVersion}</version>
-            <exclusions>
-                <!-- Excluded as it generates a split package situation with javax.inject -->
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-                <!-- Not needed dependencies -->
-                <exclusion>
-                    <groupId>com.google.android</groupId>
-                    <artifactId>annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-annotations</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.perfmark</groupId>
-                    <artifactId>perfmark-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+            <artifactId>io.grpc</artifactId></dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
