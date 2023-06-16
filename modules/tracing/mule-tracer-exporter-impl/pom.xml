@@ -25,7 +25,7 @@
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <opentelemetryVersion>1.20.1</opentelemetryVersion>
-        <ioGrpcVersion>1.51.0</ioGrpcVersion>
+        <ioGrpcHelidonVersion>3.2.1</ioGrpcHelidonVersion>
     </properties>
 
     <dependencyManagement>
@@ -43,20 +43,6 @@
                 <version>1.17.6</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-bom</artifactId>
-                <version>${ioGrpcVersion}</version>
-                <type>pom</type>
-                <scope>import</scope>
-                <exclusions>
-                    <!-- Excluded as it generates a split package situation with javax.inject -->
-                    <exclusion>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>jsr305</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -93,14 +79,29 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
         </dependency>
+        <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-api</artifactId>
+            <groupId>io.helidon.grpc</groupId>
+            <artifactId>io.grpc</artifactId>
+            <version>${ioGrpcHelidonVersion}</version>
             <exclusions>
                 <!-- Excluded as it generates a split package situation with javax.inject -->
                 <exclusion>
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
+                </exclusion>
+                <!-- Not needed dependencies -->
+                <exclusion>
+                    <groupId>com.google.android</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>animal-sniffer-annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.perfmark</groupId>
+                    <artifactId>perfmark-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
