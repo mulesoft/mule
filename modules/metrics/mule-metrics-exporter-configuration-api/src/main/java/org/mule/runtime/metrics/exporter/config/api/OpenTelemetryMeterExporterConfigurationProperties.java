@@ -13,9 +13,6 @@ public class OpenTelemetryMeterExporterConfigurationProperties {
 
   private OpenTelemetryMeterExporterConfigurationProperties() {}
 
-  public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_CONFIGURATION_FILE_PATH =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".configuration.file.path";
-
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".enabled";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".type";
