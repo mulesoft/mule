@@ -103,6 +103,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     return new String[] {
         "2.4.21",
         "2.5.22",
+        "3.0.0",
         "3.0.17"
     };
   }

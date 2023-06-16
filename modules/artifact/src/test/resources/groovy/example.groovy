@@ -1,3 +1,2 @@
-reportType = "test";
-reportType = reportType.toUpperCase(Locale.US);
-return reportType;
+package groovy
+return "TEST"
