@@ -26,6 +26,7 @@ import org.mule.module.artifact.classloader.AwsIdleConnectionReaperResourceRelea
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
+import org.mule.module.artifact.classloader.GroovyResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -110,6 +111,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
   private volatile boolean shouldReleaseActiveMQReferences = false;
+  private volatile boolean shouldReleaseGroovyReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
@@ -278,6 +280,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (!shouldReleaseActiveMQReferences && name.startsWith("org.apache.activemq")) {
       shouldReleaseActiveMQReferences = true;
     }
+
+    if (!shouldReleaseGroovyReferences && name.startsWith("org.codehaus.groovy")) {
+      shouldReleaseGroovyReferences = true;
+    }
     return clazz;
   }
 
@@ -336,6 +342,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
     if (shouldReleaseActiveMQReferences) {
       resourceReleaserExecutor.addResourceReleaser(() -> new ActiveMQResourceReleaser(this));
+    }
+    if (shouldReleaseGroovyReferences) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new GroovyResourceReleaser(this));
     }
   }
 
