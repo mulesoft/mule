@@ -34,6 +34,7 @@ import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigu
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
 import org.slf4j.Logger;
 
 /**
