@@ -72,7 +72,6 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
 
   @Override
   public DefaultExpressionLanguageFactoryService createDefaultExpressionLanguageFactoryService() {
-    System.out.println("weaveServiceJarFile" + WEAVE_SERVICE_CLASSLOADER_SUPPLIER.get());
     return WEAVE_SERVICE_CLASSLOADER_SUPPLIER.get()
         .map(this::instantiateExpressionLanguageService)
         .orElseGet(() -> new WeaveDefaultExpressionLanguageFactoryService(null));
@@ -80,7 +79,6 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
 
   @Override
   public ExpressionLanguageMetadataService createExpressionLanguageMetadataService() {
-    System.out.println("weaveServiceJarFile" + WEAVE_SERVICE_CLASSLOADER_SUPPLIER.get());
     return WEAVE_SERVICE_CLASSLOADER_SUPPLIER.get()
         .map(this::instantiateExpressionLanguageMetadataService)
         .orElseGet(() -> new WeaveExpressionLanguageMetadataServiceImpl());
@@ -89,13 +87,11 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
   private static ClassLoader createWeaveServiceClassLoaderFromExplodedServiceDir(File weaveServiceJarFile) {
     // Unpack the service because java doesn't allow to create a classloader with jars within a zip out of the box.
     File serviceExplodedDir;
-    System.out.println("weaveServiceJarFile" + weaveServiceJarFile);
     try {
       serviceExplodedDir = createTempDirectory("mule-service-weave").toFile();
     } catch (IOException e) {
       throw new IllegalStateException("Couldn't create temporary dir for mule-service-weave", e);
     }
-    System.out.println("serviceExplodedDir" + serviceExplodedDir);
     try {
       unzip(weaveServiceJarFile, serviceExplodedDir);
     } catch (IOException e) {
@@ -129,12 +125,10 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
 
                                 @Override
                                 protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                                  System.out.println("loading" + name);
                                   if (name.startsWith("org.mule.weave.")) {
                                     // Force DW classes to be loaded by the service CL, not the root one
                                     throw new ClassNotFoundException(name);
                                   } else {
-                                    System.out.println("loading via super" + name);
                                     return super.loadClass(name, resolve);
                                   }
                                 }
