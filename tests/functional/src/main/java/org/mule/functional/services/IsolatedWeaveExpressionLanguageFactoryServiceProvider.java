@@ -51,6 +51,7 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
     String classPath = getProperty("java.class.path");
     String modulePath = getProperty("jdk.module.path");
     String pathSeparator = getProperty("path.separator");
+    // Needs special handling for windows builds
     String fileSeparator = getProperty("file.separator").replace("\\", "\\\\");;
 
     return (modulePath != null
