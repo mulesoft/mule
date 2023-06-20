@@ -7,6 +7,7 @@
 package org.mule.test.oauth;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.sdk.api.runtime.parameter.HttpParameterPlacement.BODY;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -38,6 +39,9 @@ public class TestWithOAuthParamsConnectionProvider extends LegacyTestOAuthConnec
 
   @OAuthParameter(placement = HttpParameterPlacement.HEADERS)
   String header;
+
+  @org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter(placement = BODY)
+  String bodyParameter;
 
   @Override
   public TestOAuthConnection connect() throws ConnectionException {

@@ -29,6 +29,10 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
