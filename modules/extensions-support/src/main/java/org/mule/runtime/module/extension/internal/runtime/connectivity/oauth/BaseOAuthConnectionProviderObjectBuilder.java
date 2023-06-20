@@ -175,7 +175,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
           target = params.getBodyParams();
           break;
         default:
-        throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
+          throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
       }
 
       if (value instanceof Map) {
