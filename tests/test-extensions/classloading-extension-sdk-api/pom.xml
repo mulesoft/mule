@@ -40,13 +40,4 @@
         </pluginManagement>
     </build>
 
-<!--
-    <dependencies>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-artifact-ast</artifactId>
-        </dependency>
-    </dependencies>
--->
-
 </project>
