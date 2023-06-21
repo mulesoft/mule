@@ -51,6 +51,8 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
     String classPath = getProperty("java.class.path");
     String modulePath = getProperty("jdk.module.path");
     String pathSeparator = getProperty("path.separator");
+    // Needs special handling for windows builds
+    String fileSeparator = getProperty("file.separator").replace("\\", "\\\\");;
 
     return (modulePath != null
         ? concat(Stream.of(classPath.split(pathSeparator)),
@@ -58,7 +60,7 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
         : Stream.of(classPath.split(pathSeparator)))
             .filter(StringUtils::isNotBlank)
             .filter(pathEntry -> {
-              final String[] split = pathEntry.split("/");
+              final String[] split = pathEntry.split(fileSeparator);
               final String fileName = split[split.length - 1];
 
               return fileName.startsWith("mule-service-weave") && fileName.endsWith("mule-service.jar");
@@ -90,7 +92,6 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
     } catch (IOException e) {
       throw new IllegalStateException("Couldn't create temporary dir for mule-service-weave", e);
     }
-
     try {
       unzip(weaveServiceJarFile, serviceExplodedDir);
     } catch (IOException e) {
