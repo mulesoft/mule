@@ -6,17 +6,22 @@
  */
 package org.mule.runtime.core.internal.execution;
 
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.EnrichedNotificationInfo.createInfo;
+
+import static java.util.Optional.ofNullable;
+import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
+import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -61,16 +66,20 @@ public final class SourceErrorException extends MuleRuntimeException {
   }
 
   public MessagingException toMessagingException(Collection<ExceptionContextProvider> exceptionContextProviders,
-                                                 MessageSource messageSource) {
-    MessagingException messagingException = new MessagingException(CoreEvent.builder(getEvent())
-        .error(ErrorBuilder.builder(getCause())
-            .errorType(getErrorType())
-            .build())
-        .build(), getCause());
+                                                 Pipeline flowConstruct) {
+    MessagingException messagingException =
+        new MessagingException(CoreEvent
+            .builder(quickCopy(child(((BaseEventContext) event.getContext()), ofNullable(flowConstruct.getLocation())),
+                               event))
+            .error(ErrorBuilder.builder(getCause())
+                .errorType(getErrorType())
+                .build())
+            .build(),
+                               getCause());
 
     EnrichedNotificationInfo notificationInfo = createInfo(messagingException.getEvent(), messagingException, null);
     for (ExceptionContextProvider exceptionContextProvider : exceptionContextProviders) {
-      exceptionContextProvider.putContextInfo(messagingException.getExceptionInfo(), notificationInfo, messageSource);
+      exceptionContextProvider.putContextInfo(messagingException.getExceptionInfo(), notificationInfo, flowConstruct.getSource());
     }
 
     return messagingException;

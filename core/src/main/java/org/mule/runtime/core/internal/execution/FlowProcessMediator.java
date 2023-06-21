@@ -464,7 +464,7 @@ public class FlowProcessMediator implements Initialisable {
    */
   private void policySuccessError(Pipeline flowConstruct, SourceErrorException see) {
     MessagingException messagingException =
-        see.toMessagingException(exceptionContextProviders, flowConstruct.getSource());
+        see.toMessagingException(exceptionContextProviders, flowConstruct);
 
     if (flowConstruct instanceof AbstractPipeline) {
       ((AbstractPipeline) flowConstruct).errorRouterForSourceResponseError(flow -> me -> {
@@ -653,7 +653,7 @@ public class FlowProcessMediator implements Initialisable {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
-        return ((SourceErrorException) throwable).toMessagingException(exceptionContextProviders, flowConstruct.getSource());
+        return ((SourceErrorException) throwable).toMessagingException(exceptionContextProviders, flowConstruct);
       } else {
         return null;
       }

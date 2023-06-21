@@ -103,9 +103,15 @@ public class RootInternalSpan implements InternalSpan {
       attributes.forEach(child::setRootAttribute);
     }
     if (managedChildSpan && child instanceof ExportOnEndExecutionSpan) {
-      ((ExportOnEndExecutionSpan) child).getSpanExporter().updateParentSpanFrom(serializeAsMap());
-      managedSpan = new DeferredEndSpanWrapper(child);
-      return managedSpan;
+      if (managedSpan == null) {
+        // The RootInternalSpan was still waiting for the managed span, then it wraps the child span to defer its end.
+        ((ExportOnEndExecutionSpan) child).getSpanExporter().updateParentSpanFrom(serializeAsMap());
+        managedSpan = new DeferredEndSpanWrapper(child);
+        return managedSpan;
+      } else {
+        // The RootInternalSpan already has its managed span, then it delegates the call to it.
+        return managedSpan.onChild(child);
+      }
     } else {
       return child;
     }
