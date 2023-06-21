@@ -580,7 +580,6 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
-                                <skipIfEmpty>true</skipIfEmpty>
 		                        <archive>
         		                    <manifestEntries>
                 		                <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
