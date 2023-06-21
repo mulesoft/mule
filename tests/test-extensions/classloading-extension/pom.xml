@@ -24,6 +24,12 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>classloading-extension-sdk-api</artifactId>
+			<classifier>jar</classifier>
+			<version>${project.version}</version>
+		</dependency>
     </dependencies>
 
 </project>

@@ -45,6 +45,7 @@
         <module>values-extension</module>
         <module>sample-data-extension</module>
         <module>substitution-group-extension</module>
+        <module>classloading-extension-sdk-api</module>
         <module>classloading-extension</module>
         <module>resource-extension</module>
         <module>custom-object-store-extension</module>
