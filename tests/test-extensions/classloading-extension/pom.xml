@@ -27,9 +27,9 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>classloading-extension-sdk-api</artifactId>
-			<classifier>jar</classifier>
-			<version>${project.version}</version>
-		</dependency>
+            <classifier>jar</classifier>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
