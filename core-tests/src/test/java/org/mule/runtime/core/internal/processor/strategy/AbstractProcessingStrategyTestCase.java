@@ -910,7 +910,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     private final List<AssertionError> failures = new ArrayList<>();
 
     private final String threadNamePrefix;
-    private final ExecutorService executor;
+    protected final ExecutorService executor;
 
     public TestScheduler(int threads, String threadNamePrefix, boolean reject) {
       super(1, new NamedThreadFactory(threadNamePrefix + ".tasks"));
