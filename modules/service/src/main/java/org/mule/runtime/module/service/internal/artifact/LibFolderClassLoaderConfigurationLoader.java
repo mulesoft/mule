@@ -7,10 +7,12 @@
 
 package org.mule.runtime.module.service.internal.artifact;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLUGIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -38,7 +40,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
  */
 public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
 
-  static final String LIB_FOLDER = "lib";
+  public static final String LIB_FOLDER = "lib";
 
   private static final Set<ArtifactType> supportedTypes = new HashSet<>(asList(SERVICE, SERVER_PLUGIN));
 

@@ -5,7 +5,13 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.discoverer;
+package org.mule.runtime.module.service.internal.test.discoverer;
+
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;
+import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory.SERVICE_PROVIDER_DISCOVERER;
 
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,11 +25,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
-import static org.mule.test.allure.AllureConstants.ServicesFeature.SERVICES;
-import static org.mule.test.allure.AllureConstants.ServicesFeature.ServicesStory.SERVICE_PROVIDER_DISCOVERER;
 
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -39,7 +40,8 @@ import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
-import org.mule.runtime.module.service.internal.discoverer.ServiceRegistryTestCase.FooService;
+import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
+import org.mule.runtime.module.service.internal.test.discoverer.ServiceRegistryTestCase.FooService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
@@ -47,13 +49,15 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(SERVICES)
 @Story(SERVICE_PROVIDER_DISCOVERER)
@@ -63,9 +67,9 @@ public class FileSystemServiceProviderDiscovererTestCase extends AbstractMuleTes
   public SystemPropertyTemporaryFolder temporaryFolder = new SystemPropertyTemporaryFolder(MULE_HOME_DIRECTORY_PROPERTY);
 
   private final ServiceClassLoaderFactory serviceClassLoaderFactory = mock(ServiceClassLoaderFactory.class);
-  private ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
-  private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
-  private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
+  private final ArtifactClassLoader containerClassLoader = mock(ArtifactClassLoader.class);
+  private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
+  private final ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
 
   @Before
   public void setUp() throws Exception {

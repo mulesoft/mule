@@ -142,13 +142,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

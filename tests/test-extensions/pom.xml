@@ -60,7 +60,7 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <executions>
                         <execution>
-                            <phase>package</phase>
+                            <id>default-jar</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
