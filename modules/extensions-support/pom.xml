@@ -16,6 +16,8 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.extensions.support</javaModuleName>
+        <!-- Required by mule-extension-ast-loader -->
+        <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -287,16 +289,10 @@
         </testResources>
         <plugins>
             <!-- Required by mule-extension-ast-loader -->
+            <!-- Force creation of the test-jar before the shade-plugin runs -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
