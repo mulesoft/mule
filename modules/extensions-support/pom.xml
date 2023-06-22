@@ -317,6 +317,15 @@
                                     <shadedPattern>org.mule.springframework</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <filters>
+                                <!-- Avoid having SPI references to spring classes -->
+                                <filter>
+                                    <artifact>org.springframework:spring-core</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <!-- Required by mule-extension-ast-loader -->
                             <shadeTestJar>true</shadeTestJar>
                             <minimizeJar>true</minimizeJar>
