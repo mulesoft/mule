@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.artifact;
+package org.mule.runtime.module.service.internal.test.artifact;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;

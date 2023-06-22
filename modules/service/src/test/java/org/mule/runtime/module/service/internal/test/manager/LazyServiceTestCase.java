@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.service.internal.manager;
+package org.mule.runtime.module.service.internal.test.manager;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -15,6 +15,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
@@ -22,20 +23,26 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
+import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.verification.VerificationMode;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LazyServiceTestCase extends AbstractMuleTestCase {
 
   private static final String TEST_VALUE = "dubby dubby do";
   private static final String SERVICE_NAME = "test service";
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock
   private ServiceAssembly assembly;

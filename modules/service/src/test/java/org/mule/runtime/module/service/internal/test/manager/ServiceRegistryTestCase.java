@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.manager;
+package org.mule.runtime.module.service.internal.test.manager;
 
 import static java.util.Optional.empty;
 
@@ -20,6 +20,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceDefinition;
 import org.mule.runtime.api.service.ServiceProvider;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Optional;

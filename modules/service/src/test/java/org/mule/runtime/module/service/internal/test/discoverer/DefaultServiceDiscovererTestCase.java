@@ -5,16 +5,19 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.discoverer;
+package org.mule.runtime.module.service.internal.test.discoverer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
+import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.internal.discoverer.ServiceResolver;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;

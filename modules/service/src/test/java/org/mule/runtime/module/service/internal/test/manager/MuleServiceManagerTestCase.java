@@ -5,7 +5,9 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.manager;
+package org.mule.runtime.module.service.internal.test.manager;
+
+import static java.util.Arrays.asList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -15,26 +17,32 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
+import org.mule.runtime.module.service.internal.manager.MuleServiceManager;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Arrays;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-@RunWith(MockitoJUnitRunner.class)
 public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
 
   private Service service1;
   private Service service2;
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   @Mock
   private ServiceDiscoverer serviceDiscoverer;
@@ -46,7 +54,7 @@ public class MuleServiceManagerTestCase extends AbstractMuleTestCase {
     service1 = mockService();
     service2 = mockService();
 
-    when(serviceDiscoverer.discoverServices()).thenReturn(Arrays.asList(service1, service2));
+    when(serviceDiscoverer.discoverServices()).thenReturn(asList(service1, service2));
     when(service1.getName()).thenReturn("Awesome Service");
     when(service2.getName()).thenReturn("Yet another awesome Service");
 

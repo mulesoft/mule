@@ -5,9 +5,16 @@
  * LICENSE.txt file.
  */
 
-package org.mule.runtime.module.service.internal.artifact;
+package org.mule.runtime.module.service.internal.test.artifact;
+
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
+import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
+import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
 import static java.util.Optional.empty;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -18,11 +25,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServiceFolder;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
-import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder.builder;
-import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.core.api.config.MuleProperties;
@@ -34,19 +36,22 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationL
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
+import org.mule.runtime.module.service.internal.artifact.ServiceDescriptorFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 
 import java.io.File;
 import java.util.Map;
 
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+
+import io.qameta.allure.Story;
 
 @Story(ARTIFACT_DESCRIPTORS)
 public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
@@ -55,9 +60,9 @@ public class ServiceDescriptorFactoryTestCase extends AbstractMuleTestCase {
   private static final String SERVICE_API_CLASS_NAME = "org.foo.FooServiceProvider";
   private static final String PROVIDER_CLASS_NAME = "org.foo.FooServiceProvider";
 
-  private DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
+  private final DescriptorLoaderRepository descriptorLoaderRepository = mock(DescriptorLoaderRepository.class);
 
-  private ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
+  private final ArtifactDescriptorValidator artifactDescriptorValidator = mock(ArtifactDescriptorValidator.class);
   private ServiceDescriptorFactory serviceDescriptorFactory;
 
   @Rule
