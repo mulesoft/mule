@@ -28,19 +28,19 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.management.MBeanServer;
-import javax.xml.bind.DatatypeConverter;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,8 +133,7 @@ public class TroubleshootingUtils {
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(Files.readAllBytes(filePath));
       byte[] digest = md.digest();
-      md5Checksum = DatatypeConverter
-          .printHexBinary(digest).toLowerCase();
+      md5Checksum = Hex.encodeHexString(digest);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     } catch (NoSuchAlgorithmException e) {

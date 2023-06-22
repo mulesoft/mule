@@ -7,8 +7,6 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
-import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
@@ -32,6 +30,7 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -72,6 +71,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.SemverException;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
@@ -1305,6 +1306,36 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           }).findFirst();
     }
     return urlOpt.orElse(null);
+  }
+
+  //////////////
+  // From VersionChecker
+
+  public static boolean areCompatibleVersions(String version1, String version2) {
+    return getSemver(version1).getMajor().equals(getSemver(version2).getMajor());
+  }
+
+  public static String getHighestVersion(String version1, String version2) {
+    final Semver semver1 = new Semver(version1, LOOSE);
+    final Semver semver2 = new Semver(version2, LOOSE);
+    return semver1.isGreaterThan(semver2) ? semver1.getOriginalValue() : semver2.getOriginalValue();
+  }
+
+  public static boolean isHighestVersion(String version1, String version2) {
+    final Semver semver1 = new Semver(version1, LOOSE);
+    final Semver semver2 = new Semver(version2, LOOSE);
+    return semver1.isGreaterThan(semver2);
+  }
+
+  private static Semver getSemver(String version) {
+    try {
+      return new Semver(version, LOOSE);
+    } catch (SemverException e) {
+      throw new IllegalArgumentException(
+                                         format("Unable to parse version %s, version is not following semantic versioning",
+                                                version),
+                                         e);
+    }
   }
 
 }
