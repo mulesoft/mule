@@ -223,7 +223,7 @@
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
         <allureReportVersion>2.8.1</allureReportVersion>
-        <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
+        <allure.maven.plugin.version>2.12.0</allure.maven.plugin.version>
         <jacoco.version>0.8.8</jacoco.version>
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
@@ -242,37 +242,11 @@
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
-        <allureJunitVersion>2.8.1</allureJunitVersion>
+        <allureJunitVersion>2.22.2</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <tikaVersion>1.24.1</tikaVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
-            <groupId>com.googlecode.multithreadedtc</groupId>
-            <artifactId>multithreadedtc</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit4</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.tika</groupId>
-                    <artifactId>tika-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
