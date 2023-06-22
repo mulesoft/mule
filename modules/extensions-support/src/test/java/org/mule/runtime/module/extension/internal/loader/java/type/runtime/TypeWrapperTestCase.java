@@ -24,15 +24,17 @@ import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.semantics.security.Password;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.junit.Test;
 
-public class TypeWrapperTestCase {
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+
+public class TypeWrapperTestCase extends AbstractMuleTestCase {
 
   @Test
   public void enumParameterType() {
@@ -58,6 +60,16 @@ public class TypeWrapperTestCase {
   @Description("Ensure JDK internal fields are filtered out as we can't use reflection on them in Java 17 and above")
   public void filterInternalJdkFields() {
     TypeWrapper type = new TypeWrapper(LocalDateTime.class, new DefaultExtensionsTypeLoaderFactory()
+        .createTypeLoader(currentThread().getContextClassLoader()));
+    List<FieldElement> fields = type.getFields();
+    assertThat(fields, empty());
+  }
+
+  @Test
+  @Issue("W-")
+  @Description("Ensure synthetic fields are filtered out as they might be added to classes we can't use reflection on in Java 17 and above")
+  public void filterSyntheticFields() {
+    TypeWrapper type = new TypeWrapper(SomeClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader()));
     List<FieldElement> fields = type.getFields();
     assertThat(fields, empty());
