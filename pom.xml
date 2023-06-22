@@ -567,11 +567,11 @@
                             <configuration>
                                 <skip>${skipExportTests}</skip>
                                 <skipIfEmpty>true</skipIfEmpty>
-		                        <archive>
-        		                    <manifestEntries>
-                		                <Automatic-Module-Name>${javaTestModuleName}</Automatic-Module-Name>
-                        		    </manifestEntries>
-								</archive>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${javaTestModuleName}</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
                             </configuration>
                         </execution>
                         <execution>
@@ -580,11 +580,11 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
-		                        <archive>
-        		                    <manifestEntries>
-                		                <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
-                        		    </manifestEntries>
-								</archive>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
                             </configuration>
                         </execution>
                     </executions>
