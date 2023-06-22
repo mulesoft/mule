@@ -22513,7 +22513,7 @@
                     "type": "String"
                   },
                   "hasDynamicType": false,
-                  "required": true,
+                  "required": false,
                   "isConfigOverride": false,
                   "isComponentId": false,
                   "fieldValueProviderModels": [],
@@ -68996,7 +68996,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69008,7 +69007,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -69159,8 +69159,6 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "label": "Person",
-        "typeId": "http://example.com/example.json",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69172,7 +69170,9 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "label": "Person",
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"

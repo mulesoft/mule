@@ -8,6 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import org.mule.runtime.api.util.MultiMap;
 
+/**
+ * Holds custom OAuth parameters classified by their placement
+ *
+ * @since 4.5.0
+ */
 public class CustomOAuthParameters {
 
   private final MultiMap<String, String> queryParams = new MultiMap<>();

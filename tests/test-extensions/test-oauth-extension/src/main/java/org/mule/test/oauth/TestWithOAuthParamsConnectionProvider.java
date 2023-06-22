@@ -16,6 +16,7 @@ import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.AuthorizationCode;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthParameter;
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
+import org.mule.sdk.api.annotation.param.Optional;
 
 @AuthorizationCode(accessTokenUrl = TestOAuthConnectionProvider.ACCESS_TOKEN_URL,
     authorizationUrl = TestOAuthConnectionProvider.AUTH_URL,
@@ -41,6 +42,7 @@ public class TestWithOAuthParamsConnectionProvider extends LegacyTestOAuthConnec
   String header;
 
   @org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter(placement = BODY)
+  @Optional
   String bodyParameter;
 
   @Override
