@@ -86,21 +86,6 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     event = removeVariableProcessor.process(event);
   }
 
-  @Test
-  @Ignore
-  public void testRemoveVariableWithRegexExpression() throws MuleException {
-    addMockedPropeerties(event, new HashSet<>(asList("MULE_ID", "MULE_CORRELATION_ID", "SomeVar", "MULE_GROUP_ID")));
-
-    removeVariableProcessor.setIdentifier("MULE_(.*)");
-    removeVariableProcessor.initialise();
-    event = removeVariableProcessor.process(event);
-
-    verifyRemoved(event, "MULE_ID");
-    verifyRemoved(event, "MULE_CORRELATION_ID");
-    verifyRemoved(event, "MULE_GROUP_ID");
-    verifyNotRemoved(event, "SomeVar");
-  }
-
   protected abstract void addMockedPropeerties(CoreEvent event, Set<String> properties);
 
   protected abstract void verifyRemoved(CoreEvent mockEvent, String key);
