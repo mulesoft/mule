@@ -382,6 +382,8 @@ public class FlowProcessMediator implements Initialisable {
         public void complete(Void value) {
           onTerminate(flowConstruct, ctx, right(successResult.getResult()));
           finish(flowConstruct, ctx, null);
+          // At this point the flow has nothing left to schedule or execute, so we end the flow span.
+          coreEventTracer.endCurrentSpan(event);
         }
 
         @Override
@@ -407,8 +409,6 @@ public class FlowProcessMediator implements Initialisable {
       } catch (Exception e) {
         policySuccessError(flowConstruct,
                            new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e));
-      } finally {
-        coreEventTracer.endCurrentSpan(event);
       }
     };
   }
@@ -464,7 +464,7 @@ public class FlowProcessMediator implements Initialisable {
    */
   private void policySuccessError(Pipeline flowConstruct, SourceErrorException see) {
     MessagingException messagingException =
-        see.toMessagingException(exceptionContextProviders, flowConstruct);
+        see.toMessagingException(exceptionContextProviders, flowConstruct.getSource());
 
     if (flowConstruct instanceof AbstractPipeline) {
       ((AbstractPipeline) flowConstruct).errorRouterForSourceResponseError(flow -> me -> {
@@ -482,11 +482,15 @@ public class FlowProcessMediator implements Initialisable {
                             public void complete(Void value) {
                               onTerminate(flow, ctx, left(me));
                               finish(flow, ctx, null);
+                              // At this point the flow has nothing left to schedule or execute, so we end the Flow span.
+                              coreEventTracer.endCurrentSpan(event);
                             }
 
                             @Override
                             public void error(Throwable e) {
                               finish(flow, ctx, e);
+                              // At this point the flow has nothing left to schedule or execute, so we end the Flow span.
+                              coreEventTracer.endCurrentSpan(event);
                             }
                           });
       }).accept(messagingException);
@@ -653,7 +657,7 @@ public class FlowProcessMediator implements Initialisable {
       if (throwable instanceof MessagingException) {
         return (MessagingException) throwable;
       } else if (throwable instanceof SourceErrorException) {
-        return ((SourceErrorException) throwable).toMessagingException(exceptionContextProviders, flowConstruct);
+        return ((SourceErrorException) throwable).toMessagingException(exceptionContextProviders, flowConstruct.getSource());
       } else {
         return null;
       }
