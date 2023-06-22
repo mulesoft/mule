@@ -42,8 +42,8 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   private static final Pattern APIKIT_SOAP_FLOWNAME_PATTERN = compile(APIKIT_SOAP_FLOWNAME_REGEX);
 
   private static final long serialVersionUID = 1L;
-  public static final String FLOWS_SUMMARY_APP_STATISTICS_NAME_TEMPLATE = "flows-summary-statistics-%s";
-  public static final String FLOWS_SUMMARY_APP_STATISTICS_DESCRIPTION_TEMPLATE = "Flow summary statistics for %s";
+  public static final String FLOWS_SUMMARY_APP_STATISTICS_NAME = "flows-summary-statistic";
+  public static final String FLOWS_SUMMARY_APP_STATISTICS_DESCRIPTION_TEMPLATE = "Flow summary statistics";
   public static final String DECLARED_PRIVATE_FLOWS_APP_NAME = "declared-private-flows";
   public static final String DECLARED_PRIVATE_FLOWS_APP_DESCRIPTION = "Declared Private Flows";
   public static final String ACTIVE_PRIVATE_FLOWS_APP_NAME = "active-private-flows";
@@ -173,7 +173,7 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   @Override
   public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
     String artifactId = meterProvider.getArtifactId();
-    Meter meter = meterProvider.getMeterBuilder(FLOWS_SUMMARY_APP_STATISTICS_NAME_TEMPLATE)
+    Meter meter = meterProvider.getMeterBuilder(FLOWS_SUMMARY_APP_STATISTICS_NAME)
         .withDescription(FLOWS_SUMMARY_APP_STATISTICS_DESCRIPTION_TEMPLATE)
         .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId)
         .build();

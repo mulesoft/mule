@@ -109,7 +109,7 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     private final Meter meter;
     private InstrumentRepository instrumentRepository;
     private String description;
-    private String unit = "";
+    private String unit;
     private long initialValue;
     private MeterExporter meterExporter;
 

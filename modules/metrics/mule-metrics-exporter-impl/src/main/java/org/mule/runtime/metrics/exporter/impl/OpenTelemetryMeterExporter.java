@@ -11,6 +11,8 @@ import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METR
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import io.opentelemetry.api.metrics.LongCounterBuilder;
+import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
@@ -53,7 +55,7 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
     // TODO W-13218993: In this task all the configuration possibilities will be applied.
     String endpoint = getProperty(METRIC_EXPORTER_ENDPOINT);
 
-    MetricExporter metricExporter = null;
+    MetricExporter metricExporter;
 
     if (endpoint != null) {
       metricExporter = OtlpGrpcMetricExporter.builder().setEndpoint(endpoint).build();
@@ -73,19 +75,30 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
   public synchronized void enableExport(LongCounter longCounter) {
     Meter openTelemetryMeter = openTelemetryMeters.get(longCounter.getMeter().getName());
     Attributes attributes = new OpentelemetryExporterAttributes(longCounter.getMeter());
-    counters.add(openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription())
-        .setUnit(Objects.toString(longCounter.getUnit(), ""))
-        .buildWithCallback(measurement -> measurement.record(longCounter.getValueAsLong(), attributes)));
+    LongCounterBuilder longCounterBuilder =
+        openTelemetryMeter.counterBuilder(longCounter.getName()).setDescription(longCounter.getDescription());
+
+    if (longCounter.getUnit() != null) {
+      longCounterBuilder = longCounterBuilder.setUnit(longCounter.getUnit());
+    }
+
+    counters
+        .add(longCounterBuilder.buildWithCallback(measurement -> measurement.record(longCounter.getValueAsLong(), attributes)));
   }
 
   @Override
   public synchronized void enableExport(LongUpDownCounter upDownCounter) {
     Meter openTelemetryMeter = openTelemetryMeters.get(upDownCounter.getMeter().getName());
     Attributes attributes = new OpentelemetryExporterAttributes(upDownCounter.getMeter());
-    upDownCounters.add(openTelemetryMeter.upDownCounterBuilder(upDownCounter.getName())
-        .setDescription(upDownCounter.getDescription())
-        .setUnit(Objects.toString(upDownCounter.getUnit(), ""))
-        .buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
+    LongUpDownCounterBuilder longUpDownCounter = openTelemetryMeter.upDownCounterBuilder(upDownCounter.getName())
+        .setDescription(upDownCounter.getDescription());
+
+    if (upDownCounter.getUnit() != null) {
+      longUpDownCounter = longUpDownCounter.setUnit(Objects.toString(upDownCounter.getUnit(), ""));
+    }
+
+    upDownCounters
+        .add(longUpDownCounter.buildWithCallback(measurement -> measurement.record(upDownCounter.getValueAsLong(), attributes)));
   }
 
   @Override

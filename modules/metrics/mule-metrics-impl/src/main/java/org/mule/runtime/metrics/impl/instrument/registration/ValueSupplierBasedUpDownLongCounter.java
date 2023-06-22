@@ -116,7 +116,7 @@ public class ValueSupplierBasedUpDownLongCounter implements LongUpDownCounter {
     private final Meter meter;
     private final InstrumentRepository instrumentRepository;
     private String description;
-    private String unit = "";
+    private String unit;
     private Consumer<Long> addOperation;
     private Supplier<Long> incrementOperation;
     private Supplier<Long> decrementAndGetOperation;

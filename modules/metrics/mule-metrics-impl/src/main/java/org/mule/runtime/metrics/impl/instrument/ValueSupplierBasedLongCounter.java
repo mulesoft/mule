@@ -112,7 +112,7 @@ public class ValueSupplierBasedLongCounter implements LongCounter {
     private InstrumentRepository instrumentRepository;
     private MeterExporter meterExporter;
     private String description;
-    private String unit = "";
+    private String unit;
     private Consumer<Long> addOperation;
     private Supplier<Long> incrementAndGetOperation;
     private Supplier<Long> valueSupplier;
