@@ -81,6 +81,8 @@ import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -604,6 +606,9 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       for (int i = 0; i < (2 * 2) + 1; ++i) {
         futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
+
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> cpuIntensive.executor.toString().contains("queued tasks = 2")));
 
       // Give time for the extra dispatch to get to the point where it starts retrying
       Thread.sleep(1000);
