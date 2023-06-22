@@ -265,6 +265,9 @@ public class JavaOperationModelParserTestCase {
     public void transactionalOperation(@Connection JavaConnectionProviderModelParserTestCase.SdkTestTransactionalConnection connection) {}
   }
 
+  /**
+   * Also see {@code testfiles.SdkOperations} in {@code mule-extensions-ast-loader}.
+   */
   private static class SkdOperations {
 
     @MinMuleVersion("4.4")
