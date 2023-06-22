@@ -166,6 +166,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
@@ -1851,4 +1852,9 @@ public final class IntrospectionUtils {
     return of(fields.iterator().next());
   }
 
+  public static void clearResolvableTypeCache() {
+    org.springframework.util.ReflectionUtils.clearCache();
+    AnnotationUtils.clearCache();
+    ResolvableType.clearCache();
+  }
 }

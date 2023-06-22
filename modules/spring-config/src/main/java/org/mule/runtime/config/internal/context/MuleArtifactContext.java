@@ -38,6 +38,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONF
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseArtifactExtensionModel;
 import static org.mule.runtime.module.artifact.activation.internal.ast.validation.AstValidationUtils.logWarningsAndThrowIfContainsErrors;
 import static org.mule.runtime.module.extension.internal.manager.ExtensionErrorsRegistrant.registerErrorMappings;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.clearResolvableTypeCache;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
@@ -475,6 +476,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
       resetCommonCaches();
       clearSpringSoftReferencesCachesForDynamicClassLoaders();
+      clearResolvableTypeCache();
     }
   }
 
