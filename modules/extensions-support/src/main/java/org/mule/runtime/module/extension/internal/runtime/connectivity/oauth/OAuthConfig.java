@@ -52,7 +52,7 @@ public abstract class OAuthConfig<T extends OAuthGrantType> {
   /**
    * @since 4.5.0
    */
-  public MultiMap<String, String> getCustomBodyParameters() {
+  public Map<String, String> getCustomBodyParameters() {
     return customOAuthParameters.getBodyParams();
   }
 

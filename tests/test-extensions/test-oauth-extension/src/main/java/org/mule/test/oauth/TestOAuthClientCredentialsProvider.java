@@ -9,6 +9,7 @@ package org.mule.test.oauth;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
 import static org.mule.sdk.api.security.CredentialsPlacement.QUERY_PARAMS;
+import static org.mule.sdk.api.runtime.parameter.HttpParameterPlacement.BODY;
 import static org.mule.test.oauth.TestOAuthConnectionProvider.ACCESS_TOKEN_URL;
 import static org.mule.test.oauth.TestOAuthConnectionProvider.DEFAULT_SCOPE;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -34,6 +35,10 @@ public class TestOAuthClientCredentialsProvider extends LegacyTestOAuthConnectio
   @OAuthParameter(placement = HEADERS)
   @Optional
   private String knownCustomHeader;
+
+  @org.mule.sdk.api.annotation.connectivity.oauth.OAuthParameter(placement = BODY)
+  @Optional
+  private String bodyParameter;
 
   @OAuthParameter(placement = HEADERS)
   @Optional
