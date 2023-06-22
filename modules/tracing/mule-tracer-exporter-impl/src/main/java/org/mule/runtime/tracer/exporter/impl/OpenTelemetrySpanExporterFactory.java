@@ -47,7 +47,6 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetrySpanExporterFactory.class);
 
-  @Inject
   private SpanExporterConfiguration configuration;
 
   private SpanExporterConfiguration privilegedConfiguration =
@@ -112,6 +111,11 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Override
   public SpanSnifferManager getSpanSnifferManager() {
     return new OpenTelemetrySpanSnifferManager();
+  }
+
+  @Inject
+  protected void setConfiguration(SpanExporterConfiguration configuration) {
+    this.configuration = configuration;
   }
 
   @Override

@@ -7,6 +7,7 @@
 
 package org.mule.runtime.tracer.exporter.config.impl;
 
+import static org.mule.runtime.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
@@ -20,6 +21,7 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 import static java.nio.file.Files.copy;
+import static java.nio.file.Paths.get;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -33,9 +35,8 @@ import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundExcepti
 import org.mule.runtime.core.api.MuleContext;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -62,7 +63,9 @@ public class FileSpanExporterConfigurationTestCase {
   public static final String TEST_NOT_FOUND_CONF_FILE_NAME = "test-not-found.conf";
   public static final String TEST_CONF_FILE_NAME = "test.conf";
   public static final String SYSTEM_PROPERTY_VALUE = "system_property_value";
+  public static final String TEST_ORIGINAL_CONF_FILE = "test-original.conf";
   private static final long TIMEOUT_MILLIS = 10000l;
+  public static final String TEST_OVERWRITTEN_CONF_FILE = "test-overwritten.conf";
   private final boolean enableConfigInFile;
   private final String valueNonSystemProperty;
   private final String valueSystemProperty;
@@ -150,20 +153,20 @@ public class FileSpanExporterConfigurationTestCase {
     assertThat(caFileLocation, is(notNullValue()));
     assertThat(keyFileLocation, is(notNullValue()));
 
-    Path caFileLocationPath = Paths.get(caFileLocation);
-    Path keyFileLocationPath = Paths.get(keyFileLocation);
+    Path caFileLocationPath = get(caFileLocation);
+    Path keyFileLocationPath = get(keyFileLocation);
 
     assertThat(caFileLocationPath.isAbsolute(), is(TRUE));
     assertThat(keyFileLocationPath.isAbsolute(), is(TRUE));
   }
 
   @Test
-  public void configurationFileChanged() throws IOException {
+  public void configurationFileChanged() throws Exception {
     File file = createTempFile("tracing", "test");
-    Path testFile = Paths.get(file.getPath());
-    Path originalConfigFile = Paths.get(getClass().getResource("/conf/test-original.conf").getPath());
-    Path overwrittenConfigFile = Paths.get(getClass().getResource("/conf/test-overwritten.conf").getPath());
-    copy(originalConfigFile, testFile, REPLACE_EXISTING);
+    Path testFile = get(file.getPath());
+    URI originalConfigFileUri = getResourceAsUrl(TEST_ORIGINAL_CONF_FILE, getClass()).toURI();
+    URI overwrittenConfigFileUri = getResourceAsUrl(TEST_OVERWRITTEN_CONF_FILE, getClass()).toURI();
+    copy(get(originalConfigFileUri), testFile, REPLACE_EXISTING);
 
     final TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
         new TestFileSpanExporterConfiguration(mock(MuleContext.class), "", file.getAbsolutePath());
@@ -173,7 +176,7 @@ public class FileSpanExporterConfigurationTestCase {
       testFileSpanExporterConfiguration.changed = true;
     });
     assertThat(testFileSpanExporterConfiguration.getStringValue("key"), equalTo("value"));
-    copy(overwrittenConfigFile, testFile, REPLACE_EXISTING);
+    copy(get(overwrittenConfigFileUri), testFile, REPLACE_EXISTING);
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
         .check(new JUnitLambdaProbe(() -> testFileSpanExporterConfiguration.changed));
     assertThat(testFileSpanExporterConfiguration.getStringValue("key"), equalTo("value-overwritten"));
