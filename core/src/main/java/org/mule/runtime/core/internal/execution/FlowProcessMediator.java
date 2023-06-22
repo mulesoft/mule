@@ -482,14 +482,14 @@ public class FlowProcessMediator implements Initialisable {
                             public void complete(Void value) {
                               onTerminate(flow, ctx, left(me));
                               finish(flow, ctx, null);
-                              // At this point the flow has nothing left to schedule or execute, so we end the Flow span.
+                              // At this point the flow has nothing left to schedule or execute, so we end the flow span.
                               coreEventTracer.endCurrentSpan(event);
                             }
 
                             @Override
                             public void error(Throwable e) {
                               finish(flow, ctx, e);
-                              // At this point the flow has nothing left to schedule or execute, so we end the Flow span.
+                              // At this point the flow has nothing left to schedule or execute, so we end the flow span.
                               coreEventTracer.endCurrentSpan(event);
                             }
                           });
