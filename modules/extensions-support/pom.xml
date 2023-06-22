@@ -322,7 +322,7 @@
                                 </relocation>
                             </relocations>
                             <filters>
-								<!-- Avoid having SPI references to spring classes -->
+                                <!-- Avoid having SPI references to spring classes -->
                                 <filter>
                                     <artifact>org.springframework:spring-core</artifact>
                                     <excludes>
