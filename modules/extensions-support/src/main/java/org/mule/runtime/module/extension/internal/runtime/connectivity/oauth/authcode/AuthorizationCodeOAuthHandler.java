@@ -199,6 +199,8 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .localAuthorizationUrlResourceOwnerId("#[attributes.queryParams.resourceOwnerId]")
         .state("#[attributes.queryParams.state]")
         .customParameters(config.getCustomQueryParameters())
+        .customHeaders(config.getCustomHeaders())
+        .customBodyParameters(config.getCustomBodyParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
     dancerBuilder.includeRedirectUriInRefreshTokenRequest(grantType.includeRedirectUriInRefreshTokenRequest());
