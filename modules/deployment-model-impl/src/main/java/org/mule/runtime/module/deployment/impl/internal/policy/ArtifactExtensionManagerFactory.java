@@ -33,11 +33,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import static org.mule.runtime.config.internal.util.IntrospectionUtils.setWeakHashCaches;
+
+
 
 /**
  * Creates {@link ExtensionManager} for mule artifacts that own a {@link MuleContext}
  */
 public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory {
+
+  static {
+    setWeakHashCaches();
+  }
 
   private static final BiFunction<PluginClassLoaderSupplier, ExtensionModelLoaderRepository, ExtensionModelDiscoverer> EXT_MODEL_DISCOVERER =
       ExtensionModelDiscoverer::defaultExtensionModelDiscoverer;

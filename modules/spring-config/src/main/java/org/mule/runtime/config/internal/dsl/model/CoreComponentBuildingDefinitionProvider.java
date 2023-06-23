@@ -13,7 +13,6 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_EL
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
-import static org.mule.runtime.config.internal.util.IntrospectionUtils.setWeakHashCaches;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
@@ -207,10 +206,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String LOG_EXCEPTION = "logException";
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
-
-  static {
-    setWeakHashCaches();
-  }
 
   @SuppressWarnings("rawtypes")
   private static ComponentBuildingDefinition.Builder baseDefinition =

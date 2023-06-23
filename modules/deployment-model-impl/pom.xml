@@ -109,7 +109,7 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
