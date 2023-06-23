@@ -71,7 +71,7 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     private final String name;
     private InstrumentRepository instrumentRepository;
     private String description;
-    private String unit = "";
+    private String unit;
     private String meterName;
     private long initialValue;
 

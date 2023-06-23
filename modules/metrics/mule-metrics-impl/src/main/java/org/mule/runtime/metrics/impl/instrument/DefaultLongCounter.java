@@ -73,7 +73,7 @@ public class DefaultLongCounter implements LongCounter {
     private final String name;
     private InstrumentRepository instrumentRepository;
     private String description;
-    private String unit = "";
+    private String unit;
     private String meterName;
 
     public DefaultLongCounterBuilder(String name, String meterName) {
