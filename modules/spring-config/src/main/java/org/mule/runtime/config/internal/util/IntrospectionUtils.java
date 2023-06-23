@@ -18,18 +18,9 @@ import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
-/**
- * Set of utility operations to get insights about objects and their components
- *
- * @since 3.7.0
- */
 public final class IntrospectionUtils {
 
   private static final Logger LOGGER = getLogger(IntrospectionUtils.class);
-
-  static {
-    setWeakHashCaches();
-  }
 
   private IntrospectionUtils() {}
 
@@ -38,7 +29,7 @@ public final class IntrospectionUtils {
    * <p>
    * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
    */
-  private static void setWeakHashCaches() {
+  public static void setWeakHashCaches() {
     try {
       Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
       Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -51,5 +42,4 @@ public final class IntrospectionUtils {
       }
     }
   }
-
 }
