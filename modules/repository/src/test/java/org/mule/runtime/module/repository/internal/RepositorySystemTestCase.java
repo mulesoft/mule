@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.module.repository.internal;
 
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REPOSITORY_FOLDER_PROPERTY;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+import static org.mule.tck.junit4.rule.RequiresConnectivity.checkConnectivity;
+
+import static java.lang.String.format;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 import static org.junit.rules.ExpectedException.none;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REPOSITORY_FOLDER_PROPERTY;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
-import static org.mule.tck.junit4.rule.RequiresConnectivity.checkConnectivity;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -24,14 +27,17 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceDisabledException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.io.File;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-
 public class RepositorySystemTestCase extends AbstractMuleTestCase {
+
+  // TODO W-13645342: use a mock repository to allow this test to run offline
+  private static final String MAVEN_CENTRAL_REPO_URL = "https://repo.maven.apache.org";
 
   private static final BundleDescriptor VALID_BUNDLE_DESCRIPTOR =
       new BundleDescriptor.Builder().setGroupId("ant").setArtifactId("ant-antlr").setVersion("1.6").build();
@@ -85,10 +91,11 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   }
 
   private void executeTestWithDefaultRemoteRepo(TestTask test) throws Exception {
-    assumeTrue("No connectivity to http://central.maven.org. Ignoring test.", checkConnectivity("http://central.maven.org"));
+    assumeTrue(format("No connectivity to %s. Ignoring test.", MAVEN_CENTRAL_REPO_URL),
+               checkConnectivity(MAVEN_CENTRAL_REPO_URL));
 
     testWithSystemProperty(MULE_REPOSITORY_FOLDER_PROPERTY, temporaryFolder.getRoot().getAbsolutePath(), () -> {
-      testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, "http://central.maven.org/maven2/", () -> {
+      testWithSystemProperty(MULE_REMOTE_REPOSITORIES_PROPERTY, format("%s/maven2/", MAVEN_CENTRAL_REPO_URL), () -> {
         test.execute();
       });
     });
