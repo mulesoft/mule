@@ -6,14 +6,18 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static org.apache.tika.io.IOUtils.readLines;
+import static org.mule.runtime.core.api.util.ClassUtils.getResource;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.apache.commons.io.IOUtils.readLines;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.core.api.util.ClassUtils.getResource;
+
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -101,7 +105,7 @@ public class MuleArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = classLoader.findResource(request + ":" + resourceName);
     assertThat(resource, is(notNullValue()));
     assertThat(resource, is(equalTo(new URL("jar:" + expectedArtifactLocation.toString() + "!/" + resourceName))));
-    assertThat(readLines(resource.openStream()).get(0), is(expectedLine));
+    assertThat(readLines(resource.openStream(), UTF_8).get(0), is(expectedLine));
   }
 
 }
