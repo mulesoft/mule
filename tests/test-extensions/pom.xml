@@ -61,12 +61,18 @@
                     <artifactId>maven-jar-plugin</artifactId>
                     <executions>
                         <execution>
-                            <id>default-jar</id>
+							<!-- Generate the jar with the classifier in addition to the standard jar -->
+                            <id>default-mule-plugin-jar</id>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
                                 <classifier>mule-plugin</classifier>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
                             </configuration>
                         </execution>
                     </executions>
