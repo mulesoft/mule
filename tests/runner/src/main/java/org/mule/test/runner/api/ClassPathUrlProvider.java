@@ -8,8 +8,7 @@
 package org.mule.test.runner.api;
 
 import static java.io.File.pathSeparator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -49,7 +48,7 @@ public class ClassPathUrlProvider {
    * @param urls {@link URL}s to be added to the ones already in classpath, not null or empty.
    */
   public ClassPathUrlProvider(List<URL> urls) {
-    checkNotNull(urls, "urls cannot be null");
+    requireNonNull(urls, "urls cannot be null");
 
     this.urls = readUrlsFromSystemProperties();
     this.urls.addAll(urls);

@@ -27,7 +27,6 @@ module org.mule.test.runner {
 
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.maven.pom.parser.api;
-  // TODO
   requires org.mule.runtime.maven.client.impl;
 
   requires java.management;
