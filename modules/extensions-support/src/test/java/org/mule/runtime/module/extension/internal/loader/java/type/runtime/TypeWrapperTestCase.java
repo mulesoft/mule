@@ -7,11 +7,13 @@
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
 import static java.lang.Thread.currentThread;
+import static java.util.stream.Collectors.toSet;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -21,12 +23,15 @@ import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithParameters;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Alias;
 import org.mule.sdk.api.annotation.param.Optional;
 import org.mule.sdk.api.annotation.semantics.security.Password;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
@@ -69,6 +74,15 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   @Issue("W-13648907")
   @Description("Ensure synthetic fields are filtered out as they might be added to classes we can't use reflection on in Java 17 and above")
   public void filterSyntheticFields() {
+    // precondition check
+    final Collection<String> allFiledNames = IntrospectionUtils.getFields(SomeClass.class)
+        .stream()
+        .map(Field::getName)
+        .collect(toSet());
+    // being a non-static inner class makes it have a synthetic field pointing to its owner instance.
+    assertThat(allFiledNames, hasItem("this$0"));
+
+    // actual test
     TypeWrapper type = new TypeWrapper(SomeClass.class, new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(currentThread().getContextClassLoader()));
     List<FieldElement> fields = type.getFields();
