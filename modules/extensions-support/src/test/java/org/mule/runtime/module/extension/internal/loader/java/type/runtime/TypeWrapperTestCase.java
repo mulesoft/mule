@@ -66,7 +66,7 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Issue("W-")
+  @Issue("W-13648907")
   @Description("Ensure synthetic fields are filtered out as they might be added to classes we can't use reflection on in Java 17 and above")
   public void filterSyntheticFields() {
     TypeWrapper type = new TypeWrapper(SomeClass.class, new DefaultExtensionsTypeLoaderFactory()
