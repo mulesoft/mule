@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.deprecated.Deprecated;
@@ -74,13 +74,13 @@ public class TypeWrapperTestCase extends AbstractMuleTestCase {
   @Issue("W-13648907")
   @Description("Ensure synthetic fields are filtered out as they might be added to classes we can't use reflection on in Java 17 and above")
   public void filterSyntheticFields() {
-    // precondition check
-    final Collection<String> allFiledNames = IntrospectionUtils.getFields(SomeClass.class)
+    // precondition check, verify the class has synthetic fields
+    final Collection<Field> allFiledNames = IntrospectionUtils.getFields(SomeClass.class)
         .stream()
-        .map(Field::getName)
+        .filter(Field::isSynthetic)
         .collect(toSet());
-    // being a non-static inner class makes it have a synthetic field pointing to its owner instance.
-    assertThat(allFiledNames, hasItem("this$0"));
+    // being a non-static inner class makes `SomeClass` have a synthetic field pointing to its owner instance.
+    assertThat(allFiledNames, not(empty()));
 
     // actual test
     TypeWrapper type = new TypeWrapper(SomeClass.class, new DefaultExtensionsTypeLoaderFactory()
