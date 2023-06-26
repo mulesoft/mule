@@ -138,8 +138,8 @@
             <artifactId>uuid</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -195,9 +195,9 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
-            <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
-            <groupId>javax.jms</groupId>
-            <artifactId>javax.jms-api</artifactId>
+            <!-- jakarta.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
+            <groupId>jakarta.jms</groupId>
+            <artifactId>jakarta.jms-api</artifactId>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
