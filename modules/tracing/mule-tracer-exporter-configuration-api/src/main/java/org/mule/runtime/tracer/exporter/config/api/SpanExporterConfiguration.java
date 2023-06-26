@@ -30,4 +30,9 @@ public interface SpanExporterConfiguration {
 
     return value;
   }
+
+  /**
+   * @param doOnConfigurationChanged to execute when a change in the configuration is detected.
+   */
+  default void doOnConfigurationChanged(Runnable doOnConfigurationChanged) {}
 }

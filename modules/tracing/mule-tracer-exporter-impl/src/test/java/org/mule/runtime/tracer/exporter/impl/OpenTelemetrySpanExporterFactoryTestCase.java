@@ -25,6 +25,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
@@ -36,6 +37,7 @@ public class OpenTelemetrySpanExporterFactoryTestCase {
     MuleConfiguration muleConfiguration = mock(MuleConfiguration.class);
     FeatureFlaggingService featureFlaggingService = mock(FeatureFlaggingService.class);
     SpanProcessor mockedSpanProcessor = mock(SpanProcessor.class);
+    SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
 
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
@@ -50,6 +52,7 @@ public class OpenTelemetrySpanExporterFactoryTestCase {
     };
 
     spanExporterFactory.setMuleContext(muleContext);
+    spanExporterFactory.setConfiguration(spanExporterConfiguration);
     spanExporterFactory.setFeatureFlaggingService(featureFlaggingService);
     spanExporterFactory.initialise();
     spanExporterFactory.dispose();

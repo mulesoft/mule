@@ -7,15 +7,22 @@
 
 package org.mule.runtime.tracer.exporter.config.impl;
 
+import static org.mule.runtime.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_CORE_EVENT_TRACER;
 
+import static java.io.File.createTempFile;
 import static java.lang.Boolean.TRUE;
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
+import static java.nio.file.Files.copy;
+import static java.nio.file.Paths.get;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -27,8 +34,9 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 
+import java.io.File;
+import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -41,6 +49,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
@@ -49,7 +59,13 @@ public class FileSpanExporterConfigurationTestCase {
 
   public static final String CONF_FOLDER = "conf";
   public static final String CONF_FOLDER_NOT_FOUND = "conf-not-found";
+
+  public static final String TEST_NOT_FOUND_CONF_FILE_NAME = "test-not-found.conf";
+  public static final String TEST_CONF_FILE_NAME = "test.conf";
   public static final String SYSTEM_PROPERTY_VALUE = "system_property_value";
+  public static final String TEST_ORIGINAL_CONF_FILE = "test-original.conf";
+  private static final long TIMEOUT_MILLIS = 10000l;
+  public static final String TEST_OVERWRITTEN_CONF_FILE = "test-overwritten.conf";
   private final boolean enableConfigInFile;
   private final String valueNonSystemProperty;
   private final String valueSystemProperty;
@@ -63,12 +79,14 @@ public class FileSpanExporterConfigurationTestCase {
   @Before
   public void before() {
     setProperty(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY, Boolean.toString(enableConfigInFile));
+    setProperty(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY, "1000");
   }
 
   @After
   public void after() {
     clearProperty(KEY_PROPERTY_SYSTEM_PROPERTY);
     clearProperty(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY);
+    clearProperty(MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY);
   }
 
   public FileSpanExporterConfigurationTestCase(boolean enableConfigInFile, String valuePropertyNonSystemPropertyConfDirectory,
@@ -88,7 +106,7 @@ public class FileSpanExporterConfigurationTestCase {
   @Test
   public void returnsTheValueForANonSystemProperty() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration =
-        new TestFileSpanExporterConfiguration(mock(MuleContext.class));
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), equalTo(
                                                                                                        valueNonSystemProperty));
   }
@@ -97,7 +115,7 @@ public class FileSpanExporterConfigurationTestCase {
   public void returnsTheResolvedSystemProperty() {
     setProperty(valueSystemProperty, SYSTEM_PROPERTY_VALUE);
     FileSpanExporterConfiguration fileSpanExporterConfiguration =
-        new TestFileSpanExporterConfiguration(mock(MuleContext.class));
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
                                                                                                    SYSTEM_PROPERTY_VALUE));
   }
@@ -106,21 +124,21 @@ public class FileSpanExporterConfigurationTestCase {
   public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() {
     expectedException.expect(PropertyNotFoundException.class);
     FileSpanExporterConfiguration fileSpanExporterConfiguration =
-        new TestFileSpanExporterConfiguration(mock(MuleContext.class));
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(valueSystemProperty));
   }
 
   @Test
   public void whenNoPropertyIsInTheFileNullValueIsReturned() {
     FileSpanExporterConfiguration fileSpanExporterConfiguration =
-        new TestFileSpanExporterConfiguration(mock(MuleContext.class));
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
     assertThat(fileSpanExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
   }
 
   @Test
   public void whenFileIsNotFoundNoPropertyIsFound() {
-    TestNoFileFoundSpanExporterConfiguration testNoFileFoundSpanExporterConfiguration =
-        new TestNoFileFoundSpanExporterConfiguration(mock(MuleContext.class));
+    FileSpanExporterConfiguration testNoFileFoundSpanExporterConfiguration =
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER_NOT_FOUND, TEST_NOT_FOUND_CONF_FILE_NAME);
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
   }
@@ -128,35 +146,60 @@ public class FileSpanExporterConfigurationTestCase {
   @Test
   public void whenValueCorrespondingToPathGetAbsoluteValue() {
     TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
-        new TestFileSpanExporterConfiguration(mock(MuleContext.class));
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
     String caFileLocation = testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION);
     String keyFileLocation = testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
 
     assertThat(caFileLocation, is(notNullValue()));
     assertThat(keyFileLocation, is(notNullValue()));
 
-    Path caFileLocationPath = Paths.get(caFileLocation);
-    Path keyFileLocationPath = Paths.get(keyFileLocation);
+    Path caFileLocationPath = get(caFileLocation);
+    Path keyFileLocationPath = get(keyFileLocation);
 
     assertThat(caFileLocationPath.isAbsolute(), is(TRUE));
     assertThat(keyFileLocationPath.isAbsolute(), is(TRUE));
   }
 
+  @Test
+  public void configurationFileChanged() throws Exception {
+    File file = createTempFile("tracing", "test");
+    Path testFile = get(file.getPath());
+    URI originalConfigFileUri = getResourceAsUrl(TEST_ORIGINAL_CONF_FILE, getClass()).toURI();
+    URI overwrittenConfigFileUri = getResourceAsUrl(TEST_OVERWRITTEN_CONF_FILE, getClass()).toURI();
+    copy(get(originalConfigFileUri), testFile, REPLACE_EXISTING);
+
+    final TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), "", file.getAbsolutePath());
+
+    testFileSpanExporterConfiguration.doOnConfigurationChanged(() -> {
+      testFileSpanExporterConfiguration.initialiseProperties();
+      testFileSpanExporterConfiguration.changed = true;
+    });
+    assertThat(testFileSpanExporterConfiguration.getStringValue("key"), equalTo("value"));
+    copy(get(overwrittenConfigFileUri), testFile, REPLACE_EXISTING);
+    new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
+        .check(new JUnitLambdaProbe(() -> testFileSpanExporterConfiguration.changed));
+    assertThat(testFileSpanExporterConfiguration.getStringValue("key"), equalTo("value-overwritten"));
+  }
 
   /**
    * {@link FileSpanExporterConfiguration} used for testing properties file.
    */
   private static class TestFileSpanExporterConfiguration extends FileSpanExporterConfiguration {
 
-    public static final String TEST_CONF_FILE_NAME = "test.conf";
+    private final String confFolder;
+    private final String confFileName;
+    private boolean changed;
 
-    public TestFileSpanExporterConfiguration(MuleContext muleContext) {
+    public TestFileSpanExporterConfiguration(MuleContext muleContext, String confFolder, String confFileName) {
       super(muleContext);
+      this.confFolder = confFolder;
+      this.confFileName = confFileName;
     }
 
     @Override
     protected String getPropertiesFileName() {
-      return TEST_CONF_FILE_NAME;
+      return confFileName;
     }
 
     @Override
@@ -166,34 +209,7 @@ public class FileSpanExporterConfigurationTestCase {
 
     @Override
     protected String getConfFolder() {
-      return CONF_FOLDER;
-    }
-  }
-
-  /**
-   * {@link FileSpanExporterConfiguration} used for testing properties file not found.
-   */
-  private static class TestNoFileFoundSpanExporterConfiguration extends FileSpanExporterConfiguration {
-
-    public static final String TEST_NOT_FOUND_CONF_FILE_NAME = "test-not-found.conf";
-
-    public TestNoFileFoundSpanExporterConfiguration(MuleContext muleContext) {
-      super(muleContext);
-    }
-
-    @Override
-    protected String getPropertiesFileName() {
-      return TEST_NOT_FOUND_CONF_FILE_NAME;
-    }
-
-    @Override
-    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-      return Thread.currentThread().getContextClassLoader();
-    }
-
-    @Override
-    protected String getConfFolder() {
-      return CONF_FOLDER_NOT_FOUND;
+      return confFolder;
     }
   }
 }
