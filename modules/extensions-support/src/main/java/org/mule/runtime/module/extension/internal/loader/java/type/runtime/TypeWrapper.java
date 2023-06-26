@@ -10,6 +10,7 @@ import static org.mule.runtime.module.extension.api.loader.java.type.PropertyEle
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
 import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
+
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isPrivate;
 import static java.lang.reflect.Modifier.isStatic;
@@ -61,7 +62,7 @@ public class TypeWrapper implements Type {
   private List<TypeGeneric> generics = emptyList();
   private ResolvableType[] resolvableTypeGenerics = new ResolvableType[] {};
   ClassTypeLoader typeLoader;
-  private LazyValue<Boolean> instantiable;
+  private final LazyValue<Boolean> instantiable;
 
   public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
     this.aClass = aClass != null ? aClass : Object.class;
@@ -133,11 +134,21 @@ public class TypeWrapper implements Type {
    */
   @Override
   public List<FieldElement> getFields() {
+    // Avoid querying fields that would be filtered out anyway
+    if (aClass.isPrimitive() || aClass.isArray() || isJdkClass(aClass)) {
+      return emptyList();
+    }
+
     return IntrospectionUtils.getFields(aClass).stream()
-        .filter(field -> !field.getDeclaringClass().getPackage().getName().startsWith("java."))
+        .filter(field -> !isJdkClass(field.getDeclaringClass()))
         .filter(field -> !isPrivateStaticFinal(field))
+        .filter(field -> !field.isSynthetic())
         .map((Field field) -> new FieldWrapper(field, typeLoader))
         .collect(toList());
+  }
+
+  private static boolean isJdkClass(Class aClass) {
+    return aClass.getPackage().getName().startsWith("java.");
   }
 
   private static boolean isPrivateStaticFinal(Field field) {
