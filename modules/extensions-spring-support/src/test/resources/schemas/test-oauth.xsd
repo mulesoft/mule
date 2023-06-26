@@ -1815,6 +1815,7 @@
           <xs:attribute type="xs:string" use="required" name="defaultPlacement"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="queryParam"></xs:attribute>
           <xs:attribute type="xs:string" use="required" name="header"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="bodyParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>
         </xs:extension>
@@ -2505,6 +2506,7 @@
           <xs:attribute type="mule:expressionList" use="optional" name="stackedTypeArrayParameters"></xs:attribute>
           <xs:attribute type="mule:expressionMap" use="optional" name="stackedTypeMapParameter"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="knownCustomHeader"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="bodyParameter"></xs:attribute>
           <xs:attribute type="mule:substitutableName" use="optional" name="randomHeaders"></xs:attribute>
           <xs:attribute type="xs:string" use="optional" name="anotherConnectionProperties"></xs:attribute>
           <xs:attribute type="mule:expressionInt" use="optional" name="detailsPriority"></xs:attribute>

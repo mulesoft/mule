@@ -7,8 +7,9 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
 import static java.util.Optional.ofNullable;
-import org.mule.runtime.api.util.MultiMap;
+
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.CustomOAuthParameters;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthObjectStoreConfig;
 
@@ -37,8 +38,7 @@ public final class AuthorizationCodeConfig extends OAuthConfig<AuthorizationCode
 
   public AuthorizationCodeConfig(String ownerConfigName,
                                  Optional<OAuthObjectStoreConfig> storeConfig,
-                                 MultiMap<String, String> customParameters,
-                                 MultiMap<String, String> customHeaders,
+                                 CustomOAuthParameters customOAuthParameters,
                                  Map<Field, String> parameterExtractors,
                                  AuthorizationCodeGrantType grantType,
                                  OAuthCallbackConfig callbackConfig,
@@ -50,7 +50,7 @@ public final class AuthorizationCodeConfig extends OAuthConfig<AuthorizationCode
                                  String resourceOwnerId,
                                  String before,
                                  String after) {
-    super(ownerConfigName, storeConfig, customParameters, customHeaders, parameterExtractors);
+    super(ownerConfigName, storeConfig, customOAuthParameters, parameterExtractors);
 
     this.consumerKey = consumerKey;
     this.consumerSecret = consumerSecret;

@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cl
 
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.CLIENT_ID_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.CLIENT_SECRET_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_AUTHORIZATION_CODE_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_CLIENT_CREDENTIALS_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.SCOPES_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.TOKEN_URL_PARAMETER_NAME;
@@ -26,6 +25,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.BaseOAuthConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.CustomOAuthParameters;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
@@ -84,8 +84,7 @@ public class ClientCredentialsConnectionProviderObjectBuilder<C> extends BaseOAu
 
     ClientCredentialsConfig config = new ClientCredentialsConfig(ownerConfigName,
                                                                  buildOAuthObjectStoreConfig(result),
-                                                                 customParameters.getQueryParams(),
-                                                                 customParameters.getHeaders(),
+                                                                 customParameters,
                                                                  callbackValues,
                                                                  clientCredentialsParams.get(CLIENT_ID_PARAMETER_NAME),
                                                                  clientCredentialsParams.get(CLIENT_SECRET_PARAMETER_NAME),

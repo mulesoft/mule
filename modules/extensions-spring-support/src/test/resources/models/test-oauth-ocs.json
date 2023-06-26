@@ -1,7 +1,7 @@
 {
   "name": "Test OAuth Extension",
   "description": "",
-  "version": "@mule.runtime.version@",
+  "version": "4.5.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
@@ -13,7 +13,7 @@
     "prefix": "test-oauth",
     "namespace": "http://www.mulesoft.org/schema/mule/test-oauth",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/test-oauth/current/mule-test-oauth.xsd",
-    "schemaVersion": "@mule.runtime.version@",
+    "schemaVersion": "4.5.0-SNAPSHOT",
     "xsdFileName": "mule-test-oauth.xsd"
   },
   "resources": [],
@@ -21715,7 +21715,7 @@
               "namespace": "MULE"
             }
           },
-          "minMuleVersion": "4.1.1",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -22591,6 +22591,35 @@
                   "name": "header",
                   "description": "",
                   "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 23
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "bodyParameter",
+                  "description": "",
+                  "modelProperties": {}
                 }
               ],
               "exclusiveParametersModels": [],
@@ -22628,7 +22657,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -22672,7 +22701,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -22716,7 +22745,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -22760,7 +22789,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26
+                    "order": 27
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -22789,7 +22818,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -22999,7 +23028,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28,
+                    "order": 29,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -23055,7 +23084,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23086,7 +23115,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23118,7 +23147,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 32
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23150,7 +23179,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 32
+                    "order": 33
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23182,7 +23211,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 33
+                    "order": 34
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -23211,7 +23240,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 34
+                    "order": 35
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23242,7 +23271,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 35
+                    "order": 36
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23276,7 +23305,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 36
+                    "order": 37
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23328,7 +23357,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 37
+                    "order": 38
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23366,7 +23395,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 38
+                    "order": 39
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23397,7 +23426,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 39
+                    "order": 40
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23428,7 +23457,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 40
+                    "order": 41
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -23477,7 +23506,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 41
+                    "order": 42
                   },
                   "allowedStereotypeModels": [
                     {
@@ -23549,6 +23578,7 @@
                 "defaultPlacement",
                 "queryParam",
                 "header",
+                "bodyParameter",
                 "anotherConnectionProperties",
                 "detailsPriority",
                 "profileConnectionProperties",
@@ -34225,6 +34255,35 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "bodyParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "classInformation": {
@@ -34264,7 +34323,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34308,7 +34367,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34352,7 +34411,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34396,7 +34455,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34440,7 +34499,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34469,7 +34528,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34679,7 +34738,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -34735,7 +34794,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34766,7 +34825,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34798,7 +34857,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -34830,7 +34889,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -34877,7 +34936,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -34943,6 +35002,7 @@
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
                 "knownCustomHeader",
+                "bodyParameter",
                 "randomHeaders",
                 "anotherConnectionProperties",
                 "detailsPriority",
@@ -44666,6 +44726,35 @@
                 {
                   "type": {
                     "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": false,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "NOT_SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 20
+                  },
+                  "allowedStereotypeModels": [],
+                  "semanticTerms": [],
+                  "name": "bodyParameter",
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
                     "type": "Object",
                     "annotations": {
                       "classInformation": {
@@ -44705,7 +44794,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 20
+                    "order": 21
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -44749,7 +44838,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 21
+                    "order": 22
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -44793,7 +44882,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 22
+                    "order": 23
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -44837,7 +44926,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 23
+                    "order": 24
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -44881,7 +44970,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 24
+                    "order": 25
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -44910,7 +44999,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 25
+                    "order": 26
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45120,7 +45209,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 26,
+                    "order": 27,
                     "tabName": "Advanced"
                   },
                   "allowedStereotypeModels": [],
@@ -45176,7 +45265,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 27
+                    "order": 28
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -45207,7 +45296,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 28
+                    "order": 29
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -45239,7 +45328,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 29
+                    "order": 30
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [
@@ -45271,7 +45360,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 30
+                    "order": 31
                   },
                   "allowedStereotypeModels": [],
                   "semanticTerms": [],
@@ -45318,7 +45407,7 @@
                     "password": false,
                     "text": false,
                     "query": false,
-                    "order": 31
+                    "order": 32
                   },
                   "allowedStereotypeModels": [
                     {
@@ -45384,6 +45473,7 @@
                 "stackedTypeArrayParameters",
                 "stackedTypeMapParameter",
                 "knownCustomHeader",
+                "bodyParameter",
                 "randomHeaders",
                 "anotherConnectionProperties",
                 "detailsPriority",

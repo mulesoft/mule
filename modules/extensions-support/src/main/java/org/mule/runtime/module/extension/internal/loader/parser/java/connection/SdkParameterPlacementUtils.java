@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.connection;
 
+import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement;
 
 /**
@@ -25,8 +26,10 @@ public class SdkParameterPlacementUtils {
         return HttpParameterPlacement.QUERY_PARAMS;
       case HEADERS:
         return HttpParameterPlacement.HEADERS;
+      case BODY:
+        return HttpParameterPlacement.BODY;
       default:
-        return HttpParameterPlacement.QUERY_PARAMS;
+        throw new IllegalParameterModelDefinitionException("Unknown OAuth Parameter placement: " + parameterPlacement);
     }
   }
 
