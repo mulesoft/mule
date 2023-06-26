@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
-import static java.util.regex.Pattern.compile;
 import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+import static java.util.regex.Pattern.compile;
 
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;

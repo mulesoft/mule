@@ -21,13 +21,13 @@ import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 @Feature(PROFILING)
 @Story(METRICS_IMPLEMENTATION)

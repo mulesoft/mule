@@ -10,13 +10,13 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 import org.mule.runtime.metrics.api.meter.Meter;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.common.AttributesBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+
+import io.opentelemetry.api.common.AttributeKey;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 
 /**
  * {@link Attributes} based on a {@link Meter} for otel export.
