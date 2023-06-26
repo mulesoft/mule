@@ -7,10 +7,8 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.io.File.pathSeparator;
-
-import com.google.common.collect.Lists;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,6 +18,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class ClassPathUrlProvider {
    * @param urls {@link URL}s to be added to the ones already in classpath, not null or empty.
    */
   public ClassPathUrlProvider(List<URL> urls) {
-    checkNotNull(urls, "urls cannot be null");
+    requireNonNull(urls, "urls cannot be null");
 
     this.urls = readUrlsFromSystemProperties();
     this.urls.addAll(urls);
@@ -60,6 +60,7 @@ public class ClassPathUrlProvider {
    */
   private List<URL> readUrlsFromSystemProperties() {
     final Set<URL> urls = new LinkedHashSet<>();
+    addUrlsFromSystemProperty(urls, "jdk.module.path");
     addUrlsFromSystemProperty(urls, "java.class.path");
     addUrlsFromSystemProperty(urls, "sun.boot.class.path");
     addUrlsFromSystemProperty(urls, "surefire.test.class.path");

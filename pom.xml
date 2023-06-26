@@ -232,7 +232,12 @@
         <oldMuleArtifactVersion>4.4.0</oldMuleArtifactVersion>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         
-        <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
+        <surefire.args.base>
+            -XX:+TieredCompilation
+            -Dfile.encoding=UTF-8
+            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
+            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
+        </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
         <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
         <surefire.test.unit.open.args>-XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/java.lang=ALL-UNNAMED ${surefire.args.base}</surefire.test.unit.open.args>

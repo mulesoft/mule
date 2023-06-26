@@ -7,12 +7,19 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.base.Joiner.on;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.base.Joiner.on;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.MuleMavenRepositoryState;
 import org.mule.maven.client.internal.MuleMavenResolutionContext;
@@ -60,8 +67,10 @@ public class DependencyResolver {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private MuleMavenResolutionContext resolutionContext;
-  private MuleMavenRepositoryState repositoryState;
+  private final MavenClient mavenClient;
+
+  private final MuleMavenResolutionContext resolutionContext;
+  private final MuleMavenRepositoryState repositoryState;
 
   /**
    * Creates an instance of the resolver.
@@ -70,7 +79,9 @@ public class DependencyResolver {
    * @param workspaceReader    {@link WorkspaceReader} used to resolve {@link Dependency dependencies} within the workspace.
    */
   public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
-    checkNotNull(mavenConfiguration, "mavenConfiguration cannot be null");
+    requireNonNull(mavenConfiguration, "mavenConfiguration cannot be null");
+
+    this.mavenClient = discoverProvider(MavenClientProvider.class.getClassLoader()).createMavenClient(mavenConfiguration);
 
     this.resolutionContext = new MuleMavenResolutionContext(mavenConfiguration);
     this.repositoryState = new MuleMavenRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,

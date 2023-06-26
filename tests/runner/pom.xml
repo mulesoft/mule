@@ -12,6 +12,16 @@
     <description>Test Runner for Mule Integration Tests</description>
 
     <properties>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.test.runner/org.mule.test.runner.api=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.classification=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.classloader=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.maven=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.utils=junit
+            ${surefire.args.base}
+        </surefire.args>
+
         <javaModuleName>org.mule.test.runner</javaModuleName>
         
         <javassist.version>3.28.0-GA</javassist.version>
