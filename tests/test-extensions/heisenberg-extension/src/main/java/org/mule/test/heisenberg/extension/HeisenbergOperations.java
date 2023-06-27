@@ -657,6 +657,16 @@ public class HeisenbergOperations implements Disposable {
 
   public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {}
 
+  @MediaType(value = ANY, strict = false)
+  public void nonBlocking(@Content(primary = true) @Optional(defaultValue = "#[payload]") TypedValue<Object> content,
+                          CompletionCallback<Object, Object> callback) {
+    final Runnable command = () -> {
+      callback.success(Result.builder().output(content.getValue()).build());
+    };
+
+    executor.get().execute(command);
+  }
+
   @OutputResolver(output = HeisenbergOutputResolver.class)
   public Map<String, Object> getInjectedObjects(@Optional Object object, @Optional Serializable serializable) {
     return ImmutableMap.<String, Object>builder()
