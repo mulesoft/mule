@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -13,7 +13,11 @@ import static java.util.Collections.emptySet;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.api.TestContainerClassLoaderAssembler;
+import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
+import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
+import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -82,7 +86,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   protected MuleArtifactClassLoader createLauncherArtifactClassLoader() {
     ClassLoader launcherClassLoader = this.getClass().getClassLoader();
 
-    return new MuleArtifactClassLoader("mule", new ArtifactDescriptor("mule"), new URL[0], launcherClassLoader,
+    return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
                                        new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
 
       @Override

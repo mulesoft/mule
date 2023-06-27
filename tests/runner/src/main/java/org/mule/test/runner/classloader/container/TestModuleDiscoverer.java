@@ -4,10 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.ModuleDiscoverer;
 
 import java.util.ArrayList;
 import java.util.HashSet;

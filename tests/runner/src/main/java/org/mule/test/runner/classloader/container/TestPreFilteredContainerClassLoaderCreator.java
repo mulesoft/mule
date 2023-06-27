@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
 
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -12,6 +12,10 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;

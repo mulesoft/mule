@@ -4,7 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
+
+import org.mule.runtime.container.internal.ClasspathTestModuleDiscoverer;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
+import org.mule.runtime.container.internal.ModuleDiscoverer;
 
 import java.util.List;
 
