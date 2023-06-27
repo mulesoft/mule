@@ -33,6 +33,7 @@
         <module>model</module>
         <module>http-resource-service</module>
         <module>core-functional-tests</module>
+        <module>module-extensions-spring-support-functional-tests</module>
     </modules>
 
     <build>

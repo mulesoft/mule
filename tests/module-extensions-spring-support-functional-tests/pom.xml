@@ -1,111 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.mule.runtime</groupId>
-        <artifactId>mule-modules</artifactId>
+        <groupId>org.mule.tests</groupId>
+        <artifactId>mule-tests</artifactId>
         <version>4.5.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-extensions-spring-support</artifactId>
-    <name>Mule Extensions Spring Support</name>
+    <artifactId>mule-module-extensions-spring-support-functional-tests</artifactId>
     <packaging>jar</packaging>
-    <description>
-        Support for extensions to be configured through a mule config file
-        backed by the spring framework
-    </description>
+    <name>Mule Extensions Spring Support Functional Tests</name>
+    <description>Module for testing extensions spring support features in a functional way</description>
 
     <properties>
         <surefire.args>${surefire.test.unit.open.args}</surefire.args>
 
-        <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
-        <skipExportTests>false</skipExportTests>
+        <javaModuleName>org.mule.test.core.functional</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsoup.version>1.15.3</jsoup.version>
-        <mule.runtime.version>${project.version}</mule.runtime.version>
     </properties>
 
-    <build>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test/resources</directory>
-                <includes>
-                    <include>**/*.json</include>
-                </includes>
-                <filtering>true</filtering>
-            </testResource>
-            <testResource>
-                <directory>${basedir}/src/test/resources</directory>
-                <excludes>
-                    <exclude>**/*.json</exclude>
-                </excludes>
-                <filtering>false</filtering>
-            </testResource>
-        </testResources>
-    </build>
-
     <dependencies>
-
-        <!-- Dependencies for the JavaDocReader-->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
-        </dependency>
-
-        <!-- Mule Dependencies -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-soap-support</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <!-- TypedValueParameterOperationExecutionTestCase fails if this dependency is not here, even if it comes transitively -->
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-metadata-model-xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-dsl-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-tls</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-javaee</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -117,12 +32,62 @@
             <!-- the app classpath, this needs to go into the container classloader -->
             <scope>provided</scope>
         </dependency>
+        <!--TODO: MULE-10837-->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-service</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--TODO: MULE-11030 remove dependency-->
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-dwb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-extensions-support</artifactId>
+            <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-extensions-spring-support</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--TODO: MULE-10837-->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-service</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests.plugin</groupId>
+            <artifactId>mule-tests-component-plugin</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-runner</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -133,43 +98,40 @@
         </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-runner</artifactId>
+            <artifactId>mule-tests-unit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.testing.compile</groupId>
-            <artifactId>compile-testing</artifactId>
-            <version>0.14</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                </exclusion>
-            </exclusions>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.saxon</groupId>
-            <artifactId>Saxon-HE</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-model</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-api</artifactId>
-            <version>${muleApiVersion}</version>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
 
         <!-- Test Extensions dependencies -->
-
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>test-components</artifactId>
+            <version>${muleTestComponentsVersion}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
+                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
+                    <groupId>org.mule.sdk</groupId>
+                    <artifactId>mule-sdk-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-metadata-extension</artifactId>
@@ -362,54 +324,10 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
-        <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--TODO: MULE-11030 remove dependency-->
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
-            <classifier>mule-service</classifier>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-dwb-api</artifactId> 
-            <scope>provided</scope>             
-        </dependency>         
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-allure</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <version>${jsonassert.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.tests.plugin</groupId>
-            <artifactId>mule-tests-component-plugin</artifactId>
-            <version>${project.version}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
+            <artifactId>mule-module-extensions-support</artifactId>
+            <version>4.5.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

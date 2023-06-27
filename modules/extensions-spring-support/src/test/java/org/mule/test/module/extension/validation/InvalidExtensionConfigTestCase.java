@@ -23,7 +23,6 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.VeganExtension;
-import org.mule.tests.api.TestComponentsExtension;
 
 import java.util.ArrayList;
 import java.util.List;
