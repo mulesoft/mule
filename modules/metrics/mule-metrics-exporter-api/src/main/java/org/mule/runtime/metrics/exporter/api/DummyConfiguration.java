@@ -16,4 +16,6 @@ public interface DummyConfiguration {
   public String getExporterType();
 
   public Integer getExportingInterval();
+
+  public String getArtifactId();
 }

@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.metrics.api.meter.Meter;
+import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.impl.meter.repository.MeterRepository;
 
 import io.qameta.allure.Feature;
@@ -31,7 +32,11 @@ public class DefaultMeterTestCase {
   @Test
   public void testBuilderWithoutMeterRepositoryWithoutDescription() {
     String meterName = "test-meter";
-    Meter meter = DefaultMeter.builder(meterName).build();
+    MeterExporter meterExporter = mock(MeterExporter.class);
+    Meter meter = DefaultMeter
+        .builder(meterName)
+        .withMeterExporter(meterExporter)
+        .build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), isEmptyOrNullString());
   }
@@ -40,7 +45,11 @@ public class DefaultMeterTestCase {
   public void testBuilderWithoutMeterRepositoryWithDescription() {
     String meterName = "test-meter";
     String testEmptyString = "Test empty string";
-    Meter meter = DefaultMeter.builder(meterName).withDescription(testEmptyString).build();
+    MeterExporter meterExporter = mock(MeterExporter.class);
+    Meter meter = DefaultMeter.builder(meterName)
+        .withMeterExporter(meterExporter)
+        .withDescription(testEmptyString)
+        .build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), equalTo(testEmptyString));
   }
@@ -49,7 +58,11 @@ public class DefaultMeterTestCase {
   public void testBuilderWithMeterRepositoryWithoutDescription() {
     String meterName = "test-meter";
     MeterRepository meterRepository = mock(MeterRepository.class);
-    Meter meter = DefaultMeter.builder(meterName).withMeterRepository(meterRepository).build();
+    MeterExporter meterExporter = mock(MeterExporter.class);
+    Meter meter = DefaultMeter.builder(meterName)
+        .withMeterExporter(meterExporter)
+        .withMeterRepository(meterRepository)
+        .build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), isEmptyOrNullString());
     verify(meterRepository).create(eq(meterName), any());
@@ -60,7 +73,12 @@ public class DefaultMeterTestCase {
     String meterName = "test-meter";
     String testEmptyString = "Test empty string";
     MeterRepository meterRepository = mock(MeterRepository.class);
-    Meter meter = DefaultMeter.builder(meterName).withMeterRepository(meterRepository).withDescription(testEmptyString).build();
+    MeterExporter meterExporter = mock(MeterExporter.class);
+    Meter meter = DefaultMeter.builder(meterName)
+        .withMeterExporter(meterExporter)
+        .withMeterRepository(meterRepository)
+        .withDescription(testEmptyString)
+        .build();
     assertThat(meter.getName(), equalTo(meterName));
     assertThat(meter.getDescription(), equalTo(testEmptyString));
     verify(meterRepository).create(eq(meterName), any());

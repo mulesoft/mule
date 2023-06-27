@@ -6,8 +6,12 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
+import org.mule.runtime.metrics.api.meter.Meter;
+
 /**
- * A counter for register long measurements.
+ * A counter for registering long measurements that can be incremented/decreased.
+ *
+ * @since 4.5.0
  */
 public interface LongUpDownCounter extends Instrument {
 
@@ -19,9 +23,14 @@ public interface LongUpDownCounter extends Instrument {
   void add(long value);
 
   /**
-   * @return the value for the counter.
+   * @return the value for the counter as a long.
    */
-  long getValue();
+  long getValueAsLong();
+
+  /**
+   * @return the value for the counter as a int.
+   */
+  int getValueAsInt();
 
   /**
    * @return the unit for this measurement.
@@ -29,7 +38,36 @@ public interface LongUpDownCounter extends Instrument {
   String getUnit();
 
   /**
-   * @return the meter name for this counter.
+   * @return the {@link Meter}.
    */
-  String getMeterName();
+  Meter getMeter();
+
+  /**
+   * increments the counter and gets the value as an int.
+   *
+   * @return the resulting value as int.
+   */
+  int incrementAndGetAsInt();
+
+  /**
+   * increments the counter and gets the value as a long.
+   *
+   * @return the resulting value as long.
+   */
+  long incrementAndGetAsLong();
+
+  /**
+   * decrements the counter and gets the value as an int.
+   *
+   * @return the resulting value as int.
+   */
+  int decrementAndGetAsInt();
+
+  /**
+   * decrements the counter and gets the value as a long.
+   *
+   * @return the resulting value as long.
+   */
+  long decrementAndGetAsLong();
+
 }

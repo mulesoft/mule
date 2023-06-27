@@ -13,6 +13,8 @@ import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
  * A runtime managed provider to obtain {@link Meter}.
  *
  * @see Meter
+ *
+ * @since 4.5.0
  */
 public interface MeterProvider {
 

@@ -8,32 +8,33 @@ package org.mule.runtime.metrics.api.instrument.builder;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 /**
- * Builder class for {@link LongCounter}
+ * Builder class for {@link LongCounter}.
+ *
+ * @since 4.5.0
  */
-public interface LongCounterBuilder {
+public interface LongCounterBuilder extends InstrumentBuilder<LongCounter> {
 
   /**
-   * Sets the description for the instrument to build.
-   *
-   * @param description The description.
-   *
-   * @return the {@link LongCounterBuilder}
+   * @param consumerForAddOperation the {@link Consumer} to be invoked when the {@link LongCounter#add(long)} is invoked.
+   * @return {@link LongCounterBuilder}.
    */
-  LongCounterBuilder withDescription(String description);
+  LongCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation);
 
   /**
-   * Sets the unit for this instrument to build.
-   *
-   * @param unit the unit.
-   *
-   * @@return the {@link LongCounterBuilder}.
+   * @param supplierForIncrementAndGetOperation the {@link Supplier} to be used when {@link LongCounter#incrementAndGetAsInt()}
+   *                                            and {@link LongCounter#incrementAndGetAsLong()} are invoked.
+   * @return the {@link LongCounterBuilder}.
    */
-  LongCounterBuilder withUnit(String unit);
+  LongCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation);
 
   /**
-   * @return the {@link LongCounter}.
+   * @param valueSupplier the value {@link Supplier} to invoke when {@link LongCounter#getValueAsLong()} and
+   *                      {@link LongCounter#getValueAsInt()} are invoked.
+   * @return the corresponding {@link LongCounterBuilder}
    */
-  LongCounter build();
-
+  LongCounterBuilder withValueSupplier(Supplier<Long> valueSupplier);
 }

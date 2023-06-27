@@ -8,6 +8,7 @@
 package org.mule.runtime.core.api.management.stats;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.metrics.api.MeterProvider;
 
 /**
  * Maintains different statistics for {@link org.mule.runtime.core.api.construct.FlowConstruct} instances
@@ -188,4 +189,10 @@ public interface FlowConstructStatistics extends Statistics {
    */
   ResetOnQueryCounter getDispatchedMessagesCounter();
 
+  /**
+   * Tracks the statistics using the provided {@link MeterProvider}
+   *
+   * @param meterProvider the {@link MeterProvider} to use for tracking.
+   */
+  default void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {}
 }

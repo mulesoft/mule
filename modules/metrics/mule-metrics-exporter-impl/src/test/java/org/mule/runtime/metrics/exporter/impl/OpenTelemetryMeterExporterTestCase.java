@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
@@ -58,18 +59,26 @@ public class OpenTelemetryMeterExporterTestCase {
       public Integer getExportingInterval() {
         return 1;
       }
+
+      @Override
+      public String getArtifactId() {
+        return "app";
+      }
     };
 
-    meter = DefaultMeter.builder("testMetricName").build();
+    MeterExporter meterExporter = mock(MeterExporter.class);
+    meter = DefaultMeter.builder("testMetricName").withMeterExporter(meterExporter).build();
     longCounter = meter.counterBuilder("long-counter-test").withDescription("Long Counter test")
         .withUnit("test-unit").build();
-    longUpDownCounter = meter.upDownCounterBuilder("long-up-down-counter-test").withDescription("Long UpDownCounter test")
-        .withUnit("test-unit").withInitialValue(50L).build();
+    longUpDownCounter = meter.upDownCounterBuilder("long-up-down-counter-test")
+        .withInitialValue(50L)
+        .withDescription("Long UpDownCounter test")
+        .withUnit("test-unit").build();
   }
 
   @Test
   public void exporterShouldExportLongCounterMetricSuccessfully() {
-    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new OpenTelemetryMeterExporterFactory();
+    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
     MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
     InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
 
@@ -103,7 +112,7 @@ public class OpenTelemetryMeterExporterTestCase {
 
   @Test
   public void exporterShouldExportUpDownCounterMetricSuccessfully() {
-    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new OpenTelemetryMeterExporterFactory();
+    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
     MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
     InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
 
@@ -141,4 +150,11 @@ public class OpenTelemetryMeterExporterTestCase {
         .filter(metricData -> metricData.getName().equals(name)).collect(Collectors.toList());
   }
 
+  private class TestOpenTelemetryMeterExporterFactory extends OpenTelemetryMeterExporterFactory {
+
+    @Override
+    protected String getResourceId() {
+      return "app";
+    }
+  }
 }

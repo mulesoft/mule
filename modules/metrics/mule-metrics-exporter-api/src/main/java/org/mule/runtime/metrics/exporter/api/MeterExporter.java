@@ -37,4 +37,9 @@ public interface MeterExporter {
    * @param upDownCounter the instrument to export.
    */
   void enableExport(LongUpDownCounter upDownCounter);
+
+  /**
+   * Disposes the {@link MeterExporter}.
+   */
+  void dispose();
 }

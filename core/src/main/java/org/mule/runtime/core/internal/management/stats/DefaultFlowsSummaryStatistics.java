@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+
 import static java.util.regex.Pattern.compile;
 
+import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.FlowsSummaryStatistics;
+import org.mule.runtime.metrics.api.meter.Meter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -39,6 +43,20 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
   private static final Pattern APIKIT_SOAP_FLOWNAME_PATTERN = compile(APIKIT_SOAP_FLOWNAME_REGEX);
 
   private static final long serialVersionUID = 1L;
+  public static final String FLOWS_SUMMARY_APP_STATISTICS_NAME = "flows-summary-statistic";
+  public static final String FLOWS_SUMMARY_APP_STATISTICS_DESCRIPTION_TEMPLATE = "Flow summary statistics";
+  public static final String DECLARED_PRIVATE_FLOWS_APP_NAME = "declared-private-flows";
+  public static final String DECLARED_PRIVATE_FLOWS_APP_DESCRIPTION = "Declared Private Flows";
+  public static final String ACTIVE_PRIVATE_FLOWS_APP_NAME = "active-private-flows";
+  public static final String ACTIVE_PRIVATE_FLOWS_APP_DESCRIPTION = "Activate Private Flows";
+  public static final String DECLARED_TRIGGER_FLOWS_APP_NAME = "declared-trigger-flows";
+  public static final String DECLARED_TRIGGER_FLOWS_APP_DESCRIPTION = "Declared Trigger Flows";
+  public static final String ACTIVE_TRIGGER_FLOWS_NAME = "active-trigger-flows";
+  public static final String ACTIVE_TRIGGER_FLOWS_DESCRIPTION = "Active Trigger Flows";
+  public static final String DECLARED_APIKIT_FLOWS_APP_NAME = "declared-apikit-flows";
+  public static final String DECLARED_APIKIT_FLOWS_APP_DESCRIPTION = "Declared ApiKit Flows";
+  public static final String ACTIVE_APIKIT_FLOWS_APP_NAME = "active-apikit-flows";
+  public static final String ACTIVE_APIKIT_FLOWS_APP_DESCRIPTION = "Active Apikit Flows";
 
   private final boolean enabled;
 
@@ -153,4 +171,56 @@ public class DefaultFlowsSummaryStatistics implements FlowsSummaryStatistics {
         || APIKIT_SOAP_FLOWNAME_PATTERN.matcher(flowName).matches();
   }
 
+  @Override
+  public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
+    String artifactId = meterProvider.getArtifactId();
+    Meter meter = meterProvider.getMeterBuilder(FLOWS_SUMMARY_APP_STATISTICS_NAME)
+        .withDescription(FLOWS_SUMMARY_APP_STATISTICS_DESCRIPTION_TEMPLATE)
+        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId)
+        .build();
+
+    // Register the declared private flows.
+    meter.counterBuilder(DECLARED_PRIVATE_FLOWS_APP_NAME)
+        .withValueSupplier(() -> (long) declaredPrivateFlows.get())
+        .withConsumerForAddOperation(value -> declaredPrivateFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredPrivateFlows.incrementAndGet())
+        .withDescription(DECLARED_PRIVATE_FLOWS_APP_DESCRIPTION).build();
+
+
+    // Register the active private flows.
+    meter.counterBuilder(ACTIVE_PRIVATE_FLOWS_APP_NAME)
+        .withValueSupplier(() -> (long) activePrivateFlows.get())
+        .withConsumerForAddOperation(value -> activePrivateFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activePrivateFlows.incrementAndGet())
+        .withDescription(ACTIVE_PRIVATE_FLOWS_APP_DESCRIPTION).build();
+
+    // Register the declared trigger flows.
+    meter.counterBuilder(DECLARED_TRIGGER_FLOWS_APP_NAME)
+        .withValueSupplier(() -> (long) declaredTriggerFlows.get())
+        .withConsumerForAddOperation(value -> declaredTriggerFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredTriggerFlows.incrementAndGet())
+        .withDescription(DECLARED_TRIGGER_FLOWS_APP_DESCRIPTION).build();
+
+
+    // Register the active trigger flows.
+    meter.counterBuilder(ACTIVE_TRIGGER_FLOWS_NAME)
+        .withValueSupplier(() -> (long) activeTriggerFlows.get())
+        .withConsumerForAddOperation(value -> activeTriggerFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activeTriggerFlows.incrementAndGet())
+        .withDescription(ACTIVE_TRIGGER_FLOWS_DESCRIPTION).build();
+
+    // Register the declared apikit flows.
+    meter.counterBuilder(DECLARED_APIKIT_FLOWS_APP_NAME)
+        .withValueSupplier(() -> (long) declaredApikitFlows.get())
+        .withConsumerForAddOperation(value -> declaredApikitFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) declaredApikitFlows.incrementAndGet())
+        .withDescription(DECLARED_APIKIT_FLOWS_APP_DESCRIPTION).build();
+
+    // Register the active apikit flows.
+    meter.counterBuilder(ACTIVE_APIKIT_FLOWS_APP_NAME)
+        .withValueSupplier(() -> (long) activeApikitFlows.get())
+        .withConsumerForAddOperation(value -> activeApikitFlows.addAndGet(value.intValue()))
+        .withSupplierForIncrementAndGetOperation(() -> (long) activeApikitFlows.incrementAndGet())
+        .withDescription(ACTIVE_APIKIT_FLOWS_APP_DESCRIPTION).build();
+  }
 }

@@ -14,6 +14,8 @@ import java.util.function.Function;
 
 /**
  * A repository for {@link Instrument}.
+ *
+ * @since 4.5.0
  */
 public class InstrumentRepository {
 
