@@ -131,10 +131,6 @@ public class HeisenbergRouters implements Initialisable, Startable, Stoppable, D
                   RouterCompletionCallback callback) {
     Map<String, Object> attr = withAttributes.stream().collect(toMap(Attribute::getName, r -> r));
 
-    if (beforeCallAssertions == null && afterCallAssertions == null) {
-      callback.success(Result.builder().build());
-    }
-
     if (beforeCallAssertions != null) {
       beforeCallAssertions.getChain()
           // Control de payload/attributes of the chain execution
