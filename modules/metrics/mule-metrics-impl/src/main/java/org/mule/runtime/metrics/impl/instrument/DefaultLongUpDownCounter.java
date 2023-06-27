@@ -15,6 +15,8 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link LongUpDownCounter}.
@@ -33,11 +35,20 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
   private final Meter meter;
   private final AtomicLong value;
 
+  private Consumer<Long> consumerForAddOperation;
+  private Supplier<Long> supplierForIncrementAndGetOperation;
+  private Supplier<Long> supplierForDecrementAndGetOperation;
+  private Supplier<Long> valueSupplier;
+
   private DefaultLongUpDownCounter(String name, String description, String unit, long initialValue, Meter meter) {
     this.name = name;
     this.description = description;
     this.initialValue = initialValue;
     this.value = new AtomicLong(initialValue);
+    this.valueSupplier = value::get;
+    this.supplierForDecrementAndGetOperation = value::decrementAndGet;
+    this.supplierForIncrementAndGetOperation = value::incrementAndGet;
+    this.consumerForAddOperation = value::addAndGet;
     this.unit = unit;
     this.meter = meter;
   }
@@ -54,17 +65,17 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
 
   @Override
   public void add(long value) {
-    this.value.addAndGet(value);
+    this.consumerForAddOperation.accept(value);
   }
 
   @Override
   public long getValueAsLong() {
-    return value.longValue();
+    return valueSupplier.get().longValue();
   }
 
   @Override
   public int getValueAsInt() {
-    return value.intValue();
+    return valueSupplier.get().intValue();
   }
 
   @Override
@@ -79,22 +90,38 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
 
   @Override
   public int incrementAndGetAsInt() {
-    return (int) value.incrementAndGet();
+    return supplierForIncrementAndGetOperation.get().intValue();
   }
 
   @Override
   public long incrementAndGetAsLong() {
-    return value.incrementAndGet();
+    return supplierForIncrementAndGetOperation.get();
   }
 
   @Override
   public int decrementAndGetAsInt() {
-    return (int) value.decrementAndGet();
+    return supplierForDecrementAndGetOperation.get().intValue();
   }
 
   @Override
   public long decrementAndGetAsLong() {
-    return value.decrementAndGet();
+    return supplierForDecrementAndGetOperation.get();
+  }
+
+  private void setValueSupplier(Supplier<Long> valueSupplier) {
+    this.valueSupplier = valueSupplier;
+  }
+
+  private void setSupplierForDecrementAndGetOperation(Supplier<Long> supplierForDecrementAndGetOperation) {
+    this.supplierForDecrementAndGetOperation = supplierForDecrementAndGetOperation;
+  }
+
+  private void setSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation) {
+    this.supplierForIncrementAndGetOperation = supplierForIncrementAndGetOperation;
+  }
+
+  private void setConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+    this.consumerForAddOperation = consumerForAddOperation;
   }
 
   @Override
@@ -112,6 +139,11 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     private String unit;
     private long initialValue;
     private MeterExporter meterExporter;
+
+    private Consumer<Long> consumerForAddOperation;
+    private Supplier<Long> supplierForIncrementAndGetOperation;
+    private Supplier<Long> supplierForDecrementAndGetOperation;
+    private Supplier<Long> valueSupplier;
 
     public DefaultLongUpDownCounterBuilder(String name, Meter meter) {
       this.name = name;
@@ -147,6 +179,30 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     }
 
     @Override
+    public DefaultLongUpDownCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+      this.consumerForAddOperation = consumerForAddOperation;
+      return this;
+    }
+
+    @Override
+    public DefaultLongUpDownCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementAndGetOperation) {
+      this.supplierForIncrementAndGetOperation = supplierForIncrementAndGetOperation;
+      return this;
+    }
+
+    @Override
+    public DefaultLongUpDownCounterBuilder withSupplierForDecrementAndGetOperation(Supplier<Long> supplierForDecrementAndGetOperation) {
+      this.supplierForDecrementAndGetOperation = supplierForDecrementAndGetOperation;
+      return this;
+    }
+
+    @Override
+    public LongUpDownCounterBuilder withValueSupplier(Supplier<Long> valueSupplier) {
+      this.valueSupplier = valueSupplier;
+      return this;
+    }
+
+    @Override
     public LongUpDownCounter build() {
       LongUpDownCounter longUpDownCounter = ofNullable(instrumentRepository)
           .map(repository -> (LongUpDownCounter) repository.create(name,
@@ -162,7 +218,25 @@ public class DefaultLongUpDownCounter implements LongUpDownCounter {
     }
 
     private LongUpDownCounter doBuild(String name, String description, String unit, long initialValue, Meter meter) {
-      return new DefaultLongUpDownCounter(name, description, unit, initialValue, meter);
+      DefaultLongUpDownCounter longUpDownCounter = new DefaultLongUpDownCounter(name, description, unit, initialValue, meter);
+
+      if (consumerForAddOperation != null) {
+        longUpDownCounter.setConsumerForAddOperation(consumerForAddOperation);
+      }
+
+      if (supplierForIncrementAndGetOperation != null) {
+        longUpDownCounter.setSupplierForIncrementAndGetOperation(supplierForIncrementAndGetOperation);
+      }
+
+      if (supplierForDecrementAndGetOperation != null) {
+        longUpDownCounter.setSupplierForDecrementAndGetOperation(supplierForDecrementAndGetOperation);
+      }
+
+      if (valueSupplier != null) {
+        longUpDownCounter.setValueSupplier(valueSupplier);
+      }
+
+      return longUpDownCounter;
     }
 
   }

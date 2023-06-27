@@ -8,8 +8,6 @@ package org.mule.runtime.metrics.api.meter;
 
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
-import org.mule.runtime.metrics.api.instrument.registration.LongCounterRegistrationHelper;
-import org.mule.runtime.metrics.api.instrument.registration.LongUpDownCounterRegistrationHelper;
 
 import java.util.function.BiConsumer;
 
@@ -53,15 +51,4 @@ public interface Meter {
    */
   LongCounterBuilder counterBuilder(String name);
 
-  /**
-   * @param counterName the name of the instrument.
-   * @return the {@link LongCounterRegistrationHelper}
-   */
-  LongCounterRegistrationHelper counterRegistrationHelper(String counterName);
-
-  /**
-   * @param counterName the name of the instrument.
-   * @return the {@link LongUpDownCounterRegistrationHelper}
-   */
-  LongUpDownCounterRegistrationHelper upDownCounterRegistrationHelper(String counterName);
 }

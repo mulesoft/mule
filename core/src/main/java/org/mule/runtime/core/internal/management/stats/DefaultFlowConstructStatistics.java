@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   private static final long serialVersionUID = 5337576392583767442L;
-  public static final String FLOW_CONSTRUCT_STATISTICS_NAME_TEMPLATE = "flow.construct.statistics";
-  public static final String FLOW_CONSTRUCT_STATISTICS_DESCRIPTION_TEMPLATE = "Flow Construct Statistics";
+  public static final String FLOW_CONSTRUCT_STATISTICS_NAME = "flow.construct.statistics";
+  public static final String FLOW_CONSTRUCT_STATISTICS_DESCRIPTION = "Flow Construct Statistics";
   public static final String RECEIVED_EVENTS_NAME = "received.events";
   public static final String RECEIVED_EVENTS_DESCRIPTION = "Received Events";
   public static final String DISPATCHED_MESSAGES_NAME = "dispatched.messages";
@@ -249,36 +249,36 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
     String artifactId = getName() + "-" + meterProvider.getArtifactId();
-    Meter meter = meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME_TEMPLATE)
-        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION_TEMPLATE)
+    Meter meter = meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
+        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
         .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
 
     // Register the declared private flows.
-    meter.counterRegistrationHelper(RECEIVED_EVENTS_NAME)
+    meter.counterBuilder(RECEIVED_EVENTS_NAME)
         .withValueSupplier(receivedEvents::get)
         .withConsumerForAddOperation(receivedEvents::addAndGet)
         .withSupplierForIncrementAndGetOperation(receivedEvents::incrementAndGet)
-        .withDescription(RECEIVED_EVENTS_DESCRIPTION).register();
+        .withDescription(RECEIVED_EVENTS_DESCRIPTION).build();
 
     // Register the dispatched messages counter
-    meter.counterRegistrationHelper(DISPATCHED_MESSAGES_NAME)
+    meter.counterBuilder(DISPATCHED_MESSAGES_NAME)
         .withValueSupplier(dispatchedMessages::get)
         .withConsumerForAddOperation(dispatchedMessages::addAndGet)
         .withSupplierForIncrementAndGetOperation(dispatchedMessages::incrementAndGet)
-        .withDescription(DISPATCHED_MESSAGES_DESCRIPTION).register();
+        .withDescription(DISPATCHED_MESSAGES_DESCRIPTION).build();
 
     // Register the execution errors counter
-    meter.counterRegistrationHelper(EXECUTION_ERRORS_NAME)
+    meter.counterBuilder(EXECUTION_ERRORS_NAME)
         .withValueSupplier(executionError::get)
         .withConsumerForAddOperation(executionError::addAndGet)
         .withSupplierForIncrementAndGetOperation(executionError::incrementAndGet)
-        .withDescription(EXECUTION_ERRORS_DESCRIPTION).register();
+        .withDescription(EXECUTION_ERRORS_DESCRIPTION).build();
 
     // Register the fatal errors counter
-    meter.counterRegistrationHelper(FATAL_ERRORS_NAME)
+    meter.counterBuilder(FATAL_ERRORS_NAME)
         .withValueSupplier(fatalError::get)
         .withConsumerForAddOperation(fatalError::addAndGet)
         .withSupplierForIncrementAndGetOperation(fatalError::incrementAndGet)
-        .withDescription(FATAL_ERRORS_DESCRIPTION).register();
+        .withDescription(FATAL_ERRORS_DESCRIPTION).build();
   }
 }

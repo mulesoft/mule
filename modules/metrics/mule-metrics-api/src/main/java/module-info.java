@@ -16,7 +16,6 @@ module org.mule.runtime.metrics.api {
   exports org.mule.runtime.metrics.api;
   exports org.mule.runtime.metrics.api.instrument;
   exports org.mule.runtime.metrics.api.instrument.builder;
-  exports org.mule.runtime.metrics.api.instrument.registration;
   exports org.mule.runtime.metrics.api.meter;
   exports org.mule.runtime.metrics.api.meter.builder;
 

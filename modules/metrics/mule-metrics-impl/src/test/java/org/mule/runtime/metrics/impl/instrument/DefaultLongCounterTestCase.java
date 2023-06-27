@@ -7,7 +7,6 @@
 package org.mule.runtime.metrics.impl.instrument;
 
 import static org.mule.runtime.metrics.impl.instrument.DefaultLongCounter.builder;
-import static org.mule.runtime.metrics.impl.instrument.ValueSupplierBasedLongCounter.getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_IMPLEMENTATION;
 
@@ -64,13 +63,13 @@ public class DefaultLongCounterTestCase {
     when(meter.getName()).thenReturn(meterName);
     AtomicLong value = new AtomicLong(0);
     LongCounter longCounter =
-        getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper(instrumentName, meter)
+        DefaultLongCounter.builder(instrumentName, meter)
             .withDescription(instrumentDescription)
             .withUnit(unit)
             .withSupplierForIncrementAndGetOperation(value::incrementAndGet)
             .withConsumerForAddOperation(value::addAndGet)
             .withValueSupplier(value::get)
-            .register();
+            .build();
     assertThat(longCounter.getName(), equalTo(instrumentName));
     assertThat(longCounter.getDescription(), equalTo(instrumentDescription));
     assertThat(longCounter.getUnit(), equalTo(unit));
@@ -112,14 +111,14 @@ public class DefaultLongCounterTestCase {
     InstrumentRepository repository = new TestRepository();
     AtomicLong value = new AtomicLong(0);
     LongCounter longCounter =
-        getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper(instrumentName, meter)
+        DefaultLongCounter.builder(instrumentName, meter)
             .withDescription(instrumentDescription)
             .withUnit(unit)
             .withSupplierForIncrementAndGetOperation(value::incrementAndGet)
             .withConsumerForAddOperation(value::addAndGet)
             .withValueSupplier(value::get)
             .withInstrumentRepository(repository)
-            .register();
+            .build();
     assertThat(longCounter.getName(), equalTo(instrumentName));
     assertThat(longCounter.getDescription(), equalTo(instrumentDescription));
     assertThat(longCounter.getUnit(), equalTo(unit));
@@ -153,13 +152,13 @@ public class DefaultLongCounterTestCase {
     AtomicLong value = new AtomicLong(0);
     Meter meter = mock(Meter.class);
     LongCounter longCounter =
-        getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper(instrumentName, meter)
+        DefaultLongCounter.builder(instrumentName, meter)
             .withDescription(instrumentDescription)
             .withUnit(unit)
             .withSupplierForIncrementAndGetOperation(value::incrementAndGet)
             .withConsumerForAddOperation(value::addAndGet)
             .withValueSupplier(value::get)
-            .register();
+            .build();
     longCounter.add(-10);
   }
 

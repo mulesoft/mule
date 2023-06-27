@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.metrics.impl.meter;
 
-import static org.mule.runtime.metrics.impl.instrument.registration.ValueSupplierBasedUpDownLongCounter.getValueSupplierBasedLongUpDownCounterRegistrationWithInstrumentRepositoryHelper;
-import static org.mule.runtime.metrics.impl.instrument.ValueSupplierBasedLongCounter.getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper;
-
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
@@ -16,8 +13,6 @@ import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
-import org.mule.runtime.metrics.api.instrument.registration.LongCounterRegistrationHelper;
-import org.mule.runtime.metrics.api.instrument.registration.LongUpDownCounterRegistrationHelper;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.impl.instrument.DefaultLongCounter;
 import org.mule.runtime.metrics.impl.instrument.DefaultLongUpDownCounter;
@@ -81,21 +76,6 @@ public class DefaultMeter implements Meter {
         .withMeterExporter(meterExporter);
   }
 
-  @Override
-  public LongCounterRegistrationHelper counterRegistrationHelper(String counterName) {
-    return getValueSupplierBasedLongCounterRegistrationWithInstrumentRepositoryHelper(counterName,
-                                                                                      this)
-                                                                                          .withInstrumentRepository(instrumentRepository)
-                                                                                          .withMeterExporter(meterExporter);
-  }
-
-  @Override
-  public LongUpDownCounterRegistrationHelper upDownCounterRegistrationHelper(String counterName) {
-    return getValueSupplierBasedLongUpDownCounterRegistrationWithInstrumentRepositoryHelper(counterName,
-                                                                                            this,
-                                                                                            instrumentRepository);
-  }
-
   private static class DefaultMeterBuilder implements MeterBuilderWithRepository {
 
     private final String meterName;
@@ -103,7 +83,7 @@ public class DefaultMeter implements Meter {
     private MeterRepository meterRepository;
     private MeterExporter meterExporter;
 
-    private Map<String, String> meterAttributes = new HashMap<>();
+    private final Map<String, String> meterAttributes = new HashMap<>();
 
     public DefaultMeterBuilder(String meterName) {
       this.meterName = meterName;

@@ -15,6 +15,8 @@ import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * An implementation of {@link LongCounter}.
@@ -29,7 +31,13 @@ public class DefaultLongCounter implements LongCounter {
   private final String name;
   private final String description;
   private final String unit;
-  private Meter meter;
+  private final Meter meter;
+
+  private Supplier<Long> valueSupplier = value::get;
+
+  private Consumer<Long> addOperation = value::addAndGet;
+
+  private Supplier<Long> incrementAndGetOperation = value::incrementAndGet;
 
   private DefaultLongCounter(String name, String description, String unit, Meter meter) {
     this.name = name;
@@ -58,12 +66,13 @@ public class DefaultLongCounter implements LongCounter {
     if (value < 0) {
       throw new IllegalArgumentException("The value to add must be positive");
     }
-    this.value.addAndGet(value);
+
+    addOperation.accept(value);
   }
 
   @Override
   public long getValueAsLong() {
-    return value.longValue();
+    return valueSupplier.get();
   }
 
   @Override
@@ -73,17 +82,17 @@ public class DefaultLongCounter implements LongCounter {
 
   @Override
   public int getValueAsInt() {
-    return value.intValue();
+    return valueSupplier.get().intValue();
   }
 
   @Override
   public int incrementAndGetAsInt() {
-    return (int) value.incrementAndGet();
+    return incrementAndGetOperation.get().intValue();
   }
 
   @Override
   public long incrementAndGetAsLong() {
-    return value.incrementAndGet();
+    return incrementAndGetOperation.get();
   }
 
   @Override
@@ -99,6 +108,10 @@ public class DefaultLongCounter implements LongCounter {
     private String description;
     private String unit;
     private MeterExporter meterExporter;
+
+    private Consumer<Long> addOperation;
+    private Supplier<Long> incrementAndGetOperation;
+    private Supplier<Long> valueSupplier;
 
     public DefaultLongCounterBuilder(String name, Meter meter) {
       this.name = name;
@@ -130,8 +143,8 @@ public class DefaultLongCounter implements LongCounter {
     @Override
     public LongCounter build() {
       LongCounter longCounter = ofNullable(instrumentRepository)
-          .map(repository -> (LongCounter) repository.create(name, name -> doBuild(name, description, unit, meter)))
-          .orElse(doBuild(name, description, unit, meter));
+          .map(repository -> (LongCounter) repository.create(name, name -> doBuild()))
+          .orElse(doBuild());
 
       if (meterExporter != null) {
         meterExporter.enableExport(longCounter);
@@ -140,8 +153,52 @@ public class DefaultLongCounter implements LongCounter {
       return longCounter;
     }
 
-    private LongCounter doBuild(String name, String description, String unit, Meter meter) {
-      return new DefaultLongCounter(name, description, unit, meter);
+    private LongCounter doBuild() {
+      DefaultLongCounter longCounter = new DefaultLongCounter(name, description, unit, meter);
+
+      if (valueSupplier != null) {
+        longCounter.setValueSupplier(valueSupplier);
+      }
+
+      if (addOperation != null) {
+        longCounter.setAddOperation(addOperation);
+      }
+
+      if (incrementAndGetOperation != null) {
+        longCounter.setIncrementAndGetOperation(incrementAndGetOperation);
+      }
+
+      return longCounter;
     }
+
+    @Override
+    public DefaultLongCounterBuilder withConsumerForAddOperation(Consumer<Long> consumerForAddOperation) {
+      this.addOperation = consumerForAddOperation;
+      return this;
+    }
+
+    @Override
+    public DefaultLongCounterBuilder withSupplierForIncrementAndGetOperation(Supplier<Long> supplierForIncrementOperation) {
+      this.incrementAndGetOperation = supplierForIncrementOperation;
+      return this;
+    }
+
+    @Override
+    public DefaultLongCounterBuilder withValueSupplier(Supplier<Long> valueSupplier) {
+      this.valueSupplier = valueSupplier;
+      return this;
+    }
+  }
+
+  private void setIncrementAndGetOperation(Supplier<Long> incrementAndGetOperation) {
+    this.incrementAndGetOperation = incrementAndGetOperation;
+  }
+
+  private void setAddOperation(Consumer<Long> addOperation) {
+    this.addOperation = addOperation;
+  }
+
+  private void setValueSupplier(Supplier<Long> valueSupplier) {
+    this.valueSupplier = valueSupplier;
   }
 }

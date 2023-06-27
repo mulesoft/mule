@@ -70,5 +70,4 @@ public interface LongUpDownCounter extends Instrument {
    */
   long decrementAndGetAsLong();
 
-
 }
