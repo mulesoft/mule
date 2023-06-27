@@ -122,7 +122,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent, Assertion condition) {
-    endCommand.execute(coreEvent.getContext(), SUCCESSFUL_ASSERTION);
+    endCommand.execute(coreEvent.getContext(), condition);
   }
 
   @Override
