@@ -126,6 +126,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -474,6 +475,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
 
       resetCommonCaches();
+      IntrospectionUtils.resetCommonCaches();
       clearSpringSoftReferencesCachesForDynamicClassLoaders();
     }
   }

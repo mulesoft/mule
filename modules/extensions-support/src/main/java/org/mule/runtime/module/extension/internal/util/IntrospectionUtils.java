@@ -106,6 +106,9 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -166,6 +169,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
@@ -190,6 +194,9 @@ public final class IntrospectionUtils {
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
    * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
+   * <p>
+   * This hack is also present in the {@code deployment} module. It's because this module shades the spring dependencies and
+   * changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
    */
   private static void setWeakHashCaches() {
     try {
@@ -1851,4 +1858,13 @@ public final class IntrospectionUtils {
     return of(fields.iterator().next());
   }
 
+  /**
+   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading springcore and then
+   * the classes (and their caches) are created twice.
+   */
+  public static void resetCommonCaches() {
+    org.springframework.util.ReflectionUtils.clearCache();
+    AnnotationUtils.clearCache();
+    ResolvableType.clearCache();
+  }
 }
