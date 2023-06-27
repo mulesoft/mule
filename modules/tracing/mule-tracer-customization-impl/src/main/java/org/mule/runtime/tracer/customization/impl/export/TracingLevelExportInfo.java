@@ -17,6 +17,7 @@ public class TracingLevelExportInfo {
   private InitialExportInfoProvider initialExportInfoProvider;
   private Object spanIdentifier;
   private boolean isOverride;
+  private InitialExportInfo initialExportInfo;
 
   public TracingLevelExportInfo(InitialExportInfoProvider initialExportInfoProvider, boolean isOverride) {
     this.initialExportInfoProvider = initialExportInfoProvider;
@@ -36,11 +37,17 @@ public class TracingLevelExportInfo {
   }
 
   public boolean isExportable() {
-    return getInitialExportInfo().isExportable();
+    if (initialExportInfo == null) {
+      initialExportInfo = getInitialExportInfo();
+    }
+    return initialExportInfo.isExportable();
   }
 
   public Set<String> noExportUntil() {
-    return getInitialExportInfo().noExportUntil();
+    if (initialExportInfo == null) {
+      initialExportInfo = getInitialExportInfo();
+    }
+    return initialExportInfo.noExportUntil();
   }
 
   private InitialExportInfo getInitialExportInfo() {
