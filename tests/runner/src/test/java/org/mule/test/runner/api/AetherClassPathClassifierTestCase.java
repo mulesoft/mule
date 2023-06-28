@@ -10,10 +10,10 @@ package org.mule.test.runner.api;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+import static org.mule.test.runner.utils.RunnerModuleUtils.RUNNER_PROPERTIES_MULE_VERSION;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -108,7 +108,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
 
   @Before
   public void before() throws Exception {
-    String muleVersion = getMuleVersion();
+    String muleVersion = RUNNER_PROPERTIES_MULE_VERSION;
 
     this.rootArtifact = new DefaultArtifact("org.foo:foo-root:1.0-SNAPSHOT");
 

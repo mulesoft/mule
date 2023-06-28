@@ -14,6 +14,7 @@ import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
+import static org.mule.test.runner.utils.RunnerModuleUtils.RUNNER_PROPERTIES_MULE_VERSION;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkCompatibilityApiArtifact;
 
@@ -62,7 +63,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -135,16 +135,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private final ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private final PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
 
-  static String getMuleVersion() {
-    try {
-      Properties properties = new Properties();
-      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
-      return properties.getProperty("mule.version");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   /**
    * Creates an instance of the classifier.
    *
@@ -159,7 +149,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
 
-    muleVersion = getMuleVersion();
+    muleVersion = RUNNER_PROPERTIES_MULE_VERSION;
   }
 
   /**

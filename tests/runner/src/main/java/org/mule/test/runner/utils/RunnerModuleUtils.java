@@ -19,6 +19,7 @@ import org.mule.test.runner.api.DependencyResolver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.HashMap;
@@ -51,11 +52,11 @@ import net.bytebuddy.description.modifier.SyntheticState;
 import net.bytebuddy.description.modifier.TypeManifestation;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.description.type.PackageDescription;
+import net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape;
 import net.bytebuddy.description.type.RecordComponentList;
 import net.bytebuddy.description.type.TypeDefinition;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeList;
-import net.bytebuddy.description.type.RecordComponentDescription.InDefinedShape;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.bytecode.StackSize;
 
@@ -71,6 +72,22 @@ public final class RunnerModuleUtils {
   public static final String EXCLUDED_ARTIFACTS = "excluded.artifacts";
   public static final String EXTRA_BOOT_PACKAGES = "extraBoot.packages";
   public static final String JAR_EXTENSION = "jar";
+
+  public static final String RUNNER_PROPERTIES_MULE_VERSION;
+  private static final String RUNNER_PROPERTIES_MULE_SDK_API_VERSION;
+  private static final String RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION;
+
+  static {
+    try (final InputStream resourceAsStream = RunnerModuleUtils.class.getResourceAsStream("/runner.properties")) {
+      Properties properties = new Properties();
+      properties.load(resourceAsStream);
+      RUNNER_PROPERTIES_MULE_VERSION = properties.getProperty("mule.version");
+      RUNNER_PROPERTIES_MULE_SDK_API_VERSION = properties.getProperty("mule.sdk.api.version");
+      RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION = properties.getProperty("mule.sdk.compatibility.api.version");
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
 
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String DEFAULT_TEST_SDK_API_VERSION_PROPERTY = SYSTEM_PROPERTY_PREFIX + "testSdkApiVersion";
@@ -89,7 +106,6 @@ public final class RunnerModuleUtils {
                                                                                              SDK_COMPATIBILITY_API_ARTIFACT_ID,
                                                                                              JAR_EXTENSION,
                                                                                              DEFAULT_SDK_COMPATIBILITY_API_VERSION);
-
 
   private RunnerModuleUtils() {}
 
@@ -674,7 +690,7 @@ public final class RunnerModuleUtils {
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkApiVersionForTest() {
-    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.6.0");
+    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, RUNNER_PROPERTIES_MULE_SDK_API_VERSION);
   }
 
   /**
@@ -683,7 +699,7 @@ public final class RunnerModuleUtils {
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkCompatibilityApiVersionForTest() {
-    return getProperty(DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY, "0.6.0-rc3");
+    return getProperty(DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY, RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION);
   }
 
 }
