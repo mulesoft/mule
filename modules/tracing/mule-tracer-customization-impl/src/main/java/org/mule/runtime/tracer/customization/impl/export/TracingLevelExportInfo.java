@@ -60,6 +60,7 @@ public class TracingLevelExportInfo {
   public void propagateExportInfo(TracingLevelExportInfo parentTracingLevelExportInfo) {
     if (!isOverride() && parentTracingLevelExportInfo.isOverride()) {
       this.initialExportInfoProvider = parentTracingLevelExportInfo.getInitialExportInfoProvider();
+      initialExportInfo = getInitialExportInfo();
       this.isOverride = true;
     }
   }
