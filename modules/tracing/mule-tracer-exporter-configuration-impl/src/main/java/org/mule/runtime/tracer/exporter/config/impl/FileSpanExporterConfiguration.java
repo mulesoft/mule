@@ -68,7 +68,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
   private URL configurationUrl;
-  private CompositeRunnable doOnConfigurationChanged = new CompositeRunnable();
+  private final CompositeRunnable doOnConfigurationChanged = new CompositeRunnable();
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private String resolvedConfigurationFilePath;
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
@@ -111,7 +111,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
         configurationValue = configurationValue.get(path[i]);
       }
-      // TODO: Define if we want to validate that the value is test (isTextual) otherwise this returns null
       return configurationValue != null ? configurationValue.textValue() : null;
     } else {
       return getProperty(key);
