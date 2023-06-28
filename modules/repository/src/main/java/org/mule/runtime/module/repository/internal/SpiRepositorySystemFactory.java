@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.repository.internal;
 
+import static org.mule.maven.client.internal.util.MavenVersionUtils.IS_MAVEN_VERSION_38;
+
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
+import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.DefaultVersionRangeResolver;
 import org.apache.maven.repository.internal.DefaultVersionResolver;
+import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
@@ -29,13 +33,21 @@ public class SpiRepositorySystemFactory implements RepositorySystemFactory {
   @Override
   public RepositorySystem createRepositorySystem() {
     DefaultServiceLocator locator = new DefaultServiceLocator();
-    locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
     locator.addService(TransporterFactory.class, FileTransporterFactory.class);
     locator.addService(TransporterFactory.class, HttpTransporterFactory.class);
     locator.addService(RepositorySystem.class, DefaultRepositorySystem.class);
     locator.addService(VersionResolver.class, DefaultVersionResolver.class);
     locator.addService(VersionRangeResolver.class, DefaultVersionRangeResolver.class);
     locator.addService(ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class);
+
+    if (IS_MAVEN_VERSION_38) {
+      locator.addService(RepositoryConnectorFactory.class, BasicRepositoryConnectorFactory.class);
+    } else {
+      locator.addService(ModelCacheFactory.class, DefaultModelCacheFactory.class);
+      locator.addService(RepositoryConnectorFactory.class,
+                         org.eclipse.aether.connector.basic.shaded.BasicRepositoryConnectorFactory.class);
+    }
+
     locator.setErrorHandler(new DefaultServiceLocator.ErrorHandler() {
 
       @Override
@@ -43,6 +55,7 @@ public class SpiRepositorySystemFactory implements RepositorySystemFactory {
         exception.printStackTrace();
       }
     });
+
     return locator.getService(RepositorySystem.class);
   }
 }
