@@ -7,7 +7,6 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
@@ -171,7 +170,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   @Override
   public ArtifactsUrlClassification classify(final ClassPathClassifierContext context) {
-    checkNotNull(context, "context cannot be null");
+    requireNonNull(context, "context cannot be null");
 
     logger.info("Running dependencies classification on: '{}' in order to build Mule class loaders", context.getRootArtifact());
 

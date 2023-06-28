@@ -46,7 +46,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
                                                              new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
                                                                  .getClassLoader())));
     testContainerClassLoaderCreator =
-        new TestPreFilteredContainerClassLoaderCreator(extraBootPackages, urls.toArray(new URL[0]));
+        new TestPreFilteredContainerClassLoaderCreator(extraBootPackages, urls.toArray(new URL[urls.size()]));
     containerClassLoaderFactory = new ContainerClassLoaderFactory(testContainerClassLoaderCreator);
   }
 

@@ -8,7 +8,6 @@
 package org.mule.test.runner.api;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -112,7 +111,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
    */
   public ArtifactDescriptorResult readArtifactDescriptor(Artifact artifact) throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
         new ArtifactDescriptorRequest(artifact, resolveRepositories(), null);
@@ -129,7 +128,7 @@ public class DependencyResolver {
    */
   public ArtifactDescriptorResult readArtifactDescriptor(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
         new ArtifactDescriptorRequest(artifact, resolveRepositories(remoteRepositories), null);
@@ -145,7 +144,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactResolutionException} if the artifact could not be resolved.
    */
   public ArtifactResult resolveArtifact(Artifact artifact) throws ArtifactResolutionException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
@@ -161,7 +160,7 @@ public class DependencyResolver {
    */
   public ArtifactResult resolveArtifact(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactResolutionException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(remoteRepositories), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
@@ -175,7 +174,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
    */
   public List<Dependency> getDirectDependencies(Artifact artifact) throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     return readArtifactDescriptor(artifact).getDependencies();
   }
@@ -190,7 +189,7 @@ public class DependencyResolver {
    */
   public List<Dependency> getDirectDependencies(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     return readArtifactDescriptor(artifact, remoteRepositories).getDependencies();
   }
