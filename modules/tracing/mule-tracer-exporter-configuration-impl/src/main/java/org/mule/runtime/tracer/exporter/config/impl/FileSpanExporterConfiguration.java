@@ -23,9 +23,6 @@ import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -49,6 +46,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 
 /**
@@ -182,7 +182,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     return PROPERTIES_FILE_NAME;
   }
 
-  public static JsonNode loadConfiguration(InputStream is) throws IOException {
+  private static JsonNode loadConfiguration(InputStream is) throws IOException {
     if (is == null) {
       I18nMessage error = objectIsNull("input stream");
       throw new IOException(error.toString());
