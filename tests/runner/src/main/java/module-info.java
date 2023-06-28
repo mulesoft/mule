@@ -15,9 +15,11 @@ module org.mule.test.runner {
 
   requires org.mule.runtime.api;
   requires org.mule.sdk.api;
+  requires org.mule.sdk.compatibility.api;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.jpms.utils;
   requires org.mule.runtime.container;
   requires org.mule.runtime.service;
   requires org.mule.runtime.artifact;
