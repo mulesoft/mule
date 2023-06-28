@@ -18,12 +18,14 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -46,7 +48,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 
@@ -61,17 +62,16 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   public final static String MULE_TRACING_CONFIGURATION_PATH = SYSTEM_PROPERTY_PREFIX + "tracer.config.path";
   private final String PROPERTIES_FILE_NAME = getProperty(MULE_TRACING_CONFIGURATION_PATH, "tracer-exporter.conf");
-
   private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
-
   private ConfigurationPropertiesResolver propertyResolver;
-  private Properties properties;
+  private JsonNode configuration;
   private ClassLoaderResourceProvider resourceProvider;
   private boolean propertiesInitialised;
   private URL configurationUrl;
   private CompositeRunnable doOnConfigurationChanged = new CompositeRunnable();
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private String resolvedConfigurationFilePath;
+  private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -84,26 +84,38 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       propertiesInitialised = true;
     }
 
-    String value = properties.getProperty(key);
+    String value = readStringFromConfigOrSystemProperty(key);
 
     if (value != null) {
-      // Verify if it is a system property.
+      // Resolves the actual value when the current one is a system property reference.
       value = propertyResolver.apply(value);
 
       if (isAValueCorrespondingToAPath(key)) {
         // Obtain absolute path and return it if possible.
         String absolutePath = getAbsolutePath(value);
-
         if (absolutePath != null) {
           return absolutePath;
         }
         // Otherwise, return the non-resolved value so that the error message makes sense.
       }
-
       return value;
     }
-
     return null;
+  }
+
+  private String readStringFromConfigOrSystemProperty(String key) {
+    if (configuration != null) {
+      // We read the yaml configuration
+      String[] path = key.split("\\.");
+      JsonNode configurationValue = configuration;
+      for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
+        configurationValue = configurationValue.get(path[i]);
+      }
+      // TODO: Define if we want to validate that the value is test (isTextual) otherwise this returns null
+      return configurationValue != null ? configurationValue.textValue() : null;
+    } else {
+      return getProperty(key);
+    }
   }
 
   private String getAbsolutePath(String value) {
@@ -129,34 +141,28 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         key.equals(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
   }
 
-  private Properties getSpanExporterConfigurationProperties() {
-    Properties properties = null;
-
+  private void getSpanExporterConfigurationProperties() {
     if (getBoolean(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY)) {
       try {
         // This will verify first in the app and then in the conf folder.
         InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
-        properties = loadProperties(is);
+        configuration = loadConfiguration(is);
         configurationUrl = getResourceOrFail(getPropertiesFileName(), getExecutionClassLoader(muleContext), true);
       } catch (MuleRuntimeException | IOException e) {
         LOGGER
-            .info("No tracer exporter config found in the app or in the conf directory. The config will be retrieved only from the system properties.");
-        return getProperties();
+            .info("No tracer exporter config found in the app or in the conf directory. Switching to system property based configuration.");
       }
     } else {
       try {
         String resourcePath = resolveConfigurationFilePath();
         InputStream is = getResourceAsStream(resourcePath, FileSpanExporterConfiguration.class);
-        properties = loadProperties(is);
+        configuration = loadConfiguration(is);
         configurationUrl = getResourceAsUrl(resourcePath, FileSpanExporterConfiguration.class, true, true);
       } catch (IOException e) {
         LOGGER
-            .info("No tracer exporter config found in the conf directory. The config will be retrieved only from the system properties.");
-        properties = getProperties();
+            .info("No tracer exporter config found in the conf directory. Switching to system property based configuration.");
       }
     }
-
-    return properties;
   }
 
   private String resolveConfigurationFilePath() {
@@ -177,16 +183,13 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     return PROPERTIES_FILE_NAME;
   }
 
-  public static Properties loadProperties(InputStream is) throws IOException {
+  public static JsonNode loadConfiguration(InputStream is) throws IOException {
     if (is == null) {
       I18nMessage error = objectIsNull("input stream");
       throw new IOException(error.toString());
     }
-
     try {
-      Properties props = new Properties();
-      props.load(is);
-      return props;
+      return configFileMapper.readTree(is);
     } finally {
       is.close();
     }
@@ -194,7 +197,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   protected void initialiseProperties() {
     resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
-    properties = getSpanExporterConfigurationProperties();
+    getSpanExporterConfigurationProperties();
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
@@ -225,9 +228,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     private final List<Runnable> runnables = new ArrayList<>();
 
     CompositeRunnable() {
-      runnables.add(() -> {
-        initialiseProperties();;
-      });
+      runnables.add(FileSpanExporterConfiguration.this::initialiseProperties);
     }
 
     @Override
