@@ -22,6 +22,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 
+import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -47,11 +48,22 @@ public class LightweightDeployableProjectModelBuilder extends AbstractMavenDeplo
     this(projectFolder, empty(), isDomain);
   }
 
+  public LightweightDeployableProjectModelBuilder(File projectFolder, boolean isDomain,
+                                                  Optional<MavenConfiguration> mavenConfigurationOpt) {
+    this(projectFolder, empty(), isDomain, mavenConfigurationOpt);
+  }
+
   public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain) {
-    super(getMavenConfig(), projectFolder);
+    this(projectFolder, model, isDomain, empty());
+  }
+
+  public LightweightDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model, boolean isDomain,
+                                                  Optional<MavenConfiguration> mavenConfigurationOpt) {
+    super(mavenConfigurationOpt.orElse(getMavenConfig()), projectFolder);
     this.model = model;
     this.isDomain = isDomain;
   }
+
 
   @Override
   protected DeployableProjectModel doBuild(MavenPomParser parser, ArtifactCoordinates deployableArtifactCoordinates) {

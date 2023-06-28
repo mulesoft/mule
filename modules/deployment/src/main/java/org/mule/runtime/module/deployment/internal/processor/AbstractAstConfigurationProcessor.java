@@ -34,7 +34,7 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
       return contextForEmptyArtifact(artifactContextConfiguration);
     }
 
-yur    ArtifactAst artifactAst = obtainArtifactAst(artifactContextConfiguration);
+    ArtifactAst artifactAst = obtainArtifactAst(artifactContextConfiguration);
 
     ArtifactAstConfigurationBuilder configurationBuilder =
         new ArtifactAstConfigurationBuilder(artifactAst,

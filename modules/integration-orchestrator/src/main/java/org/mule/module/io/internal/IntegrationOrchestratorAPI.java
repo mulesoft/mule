@@ -105,8 +105,8 @@ public class IntegrationOrchestratorAPI {
           // TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
           try {
 
-             Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
-             if (application == null) {
+            Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
+            if (application == null) {
               String runtimeConfigurationUrlForFetchingIntegrationConfig =
                   String.format("%s/config/integration/%s", runtimeConfigurationServiceUrl, integrationId);
 
