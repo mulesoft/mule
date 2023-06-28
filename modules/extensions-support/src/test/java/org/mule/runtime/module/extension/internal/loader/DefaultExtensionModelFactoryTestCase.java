@@ -158,7 +158,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
-                                                             "blockingNonBlocking", "callGusFringNonBlocking", "tapPhones",
+                                                             "blockingNonBlocking", "nonBlocking", "callGusFringNonBlocking",
+                                                             "tapPhones",
                                                              "sdkExecuteForeingOrders");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
