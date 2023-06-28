@@ -138,21 +138,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>test-components</artifactId>
-            <version>${muleTestComponentsVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
