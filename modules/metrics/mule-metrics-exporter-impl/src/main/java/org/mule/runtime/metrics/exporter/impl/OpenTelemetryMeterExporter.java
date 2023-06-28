@@ -6,24 +6,19 @@
  */
 package org.mule.runtime.metrics.exporter.impl;
 
-import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENDPOINT;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE;
+import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport.valueOf;
 
-import static java.lang.System.getProperty;
+import static java.lang.Long.parseLong;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
-import org.mule.runtime.metrics.exporter.api.DummyConfiguration;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
-import org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport;
-
-import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.metrics.LongCounterBuilder;
-import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
-import io.opentelemetry.api.metrics.ObservableLongCounter;
-import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
-
+import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.MeterExporterConfiguratorException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +26,11 @@ import java.util.Map;
 import java.util.List;
 import java.util.Objects;
 
-import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
+import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.metrics.LongCounterBuilder;
+import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
+import io.opentelemetry.api.metrics.ObservableLongCounter;
+import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.MeterProvider;
@@ -47,28 +46,29 @@ import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   private final List<ObservableLongCounter> counters = new ArrayList<>();
-
   private final List<ObservableLongUpDownCounter> upDownCounters = new ArrayList<>();
   private final MeterProvider meterProvider;
   private final Map<String, Meter> openTelemetryMeters = new HashMap<>();
 
-  public OpenTelemetryMeterExporter(DummyConfiguration configuration, Resource resource) {
+  public OpenTelemetryMeterExporter(MeterExporterConfiguration configuration, Resource resource) {
     // TODO W-13218993: In this task all the configuration possibilities will be applied.
-    String endpoint = getProperty(METRIC_EXPORTER_ENDPOINT);
-
     MetricExporter metricExporter;
+    String meterExporterType = configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE);
 
-    if (endpoint != null) {
-      metricExporter = OtlpGrpcMetricExporter.builder().setEndpoint(endpoint).build();
-    } else {
-      metricExporter =
-          OpenTelemetryMeterExporterTransport.valueOf(configuration.getExporterType()).getMetricExporter();
+    if (meterExporterType == null) {
+      throw new MeterExporterConfiguratorException("A type for the metric export was not created");
+    }
+
+    try {
+      metricExporter = valueOf(meterExporterType).getMeterExporterConfigurator().configExporter(configuration);
+    } catch (Exception e) {
+      throw new MeterExporterConfiguratorException(e);
     }
 
     this.meterProvider = SdkMeterProvider.builder()
         .setResource(resource)
         .registerMetricReader(PeriodicMetricReader.builder(metricExporter)
-            .setInterval(configuration.getExportingInterval(), SECONDS).build())
+            .setInterval(parseLong(configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL)), SECONDS).build())
         .build();
   }
 

@@ -39,4 +39,6 @@ public class OpenTelemetryMeterExporterConfigurationProperties {
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_AGGREGATION_TEMPORALITY =
       MULE_OPEN_TELEMETRY_METER_EXPORTER + ".aggregation.temporality";
+
+  public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".interval";
 }

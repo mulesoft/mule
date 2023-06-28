@@ -13,9 +13,9 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.meter.builder.MeterBuilder;
-import org.mule.runtime.metrics.exporter.api.DummyConfiguration;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
+import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.impl.meter.repository.MeterRepository;
 
 import javax.inject.Inject;
@@ -31,29 +31,15 @@ public class DefaultMeterProvider implements MeterProvider, Disposable {
   @Inject
   MuleContext muleContext;
 
+  @Inject
+  MeterExporterConfiguration configuration;
 
   MeterRepository meterRepository = new MeterRepository();
   private LazyValue<MeterExporter> meterExporter = new LazyValue<>(this::resolveMeterExporter);
 
   private MeterExporter resolveMeterExporter() {
     // TODO W-13218993: In this task all the configuration possibilities will be applied.
-    return meterExporterFactory.getMeterExporter(new DummyConfiguration() {
-
-      @Override
-      public String getExporterType() {
-        return "GRPC";
-      }
-
-      @Override
-      public Integer getExportingInterval() {
-        return 1;
-      }
-
-      @Override
-      public String getArtifactId() {
-        return muleContext.getConfiguration().getId();
-      }
-    });
+    return meterExporterFactory.getMeterExporter(configuration);
   }
 
   @Override

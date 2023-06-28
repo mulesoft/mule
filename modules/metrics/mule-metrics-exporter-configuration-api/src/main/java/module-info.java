@@ -5,7 +5,14 @@
  * LICENSE.txt file.
  */
 
-module org.mule.runtime.metrics.tracer.exporter.configuration.api {
+/**
+ * Definitions for Mule Metrics Exporter Configuration.
+ *
+ * @moduleGraph
+ * @since 4.5
+ */
+module org.mule.runtime.metrics.exporter.configuration.api {
 
   exports org.mule.runtime.metrics.exporter.config.api;
+
 }

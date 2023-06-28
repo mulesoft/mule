@@ -7,7 +7,6 @@
 package org.mule.runtime.metrics.exporter.impl;
 
 import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_SNIFFER_EXPORTER;
-import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport.IN_MEMORY;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_EXPORTER;
 
@@ -15,11 +14,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
-import org.mule.runtime.metrics.exporter.api.DummyConfiguration;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
+import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
+import org.mule.runtime.metrics.exporter.config.impl.FileMeterExporterConfiguration;
+import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMetricExporterConfiguration;
 import org.mule.runtime.metrics.impl.meter.DefaultMeter;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
@@ -41,30 +43,16 @@ public class OpenTelemetryMeterExporterTestCase {
   private static final int TIMEOUT_MILLIS = 30000;
   private static final int POLL_DELAY_MILLIS = 100;
 
-  private DummyConfiguration configuration;
+  private MeterExporterConfiguration configuration;
   private Meter meter;
   private LongCounter longCounter;
   private LongUpDownCounter longUpDownCounter;
 
   @Before
   public void setUp() {
-    configuration = new DummyConfiguration() {
-
-      @Override
-      public String getExporterType() {
-        return IN_MEMORY.name();
-      }
-
-      @Override
-      public Integer getExportingInterval() {
-        return 1;
-      }
-
-      @Override
-      public String getArtifactId() {
-        return "app";
-      }
-    };
+    MuleContext muleContext = mock(MuleContext.class);
+    TestFileMeterExporterConfiguration fileMeterExporterConfiguration = new TestFileMeterExporterConfiguration(muleContext);
+    configuration = new OpenTelemetryAutoConfigurableMetricExporterConfiguration(fileMeterExporterConfiguration);
 
     MeterExporter meterExporter = mock(MeterExporter.class);
     meter = DefaultMeter.builder("testMetricName").withMeterExporter(meterExporter).build();
@@ -157,4 +145,27 @@ public class OpenTelemetryMeterExporterTestCase {
       return "app";
     }
   }
+
+  private static class TestFileMeterExporterConfiguration extends FileMeterExporterConfiguration {
+
+    public static final String CONF_FOLDER = "conf";
+
+    /**
+     * {@link FileMeterExporterConfiguration} used for testing properties file.
+     */
+    public TestFileMeterExporterConfiguration(MuleContext muleContext) {
+      super(muleContext);
+    }
+
+    @Override
+    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
+      return Thread.currentThread().getContextClassLoader();
+    }
+
+    @Override
+    protected String getConfFolder() {
+      return CONF_FOLDER;
+    }
+  }
+
 }

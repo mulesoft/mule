@@ -7,11 +7,10 @@
 
 package org.mule.runtime.metrics.exporter.impl.config;
 
-import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_SNIFFER_EXPORTER;
-
-import io.opentelemetry.exporter.otlp.http.metrics.OtlpHttpMetricExporter;
-import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
-import io.opentelemetry.sdk.metrics.export.MetricExporter;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.MeterExporterConfigurator;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.grpc.GrpcMeterExporterConfigurator;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.http.HttpMeterExporterConfigurator;
+import org.mule.runtime.metrics.exporter.impl.optel.resources.inmemory.InMemoryMeterExporterConfigurator;
 
 /**
  * Specifies different ways in which metrics can be exported.
@@ -20,19 +19,19 @@ import io.opentelemetry.sdk.metrics.export.MetricExporter;
  */
 public enum OpenTelemetryMeterExporterTransport {
 
-  GRPC(OtlpGrpcMetricExporter.getDefault()),
+  GRPC(new GrpcMeterExporterConfigurator()),
 
-  HTTP(OtlpHttpMetricExporter.getDefault()),
+  HTTP(new HttpMeterExporterConfigurator()),
 
-  IN_MEMORY(METER_SNIFFER_EXPORTER);
+  IN_MEMORY(new InMemoryMeterExporterConfigurator());
 
-  private final MetricExporter metricExporter;
+  private final MeterExporterConfigurator meterExporterConfigurator;
 
-  OpenTelemetryMeterExporterTransport(MetricExporter metricExporter) {
-    this.metricExporter = metricExporter;
+  OpenTelemetryMeterExporterTransport(MeterExporterConfigurator meterExporterConfigurator) {
+    this.meterExporterConfigurator = meterExporterConfigurator;
   }
 
-  public MetricExporter getMetricExporter() {
-    return metricExporter;
+  public MeterExporterConfigurator getMeterExporterConfigurator() {
+    return meterExporterConfigurator;
   }
 }
