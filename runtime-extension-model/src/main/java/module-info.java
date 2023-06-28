@@ -30,17 +30,38 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.core.api.error;
   exports org.mule.runtime.core.api.extension.provider;
 
+  uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+
   provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
       org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
+
+  provides org.mule.runtime.ast.api.validation.ValidationsProvider with
+      org.mule.runtime.config.internal.validation.CoreValidationsProvider;
 
   exports org.mule.runtime.config.internal.error to
       org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
   exports org.mule.runtime.config.internal.validation to
-      com.mulesoft.mule.runtime.ee.extension.model;
+      com.mulesoft.mule.runtime.ee.extension.model,
+      org.mule.runtime.spring.config;
+
+  exports org.mule.runtime.core.api.source.scheduler to
+      org.mule.runtime.core.components,
+      org.mule.runtime.spring.config,
+      org.mule.runtime.extensions.spring.support;
 
   exports org.mule.runtime.core.internal.extension to
-      com.mulesoft.mule.runtime.ee.extension.model;
+      com.mulesoft.mule.runtime.ee.extension.model,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support;
+  
+  // Beans created using Spring
+  // TODO avoid opening this to spring libs from applications!
+  opens org.mule.runtime.core.api.source.scheduler to
+      spring.beans;
+
+  opens org.mule.runtime.config.internal.validation to
+      spring.core;
 
 }
