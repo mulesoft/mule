@@ -51,10 +51,12 @@ public final class ExceptionMapper {
    * @return optional created with the found error type, if any, or an empty optional.
    */
   public Optional<ErrorType> resolveErrorType(Class<? extends Throwable> exceptionType) {
-    return exceptionMappings.stream()
-        .filter(exceptionMapping -> exceptionMapping.matches(exceptionType))
-        .findFirst()
-        .map(ExceptionMapping::getErrorType);
+    for (ExceptionMapping exceptionMapping : exceptionMappings) {
+      if (exceptionMapping.matches(exceptionType)) {
+        return Optional.ofNullable(exceptionMapping.getErrorType());
+      }
+    }
+    return Optional.empty();
   }
 
   /**
