@@ -15,9 +15,10 @@ package org.mule.runtime.tracer.exporter.config.api;
 public interface SpanExporterConfiguration {
 
   /**
-   * @param key the key of a configuration parameter
-   *
-   * @return the value associated to the {@param key}
+   * Returns the value of a configuration parameter.
+   * 
+   * @param key the key of a configuration parameter.
+   * @return the value associated to the {@param key} or null if not found.
    */
   String getStringValue(String key);
 

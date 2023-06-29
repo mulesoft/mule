@@ -8,7 +8,7 @@
 package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFIGURATION_PATH;
-import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -16,6 +16,7 @@ import static java.lang.System.getProperty;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
@@ -25,10 +26,14 @@ import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 
 /**
@@ -44,11 +49,14 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   private final MuleContext muleContext;
 
   private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
-  private static final String LEVEL_PROPERTY_NAME = "level";
+  private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
+  private static final String OVERRIDES_PROPERTY_NAME = "mule.openTelemetry.tracer.levelOverrides";
   private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
   private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
+  private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
   private TracingLevel tracingLevel = DEFAULT_LEVEL;
+  private JsonNode configuration;
 
   public FileTracingLevelConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -56,29 +64,37 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   }
 
   private void setTracingLevels() {
-    Properties properties = getTracingLevelProperties();
-    setTracingLevel(properties);
-    properties.remove(LEVEL_PROPERTY_NAME);
-    setTracingLevelOverrides(properties);
+    configuration = getTracingLevelConfiguration();
+    setTracingLevel();
+    setTracingLevelOverrides();
   }
 
-  private void setTracingLevel(Properties properties) {
-    if (properties.containsKey(LEVEL_PROPERTY_NAME)) {
+  private void setTracingLevel() {
+    String configuredTracingLevel = readStringFromConfig(LEVEL_PROPERTY_NAME);
+    if (configuredTracingLevel != null) {
       try {
-        tracingLevel = TracingLevel.valueOf(properties.getProperty(LEVEL_PROPERTY_NAME).toUpperCase(Locale.ROOT));
+        tracingLevel = TracingLevel.valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
-        LOGGER.info(format("Wrong tracing level found in configuration file. The tracing level will be set to the default: %s",
-                           DEFAULT_LEVEL));
+        LOGGER
+            .error(format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level: %s",
+                          configuredTracingLevel, DEFAULT_LEVEL));
       }
     }
   }
 
-  private void setTracingLevelOverrides(Properties properties) {
-    properties.forEach((location, override) -> {
-      try {
-        tracingLevelOverrides.put(location.toString(), TracingLevel.valueOf(override.toString().toUpperCase(Locale.ROOT)));
-      } catch (IllegalArgumentException e) {
-        LOGGER.info("Wrong tracing level found in configuration file. This tracing level will be ignored.");
+  private void setTracingLevelOverrides() {
+    readStringListFromConfig(OVERRIDES_PROPERTY_NAME).forEach((override) -> {
+      String[] levelOverride = override.split("=");
+      if (levelOverride.length != 2) {
+        LOGGER.error(format("Wrong tracing level override found in configuration file: %s. This override will be ignored.",
+                            override));
+      } else {
+        try {
+          tracingLevelOverrides.put(levelOverride[0], TracingLevel.valueOf(levelOverride[1].toUpperCase(Locale.ROOT)));
+        } catch (IllegalArgumentException e) {
+          LOGGER.error(format("Wrong tracing level override found in configuration file: %s. This override will be ignored.",
+                              override));
+        }
       }
     });
   }
@@ -101,17 +117,31 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
     return tracingLevelOverrides.get(location);
   }
 
-  private Properties getTracingLevelProperties() {
+  private JsonNode getTracingLevelConfiguration() {
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
       InputStream is = resourceProvider
           .getResourceAsStream(CONFIGURATION_PATH + getPropertiesFileName());
-      return loadProperties(is);
+      return loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
-      LOGGER.info(format("No tracing level config found in the conf directory. The tracing level will be set to the default: %s",
-                         DEFAULT_LEVEL));
+      LOGGER
+          .warn(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
+                       DEFAULT_LEVEL),
+                e);
     }
-    return new Properties();
+    return null;
+  }
+
+  private static JsonNode loadConfiguration(InputStream is) throws IOException {
+    if (is == null) {
+      I18nMessage error = objectIsNull("input stream");
+      throw new IOException(error.toString());
+    }
+    try {
+      return configFileMapper.readTree(is);
+    } finally {
+      is.close();
+    }
   }
 
   protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
@@ -124,6 +154,37 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
 
   protected String getConfFolder() {
     return MuleFoldersUtil.getConfFolder().getAbsolutePath();
+  }
+
+  private String readStringFromConfig(String key) {
+    if (configuration != null) {
+      String[] path = key.split("\\.");
+      JsonNode configurationValue = configuration;
+      for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
+        configurationValue = configurationValue.get(path[i]);
+      }
+      return configurationValue != null ? configurationValue.textValue() : null;
+    }
+    return null;
+  }
+
+  private List<String> readStringListFromConfig(String key) {
+    List<String> configuredValues = new ArrayList<>();
+    if (configuration != null) {
+      String[] path = key.split("\\.");
+      JsonNode configurationValue = configuration;
+      for (int i = 0; i < path.length && configurationValue != null; i++) {
+        configurationValue = configurationValue.get(path[i]);
+      }
+      if (configurationValue != null) {
+        configurationValue.elements().forEachRemaining(jsonNode -> {
+          if (jsonNode.isTextual()) {
+            configuredValues.add(jsonNode.textValue());
+          }
+        });
+      }
+    }
+    return configuredValues;
   }
 
 }
