@@ -11,11 +11,14 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMENT_ANNOTATION_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.mule.runtime.properties.internal.loader.ConfigurationPropertiesProviderFactoryLoader.loadConfigurationPropertiesProviderFactories;
+
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -28,14 +31,16 @@ import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
-import org.slf4j.Logger;
 
-import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
+
+import javax.xml.namespace.QName;
+
+import org.slf4j.Logger;
 
 /**
  * Utils for Properties Resolver Creation.
@@ -116,15 +121,15 @@ public class PropertiesResolverUtils {
   public static Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> loadProviderFactories() {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
 
-    ServiceLoader<ConfigurationPropertiesProviderFactory> providerFactories = load(ConfigurationPropertiesProviderFactory.class);
-    providerFactories.forEach(service -> {
-      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
-      if (providerFactoriesMap.containsKey(componentIdentifier)) {
-        throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
-            + componentIdentifier));
-      }
-      providerFactoriesMap.put(componentIdentifier, service);
-    });
+    loadConfigurationPropertiesProviderFactories()
+        .forEach(service -> {
+          ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
+          if (providerFactoriesMap.containsKey(componentIdentifier)) {
+            throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
+                + componentIdentifier));
+          }
+          providerFactoriesMap.put(componentIdentifier, service);
+        });
 
     // Support of the old deprecated interface only if it is available in the classpath.
     // This may happen only on environments where the runtime modules are uses as libs in some tool, but not when inside the
