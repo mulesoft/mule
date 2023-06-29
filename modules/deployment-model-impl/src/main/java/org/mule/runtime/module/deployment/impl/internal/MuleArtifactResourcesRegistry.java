@@ -277,7 +277,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    artifactDescriptorValidatorBuilder),
                                                            new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
 
-    extensionModelLoaderRepository = getExtensionModelLoaderManager(containerClassLoader.getClassLoader());
+    extensionModelLoaderRepository = getExtensionModelLoaderManager();
 
     pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);

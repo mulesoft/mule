@@ -12,7 +12,6 @@ import static org.mule.runtime.module.artifact.activation.api.extension.discover
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.groupingBy;
@@ -58,13 +57,12 @@ public class DefaultExtensionModelLoaderRepository implements ExtensionModelLoad
    *
    * @param containerClassLoader {@link ClassLoader} from the container.
    */
-  public DefaultExtensionModelLoaderRepository(ClassLoader containerClassLoader) {
-    requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
-    this.extModelLoadersLookup = () -> lookupLoadersFromSpi(containerClassLoader);
+  public DefaultExtensionModelLoaderRepository() {
+    this.extModelLoadersLookup = () -> lookupLoadersFromSpi();
   }
 
-  private Collection<ExtensionModelLoader> lookupLoadersFromSpi(ClassLoader containerClassLoader) {
-    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders(containerClassLoader)
+  private Collection<ExtensionModelLoader> lookupLoadersFromSpi() {
+    Collection<ExtensionModelLoader> loaders = lookupExtensionModelLoaders()
         .collect(toList());
 
     if (LOGGER.isDebugEnabled()) {

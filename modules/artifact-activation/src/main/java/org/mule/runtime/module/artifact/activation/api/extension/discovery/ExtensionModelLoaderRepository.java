@@ -30,7 +30,7 @@ public interface ExtensionModelLoaderRepository {
    * @since 4.5
    */
   static ExtensionModelLoaderRepository getExtensionModelLoaderManager() {
-    return new DefaultExtensionModelLoaderRepository(ExtensionModelLoaderRepository.class.getClassLoader());
+    return new DefaultExtensionModelLoaderRepository();
   }
 
   /**
@@ -38,19 +38,8 @@ public interface ExtensionModelLoaderRepository {
    *         {@link ExtensionModelLoaderRepository}.
    * @since 4.5
    */
-  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ClassLoader containerClassLoader) {
-    return new DefaultExtensionModelLoaderRepository(containerClassLoader);
-  }
-
-  /**
-   * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
-   *         {@link ExtensionModelLoaderRepository}.
-   * @since 4.5
-   */
-  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ClassLoader containerClassLoader,
-                                                                       Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
-    DefaultExtensionModelLoaderRepository muleExtensionModelLoaderManager =
-        new DefaultExtensionModelLoaderRepository(containerClassLoader);
+  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
+    DefaultExtensionModelLoaderRepository muleExtensionModelLoaderManager = new DefaultExtensionModelLoaderRepository();
     muleExtensionModelLoaderManager.setExtensionModelLoadersLookup(extModelLoadersLookup);
     return muleExtensionModelLoaderManager;
   }

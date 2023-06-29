@@ -52,6 +52,20 @@ public class PropertiesResolverUtils {
   public static final String GLOBAL_PROPERTY = "global-property";
   private static final Logger LOGGER = getLogger(PropertiesResolverUtils.class);
 
+  private static final Class<?> PROVIDER_FACTORY_IFACE_OLD;
+
+  static {
+    final String oldInterfaceName = "org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory";
+
+    Class<?> providerFactoryIfaceOld = null;
+    try {
+      providerFactoryIfaceOld = forName(oldInterfaceName);
+    } catch (ClassNotFoundException e) {
+      LOGGER.debug("Interface '" + oldInterfaceName + "' not available in classpath, skipping its processing.");
+    }
+    PROVIDER_FACTORY_IFACE_OLD = providerFactoryIfaceOld;
+  }
+
   private PropertiesResolverUtils() {
     // do nothing
   }
@@ -122,6 +136,8 @@ public class PropertiesResolverUtils {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
 
     loadConfigurationPropertiesProviderFactories()
+        // Skip loading these, since they will be loading by the following block
+        .filter(service -> PROVIDER_FACTORY_IFACE_OLD == null || !PROVIDER_FACTORY_IFACE_OLD.isAssignableFrom(service.getClass()))
         .forEach(service -> {
           ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
           if (providerFactoriesMap.containsKey(componentIdentifier)) {
@@ -134,23 +150,17 @@ public class PropertiesResolverUtils {
     // Support of the old deprecated interface only if it is available in the classpath.
     // This may happen only on environments where the runtime modules are uses as libs in some tool, but not when inside the
     // Runtime.
-    try {
-      Class<?> providerFactoryIfaceOld =
-          forName("org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory");
-
+    if (PROVIDER_FACTORY_IFACE_OLD != null) {
       ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
-          (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(providerFactoryIfaceOld);
+          (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(PROVIDER_FACTORY_IFACE_OLD);
       providerFactoriesOld.forEach(service -> {
         ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
         if (providerFactoriesMap.containsKey(componentIdentifier)) {
-          throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
-              + componentIdentifier));
+          // skipping already present factory with the newer api
+          return;
         }
         providerFactoriesMap.put(componentIdentifier, service);
       });
-    } catch (ClassNotFoundException e) {
-      LOGGER
-          .debug("Interface 'org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory' not available in classpath, skipping its processing.");
     }
 
     return providerFactoriesMap;

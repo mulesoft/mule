@@ -16,7 +16,6 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
 import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 
@@ -137,15 +136,15 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private List<GeneratedResourceFactory> getResourceFactories() {
-    return loadGeneratedResourceFactories(currentThread().getContextClassLoader()).collect(toList());
+    return loadGeneratedResourceFactories().collect(toList());
   }
 
   private ExtensionSchemaGenerator getSchemaGenerator() {
-    return loadExtensionSchemaGenerators(currentThread().getContextClassLoader()).findFirst().get();
+    return loadExtensionSchemaGenerators().findFirst().get();
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
-    return loadDslResourceFactories(currentThread().getContextClassLoader()).collect(toList());
+    return loadDslResourceFactories().collect(toList());
   }
 
   private File createManifestFileIfNecessary(File targetDirectory) {
