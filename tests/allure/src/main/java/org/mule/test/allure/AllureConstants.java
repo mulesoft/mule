@@ -117,6 +117,11 @@ public interface AllureConstants {
     }
   }
 
+  interface JpmsFeature {
+
+    String JPMS_FEATURE = "Java Platform Module System";
+  }
+
   interface ClassloadingIsolationFeature {
 
     String CLASSLOADING_ISOLATION = "Classloading Isolation";
