@@ -15,6 +15,7 @@ import static org.mule.runtime.properties.internal.loader.ConfigurationPropertie
 
 import static java.lang.Class.forName;
 import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 
@@ -135,7 +136,7 @@ public class PropertiesResolverUtils {
   public static Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> loadProviderFactories() {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = new HashMap<>();
 
-    loadConfigurationPropertiesProviderFactories()
+    loadConfigurationPropertiesProviderFactories(currentThread().getContextClassLoader())
         // Skip loading these, since they will be loading by the following block
         .filter(service -> PROVIDER_FACTORY_IFACE_OLD == null || !PROVIDER_FACTORY_IFACE_OLD.isAssignableFrom(service.getClass()))
         .forEach(service -> {

@@ -11,7 +11,6 @@ import static org.mule.runtime.dsl.internal.component.config.ComponentBuildingDe
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
@@ -36,7 +35,7 @@ public final class ComponentBuildingDefinitionUtils {
     if (runtimeComponentBuildingDefinitions == null) {
       List<ComponentBuildingDefinition> allDefinitions = new ArrayList<>();
 
-      lookupComponentBuildingDefinitionProviders(MuleArtifactContext.class.getClassLoader())
+      lookupComponentBuildingDefinitionProviders()
           .forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init();
 
@@ -66,7 +65,7 @@ public final class ComponentBuildingDefinitionUtils {
   public static List<ComponentBuildingDefinition> getExtensionModelsComponentBuildingDefinitions(Set<ExtensionModel> extensionModels,
                                                                                                  DslResolvingContext dslResolvingContext) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    lookupComponentBuildingDefinitionProviders(MuleArtifactContext.class.getClassLoader())
+    lookupComponentBuildingDefinitionProviders()
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
             ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider =
