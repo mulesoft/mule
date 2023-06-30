@@ -98,6 +98,9 @@ public class FileSpanExporterConfigurationTestCase {
 
   public static final String KEY_PROPERTY_NON_SYSTEM_PROPERTY = "keyNonSystemProperty";
   public static final String KEY_PROPERTY_SYSTEM_PROPERTY = "keySystemProperty";
+  public static final String KEY_BOOLEAN_VALUE = "booleanValue";
+  public static final String KEY_STRING_VALUE_ONE = "stringValueOne";
+  public static final String KEY_STRING_VALUE_TWO = "stringValueTwo";
   public static final String NO_KEY_IN_FILE = "noKeyInFile";
 
   @Rule
@@ -141,6 +144,26 @@ public class FileSpanExporterConfigurationTestCase {
         new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER_NOT_FOUND, TEST_NOT_FOUND_CONF_FILE_NAME);
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), is(nullValue()));
     assertThat(testNoFileFoundSpanExporterConfiguration.getStringValue(KEY_PROPERTY_NON_SYSTEM_PROPERTY), is(nullValue()));
+  }
+
+  @Test
+  public void readsStringValue() {
+    TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
+    String stringValueOne = testFileSpanExporterConfiguration.getStringValue(KEY_STRING_VALUE_ONE);
+    String stringValueTwo = testFileSpanExporterConfiguration.getStringValue(KEY_STRING_VALUE_TWO);
+
+    assertThat(stringValueOne, is("stringValueOne"));
+    assertThat(stringValueTwo, is("stringValueTwo"));
+  }
+
+  @Test
+  public void readsBooleanValue() {
+    TestFileSpanExporterConfiguration testFileSpanExporterConfiguration =
+        new TestFileSpanExporterConfiguration(mock(MuleContext.class), CONF_FOLDER, TEST_CONF_FILE_NAME);
+    String booleanValue = testFileSpanExporterConfiguration.getStringValue(KEY_BOOLEAN_VALUE);
+
+    assertThat(booleanValue, is("true"));
   }
 
   @Test
