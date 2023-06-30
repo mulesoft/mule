@@ -7,8 +7,14 @@
 
 package org.mule.runtime.metrics.impl.config;
 
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE;
+
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Dummy configuration to use for tests
@@ -18,15 +24,10 @@ public class DummyConfiguration implements MeterExporterConfiguration {
 
   @Override
   public String getStringValue(String key) {
-    return null;
-  }
-
-  public String getExporterType() {
-    return "GRPC";
-  }
-
-  public Integer getExportingInterval() {
-    return 1;
+    Map<String, String> defaultProperties = new HashMap<>();
+    defaultProperties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, "GRPC");
+    defaultProperties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, "1");
+    return defaultProperties.get(key);
   }
 
   public String getArtifactId(MuleContext muleContext) {

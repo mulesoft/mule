@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.metrics.exporter.impl;
 
+import static org.mule.runtime.metrics.exporter.api.MeterExporterProperties.METRIC_EXPORTER_ENDPOINT;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE;
 import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport.valueOf;
 
 import static java.lang.Long.parseLong;
+import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -31,6 +33,7 @@ import io.opentelemetry.api.metrics.LongCounterBuilder;
 import io.opentelemetry.api.metrics.LongUpDownCounterBuilder;
 import io.opentelemetry.api.metrics.ObservableLongCounter;
 import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
+import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.MeterProvider;
@@ -60,7 +63,12 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
     }
 
     try {
-      metricExporter = valueOf(meterExporterType).getMeterExporterConfigurator().configExporter(configuration);
+      String endpoint = getProperty(METRIC_EXPORTER_ENDPOINT);
+      if (endpoint != null) {
+        metricExporter = OtlpGrpcMetricExporter.builder().setEndpoint(endpoint).build();
+      } else {
+        metricExporter = valueOf(meterExporterType).getMeterExporterConfigurator().configExporter(configuration);
+      }
     } catch (Exception e) {
       throw new MeterExporterConfiguratorException(e);
     }
