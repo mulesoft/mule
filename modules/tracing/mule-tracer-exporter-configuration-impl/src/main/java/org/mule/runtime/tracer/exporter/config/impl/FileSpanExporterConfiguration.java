@@ -111,7 +111,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
         configurationValue = configurationValue.get(path[i]);
       }
-      return configurationValue != null ? configurationValue.textValue() : null;
+      return configurationValue != null && !configurationValue.asText().isEmpty() ? configurationValue.asText() : null;
     } else {
       return getProperty(key);
     }
