@@ -6,33 +6,42 @@
  */
 package org.mule.runtime.metrics.exporter.impl;
 
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE;
+import static org.mule.runtime.metrics.exporter.impl.config.OpenTelemetryMeterExporterTransport.IN_MEMORY;
 import static org.mule.runtime.metrics.exporter.impl.OpenTelemetryMeterExporterFactory.METER_SNIFFER_EXPORTER;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_EXPORTER;
+
+import static java.lang.Boolean.TRUE;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
-import org.mule.runtime.metrics.exporter.config.impl.FileMeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMetricExporterConfiguration;
+import org.mule.runtime.metrics.exporter.impl.utils.TestMeterExporterConfiguration;
+import org.mule.runtime.metrics.exporter.impl.utils.TestOpenTelemetryMeterExporterFactory;
 import org.mule.runtime.metrics.impl.meter.DefaultMeter;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.opentelemetry.sdk.metrics.data.MetricData;
 import io.opentelemetry.sdk.testing.exporter.InMemoryMetricExporter;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,6 +49,14 @@ import org.junit.Test;
 @Story(METRICS_EXPORTER)
 public class OpenTelemetryMeterExporterTestCase {
 
+  private static final String METER_EXPORTER_INTERVAL = "1";
+  private static final String METER_NAME = "testMetricName";
+  private static final String LONG_COUNTER_NAME = "long-counter-test";
+  private static final String LONG_COUNTER_DESCRIPTION = "Long Counter test";
+  private static final String UNIT_NAME = "test-unit";
+  private static final String LONG_UP_DOWN_COUNTER_NAME = "long-up-down-counter-test";
+  private static final String LONG_UP_DOWN_COUNTER_DESCRIPTION = "Long UpDownCounter test";
+  private static final long LONG_UP_DOWN_INITIAL_VALUE = 50L;
   private static final int TIMEOUT_MILLIS = 30000;
   private static final int POLL_DELAY_MILLIS = 100;
 
@@ -50,18 +67,24 @@ public class OpenTelemetryMeterExporterTestCase {
 
   @Before
   public void setUp() {
-    MuleContext muleContext = mock(MuleContext.class);
-    TestFileMeterExporterConfiguration fileMeterExporterConfiguration = new TestFileMeterExporterConfiguration(muleContext);
-    configuration = new OpenTelemetryAutoConfigurableMetricExporterConfiguration(fileMeterExporterConfiguration);
+    Map<String, String> properties = getMeterExporterProperties();
+    configuration = getMeterExporterConfiguration(properties);
 
     MeterExporter meterExporter = mock(MeterExporter.class);
-    meter = DefaultMeter.builder("testMetricName").withMeterExporter(meterExporter).build();
-    longCounter = meter.counterBuilder("long-counter-test").withDescription("Long Counter test")
-        .withUnit("test-unit").build();
-    longUpDownCounter = meter.upDownCounterBuilder("long-up-down-counter-test")
-        .withInitialValue(50L)
-        .withDescription("Long UpDownCounter test")
-        .withUnit("test-unit").build();
+    meter = DefaultMeter.builder(METER_NAME)
+        .withMeterExporter(meterExporter)
+        .build();
+
+    longCounter = meter.counterBuilder(LONG_COUNTER_NAME)
+        .withDescription(LONG_COUNTER_DESCRIPTION)
+        .withUnit(UNIT_NAME)
+        .build();
+
+    longUpDownCounter = meter.upDownCounterBuilder(LONG_UP_DOWN_COUNTER_NAME)
+        .withInitialValue(LONG_UP_DOWN_INITIAL_VALUE)
+        .withDescription(LONG_UP_DOWN_COUNTER_DESCRIPTION)
+        .withUnit(UNIT_NAME)
+        .build();
   }
 
   @Test
@@ -133,39 +156,21 @@ public class OpenTelemetryMeterExporterTestCase {
     }
   }
 
-  private List<MetricData> getMetricsByCounterName(List<MetricData> metrics, String name) {
-    return metrics.stream()
-        .filter(metricData -> metricData.getName().equals(name)).collect(Collectors.toList());
+  @NotNull
+  private static Map<String, String> getMeterExporterProperties() {
+    Map<String, String> properties = new HashMap<>();
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_ENABLED, TRUE.toString());
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_TYPE, IN_MEMORY.name());
+    properties.put(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL, METER_EXPORTER_INTERVAL);
+    return properties;
   }
 
-  private class TestOpenTelemetryMeterExporterFactory extends OpenTelemetryMeterExporterFactory {
-
-    @Override
-    protected String getResourceId() {
-      return "app";
-    }
+  @NotNull
+  private static OpenTelemetryAutoConfigurableMetricExporterConfiguration getMeterExporterConfiguration(Map<String, String> properties) {
+    return new OpenTelemetryAutoConfigurableMetricExporterConfiguration(new TestMeterExporterConfiguration(properties));
   }
 
-  private static class TestFileMeterExporterConfiguration extends FileMeterExporterConfiguration {
-
-    public static final String CONF_FOLDER = "conf";
-
-    /**
-     * {@link FileMeterExporterConfiguration} used for testing properties file.
-     */
-    public TestFileMeterExporterConfiguration(MuleContext muleContext) {
-      super(muleContext);
-    }
-
-    @Override
-    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-      return Thread.currentThread().getContextClassLoader();
-    }
-
-    @Override
-    protected String getConfFolder() {
-      return CONF_FOLDER;
-    }
+  private List<MetricData> getMetricsByCounterName(List<MetricData> metrics, String metricName) {
+    return metrics.stream().filter(metric -> metric.getName().equals(metricName)).collect(Collectors.toList());
   }
-
 }

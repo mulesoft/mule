@@ -42,8 +42,7 @@ public class FileMeterExporterConfigurationTestCase {
   public void returnsTheValueForANonSystemProperty() {
     FileMeterExporterConfiguration fileMeterExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
-    assertThat(fileMeterExporterConfiguration.getStringValue(KEY_NON_SYSTEM_PROPERTY), equalTo(
-                                                                                               VALUE_NON_SYSTEM_PROPERTY));
+    assertThat(fileMeterExporterConfiguration.getStringValue(KEY_NON_SYSTEM_PROPERTY), equalTo(VALUE_NON_SYSTEM_PROPERTY));
   }
 
   @Test
