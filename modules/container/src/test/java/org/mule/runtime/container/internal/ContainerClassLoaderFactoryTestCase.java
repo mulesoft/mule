@@ -7,6 +7,10 @@
 
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -15,9 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
-import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -131,7 +133,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final List<MuleModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("sdk-module")
-        .exportingPackages("org.mule.sdk.api.connectivity", "org.omg.test").build());
+        .exportingPackages("org.mule.sdk.api.connectivity", "org.mule.sdk.compatibility.api.helper", "org.omg.test").build());
     modules.add(new TestModuleBuilder("other-sdk-module")
         .exportingPackages("org.mule.sdk.api.runtime.streaming", "org.mule.extension.validation.api.condition",
                            "org.xml.sax.test")
@@ -143,6 +145,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
     final ClassLoaderLookupPolicy classLoaderLookupPolicy = containerClassLoader.getClassLoaderLookupPolicy();
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.connectivity.Foo"), sameInstance(PARENT_FIRST));
+    assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.compatibility.api.helper.Something"),
+               sameInstance(PARENT_FIRST));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.omg.test.Bar"), sameInstance(PARENT_FIRST));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.sdk.api.runtime.streaming.SomeStreaming"),
                sameInstance(PARENT_FIRST));

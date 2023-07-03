@@ -36,6 +36,7 @@ public class ContainerClassLoaderCreatorUtils {
 
   private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
   private static final String MULE_SDK_API_PACKAGE = "org.mule.sdk.api";
+  private static final String MULE_SDK_COMPATIBILITY_API_PACKAGE = "org.mule.sdk.compatibility.api";
   private static final boolean ALLOW_JRE_EXTENSION = parseBoolean(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
   private static final String[] JRE_EXTENDABLE_PACKAGES =
       getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
@@ -95,9 +96,9 @@ public class ContainerClassLoaderCreatorUtils {
    *         {@link ContainerOnlyLookupStrategy}, or null otherwise.
    */
   private static LookupStrategy getSpecialLookupStrategy(String exportedPackage) {
-    // If an extension uses a class provided by the mule-sdk-api artifact, the container classloader should use
+    // If an extension uses a class provided by the mule-sdk-api artifacts, the container classloader should use
     // the class with which the extension was compiled only if the class is not present in the distribution.
-    if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE)) {
+    if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE) || exportedPackage.startsWith(MULE_SDK_COMPATIBILITY_API_PACKAGE)) {
       return PARENT_FIRST;
     }
     // Let artifacts extend non "java." JRE packages

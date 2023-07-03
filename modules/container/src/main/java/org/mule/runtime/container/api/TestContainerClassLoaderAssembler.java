@@ -9,7 +9,6 @@ package org.mule.runtime.container.api;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.SYSTEM_PACKAGES;
 
 import org.mule.runtime.container.internal.DefaultTestContainerClassLoaderAssembler;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.net.URL;
