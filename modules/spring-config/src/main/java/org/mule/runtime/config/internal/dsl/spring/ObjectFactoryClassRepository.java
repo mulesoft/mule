@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.spring;
 
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-
 import static java.lang.Class.forName;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
 import static net.bytebuddy.description.modifier.Ownership.STATIC;
+import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
 import static net.bytebuddy.dynamic.loading.ClassLoadingStrategy.Default.INJECTION;
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
 import static net.bytebuddy.implementation.FieldAccessor.ofBeanProperty;
@@ -32,14 +30,17 @@ import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.SmartFactoryBean;
+
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 import net.bytebuddy.implementation.LoadedTypeInitializer;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * Repository for storing the dynamic class generated to mimic {@link org.springframework.beans.factory.FactoryBean} from an
@@ -63,7 +64,9 @@ public class ObjectFactoryClassRepository {
   private static final LoadingCache<ClassLoader, ClassLoader> COMPOSITE_CL_CACHE = newBuilder()
       .weakKeys()
       .weakValues()
-      .build(cl -> from(ObjectFactoryClassRepository.class.getClassLoader(), cl));
+      .build(cl -> new MultipleParentClassLoader.Builder(false)
+          .append(ObjectFactoryClassRepository.class.getClassLoader(), cl)
+          .build(ObjectFactoryClassRepository.class.getClassLoader()));
 
   public static final String IS_SINGLETON = "isSingleton";
   public static final String OBJECT_TYPE_CLASS = "objectTypeClass";

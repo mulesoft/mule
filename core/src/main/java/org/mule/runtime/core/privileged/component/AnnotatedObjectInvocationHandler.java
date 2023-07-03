@@ -6,38 +6,38 @@
  */
 package org.mule.runtime.core.privileged.component;
 
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.RemoveDynamicAnnotationsInterceptor;
-import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ToStringInterceptor;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-
 import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
-import static org.slf4j.LoggerFactory.getLogger;
-import static net.bytebuddy.implementation.MethodDelegation.to;
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
+import static net.bytebuddy.implementation.MethodDelegation.to;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.isToString;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
+import static org.slf4j.LoggerFactory.getLogger;
 
-import net.bytebuddy.dynamic.DynamicType;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.RemoveDynamicAnnotationsInterceptor;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ToStringInterceptor;
 import org.mule.runtime.core.internal.component.DynamicallyComponent;
 import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
 
-import net.bytebuddy.ByteBuddy;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
+
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 /**
  * Provides {@code annotations} handling logic for Byte Buddy enhanced classes that implement {@link Component} dynamically.
@@ -102,8 +102,10 @@ public final class AnnotatedObjectInvocationHandler {
     builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
 
     ClassLoader classLoader;
-    if (ByteBuddy.class.getClassLoader() != clazz.getClassLoader()) {
-      classLoader = from(AnnotatedObjectInvocationHandler.class.getClassLoader(), clazz.getClassLoader());
+    if (AnnotatedObjectInvocationHandler.class.getClassLoader() != clazz.getClassLoader()) {
+      classLoader = new MultipleParentClassLoader.Builder(false)
+          .append(AnnotatedObjectInvocationHandler.class.getClassLoader(), clazz.getClassLoader())
+          .build(AnnotatedObjectInvocationHandler.class.getClassLoader());
     } else {
       classLoader = clazz.getClassLoader();
     }

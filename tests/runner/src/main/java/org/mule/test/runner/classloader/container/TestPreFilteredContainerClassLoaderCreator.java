@@ -68,7 +68,12 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
 
-    final URLClassLoader thirdPartiesClassLoader = new URLClassLoader(thirdPartyUrls, parentClassLoader);
+    ClassLoader thirdPartiesClassLoader =
+        new MuleArtifactClassLoader(artifactDescriptor.getName() + " - Third parties", artifactDescriptor,
+                                    thirdPartyUrls,
+                                    parentClassLoader,
+                                    new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
+    // final URLClassLoader thirdPartiesClassLoader = new URLClassLoader(thirdPartyUrls, parentClassLoader);
 
     containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
                                                        muleUrls,
