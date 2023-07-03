@@ -42,6 +42,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
@@ -220,7 +221,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
     }
 
-    List<URL> containerUrls =
+    Pair<List<URL>, List<URL>> containerUrls =
         buildContainerUrlClassification(context, directDependencies, applicationSharedLibArtifactUrlClassifications,
                                         serviceUrlClassifications, pluginUrlClassifications, rootArtifactType,
                                         remoteRepositories);
@@ -233,8 +234,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     resolveSnapshotVersionsToTimestampedFromClassPath(applicationSharedLibUrls, context.getClassPathURLs());
 
-    return new ArtifactsUrlClassification(containerUrls, serviceUrlClassifications, testRunnerLibUrls, applicationLibUrls,
-                                          applicationSharedLibUrls, pluginUrlClassifications, testRunnerExportedLibUrls);
+    return new ArtifactsUrlClassification(containerUrls.getFirst(),
+                                          containerUrls.getSecond(),
+                                          serviceUrlClassifications,
+                                          testRunnerLibUrls,
+                                          applicationLibUrls,
+                                          applicationSharedLibUrls,
+                                          pluginUrlClassifications,
+                                          testRunnerExportedLibUrls);
   }
 
   /**
@@ -398,15 +405,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param pluginUrlClassifications       {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
    * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
-   * @return {@link List} of {@link URL}s for the container class loader
+   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
+   *         are jar urls for third parties.
    */
-  private List<URL> buildContainerUrlClassification(ClassPathClassifierContext context,
-                                                    List<Dependency> directDependencies,
-                                                    List<ArtifactUrlClassification> applicationSharedLibUrls,
-                                                    List<ServiceUrlClassification> serviceUrlClassifications,
-                                                    List<PluginUrlClassification> pluginUrlClassifications,
-                                                    ArtifactClassificationType rootArtifactType,
-                                                    List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private Pair<List<URL>, List<URL>> buildContainerUrlClassification(ClassPathClassifierContext context,
+                                                                     List<Dependency> directDependencies,
+                                                                     List<ArtifactUrlClassification> applicationSharedLibUrls,
+                                                                     List<ServiceUrlClassification> serviceUrlClassifications,
+                                                                     List<PluginUrlClassification> pluginUrlClassifications,
+                                                                     ArtifactClassificationType rootArtifactType,
+                                                                     List<RemoteRepository> rootArtifactRemoteRepositories) {
     directDependencies = directDependencies.stream()
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
         .filter(dependency -> {
@@ -464,15 +472,24 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
 
-    List<URL> containerUrls;
+    List<URL> containerMuleUrls;
+    List<URL> container3ppUrls;
     try {
-      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, managedDependencies,
-                                                                   dependencyFilter,
-                                                                   rootArtifactRemoteRepositories));
+      final Pair<List<File>, List<File>> resolvedDependencies =
+          dependencyResolver.resolveContainerDependencies(null, directDependencies, managedDependencies,
+                                                          dependencyFilter,
+                                                          rootArtifactRemoteRepositories);
+      containerMuleUrls = toUrl(resolvedDependencies.getFirst());
+      container3ppUrls = toUrl(resolvedDependencies.getSecond());
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
-    containerUrls = containerUrls.stream().filter(url -> {
+    containerMuleUrls = containerMuleUrls.stream().filter(url -> {
+      String file = toFile(url).getAbsolutePath();
+      return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
+                                                                                                                  ZIP_EXTENSION));
+    }).collect(toList());
+    container3ppUrls = container3ppUrls.stream().filter(url -> {
       String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
                                                                                                                   ZIP_EXTENSION));
@@ -484,12 +501,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         throw new IllegalStateException("rootArtifact (" + context.getRootArtifact()
             + ") identified as MODULE but doesn't have an output");
       }
-      containerUrls.add(0, toUrl(rootArtifactOutputFile));
+      container3ppUrls.add(0, toUrl(rootArtifactOutputFile));
     }
 
-    resolveSnapshotVersionsToTimestampedFromClassPath(containerUrls, context.getClassPathURLs());
+    resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return containerUrls;
+    return new Pair<>(containerMuleUrls, container3ppUrls);
   }
 
   /**
@@ -806,9 +823,11 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                           orFilter(new PatternExclusionsDependencyFilter("*:*:*:"
                                                               + MULE_PLUGIN_CLASSIFIER + ":*"),
                                                                    new PatternInclusionsDependencyFilter(toId(artifactToClassify))));
-      urls = toUrl(dependencyResolver.resolveDependencies(new Dependency(artifactToClassify, COMPILE),
-                                                          emptyList(), emptyList(),
-                                                          dependencyFilter, rootArtifactRemoteRepositories));
+      final List<File> resolvedDependencies =
+          dependencyResolver.resolveDependencies(new Dependency(artifactToClassify, COMPILE),
+                                                 emptyList(), emptyList(),
+                                                 dependencyFilter, rootArtifactRemoteRepositories);
+      urls = toUrl(resolvedDependencies);
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
                                       e);
@@ -1150,8 +1169,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
                                orFilter(dependencyFilter, new PatternExclusionsDependencyFilter(exclusionsPatterns)),
                                rootArtifactRemoteRepositories);
-      appFiles
-          .addAll(urls);
+      appFiles.addAll(urls);
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for application '" + context.getRootArtifact()
           + "' classification", e);

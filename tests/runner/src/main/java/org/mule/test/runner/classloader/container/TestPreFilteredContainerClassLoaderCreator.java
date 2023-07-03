@@ -38,16 +38,19 @@ import com.google.common.collect.ImmutableSet;
 public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 
   private final Set<String> extraBootPackages;
-  private final URL[] urls;
+  private final URL[] muleUrls;
+  private final URL[] thirdPartyUrls;
   private final URLClassLoader classLoader;
   private final DefaultModuleRepository testContainerModuleRepository;
   private ArtifactClassLoader containerClassLoader;
 
-  public TestPreFilteredContainerClassLoaderCreator(final List<String> extraBootPackages, final URL[] urls) {
+  public TestPreFilteredContainerClassLoaderCreator(final List<String> extraBootPackages, final URL[] muleUrls,
+                                                    final URL[] thirdPartyUrls) {
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(BOOT_PACKAGES).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
-    this.urls = urls;
-    this.classLoader = new URLClassLoader(urls, null);
+    this.muleUrls = muleUrls;
+    this.thirdPartyUrls = thirdPartyUrls;
+    this.classLoader = new URLClassLoader(muleUrls, null);
     this.testContainerModuleRepository = new DefaultModuleRepository(new TestContainerModuleDiscoverer(classLoader));
   }
 
@@ -64,7 +67,12 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-    containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor, urls, parentClassLoader,
+
+    final URLClassLoader thirdPartiesClassLoader = new URLClassLoader(thirdPartyUrls, parentClassLoader);
+
+    containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
+                                                       muleUrls,
+                                                       thirdPartiesClassLoader,
                                                        new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
     return containerClassLoader;
   }

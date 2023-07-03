@@ -22,8 +22,10 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.MuleMavenRepositoryState;
 import org.mule.maven.client.internal.MuleMavenResolutionContext;
+import org.mule.runtime.api.util.Pair;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -214,9 +216,51 @@ public class DependencyResolver {
    * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
    *         be resolved
    */
+  public Pair<List<File>, List<File>> resolveContainerDependencies(Dependency root, List<Dependency> directDependencies,
+                                                                   List<Dependency> managedDependencies,
+                                                                   DependencyFilter dependencyFilter,
+                                                                   List<RemoteRepository> remoteRepositories)
+      throws DependencyCollectionException, DependencyResolutionException {
+    DependencyNode node =
+        resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
+
+    return getContainerFiles(node);
+  }
+
+  /**
+   * Resolves and filters transitive dependencies for the root and direct dependencies.
+   * <p/>
+   * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
+   * dependencies from the root dependency's artifact descriptor, giving higher priority to the dependencies from the root.
+   *
+   * @param root                {@link Dependency} node from to collect its dependencies, may be {@code null}
+   * @param directDependencies  {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
+   *                            {@code null}
+   * @param managedDependencies {@link List} of managed {@link Dependency}s to be used for resolving the depedency graph, may be
+   *                            {@code null}
+   * @param dependencyFilter    {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve
+   *                            operation. May be {@code null} to no filter
+   * @param remoteRepositories  {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
+   *                            defined in the context.
+   * @return a {@link List} of {@link File}s for each dependency resolved
+   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
+   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
+   *         be resolved
+   */
   public List<File> resolveDependencies(Dependency root, List<Dependency> directDependencies,
                                         List<Dependency> managedDependencies,
-                                        DependencyFilter dependencyFilter, List<RemoteRepository> remoteRepositories)
+                                        DependencyFilter dependencyFilter,
+                                        List<RemoteRepository> remoteRepositories)
+      throws DependencyCollectionException, DependencyResolutionException {
+    DependencyNode node =
+        resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
+
+    return getFiles(node);
+  }
+
+  private DependencyNode resolveDependencyNode(Dependency root, List<Dependency> directDependencies,
+                                               List<Dependency> managedDependencies, DependencyFilter dependencyFilter,
+                                               List<RemoteRepository> remoteRepositories)
       throws DependencyCollectionException, DependencyResolutionException {
     CollectRequest collectRequest = new CollectRequest();
     collectRequest.setRoot(root);
@@ -242,9 +286,7 @@ public class DependencyResolver {
       logUnresolvedArtifacts(node, e);
       throw e;
     }
-
-    List<File> files = getFiles(node);
-    return files;
+    return node;
   }
 
   private String printCollectRequest(CollectRequest collectRequest) {
@@ -304,6 +346,47 @@ public class DependencyResolver {
     node.accept(nlg);
 
     return nlg.getFiles().stream().map(File::getAbsoluteFile).collect(toList());
+  }
+
+  /**
+   * Traverse the {@link DependencyNode} to get the files for each artifact.
+   *
+   * @param node {@link DependencyNode} that represents the dependency graph
+   * @return {@link List} of {@link File}s for each artifact resolved
+   */
+  private Pair<List<File>, List<File>> getContainerFiles(DependencyNode node) {
+    PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+    node.accept(nlg);
+
+    List<File> muleDependencyFiles = new ArrayList<>();
+    List<File> thirdPartyDependencyFiles = new ArrayList<>();
+
+    nlg.getNodes()
+        .stream()
+        .forEach(depNode -> {
+          final Artifact artifact = depNode.getArtifact();
+          if (artifact.getFile() == null) {
+            return;
+          }
+
+          final File absoluteFile = artifact.getFile().getAbsoluteFile();
+
+          if ((artifact.getGroupId().equals("org.mule.runtime")
+              || artifact.getGroupId().equals("org.mule.sdk")
+              || artifact.getGroupId().equals("org.mule.weave")
+              || artifact.getGroupId().equals("org.mule.mvel")
+              || artifact.getGroupId().equals("com.mulesoft.mule.runtime")
+              || artifact.getGroupId().equals("com.mulesoft.mule.runtime.modules")
+              || artifact.getGroupId().equals("com.mulesoft.anypoint"))
+              // why does maven-client use this?
+              && !artifact.getArtifactId().equals("api-annotations")) {
+            muleDependencyFiles.add(absoluteFile);
+          } else {
+            thirdPartyDependencyFiles.add(absoluteFile);
+          }
+        });
+
+    return new Pair<>(muleDependencyFiles, thirdPartyDependencyFiles);
   }
 
   /**

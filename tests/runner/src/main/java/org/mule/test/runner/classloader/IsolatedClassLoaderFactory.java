@@ -125,7 +125,8 @@ public class IsolatedClassLoaderFactory {
 
     try (final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
         create(extraBootPackages, extraPrivilegedArtifacts,
-               artifactsUrlClassification.getContainerUrls())) {
+               artifactsUrlClassification.getContainerMuleUrls(),
+               artifactsUrlClassification.getContainer3ppUrls())) {
 
       ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 
