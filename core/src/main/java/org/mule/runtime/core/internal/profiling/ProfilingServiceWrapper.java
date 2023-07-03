@@ -36,7 +36,6 @@ import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
-
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
@@ -69,6 +68,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   protected SpanExporterConfiguration spanExporterConfiguration;
 
   private Boolean isTracingExportEnabled = null;
+  private EventTracer<CoreEvent> updatableCoreEvenTracer;
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -175,15 +175,18 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    if (isTracingExportEnabled == null) {
-      isTracingExportEnabled = isTracingExportEnabled();
+    if (updatableCoreEvenTracer == null) {
+      updatableCoreEvenTracer = resolveUpdatableCoreEventTracer();
     }
+    return updatableCoreEvenTracer;
+  }
 
-    if (isTracingExportEnabled) {
-      return coreEventTracer;
-    }
-
-    return getProfilingService().getCoreEventTracer();
+  private EventTracer<CoreEvent> resolveUpdatableCoreEventTracer() {
+    final SelectableCoreEventTracer selectableCoreEventTracer =
+        new SelectableCoreEventTracer(coreEventTracer, getProfilingService().getCoreEventTracer(), isTracingExportEnabled());
+    spanExporterConfiguration
+        .doOnConfigurationChanged(() -> selectableCoreEventTracer.useFirstCoreEventTracer(isTracingExportEnabled()));
+    return selectableCoreEventTracer;
   }
 
   private boolean isTracingExportEnabled() {

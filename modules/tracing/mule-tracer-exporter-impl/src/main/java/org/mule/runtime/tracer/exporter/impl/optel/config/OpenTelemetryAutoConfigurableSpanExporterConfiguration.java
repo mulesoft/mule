@@ -21,6 +21,8 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 
+import static java.util.Collections.synchronizedList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -30,7 +32,9 @@ import org.mule.runtime.tracer.exporter.config.impl.FileSpanExporterConfiguratio
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -58,7 +62,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
-  private SetteableRunnable doOnChange = new SetteableRunnable();
+  private final List<Runnable> runnablesOnChange = synchronizedList(new ArrayList<>());
 
   /**
    * This constructor is needed for injection in the registry.
@@ -75,7 +79,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     try {
       if (delegate == null) {
         this.delegate = new FileSpanExporterConfiguration(muleContext);
-        this.delegate.doOnConfigurationChanged(doOnChange);
+        this.delegate.doOnConfigurationChanged(() -> runnablesOnChange.forEach(Runnable::run));
         initialiseDefaultConfigurationValues();
       }
       return delegate.getStringValue(key, defaultConfigurationValues.get(key));
@@ -105,29 +109,13 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
 
   @Override
   public void doOnConfigurationChanged(Runnable doOnChange) {
-    this.doOnChange.setRunnable(doOnChange);
+    runnablesOnChange.add(doOnChange);
   }
 
   @Override
   public void dispose() {
     if (delegate != null) {
       disposeIfNeeded(delegate, LOGGER);
-    }
-  }
-
-  private class SetteableRunnable implements Runnable {
-
-    private Runnable runnable;
-
-    @Override
-    public void run() {
-      if (runnable != null) {
-        runnable.run();
-      }
-    }
-
-    void setRunnable(Runnable runnable) {
-      this.runnable = runnable;
     }
   }
 }
