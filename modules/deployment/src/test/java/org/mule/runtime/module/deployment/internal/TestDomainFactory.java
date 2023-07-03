@@ -89,8 +89,7 @@ public class TestDomainFactory extends DefaultDomainFactory {
     return new TestDomainFactory(artifactClassLoaderManager, serviceRepository, domainDescriptorFactory,
                                  DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory(),
                                  domainClassLoaderBuilderFactory,
-                                 ExtensionModelLoaderRepository
-                                     .getExtensionModelLoaderManager(containerClassLoader.getClassLoader()));
+                                 ExtensionModelLoaderRepository.getExtensionModelLoaderManager());
   }
 
   private TestDomainFactory(ClassLoaderRepository classLoaderRepository,

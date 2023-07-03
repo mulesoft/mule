@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionModelLoaderProviders;
 
 import static java.lang.Boolean.getBoolean;
-import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
@@ -26,23 +25,15 @@ import java.util.stream.Stream;
 public final class ExtensionLoaderUtils {
 
   /**
-   * @return a {@link Stream} with all the {@link ExtensionModelLoader} available on the current context {@link ClassLoader}
+   * @return a {@link Stream} with all the {@link ExtensionModelLoader} available in the Runtime.
    */
   public static Stream<ExtensionModelLoader> lookupExtensionModelLoaders() {
-    return lookupExtensionModelLoaders(currentThread().getContextClassLoader());
-  }
-
-  /**
-   * @param classLoader the classloader owning the search space
-   * @return a {@link Stream} with all the {@link ExtensionModelLoader} available to the given {@code classloader}
-   */
-  public static Stream<ExtensionModelLoader> lookupExtensionModelLoaders(ClassLoader classLoader) {
-    return loadExtensionModelLoaderProviders(classLoader)
+    return loadExtensionModelLoaderProviders()
         .flatMap(p -> p.getExtensionModelLoaders().stream());
   }
 
   /**
-   * Finds an {@link ExtensionModelLoader} with a matching {@code id} using the current context {@code classLoader}
+   * Finds an {@link ExtensionModelLoader} with a matching {@code id} in the Runtime
    *
    * @param id the wanted loader's id
    * @return the found {@link ExtensionModelLoader}
@@ -50,33 +41,19 @@ public final class ExtensionLoaderUtils {
    * @since 4.5.0
    */
   public static ExtensionModelLoader getLoaderById(String id) {
-    return getLoaderById(currentThread().getContextClassLoader(), id);
-  }
-
-  /**
-   * Finds an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@code classLoader}
-   *
-   * @param classLoader the classloader owning the search space
-   * @param id          the wanted loader's id
-   * @return the found {@link ExtensionModelLoader}
-   * @throws NoSuchElementException if no matching loader is found
-   * @since 4.5.0
-   */
-  public static ExtensionModelLoader getLoaderById(ClassLoader classLoader, String id) {
-    return getOptionalLoaderById(classLoader, id)
+    return getOptionalLoaderById(id)
         .orElseThrow(() -> new NoSuchElementException("No loader found for id:{" + id + "}"));
   }
 
   /**
-   * Looks for an {@link ExtensionModelLoader} with a matching {@code id} in the context of the given {@code classLoader}
+   * Looks for an {@link ExtensionModelLoader} with a matching {@code id} in the Runtime
    *
-   * @param classLoader the classloader owning the search space
-   * @param id          the wanted loader's id
+   * @param id the wanted loader's id
    * @return An optional {@link ExtensionModelLoader}
    * @since 4.5.0
    */
-  public static Optional<ExtensionModelLoader> getOptionalLoaderById(ClassLoader classLoader, String id) {
-    return lookupExtensionModelLoaders(classLoader)
+  public static Optional<ExtensionModelLoader> getOptionalLoaderById(String id) {
+    return lookupExtensionModelLoaders()
         .filter(extensionModelLoader -> extensionModelLoader.getId().equals(id))
         .findFirst();
   }
