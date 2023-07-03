@@ -31,5 +31,5 @@ service:
   extensions: [health_check]
   pipelines:
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, otlp/mtls]
       exporters: [otlp]

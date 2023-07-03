@@ -50,8 +50,9 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
 
   private final List<ObservableLongCounter> counters = new ArrayList<>();
   private final List<ObservableLongUpDownCounter> upDownCounters = new ArrayList<>();
-  private final MeterProvider meterProvider;
   private final Map<String, Meter> openTelemetryMeters = new HashMap<>();
+  private final MeterProvider meterProvider;
+  private final PeriodicMetricReader periodicMetricReader;
 
   public OpenTelemetryMeterExporter(MeterExporterConfiguration configuration, Resource resource) {
     // TODO W-13218993: In this task all the configuration possibilities will be applied.
@@ -73,10 +74,13 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
       throw new MeterExporterConfiguratorException(e);
     }
 
+    long periodicMetricReaderInterval = parseLong(configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL));
+    this.periodicMetricReader = PeriodicMetricReader.builder(metricExporter)
+        .setInterval(periodicMetricReaderInterval, SECONDS).build();
+
     this.meterProvider = SdkMeterProvider.builder()
         .setResource(resource)
-        .registerMetricReader(PeriodicMetricReader.builder(metricExporter)
-            .setInterval(parseLong(configuration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL)), SECONDS).build())
+        .registerMetricReader(periodicMetricReader)
         .build();
   }
 
@@ -119,5 +123,9 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
   public void dispose() {
     counters.forEach(ObservableLongCounter::close);
     upDownCounters.forEach(ObservableLongUpDownCounter::close);
+
+    if (periodicMetricReader != null) {
+      periodicMetricReader.shutdown();
+    }
   }
 }

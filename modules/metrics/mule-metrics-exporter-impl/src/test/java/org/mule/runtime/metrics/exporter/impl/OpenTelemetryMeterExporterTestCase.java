@@ -20,11 +20,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
+import org.mule.runtime.metrics.exporter.config.impl.FileMeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMetricExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.utils.TestMeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.utils.TestOpenTelemetryMeterExporterFactory;
@@ -61,6 +63,7 @@ public class OpenTelemetryMeterExporterTestCase {
   private static final int POLL_DELAY_MILLIS = 100;
 
   private MeterExporterConfiguration configuration;
+  private MeterExporterConfiguration fileMeterExporterConfiguration;
   private Meter meter;
   private LongCounter longCounter;
   private LongUpDownCounter longUpDownCounter;
@@ -69,6 +72,9 @@ public class OpenTelemetryMeterExporterTestCase {
   public void setUp() {
     Map<String, String> properties = getMeterExporterProperties();
     configuration = getMeterExporterConfiguration(properties);
+
+    MuleContext muleContext = mock(MuleContext.class);
+    fileMeterExporterConfiguration = new TestFileMeterExporterConfiguration(muleContext);
 
     MeterExporter meterExporter = mock(MeterExporter.class);
     meter = DefaultMeter.builder(METER_NAME)
@@ -156,6 +162,75 @@ public class OpenTelemetryMeterExporterTestCase {
     }
   }
 
+  @Test
+  public void exporterWithAFileConfigShouldExportLongCounterMetricSuccessfully() {
+    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
+    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(fileMeterExporterConfiguration);
+    InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
+
+    try {
+      openTelemetryMeterExporter.registerMeterToExport(meter);
+      openTelemetryMeterExporter.enableExport(longCounter);
+      longCounter.add(4);
+
+      PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+      prober.check(new JUnitProbe() {
+
+        @Override
+        protected boolean test() {
+          return getMetricsByCounterName(inMemoryMetricExporter.getFinishedMetricItems(), longCounter.getName())
+              .size() >= 1;
+        }
+
+        @Override
+        public String describeFailure() {
+          return "The expected amount of metrics was not captured";
+        }
+      });
+
+      getMetricsByCounterName(inMemoryMetricExporter.getFinishedMetricItems(), longCounter.getName()).get(0)
+          .getLongSumData().getPoints().stream()
+          .forEach(longPointData -> assertThat(longPointData.getValue(), equalTo(4L)));
+    } finally {
+      METER_SNIFFER_EXPORTER.dispose(inMemoryMetricExporter);
+    }
+  }
+
+  @Test
+  public void exporterWithAFileConfigShouldExportUpDownCounterMetricSuccessfully() {
+    OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
+    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(fileMeterExporterConfiguration);
+    InMemoryMetricExporter inMemoryMetricExporter = METER_SNIFFER_EXPORTER.getExportedMeterSniffer();
+
+    try {
+      openTelemetryMeterExporter.registerMeterToExport(meter);
+      openTelemetryMeterExporter.enableExport(longUpDownCounter);
+      longUpDownCounter.add(4);
+      longUpDownCounter.add(-1);
+
+      PollingProber prober = new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS);
+      prober.check(new JUnitProbe() {
+
+        @Override
+        protected boolean test() {
+          return getMetricsByCounterName(inMemoryMetricExporter.getFinishedMetricItems(), longUpDownCounter.getName())
+              .size() >= 1;
+        }
+
+        @Override
+        public String describeFailure() {
+          return "The expected amount of metrics was not captured";
+        }
+      });
+
+      getMetricsByCounterName(inMemoryMetricExporter.getFinishedMetricItems(), longUpDownCounter.getName())
+          .get(0).getLongSumData().getPoints().stream()
+          .forEach(longPointData -> assertThat(longPointData.getValue(), equalTo(53L)));
+    } finally {
+      METER_SNIFFER_EXPORTER.dispose(inMemoryMetricExporter);
+    }
+  }
+
   @NotNull
   private static Map<String, String> getMeterExporterProperties() {
     Map<String, String> properties = new HashMap<>();
@@ -172,5 +247,27 @@ public class OpenTelemetryMeterExporterTestCase {
 
   private List<MetricData> getMetricsByCounterName(List<MetricData> metrics, String metricName) {
     return metrics.stream().filter(metric -> metric.getName().equals(metricName)).collect(Collectors.toList());
+  }
+
+  private static class TestFileMeterExporterConfiguration extends FileMeterExporterConfiguration {
+
+    public static final String CONF_FOLDER = "conf";
+
+    /**
+     * {@link FileMeterExporterConfiguration} used for testing properties file.
+     */
+    public TestFileMeterExporterConfiguration(MuleContext muleContext) {
+      super(muleContext);
+    }
+
+    @Override
+    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
+      return Thread.currentThread().getContextClassLoader();
+    }
+
+    @Override
+    protected String getConfFolder() {
+      return CONF_FOLDER;
+    }
   }
 }

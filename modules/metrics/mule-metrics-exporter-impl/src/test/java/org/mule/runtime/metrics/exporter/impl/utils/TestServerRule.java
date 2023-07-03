@@ -29,7 +29,6 @@ public class TestServerRule extends ServerRule {
   private static final String GRPC_ENDPOINT_PATH = "/opentelemetry.proto.collector.metrics.v1.MetricsService/Export";
 
   private List<TestExportedMeter> metrics = new ArrayList<>();
-  private final List<ExportMetricsServiceRequest> metricsRequests = new ArrayList<>();
 
   @Override
   protected void configure(ServerBuilder sb) {
@@ -41,7 +40,6 @@ public class TestServerRule extends ServerRule {
                                                                           byte @NotNull [] message) {
                    try {
                      metrics = TestOpenTelemetryMeterExporterUtils.getMetrics(parseFrom(message));
-                     metricsRequests.add(ExportMetricsServiceRequest.parseFrom(message));
                    } catch (InvalidProtocolBufferException e) {
                      throw new UncheckedIOException(e);
                    }
@@ -58,9 +56,5 @@ public class TestServerRule extends ServerRule {
 
   public List<TestExportedMeter> getMetrics() {
     return metrics;
-  }
-
-  public List<ExportMetricsServiceRequest> getMetricsRequests() {
-    return metricsRequests;
   }
 }

@@ -76,6 +76,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   private static final DockerImageName COLLECTOR_IMAGE =
       DockerImageName.parse("ghcr.io/open-telemetry/opentelemetry-java/otel-collector");
 
+  private MeterExporter openTelemetryMeterExporter;
   private Meter meter;
   private LongCounter longCounter;
   private GenericContainer<?> collector;
@@ -131,6 +132,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
   @After
   public void after() {
+    openTelemetryMeterExporter.dispose();
     collector.stop();
     server.reset();
   }
@@ -146,7 +148,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -180,7 +182,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -217,7 +219,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -255,7 +257,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -297,7 +299,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -308,7 +310,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
       @Override
       protected boolean test() {
-        return server.getMetrics().size() == 0 && server.getMetricsRequests().size() == 0;
+        return server.getMetrics().size() >= 1;
       }
 
       @Override
@@ -322,7 +324,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   public void configuredHttpSecureExporterShouldExportLongCounterMetricSuccessfully() {
     String meterExporterEndpoint =
         "https://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_HTTP_MTLS_PORT)
-            + "/v1/traces";
+            + "/v1/metrics";
     String meterExporterHeaders = "{\"Header\": \"Header Value\"}";
     String meterExporterCompressionType = "gzip";
 
@@ -340,7 +342,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
     MeterExporterConfiguration configuration = getMeterExporterConfiguration(properties);
     OpenTelemetryMeterExporterFactory openTelemetryMeterExporterFactory = new TestOpenTelemetryMeterExporterFactory();
-    MeterExporter openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
+    openTelemetryMeterExporter = openTelemetryMeterExporterFactory.getMeterExporter(configuration);
 
     openTelemetryMeterExporter.registerMeterToExport(meter);
     openTelemetryMeterExporter.enableExport(longCounter);
@@ -351,7 +353,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
 
       @Override
       protected boolean test() {
-        return server.getMetrics().size() == 0 && server.getMetricsRequests().size() == 0;
+        return server.getMetrics().size() >= 1;
       }
 
       @Override
