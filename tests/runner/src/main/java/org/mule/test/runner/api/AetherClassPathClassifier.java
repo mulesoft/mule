@@ -16,6 +16,7 @@ import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkCompatibilityApiArtifact;
 
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempDirectory;
@@ -436,6 +437,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
     directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
+    directDependencies.add(new Dependency(getDefaultSdkCompatibilityApiArtifact(), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);

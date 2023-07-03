@@ -74,13 +74,21 @@ public final class RunnerModuleUtils {
 
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String DEFAULT_TEST_SDK_API_VERSION_PROPERTY = SYSTEM_PROPERTY_PREFIX + "testSdkApiVersion";
+  private static String DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY =
+      SYSTEM_PROPERTY_PREFIX + "testSdkCompatibilityApiVersion";
   private static final String SDK_API_GROUP_ID = "org.mule.sdk";
   private static final String SDK_API_ARTIFACT_ID = "mule-sdk-api";
+  private static final String SDK_COMPATIBILITY_API_ARTIFACT_ID = "mule-sdk-compatibility-api";
   private static final String DEFAULT_SDK_API_VERSION = getDefaultSdkApiVersionForTest();
+  private static final String DEFAULT_SDK_COMPATIBILITY_API_VERSION = getDefaultSdkCompatibilityApiVersionForTest();
   private static final Artifact DEFAULT_SDK_API_ARTIFACT = new DefaultArtifact(SDK_API_GROUP_ID,
                                                                                SDK_API_ARTIFACT_ID,
                                                                                JAR_EXTENSION,
                                                                                DEFAULT_SDK_API_VERSION);
+  private static final Artifact DEFAULT_SDK_COMPATIBILITY_API_ARTIFACT = new DefaultArtifact(SDK_API_GROUP_ID,
+                                                                                             SDK_COMPATIBILITY_API_ARTIFACT_ID,
+                                                                                             JAR_EXTENSION,
+                                                                                             DEFAULT_SDK_COMPATIBILITY_API_VERSION);
 
 
   private RunnerModuleUtils() {}
@@ -105,6 +113,13 @@ public final class RunnerModuleUtils {
    */
   public static Artifact getDefaultSdkApiArtifact() {
     return DEFAULT_SDK_API_ARTIFACT;
+  }
+
+  /**
+   * @return an {@link Artifact} pointing to the default mule-sdk-api.
+   */
+  public static Artifact getDefaultSdkCompatibilityApiArtifact() {
+    return DEFAULT_SDK_COMPATIBILITY_API_ARTIFACT;
   }
 
   /**
@@ -659,7 +674,16 @@ public final class RunnerModuleUtils {
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkApiVersionForTest() {
-    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.4.0");
+    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.6.0");
+  }
+
+  /**
+   * @return resolves the default version of {@code mule-sdk-compatibility-api} to add into the container classpath
+   * @sine 4.5.0
+   */
+  // TODO: MULE-19762 remove once forward compatibility is finished
+  private static String getDefaultSdkCompatibilityApiVersionForTest() {
+    return getProperty(DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY, "0.6.0-rc3");
   }
 
 }
