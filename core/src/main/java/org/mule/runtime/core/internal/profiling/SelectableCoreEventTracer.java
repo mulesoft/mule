@@ -98,6 +98,16 @@ public class SelectableCoreEventTracer implements EventTracer<CoreEvent> {
   }
 
   @Override
+  public Map<String, String> getDistributedTraceContextMap(CoreEvent event) {
+    return currentEventTracer.getDistributedTraceContextMap(event);
+  }
+
+  @Override
+  public void recordErrorAtCurrentSpan(CoreEvent event, boolean isErrorEscapingCurrentSpan) {
+    currentEventTracer.recordErrorAtCurrentSpan(event, isErrorEscapingCurrentSpan);
+  }
+
+  @Override
   public SpanSnifferManager getSpanSnifferManager() {
     return currentEventTracer.getSpanSnifferManager();
   }
