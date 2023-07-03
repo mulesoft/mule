@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Optional;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
 
@@ -69,6 +70,7 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
   }
 
   @Test
+  @Issue("W-13682699")
   public void locationWithAbsolutePath() {
     File templateFile = new File("test-classes/template.txt");
     assertThat(templateFile.exists(), is(true));
