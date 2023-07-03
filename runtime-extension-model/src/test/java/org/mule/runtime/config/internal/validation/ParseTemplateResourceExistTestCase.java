@@ -7,7 +7,6 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
@@ -71,7 +70,8 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
 
   @Test
   public void locationWithAbsolutePath() {
-    File templateFile = new File("template.txt");
+    File templateFile = new File("test-classes/template.txt");
+    assertThat(templateFile.exists(), is(true));
     String absolutePath = templateFile.getAbsolutePath();
 
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
