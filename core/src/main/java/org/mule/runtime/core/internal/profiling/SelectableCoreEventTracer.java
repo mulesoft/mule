@@ -111,4 +111,8 @@ public class SelectableCoreEventTracer implements EventTracer<CoreEvent> {
   public SpanSnifferManager getSpanSnifferManager() {
     return currentEventTracer.getSpanSnifferManager();
   }
+
+  public EventTracer<CoreEvent> getCurrentEventTracer() {
+    return currentEventTracer;
+  }
 }

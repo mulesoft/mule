@@ -47,7 +47,8 @@ public class ProfilingServiceWrapperTestCase {
     ProfilingServiceWrapper profilingServiceWrapper = new TestProfilingServiceWrapper(spanExporterConfiguration);
 
     EventTracer<CoreEvent> coreEventTracer = profilingServiceWrapper.getCoreEventTracer();
-    assertThat(coreEventTracer, equalTo(MOCK_CORE_EVENT_TRACER));
+    assertThat(coreEventTracer, instanceOf(SelectableCoreEventTracer.class));
+    assertThat(((SelectableCoreEventTracer) coreEventTracer).getCurrentEventTracer(), equalTo(MOCK_CORE_EVENT_TRACER));
 
     // We also verify that the core event tracer is the same when retrieved again.
     assertThat(profilingServiceWrapper.getCoreEventTracer(), equalTo(coreEventTracer));
@@ -59,7 +60,8 @@ public class ProfilingServiceWrapperTestCase {
     when(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false")).thenReturn(FALSE.toString());
     ProfilingServiceWrapper profilingServiceWrapper = new TestProfilingServiceWrapper(spanExporterConfiguration);
     EventTracer<CoreEvent> coreEventTracer = profilingServiceWrapper.getCoreEventTracer();
-    assertThat(coreEventTracer, instanceOf(NoopCoreEventTracer.class));
+    assertThat(coreEventTracer, instanceOf(SelectableCoreEventTracer.class));
+    assertThat(((SelectableCoreEventTracer) coreEventTracer).getCurrentEventTracer(), instanceOf(NoopCoreEventTracer.class));
 
     // We also verify that the core event tracer is the same when retrieved again.
     assertThat(profilingServiceWrapper.getCoreEventTracer(), equalTo(coreEventTracer));
