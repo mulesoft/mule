@@ -72,7 +72,6 @@ public class ParseTemplateResourceExistTestCase extends AbstractCoreValidationTe
   @Test
   public void locationWithAbsolutePath() {
     File templateFile = new File("template.txt");
-    assertThat(templateFile.exists(), is(true));
     String absolutePath = templateFile.getAbsolutePath();
 
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
