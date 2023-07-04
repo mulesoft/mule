@@ -58,13 +58,7 @@
           "classSimpleName": "BundleScope",
           "elementKind": "enum",
           "justification": "W-12514052: moved to the new pom parser api"
-        }
-      ]
-    }
-  },
-  "4.5.0": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "code": "java.class.externalClassExposedInAPI",
           "new": "class org.mule.maven.client.api.model.BundleDependency",
