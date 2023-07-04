@@ -10,9 +10,9 @@ import static io.opentelemetry.api.common.AttributeKey.stringKey;
 
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.metrics.exporter.api.DummyConfiguration;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.api.MeterExporterFactory;
+import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.capturer.CapturingMeterExporterWrapper;
 
 import javax.inject.Inject;
@@ -39,7 +39,7 @@ public class OpenTelemetryMeterExporterFactory implements MeterExporterFactory {
   private final LazyValue<Resource> resource = new LazyValue<>(this::getResource);
 
   @Override
-  public MeterExporter getMeterExporter(DummyConfiguration configuration) {
+  public MeterExporter getMeterExporter(MeterExporterConfiguration configuration) {
     return new OpenTelemetryMeterExporter(configuration, resource.get());
   }
 

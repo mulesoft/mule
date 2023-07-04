@@ -6,7 +6,7 @@
  */
 
 /**
- * Definitions for Mule Metric exporter.
+ * Definitions for Mule Metrics Exporter.
  *
  * @moduleGraph
  * @since 4.5
@@ -14,7 +14,8 @@
 module org.mule.runtime.metrics.exporter.api {
 
   requires org.mule.runtime.metrics.api;
-  
+  requires org.mule.runtime.metrics.exporter.configuration.api;
+
   exports org.mule.runtime.metrics.exporter.api;
 
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.metrics.exporter.api;
 
+import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
+
 /**
  * A factory for {@link MeterExporter}
  *
@@ -14,10 +16,9 @@ package org.mule.runtime.metrics.exporter.api;
 public interface MeterExporterFactory {
 
   /**
-   * @param configuration the {@link DummyConfiguration} with the details to create the exporter
+   * @param configuration the {@link MeterExporterConfiguration} with the details to create the exporter
    *
    * @return a {@link MeterExporter}.
    */
-  // TODO W-13065409: Assign the class responsible for configuration when implemented
-  MeterExporter getMeterExporter(DummyConfiguration configuration);
+  MeterExporter getMeterExporter(MeterExporterConfiguration configuration);
 }

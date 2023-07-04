@@ -40,17 +40,16 @@ public class FileMeterExporterConfigurationTestCase {
 
   @Test
   public void returnsTheValueForANonSystemProperty() {
-    FileMeterExporterConfiguration fileSpanExporterConfiguration =
+    FileMeterExporterConfiguration fileMeterExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
-    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_NON_SYSTEM_PROPERTY), equalTo(
-                                                                                              VALUE_NON_SYSTEM_PROPERTY));
+    assertThat(fileMeterExporterConfiguration.getStringValue(KEY_NON_SYSTEM_PROPERTY), equalTo(VALUE_NON_SYSTEM_PROPERTY));
   }
 
   @Test
   public void whenPropertyIsNotInTheFileNullValueIsReturned() {
-    FileMeterExporterConfiguration fileSpanExporterConfiguration =
+    FileMeterExporterConfiguration fileMeterExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
-    assertThat(fileSpanExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
+    assertThat(fileMeterExporterConfiguration.getStringValue(NO_KEY_IN_FILE), is(nullValue()));
   }
 
   @Test
@@ -62,11 +61,12 @@ public class FileMeterExporterConfigurationTestCase {
 
   @Test
   public void whenValueCorrespondingToPathGetAbsoluteValue() {
-    TestFileMeterExporterConfiguration testFileSpanExporterConfiguration =
+    TestFileMeterExporterConfiguration testfileMeterExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
-    String caFileLocation = testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION);
+    String caFileLocation =
+        testfileMeterExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION);
     String keyFileLocation =
-        testFileSpanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION);
+        testfileMeterExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION);
 
     assertThat(caFileLocation, is(notNullValue()));
     assertThat(keyFileLocation, is(notNullValue()));
