@@ -248,19 +248,13 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       childOpenTelemetrySpanExporter.initialExportInfo.propagateInitialExportInfo(this.initialExportInfo);
       childOpenTelemetrySpanExporter.update();
 
-      // If it isn't exportable propagate the traceId and spanId
-      if (!childOpenTelemetrySpanExporter.exportable) {
-        childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
-        childOpenTelemetrySpanExporter.spanContext = spanContext;
-        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
+      // In case "no export until" is set, and it is not a child span that resets that condition (because
+      // we have a span that begins again to be exportable), we have to propagate that condition to the
+      // child span.
+      if (!noExportUntil.isEmpty()
+          && !noExportUntil.contains(getNameWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
+        childOpenTelemetrySpanExporter.exportable = false;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
-        childOpenTelemetrySpanExporter.setRootName(rootName);
-        return;
-      }
-
-      // If it is a policy span, propagate the rootSpan.
-      if (childOpenTelemetrySpanExporter.isPolicySpan) {
-        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
       }
 
       // Propagates the root name until it finds a root.
@@ -269,16 +263,17 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
         rootAttributes.forEach(childOpenTelemetrySpanExporter::setRootAttribute);
       }
 
-      // In case "no export until" is set, and it is not a child span that resets that condition (because
-      // we have a span that begins again to be exportable), we have to propagate that condition to the
-      // child span.
-      if (!noExportUntil.isEmpty()
-          && !noExportUntil.contains(getNameWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
+      // If it isn't exportable propagate the traceId and spanId
+      if (!childOpenTelemetrySpanExporter.exportable) {
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
-        childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
         childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
-        childOpenTelemetrySpanExporter.exportable = false;
+        return;
+      }
+
+      // If it is a policy span, propagate the rootSpan.
+      if (childOpenTelemetrySpanExporter.isPolicySpan) {
+        childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
       }
 
       if (childOpenTelemetrySpanExporter.parentSpanContext == getInvalid()) {
