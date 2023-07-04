@@ -473,14 +473,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
 
     List<URL> containerMuleUrls;
-    List<URL> container3ppUrls;
+    List<URL> containerOptUrls;
     try {
       final Pair<List<File>, List<File>> resolvedDependencies =
           dependencyResolver.resolveContainerDependencies(null, directDependencies, managedDependencies,
                                                           dependencyFilter,
                                                           rootArtifactRemoteRepositories);
       containerMuleUrls = toUrl(resolvedDependencies.getFirst());
-      container3ppUrls = toUrl(resolvedDependencies.getSecond());
+      containerOptUrls = toUrl(resolvedDependencies.getSecond());
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
@@ -489,7 +489,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
                                                                                                                   ZIP_EXTENSION));
     }).collect(toList());
-    container3ppUrls = container3ppUrls.stream().filter(url -> {
+    containerOptUrls = containerOptUrls.stream().filter(url -> {
       String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
                                                                                                                   ZIP_EXTENSION));
@@ -506,7 +506,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return new Pair<>(containerMuleUrls, container3ppUrls);
+    return new Pair<>(containerMuleUrls, containerOptUrls);
   }
 
   /**

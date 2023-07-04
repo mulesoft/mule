@@ -26,8 +26,8 @@ public interface TestContainerClassLoaderAssembler extends AutoCloseable {
 
   static TestContainerClassLoaderAssembler create(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
                                                   List<URL> muleUrls,
-                                                  List<URL> thirdPartyUrls) {
-    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, muleUrls, thirdPartyUrls);
+                                                  List<URL> optUrls) {
+    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, muleUrls, optUrls);
   }
 
   /**

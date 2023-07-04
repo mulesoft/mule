@@ -39,17 +39,17 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
 
   private final Set<String> extraBootPackages;
   private final URL[] muleUrls;
-  private final URL[] thirdPartyUrls;
+  private final URL[] optUrls;
   private final URLClassLoader classLoader;
   private final DefaultModuleRepository testContainerModuleRepository;
   private ArtifactClassLoader containerClassLoader;
 
   public TestPreFilteredContainerClassLoaderCreator(final List<String> extraBootPackages, final URL[] muleUrls,
-                                                    final URL[] thirdPartyUrls) {
+                                                    final URL[] optUrls) {
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(BOOT_PACKAGES).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     this.muleUrls = muleUrls;
-    this.thirdPartyUrls = thirdPartyUrls;
+    this.optUrls = optUrls;
     this.classLoader = new URLClassLoader(muleUrls, null);
     this.testContainerModuleRepository = new DefaultModuleRepository(new TestContainerModuleDiscoverer(classLoader));
   }
@@ -67,17 +67,18 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-
-    ClassLoader thirdPartiesClassLoader =
-        new MuleArtifactClassLoader(artifactDescriptor.getName() + " - Third parties", artifactDescriptor,
-                                    thirdPartyUrls,
+    // This cannot be a simple URLClassLoader because mockito is in the classloader for the test-runner-plugin and how the
+    // subclass mockito maker creates the dynamic mock class.
+    // An attempt should be made to check if a simple URLClassLoader works if inline mocks are used.
+    ClassLoader containerOptClassLoader =
+        new MuleArtifactClassLoader(artifactDescriptor.getName() + "/opt", artifactDescriptor,
+                                    optUrls,
                                     parentClassLoader,
                                     new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
-    // final URLClassLoader thirdPartiesClassLoader = new URLClassLoader(thirdPartyUrls, parentClassLoader);
 
     containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
                                                        muleUrls,
-                                                       thirdPartiesClassLoader,
+                                                       containerOptClassLoader,
                                                        new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
     return containerClassLoader;
   }

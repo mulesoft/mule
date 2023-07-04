@@ -359,7 +359,7 @@ public class DependencyResolver {
     node.accept(nlg);
 
     List<File> muleDependencyFiles = new ArrayList<>();
-    List<File> thirdPartyDependencyFiles = new ArrayList<>();
+    List<File> optDependencyFiles = new ArrayList<>();
 
     nlg.getNodes()
         .stream()
@@ -375,6 +375,7 @@ public class DependencyResolver {
               || artifact.getGroupId().equals("org.mule.sdk")
               || artifact.getGroupId().equals("org.mule.weave")
               || artifact.getGroupId().equals("org.mule.mvel")
+              || artifact.getGroupId().equals("org.mule.commons")
               || artifact.getGroupId().equals("com.mulesoft.mule.runtime")
               || artifact.getGroupId().equals("com.mulesoft.mule.runtime.modules")
               || artifact.getGroupId().equals("com.mulesoft.anypoint"))
@@ -382,11 +383,11 @@ public class DependencyResolver {
               && !artifact.getArtifactId().equals("api-annotations")) {
             muleDependencyFiles.add(absoluteFile);
           } else {
-            thirdPartyDependencyFiles.add(absoluteFile);
+            optDependencyFiles.add(absoluteFile);
           }
         });
 
-    return new Pair<>(muleDependencyFiles, thirdPartyDependencyFiles);
+    return new Pair<>(muleDependencyFiles, optDependencyFiles);
   }
 
   /**

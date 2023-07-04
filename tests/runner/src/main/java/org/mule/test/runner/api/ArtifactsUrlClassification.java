@@ -21,7 +21,7 @@ import java.util.List;
 public class ArtifactsUrlClassification {
 
   private final List<URL> containerMuleUrls;
-  private final List<URL> container3ppUrls;
+  private final List<URL> containerOptUrls;
   private final List<ServiceUrlClassification> serviceUrlClassifications;
   private final List<URL> applicationSharedLibUrls;
   private final List<PluginUrlClassification> pluginUrlClassifications;
@@ -34,7 +34,7 @@ public class ArtifactsUrlClassification {
    * 
    * @param containerMuleUrls         list of {@link URL} that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} exporting its api. Not null.
-   * @param container3ppUrls          list of {@link URL} that define the artifacts that would be loaded with the container
+   * @param containerOptUrls          list of {@link URL} that define the artifacts that would be loaded with the container
    *                                  {@link ClassLoader} encapsulating its api. Not null.
    * @param serviceUrlClassifications for each plugin discovered a list of {@link ArtifactUrlClassification} that defines the
    *                                  artifact that would be loaded by the service {@link ClassLoader}. Not null.
@@ -48,13 +48,13 @@ public class ArtifactsUrlClassification {
    * @param testRunnerExportedLibUrls define the artifacts that will exported on the test runner plugin in addition to the test
    *                                  classes and resources from the module being tested
    */
-  public ArtifactsUrlClassification(List<URL> containerMuleUrls, List<URL> container3ppUrls,
+  public ArtifactsUrlClassification(List<URL> containerMuleUrls, List<URL> containerOptUrls,
                                     List<ServiceUrlClassification> serviceUrlClassifications,
                                     List<URL> testRunnerLibUrls, List<URL> applicationLibUrls, List<URL> applicationSharedLibUrls,
                                     List<PluginUrlClassification> pluginUrlClassifications,
                                     List<URL> testRunnerExportedLibUrls) {
     requireNonNull(containerMuleUrls, "containerMuleUrls cannot be null");
-    requireNonNull(container3ppUrls, "container3ppUrls cannot be null");
+    requireNonNull(containerOptUrls, "containerOptUrls cannot be null");
     requireNonNull(serviceUrlClassifications, "serviceUrlClassifications cannot be null");
     requireNonNull(testRunnerLibUrls, "testRunnerLibUrls cannot be null");
     requireNonNull(applicationLibUrls, "applicationLibUrls cannot be null");
@@ -63,7 +63,7 @@ public class ArtifactsUrlClassification {
     requireNonNull(testRunnerExportedLibUrls, "testRunnerExportedLibUrls cannot be null");
 
     this.containerMuleUrls = containerMuleUrls;
-    this.container3ppUrls = container3ppUrls;
+    this.containerOptUrls = containerOptUrls;
     this.serviceUrlClassifications = serviceUrlClassifications;
     this.applicationSharedLibUrls = applicationSharedLibUrls;
     this.pluginUrlClassifications = pluginUrlClassifications;
@@ -76,8 +76,8 @@ public class ArtifactsUrlClassification {
     return containerMuleUrls;
   }
 
-  public List<URL> getContainer3ppUrls() {
-    return container3ppUrls;
+  public List<URL> getContainerOptUrls() {
+    return containerOptUrls;
   }
 
   public List<ServiceUrlClassification> getServiceUrlClassifications() {

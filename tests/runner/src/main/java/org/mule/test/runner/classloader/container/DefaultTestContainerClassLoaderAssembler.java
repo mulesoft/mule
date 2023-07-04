@@ -40,7 +40,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   private final ContainerClassLoaderFactory containerClassLoaderFactory;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> muleUrls, List<URL> thirdPartyUrls) {
+                                                  List<URL> muleUrls, List<URL> optUrls) {
     moduleRepository =
         new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
                                                              new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
@@ -48,7 +48,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
     testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(extraBootPackages,
                                                        muleUrls.toArray(new URL[muleUrls.size()]),
-                                                       thirdPartyUrls.toArray(new URL[thirdPartyUrls.size()]));
+                                                       optUrls.toArray(new URL[optUrls.size()]));
     containerClassLoaderFactory = new ContainerClassLoaderFactory(testContainerClassLoaderCreator);
   }
 

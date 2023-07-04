@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.component;
 
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+
 import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
@@ -37,7 +39,6 @@ import org.slf4j.Logger;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 /**
  * Provides {@code annotations} handling logic for Byte Buddy enhanced classes that implement {@link Component} dynamically.
@@ -103,9 +104,7 @@ public final class AnnotatedObjectInvocationHandler {
 
     ClassLoader classLoader;
     if (AnnotatedObjectInvocationHandler.class.getClassLoader() != clazz.getClassLoader()) {
-      classLoader = new MultipleParentClassLoader.Builder(false)
-          .append(AnnotatedObjectInvocationHandler.class.getClassLoader(), clazz.getClassLoader())
-          .build(AnnotatedObjectInvocationHandler.class.getClassLoader());
+      classLoader = from(AnnotatedObjectInvocationHandler.class.getClassLoader(), clazz.getClassLoader());
     } else {
       classLoader = clazz.getClassLoader();
     }

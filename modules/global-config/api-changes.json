@@ -3,6 +3,39 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.Authentication",
+          "new": "interface org.mule.maven.client.api.model.Authentication",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "Authentication",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.MavenConfiguration",
+          "new": "interface org.mule.maven.client.api.model.MavenConfiguration",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "MavenConfiguration",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "new": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "RemoteRepository",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
+        {
           "code": "java.class.removed",
           "old": "class org.mule.maven.client.api.model.BundleDependency",
           "package": "org.mule.maven.client.api.model",
