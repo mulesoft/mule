@@ -371,16 +371,7 @@ public class DependencyResolver {
 
           final File absoluteFile = artifact.getFile().getAbsoluteFile();
 
-          if ((artifact.getGroupId().equals("org.mule.runtime")
-              || artifact.getGroupId().equals("org.mule.sdk")
-              || artifact.getGroupId().equals("org.mule.weave")
-              || artifact.getGroupId().equals("org.mule.mvel")
-              || artifact.getGroupId().equals("org.mule.commons")
-              || artifact.getGroupId().equals("com.mulesoft.mule.runtime")
-              || artifact.getGroupId().equals("com.mulesoft.mule.runtime.modules")
-              || artifact.getGroupId().equals("com.mulesoft.anypoint"))
-              // why does maven-client use this?
-              && !artifact.getArtifactId().equals("api-annotations")) {
+          if (isMuleContainerGroupId(artifact.getGroupId())) {
             muleDependencyFiles.add(absoluteFile);
           } else {
             optDependencyFiles.add(absoluteFile);
@@ -388,6 +379,17 @@ public class DependencyResolver {
         });
 
     return new Pair<>(muleDependencyFiles, optDependencyFiles);
+  }
+
+  private boolean isMuleContainerGroupId(final String groupId) {
+    return groupId.equals("org.mule.runtime")
+        || groupId.equals("org.mule.sdk")
+        || groupId.equals("org.mule.weave")
+        || groupId.equals("org.mule.mvel")
+        || groupId.equals("org.mule.commons")
+        || groupId.equals("com.mulesoft.mule.runtime")
+        || groupId.equals("com.mulesoft.mule.runtime.modules")
+        || groupId.equals("com.mulesoft.anypoint");
   }
 
   /**

@@ -7,7 +7,7 @@
 package org.mule.runtime.globalconfig.internal;
 
 import static org.mule.runtime.globalconfig.internal.DefaultEnableableConfig.ENABLED_PROPERTY;
-import org.mule.maven.client.api.model.MavenConfiguration;
+
 import org.mule.runtime.globalconfig.api.EnableableConfig;
 import org.mule.runtime.globalconfig.api.cluster.ClusterConfig;
 import org.mule.runtime.globalconfig.api.exception.RuntimeGlobalConfigException;
@@ -36,7 +36,7 @@ public class ClusterConfigBuilder {
 
   /**
    * @param mavenConfig the maven configuration set by the user
-   * @return a {@link MavenConfiguration} created by using the user configuration and default values set by mule.
+   * @return a {@link ClusterConfig} created by using the user configuration and default values set by mule.
    */
   public static ClusterConfig parseClusterConfig(Config mavenConfig) {
     ClusterConfigImpl clusterConfig = new ClusterConfigImpl();

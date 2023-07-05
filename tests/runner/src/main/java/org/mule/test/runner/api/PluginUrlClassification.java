@@ -7,9 +7,10 @@
 
 package org.mule.test.runner.api;
 
-import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
@@ -55,11 +56,11 @@ public class PluginUrlClassification {
   public PluginUrlClassification(String name, List<URL> urls, List<Class> exportClasses, List<String> pluginDependencies,
                                  Set<String> exportedPackages, Set<String> exportedResources,
                                  Set<String> privilegedExportedPackages, Set<String> privilegedArtifacts) {
-    checkNotNull(name, "name cannot be null");
-    checkNotNull(urls, "urls cannot be null");
-    checkNotNull(pluginDependencies, "pluginDependencies cannot be null");
-    checkNotNull(exportedPackages, "exportedPackages cannot be null");
-    checkNotNull(exportedResources, "exportedResources cannot be null");
+    requireNonNull(name, "name cannot be null");
+    requireNonNull(urls, "urls cannot be null");
+    requireNonNull(pluginDependencies, "pluginDependencies cannot be null");
+    requireNonNull(exportedPackages, "exportedPackages cannot be null");
+    requireNonNull(exportedResources, "exportedResources cannot be null");
 
     checkArgument(privilegedExportedPackages != null, "privilegedExportedPackages cannot be null");
     checkArgument(privilegedArtifacts != null, "privilegedArtifacts cannot be null");
