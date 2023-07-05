@@ -405,8 +405,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param pluginUrlClassifications       {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
    * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
-   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
-   *         are jar urls for third parties.
+   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jar urls, second are
+   *         jar urls for third parties.
    */
   private Pair<List<URL>, List<URL>> buildContainerUrlClassification(ClassPathClassifierContext context,
                                                                      List<Dependency> directDependencies,

@@ -209,8 +209,8 @@ public class DependencyResolver {
    *                            {@code null}
    * @param dependencyFilter    {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve
    *                            operation. May be {@code null} to no filter
-   * @param remoteRepositories  {@link RemoteRepository} to be used when resolving dependencies in addition to the ones already
-   *                            defined in the context.
+   * @param remoteRepositories  a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule
+   *                            jar urls, second are jar urls for third parties.
    * @return a {@link List} of {@link File}s for each dependency resolved
    * @throws {@link DependencyCollectionException} if the dependency tree could not be built
    * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
@@ -352,7 +352,8 @@ public class DependencyResolver {
    * Traverse the {@link DependencyNode} to get the files for each artifact.
    *
    * @param node {@link DependencyNode} that represents the dependency graph
-   * @return {@link List} of {@link File}s for each artifact resolved
+   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
+   *         are jar urls for third parties.
    */
   private Pair<List<File>, List<File>> getContainerFiles(DependencyNode node) {
     PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
@@ -381,6 +382,7 @@ public class DependencyResolver {
     return new Pair<>(muleDependencyFiles, optDependencyFiles);
   }
 
+  // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies
   private boolean isMuleContainerGroupId(final String groupId) {
     return groupId.equals("org.mule.runtime")
         || groupId.equals("org.mule.sdk")
