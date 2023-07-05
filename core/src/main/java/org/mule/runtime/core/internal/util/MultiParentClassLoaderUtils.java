@@ -13,6 +13,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 /**
+ * Provides utilities for creating multi-parent/composite classloaders.
  * 
  * @since 4.5
  */
