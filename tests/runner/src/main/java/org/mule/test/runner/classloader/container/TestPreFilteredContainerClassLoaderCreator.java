@@ -67,15 +67,7 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-    // This cannot be a simple URLClassLoader because mockito is in the classloader for the test-runner-plugin and how the
-    // subclass mockito maker creates the dynamic mock class.
-    // An attempt should be made to check if a simple URLClassLoader works if inline mocks are used.
-    ClassLoader containerOptClassLoader =
-        new MuleArtifactClassLoader(artifactDescriptor.getName() + "/opt", artifactDescriptor,
-                                    optUrls,
-                                    parentClassLoader,
-                                    new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
-
+    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, parentClassLoader);
     containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
                                                        muleUrls,
                                                        containerOptClassLoader,
