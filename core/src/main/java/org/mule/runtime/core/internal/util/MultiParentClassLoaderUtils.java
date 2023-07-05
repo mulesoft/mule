@@ -19,6 +19,8 @@ import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
  */
 public class MultiParentClassLoaderUtils {
 
+  private static final ClassLoader CONTAINER_CLASS_LOADER = MultiParentClassLoaderUtils.class.getClassLoader();
+
   private MultiParentClassLoaderUtils() {
     // nothing to do
   }
@@ -35,7 +37,7 @@ public class MultiParentClassLoaderUtils {
       .build(cl -> new MultipleParentClassLoader.Builder(false)
           .appendMostSpecific(MultiParentClassLoaderUtils.class)
           .appendMostSpecific(cl)
-          .build(MultiParentClassLoaderUtils.class.getClassLoader()));
+          .build(CONTAINER_CLASS_LOADER));
 
   /**
    * Creates a new classloader that has visibility on the Mule Container classloader and {@code deploymentClassLoader}.
@@ -49,7 +51,7 @@ public class MultiParentClassLoaderUtils {
    */
   public static ClassLoader multiParentClassLoaderFor(ClassLoader deploymentClassLoader) {
     if (deploymentClassLoader == null) {
-      return MultiParentClassLoaderUtils.class.getClassLoader();
+      return CONTAINER_CLASS_LOADER;
     } else {
       return COMPOSITE_CL_CACHE.get(deploymentClassLoader);
     }
