@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.privileged.component;
 
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.core.internal.util.MultiParentClassLoaderUtils.multiParentClassLoaderFor;
 
 import static java.lang.reflect.Modifier.isFinal;
 import static java.util.Arrays.asList;
@@ -102,13 +102,7 @@ public final class AnnotatedObjectInvocationHandler {
             .intercept(to(annotatedObjectInvocationHandler))));
     builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
 
-    ClassLoader classLoader;
-    if (AnnotatedObjectInvocationHandler.class.getClassLoader() != clazz.getClassLoader()) {
-      classLoader = from(AnnotatedObjectInvocationHandler.class.getClassLoader(), clazz.getClassLoader());
-    } else {
-      classLoader = clazz.getClassLoader();
-    }
-
+    ClassLoader classLoader = multiParentClassLoaderFor(clazz.getClassLoader());
     return builder.get().make().load(classLoader).getLoaded();
   }
 
