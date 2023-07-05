@@ -9,64 +9,100 @@ package org.mule.runtime.tracer.customization.impl.export;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.DebugInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.MonitoringInitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.provider.OverviewInitialExportInfoProvider;
+import org.mule.runtime.tracing.level.api.config.TracingLevel;
+import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.util.Set;
 
+// Hacer que esto implemente InitialExportInfo
 public class TracingLevelExportInfo {
 
+  private final Component component;
+  // Tratar de unificar estos dos valores de alguna manera
+  private final String spanNameOverride;
   private InitialExportInfoProvider initialExportInfoProvider;
-  private Object spanIdentifier;
-  private boolean isOverride;
-  private InitialExportInfo initialExportInfo;
+  private final boolean isLevelOverride;
 
-  public TracingLevelExportInfo(InitialExportInfoProvider initialExportInfoProvider, boolean isOverride) {
+  private TracingLevelExportInfo(InitialExportInfoProvider initialExportInfoProvider, String spanNameOverride,
+                                 boolean isLevelOverride) {
     this.initialExportInfoProvider = initialExportInfoProvider;
-    this.isOverride = isOverride;
+    this.isLevelOverride = isLevelOverride;
+    this.spanNameOverride = spanNameOverride;
+    this.component = null;
   }
 
-  public void setSpanIdentifier(Component spanIdentifier) {
-    this.spanIdentifier = spanIdentifier;
+  private TracingLevelExportInfo(InitialExportInfoProvider initialExportInfoProvider, Component component,
+                                 boolean isLevelOverride) {
+    this.initialExportInfoProvider = initialExportInfoProvider;
+    this.isLevelOverride = isLevelOverride;
+    this.component = component;
+    this.spanNameOverride = null;
   }
 
-  public void setSpanIdentifier(String spanIdentifier) {
-    this.spanIdentifier = spanIdentifier;
+  public static TracingLevelExportInfo createTracingLevelExportInfo(Component component,
+                                                                    TracingLevelConfiguration tracingLevelConfiguration) {
+    // Porque se pide un override si puede ser igual al level? Agregar un isOverride a TracingLevel
+    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
+    TracingLevel tracingLevelOverride = getTracingLevelOverride(component, tracingLevelConfiguration);
+    return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevelOverride), component,
+                                      !tracingLevelOverride.equals(tracingLevel));
   }
 
-  public boolean isOverride() {
-    return this.isOverride;
+  public static TracingLevelExportInfo createTracingLevelExportInfo(Component component, String nameOverride,
+                                                                    TracingLevelConfiguration tracingLevelConfiguration) {
+    // Porque se pide un override si puede ser igual al level? Agregar un isOverride a TracingLevel
+    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
+    TracingLevel tracingLevelOverride =
+        getTracingLevelOverride(component, tracingLevelConfiguration);
+    return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevelOverride), nameOverride,
+                                      !tracingLevelOverride.equals(tracingLevel));
+  }
+
+  private static TracingLevel getTracingLevelOverride(Component component, TracingLevelConfiguration tracingLevelConfiguration) {
+    return component.getLocation() != null
+        ? tracingLevelConfiguration.getTracingLevelOverride(component.getLocation().getLocation())
+        : tracingLevelConfiguration.getTracingLevel();
+  }
+
+  private static InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
+    switch (tracingLevel) {
+      case OVERVIEW:
+        return new OverviewInitialExportInfoProvider();
+      case DEBUG:
+        return new DebugInitialExportInfoProvider();
+      default:
+        return new MonitoringInitialExportInfoProvider();
+    }
+  }
+
+  // Esto tendria que ser mas estatico (revisar)
+  private InitialExportInfo getInitialExportInfo() {
+    if (spanNameOverride != null) {
+      return initialExportInfoProvider.getInitialExportInfo(spanNameOverride);
+    } else {
+      return initialExportInfoProvider.getInitialExportInfo(component);
+    }
   }
 
   public boolean isExportable() {
-    if (initialExportInfo == null) {
-      initialExportInfo = getInitialExportInfo();
-    }
-    return initialExportInfo.isExportable();
+    return getInitialExportInfo().isExportable();
   }
 
   public Set<String> noExportUntil() {
-    if (initialExportInfo == null) {
-      initialExportInfo = getInitialExportInfo();
-    }
-    return initialExportInfo.noExportUntil();
+    return getInitialExportInfo().noExportUntil();
   }
 
-  private InitialExportInfo getInitialExportInfo() {
-    if (this.spanIdentifier instanceof Component) {
-      return this.initialExportInfoProvider.getInitialExportInfo((Component) spanIdentifier);
-    }
-    return this.initialExportInfoProvider.getInitialExportInfo((String) spanIdentifier);
-  }
-
-  public void propagateExportInfo(TracingLevelExportInfo parentTracingLevelExportInfo) {
-    if (!isOverride() && parentTracingLevelExportInfo.isOverride()) {
-      this.initialExportInfoProvider = parentTracingLevelExportInfo.getInitialExportInfoProvider();
-      initialExportInfo = getInitialExportInfo();
-      this.isOverride = true;
+  public void initialize(InitialExportInfo initialExportInfo) {
+    if (!isLevelOverride) {
+      this.initialExportInfoProvider =
+          ((ExecutionInitialExportInfo) initialExportInfo).getTracingLevelExportInfo().getInitialExportInfoProvider();
     }
   }
 
-  private InitialExportInfoProvider getInitialExportInfoProvider() {
-    return this.initialExportInfoProvider;
+  public InitialExportInfoProvider getInitialExportInfoProvider() {
+    return initialExportInfoProvider;
   }
-
 }

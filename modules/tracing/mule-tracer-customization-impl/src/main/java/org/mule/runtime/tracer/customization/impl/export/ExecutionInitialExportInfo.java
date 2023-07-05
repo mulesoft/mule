@@ -36,8 +36,8 @@ public class ExecutionInitialExportInfo implements InitialExportInfo {
 
   @Override
   public void propagateInitialExportInfo(InitialExportInfo parentInitialExportInfo) {
-    ExecutionInitialExportInfo parentExecutionInitialExportInfo = ((ExecutionInitialExportInfo) parentInitialExportInfo);
-    this.tracingLevelExportInfo.propagateExportInfo(parentExecutionInitialExportInfo.getTracingLevelExportInfo());
+    tracingLevelExportInfo
+        .initialize(parentInitialExportInfo);
   }
 
   public TracingLevelExportInfo getTracingLevelExportInfo() {
