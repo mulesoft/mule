@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.launcher.log4j2;
 
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URI;
 import java.util.concurrent.TimeUnit;

@@ -14,7 +14,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
 import java.net.URL;
 import java.util.Enumeration;

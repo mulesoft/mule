@@ -25,9 +25,9 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.ShutdownListener;
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.io.Serializable;
