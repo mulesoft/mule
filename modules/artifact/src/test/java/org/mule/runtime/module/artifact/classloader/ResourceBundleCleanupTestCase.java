@@ -20,13 +20,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.size.SmallTest;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;

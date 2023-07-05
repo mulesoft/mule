@@ -29,6 +29,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
 import org.mule.tck.util.CollectableReference;
 
 import java.net.MalformedURLException;
@@ -68,8 +69,10 @@ public class RegionClassLoaderDisposalTestCase extends RegionClassLoaderTestCase
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
     createClassLoaders(regionClassLoader);
 
-    final ArtifactClassLoader ownerClassLoader = spy(new TestApplicationClassLoader(regionClassLoader));
-    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader ownerClassLoader =
+        spy(new TestApplicationClassLoader(regionClassLoader));
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader regionMember2 =
+        mock(org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
 
@@ -92,9 +95,11 @@ public class RegionClassLoaderDisposalTestCase extends RegionClassLoaderTestCase
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
     createClassLoaders(regionClassLoader);
 
-    final ArtifactClassLoader ownerClassLoader = spy(new TestApplicationClassLoader(regionClassLoader));
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader ownerClassLoader =
+        spy(new TestApplicationClassLoader(regionClassLoader));
     doThrow(new RuntimeException()).when(ownerClassLoader).dispose();
-    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader regionMember2 =
+        mock(org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
 
     regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);
@@ -118,10 +123,13 @@ public class RegionClassLoaderDisposalTestCase extends RegionClassLoaderTestCase
         new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, getClass().getClassLoader(), lookupPolicy);
     createClassLoaders(regionClassLoader);
 
-    final ArtifactClassLoader ownerClassLoader = spy(new RegionClassLoaderTestCase.TestApplicationClassLoader(regionClassLoader));
-    final ArtifactClassLoader regionMember2 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader ownerClassLoader =
+        spy(new RegionClassLoaderTestCase.TestApplicationClassLoader(regionClassLoader));
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader regionMember2 =
+        mock(org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
     doThrow(new RuntimeException()).when(regionMember2).dispose();
-    final ArtifactClassLoader regionMember3 = mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
+    final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader regionMember3 =
+        mock(ArtifactClassLoader.class, RETURNS_DEEP_STUBS);
 
     regionClassLoader.addClassLoader(ownerClassLoader, NULL_CLASSLOADER_FILTER);
     regionClassLoader.addClassLoader(regionMember2, NULL_CLASSLOADER_FILTER);

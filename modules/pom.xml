@@ -18,6 +18,7 @@
 
     <modules>
         <module>all-modules</module>
+        <module>artifact-api</module>
         <module>artifact</module>
         <module>artifact-activation</module>
         <module>container</module>

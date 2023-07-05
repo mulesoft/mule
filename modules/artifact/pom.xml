@@ -20,6 +20,12 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-jar-handling-utils</artifactId>
             <version>${project.version}</version>
         </dependency>

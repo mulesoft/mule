@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal;
 
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;

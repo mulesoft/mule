@@ -38,7 +38,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;

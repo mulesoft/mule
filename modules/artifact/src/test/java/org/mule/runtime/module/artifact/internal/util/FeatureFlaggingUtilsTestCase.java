@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 

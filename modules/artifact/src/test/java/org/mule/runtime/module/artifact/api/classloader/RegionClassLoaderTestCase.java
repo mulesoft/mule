@@ -39,10 +39,12 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.util.EnumerationMatcher;
 
@@ -98,7 +100,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   private final URL API_LOCATION;
   private final URL API_LOADED_RESOURCE;
 
-  protected final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+  protected final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+      mock(ClassLoaderLookupPolicy.class);
   protected final ArtifactDescriptor artifactDescriptor;
   private final URL API_WITH_SPACES_LOCATION;
   private final URL API_WITH_SPACES_LOADED_RESOURCE;
@@ -131,7 +134,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(parentClassLoader.loadClass(CLASS_NAME)).thenThrow(new ClassNotFoundException());
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    List<ArtifactClassLoader> classLoaders = createClassLoaders(regionClassLoader);
+    List<org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader> classLoaders =
+        createClassLoaders(regionClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
 
@@ -139,11 +143,11 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     regionClassLoader.loadClass(CLASS_NAME);
   }
 
-  protected List<ArtifactClassLoader> createClassLoaders(RegionClassLoader parent) {
+  protected List<org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader> createClassLoaders(RegionClassLoader parent) {
     appClassLoader = new TestApplicationClassLoader(parent);
     pluginClassLoader = new SubTestClassLoader(parent);
 
-    List<ArtifactClassLoader> classLoaders = new LinkedList<>();
+    List<org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader> classLoaders = new LinkedList<>();
     Collections.addAll(classLoaders, appClassLoader, pluginClassLoader);
     return classLoaders;
   }
@@ -156,7 +160,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
-    List<ArtifactClassLoader> classLoaders = createClassLoaders(regionClassLoader);
+    List<org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader> classLoaders =
+        createClassLoaders(regionClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
     when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
@@ -189,7 +194,8 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(null);
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    List<ArtifactClassLoader> classLoaders = createClassLoaders(regionClassLoader);
+    List<org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader> classLoaders =
+        createClassLoaders(regionClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
 
@@ -651,7 +657,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
   }
 
   private void getResourceFromExportingArtifact(String resource, URL expectedResult, RegionClassLoader regionClassLoader) {
-    ArtifactClassLoader pluginClassloader = mock(ArtifactClassLoader.class);
+    org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader pluginClassloader = mock(ArtifactClassLoader.class);
     ArtifactDescriptor pluginDescriptor = mock(ArtifactDescriptor.class);
 
     when(lookupPolicy.getPackageLookupStrategy(PACKAGE_NAME)).thenReturn(CHILD_FIRST);

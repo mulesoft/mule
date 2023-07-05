@@ -11,7 +11,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifactapi.classloader.ShutdownListener;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.tck.classlaoder.TestClassLoader;
 
 public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {

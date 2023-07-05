@@ -9,8 +9,8 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifactapi.classloader.LookupStrategy;
 
 import java.util.Map;
 import java.util.stream.Stream;

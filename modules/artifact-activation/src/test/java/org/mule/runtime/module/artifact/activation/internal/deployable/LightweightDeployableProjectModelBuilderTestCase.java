@@ -23,7 +23,7 @@ import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
@@ -83,7 +83,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     List<BundleDependency> additionalBundleDependencies =
         deployableProjectModel.getAdditionalPluginDependencies().values().stream().findFirst().get();
     assertThat(additionalBundleDependencies.size(), is(1));
-    org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor descriptor =
+    org.mule.runtime.module.artifactapi.descriptor.BundleDescriptor descriptor =
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));

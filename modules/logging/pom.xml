@@ -20,6 +20,36 @@
     </properties>
 
     <dependencies>
+        <!-- TODO: Remove this -->
+<!--        <dependency>-->
+<!--            <groupId>org.mule.runtime</groupId>-->
+<!--            <artifactId>mule-module-launcher</artifactId>-->
+<!--            <version>4.5.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
+        <!-- TODO: Remove this -->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-api</artifactId>
+            <version>1.5.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-artifact-api</artifactId>
+            <version>4.5.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -51,6 +81,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-common</artifactId>
+            <version>4.5.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>

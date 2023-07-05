@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

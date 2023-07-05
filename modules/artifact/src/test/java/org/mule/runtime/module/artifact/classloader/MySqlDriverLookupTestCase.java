@@ -22,8 +22,8 @@ import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

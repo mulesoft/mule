@@ -34,7 +34,7 @@ import org.mule.module.artifact.classloader.JdbcResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;

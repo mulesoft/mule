@@ -15,7 +15,6 @@ import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProj
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
-import org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;

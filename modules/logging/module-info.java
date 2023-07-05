@@ -25,4 +25,9 @@ module org.mule.runtime.logging {
   requires transitive java.logging;
   requires transitive org.apache.commons.logging;
 
+  requires org.apache.logging.log4j.core;
+  requires org.mule.runtime.api;
+    requires org.mule.runtime.module.common;
+    requires com.github.benmanes.caffeine;
+
 }

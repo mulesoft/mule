@@ -14,6 +14,7 @@ import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifactapi.plugin.MuleLoaderDescriber;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ import java.util.Map;
  */
 @NoInstantiate
 @NoExtend
-public class LoaderDescriber {
+public class LoaderDescriber implements MuleLoaderDescriber {
 
   private final String id;
   private final Map<String, Object> attributes = new HashMap<>();

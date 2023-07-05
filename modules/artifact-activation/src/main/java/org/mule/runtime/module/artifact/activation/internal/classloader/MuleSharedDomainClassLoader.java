@@ -29,7 +29,8 @@ import org.slf4j.Logger;
 /**
  * Defines a {@link MuleArtifactClassLoader} for a domain artifact.
  */
-public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader {
+public class MuleSharedDomainClassLoader extends NativeLibraryLoaderMuleDeployableArtifactClassLoader
+        implements org.mule.runtime.module.artifactapi.classloader.MuleSharedDomainClassLoader {
 
   static {
     registerAsParallelCapable();

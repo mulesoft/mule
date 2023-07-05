@@ -21,6 +21,7 @@ import static org.mule.runtime.module.artifact.api.classloader.ParentOnlyLookupS
 import static org.mule.tck.junit4.matcher.FunctionExpressionMatcher.expressionMatches;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.exception.CompositeClassNotFoundException;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.classlaoder.TestClassLoader.TestClassNotFoundException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -49,7 +50,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesParentOnlyLookup() throws Exception {
     URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
     FineGrainedControlClassLoader ext =
         new FineGrainedControlClassLoader(new URL[] {getChildFileResource()}, parent, lookupPolicy);
@@ -63,7 +65,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
     final ClassNotFoundException thrownException = new ClassNotFoundException("ERROR");
     when(parent.loadClass(TEST_CLASS_NAME)).thenThrow(thrownException);
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_ONLY);
 
     expected.expect(CompositeClassNotFoundException.class);
@@ -81,7 +84,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesParentFirstLookup() throws Exception {
     URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
 
     FineGrainedControlClassLoader ext =
@@ -94,7 +98,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesParentFirstThenChildLookup() throws Exception {
     ClassLoader parent = Thread.currentThread().getContextClassLoader();
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
     when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(PARENT_FIRST);
     when(lookupPolicy.getClassLookupStrategy(String.class.getName())).thenReturn(PARENT_FIRST);
@@ -109,7 +114,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesParentFirstAndChildLookupAndFails() throws Exception {
     ClassLoader parent = Thread.currentThread().getContextClassLoader();
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
 
     expected.expect(CompositeClassNotFoundException.class);
@@ -129,7 +135,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesChildFirstLookup() throws Exception {
     URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_FIRST);
     when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(PARENT_ONLY);
     when(lookupPolicy.getClassLookupStrategy(String.class.getName())).thenReturn(PARENT_ONLY);
@@ -144,7 +151,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesChildFirstThenParentLookup() throws Exception {
     URLClassLoader parent = new URLClassLoader(new URL[] {getParentResource()}, Thread.currentThread().getContextClassLoader());
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(PARENT_FIRST);
 
     FineGrainedControlClassLoader ext = new FineGrainedControlClassLoader(new URL[0], parent, lookupPolicy);
@@ -156,7 +164,8 @@ public class FineGrainedControlClassLoaderTestCase extends AbstractMuleTestCase 
   public void usesChildFirstThenParentLookupAndFails() throws Exception {
     ClassLoader parent = Thread.currentThread().getContextClassLoader();
 
-    final ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    final org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy =
+        mock(org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy.class);
     when(lookupPolicy.getClassLookupStrategy(TEST_CLASS_NAME)).thenReturn(CHILD_FIRST);
 
     expected.expect(CompositeClassNotFoundException.class);

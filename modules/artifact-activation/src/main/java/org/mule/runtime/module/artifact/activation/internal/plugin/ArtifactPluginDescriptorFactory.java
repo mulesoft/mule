@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.plugin;
 
-import static java.util.Optional.empty;
-
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.module.artifact.activation.internal.descriptor.AbstractArtifactDescriptorFactory;

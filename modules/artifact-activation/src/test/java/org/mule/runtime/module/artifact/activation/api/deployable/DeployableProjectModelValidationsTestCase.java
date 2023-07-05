@@ -8,7 +8,7 @@ package org.mule.runtime.module.artifact.activation.api.deployable;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.API_CLASSIFIERS;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
+import static org.mule.runtime.module.artifactapi.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
@@ -23,8 +23,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
-import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
+import org.mule.runtime.module.artifactapi.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

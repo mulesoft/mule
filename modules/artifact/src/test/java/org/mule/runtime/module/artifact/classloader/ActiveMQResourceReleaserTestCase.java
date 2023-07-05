@@ -28,8 +28,8 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

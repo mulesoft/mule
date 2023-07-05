@@ -30,6 +30,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
+import org.mule.runtime.module.artifactapi.classloader.MuleRegionClassLoader;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -64,7 +65,7 @@ import org.slf4j.Logger;
  * resources are found will depend on the order in which the class loaders were added to the region.
  */
 // TODO W-12637978 - extend from MuleArtifactClassLoader and make internal
-public class RegionClassLoader extends MuleDeployableArtifactClassLoader {
+public class RegionClassLoader extends MuleDeployableArtifactClassLoader implements MuleRegionClassLoader {
 
   protected static final String REGION_OWNER_CANNOT_BE_REMOVED_ERROR = "Region owner cannot be removed";
   static {

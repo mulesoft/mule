@@ -15,9 +15,9 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifactapi.classloader.ShutdownListener;
 
 import java.net.URI;
 import java.util.List;
