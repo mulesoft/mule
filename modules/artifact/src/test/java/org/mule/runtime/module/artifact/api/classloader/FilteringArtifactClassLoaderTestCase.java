@@ -24,7 +24,6 @@ import static org.mule.tck.util.EnumerationMatcher.equalTo;
 
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -66,8 +65,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
 
   protected FilteringArtifactClassLoader filteringArtifactClassLoader;
   protected final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
-  protected final org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader artifactClassLoader =
-      mock(ArtifactClassLoader.class);
+  protected final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
 
   @Parameters(name = "verbose: {0}")
   public static Collection<Object[]> params() {

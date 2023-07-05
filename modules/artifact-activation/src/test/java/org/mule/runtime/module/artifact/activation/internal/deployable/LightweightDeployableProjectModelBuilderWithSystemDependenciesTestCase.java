@@ -24,7 +24,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
-import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;

@@ -12,7 +12,7 @@ import static org.mule.runtime.module.artifact.activation.internal.plugin.Plugin
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.mule.runtime.module.artifactapi.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

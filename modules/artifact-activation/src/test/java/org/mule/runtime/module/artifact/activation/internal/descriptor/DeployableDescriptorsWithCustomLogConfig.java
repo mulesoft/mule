@@ -14,7 +14,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.net.URISyntaxException;

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
 import org.mule.mvel2.optimizers.dynamic.DynamicOptimizer;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;

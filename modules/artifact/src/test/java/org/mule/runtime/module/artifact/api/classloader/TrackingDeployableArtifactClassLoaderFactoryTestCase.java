@@ -14,9 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -33,18 +31,18 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private DeployableArtifactClassLoaderFactory<ArtifactDescriptor> delegateFactory;
   private TrackingDeployableArtifactClassLoaderFactory<ArtifactDescriptor> factory;
-  private org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader parent;
+  private org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader parent;
   private ArtifactDescriptor descriptor;
-  private org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader classLoader;
+  private org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader classLoader;
 
   @Before
   public void setUp() throws Exception {
     artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
     delegateFactory = mock(DeployableArtifactClassLoaderFactory.class);
     factory = new TrackingDeployableArtifactClassLoaderFactory<>(artifactClassLoaderManager, delegateFactory);
-    parent = mock(org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader.class);
+    parent = mock(org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader.class);
     descriptor = new ArtifactDescriptor(ARTIFACT_NAME);
-    org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     classLoader = new MuleArtifactClassLoader(ARTIFACT_NAME, descriptor, new URL[0], getClass().getClassLoader(), lookupPolicy);
 
     when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
@@ -53,7 +51,7 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
 
   @Test
   public void registersClassLoader() throws Exception {
-    org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader artifactClassLoader =
+    org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader artifactClassLoader =
         factory.create(ARTIFACT_ID, parent, descriptor);
 
     verify(artifactClassLoaderManager).register(artifactClassLoader);

@@ -18,8 +18,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
 
-import org.mule.runtime.module.artifactapi.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifactapi.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.IOException;

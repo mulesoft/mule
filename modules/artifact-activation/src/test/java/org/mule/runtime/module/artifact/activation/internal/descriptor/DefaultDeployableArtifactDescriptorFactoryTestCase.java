@@ -24,12 +24,12 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.core.Is.is;
 
 import org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifactapi.descriptor.ArtifactPluginDescriptor;
-import org.mule.runtime.module.artifactapi.descriptor.BundleDependency;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 
 import java.net.URISyntaxException;

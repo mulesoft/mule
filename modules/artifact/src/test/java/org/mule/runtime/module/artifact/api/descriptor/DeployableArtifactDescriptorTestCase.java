@@ -13,7 +13,6 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashSet;
@@ -30,8 +29,7 @@ public class DeployableArtifactDescriptorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void sanitizesConfigResources() {
-    org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor descriptor =
-        new DeployableArtifactDescriptor("test");
+    DeployableArtifactDescriptor descriptor = new DeployableArtifactDescriptor("test");
     Set<String> configResources = new HashSet<>();
     configResources.add("config\\db\\connection.xml");
     configResources.add("config\\db\\flows.xml");

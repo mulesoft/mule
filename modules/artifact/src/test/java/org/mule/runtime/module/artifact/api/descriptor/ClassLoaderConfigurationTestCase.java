@@ -13,7 +13,6 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
-import org.mule.runtime.module.artifactapi.descriptor.ClassLoaderConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashSet;
@@ -33,7 +32,7 @@ public class ClassLoaderConfigurationTestCase extends AbstractMuleTestCase {
     Set<String> exportedResources = new HashSet<>();
     exportedResources.add("META-INF\\schemas\\schema.xml");
     exportedResources.add("META-INF\\README.txt");
-    org.mule.runtime.module.artifactapi.descriptor.ClassLoaderConfiguration classLoaderConfiguration =
+    ClassLoaderConfiguration classLoaderConfiguration =
         new ClassLoaderConfiguration.ClassLoaderConfigurationBuilder().exportingResources(exportedResources).build();
 
     assertThat(classLoaderConfiguration.getExportedResources(),
