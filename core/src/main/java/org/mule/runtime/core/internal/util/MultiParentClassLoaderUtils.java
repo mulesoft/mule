@@ -48,7 +48,11 @@ public class MultiParentClassLoaderUtils {
    * @return a classloader with visibility on the Mule Container classloader and {@code deploymentClassLoader}.
    */
   public static ClassLoader multiParentClassLoaderFor(ClassLoader deploymentClassLoader) {
-    return COMPOSITE_CL_CACHE.get(deploymentClassLoader);
+    if (deploymentClassLoader == null) {
+      return MultiParentClassLoaderUtils.class.getClassLoader();
+    } else {
+      return COMPOSITE_CL_CACHE.get(deploymentClassLoader);
+    }
   }
 
 }
