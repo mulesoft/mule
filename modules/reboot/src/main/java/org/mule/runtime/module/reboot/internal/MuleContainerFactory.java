@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  * A factory for {@link MuleContainer} instances. Responsible for choosing the right implementation class and setting up its
@@ -66,7 +71,15 @@ public class MuleContainerFactory {
    */
   protected ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
     DefaultMuleClassPathConfig config = new DefaultMuleClassPathConfig(muleHome, muleBase);
-    return new MuleContainerSystemClassLoader(config);
+
+    return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
+                                        config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
+                                        (modulePathEntriesParent,
+                                         modulePathEntriesChild,
+                                         parent) -> new URLClassLoader(modulePathEntriesChild,
+                                                                       new URLClassLoader(modulePathEntriesParent,
+                                                                                          parent)),
+                                        getSystemClassLoader());
   }
 
   private File lookupMuleHome() throws IOException {

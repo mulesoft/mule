@@ -14,6 +14,8 @@ module org.mule.runtime.jpms.utils {
 
   requires java.management;
 
+  requires org.apache.commons.lang3;
+
   exports org.mule.runtime.jpms.api;
 
 }

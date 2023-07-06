@@ -14,7 +14,8 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -24,6 +25,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -53,6 +55,8 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
     }
   }
 
+  private Optional<ModuleLayer> parentLayer = ofNullable(ServiceModuleLayerFactory.class.getModule().getLayer());
+
   /**
    * {@inheritDoc}
    *
@@ -71,7 +75,7 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
     ModuleLayer artifactLayer = createModuleLayer(descriptor.getClassLoaderConfiguration().getUrls(), parent,
-                                                  empty(), true, true);
+                                                  parentLayer, true, true);
 
     String serviceModuleName = artifactLayer.modules()
         .stream()
@@ -106,4 +110,10 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
                   containerClassLoader.getContainerClassLoader().getClassLoader(),
                   containerClassLoader.getContainerClassLoaderLookupPolicy());
   }
+
+  @Override
+  public void setParentLayerFrom(Class clazz) {
+    parentLayer = ofNullable(clazz.getModule().getLayer());
+  }
+
 }
