@@ -8,28 +8,40 @@
 package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFIGURATION_PATH;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
+
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
+import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.util.Collections.synchronizedList;
+import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,10 +53,11 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class FileTracingLevelConfiguration implements TracingLevelConfiguration {
+public class FileTracingLevelConfiguration implements TracingLevelConfiguration, Disposable {
 
-  private final String CONFIGURATION_PATH =
-      getProperty(TRACING_LEVEL_CONFIGURATION_PATH, getConfFolder() + FileSystems.getDefault().getSeparator());
+  private final String CONFIGURATION_FILE_PATH =
+      getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
+                  getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
 
   private final MuleContext muleContext;
 
@@ -55,16 +68,36 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
+  private boolean tracingConfigurationFileWatcherInitialised;
   private TracingLevel tracingLevel = DEFAULT_LEVEL;
   private JsonNode configuration;
+
+  private List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
+  private URL configurationUrl;
+  private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
+  private ConfigurationPropertiesResolver propertyResolver;
 
   public FileTracingLevelConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
     setTracingLevels();
+    onConfigurationChangeRunnables.add(() -> setTracingLevels());
+    if (configuration != null && !tracingConfigurationFileWatcherInitialised) {
+      tracingConfigurationFileWatcher =
+          new TracingConfigurationFileWatcher(configurationUrl.getFile(), getOnConfigurationChanged());
+      tracingConfigurationFileWatcher.start();
+      tracingConfigurationFileWatcherInitialised = true;
+    }
+  }
+
+  private Runnable getOnConfigurationChanged() {
+    return () -> onConfigurationChangeRunnables.forEach(Runnable::run);
   }
 
   private void setTracingLevels() {
     configuration = getTracingLevelConfiguration();
+    propertyResolver =
+        new DefaultConfigurationPropertiesResolver(empty(),
+                                                   new SystemPropertiesConfigurationProvider());
     setTracingLevel();
     setTracingLevelOverrides();
   }
@@ -73,6 +106,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
     String configuredTracingLevel = readStringFromConfig(LEVEL_PROPERTY_NAME);
     if (configuredTracingLevel != null) {
       try {
+        configuredTracingLevel = propertyResolver.apply(configuredTracingLevel);
         tracingLevel = TracingLevel.valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
         LOGGER
@@ -113,6 +147,18 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
     return tracingLevel;
   }
 
+  @Override
+  public void onConfigurationChange(Consumer<TracingLevelConfiguration> onConfigurationChangeConsumer) {
+    this.onConfigurationChangeRunnables.add(() -> onConfigurationChangeConsumer.accept(this));
+  }
+
+  @Override
+  public void dispose() {
+    if (tracingConfigurationFileWatcher != null) {
+      tracingConfigurationFileWatcher.interrupt();
+    }
+  }
+
   private TracingLevel getTracingLevelOverrideFrom(String location) {
     return tracingLevelOverrides.get(location);
   }
@@ -121,7 +167,9 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
       InputStream is = resourceProvider
-          .getResourceAsStream(CONFIGURATION_PATH + getPropertiesFileName());
+          .getResourceAsStream(CONFIGURATION_FILE_PATH);
+      configurationUrl =
+          getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
       return loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
       LOGGER
@@ -153,7 +201,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration 
   }
 
   protected String getConfFolder() {
-    return MuleFoldersUtil.getConfFolder().getAbsolutePath();
+    return getProperty(TRACING_LEVEL_CONFIGURATION_PATH, MuleFoldersUtil.getConfFolder().getAbsolutePath());
   }
 
   private String readStringFromConfig(String key) {

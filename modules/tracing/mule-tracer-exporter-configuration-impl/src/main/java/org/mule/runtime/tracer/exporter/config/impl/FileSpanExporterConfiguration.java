@@ -32,8 +32,8 @@ import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPro
 import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
-import org.mule.runtime.tracer.exporter.config.impl.watcher.TracingConfigurationFileWatcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +72,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private String resolvedConfigurationFilePath;
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
+  private boolean tracingConfigurationFileWatcherInitialised;
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -200,9 +201,10 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     propertyResolver =
         new DefaultConfigurationPropertiesResolver(empty(),
                                                    new SystemPropertiesConfigurationProvider());
-    if (configurationUrl != null) {
+    if (configurationUrl != null && !tracingConfigurationFileWatcherInitialised) {
       tracingConfigurationFileWatcher = new TracingConfigurationFileWatcher(configurationUrl.getFile(), doOnConfigurationChanged);
       tracingConfigurationFileWatcher.start();
+      tracingConfigurationFileWatcherInitialised = true;
     }
   }
 

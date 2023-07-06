@@ -7,6 +7,8 @@
 
 package org.mule.runtime.tracing.level.api.config;
 
+import java.util.function.Consumer;
+
 /**
  * Allows to configure the desired tracing level
  *
@@ -27,4 +29,11 @@ public interface TracingLevelConfiguration {
    * @return a tracing level.
    */
   TracingLevel getTracingLevelOverride(String location);
+
+  /**
+   * Consumer to be invoked when a {@link TracingLevelConfiguration} is changed.
+   *
+   * @param onConfigurationChangeConsumer to execute when the configuration is changed.
+   */
+  void onConfigurationChange(Consumer<TracingLevelConfiguration> onConfigurationChangeConsumer);
 }

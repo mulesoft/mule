@@ -7,18 +7,17 @@
 package org.mule.runtime.tracer.customization.impl.provider;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
-import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
-import org.mule.runtime.tracer.customization.impl.export.TracingLevelExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
-import org.mule.runtime.tracing.level.api.config.TracingLevel;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 
@@ -29,6 +28,7 @@ import javax.inject.Inject;
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
+  private Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> initialSpanInfos = new ConcurrentHashMap<>();
   public static final String API_ID_CONFIGURATION_PROPERTIES_KEY = "apiId";
 
   @Inject
@@ -50,8 +50,9 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, getTracingLevelExportInfo(location));
+    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, null, null),
+                                            identifier -> new ExecutionInitialSpanInfo(component, apiId,
+                                                                                       tracingLevelConfiguration));
   }
 
   @Override
@@ -61,8 +62,10 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, getTracingLevelExportInfo(location), null, suffix);
+
+    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, null),
+                                            identifier -> new ExecutionInitialSpanInfo(component, apiId, null, suffix,
+                                                                                       tracingLevelConfiguration));
   }
 
   @Override
@@ -72,8 +75,9 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    String location = getLocationAsString(component.getLocation());
-    return new ExecutionInitialSpanInfo(component, apiId, overriddenName, getTracingLevelExportInfo(location));
+    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, overriddenName),
+                                            identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                                                                       tracingLevelConfiguration));
   }
 
   public void initialiseAttributes() {
@@ -82,23 +86,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
   }
 
-  private TracingLevelExportInfo getTracingLevelExportInfo(String location) {
-    TracingLevel tracingLevel = tracingLevelConfiguration.getTracingLevel();
-    TracingLevel tracingLevelOverride = tracingLevelConfiguration.getTracingLevelOverride(location);
-    if (!tracingLevelOverride.equals(tracingLevel)) {
-      return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevelOverride), true);
-    }
-    return new TracingLevelExportInfo(resolveInitialExportInfoProvider(tracingLevel), false);
-  }
-
-  private InitialExportInfoProvider resolveInitialExportInfoProvider(TracingLevel tracingLevel) {
-    switch (tracingLevel) {
-      case OVERVIEW:
-        return new OverviewInitialExportInfoProvider();
-      case DEBUG:
-        return new DebugInitialExportInfoProvider();
-      default:
-        return new MonitoringInitialExportInfoProvider();
-    }
+  private InitialSpanInfoIdentifier getInitialSpanInfoIdentifier(Component location, String suffix, String overriddenName) {
+    return new InitialSpanInfoIdentifier(location, suffix, overriddenName);
   }
 }
