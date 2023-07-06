@@ -17,6 +17,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.artifact.api.plugin.LoaderDescriber;
 
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Describes an artifact with classifier {@code mule-plugin}, used within an Application or Domain.

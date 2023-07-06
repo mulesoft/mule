@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
+import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.PARENT_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
@@ -13,6 +14,8 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
@@ -24,6 +27,8 @@ import org.mule.tck.probe.PollingProber;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.net.URL;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;

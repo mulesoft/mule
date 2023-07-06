@@ -31,16 +31,16 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
   private ArtifactClassLoaderManager artifactClassLoaderManager;
   private DeployableArtifactClassLoaderFactory<ArtifactDescriptor> delegateFactory;
   private TrackingDeployableArtifactClassLoaderFactory<ArtifactDescriptor> factory;
-  private org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader parent;
+  private ArtifactClassLoader parent;
   private ArtifactDescriptor descriptor;
-  private org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader classLoader;
+  private ArtifactClassLoader classLoader;
 
   @Before
   public void setUp() throws Exception {
     artifactClassLoaderManager = mock(ArtifactClassLoaderManager.class);
     delegateFactory = mock(DeployableArtifactClassLoaderFactory.class);
     factory = new TrackingDeployableArtifactClassLoaderFactory<>(artifactClassLoaderManager, delegateFactory);
-    parent = mock(org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader.class);
+    parent = mock(ArtifactClassLoader.class);
     descriptor = new ArtifactDescriptor(ARTIFACT_NAME);
     org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     classLoader = new MuleArtifactClassLoader(ARTIFACT_NAME, descriptor, new URL[0], getClass().getClassLoader(), lookupPolicy);
@@ -51,8 +51,7 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
 
   @Test
   public void registersClassLoader() throws Exception {
-    org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader artifactClassLoader =
-        factory.create(ARTIFACT_ID, parent, descriptor);
+    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, parent, descriptor);
 
     verify(artifactClassLoaderManager).register(artifactClassLoader);
   }

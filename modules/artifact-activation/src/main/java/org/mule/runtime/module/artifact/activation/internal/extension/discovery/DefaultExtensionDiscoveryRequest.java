@@ -18,6 +18,7 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;

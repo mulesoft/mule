@@ -26,6 +26,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
+import org.mule.tck.size.SmallTest;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
