@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static java.lang.Thread.currentThread;
 import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.StreamSupport.stream;
@@ -28,7 +29,7 @@ public interface RuntimeExtensionModelProvider {
    */
   static Set<ExtensionModel> discoverRuntimeExtensionModels() {
     return stream(((Iterable<RuntimeExtensionModelProvider>) () -> load(RuntimeExtensionModelProvider.class,
-                                                                        RuntimeExtensionModelProvider.class.getClassLoader())
+                                                                        currentThread().getContextClassLoader())
                                                                             .iterator()).spliterator(),
                   false)
                       .map(RuntimeExtensionModelProvider::createExtensionModel)
