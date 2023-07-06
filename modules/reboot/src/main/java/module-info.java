@@ -12,12 +12,13 @@
  * @since 4.5
  */
 module org.mule.boot {
-  
+
+  // TODO W-13151134: export only to modules that require it once org.mule.runtime.launcher is modularized
+  // exports org.mule.runtime.module.reboot.internal to org.mule.boot.tanuki,org.mule.runtime.launcher;
+  exports org.mule.runtime.module.reboot.internal;
+
   requires org.mule.runtime.logging;
   requires org.mule.runtime.jpms.utils;
 
   requires commons.cli;
-  // Tanuki wrapper
-  requires wrapper;
-
 }

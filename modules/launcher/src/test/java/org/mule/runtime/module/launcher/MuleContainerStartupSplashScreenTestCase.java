@@ -61,7 +61,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @Before
   public void setUp() {
-    splashScreen = new MuleContainerStartupSplashScreen(false);
+    splashScreen = new MuleContainerStartupSplashScreen(getAdditionalSplashEntries());
   }
 
   @Override
@@ -77,5 +77,12 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
   @Override
   protected Matcher<String> getComplexLogMatcher() {
     return containsStringIgnoringLineBreaks(COMPLEX_LOG_PART);
+  }
+
+  private String[] getAdditionalSplashEntries() {
+    return new String[] {
+        "Additional splash entry 1",
+        "Additional splash entry 2"
+    };
   }
 }

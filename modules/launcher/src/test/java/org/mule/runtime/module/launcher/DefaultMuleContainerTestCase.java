@@ -9,8 +9,8 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-import static org.mule.runtime.module.launcher.MuleContainer.APP_COMMAND_LINE_OPTION;
-import static org.mule.runtime.module.launcher.MuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.runtime.module.launcher.DefaultMuleContainer.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.launcher.DefaultMuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
 import static java.lang.System.clearProperty;
@@ -52,7 +52,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 @SmallTest
-public class MuleContainerTestCase extends AbstractMuleTestCase {
+public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
 
   private static final String APP_NAME = "testApp";
 
@@ -64,7 +64,7 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  private MuleContainer container;
+  private DefaultMuleContainer container;
 
   private MuleCoreExtensionManagerServer coreExtensionManager;
 
@@ -88,9 +88,9 @@ public class MuleContainerTestCase extends AbstractMuleTestCase {
     FileUtils.deleteDirectory(getExecutionFolder());
   }
 
-  private MuleContainer createMuleContainer() throws InitialisationException {
-    return new MuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
-                             extensionModelLoaderRepository, troubleshootingService) {
+  private DefaultMuleContainer createMuleContainer() throws InitialisationException {
+    return new DefaultMuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
+                                    extensionModelLoaderRepository, troubleshootingService) {
 
       @Override
       Map<String, Object> getCommandLineOptions(String[] args) {
