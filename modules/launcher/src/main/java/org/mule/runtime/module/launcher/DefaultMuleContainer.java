@@ -297,6 +297,9 @@ public class DefaultMuleContainer implements MuleContainer {
     } catch (MuleException e) {
       shutdown(e);
       throw e;
+    } catch (Throwable t) {
+      shutdown(t);
+      throw new MuleRuntimeException(t);
     }
   }
 
