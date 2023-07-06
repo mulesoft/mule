@@ -67,12 +67,12 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     TracingLevelExportInfo tracingLevelExportInfo =
         getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix, tracingLevelConfiguration);
 
-    this.initialExportInfo = resolveInitialExpoterInfo(tracingLevelExportInfo);
+    this.initialExportInfo = resolveInitialExporterInfo(tracingLevelExportInfo);
     tracingLevelConfiguration
         .onConfigurationChange(tlc -> {
           this.initialExportInfo =
-              resolveInitialExpoterInfo(getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix,
-                                                                  tracingLevelConfiguration));
+              resolveInitialExporterInfo(getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix,
+                                                                   tracingLevelConfiguration));
         });
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);
@@ -84,7 +84,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     }
   }
 
-  private static ExecutionInitialExportInfo resolveInitialExpoterInfo(TracingLevelExportInfo tracingLevelExportInfo) {
+  private static ExecutionInitialExportInfo resolveInitialExporterInfo(TracingLevelExportInfo tracingLevelExportInfo) {
     return new ExecutionInitialExportInfo(tracingLevelExportInfo);
   }
 
