@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.logging;
 
-import static org.mule.runtime.module.artifactapi.classloader.CompositeClassLoaderArtifactFinder.findClassLoader;
+import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Thread.currentThread;
@@ -14,12 +14,12 @@ import static java.lang.Thread.currentThread;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.module.artifactapi.classloader.CompositeClassLoader;
-import org.mule.runtime.module.artifactapi.policy.MulePolicyTemplateDescriptor;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.MuleRegionClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.ShutdownListener;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
+import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 
 import java.net.URI;
 import java.util.List;
@@ -132,7 +132,7 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
       loggerClassLoader =
           isPolicyClassLoader(loggerClassLoader.getParent()) ? loggerClassLoader.getParent().getParent()
               : loggerClassLoader.getParent();
-    } else if (!(loggerClassLoader instanceof MuleRegionClassLoader)
+    } else if (!(loggerClassLoader instanceof RegionClassLoader)
         && !(loggerClassLoader instanceof MuleSharedDomainClassLoader)) {
       loggerClassLoader = SYSTEM_CLASSLOADER;
     }
@@ -140,11 +140,11 @@ class ArtifactAwareContextSelector implements ContextSelector, Disposable {
   }
 
   private static boolean isPolicyClassLoader(ClassLoader loggerClassLoader) {
-    return ((ArtifactClassLoader) loggerClassLoader).getArtifactDescriptor() instanceof MulePolicyTemplateDescriptor;
+    return ((ArtifactClassLoader) loggerClassLoader).getArtifactDescriptor() instanceof PolicyTemplateDescriptor;
   }
 
   private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof MuleRegionClassLoader) && classLoader.getParent() instanceof MuleRegionClassLoader;
+    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
   @Override

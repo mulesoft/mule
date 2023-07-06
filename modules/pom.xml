@@ -19,7 +19,6 @@
     <modules>
         <module>all-modules</module>
         <module>artifact</module>
-        <module>artifact-api</module>
         <module>artifact-activation</module>
         <module>boot-logging</module>
         <module>container</module>

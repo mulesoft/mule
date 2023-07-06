@@ -15,10 +15,10 @@ import static org.mule.runtime.module.logging.ArtifactAwareContextSelector.resol
 import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.DirectoryResourceLocator;
-import org.mule.runtime.module.artifactapi.classloader.LocalResourceLocator;
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
+import org.mule.runtime.module.artifact.api.classloader.LocalResourceLocator;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
 import java.net.URI;

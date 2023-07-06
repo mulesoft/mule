@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.logging;
 
-import org.mule.runtime.module.artifactapi.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifactapi.classloader.MuleRegionClassLoader;
-import org.mule.runtime.module.artifactapi.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifactapi.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
@@ -70,9 +70,9 @@ class MuleLoggerContext extends LoggerContext {
       artifactClassloader = true;
       artifactName = getArtifactName((ArtifactClassLoader) ownerClassLoader);
       artifactDescriptor = getArtifactDescriptor((ArtifactClassLoader) ownerClassLoader);
-      if (ownerClassLoader instanceof MuleRegionClassLoader) {
-        MuleRegionClassLoader mrcl = (MuleRegionClassLoader) ownerClassLoader;
-        ArtifactClassLoader oacl = (ArtifactClassLoader) mrcl.getOwnerClassLoader();
+      if (ownerClassLoader instanceof RegionClassLoader) {
+        RegionClassLoader mrcl = (RegionClassLoader) ownerClassLoader;
+        ArtifactClassLoader oacl = mrcl.getOwnerClassLoader();
         applicationClassloader = oacl.getArtifactDescriptor() instanceof ApplicationDescriptor;
       } else {
         applicationClassloader = false;
