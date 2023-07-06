@@ -16,6 +16,7 @@ import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
+import org.mule.runtime.jpms.api.JpmsUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
@@ -70,8 +71,13 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, launcherArtifact);
-    final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
+    ClassLoader containerSystemClassloader = JpmsUtils.createModuleLayerClassLoader(optUrls, muleUrls,
+                                                                                    (modulePathEntriesParent,
+                                                                                     modulePathEntriesChild,
+                                                                                     parent) -> new URLClassLoader(modulePathEntriesChild,
+                                                                                                                   new URLClassLoader(modulePathEntriesParent,
+                                                                                                                                      parent)),
+                                                                                    launcherArtifact);
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages);

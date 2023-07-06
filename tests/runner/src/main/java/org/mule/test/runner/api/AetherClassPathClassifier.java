@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.api;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
@@ -20,6 +21,7 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkCompatib
 import static java.lang.String.format;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Paths.get;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
@@ -58,6 +60,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -123,6 +126,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
+
+  private static final Set<String> JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST =
+      new HashSet<>(asList("xml-apis:xml-apis"));
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -561,10 +567,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link Predicate} for selecting direct dependencies for the Container.
    */
   private Predicate<Dependency> getContainerDirectDependenciesFilter(ArtifactClassificationType rootArtifactType) {
-    return rootArtifactType.equals(MODULE)
-        ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
-        : directDep -> directDep.getScope().equals(PROVIDED)
-            || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER);
+    Predicate<Dependency> xmlApisInContainer = classloaderContainerJpmsModuleLayer()
+        ? directDep -> !JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST
+            .contains(directDep.getArtifact().getGroupId() + ":" + directDep.getArtifact().getArtifactId())
+        : directDep -> true;
+
+    return xmlApisInContainer
+        .and(rootArtifactType.equals(MODULE)
+            ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
+            : directDep -> directDep.getScope().equals(PROVIDED)
+                || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER));
   }
 
   /**
