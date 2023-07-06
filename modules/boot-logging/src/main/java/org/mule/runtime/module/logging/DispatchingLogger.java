@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.logging;
 
-import static org.mule.runtime.module.common.MuleContainerUtils.setContextClassLoader;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.module.logging.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 
 import static java.lang.Thread.currentThread;

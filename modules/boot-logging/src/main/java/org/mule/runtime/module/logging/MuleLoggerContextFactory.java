@@ -7,8 +7,8 @@
 package org.mule.runtime.module.logging;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.common.MuleContainerUtils.getMuleBase;
-import static org.mule.runtime.module.common.MuleContainerUtils.getMuleConfDir;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleBase;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleConfDir;
 import static org.mule.runtime.module.logging.ArtifactAwareContextSelector.LOGGER;
 import static org.mule.runtime.module.logging.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 

@@ -7,7 +7,8 @@
 package org.mule.runtime.module.logging;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.module.common.MuleProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 
 import static java.lang.ThreadLocal.withInitial;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
@@ -44,7 +45,7 @@ import org.apache.logging.log4j.core.LoggerContext;
  * {@link #disposeDelayInMillis} before it is actually stopped. This is to give asynchronous loggers some time to flush the
  * pending messages. Notice that there's no guarantee that the waiting time is enough (although it should for most cases).
  * {@link #disposeDelayInMillis} defaults to 15 seconds but it can be customized by setting the
- * {@link MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS} system property
+ * {@link org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS} system property
  *
  * This class also implements the {@link Disposable} interface. When {@link #dispose()} is invoked all the contexts are stopped
  * right away

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.logging;
 
-import static org.mule.runtime.module.common.MuleProperties.MULE_LOG_SEPARATION_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
