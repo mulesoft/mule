@@ -156,8 +156,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
 
-    List<ArtifactClassLoader> classLoaders =
-        createClassLoaders(regionClassLoader);
+    List<ArtifactClassLoader> classLoaders = createClassLoaders(regionClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
     when(lookupPolicy.getClassLookupStrategy(Object.class.getName())).thenReturn(CHILD_FIRST);
@@ -190,8 +189,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     when(parentClassLoader.getResource(RESOURCE_NAME)).thenReturn(null);
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
-    List<ArtifactClassLoader> classLoaders =
-        createClassLoaders(regionClassLoader);
+    List<ArtifactClassLoader> classLoaders = createClassLoaders(regionClassLoader);
 
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
 

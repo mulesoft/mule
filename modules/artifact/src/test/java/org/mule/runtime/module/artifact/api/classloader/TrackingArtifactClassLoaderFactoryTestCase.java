@@ -12,7 +12,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -52,8 +51,7 @@ public class TrackingArtifactClassLoaderFactoryTestCase extends AbstractMuleTest
 
   @Test
   public void registersClassLoader() throws Exception {
-    ArtifactClassLoader artifactClassLoader =
-        factory.create(ARTIFACT_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
+    ArtifactClassLoader artifactClassLoader = factory.create(ARTIFACT_ID, descriptor, getClass().getClassLoader(), lookupPolicy);
 
     verify(artifactClassLoaderManager).register(artifactClassLoader);
   }

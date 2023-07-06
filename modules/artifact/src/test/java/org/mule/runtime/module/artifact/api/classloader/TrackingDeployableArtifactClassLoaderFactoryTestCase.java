@@ -42,7 +42,7 @@ public class TrackingDeployableArtifactClassLoaderFactoryTestCase extends Abstra
     factory = new TrackingDeployableArtifactClassLoaderFactory<>(artifactClassLoaderManager, delegateFactory);
     parent = mock(ArtifactClassLoader.class);
     descriptor = new ArtifactDescriptor(ARTIFACT_NAME);
-    org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    ClassLoaderLookupPolicy lookupPolicy = mock(ClassLoaderLookupPolicy.class);
     classLoader = new MuleArtifactClassLoader(ARTIFACT_NAME, descriptor, new URL[0], getClass().getClassLoader(), lookupPolicy);
 
     when(lookupPolicy.getClassLookupStrategy(any())).thenReturn(PARENT_FIRST);
