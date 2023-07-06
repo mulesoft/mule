@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging.api.log4j2;
+package org.mule.runtime.module.logging;
 
 import com.lmax.disruptor.ExceptionHandler;
 import org.apache.logging.log4j.status.StatusLogger;

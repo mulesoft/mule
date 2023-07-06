@@ -24,7 +24,6 @@ import io.qameta.allure.Story;
 import org.apache.logging.log4j.core.util.Cancellable;
 import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.module.logging.api.log4j2.AsyncLoggerExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

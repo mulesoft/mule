@@ -13,7 +13,6 @@ import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 import org.mule.runtime.api.lifecycle.Disposable;
-import org.mule.runtime.module.logging.api.log4j2.AsyncLoggerExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -28,7 +28,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
-import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
+import org.mule.runtime.module.logging.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.tooling.api.ToolingService;
