@@ -7,7 +7,7 @@
 package org.mule.runtime.module.reboot;
 
 import static org.mule.runtime.jpms.api.JpmsUtils.validateNoBootModuleLayerTweaking;
-import static org.mule.runtime.module.reboot.internal.MuleContainerWrapper.createContainerWrapper;
+import static org.mule.runtime.module.reboot.internal.MuleContainerWrapperProvider.getMuleContainerWrapper;
 
 import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
@@ -40,7 +40,7 @@ public class MuleContainerBootstrap {
   public static void main(String[] args) throws Exception {
     MuleContainerFactory muleContainerFactory =
         new MuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
-    MuleContainerWrapper muleContainerWrapper = createContainerWrapper();
+    MuleContainerWrapper muleContainerWrapper = getMuleContainerWrapper();
 
     // TODO W-12412001: move this into a configurer
     // Optionally remove existing handlers attached to j.u.l root logger

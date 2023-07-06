@@ -49,4 +49,14 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
     addWrapperEventListener(new ErrorLoggingWrapperEventListener(message), EVENT_FLAG_LOGGING);
     WrapperManager.stop(exitCode);
   }
+
+  @Override
+  public void stop(int exitCode) {
+    WrapperManager.stop(exitCode);
+  }
+
+  @Override
+  public void restart() {
+    WrapperManager.restartAndReturn();
+  }
 }

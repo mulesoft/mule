@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-
 import org.apache.commons.cli.CommandLine;
 
 /**
@@ -21,30 +18,6 @@ import org.apache.commons.cli.CommandLine;
  * @since 4.5
  */
 public interface MuleContainerWrapper {
-
-  String MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY = "mule.bootstrap.container.wrapper.class";
-
-  /**
-   * Creates the implementation instance based on the system property
-   * {@link #MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY}.
-   * 
-   * @return The {@link MuleContainerWrapper} implementation.
-   */
-  static MuleContainerWrapper createContainerWrapper() {
-    String defaultManagerImplClass = "org.mule.runtime.module.tanuki.internal.MuleContainerTanukiWrapper";
-    String wrapperClassName = getProperty(MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY, defaultManagerImplClass);
-    try {
-      Class<?> wrapperClass = MuleContainerWrapper.class.getClassLoader().loadClass(wrapperClassName);
-      if (!MuleContainerWrapper.class.isAssignableFrom(wrapperClass)) {
-        throw new RuntimeException(format("System property '%s' does not define an implementation of %s",
-                                          MuleContainerWrapper.class.getName(),
-                                          wrapperClassName));
-      }
-      return (MuleContainerWrapper) wrapperClass.getConstructor().newInstance();
-    } catch (ReflectiveOperationException e) {
-      throw new RuntimeException(format("Unable to instantiate MuleContainerWrapper '%s'", wrapperClassName), e);
-    }
-  }
 
   /**
    * Adds a {@link BootstrapConfigurer} to execute before starting.
@@ -79,4 +52,18 @@ public interface MuleContainerWrapper {
    * @param message  A message to display for troubleshooting purposes.
    */
   void haltAndCatchFire(int exitCode, String message);
+
+  /**
+   * Requests that the JVM be restarted but then returns. This allows components to initiate a JVM exit and then continue,
+   * allowing a normal shutdown initiated by the JVM via shutdown hooks.
+   */
+  void restart();
+
+  /**
+   * Requests that the JVM be shutdown but then returns. This allows components to initiate a JVM exit and then continue, allowing
+   * a normal shutdown initiated by the JVM via shutdown hooks.
+   *
+   * @param exitCode The exit code that the bootstrapping application should return to the OS.
+   */
+  void stop(int exitCode);
 }
