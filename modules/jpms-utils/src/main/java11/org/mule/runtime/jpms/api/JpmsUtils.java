@@ -35,6 +35,7 @@ public final class JpmsUtils {
           + "org.mule.boot.tanuki,"
           + "org.mule.runtime.jpms.utils,"
           + "com.fasterxml.jackson.core";
+  // TODO W-13718989: these reads to the org.mule.boot/com.mulesoft.mule.boot should be declared in the reading module
   private static final String REQUIRED_CE_BOOT_ADD_READS =
       "--add-reads=org.mule.boot.tanuki=org.mule.boot";
   private static final String REQUIRED_BOOT_ADD_READS =
