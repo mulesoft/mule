@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.api.properties;
 
-import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
+import org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException;
 
 import java.util.function.UnaryOperator;
 

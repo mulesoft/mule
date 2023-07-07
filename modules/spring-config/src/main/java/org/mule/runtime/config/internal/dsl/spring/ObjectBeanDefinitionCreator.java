@@ -22,7 +22,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.model.dsl.config.RuntimeConfigurationException;
+import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
 import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 
 import java.util.List;

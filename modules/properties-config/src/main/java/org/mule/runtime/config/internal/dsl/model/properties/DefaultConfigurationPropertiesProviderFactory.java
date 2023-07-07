@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model.dsl.properties;
+package org.mule.runtime.config.internal.dsl.model.properties;
 
 import static java.util.Objects.requireNonNull;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;

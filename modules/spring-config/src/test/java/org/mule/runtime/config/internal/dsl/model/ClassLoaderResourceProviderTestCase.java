@@ -11,7 +11,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;

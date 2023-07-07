@@ -12,8 +12,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEX
 import static java.lang.String.format;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
-import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.MuleContext;

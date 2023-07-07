@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.model.dsl.config;
+package org.mule.runtime.config.internal.dsl.model.config;
 
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
 
 /**
  * Represents a configuration attribute.
@@ -46,8 +46,8 @@ public class DefaultConfigurationProperty implements ConfigurationProperty {
   }
 
   @Override
-  public String getValue() {
-    return rawValue.toString();
+  public Object getRawValue() {
+    return rawValue;
   }
 
   @Override

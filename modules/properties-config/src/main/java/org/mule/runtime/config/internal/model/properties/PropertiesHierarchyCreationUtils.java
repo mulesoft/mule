@@ -15,7 +15,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
+import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 

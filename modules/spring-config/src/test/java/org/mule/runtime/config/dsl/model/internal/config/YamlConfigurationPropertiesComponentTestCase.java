@@ -15,9 +15,9 @@ import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFI
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.COMPONENT_CONFIGURATION_YAML_STORY;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.properties.api.ResourceProvider;
-import org.mule.runtime.properties.api.DefaultConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
+import org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.properties.internal.ConfigurationPropertiesException;
 
 import org.junit.Before;

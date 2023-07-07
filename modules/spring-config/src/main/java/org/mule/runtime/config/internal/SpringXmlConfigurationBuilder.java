@@ -47,7 +47,7 @@ import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.model.dsl.config.StaticConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.dsl.model.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
