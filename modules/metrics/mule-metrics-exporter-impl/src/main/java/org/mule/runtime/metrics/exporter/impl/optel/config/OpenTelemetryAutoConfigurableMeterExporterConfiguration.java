@@ -23,7 +23,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-public class OpenTelemetryAutoConfigurableMetricExporterConfiguration implements MeterExporterConfiguration {
+public class OpenTelemetryAutoConfigurableMeterExporterConfiguration implements MeterExporterConfiguration {
 
   @Inject
   private MuleContext muleContext;
@@ -42,9 +42,9 @@ public class OpenTelemetryAutoConfigurableMetricExporterConfiguration implements
   /**
    * This constructor is needed for injection in the registry.
    */
-  public OpenTelemetryAutoConfigurableMetricExporterConfiguration() {}
+  public OpenTelemetryAutoConfigurableMeterExporterConfiguration() {}
 
-  public OpenTelemetryAutoConfigurableMetricExporterConfiguration(MeterExporterConfiguration delegate) {
+  public OpenTelemetryAutoConfigurableMeterExporterConfiguration(MeterExporterConfiguration delegate) {
     this.delegate = delegate;
     initialiseDefaultConfigurationValues();
   }

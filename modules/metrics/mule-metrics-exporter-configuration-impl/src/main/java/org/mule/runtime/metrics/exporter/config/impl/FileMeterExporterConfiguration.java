@@ -7,14 +7,21 @@
 
 package org.mule.runtime.metrics.exporter.config.impl;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CONFIGURATION_FILE_PATH;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION;
+
+import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
@@ -39,11 +46,13 @@ import org.slf4j.Logger;
 public class FileMeterExporterConfiguration implements MeterExporterConfiguration {
 
   private static final Logger LOGGER = getLogger(FileMeterExporterConfiguration.class);
-  private final String CONFIGURATION_PATH = getConfFolder() + FileSystems.getDefault().getSeparator();
   private static final String CONFIGURATION_FILE_NAME = "meter-exporter.conf";
 
   private final MuleContext muleContext;
   private final Properties properties;
+
+  private final ConfigurationPropertiesResolver propertyResolver =
+      new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
 
   public FileMeterExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
@@ -54,16 +63,20 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
   public String getStringValue(String key) {
     String value = properties.getProperty(key);
 
-    if (value != null && isAValueCorrespondingToAPath(key)) {
-      // Obtain absolute path and return it if possible.
-      String absolutePath = getAbsolutePath(value);
+    if (value != null) {
+      // Resolves the actual value when the current one is a system property reference.
+      value = propertyResolver.apply(value);
 
-      if (absolutePath != null) {
-        return absolutePath;
+      if (isAValueCorrespondingToAPath(key)) {
+        // Obtain absolute path and return it if possible.
+        String absolutePath = getAbsolutePath(value);
+
+        if (absolutePath != null) {
+          return absolutePath;
+        }
+        // Otherwise, return the non-resolved value so that the error message makes sense.
       }
-      // Otherwise, return the non-resolved value so that the error message makes sense.
     }
-
     return value;
   }
 
@@ -93,13 +106,17 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
   private Properties getMeterExporterProperties() {
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
-      InputStream is = resourceProvider
-          .getResourceAsStream(CONFIGURATION_PATH + getPropertiesFileName());
+      InputStream is = resourceProvider.getResourceAsStream(resolveConfigurationFilePath());
       return loadProperties(is);
     } catch (MuleRuntimeException | IOException e) {
       LOGGER.info("No meter exporter configuration found in the conf directory.");
     }
     return new Properties();
+  }
+
+  private String resolveConfigurationFilePath() {
+    String defaultConfigurationFilePath = getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName();
+    return getProperty(MULE_OPEN_TELEMETRY_METER_EXPORTER_CONFIGURATION_FILE_PATH, defaultConfigurationFilePath);
   }
 
   protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
