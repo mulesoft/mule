@@ -32,7 +32,7 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
   @Override
   protected void start(MuleContainerFactory muleContainerFactory, String[] args) {
     WrapperListener wrapperListener =
-        new MuleContainerTanukiWrapperListener(muleContainerFactory, this::waitAllConfigurersReady, this::dispose);
+        new MuleContainerTanukiWrapperListener(muleContainerFactory, getAllConfigurersReady(), this::dispose);
     WrapperManager.start(wrapperListener, args);
     isStarted = true;
   }

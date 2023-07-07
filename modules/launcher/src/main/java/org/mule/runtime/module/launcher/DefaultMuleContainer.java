@@ -29,6 +29,7 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -63,7 +64,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
+import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -240,15 +241,15 @@ public class DefaultMuleContainer implements MuleContainer {
   }
 
   @Override
-  public void start(BooleanSupplier configurationsReadyBarrier, List<String> additionalSplashEntries) throws MuleException {
-    start(true, configurationsReadyBarrier, additionalSplashEntries);
+  public void start(Future<Boolean> configurationsReady, List<String> additionalSplashEntries) throws MuleException {
+    start(true, configurationsReady, additionalSplashEntries);
   }
 
   public void start(boolean registerShutdownHook) throws MuleException {
-    start(registerShutdownHook, () -> true, emptyList());
+    start(registerShutdownHook, completedFuture(true), emptyList());
   }
 
-  private void start(boolean registerShutdownHook, BooleanSupplier configurationsReadyBarrier,
+  private void start(boolean registerShutdownHook, Future<Boolean> configurationsReady,
                      List<String> additionalSplashEntries)
       throws MuleException {
     if (registerShutdownHook) {
@@ -271,7 +272,7 @@ public class DefaultMuleContainer implements MuleContainer {
       coreExtensionManager.setTroubleshootingService(troubleshootingService);
 
       // Waits for all bootstrapping configurations to be ready before progressing any further
-      if (!configurationsReadyBarrier.getAsBoolean()) {
+      if (!configurationsReady.get()) {
         shutdown();
       }
 

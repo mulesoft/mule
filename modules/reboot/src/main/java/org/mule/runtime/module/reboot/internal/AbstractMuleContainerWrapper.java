@@ -6,8 +6,11 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Future;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -52,13 +55,21 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
   }
 
   /**
+   * @return A {@link Future} that will be completed when all configurations are ready, indicating whether the bootstrapping
+   *         process shall progress forward.
+   */
+  protected Future<Boolean> getAllConfigurersReady() {
+    return supplyAsync(this::waitAllConfigurersReady);
+  }
+
+  /**
    * Waits until all the configurers have finished their tasks.
    * <p>
    * Will {@link #haltAndCatchFire(int, String)} if there is any error.
    *
-   * @return Whether the bootstrapping process can process forward.
+   * @return Whether the bootstrapping process shall progress forward.
    */
-  protected boolean waitAllConfigurersReady() {
+  private boolean waitAllConfigurersReady() {
     try {
       for (BootstrapConfigurer bootstrapConfigurer : bootstrapConfigurers) {
         bootstrapConfigurer.await();

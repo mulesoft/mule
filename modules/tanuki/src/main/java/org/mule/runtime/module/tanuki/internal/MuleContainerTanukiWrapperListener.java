@@ -21,7 +21,7 @@ import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.function.BooleanSupplier;
+import java.util.concurrent.Future;
 
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -35,15 +35,15 @@ import org.tanukisoftware.wrapper.WrapperManager;
 class MuleContainerTanukiWrapperListener implements WrapperListener {
 
   private final MuleContainerFactory muleContainerFactory;
-  private final BooleanSupplier configurationsReadyBarrier;
+  private final Future<Boolean> configurationsReady;
   private final Runnable onStop;
   private MuleContainer muleContainer;
 
   public MuleContainerTanukiWrapperListener(MuleContainerFactory muleContainerFactory,
-                                            BooleanSupplier configurationsReadyBarrier,
+                                            Future<Boolean> configurationsReady,
                                             Runnable onStop) {
     this.muleContainerFactory = muleContainerFactory;
-    this.configurationsReadyBarrier = configurationsReadyBarrier;
+    this.configurationsReady = configurationsReady;
     this.onStop = onStop;
   }
 
@@ -123,7 +123,7 @@ class MuleContainerTanukiWrapperListener implements WrapperListener {
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(muleContainer.getClass().getClassLoader());
     try {
-      muleContainer.start(configurationsReadyBarrier, additionalSplashEntries);
+      muleContainer.start(configurationsReady, additionalSplashEntries);
     } finally {
       currentThread().setContextClassLoader(originalClassLoader);
     }
