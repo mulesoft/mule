@@ -21,6 +21,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +115,21 @@ public abstract class AbstractOSController {
   public void start(String... args) {
     int error = runSync(START_CMD, args);
     if (error != 0) {
+      final File muleLogFile = Paths.get(muleHome + "/logs/mule_ee.log").toFile();
+      if (muleLogFile.exists()) {
+        System.out.println("mule_ee.log:");
+        System.out.println("============");
+        try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
+          String line;
+          while ((line = br.readLine()) != null) {
+            System.out.println(line);
+          }
+        } catch (IOException e) {
+          throw new MuleControllerException("The mule instance couldn't be started. No mule_ee.log available. Errno: " + error,
+                                            e);
+        }
+      }
+
       throw new MuleControllerException("The mule instance couldn't be started. Errno: " + error);
     }
 
@@ -152,22 +173,24 @@ public abstract class AbstractOSController {
   }
 
   protected int runSync(String command, String... args) {
-    Map<Object, Object> newEnv = copyEnvironmentVariables();
+    Map<String, String> newEnv = copyEnvironmentVariables();
     return executeSyncCommand(command, args, newEnv, timeout);
   }
 
-  private int executeSyncCommand(String command, String[] args, Map<Object, Object> newEnv, int timeout) {
+  private int executeSyncCommand(String command, String[] args, Map<String, String> newEnv, int timeout) {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
     Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
-    executor.setStreamHandler(new PumpStreamHandler());
+
+    final ByteArrayOutputStream outAndErr = new ByteArrayOutputStream();
+    executor.setStreamHandler(new PumpStreamHandler(outAndErr));
     return doExecution(executor, commandLine, newEnv);
   }
 
-  protected int doExecution(Executor executor, CommandLine commandLine, Map<Object, Object> env) {
+  protected int doExecution(Executor executor, CommandLine commandLine, Map<String, String> env) {
     try {
       final StringJoiner paramsJoiner = new StringJoiner(" ");
       for (String cmdArg : commandLine.toStrings()) {
@@ -185,9 +208,9 @@ public abstract class AbstractOSController {
     }
   }
 
-  protected Map<Object, Object> copyEnvironmentVariables() {
+  protected Map<String, String> copyEnvironmentVariables() {
     Map<String, String> env = System.getenv();
-    Map<Object, Object> newEnv = new HashMap<>();
+    Map<String, String> newEnv = new HashMap<>();
     for (Map.Entry<String, String> it : env.entrySet()) {
       newEnv.put(it.getKey(), it.getValue());
     }

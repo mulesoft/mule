@@ -18,7 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MuleProcessController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleProcessController.class);
+  private static final Logger LOGGER_WRAPPER = LoggerFactory.getLogger(MuleProcessController.class.getName() + ".wrapper");
 
   private static final int DEFAULT_TIMEOUT = 60000;
 
@@ -50,7 +56,7 @@ public class MuleProcessController {
   }
 
   public void start(String... args) {
-    if (Boolean.getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
+    if (LOGGER_WRAPPER.isDebugEnabled() || Boolean.getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
       final List<String> debugArgs = new ArrayList<>();
       debugArgs.add("wrapperDebug");
       debugArgs.addAll(asList(args));
