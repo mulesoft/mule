@@ -43,15 +43,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String apiId;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelExportInfo tracingLevelExportInfo) {
-    this(component, apiId, tracingLevelExportInfo, "", "");
-  }
-
-  public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName,
-                                  TracingLevelExportInfo tracingLevelExportInfo) {
-    this(component, apiId, tracingLevelExportInfo, overriddenName, "");
-  }
-
   public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelExportInfo tracingLevelExportInfo,
                                   String overriddenName, String spanNameSuffix) {
 
