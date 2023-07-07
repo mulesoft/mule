@@ -29,7 +29,7 @@ public class SystemMuleVersionBootstrapConfigurer implements BootstrapConfigurer
   }
 
   @Override
-  public void configure() throws BootstrapConfigurationException {
+  public boolean configure() throws BootstrapConfigurationException {
     try (InputStream propertiesStream = getPropertiesStream()) {
       Properties mavenProperties = new Properties();
       mavenProperties.load(propertiesStream);
@@ -41,6 +41,7 @@ public class SystemMuleVersionBootstrapConfigurer implements BootstrapConfigurer
       String errorMessage = format("Error retrieving property 'version' from pom.properties file: %s", pomFilePath);
       throw new BootstrapConfigurationException(3, errorMessage, e);
     }
+    return true;
   }
 
   private InputStream getPropertiesStream() throws IOException {

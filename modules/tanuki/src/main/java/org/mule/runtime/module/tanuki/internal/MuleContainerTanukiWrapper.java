@@ -52,7 +52,7 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
 
   @Override
   public void stop(int exitCode) {
-    WrapperManager.stop(exitCode);
+    WrapperManager.stopAndReturn(exitCode);
   }
 
   @Override

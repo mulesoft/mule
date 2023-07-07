@@ -25,9 +25,12 @@ public interface BootstrapConfigurer {
    * <p>
    * The configuration may continue in a non-blocking fashion. See: {@link #await()}.
    *
-   * @throws BootstrapConfigurationException If the bootstrapping process must stop.
+   * @return Whether the bootstrapping process should proceed. This is used to communicate that the configuration completed
+   *         normally, but, based on some parameterization, it is expected to stop the bootstrapping.
+   * @throws BootstrapConfigurationException If there was any anomaly during the configuration and the bootstrapping process must
+   *                                         stop.
    */
-  void configure() throws BootstrapConfigurationException;
+  boolean configure() throws BootstrapConfigurationException;
 
   /**
    * Blocks until all the configuration work started by {@link #configure()} is completed.
