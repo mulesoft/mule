@@ -30,28 +30,23 @@ import java.util.List;
  */
 public class DefaultRepositoryService implements RepositoryService {
 
-  private final File repositoryFolder;
-  private final List<RemoteRepository> remoteRepositories;
   private final MavenClient mavenClient;
 
-  public DefaultRepositoryService(MavenClient mavenClient, File repositoryFolder, List<RemoteRepository> remoteRepositories) {
+  public DefaultRepositoryService(MavenClient mavenClient) {
     this.mavenClient = mavenClient;
-    this.repositoryFolder = repositoryFolder;
-    this.remoteRepositories = remoteRepositories;
   }
 
   @Override
   public File lookupBundle(BundleDependency bundleDependency) {
     try {
-      if (remoteRepositories.isEmpty()) {
+      if (mavenClient.getMavenConfiguration().getMavenRemoteRepositories().isEmpty()) {
         throw new RepositoryServiceDisabledException("Repository service has not been configured so it's disabled. "
             + "To enable it you must configure the set of repositories to use using the system property: "
             + MULE_REMOTE_REPOSITORIES_PROPERTY);
       }
 
       org.mule.maven.pom.parser.api.model.BundleDependency resolvedBundleDependency =
-          mavenClient.resolveBundleDescriptor(muleToMavenDescriptor(bundleDependency.getDescriptor()), of(repositoryFolder),
-                                              remoteRepositories);
+          mavenClient.resolveBundleDescriptor(muleToMavenDescriptor(bundleDependency.getDescriptor()));
 
       return new File(resolvedBundleDependency.getBundleUri().getPath());
     } catch (BundleDependenciesResolutionException e) {

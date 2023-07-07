@@ -55,30 +55,18 @@ public class RepositoryServiceFactory {
     List<RemoteRepository> remoteRepositories = collectRemoteRepositories();
 
     MavenClientProvider mavenClientProvider = discoverProvider(RepositoryServiceFactory.class.getClassLoader());
-    MavenClient mavenClient = mavenClientProvider.createMavenClient(getDefaultMavenConfiguration(mavenClientProvider));
+    MavenClient mavenClient = mavenClientProvider
+        .createMavenClient(getMavenConfiguration(repositoryFolder, remoteRepositories));
 
-    return new DefaultRepositoryService(mavenClient, repositoryFolder, remoteRepositories);
+    return new DefaultRepositoryService(mavenClient);
   }
 
-  private MavenConfiguration getDefaultMavenConfiguration(MavenClientProvider mavenClientProvider) {
-    final Supplier<File> localMavenRepository =
-        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
-    final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
-
-    final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
-    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
-    final Optional<File> settingsSecurity = settingsSupplierFactory.environmentSettingsSecuritySupplier();
-
+  private MavenConfiguration getMavenConfiguration(File localRepositoryFolder, List<RemoteRepository> remoteRepositories) {
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
         .forcePolicyUpdateNever(true)
-        .localMavenRepositoryLocation(localMavenRepository.get());
+        .localMavenRepositoryLocation(localRepositoryFolder);
 
-    globalSettings.ifPresent(mavenConfigurationBuilder::globalSettingsLocation);
-
-    userSettings.ifPresent(mavenConfigurationBuilder::userSettingsLocation);
-
-    settingsSecurity.ifPresent(mavenConfigurationBuilder::settingsSecurityLocation);
+    remoteRepositories.forEach(mavenConfigurationBuilder::remoteRepository);
 
     return mavenConfigurationBuilder.build();
   }
