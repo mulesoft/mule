@@ -7,9 +7,11 @@
 
 package org.mule.test.infrastructure.process;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+
+import static java.util.Arrays.asList;
+
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -170,6 +172,6 @@ public class MuleProcessController {
    * @param testEnvVars map of environment variables and their values
    */
   public void setTestEnvVars(Map<String, String> testEnvVars) {
-    controller.setTestEnvVars(testEnvVars);
+    getController().setTestEnvVars(testEnvVars);
   }
 }

@@ -10,10 +10,12 @@ package org.mule.test.infrastructure.process;
 import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 
 import static java.lang.String.format;
+import static java.nio.file.FileSystems.getDefault;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.compile;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.tck.probe.PollingProber;
@@ -23,12 +25,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 
@@ -60,7 +64,9 @@ public abstract class AbstractOSController {
   protected static final Pattern STATUS_LABELS_PATTERN = compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
   private static final String JAVA_HOME_VARIABLE = "JAVA_HOME";
-  private static final String JAVA_HOME_SYSPROP = "java.home";
+  private static final String SEPARATOR = getDefault().getSeparator();
+  private static final Pattern JAVA_HOME_PATTERN = compile("(.*?)\\" + SEPARATOR + "bin\\" + SEPARATOR + ".*");
+
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
   private static final String MULE_APP_LONG_VARIABLE = "MULE_APP_LONG";
@@ -154,14 +160,14 @@ public abstract class AbstractOSController {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
-    DefaultExecutor executor = new DefaultExecutor();
+    Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
     executor.setStreamHandler(new PumpStreamHandler());
     return doExecution(executor, commandLine, newEnv);
   }
 
-  protected int doExecution(DefaultExecutor executor, CommandLine commandLine, Map<Object, Object> env) {
+  protected int doExecution(Executor executor, CommandLine commandLine, Map<Object, Object> env) {
     try {
       final StringJoiner paramsJoiner = new StringJoiner(" ");
       for (String cmdArg : commandLine.toStrings()) {
@@ -198,10 +204,16 @@ public abstract class AbstractOSController {
       newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
     }
 
-    // Use the jvm running the tests to run the Mule Runtime...
-    String javaHomeProperty = System.getProperty(JAVA_HOME_SYSPROP);
-    if (javaHomeProperty != null) {
-      newEnv.put(JAVA_HOME_VARIABLE, javaHomeProperty);
+
+    // Use the jvm running the tests as configured in surefire to run the Mule Runtime...
+    String jvmProperty = System.getProperty("jvm");
+    if (jvmProperty != null) {
+      final Matcher javaHomeMatcher = JAVA_HOME_PATTERN.matcher(jvmProperty);
+      if (javaHomeMatcher.matches()) {
+        newEnv.put(JAVA_HOME_VARIABLE, javaHomeMatcher.group(1));
+      } else {
+        fail("Could not extract `JAVA_HOME` from `jvm` property:" + jvmProperty);
+      }
     }
 
     return newEnv;
