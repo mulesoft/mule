@@ -31,7 +31,7 @@ public class MuleContainerBootstrap {
   public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
 
   private static final String MULE_MODULE_REBOOT_POM_FILE_PATH =
-      "META-INF/maven/org.mule.module/mule-module-reboot/pom.properties";
+      "META-INF/maven/org.mule.runtime/mule-module-reboot/pom.properties";
 
   public static final String[][] CLI_OPTIONS = {{"main", "true", "Main Class"},
       {"production", "false", "Modify the system class loader for production use (as in Mule 2.x)"},
