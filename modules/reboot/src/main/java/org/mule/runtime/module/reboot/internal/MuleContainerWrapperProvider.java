@@ -19,7 +19,6 @@ import static java.lang.System.getProperty;
 public class MuleContainerWrapperProvider {
 
   private static final String MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY = "mule.bootstrap.container.wrapper.class";
-  private static final String DEFAULT_WRAPPER_IMPL_CLASS = "org.mule.runtime.module.tanuki.internal.MuleContainerTanukiWrapper";
   private static MuleContainerWrapper INSTANCE;
 
   /**
@@ -43,17 +42,27 @@ public class MuleContainerWrapperProvider {
    * @return The {@link MuleContainerWrapper} implementation.
    */
   private static MuleContainerWrapper createContainerWrapper() {
-    String wrapperClassName = getProperty(MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY, DEFAULT_WRAPPER_IMPL_CLASS);
+    String wrapperClassName = getProperty(MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY);
+    if (wrapperClassName == null) {
+      throw new RuntimeException(format("System property '%s' is not defined, it must be set with an implementation of %s",
+                                        MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY,
+                                        MuleContainerWrapper.class.getName()));
+    }
+
     try {
       Class<?> wrapperClass = MuleContainerWrapper.class.getClassLoader().loadClass(wrapperClassName);
       if (!MuleContainerWrapper.class.isAssignableFrom(wrapperClass)) {
-        throw new RuntimeException(format("System property '%s' does not define an implementation of %s",
-                                          MuleContainerWrapper.class.getName(),
-                                          wrapperClassName));
+        throw new RuntimeException(format("System property '%s=%s' does not define an implementation of %s",
+                                          MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY,
+                                          wrapperClassName,
+                                          MuleContainerWrapper.class.getName()));
       }
       return (MuleContainerWrapper) wrapperClass.getConstructor().newInstance();
     } catch (ReflectiveOperationException e) {
-      throw new RuntimeException(format("Unable to instantiate MuleContainerWrapper '%s'", wrapperClassName), e);
+      throw new RuntimeException(format("Unable to instantiate MuleContainerWrapper implementation '%s' from system property '%s'",
+                                        wrapperClassName,
+                                        MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY),
+                                 e);
     }
   }
 }
