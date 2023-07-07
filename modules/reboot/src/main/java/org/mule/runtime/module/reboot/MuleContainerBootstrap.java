@@ -11,7 +11,6 @@ import static org.mule.runtime.module.reboot.internal.MuleContainerWrapperProvid
 
 import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
-import org.mule.runtime.module.reboot.internal.SystemMuleVersionBootstrapConfigurer;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -29,9 +28,6 @@ public class MuleContainerBootstrap {
 
   public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
   public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
-
-  private static final String MULE_MODULE_REBOOT_POM_FILE_PATH =
-      "META-INF/maven/org.mule.runtime/mule-module-reboot/pom.properties";
 
   public static final String[][] CLI_OPTIONS = {{"main", "true", "Main Class"},
       {"production", "false", "Modify the system class loader for production use (as in Mule 2.x)"},
@@ -61,8 +57,6 @@ public class MuleContainerBootstrap {
       muleContainerWrapper.haltAndCatchFire(1, ex.getMessage());
       return;
     }
-
-    muleContainerWrapper.addBootstrapConfigurer(new SystemMuleVersionBootstrapConfigurer(MULE_MODULE_REBOOT_POM_FILE_PATH));
 
     muleContainerWrapper.configureAndStart(muleContainerFactory, commandLine);
   }
