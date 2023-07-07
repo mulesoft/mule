@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -26,7 +27,7 @@ public interface MuleContainer {
    *                   configuration. The state of the Container should be as if never started. The bootstrapping application must
    *                   exit after this.
    */
-  void start(BooleanSupplier configurationsReadyBarrier, String[] additionalSplashEntries) throws Exception;
+  void start(BooleanSupplier configurationsReadyBarrier, List<String> additionalSplashEntries) throws Exception;
 
   /**
    * Shuts down the Container gracefully, stopping all the associated tasks and cleaning up resources.

@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -46,12 +47,12 @@ import org.slf4j.LoggerFactory;
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
   private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
-  private final String[] additionalSplashEntries;
+  private final List<String> additionalSplashEntries;
 
   /**
    * @param additionalSplashEntries Additional splash entries to include in the body.
    */
-  public MuleContainerStartupSplashScreen(String[] additionalSplashEntries) {
+  public MuleContainerStartupSplashScreen(List<String> additionalSplashEntries) {
     this.additionalSplashEntries = additionalSplashEntries;
   }
 

@@ -8,6 +8,7 @@ package org.mule.runtime.module.tanuki.internal;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
 
 import static org.tanukisoftware.wrapper.WrapperManager.WRAPPER_LOG_LEVEL_ERROR;
 import static org.tanukisoftware.wrapper.WrapperManager.getJavaPID;
@@ -19,6 +20,7 @@ import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import org.tanukisoftware.wrapper.WrapperListener;
@@ -116,10 +118,8 @@ class MuleContainerTanukiWrapperListener implements WrapperListener {
   }
 
   private void startWithContainerClassLoader() throws Exception {
-    String[] additionalSplashEntries = {
-        format("Wrapper PID: %d", getWrapperPID()),
-        format("Java PID: %d", getJavaPID())
-    };
+    List<String> additionalSplashEntries = asList(format("Wrapper PID: %d", getWrapperPID()),
+                                                  format("Java PID: %d", getJavaPID()));
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(muleContainer.getClass().getClassLoader());
     try {

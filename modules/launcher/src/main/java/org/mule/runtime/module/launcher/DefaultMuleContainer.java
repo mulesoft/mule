@@ -28,6 +28,7 @@ import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static java.util.Collections.emptyList;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -49,7 +50,6 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.internal.util.SystemUtils;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.runtime.module.reboot.MuleContainerBootstrap;
 import org.mule.runtime.module.reboot.internal.MuleContainer;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
@@ -252,15 +252,16 @@ public class DefaultMuleContainer implements MuleContainer {
   }
 
   @Override
-  public void start(BooleanSupplier configurationsReadyBarrier, String[] additionalSplashEntries) throws MuleException {
+  public void start(BooleanSupplier configurationsReadyBarrier, List<String> additionalSplashEntries) throws MuleException {
     start(true, configurationsReadyBarrier, additionalSplashEntries);
   }
 
   public void start(boolean registerShutdownHook) throws MuleException {
-    start(registerShutdownHook, () -> true, new String[] {});
+    start(registerShutdownHook, () -> true, emptyList());
   }
 
-  private void start(boolean registerShutdownHook, BooleanSupplier configurationsReadyBarrier, String[] additionalSplashEntries)
+  private void start(boolean registerShutdownHook, BooleanSupplier configurationsReadyBarrier,
+                     List<String> additionalSplashEntries)
       throws MuleException {
     if (registerShutdownHook) {
       registerShutdownHook();
@@ -313,7 +314,7 @@ public class DefaultMuleContainer implements MuleContainer {
     });
   }
 
-  private void showSplashScreen(String[] additionalSplashEntries) {
+  private void showSplashScreen(List<String> additionalSplashEntries) {
     final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(additionalSplashEntries);
     splashScreen.doBody();
     log(splashScreen.toString());
