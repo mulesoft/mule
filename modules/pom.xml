@@ -37,7 +37,7 @@
         <module>http-api</module>
         <module>oauth-api</module>
         <module>reboot</module>
-        <module>tanuki</module>
+        <module>tanuki-boot</module>
         <module>jpms-utils</module>
         <module>properties-config</module>
         <module>spring-config</module>

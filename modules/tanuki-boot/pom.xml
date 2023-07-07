@@ -7,7 +7,7 @@
         <groupId>org.mule.runtime</groupId>
         <version>4.5.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-module-tanuki</artifactId>
+    <artifactId>mule-module-tanuki-boot</artifactId>
     <packaging>jar</packaging>
     <name>Mule 4 Container Wrapper based on Tanuki</name>
 
