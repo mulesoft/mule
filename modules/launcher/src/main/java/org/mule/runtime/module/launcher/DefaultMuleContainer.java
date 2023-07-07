@@ -88,12 +88,6 @@ public class DefaultMuleContainer implements MuleContainer {
       format("Cannot set both '%s' option and '%s' property", APP_COMMAND_LINE_OPTION, DEPLOYMENT_APPLICATION_PROPERTY);
 
   /**
-   * A properties file to be read at startup. This can be useful for setting properties which depend on the run-time environment
-   * (dev, test, production).
-   */
-  private static String startupPropertiesFile = null;
-
-  /**
    * The Runtime shutdown thread used to undeploy this server
    */
   private static MuleShutdownHook muleShutdownHook;
@@ -202,12 +196,6 @@ public class DefaultMuleContainer implements MuleContainer {
     // properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     MuleArtifactUrlStreamHandler.register();
-
-    // Startup properties
-    String propertiesFile = (String) commandlineOptions.get("props");
-    if (propertiesFile != null) {
-      setStartupPropertiesFile(propertiesFile);
-    }
 
     String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
     if (appOption != null) {
@@ -420,15 +408,6 @@ public class DefaultMuleContainer implements MuleContainer {
   // /////////////////////////////////////////////////////////////////
   // Getters and setters
   // /////////////////////////////////////////////////////////////////
-
-
-  public static String getStartupPropertiesFile() {
-    return startupPropertiesFile;
-  }
-
-  public static void setStartupPropertiesFile(String startupPropertiesFile) {
-    DefaultMuleContainer.startupPropertiesFile = startupPropertiesFile;
-  }
 
   /**
    * This class is installed only for DefaultMuleContainer running as commandline app. A clean Mule shutdown can be achieved by
