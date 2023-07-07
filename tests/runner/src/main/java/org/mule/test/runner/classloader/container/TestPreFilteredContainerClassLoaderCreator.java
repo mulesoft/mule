@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
 
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -12,6 +12,10 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
+import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
+import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -34,16 +38,19 @@ import com.google.common.collect.ImmutableSet;
 public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 
   private final Set<String> extraBootPackages;
-  private final URL[] urls;
+  private final URL[] muleUrls;
+  private final URL[] optUrls;
   private final URLClassLoader classLoader;
   private final DefaultModuleRepository testContainerModuleRepository;
   private ArtifactClassLoader containerClassLoader;
 
-  public TestPreFilteredContainerClassLoaderCreator(final List<String> extraBootPackages, final URL[] urls) {
+  public TestPreFilteredContainerClassLoaderCreator(final List<String> extraBootPackages, final URL[] muleUrls,
+                                                    final URL[] optUrls) {
     this.extraBootPackages = ImmutableSet.<String>builder().addAll(BOOT_PACKAGES).addAll(extraBootPackages)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
-    this.urls = urls;
-    this.classLoader = new URLClassLoader(urls, null);
+    this.muleUrls = muleUrls;
+    this.optUrls = optUrls;
+    this.classLoader = new URLClassLoader(muleUrls, null);
     this.testContainerModuleRepository = new DefaultModuleRepository(new TestContainerModuleDiscoverer(classLoader));
   }
 
@@ -60,7 +67,10 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-    containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor, urls, parentClassLoader,
+    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, parentClassLoader);
+    containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
+                                                       muleUrls,
+                                                       containerOptClassLoader,
                                                        new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
     return containerClassLoader;
   }

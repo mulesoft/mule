@@ -7,12 +7,13 @@
 
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -48,7 +49,7 @@ public class ArtifactClassificationTypeResolver {
    * @param dependencyResolver {@link DependencyResolver} to get artifact output. Non null.
    */
   public ArtifactClassificationTypeResolver(DependencyResolver dependencyResolver) {
-    checkNotNull(dependencyResolver, "dependencyResolver cannot be null");
+    requireNonNull(dependencyResolver, "dependencyResolver cannot be null");
 
     this.dependencyResolver = dependencyResolver;
   }

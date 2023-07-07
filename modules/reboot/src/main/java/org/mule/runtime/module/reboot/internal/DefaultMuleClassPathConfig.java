@@ -32,7 +32,8 @@ public class DefaultMuleClassPathConfig {
   protected static final String OPT_DIR = "/lib/opt";
   protected static final String OPT_JDK8_DIR = "/lib/opt/jdk-8";
 
-  protected List<URL> urls = new ArrayList<>();
+  protected List<URL> muleUrls = new ArrayList<>();
+  protected List<URL> optUrls = new ArrayList<>();
 
   public DefaultMuleClassPathConfig(File muleHome, File muleBase) {
     init(muleHome, muleBase);
@@ -45,13 +46,13 @@ public class DefaultMuleClassPathConfig {
      */
     addMuleBaseUserLibs(muleHome, muleBase);
 
-    addLibraryDirectory(muleHome, USER_DIR);
-    addLibraryDirectory(muleHome, MULE_DIR);
-    addLibraryDirectory(muleHome, OPT_DIR);
+    addLibraryDirectory(muleUrls, muleHome, USER_DIR);
+    addLibraryDirectory(muleUrls, muleHome, MULE_DIR);
+    addLibraryDirectory(optUrls, muleHome, OPT_DIR);
 
     // Do not use commons-lang3 to avoid having to add that jar to lib/boot
     if (getProperty(JAVA_RUNNING_VERSION).startsWith(JAVA_8_VERSION)) {
-      addLibraryDirectory(muleHome, OPT_JDK8_DIR);
+      addLibraryDirectory(optUrls, muleHome, OPT_JDK8_DIR);
     }
   }
 
@@ -59,28 +60,26 @@ public class DefaultMuleClassPathConfig {
     try {
       if (!muleHome.getCanonicalFile().equals(muleBase.getCanonicalFile())) {
         File userOverrideDir = new File(muleBase, USER_DIR);
-        addFile(userOverrideDir);
-        addFiles(listJars(userOverrideDir));
+        addFile(muleUrls, userOverrideDir);
+        addFiles(muleUrls, listJars(userOverrideDir));
       }
     } catch (IOException ioe) {
       System.out.println("Unable to check to see if there are local jars to load: " + ioe.toString());
     }
   }
 
-  protected void addLibraryDirectory(File muleHome, String libDirectory) {
+  protected void addLibraryDirectory(List<URL> urls, File muleHome, String libDirectory) {
     File directory = new File(muleHome, libDirectory);
-    addFile(directory);
-    addFiles(listJars(directory));
+    addFile(urls, directory);
+    addFiles(urls, listJars(directory));
   }
 
-  public List<URL> getURLs() {
-    return new ArrayList<>(this.urls);
+  public List<URL> getMuleURLs() {
+    return new ArrayList<>(this.muleUrls);
   }
 
-  public void addURLs(List<URL> moreUrls) {
-    if (moreUrls != null && !moreUrls.isEmpty()) {
-      this.urls.addAll(moreUrls);
-    }
+  public List<URL> getOptURLs() {
+    return new ArrayList<>(this.optUrls);
   }
 
   /**
@@ -88,19 +87,19 @@ public class DefaultMuleClassPathConfig {
    *
    * @param url folder (should end with a slash) or jar path
    */
-  public void addURL(URL url) {
-    this.urls.add(url);
+  public void addURL(List<URL> urls, URL url) {
+    urls.add(url);
   }
 
-  public void addFiles(List<File> files) {
+  public void addFiles(List<URL> urls, List<File> files) {
     for (File file : files) {
-      this.addFile(file);
+      this.addFile(urls, file);
     }
   }
 
-  public void addFile(File jar) {
+  public void addFile(List<URL> urls, File jar) {
     try {
-      this.addURL(jar.getAbsoluteFile().toURI().toURL());
+      this.addURL(urls, jar.getAbsoluteFile().toURI().toURL());
     } catch (MalformedURLException mux) {
       throw new RuntimeException("Failed to construct a classpath URL", mux);
     }

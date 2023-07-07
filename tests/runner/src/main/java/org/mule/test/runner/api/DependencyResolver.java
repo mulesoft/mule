@@ -8,7 +8,6 @@
 package org.mule.test.runner.api;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -23,8 +22,10 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.MuleMavenRepositoryState;
 import org.mule.maven.client.internal.MuleMavenResolutionContext;
+import org.mule.runtime.api.util.Pair;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -112,7 +113,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
    */
   public ArtifactDescriptorResult readArtifactDescriptor(Artifact artifact) throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
         new ArtifactDescriptorRequest(artifact, resolveRepositories(), null);
@@ -129,7 +130,7 @@ public class DependencyResolver {
    */
   public ArtifactDescriptorResult readArtifactDescriptor(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactDescriptorRequest request =
         new ArtifactDescriptorRequest(artifact, resolveRepositories(remoteRepositories), null);
@@ -145,7 +146,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactResolutionException} if the artifact could not be resolved.
    */
   public ArtifactResult resolveArtifact(Artifact artifact) throws ArtifactResolutionException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
@@ -161,7 +162,7 @@ public class DependencyResolver {
    */
   public ArtifactResult resolveArtifact(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactResolutionException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     final ArtifactRequest request = new ArtifactRequest(artifact, resolveRepositories(remoteRepositories), null);
     return repositoryState.getSystem().resolveArtifact(repositoryState.getSession(), request);
@@ -175,7 +176,7 @@ public class DependencyResolver {
    * @throws {@link ArtifactDescriptorException} if the artifact descriptor could not be read
    */
   public List<Dependency> getDirectDependencies(Artifact artifact) throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     return readArtifactDescriptor(artifact).getDependencies();
   }
@@ -190,9 +191,40 @@ public class DependencyResolver {
    */
   public List<Dependency> getDirectDependencies(Artifact artifact, List<RemoteRepository> remoteRepositories)
       throws ArtifactDescriptorException {
-    checkNotNull(artifact, "artifact cannot be null");
+    requireNonNull(artifact, "artifact cannot be null");
 
     return readArtifactDescriptor(artifact, remoteRepositories).getDependencies();
+  }
+
+  /**
+   * Resolves and filters transitive dependencies for the root and direct dependencies.
+   * <p/>
+   * If both a root dependency and direct dependencies are given, the direct dependencies will be merged with the direct
+   * dependencies from the root dependency's artifact descriptor, giving higher priority to the dependencies from the root.
+   *
+   * @param root                {@link Dependency} node from to collect its dependencies, may be {@code null}
+   * @param directDependencies  {@link List} of direct {@link Dependency} to collect its transitive dependencies, may be
+   *                            {@code null}
+   * @param managedDependencies {@link List} of managed {@link Dependency}s to be used for resolving the depedency graph, may be
+   *                            {@code null}
+   * @param dependencyFilter    {@link DependencyFilter} to include/exclude dependency nodes during collection and resolve
+   *                            operation. May be {@code null} to no filter
+   * @param remoteRepositories  a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule
+   *                            jar urls, second are jar urls for third parties.
+   * @return a {@link List} of {@link File}s for each dependency resolved
+   * @throws {@link DependencyCollectionException} if the dependency tree could not be built
+   * @thwows {@link DependencyResolutionException} if the dependency tree could not be built or any dependency artifact could not
+   *         be resolved
+   */
+  public Pair<List<File>, List<File>> resolveContainerDependencies(Dependency root, List<Dependency> directDependencies,
+                                                                   List<Dependency> managedDependencies,
+                                                                   DependencyFilter dependencyFilter,
+                                                                   List<RemoteRepository> remoteRepositories)
+      throws DependencyCollectionException, DependencyResolutionException {
+    DependencyNode node =
+        resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
+
+    return getContainerFiles(node);
   }
 
   /**
@@ -217,7 +249,18 @@ public class DependencyResolver {
    */
   public List<File> resolveDependencies(Dependency root, List<Dependency> directDependencies,
                                         List<Dependency> managedDependencies,
-                                        DependencyFilter dependencyFilter, List<RemoteRepository> remoteRepositories)
+                                        DependencyFilter dependencyFilter,
+                                        List<RemoteRepository> remoteRepositories)
+      throws DependencyCollectionException, DependencyResolutionException {
+    DependencyNode node =
+        resolveDependencyNode(root, directDependencies, managedDependencies, dependencyFilter, remoteRepositories);
+
+    return getFiles(node);
+  }
+
+  private DependencyNode resolveDependencyNode(Dependency root, List<Dependency> directDependencies,
+                                               List<Dependency> managedDependencies, DependencyFilter dependencyFilter,
+                                               List<RemoteRepository> remoteRepositories)
       throws DependencyCollectionException, DependencyResolutionException {
     CollectRequest collectRequest = new CollectRequest();
     collectRequest.setRoot(root);
@@ -243,9 +286,7 @@ public class DependencyResolver {
       logUnresolvedArtifacts(node, e);
       throw e;
     }
-
-    List<File> files = getFiles(node);
-    return files;
+    return node;
   }
 
   private String printCollectRequest(CollectRequest collectRequest) {
@@ -305,6 +346,52 @@ public class DependencyResolver {
     node.accept(nlg);
 
     return nlg.getFiles().stream().map(File::getAbsoluteFile).collect(toList());
+  }
+
+  /**
+   * Traverse the {@link DependencyNode} to get the files for each artifact.
+   *
+   * @param node {@link DependencyNode} that represents the dependency graph
+   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jars urls, second
+   *         are jar urls for third parties.
+   */
+  private Pair<List<File>, List<File>> getContainerFiles(DependencyNode node) {
+    PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+    node.accept(nlg);
+
+    List<File> muleDependencyFiles = new ArrayList<>();
+    List<File> optDependencyFiles = new ArrayList<>();
+
+    nlg.getNodes()
+        .stream()
+        .forEach(depNode -> {
+          final Artifact artifact = depNode.getArtifact();
+          if (artifact.getFile() == null) {
+            return;
+          }
+
+          final File absoluteFile = artifact.getFile().getAbsoluteFile();
+
+          if (isMuleContainerGroupId(artifact.getGroupId())) {
+            muleDependencyFiles.add(absoluteFile);
+          } else {
+            optDependencyFiles.add(absoluteFile);
+          }
+        });
+
+    return new Pair<>(muleDependencyFiles, optDependencyFiles);
+  }
+
+  // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies
+  private boolean isMuleContainerGroupId(final String groupId) {
+    return groupId.equals("org.mule.runtime")
+        || groupId.equals("org.mule.sdk")
+        || groupId.equals("org.mule.weave")
+        || groupId.equals("org.mule.mvel")
+        || groupId.equals("org.mule.commons")
+        || groupId.equals("com.mulesoft.mule.runtime")
+        || groupId.equals("com.mulesoft.mule.runtime.modules")
+        || groupId.equals("com.mulesoft.anypoint");
   }
 
   /**

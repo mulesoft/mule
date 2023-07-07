@@ -7,8 +7,9 @@
 
 package org.mule.test.runner.api;
 
+import static java.util.Objects.requireNonNull;
+
 import static com.google.common.collect.Lists.newArrayList;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.utils.RunnerModuleUtils;
@@ -51,7 +52,7 @@ public class ClassPathClassifierContext {
   private final List<URL> testRunnerPluginUrls = newArrayList();
 
   private boolean extensionMetadataGenerationEnabled = false;
-  private File pluginResourcesFolder;
+  private final File pluginResourcesFolder;
 
   /**
    * Creates a context used for doing the classification of the class path.
@@ -99,8 +100,8 @@ public class ClassPathClassifierContext {
                                     final boolean extensionMetadataGenerationEnabled,
                                     Set<String> applicationLibCoordinates, Set<String> testRunnerExportedLibCoordinates)
       throws IOException {
-    checkNotNull(rootArtifact, "rootArtifact cannot be null");
-    checkNotNull(classPathURLs, "classPathURLs cannot be null");
+    requireNonNull(rootArtifact, "rootArtifact cannot be null");
+    requireNonNull(classPathURLs, "classPathURLs cannot be null");
 
     this.rootArtifact = rootArtifact;
     this.pluginResourcesFolder = pluginResourcesFolder;

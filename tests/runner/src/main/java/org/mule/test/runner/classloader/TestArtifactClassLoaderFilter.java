@@ -7,13 +7,16 @@
 
 package org.mule.test.runner.classloader;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
+
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang3.ClassUtils.getPackageName;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.core.api.util.StringMessageUtils.DEFAULT_MESSAGE_WIDTH;
+
 import org.mule.runtime.core.api.util.StringMessageUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
@@ -36,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class TestArtifactClassLoaderFilter implements ArtifactClassLoaderFilter {
 
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final ArtifactClassLoaderFilter classLoaderFilter;
   private final Map<String, Object> exportedClasses;
@@ -49,8 +52,8 @@ public final class TestArtifactClassLoaderFilter implements ArtifactClassLoaderF
    * @param exportedClasses   a {@link List} of {@link Class}es to export in addition to the original filter. Not null.
    */
   public TestArtifactClassLoaderFilter(final ArtifactClassLoaderFilter classLoaderFilter, final List<Class> exportedClasses) {
-    checkNotNull(classLoaderFilter, "classLoaderFilter cannot be null");
-    checkNotNull(exportedClasses, "exportedClasses cannot be null");
+    requireNonNull(classLoaderFilter, "classLoaderFilter cannot be null");
+    requireNonNull(exportedClasses, "exportedClasses cannot be null");
 
     this.classLoaderFilter = classLoaderFilter;
     this.exportedClasses = exportedClasses.stream().collect(Collectors.toMap(Class::getName, identity()));

@@ -7,7 +7,6 @@
 package org.mule.runtime.globalconfig.api.cluster;
 
 import org.mule.api.annotation.NoImplement;
-import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.globalconfig.api.EnableableConfig;
 
 /**

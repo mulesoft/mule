@@ -115,7 +115,6 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.api.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
@@ -147,6 +146,7 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFact
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.mule.runtime.module.deployment.internal.util.container.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;

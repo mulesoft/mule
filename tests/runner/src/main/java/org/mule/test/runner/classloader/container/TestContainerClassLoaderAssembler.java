@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.api;
+package org.mule.test.runner.classloader.container;
 
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.SYSTEM_PACKAGES;
 
-import org.mule.runtime.container.internal.DefaultTestContainerClassLoaderAssembler;
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.net.URL;
@@ -24,8 +25,9 @@ import java.util.Set;
 public interface TestContainerClassLoaderAssembler extends AutoCloseable {
 
   static TestContainerClassLoaderAssembler create(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
-                                                  List<URL> urls) {
-    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, urls);
+                                                  List<URL> muleUrls,
+                                                  List<URL> optUrls) {
+    return new DefaultTestContainerClassLoaderAssembler(extraBootPackages, extraPrivilegedArtifacts, muleUrls, optUrls);
   }
 
   /**

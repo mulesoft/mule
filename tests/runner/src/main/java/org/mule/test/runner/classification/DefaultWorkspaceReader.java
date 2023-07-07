@@ -8,10 +8,10 @@
 package org.mule.test.runner.classification;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.io.FileUtils.toFile;
 
@@ -57,8 +57,8 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    *                                  {@link Artifact}
    */
   public DefaultWorkspaceReader(List<URL> classPath, WorkspaceLocationResolver workspaceLocationResolver) {
-    checkNotNull(classPath, "classPath cannot be null");
-    checkNotNull(workspaceLocationResolver, "workspaceLocationResolver cannot be null");
+    requireNonNull(classPath, "classPath cannot be null");
+    requireNonNull(workspaceLocationResolver, "workspaceLocationResolver cannot be null");
 
     this.classPath = classPath;
     this.workspaceLocationResolver = workspaceLocationResolver;

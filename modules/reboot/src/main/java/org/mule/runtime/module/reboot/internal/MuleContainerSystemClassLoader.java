@@ -19,26 +19,15 @@ public class MuleContainerSystemClassLoader extends URLClassLoader {
     registerAsParallelCapable();
   }
 
-  // protected transient Log logger = LogFactory.getLog(getClass());
-
   public MuleContainerSystemClassLoader(DefaultMuleClassPathConfig classPath) {
-    super(new URL[0]);
+    super(new URL[0], createOptClassloader(classPath.getOptURLs()));
 
-    try {
-      final List<URL> urlsList = classPath.getURLs();
-      for (URL url : urlsList) {
-        // if (logger.isDebugEnabled())
-        // {
-        // logger.debug("adding URL " + url);
-        // }
-
-        addURL(url);
-      }
-    } catch (Exception e) {
-      // if (logger.isDebugEnabled())
-      // {
-      // logger.debug(e);
-      // }
+    for (URL url : classPath.getMuleURLs()) {
+      addURL(url);
     }
+  }
+
+  private static ClassLoader createOptClassloader(List<URL> optUrls) {
+    return new URLClassLoader(optUrls.toArray(new URL[optUrls.size()]));
   }
 }

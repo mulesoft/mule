@@ -8,11 +8,11 @@
 package org.mule.test.runner.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.runtime.container.api.TestContainerClassLoaderAssembler.create;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
+import static org.mule.test.runner.classloader.container.TestContainerClassLoaderAssembler.create;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.System.getProperty;
@@ -31,7 +31,6 @@ import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFacto
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.container.api.TestContainerClassLoaderAssembler;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -55,6 +54,7 @@ import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
 import org.mule.test.runner.api.PluginUrlClassification;
 import org.mule.test.runner.api.ServiceUrlClassification;
+import org.mule.test.runner.classloader.container.TestContainerClassLoaderAssembler;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -125,7 +125,8 @@ public class IsolatedClassLoaderFactory {
 
     try (final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
         create(extraBootPackages, extraPrivilegedArtifacts,
-               artifactsUrlClassification.getContainerUrls())) {
+               artifactsUrlClassification.getContainerMuleUrls(),
+               artifactsUrlClassification.getContainerOptUrls())) {
 
       ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 

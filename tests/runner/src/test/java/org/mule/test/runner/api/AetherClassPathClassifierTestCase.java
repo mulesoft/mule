@@ -7,10 +7,19 @@
 
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
+import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
+import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
+import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.artifact.JavaScopes.PROVIDED;
@@ -34,13 +43,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
-import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
-import static org.mule.test.runner.api.AetherClassPathClassifier.getMuleVersion;
-import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
-import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
-import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
@@ -64,8 +66,7 @@ import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -73,6 +74,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 
 @SmallTest
 @Ignore("MULE-16671")
@@ -173,8 +177,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getTestRunnerLibUrls(), is(empty()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
-    assertThat(classification.getContainerUrls(), hasSize(3));
-    assertThat(classification.getContainerUrls(),
+    assertThat(classification.getContainerMuleUrls(), hasSize(3));
+    assertThat(classification.getContainerMuleUrls(),
                hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL(),
                         rootArtifactFile.toURI().toURL()));
 
@@ -240,8 +244,8 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getTestRunnerLibUrls(), contains(rootArtifactFile.toURI().toURL(), url));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
-    assertThat(classification.getContainerUrls(), hasSize(2));
-    assertThat(classification.getContainerUrls(),
+    assertThat(classification.getContainerMuleUrls(), hasSize(2));
+    assertThat(classification.getContainerMuleUrls(),
                hasItems(fooCoreArtifactFile.toURI().toURL(), fooToolsArtifactFile.toURI().toURL()));
 
     verify(artifactDescriptorResult, atLeastOnce()).getManagedDependencies();
@@ -327,7 +331,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getApplicationSharedLibUrls(), hasSize(1));
     assertThat(classification.getApplicationSharedLibUrls(), hasItem(derbyDriverFile.toURI().toURL()));
-    assertThat(classification.getContainerUrls(), is(empty()));
+    assertThat(classification.getContainerMuleUrls(), is(empty()));
 
     verify(defaultArtifactDescriptorResult, atLeastOnce()).getManagedDependencies();
     verify(dependencyResolver, atLeastOnce()).readArtifactDescriptor(any(Artifact.class));
@@ -424,7 +428,7 @@ public class AetherClassPathClassifierTestCase extends AbstractMuleTestCase {
     assertThat(classification.getTestRunnerLibUrls(), hasItem(rootArtifactFile.toURI().toURL()));
     assertThat(classification.getPluginUrlClassifications(), is(empty()));
     assertThat(classification.getApplicationSharedLibUrls(), is(empty()));
-    assertThat(classification.getContainerUrls(), hasSize(2));
+    assertThat(classification.getContainerMuleUrls(), hasSize(2));
     assertThat(classification.getServiceUrlClassifications(), hasSize(1));
     assertThat(classification.getServiceUrlClassifications().get(0).getUrls(), hasItem(fooServiceArtifactFile.toURI().toURL()));
 

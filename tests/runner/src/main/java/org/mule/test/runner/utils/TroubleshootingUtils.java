@@ -7,6 +7,7 @@
 
 package org.mule.test.runner.utils;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.util.Reference;
@@ -40,6 +41,7 @@ import java.util.jar.JarFile;
 import javax.management.MBeanServer;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,13 +116,19 @@ public class TroubleshootingUtils {
 
   public static Path getPathOfFileContaining(Path pluginJsonUrl, String substring) {
     Path auxPath = pluginJsonUrl;
-    while (auxPath != null && !auxPath.getFileName().toString().contains(substring)) {
-      auxPath = auxPath.getParent();
+    try {
+      while (auxPath != null && !auxPath.getFileName().toString().contains(substring)) {
+        auxPath = auxPath.getParent();
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(format("Could not find the substring '%s' in path '%s'", substring,
+                                        pluginJsonUrl.toAbsolutePath()),
+                                 e);
     }
 
     if (pluginJsonUrl != null && auxPath == null) {
-      throw new RuntimeException(String.format("Could not find the substring '%s' in path '%s'", substring,
-                                               pluginJsonUrl.toAbsolutePath()));
+      throw new RuntimeException(format("Could not find the substring '%s' in path '%s'", substring,
+                                        pluginJsonUrl.toAbsolutePath()));
     }
 
     return auxPath;
@@ -288,7 +296,7 @@ public class TroubleshootingUtils {
     }
 
     String getOsProcessesCommand = GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY);
-    processesList.add(String.format("OS: '%s' - Command: '%s'", OS_NAME, getOsProcessesCommand));
+    processesList.add(format("OS: '%s' - Command: '%s'", OS_NAME, getOsProcessesCommand));
 
     try {
       Process runningProcessesResult = Runtime.getRuntime().exec(GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY));

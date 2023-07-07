@@ -7,7 +7,8 @@
 
 package org.mule.test.runner.maven;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -15,12 +16,12 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
 import static java.nio.file.Files.walkFileTree;
 import static java.nio.file.Paths.get;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
+
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
-import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
-import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
 
 import org.mule.test.runner.api.WorkspaceLocationResolver;
 
@@ -76,8 +77,8 @@ public class AutoDiscoverWorkspaceLocationResolver implements WorkspaceLocationR
    * @throws IllegalArgumentException if the rootArtifactClassesFolder doesn't point to a Maven project.
    */
   public AutoDiscoverWorkspaceLocationResolver(List<URL> classPath, File rootArtifactClassesFolder) {
-    checkNotNull(classPath, "classPath cannot be null");
-    checkNotNull(rootArtifactClassesFolder, "rootArtifactClassesFolder cannot be null");
+    requireNonNull(classPath, "classPath cannot be null");
+    requireNonNull(rootArtifactClassesFolder, "rootArtifactClassesFolder cannot be null");
 
     File rootArtifactFolder = rootArtifactClassesFolder.getParentFile().getParentFile();
     logger.debug("Discovering workspace artifacts locations from '{}'", rootArtifactFolder);
