@@ -20,6 +20,7 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.g
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
@@ -78,42 +79,59 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Test
   public void backPressureWithFailStrategy() throws Exception {
-    startFlow("defaultToFail");
-    check(15000, 100, () -> {
-      sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
-      return !sdkBackPressureContexts.isEmpty();
-    });
+    try {
+      startFlow("defaultToFail");
+      check(15000, 100, () -> {
+        sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
+        return !sdkBackPressureContexts.isEmpty();
+      });
 
-    org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
-    assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.FAIL));
-    assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
-    assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
+      org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
+      assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.FAIL));
+      assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
+      assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
+    } finally {
+      stopFlow("defaultToFail");
+    }
   }
 
   @Test
   public void backPressureWithDropStrategy() throws Exception {
     startFlow("configuredToDrop");
-    check(15000, 100, () -> {
-      sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
-      return !sdkBackPressureContexts.isEmpty();
-    });
+    try {
+      check(15000, 100, () -> {
+        sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
+        return !sdkBackPressureContexts.isEmpty();
+      });
 
-    org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
-    assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.DROP));
-    assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
-    assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
+      org.mule.sdk.api.runtime.source.BackPressureContext sample = sdkBackPressureContexts.get(0);
+      assertThat(sample.getAction(), is(org.mule.sdk.api.runtime.source.BackPressureAction.DROP));
+      assertThat(sample.getEvent().getMessage().getPayload().getValue().toString(), containsString("If found by DEA contact"));
+      assertThat(sample.getSourceCallbackContext(), is(notNullValue()));
+    } finally {
+      stopFlow("configuredToDrop");
+    }
   }
 
   @Test
   public void defaultToWait() throws Exception {
     startFlow("defaultCase");
-    check(15000, 100, () -> EVENTS.size() >= 3);
 
-    assertThat(backPressureContexts, hasSize(0));
+    try {
+      check(15000, 100, () -> EVENTS.size() >= 3);
+
+      assertThat(backPressureContexts, hasSize(0));
+    } finally {
+      stopFlow("defaultCase");
+    }
   }
 
   private void startFlow(String flowName) throws Exception {
     ((Startable) registry.lookupByName(flowName).get()).start();
+  }
+
+  private void stopFlow(String flowName) throws Exception {
+    ((Stoppable) registry.lookupByName(flowName).get()).stop();
   }
 
 }
