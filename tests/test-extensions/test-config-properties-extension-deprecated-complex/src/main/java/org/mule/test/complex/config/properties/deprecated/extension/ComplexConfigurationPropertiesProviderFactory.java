@@ -10,8 +10,8 @@ import static org.mule.test.complex.config.properties.deprecated.extension.Confi
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
+import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
-import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
