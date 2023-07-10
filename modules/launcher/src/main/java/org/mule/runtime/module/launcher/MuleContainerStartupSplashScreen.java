@@ -20,8 +20,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getPatchesLibFolder
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServerPluginsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
 import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.getJavaPID;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.getWrapperPID;
 
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
@@ -36,6 +34,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -48,14 +47,13 @@ import org.slf4j.LoggerFactory;
 public class MuleContainerStartupSplashScreen extends SplashScreen {
 
   private Logger LOGGER = LoggerFactory.getLogger(MuleContainerStartupSplashScreen.class);
-  private boolean embeddedMode = false;
+  private final List<String> additionalSplashEntries;
 
   /**
-   * @param embeddedMode When true it means the splash screen should only display information relevant to the embedded mode thus
-   *                     avoiding consulting the tanuki WrapperManager
+   * @param additionalSplashEntries Additional splash entries to include in the body.
    */
-  public MuleContainerStartupSplashScreen(boolean embeddedMode) {
-    this.embeddedMode = embeddedMode;
+  public MuleContainerStartupSplashScreen(List<String> additionalSplashEntries) {
+    this.additionalSplashEntries = additionalSplashEntries;
   }
 
   public void doBody() {
@@ -98,9 +96,9 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
                   (patch != null && !"unknown".equalsIgnoreCase(patch) ? " - " + patch : ""),
                   getProperty("os.version"), getProperty("os.arch")));
 
-    if (!isEmbeddedMode()) {
-      doBody(format("Wrapper PID: %d", getWrapperPID()));
-      doBody(format("Java PID: %d", getJavaPID()));
+    // Additional entries
+    for (String additionalEntry : additionalSplashEntries) {
+      doBody(additionalEntry);
     }
 
     try {
@@ -157,9 +155,5 @@ public class MuleContainerStartupSplashScreen extends SplashScreen {
   private void listJavaSystemProperties() {
     listItems(Stream.of("java.vendor", "java.vm.name", "java.home")
         .collect(toMap(String::toString, propertyName -> getProperty(propertyName))), "JDK properties:");
-  }
-
-  private boolean isEmbeddedMode() {
-    return embeddedMode;
   }
 }

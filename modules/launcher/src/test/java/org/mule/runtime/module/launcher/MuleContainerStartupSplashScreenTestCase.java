@@ -12,9 +12,12 @@ import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.containsStringIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
+import java.util.List;
 
 import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
@@ -61,7 +64,7 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
 
   @Before
   public void setUp() {
-    splashScreen = new MuleContainerStartupSplashScreen(false);
+    splashScreen = new MuleContainerStartupSplashScreen(getAdditionalSplashEntries());
   }
 
   @Override
@@ -77,5 +80,9 @@ public class MuleContainerStartupSplashScreenTestCase extends AbstractSplashScre
   @Override
   protected Matcher<String> getComplexLogMatcher() {
     return containsStringIgnoringLineBreaks(COMPLEX_LOG_PART);
+  }
+
+  private List<String> getAdditionalSplashEntries() {
+    return asList("Additional splash entry 1", "Additional splash entry 2");
   }
 }

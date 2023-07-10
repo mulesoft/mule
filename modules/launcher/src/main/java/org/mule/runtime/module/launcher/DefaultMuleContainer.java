@@ -28,8 +28,8 @@ import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
-
-import static org.apache.commons.lang3.reflect.MethodUtils.invokeStaticMethod;
+import static java.util.Collections.emptyList;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -51,7 +51,7 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.internal.util.SystemUtils;
 import org.mule.runtime.module.launcher.log4j2.MuleLog4jContextFactory;
-import org.mule.runtime.module.reboot.MuleContainerBootstrap;
+import org.mule.runtime.module.reboot.internal.MuleContainer;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
@@ -64,15 +64,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MuleContainer {
+public class DefaultMuleContainer implements MuleContainer {
 
-  public static final String CLI_OPTIONS[][] =
+  public static final String[][] CLI_OPTIONS =
       {{"builder", "true", "Configuration Builder Type"}, {"config", "true", "Configuration File"},
           {"idle", "false", "Whether to run in idle (unconfigured) mode"}, {"main", "true", "Main Class"},
           {"mode", "true", "Run Mode"}, {"props", "true", "Startup Properties"}, {"production", "false", "Production Mode"},
@@ -86,12 +87,6 @@ public class MuleContainer {
   static final String APP_COMMAND_LINE_OPTION = "app";
   static final String INVALID_DEPLOY_APP_CONFIGURATION_ERROR =
       format("Cannot set both '%s' option and '%s' property", APP_COMMAND_LINE_OPTION, DEPLOYMENT_APPLICATION_PROPERTY);
-
-  /**
-   * A properties file to be read at startup. This can be useful for setting properties which depend on the run-time environment
-   * (dev, test, production).
-   */
-  private static String startupPropertiesFile = null;
 
   /**
    * The Runtime shutdown thread used to undeploy this server
@@ -121,24 +116,24 @@ public class MuleContainer {
       LogManager.setFactory(log4jContextFactory);
     }
 
-    logger = LoggerFactory.getLogger(MuleContainer.class);
+    logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
   }
 
   private final ServiceManager serviceManager;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
-  private boolean embeddedMode = false;
 
   /**
-   * Application entry point.
+   * Application entry point (used only for experimentation purposes).
    *
    * @param args command-line args
    */
+  // TODO W-12412027: remove this entry point once we have the alternative without Tanuki
   public static void main(String[] args) throws Exception {
-    MuleContainer container = new MuleContainer(args);
+    DefaultMuleContainer container = new DefaultMuleContainer(args);
     container.start(true);
   }
 
-  public MuleContainer(String[] args) throws InitialisationException {
+  public DefaultMuleContainer(String[] args) throws InitialisationException {
     init(args);
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
@@ -164,10 +159,11 @@ public class MuleContainer {
     artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
 
-  public MuleContainer(DeploymentService deploymentService, RepositoryService repositoryService, ToolingService toolingService,
-                       MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
-                       ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                       TroubleshootingService troubleshootingService)
+  public DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
+                              ToolingService toolingService,
+                              MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
+                              ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                              TroubleshootingService troubleshootingService)
       throws InitialisationException {
     this(new String[0], deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
          extensionModelLoaderRepository, troubleshootingService);
@@ -176,10 +172,10 @@ public class MuleContainer {
   /**
    * Configure the server with command-line arguments.
    */
-  public MuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
-                       ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
-                       ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                       TroubleshootingService troubleshootingService)
+  public DefaultMuleContainer(String[] args, DeploymentService deploymentService, RepositoryService repositoryService,
+                              ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
+                              ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                              TroubleshootingService troubleshootingService)
       throws IllegalArgumentException, InitialisationException {
     // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
     init(args);
@@ -201,12 +197,6 @@ public class MuleContainer {
     // properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
     MuleArtifactUrlStreamHandler.register();
-
-    // Startup properties
-    String propertiesFile = (String) commandlineOptions.get("props");
-    if (propertiesFile != null) {
-      setStartupPropertiesFile(propertiesFile);
-    }
 
     String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
     if (appOption != null) {
@@ -250,7 +240,18 @@ public class MuleContainer {
     }
   }
 
+  @Override
+  public void start(Future<Boolean> configurationsReady, List<String> additionalSplashEntries) throws MuleException {
+    start(true, configurationsReady, additionalSplashEntries);
+  }
+
   public void start(boolean registerShutdownHook) throws MuleException {
+    start(registerShutdownHook, completedFuture(true), emptyList());
+  }
+
+  private void start(boolean registerShutdownHook, Future<Boolean> configurationsReady,
+                     List<String> additionalSplashEntries)
+      throws MuleException {
     if (registerShutdownHook) {
       registerShutdownHook();
     }
@@ -270,8 +271,12 @@ public class MuleContainer {
       coreExtensionManager.setServiceRepository(serviceManager);
       coreExtensionManager.setTroubleshootingService(troubleshootingService);
 
-      validateLicense();
-      showSplashScreen();
+      // Waits for all bootstrapping configurations to be ready before progressing any further
+      if (!configurationsReady.get()) {
+        shutdown();
+      }
+
+      showSplashScreen(additionalSplashEntries);
 
       coreExtensionManager.initialise();
       coreExtensionManager.start();
@@ -279,18 +284,12 @@ public class MuleContainer {
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
-    } catch (Throwable e) {
+    } catch (MuleException e) {
       shutdown(e);
-    }
-  }
-
-  private void validateLicense() {
-    try {
-      invokeStaticMethod(MuleContainerBootstrap.class, "awaitLicenseValidation");
-    } catch (NoSuchMethodException e) {
-      return;
-    } catch (Exception e) {
-      throw new MuleRuntimeException(e);
+      throw e;
+    } catch (Throwable t) {
+      shutdown(t);
+      throw new MuleRuntimeException(t);
     }
   }
 
@@ -304,8 +303,8 @@ public class MuleContainer {
     });
   }
 
-  protected void showSplashScreen() {
-    final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(isEmbeddedMode());
+  private void showSplashScreen(List<String> additionalSplashEntries) {
+    final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(additionalSplashEntries);
     splashScreen.doBody();
     log(splashScreen.toString());
   }
@@ -332,8 +331,12 @@ public class MuleContainer {
     String shutdownMessage = getBoilerPlate(msgs, '*', 80);
     logger.error(shutdownMessage);
 
-    doShutdown();
-    System.exit(1);
+    try {
+      doShutdown();
+    } catch (MuleException ex) {
+      ex.addSuppressed(e);
+      throw ex;
+    }
   }
 
   /**
@@ -351,8 +354,6 @@ public class MuleContainer {
   }
 
   public void stop() throws MuleException {
-    MuleContainerBootstrap.dispose();
-
     if (deploymentService != null) {
       deploymentService.stop();
     }
@@ -409,35 +410,9 @@ public class MuleContainer {
   // Getters and setters
   // /////////////////////////////////////////////////////////////////
 
-
-  public static String getStartupPropertiesFile() {
-    return startupPropertiesFile;
-  }
-
-  public static void setStartupPropertiesFile(String startupPropertiesFile) {
-    MuleContainer.startupPropertiesFile = startupPropertiesFile;
-  }
-
   /**
-   * This flag can be set to true to indicate that the container is being ran in embedded mode which can be used to adapt some
-   * behaviours such as the info in the splash screen
-   * 
-   * @param embeddedMode set to true for embedded mode
-   */
-  public void setEmbeddedMode(boolean embeddedMode) {
-    this.embeddedMode = embeddedMode;
-  }
-
-  /**
-   * @return true if the container is set to embedded mode (instead of standalone)
-   */
-  public boolean isEmbeddedMode() {
-    return embeddedMode;
-  }
-
-  /**
-   * This class is installed only for MuleContainer running as commandline app. A clean Mule shutdown can be achieved by disposing
-   * the {@link DefaultMuleContext}.
+   * This class is installed only for DefaultMuleContainer running as commandline app. A clean Mule shutdown can be achieved by
+   * disposing the {@link DefaultMuleContext}.
    */
   private class MuleShutdownHook extends Thread {
 
@@ -448,7 +423,7 @@ public class MuleContainer {
     @Override
     public void run() {
       try {
-        MuleContainer.this.stop();
+        DefaultMuleContainer.this.stop();
       } catch (MuleException e) {
         logger.warn("Error stopping mule container", e);
       }
