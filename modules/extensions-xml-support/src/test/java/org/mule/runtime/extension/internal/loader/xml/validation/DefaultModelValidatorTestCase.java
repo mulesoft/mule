@@ -15,7 +15,7 @@ import static org.junit.rules.ExpectedException.none;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
-import static org.mule.runtime.config.api.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory.CONFIGURATION_PROPERTIES;
+import static org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory.CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;

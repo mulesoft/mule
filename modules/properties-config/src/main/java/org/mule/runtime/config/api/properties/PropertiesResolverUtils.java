@@ -26,7 +26,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
@@ -75,7 +75,7 @@ public class PropertiesResolverUtils {
    * @param artifactAst the Artifact AST to calculate the global properties from
    * @return a Lazy Evaluator to get the Global/Default Properties of a given {@link ArtifactAst}.
    */
-  public static Supplier<Map<String, org.mule.runtime.properties.api.ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
+  public static Supplier<Map<String, ConfigurationProperty>> createGlobalPropertiesSupplier(ArtifactAst artifactAst) {
     return new LazyValue<>(() -> {
       final Map<String, ConfigurationProperty> globalProperties = new HashMap<>();
 

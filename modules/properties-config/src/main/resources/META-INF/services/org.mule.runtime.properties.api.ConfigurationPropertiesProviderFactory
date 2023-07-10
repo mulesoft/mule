@@ -1,1 +1,1 @@
-org.mule.runtime.config.internal.dsl.model.properties.DefaultConfigurationPropertiesProviderFactory
+org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory

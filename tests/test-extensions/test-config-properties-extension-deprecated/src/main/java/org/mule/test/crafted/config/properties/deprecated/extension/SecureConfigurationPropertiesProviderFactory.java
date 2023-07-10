@@ -7,14 +7,13 @@
 package org.mule.test.crafted.config.properties.deprecated.extension;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.test.crafted.config.properties.deprecated.extension.TestConfigPropertiesExtensionLoadingDelegate.EXTENSION_NAME;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
-import org.mule.runtime.config.api.dsl.model.ResourceProvider;
 import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProviderFactory;
+import org.mule.runtime.properties.api.ResourceProvider;
 
 /**
  * Builds the provider for the secure-configuration-properties element.

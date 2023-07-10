@@ -10,8 +10,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.joining;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
+import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class ComplexConfigurationPropertiesProvider implements ConfigurationProp
   }
 
   @Override
-  public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+  public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
     if (textsFromComplexParams.isEmpty()) {
       return empty();
     }
@@ -38,7 +38,7 @@ public class ComplexConfigurationPropertiesProvider implements ConfigurationProp
       }
 
       @Override
-      public Object getRawValue() {
+      public String getValue() {
         return textsFromComplexParams.stream().collect(joining(","));
       }
 

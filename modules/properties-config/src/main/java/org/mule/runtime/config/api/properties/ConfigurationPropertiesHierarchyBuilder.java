@@ -10,14 +10,15 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.model.dsl.config.CompositeConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.model.dsl.config.FileConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.GlobalPropertyConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.MapConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
@@ -151,8 +152,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Set that the {@link ConfigurationPropertiesResolver} to be built won't fail in case of resolving a property doesn't exist.
-   * Instead of throwing a {@link org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException}, it will return
-   * null.
+   * Instead of throwing a {@link PropertyNotFoundException}, it will return null.
    * 
    * @return this builder.
    */

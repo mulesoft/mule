@@ -13,7 +13,7 @@ import static java.util.Optional.empty;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 
 import java.util.Map;
 import java.util.Optional;
