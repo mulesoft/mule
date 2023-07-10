@@ -20,7 +20,7 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
  * <p>
  * Log separation will always be disabled on the returned context.
  *
- * @since 4.3.0
+ * @since 4.5
  */
 public class SimpleContextSelector implements ContextSelector {
 

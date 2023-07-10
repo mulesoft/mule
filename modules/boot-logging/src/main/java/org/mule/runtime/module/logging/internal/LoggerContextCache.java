@@ -49,7 +49,7 @@ import org.apache.logging.log4j.core.LoggerContext;
  * This class also implements the {@link Disposable} interface. When {@link #dispose()} is invoked all the contexts are stopped
  * right away
  *
- * @since 3.7.0
+ * @since 4.5
  */
 final class LoggerContextCache implements Disposable {
 

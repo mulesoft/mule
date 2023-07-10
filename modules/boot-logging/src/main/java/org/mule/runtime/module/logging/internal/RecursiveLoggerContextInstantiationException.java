@@ -10,7 +10,7 @@ package org.mule.runtime.module.logging.internal;
  * Indicates that the instantiation of a {@link MuleLoggerContext} is not possible due to the same context being already under
  * construction (logging during the {@link MuleLoggerContext} construction triggers this recursive instantiation)
  *
- * @since 4.3.0
+ * @since 4.5
  */
 public class RecursiveLoggerContextInstantiationException extends RuntimeException {
 

@@ -75,7 +75,7 @@ import org.apache.logging.log4j.core.util.FileWatcher;
  * <li>if the context is not standalone, then it just logs to a file named mule-main.log</li>
  * </ul>
  *
- * @since 3.6.0
+ * @since 4.5
  */
 final class LoggerContextConfigurer {
 

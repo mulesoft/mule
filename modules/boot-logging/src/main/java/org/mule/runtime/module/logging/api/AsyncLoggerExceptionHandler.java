@@ -13,7 +13,7 @@ import org.apache.logging.log4j.status.StatusLogger;
  * Implementation of {@link ExceptionHandler} to be used when async loggers fail to log their messages. It will log this event
  * using the {@link StatusLogger}
  *
- * @since 3.6.0
+ * @since 4.5
  */
 public class AsyncLoggerExceptionHandler implements ExceptionHandler {
 

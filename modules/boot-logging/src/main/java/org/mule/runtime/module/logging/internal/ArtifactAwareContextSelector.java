@@ -52,7 +52,7 @@ import org.apache.logging.log4j.status.StatusLogger;
  * If mule is running in embedded mode, then all of this logic described above is discarded and it simply logs to a file called
  * {@code mule-main.log}.
  *
- * @since 3.6.0
+ * @since 4.5
  */
 class ArtifactAwareContextSelector implements ContextSelector, Disposable {
 

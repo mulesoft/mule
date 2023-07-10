@@ -51,7 +51,7 @@ import org.apache.logging.log4j.util.Supplier;
  * otherwise that class loader would be GC unreachable. For that reason, it uses {@link #ownerClassLoaderHash} instead of the real
  * reference
  *
- * @since 3.6.0
+ * @since 4.5
  */
 abstract class DispatchingLogger extends Logger {
 

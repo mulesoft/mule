@@ -31,7 +31,7 @@ import org.apache.logging.log4j.message.MessageFactory;
  * This class must not hold any reference to a {@link ClassLoader} since otherwise {@link Logger} instances held on static fields
  * will make that class loader GC unreachable
  *
- * @since 3.6.0
+ * @since 4.5
  */
 class MuleLoggerContext extends LoggerContext {
 

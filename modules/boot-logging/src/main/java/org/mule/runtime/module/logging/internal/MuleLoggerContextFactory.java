@@ -31,7 +31,7 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
 /**
  * Encapsulates the logic to get the proper log configuration.
  *
- * @since 3.8.0
+ * @since 4.5
  */
 public class MuleLoggerContextFactory {
 

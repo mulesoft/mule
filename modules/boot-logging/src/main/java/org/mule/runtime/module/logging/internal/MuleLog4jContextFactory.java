@@ -46,7 +46,7 @@ import org.apache.logging.log4j.spi.LoggerContextFactory;
  * <p/>
  * This class also implements {@link ShutdownCallbackRegistry} to avoid default behaviour which is
  *
- * @since 3.6.0
+ * @since 4.5
  */
 public class MuleLog4jContextFactory extends Log4jContextFactory implements Disposable, ShutdownCallbackRegistry {
 
