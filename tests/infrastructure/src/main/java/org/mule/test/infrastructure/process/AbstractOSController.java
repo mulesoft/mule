@@ -21,12 +21,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,21 +110,6 @@ public abstract class AbstractOSController {
   public void start(String... args) {
     int error = runSync(START_CMD, args);
     if (error != 0) {
-      final File muleLogFile = Paths.get(muleHome + "/logs/mule_ee.log").toFile();
-      if (muleLogFile.exists()) {
-        System.out.println("mule_ee.log:");
-        System.out.println("============");
-        try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
-          String line;
-          while ((line = br.readLine()) != null) {
-            System.out.println(line);
-          }
-        } catch (IOException e) {
-          throw new MuleControllerException("The mule instance couldn't be started. No mule_ee.log available. Errno: " + error,
-                                            e);
-        }
-      }
-
       throw new MuleControllerException("The mule instance couldn't be started. Errno: " + error);
     }
 

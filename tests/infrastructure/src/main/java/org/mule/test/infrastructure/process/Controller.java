@@ -7,24 +7,28 @@
 
 package org.mule.test.infrastructure.process;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.util.Arrays.asList;
-import static java.util.regex.Pattern.compile;
-import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
-import static org.apache.commons.io.FileUtils.copyFileToDirectory;
-import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.util.Arrays.asList;
+import static java.util.regex.Pattern.compile;
+
+import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -76,7 +80,33 @@ public class Controller {
 
   public void start(String... args) {
     checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
-    osSpecificController.start(args);
+    try {
+      osSpecificController.start(args);
+    } catch (MuleControllerException mce) {
+      try {
+        printLog();
+      } catch (IOException ioe) {
+        mce.addSuppressed(ioe);
+      }
+
+      throw mce;
+    }
+  }
+
+  public void printLog() throws IOException {
+    final File muleLogFile = getLog();
+    if (muleLogFile.exists()) {
+      System.out.println(muleLogFile.getName() + ":");
+      System.out.println("============");
+      try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+          System.out.println(" > " + line);
+        }
+      }
+    } else {
+      System.out.println("Log (" + muleLogFile.toString() + ") not available.");
+    }
   }
 
   protected void checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(String... args) {
