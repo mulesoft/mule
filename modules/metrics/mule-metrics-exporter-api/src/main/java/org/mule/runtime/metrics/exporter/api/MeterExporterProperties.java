@@ -18,8 +18,4 @@ public class MeterExporterProperties {
    */
   public static final String METRIC_EXPORTER_ENABLED_PROPERTY = "mule.open.telemetry.metric.exporter";
 
-  /**
-   * The endpoint to send.
-   */
-  public static final String METRIC_EXPORTER_ENDPOINT = "mule.open.telemetry.metric.endpoint";
 }

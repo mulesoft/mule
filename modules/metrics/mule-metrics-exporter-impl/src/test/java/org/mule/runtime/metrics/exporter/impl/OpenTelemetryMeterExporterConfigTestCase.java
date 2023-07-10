@@ -31,7 +31,7 @@ import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
-import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMetricExporterConfiguration;
+import org.mule.runtime.metrics.exporter.impl.optel.config.OpenTelemetryAutoConfigurableMeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.utils.TestExportedMeter;
 import org.mule.runtime.metrics.exporter.impl.utils.TestMeterExporterConfiguration;
 import org.mule.runtime.metrics.exporter.impl.utils.TestOpenTelemetryMeterExporterFactory;
@@ -364,8 +364,8 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   }
 
   @NotNull
-  private static OpenTelemetryAutoConfigurableMetricExporterConfiguration getMeterExporterConfiguration(Map<String, String> properties) {
-    return new OpenTelemetryAutoConfigurableMetricExporterConfiguration(new TestMeterExporterConfiguration(properties));
+  private static OpenTelemetryAutoConfigurableMeterExporterConfiguration getMeterExporterConfiguration(Map<String, String> properties) {
+    return new OpenTelemetryAutoConfigurableMeterExporterConfiguration(new TestMeterExporterConfiguration(properties));
   }
 
   private List<TestExportedMeter> getMetricsByCounterName(List<TestExportedMeter> metrics, String metricName) {
