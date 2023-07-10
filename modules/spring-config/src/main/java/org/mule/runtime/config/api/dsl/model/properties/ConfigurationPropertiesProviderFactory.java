@@ -41,8 +41,10 @@ public interface ConfigurationPropertiesProviderFactory
    * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
    * @return the properties provider
    */
-  ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
-                                                 ResourceProvider externalResourceProvider);
+  default ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
+                                                         ResourceProvider externalResourceProvider) {
+    return createProvider(parameters, uri -> externalResourceProvider.getResourceAsStream(uri));
+  }
 
   /**
    * Builds a properties provider for the provided {@code providerElementDeclaration}.
@@ -62,4 +64,14 @@ public interface ConfigurationPropertiesProviderFactory
 
     return createProvider(configurationParameters, uri -> externalResourceProvider.getResourceAsStream(uri));
   }
+
+  /**
+   * Builds a properties provider for each matching configuration element.
+   *
+   * @param parameters               the configuration parameters, after resolving property placeholders
+   * @param externalResourceProvider the resource provider for locating files (such as .properties and .yaml)
+   * @return the properties provider
+   */
+  org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
+                                                                                                  org.mule.runtime.config.api.dsl.model.ResourceProvider externalResourceProvider);
 }
