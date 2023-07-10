@@ -11,7 +11,7 @@
  * @moduleGraph
  * @since 4.5
  */
-module org.mule.runtime.logging {
+module org.mule.runtime.boot.logging {
 
   // Mule modules
   requires org.mule.runtime.api;
