@@ -79,8 +79,8 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Test
   public void backPressureWithFailStrategy() throws Exception {
+    startFlow("defaultToFail");
     try {
-      startFlow("defaultToFail");
       check(15000, 100, () -> {
         sdkBackPressureContexts.addAll(heisenberg.getSdkBackPressureContexts());
         return !sdkBackPressureContexts.isEmpty();
@@ -116,7 +116,6 @@ public class BackPressureTestCase extends AbstractExtensionFunctionalTestCase {
   @Test
   public void defaultToWait() throws Exception {
     startFlow("defaultCase");
-
     try {
       check(15000, 100, () -> EVENTS.size() >= 3);
 
