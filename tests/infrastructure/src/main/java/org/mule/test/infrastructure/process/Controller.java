@@ -15,6 +15,7 @@ import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SER
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.util.Arrays.asList;
@@ -43,8 +44,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Controller {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = suffixFileFilter(ANCHOR_SUFFIX);
@@ -96,16 +101,18 @@ public class Controller {
   public void printLog() throws IOException {
     final File muleLogFile = getLog();
     if (muleLogFile.exists()) {
-      System.out.println(muleLogFile.getName() + ":");
-      System.out.println("============");
+      final StringBuilder muleLogBuilder = new StringBuilder();
+      muleLogBuilder.append(muleLogFile.getName() + ":" + lineSeparator());
+      muleLogBuilder.append("============" + lineSeparator());
       try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
         String line;
         while ((line = br.readLine()) != null) {
-          System.out.println(" > " + line);
+          muleLogBuilder.append(" > " + line + lineSeparator());
         }
       }
+      LOGGER.info(muleLogBuilder.toString());
     } else {
-      System.out.println("Log (" + muleLogFile.toString() + ") not available.");
+      LOGGER.warn("Log (" + muleLogFile.toString() + ") not available.");
     }
   }
 

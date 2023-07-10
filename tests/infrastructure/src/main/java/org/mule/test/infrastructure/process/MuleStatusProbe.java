@@ -10,7 +10,12 @@ import org.mule.tck.probe.Probe;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MuleStatusProbe implements Probe {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleStatusProbe.class);
 
   private final MuleProcessController controller;
   private final boolean check;
@@ -30,8 +35,7 @@ public class MuleStatusProbe implements Probe {
     try {
       controller.getController().printLog();
     } catch (IOException e) {
-      System.out.println("Error printing log.");
-      e.printStackTrace();
+      LOGGER.error("Error printing log.", e);
     }
 
     return "Mule is " + (check ? "not " : "") + "running";
