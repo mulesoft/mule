@@ -20,7 +20,6 @@
         <module>all-modules</module>
         <module>artifact</module>
         <module>artifact-activation</module>
-        <module>boot-logging</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
@@ -33,6 +32,7 @@
         <module>javaee</module>
         <module>launcher</module>
         <module>license-api</module>
+        <module>log4j-configurator</module>
         <module>logging</module>
         <module>metadata-support</module>
         <module>http-api</module>
