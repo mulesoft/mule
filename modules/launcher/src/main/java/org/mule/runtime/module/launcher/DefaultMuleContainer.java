@@ -51,7 +51,7 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.internal.util.SystemUtils;
 import org.mule.runtime.module.reboot.internal.MuleContainer;
-import org.mule.runtime.module.logging.MuleLog4jContextFactory;
+import org.mule.runtime.module.logging.internal.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;

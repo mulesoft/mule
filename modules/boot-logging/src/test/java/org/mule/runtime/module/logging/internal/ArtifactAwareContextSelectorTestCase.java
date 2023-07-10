@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleHome;
-import static org.mule.runtime.module.logging.LoggerContextReaperThreadFactory.THREAD_NAME;
-import static org.mule.runtime.module.logging.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
+import static org.mule.runtime.module.logging.internal.LoggerContextReaperThreadFactory.THREAD_NAME;
+import static org.mule.runtime.module.logging.internal.MuleLoggerContextFactory.LOG4J_CONFIGURATION_FILE_PROPERTY;
 import static org.mule.tck.MuleTestUtils.getRunningThreadByName;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -50,12 +50,10 @@ import java.net.URLClassLoader;
 
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;

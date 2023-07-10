@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
@@ -21,23 +21,20 @@ import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.MessageFactory;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(LOGGING)

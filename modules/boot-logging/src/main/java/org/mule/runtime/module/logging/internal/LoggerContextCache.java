@@ -4,10 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_CONTEXT_DISPOSE_DELAY_MILLIS;
 
 import static java.lang.ThreadLocal.withInitial;

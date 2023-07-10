@@ -4,12 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FORCE_CONSOLE_LOG;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.module.logging.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
-import static org.mule.runtime.module.logging.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
+import static org.mule.runtime.module.logging.internal.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
+import static org.mule.runtime.module.logging.internal.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 
@@ -13,6 +13,7 @@ import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.module.logging.api.AsyncLoggerExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.List;

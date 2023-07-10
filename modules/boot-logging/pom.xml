@@ -20,26 +20,24 @@
     </properties>
 
     <dependencies>
-        <!-- TODO: Remove this -->
-<!--        <dependency>-->
-<!--            <groupId>org.mule.runtime</groupId>-->
-<!--            <artifactId>mule-module-launcher</artifactId>-->
-<!--            <version>4.5.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
-
-        <!-- TODO: Remove this -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-api</artifactId>
-            <version>1.5.0-SNAPSHOT</version>
-        </dependency>
-
+        <!-- Mule dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-deployment-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
+        <!-- 3rd party dependencies -->
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
@@ -47,47 +45,6 @@
         <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-1.2-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-deployment-model</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
         <!--Unit Tests-->

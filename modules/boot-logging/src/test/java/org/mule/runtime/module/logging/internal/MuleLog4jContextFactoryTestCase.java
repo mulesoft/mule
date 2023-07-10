@@ -4,26 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
+
+import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
+import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
-import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.apache.logging.log4j.core.util.Cancellable;
-import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.module.logging.api.AsyncLoggerExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -32,7 +29,13 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
+import org.apache.logging.log4j.core.util.Cancellable;
+import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

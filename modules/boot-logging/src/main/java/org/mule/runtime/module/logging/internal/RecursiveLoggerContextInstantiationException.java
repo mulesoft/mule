@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 /**
  * Indicates that the instantiation of a {@link MuleLoggerContext} is not possible due to the same context being already under

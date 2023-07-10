@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.getResource;
 
@@ -28,11 +28,9 @@ import java.io.File;
 import java.net.URISyntaxException;
 
 import org.apache.logging.log4j.core.LoggerContext;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;

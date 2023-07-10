@@ -4,10 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.logging;
+package org.mule.runtime.module.logging.internal;
 
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.module.logging.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
+import static org.mule.runtime.module.logging.internal.ArtifactAwareContextSelector.resolveLoggerContextClassLoader;
 
 import static java.lang.Thread.currentThread;
 
