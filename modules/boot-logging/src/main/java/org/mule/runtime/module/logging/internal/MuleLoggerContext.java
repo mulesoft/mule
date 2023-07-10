@@ -70,13 +70,8 @@ class MuleLoggerContext extends LoggerContext {
       artifactClassloader = true;
       artifactName = getArtifactName((ArtifactClassLoader) ownerClassLoader);
       artifactDescriptor = getArtifactDescriptor((ArtifactClassLoader) ownerClassLoader);
-      if (ownerClassLoader instanceof RegionClassLoader) {
-        RegionClassLoader mrcl = (RegionClassLoader) ownerClassLoader;
-        ArtifactClassLoader oacl = mrcl.getOwnerClassLoader();
-        applicationClassloader = oacl.getArtifactDescriptor() instanceof ApplicationDescriptor;
-      } else {
-        applicationClassloader = false;
-      }
+      applicationClassloader = ownerClassLoader instanceof RegionClassLoader && ((RegionClassLoader) ownerClassLoader)
+          .getOwnerClassLoader().getArtifactDescriptor() instanceof ApplicationDescriptor;
     } else {
       artifactClassloader = false;
       applicationClassloader = false;
