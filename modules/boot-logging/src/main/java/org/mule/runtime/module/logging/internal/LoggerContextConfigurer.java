@@ -12,9 +12,12 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_PO
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MAX;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MIN;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleConfDir;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
+import static org.mule.runtime.module.logging.internal.Utils.getFieldValue;
+import static org.mule.runtime.module.logging.internal.Utils.isFile;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.getInteger;
@@ -29,7 +32,6 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -309,59 +311,5 @@ final class LoggerContextConfigurer {
 
   private void removeAppender(LoggerContext context, Appender appender) {
     ((AbstractConfiguration) context.getConfiguration()).removeAppender(appender.getName());
-  }
-
-
-
-  private static void setFieldValue(Object target, String fieldName, Object value, boolean recursive)
-      throws IllegalAccessException, NoSuchFieldException {
-    Field field = getField(target.getClass(), fieldName, recursive);
-    boolean isAccessible = field.isAccessible();
-
-    try {
-      field.setAccessible(true);
-      field.set(target, value);
-    } finally {
-      field.setAccessible(isAccessible);
-    }
-  }
-
-  private static Field getField(Class<?> targetClass, String fieldName, boolean recursive)
-      throws NoSuchFieldException {
-    Class<?> clazz = targetClass;
-    Field field;
-    while (!Object.class.equals(clazz)) {
-      try {
-        field = clazz.getDeclaredField(fieldName);
-        return field;
-      } catch (NoSuchFieldException e) {
-        // ignore and look in superclass
-        if (recursive) {
-          clazz = clazz.getSuperclass();
-        } else {
-          break;
-        }
-      }
-    }
-    throw new NoSuchFieldException(String.format("Could not find field '%s' in class %s", fieldName,
-                                                 targetClass.getName()));
-  }
-
-  private static <T> T getFieldValue(Object target, String fieldName, boolean recursive)
-
-      throws IllegalAccessException, NoSuchFieldException {
-
-    Field f = getField(target.getClass(), fieldName, recursive);
-    boolean isAccessible = f.isAccessible();
-    try {
-      f.setAccessible(true);
-      return (T) f.get(target);
-    } finally {
-      f.setAccessible(isAccessible);
-    }
-  }
-
-  private static boolean isFile(URL url) {
-    return "file".equals(url.getProtocol());
   }
 }
