@@ -7,7 +7,9 @@
 package org.mule.runtime.tracer.exporter.impl.optel.sdk;
 
 import static org.mule.runtime.tracer.exporter.impl.optel.sdk.OpenTelemetryInstrumentationConstants.INSTRUMENTATION_LIBRARY_INFO;
+import static org.mule.runtime.tracer.exporter.impl.optel.sdk.OpenTelemetryInstrumentationConstants.INSTRUMENTATION_SCOPE_INFO;
 
+import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporter;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -57,6 +59,11 @@ public class MuleReadableSpan implements ReadableSpan {
   @Override
   public InstrumentationLibraryInfo getInstrumentationLibraryInfo() {
     return INSTRUMENTATION_LIBRARY_INFO;
+  }
+
+  @Override
+  public InstrumentationScopeInfo getInstrumentationScopeInfo() {
+    return INSTRUMENTATION_SCOPE_INFO;
   }
 
   @Override

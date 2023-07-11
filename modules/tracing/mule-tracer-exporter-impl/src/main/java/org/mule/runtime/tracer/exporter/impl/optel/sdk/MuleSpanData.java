@@ -8,6 +8,7 @@ package org.mule.runtime.tracer.exporter.impl.optel.sdk;
 
 import static java.util.Collections.emptyList;
 
+import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporter;
 
 import io.opentelemetry.api.common.Attributes;
@@ -121,6 +122,11 @@ public class MuleSpanData implements SpanData {
   @Override
   public InstrumentationLibraryInfo getInstrumentationLibraryInfo() {
     return readableSpan.getInstrumentationLibraryInfo();
+  }
+
+  @Override
+  public InstrumentationScopeInfo getInstrumentationScopeInfo() {
+    return readableSpan.getInstrumentationScopeInfo();
   }
 
   @Override
