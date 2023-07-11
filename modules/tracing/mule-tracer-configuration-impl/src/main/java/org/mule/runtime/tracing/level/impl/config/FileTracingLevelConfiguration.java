@@ -172,10 +172,16 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
           getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
       return loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
-      LOGGER
-          .warn(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
-                       DEFAULT_LEVEL),
-                e);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER
+            .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
+                          DEFAULT_LEVEL),
+                   e);
+      } else {
+        LOGGER
+            .warn(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
+                         DEFAULT_LEVEL));
+      }
     }
     return null;
   }
