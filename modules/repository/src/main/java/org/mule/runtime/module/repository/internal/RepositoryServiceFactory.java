@@ -13,7 +13,6 @@ import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleLibD
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.api.model.RemoteRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -24,8 +23,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +60,6 @@ public class RepositoryServiceFactory {
 
   private MavenConfiguration getMavenConfiguration(File localRepositoryFolder, List<RemoteRepository> remoteRepositories) {
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
-        .forcePolicyUpdateNever(true)
         .localMavenRepositoryLocation(localRepositoryFolder);
 
     remoteRepositories.forEach(mavenConfigurationBuilder::remoteRepository);

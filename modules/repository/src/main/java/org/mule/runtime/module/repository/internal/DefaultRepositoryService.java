@@ -8,11 +8,8 @@ package org.mule.runtime.module.repository.internal;
 
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 
-import static java.util.Optional.of;
-
 import org.mule.maven.client.api.BundleDependenciesResolutionException;
 import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.model.RemoteRepository;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
@@ -21,7 +18,6 @@ import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.api.RepositoryServiceDisabledException;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * Default implementation for {@code RepositoryService}.
