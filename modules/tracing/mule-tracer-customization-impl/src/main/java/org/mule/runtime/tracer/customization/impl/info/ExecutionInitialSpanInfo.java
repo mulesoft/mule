@@ -14,8 +14,8 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.impl.export.ExecutionInitialExportInfo;
 import org.mule.runtime.tracer.customization.impl.export.TracingLevelExportInfo;
+import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.util.function.BiConsumer;
 
@@ -43,8 +43,8 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String apiId;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelExportInfo tracingLevelExportInfo,
-                                  String overriddenName, String spanNameSuffix) {
+  public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName, String spanNameSuffix,
+                                  TracingLevelConfiguration tracingLevelConfiguration) {
 
     // Ver si este name tambien se puede usar para mover la logica del noExportUntil al lugar correcto pasandolo por parametro al
     // constructor de ExecutionInitialExportInfo.
@@ -53,7 +53,6 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     } else {
       name = overriddenName;
     }
-    this.initialExportInfo = new ExecutionInitialExportInfo(tracingLevelExportInfo);
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);
     this.rootSpan = isComponentOfName(component, FLOW);
@@ -62,6 +61,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
     }
+    this.initialExportInfo = TracingLevelExportInfo.createTracingLevelExportInfo(component, name, tracingLevelConfiguration);
   }
 
   @Override

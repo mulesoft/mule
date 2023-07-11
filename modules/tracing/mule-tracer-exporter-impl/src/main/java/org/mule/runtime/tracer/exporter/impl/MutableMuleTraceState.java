@@ -28,7 +28,7 @@ public class MutableMuleTraceState implements TraceState {
   private final boolean addAncestorMuleSpanIdToTraceState;
   private final boolean propagateAllRemoteTraceContext;
 
-  private String currentSpanId;
+  private final String currentSpanId;
 
   private Map<String, String> remoteState;
 

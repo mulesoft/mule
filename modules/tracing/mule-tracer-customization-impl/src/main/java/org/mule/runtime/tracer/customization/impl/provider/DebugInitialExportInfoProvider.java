@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.tracer.customization.impl.provider;
 
-import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
-import org.mule.runtime.tracer.customization.api.InternalSpanNames;
-import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
-import org.mule.runtime.tracing.level.api.config.TracingLevel;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 import static org.mule.runtime.tracer.api.span.info.InitialExportInfo.NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
@@ -23,15 +14,24 @@ import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CO
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_OPERATION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_SOURCE_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.TRY_SCOPE_INNER_CHAIN_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
 
+import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
+import org.mule.runtime.tracer.customization.api.InternalSpanNames;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
+import org.mule.runtime.tracing.level.api.config.TracingLevelId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * An {@link InitialExportInfoProvider} corresponding to the {@link TracingLevel#DEBUG}
+ * An {@link InitialExportInfoProvider} corresponding to the {@link TracingLevelId#DEBUG}
  *
  * @since 4.5.0
  */
@@ -40,7 +40,9 @@ public class DebugInitialExportInfoProvider extends MonitoringInitialExportInfoP
   private final Map<String, InitialExportInfo> initialExportInfoMapByName = new HashMap<String, InitialExportInfo>() {
 
     {
-      put(POLICY_CHAIN_SPAN_NAME,
+      put(POLICY_SOURCE_SPAN_NAME,
+          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
+      put(POLICY_OPERATION_SPAN_NAME,
           new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
       put(POLICY_NEXT_ACTION_SPAN_NAME, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);
       put(UNKNOWN, NO_EXPORTABLE_DEFAULT_EXPORT_SPAN_CUSTOMIZATION_INFO);

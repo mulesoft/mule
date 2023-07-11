@@ -31,6 +31,7 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
+import org.mule.runtime.tracing.level.api.config.TracingLevelId;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
   private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
   private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
   private static final String OVERRIDES_PROPERTY_NAME = "mule.openTelemetry.tracer.levelOverrides";
-  private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
+  private static final TracingLevel DEFAULT_LEVEL = new TracingLevel(false, TracingLevelId.MONITORING);
   private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
@@ -72,7 +73,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
   private TracingLevel tracingLevel = DEFAULT_LEVEL;
   private JsonNode configuration;
 
-  private List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
+  private final List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
   private URL configurationUrl;
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private ConfigurationPropertiesResolver propertyResolver;
@@ -107,7 +108,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
     if (configuredTracingLevel != null) {
       try {
         configuredTracingLevel = propertyResolver.apply(configuredTracingLevel);
-        tracingLevel = TracingLevel.valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
+        tracingLevel = new TracingLevel(false, TracingLevelId.valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT)));
       } catch (IllegalArgumentException e) {
         LOGGER
             .error(format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level: %s",
@@ -124,7 +125,8 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
                             override));
       } else {
         try {
-          tracingLevelOverrides.put(levelOverride[0], TracingLevel.valueOf(levelOverride[1].toUpperCase(Locale.ROOT)));
+          tracingLevelOverrides.put(levelOverride[0],
+                                    new TracingLevel(true, TracingLevelId.valueOf(levelOverride[1].toUpperCase(Locale.ROOT))));
         } catch (IllegalArgumentException e) {
           LOGGER.error(format("Wrong tracing level override found in configuration file: %s. This override will be ignored.",
                               override));
@@ -134,17 +136,14 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
   }
 
   @Override
-  public TracingLevel getTracingLevel() {
+  public TracingLevel getDefaultTracingLevel() {
     return tracingLevel;
   }
 
   @Override
-  public TracingLevel getTracingLevelOverride(String location) {
-    TracingLevel tracingLevelOverride = getTracingLevelOverrideFrom(location);
-    if (tracingLevelOverride != null) {
-      return tracingLevelOverride;
-    }
-    return tracingLevel;
+  public TracingLevel getTracingLevel(String location) {
+    TracingLevel overrideTracingLevel = getTracingLevelOverrideFrom(location);
+    return overrideTracingLevel != null ? overrideTracingLevel : getDefaultTracingLevel();
   }
 
   @Override

@@ -14,9 +14,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.ExecutionInitialExportInfo;
 import org.mule.runtime.tracer.customization.impl.info.ExecutionInitialSpanInfo;
-import org.mule.runtime.tracer.customization.impl.export.TracingLevelExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.util.Map;
@@ -55,9 +53,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
     // Mover esta logica a TracingLevelExportInfo.createTracingLevelExportInfo
     return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, "", ""),
-                                            identifier -> createExecutionInitialSpanInfo(component, "", "",
-                                                                                         createTracingLevelExportInfo(component,
-                                                                                                                      tracingLevelConfiguration)));
+                                            identifier -> createExecutionInitialSpanInfo(component, "", ""));
   }
 
   @Override
@@ -69,9 +65,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
     // Mover esta logica a TracingLevelExportInfo.createTracingLevelExportInfo
     return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, ""),
-                                            identifier -> createExecutionInitialSpanInfo(component, "", suffix,
-                                                                                         createTracingLevelExportInfo(component,
-                                                                                                                      tracingLevelConfiguration)));
+                                            identifier -> createExecutionInitialSpanInfo(component, "", suffix));
   }
 
   @Override
@@ -83,18 +77,12 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
     // Mover esta logica a TracingLevelExportInfo.createTracingLevelExportInfo
     return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, overriddenName),
-                                            identifier -> createExecutionInitialSpanInfo(component, overriddenName, suffix,
-                                                                                         createTracingLevelExportInfo(component,
-                                                                                                                      overriddenName,
-                                                                                                                      tracingLevelConfiguration)));
+                                            identifier -> createExecutionInitialSpanInfo(component, overriddenName, suffix));
   }
 
-  private ExecutionInitialSpanInfo createExecutionInitialSpanInfo(Component component, String overriddenName, String suffix,
-                                                                  TracingLevelExportInfo initialExportInfo) {
+  private ExecutionInitialSpanInfo createExecutionInitialSpanInfo(Component component, String overriddenName, String suffix) {
     ExecutionInitialSpanInfo executionInitialSpanInfo =
-        new ExecutionInitialSpanInfo(component, apiId,
-                                     initialExportInfo,
-                                     overriddenName, suffix);
+        new ExecutionInitialSpanInfo(component, apiId, overriddenName, suffix, tracingLevelConfiguration);
     registerConfigurationUpdate(component, executionInitialSpanInfo);
     return executionInitialSpanInfo;
   }
@@ -102,8 +90,8 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   private void registerConfigurationUpdate(Component component, ExecutionInitialSpanInfo executionInitialSpanInfo) {
     tracingLevelConfiguration
         .onConfigurationChange(tracingLevelConfiguration -> executionInitialSpanInfo
-            .setInitialExportInfo(new ExecutionInitialExportInfo(createTracingLevelExportInfo(component,
-                                                                                              tracingLevelConfiguration))));
+            .setInitialExportInfo(createTracingLevelExportInfo(component, executionInitialSpanInfo.getName(),
+                                                               tracingLevelConfiguration)));
   }
 
   public void initialiseAttributes() {

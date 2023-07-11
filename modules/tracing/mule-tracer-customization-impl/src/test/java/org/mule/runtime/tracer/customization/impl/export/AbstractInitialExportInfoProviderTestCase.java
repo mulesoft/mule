@@ -8,7 +8,7 @@ package org.mule.runtime.tracer.customization.impl.export;
 
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.ASYNC_INNER_CHAIN_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.CACHE_CHAIN_SPAN_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_CHAIN_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_SOURCE_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.POLICY_NEXT_ACTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
@@ -39,7 +39,7 @@ public class AbstractInitialExportInfoProviderTestCase {
 
   @Test
   public void testForSpecialCasesByName() {
-    testComponent(POLICY_CHAIN_SPAN_NAME, TRUE, singleton("execute-next"));
+    testComponent(POLICY_SOURCE_SPAN_NAME, TRUE, singleton("execute-next"));
     testComponent(POLICY_NEXT_ACTION_SPAN_NAME, FALSE, emptySet());
     testComponent(UNKNOWN, FALSE, emptySet());
     testComponent(ASYNC_INNER_CHAIN_SPAN_NAME, FALSE, emptySet());

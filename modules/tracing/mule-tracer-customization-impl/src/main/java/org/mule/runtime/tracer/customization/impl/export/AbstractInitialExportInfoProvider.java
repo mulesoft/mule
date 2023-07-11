@@ -11,13 +11,10 @@ import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUti
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
-import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,14 +24,6 @@ import java.util.Map;
  */
 public abstract class AbstractInitialExportInfoProvider implements InitialExportInfoProvider {
 
-  private final Map<Class, InitialExportInfo> initialExportInfoMapByComponentClass = new HashMap<Class, InitialExportInfo>() {
-
-    {
-      put(PolicyChain.class,
-          new NoExportTillSpanWithNameInitialExportInfo(InternalSpanNames.EXECUTE_NEXT_SPAN_NAME, true));
-    }
-  };
-
   @Override
   public InitialExportInfo getInitialExportInfo(Component component) {
     return getInitialExportInfo(component, "");
@@ -42,14 +31,6 @@ public abstract class AbstractInitialExportInfoProvider implements InitialExport
 
   @Override
   public InitialExportInfo getInitialExportInfo(Component component, String spanNameSuffix) {
-    // This is done to resolve appropriately for inner classes related to policies
-    // and will not be configurable.
-    InitialExportInfo initialExportInfo = initialExportInfoMapByComponentClass.get(component.getClass());
-
-    if (initialExportInfo != null) {
-      return initialExportInfo;
-    }
-
     return doGetInitialExportInfo(getSpanName(component.getIdentifier()) + stripToEmpty(spanNameSuffix));
   }
 
