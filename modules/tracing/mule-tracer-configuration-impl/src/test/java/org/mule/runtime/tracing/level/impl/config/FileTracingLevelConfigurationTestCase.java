@@ -42,52 +42,52 @@ public class FileTracingLevelConfigurationTestCase {
   public void whenLevelIsSpecifiedInFileItIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel(), equalTo(TracingLevelId.OVERVIEW));
+    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel().getTracingLevelId(), equalTo(TracingLevelId.OVERVIEW));
   }
 
   @Test
   public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel(), is(DEFAULT_LEVEL));
+    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel().getTracingLevelId(), is(DEFAULT_LEVEL));
   }
 
   @Test
   public void whenNoFileExistsDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel(), is(DEFAULT_LEVEL));
+    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel().getTracingLevelId(), is(DEFAULT_LEVEL));
   }
 
   @Test
   public void whenLevelIsWrongInFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel(), is(DEFAULT_LEVEL));
+    assertThat(fileTracingLevelConfiguration.getDefaultTracingLevel().getTracingLevelId(), is(DEFAULT_LEVEL));
   }
 
   @Test
   public void whenALocationOverrideIsSpecifiedInTheFileTheOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1), equalTo(TracingLevelId.MONITORING));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2), equalTo(TracingLevelId.DEBUG));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1).getTracingLevelId(), equalTo(TracingLevelId.MONITORING));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2).getTracingLevelId(), equalTo(TracingLevelId.DEBUG));
   }
 
   @Test
   public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1), equalTo(TracingLevelId.OVERVIEW));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2), equalTo(TracingLevelId.DEBUG));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1).getTracingLevelId(), equalTo(TracingLevelId.OVERVIEW));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2).getTracingLevelId(), equalTo(TracingLevelId.DEBUG));
   }
 
   @Test
   public void whenALocationOverrideIsSpecifiedAndDuplicatedInTheFileTheLastOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1), equalTo(TracingLevelId.DEBUG));
-    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2), equalTo(TracingLevelId.DEBUG));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_1).getTracingLevelId(), equalTo(TracingLevelId.DEBUG));
+    assertThat(fileTracingLevelConfiguration.getTracingLevel(LOCATION_2).getTracingLevelId(), equalTo(TracingLevelId.DEBUG));
   }
 
   /**

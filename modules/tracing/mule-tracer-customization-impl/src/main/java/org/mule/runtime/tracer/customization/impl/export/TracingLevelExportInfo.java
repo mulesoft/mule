@@ -7,7 +7,6 @@
 package org.mule.runtime.tracer.customization.impl.export;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils;
@@ -25,7 +24,7 @@ public class TracingLevelExportInfo implements InitialExportInfo {
 
   private final String spanName;
   private TracingLevel tracingLevel;
-  private final LazyValue<InitialExportInfo> initialExportInfo = new LazyValue<>(this::getInitialExportInfo);
+  private InitialExportInfo initialExportInfo;
   private Set<String> propagatedNoExportUntil = emptySet();
 
   public TracingLevel getTracingLevel() {
@@ -56,6 +55,13 @@ public class TracingLevelExportInfo implements InitialExportInfo {
 
   // Esto tendria que ser mas estatico (revisar)
   private InitialExportInfo getInitialExportInfo() {
+    if (initialExportInfo == null) {
+      initialExportInfo = createInitialExportInfo();
+    }
+    return initialExportInfo;
+  }
+
+  private InitialExportInfo createInitialExportInfo() {
     if (propagatedNoExportUntil.isEmpty() || propagatedNoExportUntil.contains(spanName)) {
       return resolveInitialExportInfoProvider(tracingLevel).getInitialExportInfo(spanName);
     } else {
@@ -80,11 +86,11 @@ public class TracingLevelExportInfo implements InitialExportInfo {
   }
 
   public boolean isExportable() {
-    return initialExportInfo.get().isExportable();
+    return getInitialExportInfo().isExportable();
   }
 
   public Set<String> noExportUntil() {
-    return initialExportInfo.get().noExportUntil();
+    return getInitialExportInfo().noExportUntil();
   }
 
   @Override
