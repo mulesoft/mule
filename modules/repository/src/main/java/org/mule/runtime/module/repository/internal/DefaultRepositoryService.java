@@ -10,6 +10,7 @@ import static org.mule.runtime.module.repository.internal.RepositoryServiceFacto
 
 import org.mule.maven.client.api.BundleDependenciesResolutionException;
 import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.exception.BundleDependencyNotFoundException;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
@@ -45,12 +46,10 @@ public class DefaultRepositoryService implements RepositoryService {
           mavenClient.resolveBundleDescriptor(muleToMavenDescriptor(bundleDependency.getDescriptor()));
 
       return new File(resolvedBundleDependency.getBundleUri().getPath());
+    } catch (BundleDependencyNotFoundException e) {
+      throw new BundleNotFoundException(e);
     } catch (BundleDependenciesResolutionException e) {
-      if (e.isArtifactNotFound()) {
-        throw new BundleNotFoundException(e);
-      } else {
-        throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
-      }
+      throw new RepositoryConnectionException("There was a problem connecting to one of the repositories", e);
     }
   }
 
