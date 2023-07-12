@@ -56,8 +56,6 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   @Inject
   protected MuleContext muleContext;
 
-  InternalProfilingService profilingService;
-
   @Inject
   protected FeatureFlaggingService featureFlaggingService;
 
@@ -67,7 +65,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   @Inject
   protected SpanExporterConfiguration spanExporterConfiguration;
 
-  private Boolean isTracingExportEnabled = null;
+  private InternalProfilingService profilingService;
   private EventTracer<CoreEvent> updatableCoreEvenTracer;
 
   @Override
