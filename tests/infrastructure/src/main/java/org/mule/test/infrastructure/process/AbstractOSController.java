@@ -126,7 +126,7 @@ public abstract class AbstractOSController {
       @Override
       public String describeFailure() {
         runSync(DUMP_CMD);
-        return format("The mule instance didn't start on time: %s", status);
+        throw new MuleControllerException(format("The mule instance didn't start on time: %s", status));
       }
     });
   }
