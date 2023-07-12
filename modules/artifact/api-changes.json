@@ -3,6 +3,22 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.visibilityIncreased",
+          "old": "method T org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::createArtifact(java.io.File, java.util.Optional<java.util.Properties>, M)",
+          "new": "method T org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::createArtifact(java.io.File, java.util.Optional<java.util.Properties>, M)",
+          "oldVisibility": "protected",
+          "newVisibility": "public",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.visibilityIncreased",
+          "old": "method M org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::createArtifactModel(java.io.File)",
+          "new": "method M org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory<M extends org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel, T extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::createArtifactModel(java.io.File)",
+          "oldVisibility": "protected",
+          "newVisibility": "public",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
           "code": "java.field.typeChanged",
           "old": "field org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS",
           "new": "field org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.API_CLASSIFIERS",
