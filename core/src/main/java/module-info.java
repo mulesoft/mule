@@ -104,12 +104,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.transaction;
   exports org.mule.runtime.core.api.transaction.xa;
   exports org.mule.runtime.core.api.transformer;
-  // exports org.mule.runtime.tracer.api.span.validation;
-  // exports org.mule.runtime.tracer.api.span.exporter;
-  // exports org.mule.runtime.tracer.api.span;
-  // exports org.mule.runtime.tracer.api.span.error;
-  // exports org.mule.runtime.tracer.api.span.info;
-  // exports org.mule.runtime.tracer.exporter.config.api;
   exports org.mule.runtime.core.api.util;
   exports org.mule.runtime.core.api.util.concurrent;
   exports org.mule.runtime.core.api.util.compression;
@@ -117,10 +111,38 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.proxy;
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
-  // exports javax.jms;
-  // exports org.mule.runtime.metrics.api.instrument;
-  // exports org.mule.runtime.metrics.api.instrument.builder;
-  // exports org.mule.runtime.metrics.api.meter.builder;
-  // exports org.mule.runtime.metrics.api;
-  // exports org.mule.runtime.metrics.api.meter;
+
+  provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
+      org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
+
+  provides org.mule.runtime.api.el.AbstractExpressionModuleBuilderFactory with
+      org.mule.runtime.core.internal.el.DefaultExpressionModuleBuilderFactory;
+
+  provides org.mule.runtime.api.message.AbstractMuleMessageBuilderFactory with
+      org.mule.runtime.core.internal.message.DefaultMessageBuilderFactory;
+
+  provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
+      org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
+
+  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+      org.mule.runtime.core.api.extension.CoreRuntimeExtensionModelProvider,
+      org.mule.runtime.core.api.extension.OperationDslExtensionModelProvider;
+
+  provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
+      org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
+
+  exports org.mule.runtime.core.internal.context to
+      org.mule.test.runner;
+  exports org.mule.runtime.core.internal.lifecycle to
+      org.mule.test.runner;
+  exports org.mule.runtime.core.internal.registry to
+      org.mule.test.runner;
+  exports org.mule.runtime.core.internal.util to
+      org.mule.runtime.deployment.model,
+      org.mule.runtime.log4j;
+  exports org.mule.runtime.core.privileged.event to
+      org.mule.runtime.log4j,
+      org.mule.test.unit;
+  exports org.mule.runtime.core.privileged.security.tls to
+      org.mule.runtime.tls;
 }

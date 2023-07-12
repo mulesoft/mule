@@ -17,6 +17,8 @@ module org.mule.runtime.http.api {
   // for api.retry.policy and api.config.bootstrap
   requires org.mule.runtime.core;
 
+  requires com.github.benmanes.caffeine;
+
   exports org.mule.runtime.http.api;
   exports org.mule.runtime.http.api.client;
   exports org.mule.runtime.http.api.client.auth;
