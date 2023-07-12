@@ -35,12 +35,4 @@ public class OpenTelemetrySpanExporterUtils {
   public static final String SPAN_KIND = "span.kind.override";
   public static final String STATUS = "status.override";
 
-  public static String getNameWithoutNamespace(String name) {
-    int index = name.lastIndexOf(":");
-    if (index != -1) {
-      return name.substring(index + 1);
-    } else {
-      return name;
-    }
-  }
 }

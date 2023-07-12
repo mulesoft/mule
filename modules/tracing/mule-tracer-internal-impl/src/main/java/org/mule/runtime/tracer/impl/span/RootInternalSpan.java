@@ -14,10 +14,11 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.impl.context.DeferredEndSpanWrapper;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -29,7 +30,7 @@ public class RootInternalSpan implements InternalSpan {
   public static final String ROOT_SPAN = "root";
 
   private String name = ROOT_SPAN;
-  private Map<String, String> attributes = new HashMap<>();
+  private final List<SpanAttribute<String>> attributes = new ArrayList<>();
 
   // This is a managed span that will not end.
   private DeferredEndSpanWrapper managedSpan;
@@ -119,14 +120,14 @@ public class RootInternalSpan implements InternalSpan {
 
   @Override
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
-    attributes.forEach(biConsumer);
+    attributes.forEach(spanAttribute -> biConsumer.accept(spanAttribute.getKey(), spanAttribute.getValue()));
   }
 
   @Override
-  public void addAttribute(String key, String value) {
+  public void addAttribute(SpanAttribute<String> spanAttribute) {
     if (managedSpan != null) {
-      managedSpan.addAttribute(key, value);
+      managedSpan.addAttribute(spanAttribute);
     }
-    attributes.put(key, value);
+    attributes.add(spanAttribute);
   }
 }

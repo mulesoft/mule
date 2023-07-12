@@ -14,10 +14,11 @@ import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -78,7 +79,7 @@ public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
   }
 
   @Override
-  public void addCurrentSpanAttributes(CoreEvent event, Map<String, String> attributes) {
+  public void addCurrentSpanAttributes(CoreEvent event, List<SpanAttribute<String>> attributes) {
     // Noop
   }
 

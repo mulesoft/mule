@@ -43,12 +43,15 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.SourceCallback;
 import org.mule.runtime.module.extension.internal.runtime.source.trace.SourceDistributedTraceContextManager;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionSourceBinder;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.api.runtime.source.SourceCallbackContext;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -262,7 +265,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
                                                                                      mimeTypeInitParam);
 
     String name = null;
-    Map<String, String> attributes = new HashMap<>();
+    List<SpanAttribute<String>> attributes = new ArrayList<>();
 
     DistributedTraceContextManager distributedSourceTraceContextManager = context.getDistributedSourceTraceContext();
 

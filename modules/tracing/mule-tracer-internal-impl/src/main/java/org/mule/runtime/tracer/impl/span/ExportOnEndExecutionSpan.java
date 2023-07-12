@@ -17,12 +17,13 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -42,7 +43,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   private final InternalSpan parent;
   private final Long startTime;
   private Long endTime;
-  private final Map<String, String> additionalAttributes = new HashMap<>();
+  private final List<SpanAttribute<String>> additionalAttributes = new ArrayList<>();
 
   private ExportOnEndExecutionSpan(SpanExporterFactory spanExporterFactory, InitialSpanInfo initialSpanInfo, Long startTime,
                                    InternalSpan parent) {
@@ -105,7 +106,7 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     initialSpanInfo.forEachAttribute(biConsumer);
     if (!additionalAttributes.isEmpty()) {
-      additionalAttributes.forEach(biConsumer);
+      additionalAttributes.forEach(spanAttribute -> biConsumer.accept(spanAttribute.getKey(), spanAttribute.getValue()));
     }
   }
 
@@ -154,8 +155,8 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
-    spanExporter.setRootAttribute(rootAttributeKey, rootAttributeValue);
+  public void setRootAttribute(SpanAttribute<String> spanAttribute) {
+    spanExporter.setRootAttribute(spanAttribute);
   }
 
   /**
@@ -183,11 +184,11 @@ public class ExportOnEndExecutionSpan implements InternalSpan {
   }
 
   @Override
-  public void addAttribute(String key, String value) {
-    if (!key.equals(SPAN_KIND) && !key.equals(STATUS) && !initialSpanInfo.isPolicySpan()) {
-      additionalAttributes.put(key, value);
+  public void addAttribute(SpanAttribute<String> spanAttribute) {
+    if (!spanAttribute.getKey().equals(SPAN_KIND) && !spanAttribute.getKey().equals(STATUS) && !initialSpanInfo.isPolicySpan()) {
+      additionalAttributes.add(spanAttribute);
     }
-    spanExporter.onAdditionalAttribute(key, value);
+    spanExporter.onAdditionalAttribute(spanAttribute);
   }
 
 }

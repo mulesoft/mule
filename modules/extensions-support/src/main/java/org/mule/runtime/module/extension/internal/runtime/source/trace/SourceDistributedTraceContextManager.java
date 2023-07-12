@@ -11,9 +11,11 @@ import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +27,7 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
 
   private Map<String, String> remoteTraceContextMap = emptyMap();
   private String name;
-  private Map<String, String> attributes = new HashMap<>();
+  private final List<SpanAttribute<String>> attributes = new ArrayList<>();
   private SpanContext spanContext;
 
   @Override
@@ -48,7 +50,19 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
     if (spanContext != null) {
       spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
     }
-    attributes.put(key, value);
+    // Mejorar esto (por ahi tener en API un StringSpanAttribute)
+    attributes.add(new SpanAttribute<String>() {
+
+      @Override
+      public String getKey() {
+        return key;
+      }
+
+      @Override
+      public String getValue() {
+        return value;
+      }
+    });
   }
 
   @Override
@@ -56,7 +70,7 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
     attributes.forEach(this::addCurrentSpanAttribute);
   }
 
-  public Map<String, String> getSpanRootAttributes() {
+  public List<SpanAttribute<String>> getSpanRootAttributes() {
     return attributes;
   }
 

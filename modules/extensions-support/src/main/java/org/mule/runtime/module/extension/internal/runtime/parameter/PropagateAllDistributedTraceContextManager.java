@@ -55,6 +55,6 @@ public class PropagateAllDistributedTraceContextManager implements DistributedTr
 
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    coreEventTracer.addCurrentSpanAttributes(coreEvent, attributes);
+    attributes.forEach(this::addCurrentSpanAttribute);
   }
 }

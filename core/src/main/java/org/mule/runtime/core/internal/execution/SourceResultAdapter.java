@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.core.internal.execution;
 
+import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.internal.execution.NoopSourceDistributedTraceContextManager.getNoopSourceDistributedTraceContextManager;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.metadata.MediaType;
@@ -16,11 +16,11 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.sdk.api.runtime.operation.Result;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -39,7 +39,7 @@ public class SourceResultAdapter {
   private final Optional<PollItemInformation> itemInformation;
   private final DistributedTraceContextManager sourceDistributedTraceContextManager;
   private final String spanName;
-  private final Map<String, String> spanRootAttributes;
+  private final List<SpanAttribute<String>> spanRootAttributes;
 
   /**
    * Creates a new instance
@@ -78,7 +78,7 @@ public class SourceResultAdapter {
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
                              Optional<PollItemInformation> pollItemInformation) {
     this(result, cursorProviderFactory, mediaType, isCollection, correlationId, payloadMediaTypeResolver,
-         getNoopSourceDistributedTraceContextManager(), null, emptyMap(), pollItemInformation);
+         getNoopSourceDistributedTraceContextManager(), null, emptyList(), pollItemInformation);
   }
 
   public SourceResultAdapter(Result<?, ?> result,
@@ -89,7 +89,7 @@ public class SourceResultAdapter {
                              PayloadMediaTypeResolver payloadMediaTypeResolver,
                              DistributedTraceContextManager sourceDistributedTraceContextManager,
                              String spanName,
-                             Map<String, String> spanAttributes,
+                             List<SpanAttribute<String>> spanAttributes,
                              Optional<PollItemInformation> pollItemInformation) {
     this.result = result;
     this.cursorProviderFactory = cursorProviderFactory;
@@ -175,7 +175,7 @@ public class SourceResultAdapter {
    *
    * @since 4.5.0
    */
-  public Map<String, String> getSpanRootAttributes() {
+  public List<SpanAttribute<String>> getSpanRootAttributes() {
     return spanRootAttributes;
   }
 }

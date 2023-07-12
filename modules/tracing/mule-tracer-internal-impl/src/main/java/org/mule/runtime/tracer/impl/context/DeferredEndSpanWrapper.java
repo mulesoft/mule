@@ -13,6 +13,7 @@ import org.mule.runtime.api.profiling.tracing.SpanDuration;
 import org.mule.runtime.api.profiling.tracing.SpanError;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
 import java.util.List;
@@ -39,8 +40,8 @@ public class DeferredEndSpanWrapper implements InternalSpan {
   }
 
   @Override
-  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
-    delegate.setRootAttribute(rootAttributeKey, rootAttributeValue);
+  public void setRootAttribute(SpanAttribute<String> rootAttribute) {
+    delegate.setRootAttribute(rootAttribute);
   }
 
   @Override
@@ -114,8 +115,8 @@ public class DeferredEndSpanWrapper implements InternalSpan {
   }
 
   @Override
-  public void addAttribute(String key, String value) {
-    delegate.addAttribute(key, value);
+  public void addAttribute(SpanAttribute<String> spanAttribute) {
+    delegate.addAttribute(spanAttribute);
   }
 
   public void doEndOriginalSpan() {
