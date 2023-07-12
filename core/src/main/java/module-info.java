@@ -131,17 +131,26 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  exports org.mule.runtime.core.internal.config.builders to
+      org.mule.test.unit;
+  exports org.mule.runtime.core.internal.serialization to
+      org.mule.test.unit;
   exports org.mule.runtime.core.internal.context to
+      org.mule.test.unit,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.lifecycle to
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.registry to
+      org.mule.test.unit,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.deployment.model,
-      org.mule.runtime.log4j;
+      org.mule.runtime.log4j,
+      com.mulesoft.mule.service.oauth.ee;
   exports org.mule.runtime.core.privileged.event to
       org.mule.runtime.log4j,
+      org.mule.test.unit;
+  exports org.mule.runtime.core.privileged.registry to
       org.mule.test.unit;
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
