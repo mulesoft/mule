@@ -5,6 +5,177 @@
       "ignore": [
         {
           "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.AuthorizationCodeOAuthDancer",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.AuthorizationCodeOAuthDancer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.AuthorizationCodeRequest",
+          "classSimpleName": "AuthorizationCodeRequest",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.AuthorizationCodeRequest",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.ClientCredentialsOAuthDancer",
+          "classSimpleName": "ClientCredentialsOAuthDancer",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.ClientCredentialsOAuthDancer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext",
+          "classSimpleName": "AuthorizationCodeDanceCallbackContext",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "enum org.mule.oauth.client.api.builder.ClientCredentialsLocation",
+          "classSimpleName": "ClientCredentialsLocation",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.ClientCredentialsLocation",
+          "elementKind": "enum",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder",
+          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthDancerBuilder<D>",
+          "classSimpleName": "OAuthDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.oauth.client.api.exception.RequestAuthenticationException",
+          "classSimpleName": "RequestAuthenticationException",
+          "package": "org.mule.oauth.client.api.exception",
+          "classQualifiedName": "org.mule.oauth.client.api.exception.RequestAuthenticationException",
+          "elementKind": "class",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "package": "org.mule.oauth.client.api.listener",
+          "classQualifiedName": "org.mule.oauth.client.api.listener.AuthorizationCodeListener",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.listener.ClientCredentialsListener",
+          "classSimpleName": "ClientCredentialsListener",
+          "package": "org.mule.oauth.client.api.listener",
+          "classQualifiedName": "org.mule.oauth.client.api.listener.ClientCredentialsListener",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "enum org.mule.oauth.client.api.state.DancerState",
+          "classSimpleName": "DancerState",
+          "package": "org.mule.oauth.client.api.state",
+          "classQualifiedName": "org.mule.oauth.client.api.state.DancerState",
+          "elementKind": "enum",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "package": "org.mule.oauth.client.api.state",
+          "classQualifiedName": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classQualifiedName": "org.mule.runtime.oauth.api.builder.OAuthDancerBuilder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.AuthorizationCodeListener::onAuthorizationCompleted(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.oauth.client.api.listener.AuthorizationCodeListener::onAuthorizationCompleted(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===) @ org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classQualifiedName": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "methodName": "onAuthorizationCompleted",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.AuthorizationCodeListener::onTokenRefreshed(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.oauth.client.api.listener.AuthorizationCodeListener::onTokenRefreshed(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===) @ org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classQualifiedName": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "methodName": "onTokenRefreshed",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext::setDancerState(===org.mule.runtime.oauth.api.state.DancerState===)",
+          "new": "parameter void org.mule.oauth.client.api.state.ResourceOwnerOAuthContext::setDancerState(===org.mule.oauth.client.api.state.DancerState===) @ org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.DancerState",
+          "newType": "org.mule.oauth.client.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classQualifiedName": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "methodName": "setDancerState",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
           "new": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
           "classSimpleName": "AuthorizationCodeOAuthDancer",
           "exampleUseChainInNewApi": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer is part of the API",

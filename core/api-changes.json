@@ -3,8 +3,164 @@
     "revapi": {
       "ignore": [
         {
+          "code": "java.method.visibilityIncreased",
+          "old": "method void org.mule.runtime.core.api.util.SystemUtils::<init>()",
+          "new": "method void org.mule.runtime.core.api.util.SystemUtils::<init>()",
+          "oldVisibility": "private",
+          "newVisibility": "protected",
+          "package": "org.mule.runtime.core.api.util",
+          "classQualifiedName": "org.mule.runtime.core.api.util.SystemUtils",
+          "classSimpleName": "SystemUtils",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.visibilityIncreased",
+          "old": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.Location)",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.ComponentLocation)",
+          "oldVisibility": "protected",
+          "newVisibility": "public",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classQualifiedName": "org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFlowLocation",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.MeterProvider",
+          "classSimpleName": "MeterProvider",
+          "package": "org.mule.runtime.metrics.api",
+          "classQualifiedName": "org.mule.runtime.metrics.api.MeterProvider",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.Instrument",
+          "classSimpleName": "Instrument",
+          "package": "org.mule.runtime.metrics.api.instrument",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.Instrument",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder<T extends org.mule.runtime.metrics.api.instrument.Instrument>",
+          "classSimpleName": "InstrumentBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder",
+          "classSimpleName": "LongCounterBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder",
+          "classSimpleName": "LongUpDownCounterBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.meter.Meter",
+          "classSimpleName": "Meter",
+          "package": "org.mule.runtime.metrics.api.meter",
+          "classQualifiedName": "org.mule.runtime.metrics.api.meter.Meter",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.meter.builder.MeterBuilder",
+          "classSimpleName": "MeterBuilder",
+          "package": "org.mule.runtime.metrics.api.meter.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.meter.builder.MeterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter",
+          "classSimpleName": "DistributedTraceContextGetter",
+          "package": "org.mule.runtime.tracer.api.context.getter",
+          "classQualifiedName": "org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.CapturedEventData",
+          "classSimpleName": "CapturedEventData",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.CapturedEventData is used as a type parameter or type variable bound on method java.util.List<org.mule.runtime.tracer.api.sniffer.CapturedEventData> org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getEvents() <- org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan is used as a type parameter or type variable bound on method java.util.Collection<org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan> org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer::getExportedSpans() <- org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.CapturedEventData",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan",
+          "classSimpleName": "CapturedExportedSpan",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan is used as a type parameter or type variable bound on method java.util.Collection<org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan> org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer::getExportedSpans() <- org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer",
+          "classSimpleName": "ExportedSpanSniffer",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.SpanSnifferManager",
+          "classSimpleName": "SpanSnifferManager",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.SpanSnifferManager",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.info.InitialExportInfo",
+          "classSimpleName": "InitialExportInfo",
+          "package": "org.mule.runtime.tracer.api.span.info",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.info.InitialExportInfo",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "classSimpleName": "InitialSpanInfo",
+          "package": "org.mule.runtime.tracer.api.span.info",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
           "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.privileged.el.context.AbstractMapContext<V extends java.lang.Object>",
+          "old": "class org.mule.runtime.core.privileged.el.context.AbstractMapContext<V>",
           "package": "org.mule.runtime.core.privileged.el.context",
           "classSimpleName": "AbstractMapContext",
           "elementKind": "class",

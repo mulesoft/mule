@@ -4,6 +4,63 @@
       "ignore": [
         {
           "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.api.dsl.model.DslElementModel<T>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModel",
+          "classSimpleName": "DslElementModel",
+          "elementKind": "class",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.app.declaration.api.ElementDeclaration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.ast.api.ComponentAst)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method <T> java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "new": "method <T> java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>> org.mule.runtime.config.api.dsl.model.DslElementModelFactory::create(org.mule.runtime.dsl.api.component.config.ComponentConfiguration)",
+          "oldType": "java.util.Optional<org.mule.runtime.config.api.dsl.model.DslElementModel<T>>",
+          "newType": "java.util.Optional<org.mule.runtime.metadata.api.dsl.DslElementModel<T>>",
+          "package": "org.mule.runtime.config.api.dsl.model",
+          "classQualifiedName": "org.mule.runtime.config.api.dsl.model.DslElementModelFactory",
+          "classSimpleName": "DslElementModelFactory",
+          "methodName": "create",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider",
+          "package": "org.mule.runtime.config.api.properties",
+          "classQualifiedName": "org.mule.runtime.config.api.properties.ConfigurationPropertiesResolverProvider",
+          "classSimpleName": "ConfigurationPropertiesResolverProvider",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.removed",
           "old": "interface org.mule.runtime.config.api.dsl.model.ResourceProvider",
           "package": "org.mule.runtime.config.api.dsl.model",
           "classSimpleName": "ResourceProvider",
