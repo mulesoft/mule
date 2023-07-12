@@ -30,7 +30,6 @@ import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
