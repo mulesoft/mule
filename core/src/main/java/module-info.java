@@ -140,6 +140,8 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.lifecycle to
       org.mule.test.runner;
+  exports org.mule.runtime.core.internal.profiling to
+      org.mule.service.scheduler;
   exports org.mule.runtime.core.internal.registry to
       org.mule.test.unit,
       org.mule.test.runner;
