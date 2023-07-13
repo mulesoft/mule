@@ -110,9 +110,9 @@ public class Controller {
           muleLogBuilder.append(" > " + line + lineSeparator());
         }
       }
-      LOGGER.info(muleLogBuilder.toString());
+      LOGGER.info("{}", muleLogBuilder);
     } else {
-      LOGGER.warn("Log (" + muleLogFile.toString() + ") not available.");
+      LOGGER.warn("Log ({}) not available.", muleLogFile.toString());
     }
   }
 

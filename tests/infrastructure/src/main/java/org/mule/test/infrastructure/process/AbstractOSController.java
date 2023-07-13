@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,22 +114,24 @@ public abstract class AbstractOSController {
       throw new MuleControllerException("The mule instance couldn't be started. Errno: " + error);
     }
 
-    new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).check(new Probe() {
-
-      private MuleProcessStatus status;
-
+    AtomicReference<MuleProcessStatus> status = new AtomicReference<>();
+    final Probe probe = new Probe() {
       @Override
       public boolean isSatisfied() {
-        status = getProcessesStatus();
-        return status == STARTED_STARTED;
+        final MuleProcessStatus currentStatus = getProcessesStatus();
+        status.set(currentStatus);
+        return currentStatus == STARTED_STARTED;
       }
 
       @Override
       public String describeFailure() {
-        runSync(DUMP_CMD);
-        throw new MuleControllerException(format("The mule instance didn't start on time: %s", status));
+        return format("The mule instance didn't start on time: %s", status.get());
       }
-    });
+    };
+    if (!new PollingProber(TIMEOUT_MILLIS, POLL_DELAY_MILLIS).poll(probe)) {
+      runSync(DUMP_CMD);
+      throw new MuleControllerException(probe.describeFailure());
+    }
   }
 
   public int stop(String... args) {

@@ -9,9 +9,11 @@ package org.mule.test.infrastructure.process;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
+import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 
 import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,12 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MuleProcessController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MuleProcessController.class);
-  private static final Logger LOGGER_WRAPPER = LoggerFactory.getLogger(MuleProcessController.class.getName() + ".wrapper");
+  private static final Logger LOGGER_WRAPPER = getLogger(MuleProcessController.class.getName() + ".wrapper");
 
   private static final int DEFAULT_TIMEOUT = 60000;
 
@@ -56,7 +56,7 @@ public class MuleProcessController {
   }
 
   public void start(String... args) {
-    if (LOGGER_WRAPPER.isDebugEnabled() || Boolean.getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
+    if (LOGGER_WRAPPER.isDebugEnabled() || getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
       final List<String> debugArgs = new ArrayList<>();
       debugArgs.add("wrapperDebug");
       debugArgs.addAll(asList(args));
