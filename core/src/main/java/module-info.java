@@ -148,6 +148,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.deployment.model,
       org.mule.runtime.log4j,
+      com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee;
   exports org.mule.runtime.core.privileged.event to
       org.mule.runtime.log4j,
