@@ -116,6 +116,7 @@ public abstract class AbstractOSController {
 
     AtomicReference<MuleProcessStatus> status = new AtomicReference<>();
     final Probe probe = new Probe() {
+
       @Override
       public boolean isSatisfied() {
         final MuleProcessStatus currentStatus = getProcessesStatus();
