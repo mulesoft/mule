@@ -8,21 +8,36 @@ package org.mule.test.infrastructure.process;
 
 import org.mule.tck.probe.Probe;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MuleStatusProbe implements Probe {
 
-  private MuleProcessController controller;
-  private boolean check;
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleStatusProbe.class);
+
+  private final MuleProcessController controller;
+  private final boolean check;
 
   private MuleStatusProbe(MuleProcessController controller, boolean isRunning) {
     this.controller = controller;
     this.check = isRunning;
   }
 
+  @Override
   public boolean isSatisfied() {
     return check == controller.isRunning();
   }
 
+  @Override
   public String describeFailure() {
+    try {
+      controller.getController().printLog();
+    } catch (IOException e) {
+      LOGGER.error("Error printing log.", e);
+    }
+
     return "Mule is " + (check ? "not " : "") + "running";
   }
 

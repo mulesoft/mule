@@ -1218,6 +1218,7 @@ public interface AllureConstants {
     interface JdkVersionStory {
 
       String JDK_VERSION = "JDK version";
+      String JDK_ENVIRONMENT_CONFIGURATION = "JDK environment configuration";
     }
   }
 }

@@ -7,9 +7,10 @@
 
 package org.mule.test.infrastructure.process;
 
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class UnixController extends AbstractOSController {
 
   @Override
   public int getProcessId() {
-    Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+    Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
@@ -57,7 +58,7 @@ public class UnixController extends AbstractOSController {
 
   @Override
   public MuleProcessStatus getProcessesStatus() {
-    Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+    Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);

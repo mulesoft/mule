@@ -7,6 +7,7 @@
 package org.mule.tck.probe;
 
 import static org.mule.tck.report.ThreadDumper.logThreadDump;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.core.api.util.func.CheckedFunction;
@@ -89,7 +90,7 @@ public class PollingProber implements Prober {
     }
   }
 
-  private boolean poll(Probe probe) {
+  public boolean poll(Probe probe) {
     Timeout timeout = new Timeout(timeoutMillis);
 
     while (true) {
@@ -121,7 +122,7 @@ public class PollingProber implements Prober {
       }
     }
 
-    private Probe probe;
+    private final Probe probe;
 
     private JUnitProbeWrapper(Probe probe) {
       super();

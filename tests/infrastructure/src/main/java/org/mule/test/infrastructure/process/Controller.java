@@ -7,24 +7,29 @@
 
 package org.mule.test.infrastructure.process;
 
-import static java.lang.Integer.parseInt;
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.util.Arrays.asList;
-import static java.util.regex.Pattern.compile;
-import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
-import static org.apache.commons.io.FileUtils.copyFileToDirectory;
-import static org.apache.commons.io.FileUtils.forceDelete;
-import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.mule.runtime.core.api.util.FileUtils.copyFile;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR_LOCATION;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_EE_SERVICE_NAME;
 import static org.mule.test.infrastructure.process.AbstractOSController.MULE_SERVICE_NAME;
 
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.util.Arrays.asList;
+import static java.util.regex.Pattern.compile;
+
+import static org.apache.commons.io.FileUtils.copyDirectoryToDirectory;
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
+import static org.apache.commons.io.FileUtils.forceDelete;
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -39,8 +44,12 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Controller {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
 
   protected static final String ANCHOR_SUFFIX = "-anchor.txt";
   private static final IOFileFilter ANCHOR_FILTER = suffixFileFilter(ANCHOR_SUFFIX);
@@ -76,7 +85,35 @@ public class Controller {
 
   public void start(String... args) {
     checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(args);
-    osSpecificController.start(args);
+    try {
+      osSpecificController.start(args);
+    } catch (MuleControllerException mce) {
+      try {
+        printLog();
+      } catch (IOException ioe) {
+        mce.addSuppressed(ioe);
+      }
+
+      throw mce;
+    }
+  }
+
+  public void printLog() throws IOException {
+    final File muleLogFile = getLog();
+    if (muleLogFile.exists()) {
+      final StringBuilder muleLogBuilder = new StringBuilder();
+      muleLogBuilder.append(muleLogFile.getName() + ":" + lineSeparator());
+      muleLogBuilder.append("============" + lineSeparator());
+      try (BufferedReader br = new BufferedReader(new FileReader(muleLogFile))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+          muleLogBuilder.append(" > " + line + lineSeparator());
+        }
+      }
+      LOGGER.info("{}", muleLogBuilder);
+    } else {
+      LOGGER.warn("Log ({}) not available.", muleLogFile.toString());
+    }
   }
 
   protected void checkRepositoryLocationAndUpdateInternalRepoPropertyIfPresent(String... args) {
