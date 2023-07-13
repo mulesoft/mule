@@ -40,9 +40,12 @@ module org.mule.runtime.core {
   requires reactor.extra;
 
   // utilities
+  requires com.github.benmanes.caffeine;
   requires com.google.gson;
   requires commons.beanutils;
   requires org.apache.commons.collections4;
+  requires org.apache.commons.io;
+  requires org.apache.commons.lang3;
   requires org.apache.commons.pool2;
   requires org.jgrapht.core;
   requires net.bytebuddy;
@@ -133,11 +136,11 @@ module org.mule.runtime.core {
 
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.test.unit;
-  exports org.mule.runtime.core.internal.serialization to
-      org.mule.test.unit;
   exports org.mule.runtime.core.internal.context to
       org.mule.test.unit,
       org.mule.test.runner;
+  // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
+  exports org.mule.runtime.core.internal.component;
   exports org.mule.runtime.core.internal.lifecycle to
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.profiling to
@@ -145,11 +148,15 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.registry to
       org.mule.test.unit,
       org.mule.test.runner;
+  exports org.mule.runtime.core.internal.serialization to
+      org.mule.test.unit;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.deployment.model,
       org.mule.runtime.log4j,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee;
+  exports org.mule.runtime.core.privileged.component to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.privileged.event to
       org.mule.runtime.log4j,
       org.mule.test.unit;
