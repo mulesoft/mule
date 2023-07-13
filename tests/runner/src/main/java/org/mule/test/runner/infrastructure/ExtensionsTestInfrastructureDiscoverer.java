@@ -80,10 +80,14 @@ public class ExtensionsTestInfrastructureDiscoverer {
    * @throws IllegalStateException if no extensions can be described
    */
   public ExtensionModel discoverExtension(Class<?> annotatedClass, ExtensionModelLoader loader) {
+    return discoverExtension(annotatedClass, loader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())));
+  }
+
+  public ExtensionModel discoverExtension(Class<?> annotatedClass, ExtensionModelLoader loader,
+                                          DslResolvingContext dslResolvingContext) {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, annotatedClass.getName());
     params.put(VERSION, getProductVersion());
-    DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
     ExtensionModel model = loader.loadExtensionModel(annotatedClass.getClassLoader(), dslResolvingContext, params);
     extensionManager.registerExtension(model);
     return model;
