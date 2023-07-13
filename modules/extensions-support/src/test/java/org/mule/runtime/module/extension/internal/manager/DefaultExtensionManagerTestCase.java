@@ -18,6 +18,8 @@ import static org.mule.runtime.module.extension.internal.manager.DefaultExtensio
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
+import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.ENFORCE_EXTENSION_JAVA_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockClassLoaderModelProperty;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockConfigurationInstance;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExecutorFactory;
@@ -92,6 +94,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -99,6 +103,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
+@Feature(SDK)
 public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
 
   @Rule
@@ -387,7 +392,8 @@ public class DefaultExtensionManagerTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void resolveJdkValidator() throws Exception {
+  @Story(ENFORCE_EXTENSION_JAVA_VERSION)
+  public void resolveJdkValidator() {
     DefaultExtensionManager extensionManager = (DefaultExtensionManager) extensionsManager;
 
     // assert default value

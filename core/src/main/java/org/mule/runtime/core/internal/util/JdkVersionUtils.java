@@ -178,10 +178,6 @@ public class JdkVersionUtils {
       }
       return true;
     }
-
-    public String asMajorMinorString() {
-      return getMajor() + "." + getMinor();
-    }
   }
 
 
@@ -317,6 +313,11 @@ public class JdkVersionUtils {
     }
   }
 
+  /**
+   * @param version a {@link JdkVersion}
+   * @return Whether the given {@code version} represents {@code Java 1.8}
+   * @since 4.5.0
+   */
   public static boolean isJava8(JdkVersion version) {
     return version.getMajor() == 1 && version.getMinor() == 8;
   }

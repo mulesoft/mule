@@ -989,6 +989,9 @@ public interface AllureConstants {
     interface SupportedJavaVersions {
 
       String JAVA_VERSIONS_IN_EXTENSION_MODEL = "Supported Java Versions are reflected in the ExtensionModel";
+
+      String ENFORCE_EXTENSION_JAVA_VERSION =
+          "Validate that all registered extensions support the Java version Mule is running on";
     }
 
   }

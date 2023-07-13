@@ -9,6 +9,12 @@ package org.mule.runtime.module.extension.internal.manager.jdk;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 
+/**
+ * {@link ExtensionJdkValidator} implementation that throws {@link JavaVersionNotSupportedByExtensionException} upon validation
+ * failure
+ *
+ * @since 4.5.0
+ */
 public class StrictExtensionJdkValidator extends BaseExtensionJdkValidator {
 
   public StrictExtensionJdkValidator(JdkVersion runningJdkVersion) {
@@ -17,7 +23,7 @@ public class StrictExtensionJdkValidator extends BaseExtensionJdkValidator {
 
   @Override
   protected void onUnsupportedJdkVersion(ExtensionModel extensionModel) {
-    throw new IllegalArgumentException(getErrorMessageFor(extensionModel));
+    throw new JavaVersionNotSupportedByExtensionException(getErrorMessageFor(extensionModel));
   }
 
 }

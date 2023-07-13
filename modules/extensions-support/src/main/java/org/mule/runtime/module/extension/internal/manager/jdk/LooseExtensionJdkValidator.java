@@ -11,6 +11,11 @@ import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 
 import org.slf4j.Logger;
 
+/**
+ * {@link ExtensionJdkValidator} implementation that logs validation misses but doesn't throw any exceptions
+ *
+ * @since 4.5.0
+ */
 public class LooseExtensionJdkValidator extends BaseExtensionJdkValidator {
 
   private final Logger logger;

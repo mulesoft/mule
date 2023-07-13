@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.manager.jdk;
 
+import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.ENFORCE_EXTENSION_JAVA_VERSION;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -15,6 +20,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.tck.size.SmallTest;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +31,8 @@ import org.slf4j.Logger;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
+@Feature(SDK)
+@Story(ENFORCE_EXTENSION_JAVA_VERSION)
 public class LooseExtensionJdkValidatorTestCase extends BaseExtensionJdkValidatorTestCase {
 
   @Mock
@@ -52,6 +61,7 @@ public class LooseExtensionJdkValidatorTestCase extends BaseExtensionJdkValidato
     task.run();
     ArgumentCaptor<String> captor = forClass(String.class);
     verify(logger).warn(captor.capture());
-    System.out.println("MESSAEG: >>>>" + captor.getValue());
+    assertThat(captor.getValue(),
+               equalTo("Extension 'Test Extension' does not support Java 21. Supported versions are: [1.8, 11, 17]"));
   }
 }

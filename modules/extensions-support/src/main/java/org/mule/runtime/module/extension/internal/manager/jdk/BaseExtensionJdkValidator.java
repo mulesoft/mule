@@ -15,12 +15,19 @@ import static java.lang.String.valueOf;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 
+/**
+ * Base implementation for {@link ExtensionJdkValidator}
+ *
+ * @since 4.5.0
+ */
 abstract class BaseExtensionJdkValidator implements ExtensionJdkValidator {
 
   protected final JdkVersion runningJdkVersion;
+  private final String versionAsString;
 
   public BaseExtensionJdkValidator(JdkVersion runningJdkVersion) {
     this.runningJdkVersion = runningJdkVersion;
+    versionAsString = isJava8(runningJdkVersion) ? JAVA_VERSION_8 : valueOf(runningJdkVersion.getMajor());
   }
 
   @Override
@@ -30,18 +37,26 @@ abstract class BaseExtensionJdkValidator implements ExtensionJdkValidator {
     }
   }
 
+  /**
+   * @param extensionModel an {@code ExtensionModel} that failed validation
+   * @return a user-friendly message about the given {@code extensionModel} failing validation
+   */
   protected String getErrorMessageFor(ExtensionModel extensionModel) {
-    return format("Extension '%s' does not support Java %s. Supported versions are: ",
+    return format("Extension '%s' does not support Java %s. Supported versions are: %s",
                   extensionModel.getName(),
-                  runningJdkVersion.asMajorMinorString(),
+                  versionAsString,
                   extensionModel.getSupportedJavaVersions());
   }
 
+  /**
+   * Handles {@link ExtensionModel} instances that failed validation
+   *
+   * @param extensionModel a {@link ExtensionModel} that failed validation
+   */
   protected abstract void onUnsupportedJdkVersion(ExtensionModel extensionModel);
 
   private boolean isSupported(ExtensionModel extensionModel) {
-    String criteria = isJava8(runningJdkVersion) ? JAVA_VERSION_8 : valueOf(runningJdkVersion.getMajor());
-    return extensionModel.getSupportedJavaVersions().contains(criteria);
+    return extensionModel.getSupportedJavaVersions().contains(versionAsString);
   }
 
 }
