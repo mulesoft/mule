@@ -3,13 +3,13 @@
  */
 package org.mule.functional.junit4;
 
-import static com.google.common.collect.ImmutableList.copyOf;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.ReflectionUtils.findMethod;
 
 import org.mule.runtime.core.api.MuleContext;
@@ -21,6 +21,7 @@ import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.manager.DefaultExtensionManager;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.runner.infrastructure.ExtensionsTestInfrastructureDiscoverer;
 
 import java.io.File;
@@ -30,6 +31,8 @@ import java.net.URLClassLoader;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+
+import org.junit.Rule;
 
 /**
  * Base test class for {@link FunctionalTestCase}s that make use of components generated through the extensions API.
@@ -50,6 +53,10 @@ import org.apache.commons.io.FileUtils;
  * @since 3.7.0
  */
 public abstract class ExtensionFunctionalTestCase extends FunctionalTestCase {
+
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
 
   private ExtensionManager extensionManager;
 

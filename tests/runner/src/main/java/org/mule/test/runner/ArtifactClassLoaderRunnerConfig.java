@@ -123,4 +123,12 @@ public @interface ArtifactClassLoaderRunnerConfig {
    */
   String[] extraPrivilegedArtifacts() default {};
 
+  /**
+   * Specifies the system properties to be set only during the creation of a classloader runner config (and the loading of the
+   * extension models it does).
+   * 
+   * @since 4.5
+   */
+  RunnerConfigSystemProperty[] systemProperties() default {};
+
 }

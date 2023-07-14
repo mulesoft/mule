@@ -174,7 +174,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
+
 import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -184,8 +187,9 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import org.mockito.verification.VerificationMode;
-import org.slf4j.Logger;
+
 import uk.org.lidalia.slf4jext.Level;
 
 /**
@@ -328,6 +332,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected TestDeploymentListener testDeploymentListener;
   protected ArtifactClassLoader containerClassLoader;
   protected TestPolicyManager policyManager;
+
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
 
   @Rule
   public SystemProperty changeChangeInterval = new SystemProperty(CHANGE_CHECK_INTERVAL_PROPERTY, "100000");

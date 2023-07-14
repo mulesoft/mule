@@ -3,13 +3,13 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.junit.MockitoJUnit.rule;
-
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -24,10 +24,12 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.RunnerConfigSystemProperty;
 
 import javax.inject.Inject;
 
 import org.junit.Rule;
+
 import org.mockito.junit.MockitoRule;
 
 /**
@@ -56,8 +58,28 @@ import org.mockito.junit.MockitoRule;
         "*:*:jar:tests:*",
         "*:*:test-jar:*:*"
     },
-    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"})
+    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"},
+    systemProperties = {
+        @RunnerConfigSystemProperty(
+            key = MuleArtifactFunctionalTestCase.EXTENSION_JVM_ENFORCEMENT_PROPERTY,
+            value = MuleArtifactFunctionalTestCase.JVM_ENFORCEMENT_LOOSE)
+    })
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
+
+  /**
+   * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
+   * it will be for internal use only.
+   *
+   * @since 4.5.0
+   */
+  static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
+  static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
+
+  // This is needed apart from the setting in {@code @ArtifactClassLoaderRunnerConfig} because tha validation also takes place
+  // during extension registering, not only during its discovery.
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_LOOSE);
 
   @Rule
   public MockitoRule rule = rule();

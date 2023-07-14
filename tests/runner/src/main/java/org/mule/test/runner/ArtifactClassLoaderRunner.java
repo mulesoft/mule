@@ -13,6 +13,9 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.of;
 
@@ -37,8 +40,10 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -128,12 +133,31 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     }
 
     if (artifactClassLoaderHolder == null) {
+      Map<String, String> originalSystemPropertiesValues = new HashMap<>();
+
       try {
         runnerConfiguration = readConfiguration(clazz);
+
+        runnerConfiguration.getSystemProperties().entrySet()
+            .forEach(sp -> {
+              originalSystemPropertiesValues.put(sp.getKey(), getProperty(sp.getKey()));
+              setProperty(sp.getKey(), sp.getValue());
+            });
+
         artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
       } catch (Exception e) {
         errorCreatingClassLoaderTestRunner = e;
         throw e;
+      } finally {
+        // Restore system properties to original values
+        originalSystemPropertiesValues.entrySet()
+            .forEach(sp -> {
+              if (sp.getValue() != null) {
+                setProperty(sp.getKey(), sp.getValue());
+              } else {
+                clearProperty(sp.getKey());
+              }
+            });
       }
     } else {
       checkConfiguration(clazz);

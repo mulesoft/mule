@@ -45,6 +45,7 @@ import org.mule.tck.config.TestNotificationListenerRegistryConfigurationBuilder;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 
 public abstract class AbstractConfigurationFailuresTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
