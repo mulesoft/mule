@@ -33,7 +33,6 @@ import static io.opentelemetry.api.trace.StatusCode.ERROR;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
@@ -72,7 +71,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   private final SpanProcessor spanProcessor;
   private final boolean enableMuleAncestorIdManagement;
   private final InitialExportInfo initialExportInfo;
-  private LazyValue<SpanContext> spanContext = new LazyValue<>(this::createSpanContext);
+  private SpanContext spanContext = null;
   private SpanContext parentSpanContext = getInvalid();
   private SpanKind spanKind = INTERNAL;
   private StatusData statusData = unset();
@@ -167,8 +166,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
 
   @Override
   public SpanIdentifier getSpanIdentifier() {
-    if (spanContext.get().isValid()) {
-      return new OpentelemetrySpanIdentifier(spanContext.get().getSpanId(), spanContext.get().getTraceId());
+    if (getSpanContext().isValid()) {
+      return new OpentelemetrySpanIdentifier(spanContext);
     } else {
       return INVALID_SPAN_IDENTIFIER;
     }
@@ -196,7 +195,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
         childOpenTelemetrySpanExporter.rootSpanExporter = rootSpanExporter;
         return;
       }
-      childOpenTelemetrySpanExporter.parentSpanContext = spanContext.get();
+      childOpenTelemetrySpanExporter.parentSpanContext = getSpanContext();
 
       // If it is a policy span, propagate the rootSpan.
       if (childOpenTelemetrySpanExporter.isPolicySpan) {
@@ -231,7 +230,10 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   }
 
   public SpanContext getSpanContext() {
-    return spanContext.get();
+    if (spanContext == null) {
+      spanContext = createSpanContext();
+    }
+    return spanContext;
   }
 
   public SpanContext getParentSpanContext() {
@@ -272,11 +274,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   }
 
   public String getSpanId() {
-    return spanContext.get().getSpanId();
+    return getSpanContext().getSpanId();
   }
 
   public String getTraceId() {
-    return spanContext.get().getTraceId();
+    return getSpanContext().getTraceId();
   }
 
 }

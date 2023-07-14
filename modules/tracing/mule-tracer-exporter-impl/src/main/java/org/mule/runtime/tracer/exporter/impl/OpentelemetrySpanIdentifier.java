@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
+import io.opentelemetry.api.trace.SpanContext;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 
 /**
@@ -18,9 +19,9 @@ public class OpentelemetrySpanIdentifier implements SpanIdentifier {
   private final String spanId;
   private final String traceId;
 
-  public OpentelemetrySpanIdentifier(String spanId, String traceId) {
-    this.spanId = spanId;
-    this.traceId = traceId;
+  public OpentelemetrySpanIdentifier(SpanContext spanContext) {
+    this.spanId = spanContext.getSpanId();
+    this.traceId = spanContext.getTraceId();
   }
 
   @Override
