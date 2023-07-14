@@ -13,7 +13,6 @@ import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
 import java.util.Map;
@@ -90,7 +89,7 @@ public interface SpanExporter {
    * @param rootAttributeKey   the key for root attribute.
    * @param rootAttributeValue the value for the root attribute.
    */
-  default void setRootAttribute(SpanAttribute<String> rootAttribute) {}
+  default void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {}
 
   /**
    * Sets the root name in the local trace for the exporter. This is useful in case a root element sets a name for the flow, and
@@ -107,7 +106,7 @@ public interface SpanExporter {
    * @param key   the key for the new attribute added
    * @param value the value for the attribute
    */
-  default void onAdditionalAttribute(SpanAttribute<String> additionalAttribute) {}
+  default void onAdditionalAttribute(String key, String value) {}
 
   /**
    * Operation to do when an attribute an error occurs.

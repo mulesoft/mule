@@ -11,10 +11,9 @@ import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextF
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.slf4j.Logger;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -22,9 +21,9 @@ import java.util.function.BiConsumer;
  *
  * @since 4.5.0
  */
-public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiCommand<EventContext, List<SpanAttribute<String>>> {
+public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiCommand<EventContext, Map<String, String>> {
 
-  private final BiConsumer<EventContext, List<SpanAttribute<String>>> consumer;
+  private BiConsumer<EventContext, Map<String, String>> consumer;
 
   public static EventContextAddAttributesCommand getEventContextAddAttributesCommand(Logger logger,
                                                                                      String errorMessage,
@@ -44,7 +43,7 @@ public class EventContextAddAttributesCommand extends AbstractFailSafeVoidBiComm
   }
 
   @Override
-  BiConsumer<EventContext, List<SpanAttribute<String>>> getConsumer() {
+  BiConsumer<EventContext, Map<String, String>> getConsumer() {
     return consumer;
   }
 }

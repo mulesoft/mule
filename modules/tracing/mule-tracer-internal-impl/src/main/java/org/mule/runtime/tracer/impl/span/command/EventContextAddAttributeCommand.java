@@ -13,7 +13,6 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 
 import org.apache.commons.lang3.function.TriFunction;
-import org.mule.runtime.tracer.api.span.StringSpanAttribute;
 import org.slf4j.Logger;
 
 /**
@@ -38,7 +37,7 @@ public class EventContextAddAttributeCommand extends AbstractFailSafeVoidTriComm
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
-        spanContext.getSpan().ifPresent(span -> span.addAttribute(new StringSpanAttribute(key, value)));
+        spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
       }
 
       return null;

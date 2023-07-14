@@ -34,14 +34,13 @@ import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.impl.optel.sdk.MuleReadableSpan;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +66,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   private final boolean isRootSpan;
   private final boolean isPolicySpan;
   private final InternalSpan internalSpan;
-  private final List<SpanAttribute<String>> rootAttributes = new ArrayList<>();
+  private final Map<String, String> rootAttributes = new HashMap<>();
   private final SpanProcessor spanProcessor;
   private final boolean enableMuleAncestorIdManagement;
   private final InitialExportInfo initialExportInfo;
@@ -138,11 +137,11 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   }
 
   @Override
-  public void setRootAttribute(SpanAttribute<String> spanAttribute) {
+  public void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {
     if (isRootSpan) {
-      internalSpan.addAttribute(spanAttribute);
+      internalSpan.addAttribute(rootAttributeKey, rootAttributeValue);
     } else {
-      this.rootAttributes.add(spanAttribute);
+      this.rootAttributes.put(rootAttributeKey, rootAttributeValue);
     }
   }
 
@@ -218,14 +217,14 @@ public class OpenTelemetrySpanExporter implements SpanExporter {
   }
 
   @Override
-  public void onAdditionalAttribute(SpanAttribute<String> spanAttribute) {
-    if (spanAttribute.getKey().equals(SPAN_KIND)) {
-      rootSpanExporter.spanKind = SpanKind.valueOf(spanAttribute.getValue());
-    } else if (spanAttribute.getKey().equals(STATUS)) {
-      StatusCode statusCode = StatusCode.valueOf(spanAttribute.getValue());
+  public void onAdditionalAttribute(String key, String value) {
+    if (key.equals(SPAN_KIND)) {
+      rootSpanExporter.spanKind = SpanKind.valueOf(value);
+    } else if (key.equals(STATUS)) {
+      StatusCode statusCode = StatusCode.valueOf(value);
       rootSpanExporter.statusData = StatusData.create(statusCode, null);
     } else if (isPolicySpan && !rootSpanExporter.equals(this)) {
-      rootSpanExporter.internalSpan.addAttribute(spanAttribute);
+      rootSpanExporter.internalSpan.addAttribute(key, value);
     }
   }
 

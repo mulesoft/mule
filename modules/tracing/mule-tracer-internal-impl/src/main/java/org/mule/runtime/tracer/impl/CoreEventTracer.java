@@ -33,7 +33,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -47,7 +46,6 @@ import org.mule.runtime.tracer.impl.span.command.EventContextSetCurrentSpanNameC
 import org.mule.runtime.tracer.impl.span.command.EventContextStartSpanCommand;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -152,7 +150,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   }
 
   @Override
-  public void addCurrentSpanAttributes(CoreEvent coreEvent, List<SpanAttribute<String>> attributes) {
+  public void addCurrentSpanAttributes(CoreEvent coreEvent, Map<String, String> attributes) {
     eventContextAddSpanAttributesCommand.execute(coreEvent.getContext(), attributes);
   }
 

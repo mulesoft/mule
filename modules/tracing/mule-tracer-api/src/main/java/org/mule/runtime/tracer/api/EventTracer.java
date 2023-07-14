@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.api;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
@@ -15,11 +16,9 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.SpanAttribute;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -148,7 +147,7 @@ public interface EventTracer<T extends Event> {
    * @param event      the event to add the attribute to.
    * @param attributes a map with the attributes to add.
    */
-  void addCurrentSpanAttributes(T event, List<SpanAttribute<String>> spanAttributes);
+  void addCurrentSpanAttributes(T event, Map<String, String> attributes);
 
   /**
    * @return a {@link SpanSnifferManager}.

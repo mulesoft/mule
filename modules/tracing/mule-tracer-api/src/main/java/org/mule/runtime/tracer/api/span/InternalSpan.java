@@ -48,15 +48,12 @@ public interface InternalSpan extends Span {
   void addError(InternalSpanError error);
 
   /**
-   * Adds an attribute to the Span.
+   * Add an attribute
    *
-   * @param spanAttribute The attribute to be added.
+   * @param key   key for the attribute
+   * @param value the value for the attribute added
    */
-  default void addAttribute(SpanAttribute<String> spanAttribute) {}
-
-  default void addAttribute(String key, String value) {
-    this.addAttribute(new StringSpanAttribute(key, value));
-  }
+  default void addAttribute(String key, String value) {}
 
   /**
    * @param span the {@link Span}
@@ -113,7 +110,7 @@ public interface InternalSpan extends Span {
    * @param rootAttributeKey   the key for root attribute.
    * @param rootAttributeValue the value for the root attribute.
    */
-  default void setRootAttribute(SpanAttribute<String> rootAttribute) {}
+  default void setRootAttribute(String rootAttributeKey, String rootAttributeValue) {}
 
   /**
    * @return the attributes count.
