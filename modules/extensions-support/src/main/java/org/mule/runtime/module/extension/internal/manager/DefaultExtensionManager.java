@@ -79,6 +79,12 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
+  /**
+   * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
+   * it will be for internal use only.
+   *
+   * @since 4.5.0
+   */
   static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
   static final String JVM_ENFORCEMENT_STRICT = "STRICT";
   static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
