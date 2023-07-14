@@ -14,6 +14,12 @@
     <description>Mule Log4j Configurator Module</description>
 
     <properties>
+        <!-- Add visibility required by the tests exclusively -->
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=net.bytebuddy.agent
+        </surefire.args>
+
         <javaModuleName>org.mule.runtime.log4j</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>

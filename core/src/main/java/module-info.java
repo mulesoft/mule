@@ -41,6 +41,7 @@ module org.mule.runtime.core {
 
   // utilities
   requires com.github.benmanes.caffeine;
+  requires com.google.common;
   requires com.google.gson;
   requires commons.beanutils;
   requires org.apache.commons.collections4;
@@ -61,6 +62,7 @@ module org.mule.runtime.core {
   requires java.transaction;
   // used by DateTime
   requires java.xml.bind;
+  requires javax.inject;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
@@ -134,34 +136,74 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  exports org.mule.runtime.core.internal.config to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.config.bootstrap to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.context to
+      org.mule.runtime.spring.config,
       org.mule.test.unit,
       org.mule.test.runner;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component;
+  exports org.mule.runtime.core.internal.el to
+      org.mule.runtime.core.mvel,
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.exception to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lifecycle to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
       org.mule.test.runner;
+  exports org.mule.runtime.core.internal.lifecycle.phases to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.profiling to
       org.mule.service.scheduler;
   exports org.mule.runtime.core.internal.registry to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans,
       org.mule.test.unit,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.serialization to
+      org.mule.runtime.artifact,
       org.mule.test.unit;
+  exports org.mule.runtime.core.internal.transformer to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.transformer.simple to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util to
+      org.mule.runtime.container,
       org.mule.runtime.deployment.model,
       org.mule.runtime.log4j,
+      org.mule.runtime.service,
+      org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee;
+
   exports org.mule.runtime.core.privileged.component to
       org.mule.runtime.extensions.support;
-  exports org.mule.runtime.core.privileged.event to
-      org.mule.runtime.log4j,
-      org.mule.test.unit;
+  exports org.mule.runtime.core.privileged.el to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.privileged.event;
+  exports org.mule.runtime.core.privileged.exception;
+  exports org.mule.runtime.core.privileged.processor.chain to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.privileged.registry to
+      org.mule.runtime.extensions.support,
       org.mule.test.unit;
+  exports org.mule.runtime.core.privileged.routing to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.transformer to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.util to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
+
+  opens org.mule.runtime.core.internal.transformer to
+      spring.core;
 }
