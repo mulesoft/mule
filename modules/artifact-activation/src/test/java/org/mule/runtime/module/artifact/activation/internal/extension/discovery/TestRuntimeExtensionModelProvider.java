@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
 import static org.mockito.Mockito.mock;
@@ -23,6 +24,7 @@ public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelP
   public ExtensionModel createExtensionModel() {
     ExtensionModel extModel = mock(ExtensionModel.class);
     when(extModel.getName()).thenReturn("testRuntime");
+    when(extModel.getSupportedJavaVersions()).thenReturn(ALL_SUPPORTED_JAVA_VERSIONS);
     return extModel;
   }
 
