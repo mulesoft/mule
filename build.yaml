@@ -21,3 +21,6 @@ additionalTestConfigs:
 # TODO W-13029381 uncomment when default changes to java 17
   #jdk11:
     #testJdkTool: OPEN-JDK11
+  jdk17:
+    testJdkTool: OPEN-JDK17
+    
