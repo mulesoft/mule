@@ -16,6 +16,7 @@ module org.mule.runtime.featureManagement {
   requires org.mule.runtime.api;
   requires org.mule.runtime.profiling.api;
   
+  requires com.github.benmanes.caffeine;
   requires togglz.core;
   
   exports org.mule.runtime.feature.api.management;

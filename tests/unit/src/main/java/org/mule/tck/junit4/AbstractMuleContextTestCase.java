@@ -20,7 +20,6 @@ import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.clearLoggingConfig;
 import static org.mule.tck.junit4.TestsLogConfigurationHelper.configureLoggingForTest;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
@@ -38,6 +37,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -64,8 +64,8 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
-import org.mule.runtime.core.internal.test.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.core.internal.serialization.JavaObjectSerializer;
+import org.mule.runtime.core.internal.test.builders.ServiceCustomizationsConfigurationBuilder;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
@@ -87,11 +87,13 @@ import java.util.function.Supplier;
 import javax.xml.namespace.QName;
 
 import com.google.common.collect.ImmutableMap;
+
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
 
 /**
  * Extends {@link AbstractMuleTestCase} providing access to a {@link MuleContext} instance and tools for manage it.
@@ -100,7 +102,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
 
   private static final Logger LOGGER = getLogger(AbstractMuleContextTestCase.class);
 
-  private static Field LIFECYCLE_EXCEPTION_COMPONENT_FIELD;
+  private static final Field LIFECYCLE_EXCEPTION_COMPONENT_FIELD;
 
   /**
    * This is stored in order to clean the field in case a {@link LifecycleException} is thrown by the {@link MuleContext}s
@@ -108,12 +110,18 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
    * are multiple failures with this cause in a row, it will cause an OOM Exception.
    */
   static {
+    Field lifecycleExceptionComponentField;
+
     try {
-      LIFECYCLE_EXCEPTION_COMPONENT_FIELD = LifecycleException.class.getDeclaredField("component");
-      LIFECYCLE_EXCEPTION_COMPONENT_FIELD.setAccessible(true);
-    } catch (NoSuchFieldException | SecurityException e) {
+      lifecycleExceptionComponentField = LifecycleException.class.getDeclaredField("component");
+      lifecycleExceptionComponentField.setAccessible(true);
+    } catch (Exception e) {
+      // Also consider the fact that the module declaring the field is not open
+      lifecycleExceptionComponentField = null;
       LOGGER.warn("Could not find LifecycleException's 'component' field: " + e.getMessage());
     }
+
+    LIFECYCLE_EXCEPTION_COMPONENT_FIELD = lifecycleExceptionComponentField;
   }
 
   public static final String WORKING_DIRECTORY_SYSTEM_PROPERTY_KEY = "workingDirectory";

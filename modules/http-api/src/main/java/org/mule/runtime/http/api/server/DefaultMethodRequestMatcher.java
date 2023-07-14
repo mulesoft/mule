@@ -7,10 +7,12 @@
 package org.mule.runtime.http.api.server;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.Collections.unmodifiableList;
+
 import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 
-import com.google.common.collect.ImmutableList;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +63,7 @@ class DefaultMethodRequestMatcher implements MethodRequestMatcher {
 
   @Override
   public List<String> getMethods() {
-    return ImmutableList.copyOf(methods);
+    return unmodifiableList(new ArrayList<>(methods));
   }
 
   @Override
