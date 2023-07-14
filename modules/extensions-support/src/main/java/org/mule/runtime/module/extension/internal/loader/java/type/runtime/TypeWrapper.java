@@ -135,7 +135,7 @@ public class TypeWrapper implements Type {
   @Override
   public List<FieldElement> getFields() {
     // Avoid querying fields that would be filtered out anyway
-    if (aClass.isPrimitive() || aClass.isArray() || isJdkClass(aClass)) {
+    if (aClass.isPrimitive() || aClass.isEnum() || aClass.isArray() || isJdkClass(aClass)) {
       return emptyList();
     }
 
