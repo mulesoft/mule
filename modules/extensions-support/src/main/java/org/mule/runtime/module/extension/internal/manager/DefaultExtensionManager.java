@@ -7,7 +7,7 @@
 
 package org.mule.runtime.module.extension.internal.manager;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.EXTENSION_JVM_ENFORCEMENT_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -78,6 +78,8 @@ import org.slf4j.LoggerFactory;
 public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
+
+  static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
   static final String JVM_ENFORCEMENT_STRICT = "STRICT";
   static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
   static final String JVM_ENFORCEMENT_DISABLED = "DISABLED";
