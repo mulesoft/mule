@@ -206,9 +206,9 @@ public class DefaultMuleContainer implements MuleContainer {
 
     // Startup properties
     String propertiesFile = (String) commandlineOptions.get("props");
-    if (propertiesFile != null) {
-      setStartupPropertiesFile(propertiesFile);
-    }
+    // if (propertiesFile != null) {
+    // setStartupPropertiesFile(propertiesFile);
+    // }
 
     String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
     if (appOption != null) {

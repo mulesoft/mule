@@ -167,24 +167,24 @@ public class MuleDeploymentService implements DeploymentService {
       this.domainDeployer.setDeploymentListener(domainDeploymentListener);
 
       this.domainBundleDeployer = new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
-              applicationDeployer, applications, domainDeploymentListener,
-              applicationDeploymentListener, this);
+                                                                  applicationDeployer, applications, domainDeploymentListener,
+                                                                  applicationDeploymentListener, this);
 
       if (useParallelDeployment()) {
         if (isDeployingSelectedAppsInOrder()) {
           throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
-                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+                                                    DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
         }
         LOGGER.info("Using parallel deployment");
         this.deploymentDirectoryWatcher =
-                new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
-                        applications,
-                        artifactStartExecutorSupplier, deploymentLock);
+            new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                                                   applications,
+                                                   artifactStartExecutorSupplier, deploymentLock, this::findArtifact);
       } else {
         this.deploymentDirectoryWatcher =
-                new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                        artifactStartExecutorSupplier,
-                        deploymentLock);
+            new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
+                                           artifactStartExecutorSupplier,
+                                           deploymentLock, this::findArtifact);
       }
     }
     // TODO we may need to set this just after creating domain deployer
