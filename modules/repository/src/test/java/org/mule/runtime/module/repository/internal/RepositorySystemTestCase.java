@@ -61,7 +61,7 @@ public class RepositorySystemTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void noExistentResource() throws Exception {
+  public void nonExistentResource() throws Exception {
     executeTestWithDefaultRemoteRepo(() -> {
       RepositoryService defaultRepositoryService = new RepositoryServiceFactory().createRepositoryService();
       BundleDescriptor bundleDescriptor =
