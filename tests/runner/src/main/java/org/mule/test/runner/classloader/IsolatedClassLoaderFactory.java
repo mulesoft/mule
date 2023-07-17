@@ -6,7 +6,7 @@ package org.mule.test.runner.classloader;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
+import static org.mule.runtime.module.service.api.artifact.impl.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 import static org.mule.test.runner.RunnerConfiguration.TEST_RUNNER_ARTIFACT_ID;
 import static org.mule.test.runner.classloader.container.TestContainerClassLoaderAssembler.create;
 

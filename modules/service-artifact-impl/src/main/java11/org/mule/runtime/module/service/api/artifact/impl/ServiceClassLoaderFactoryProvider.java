@@ -1,9 +1,11 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.service.api.artifact;
+package org.mule.runtime.module.service.api.artifact.impl;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_SERVICE_JPMS_MODULE_LAYER;
+
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;

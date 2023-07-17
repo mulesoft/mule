@@ -1,10 +1,10 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.service.internal.test.artifact;
+package org.mule.runtime.service.api.artifact.impl;
 
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
+import static org.mule.runtime.module.service.api.artifact.impl.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.core.IsEqual.equalTo;

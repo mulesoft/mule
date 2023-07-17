@@ -43,6 +43,7 @@
         <module>properties-config</module>
         <module>spring-config</module>
         <module>service</module>
+        <module>service-artifact-impl</module>
         <module>troubleshooting</module>
         <module>feature-management</module>
         <module>memory-management-parent</module>
