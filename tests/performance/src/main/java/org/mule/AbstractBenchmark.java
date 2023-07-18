@@ -3,6 +3,7 @@
  */
 package org.mule;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
@@ -70,6 +71,7 @@ public class AbstractBenchmark {
     builderList.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
     builderList.add(new BasicRuntimeServicesConfigurationBuilder());
     builderList.add(new MinimalConfigurationBuilder());
+    builderList.addAll(getAdditionalConfigurationBuilders());
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
   }
 
@@ -81,6 +83,10 @@ public class AbstractBenchmark {
 
   protected Map<String, Object> getStartUpRegistryObjects() {
     return new HashMap<>();
+  }
+
+  protected List<ConfigurationBuilder> getAdditionalConfigurationBuilders() {
+    return emptyList();
   }
 
   public CoreEvent createEvent(Flow flow) {
