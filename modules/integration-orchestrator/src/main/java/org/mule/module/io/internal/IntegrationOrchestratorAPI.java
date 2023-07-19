@@ -51,10 +51,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.OptionalLong;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -76,7 +73,7 @@ public class IntegrationOrchestratorAPI {
   public void start() {
     this.deploymentService.initializeVoltron();
     try {
-      String runtimeConfigurationServiceUrl = System.getenv("IO_RCS_URL");
+      String runtimeConfigurationServiceUrl = System.getenv("SERVICE_RCS_URL");
       String ioAPIHost = getEnvWithDefault("IO_API_HOST", "localhost");
       int ioAPIPort = Integer.valueOf(getEnvWithDefault("IO_API_PORT", "10101"));
 
@@ -143,7 +140,10 @@ public class IntegrationOrchestratorAPI {
                       .deserialize(new ByteArrayInputStream(configBytes),
                                    extensionName -> extensionModelResolver.getExtension(extensionName).orElse(null));
 
-              IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationId);
+              Properties configurationProperties = new Properties();
+              configurationProperties.put("SALESFORCE_CONFIG", UUID.randomUUID().toString());
+              IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationId,
+                                                                       Optional.of(configurationProperties));
               application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
               logger.error("Time to load integration in millis: " + (System.currentTimeMillis() - initialTime));
             }

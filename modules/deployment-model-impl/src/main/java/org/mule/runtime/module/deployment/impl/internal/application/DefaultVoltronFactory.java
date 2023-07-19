@@ -95,13 +95,14 @@ public class DefaultVoltronFactory extends AbstractDeployableArtifactFactory<App
     this.licenseValidator = licenseValidator;
   }
 
-  protected Application doCreateArtifact(File artifactDir, ArtifactAst artifactAst) throws IOException {
+  protected Application doCreateArtifact(File artifactDir, ArtifactAst artifactAst, Optional<Properties> deploymentProperties)
+      throws IOException {
     String appName = artifactDir.getName();
     if (appName.contains(" ")) {
       throw new IllegalArgumentException("Mule application name may not contain spaces: " + appName);
     }
 
-    final ApplicationDescriptor descriptor = createArtifactDescriptor(artifactDir, Optional.empty());
+    final ApplicationDescriptor descriptor = createArtifactDescriptor(artifactDir, deploymentProperties);
     return createArtifact(descriptor, artifactAst);
   }
 
@@ -167,8 +168,9 @@ public class DefaultVoltronFactory extends AbstractDeployableArtifactFactory<App
     return new ApplicationWrapper(delegate);
   }
 
-  public Application createArtifact(File artifactDir, ArtifactAst artifactAst) throws IOException {
-    return doCreateArtifact(artifactDir, artifactAst);
+  public Application createArtifact(File artifactDir, ArtifactAst artifactAst, Optional<Properties> deploymentProperties)
+      throws IOException {
+    return doCreateArtifact(artifactDir, artifactAst, deploymentProperties);
   }
 
   private Domain getDomain() {
