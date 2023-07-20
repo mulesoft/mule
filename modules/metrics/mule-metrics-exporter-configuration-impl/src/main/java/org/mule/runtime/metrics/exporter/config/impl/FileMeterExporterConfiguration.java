@@ -7,17 +7,18 @@
 
 package org.mule.runtime.metrics.exporter.config.impl;
 
-import static java.util.Optional.empty;
-import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CONFIGURATION_FILE_PATH;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION;
 
 import static java.lang.System.getProperty;
+import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
@@ -34,8 +35,10 @@ import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 
 /**
@@ -49,19 +52,20 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
   private static final String CONFIGURATION_FILE_NAME = "meter-exporter.conf";
 
   private final MuleContext muleContext;
-  private final Properties properties;
+  private JsonNode configuration;
+  private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
 
   private final ConfigurationPropertiesResolver propertyResolver =
       new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
 
   public FileMeterExporterConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
-    this.properties = getMeterExporterProperties();
+    getMeterExporterProperties();
   }
 
   @Override
   public String getStringValue(String key) {
-    String value = properties.getProperty(key);
+    String value = readStringFromConfigOrSystemProperty(key);
 
     if (value != null) {
       // Resolves the actual value when the current one is a system property reference.
@@ -78,6 +82,20 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
       }
     }
     return value;
+  }
+
+  private String readStringFromConfigOrSystemProperty(String key) {
+    if (configuration != null) {
+      // We read the yaml configuration
+      String[] path = key.split("\\.");
+      JsonNode configurationValue = configuration;
+      for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
+        configurationValue = configurationValue.get(path[i]);
+      }
+      return configurationValue != null && !configurationValue.asText().isEmpty() ? configurationValue.asText() : null;
+    } else {
+      return getProperty(key);
+    }
   }
 
   private boolean isAValueCorrespondingToAPath(String key) {
@@ -103,15 +121,14 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
     return null;
   }
 
-  private Properties getMeterExporterProperties() {
+  private void getMeterExporterProperties() {
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
       InputStream is = resourceProvider.getResourceAsStream(resolveConfigurationFilePath());
-      return loadProperties(is);
+      configuration = loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
-      LOGGER.info("No meter exporter configuration found in the conf directory.");
+      LOGGER.info("No meter exporter configuration found.");
     }
-    return new Properties();
   }
 
   private String resolveConfigurationFilePath() {
@@ -129,5 +146,17 @@ public class FileMeterExporterConfiguration implements MeterExporterConfiguratio
 
   protected String getPropertiesFileName() {
     return CONFIGURATION_FILE_NAME;
+  }
+
+  private static JsonNode loadConfiguration(InputStream is) throws IOException {
+    if (is == null) {
+      I18nMessage error = objectIsNull("input stream");
+      throw new IOException(error.toString());
+    }
+    try {
+      return configFileMapper.readTree(is);
+    } finally {
+      is.close();
+    }
   }
 }

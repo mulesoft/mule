@@ -48,6 +48,10 @@
             <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
     </dependencies>
     <name>Mule Metrics Exporter Configuration Implementation</name>
     <description>Definitions for Mule Metrics Exporter Configuration Implementation</description>
