@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.IOUtils;
+import org.mule.module.io.internal.dto.ConfigurationDTO;
+import org.mule.module.io.internal.dto.IntegrationConfigDTO;
 import org.mule.runtime.api.component.execution.ExecutionResult;
 import org.mule.runtime.api.component.execution.InputEvent;
 import org.mule.runtime.api.event.Event;
@@ -126,11 +128,16 @@ public class IntegrationOrchestratorAPI {
               ByteArrayInputStream integrationConfigResponse = new ByteArrayInputStream(httpResponse.getEntity().getBytes());
               Gson gson = new Gson();
 
-              JsonElement jsonElement = JsonParser.parseString(IOUtils.toString(integrationConfigResponse));
-              // String integrationId = jsonElement.getAsJsonObject().get("id").getAsString();
-              String configValue = jsonElement.getAsJsonObject().get("config").getAsString();
+              IntegrationConfigDTO integrationConfigDTO =
+                  gson.fromJson(IOUtils.toString(integrationConfigResponse), IntegrationConfigDTO.class);
 
-              byte[] configBytes = Base64.getDecoder().decode(configValue);
+              byte[] configBytes = Base64.getDecoder().decode(integrationConfigDTO.getConfig());
+              Properties configurationProperties = new Properties();
+              for (ConfigurationDTO configuration : integrationConfigDTO.getConfigurations()) {
+                configurationProperties.put(configuration.getIntegrationConfigName(),
+                                            configuration.getIcaasConfigId().toString());
+              }
+
               // TODO we need to extract the
               Domain domain = deploymentService.findDomain("io-domain");
               ExtensionManager extensionModelResolver =
@@ -140,8 +147,7 @@ public class IntegrationOrchestratorAPI {
                       .deserialize(new ByteArrayInputStream(configBytes),
                                    extensionName -> extensionModelResolver.getExtension(extensionName).orElse(null));
 
-              Properties configurationProperties = new Properties();
-              configurationProperties.put("SALESFORCE_CONFIG", UUID.randomUUID().toString());
+
               IntegrationOrchestratorAPI.this.deploymentService.deploy(artifactAst, integrationId,
                                                                        Optional.of(configurationProperties));
               application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
