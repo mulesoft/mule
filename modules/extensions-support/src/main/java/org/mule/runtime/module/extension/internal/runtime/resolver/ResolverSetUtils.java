@@ -16,6 +16,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isM
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ComponentParameterizationUtils.createComponentParameterization;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 
@@ -41,6 +42,7 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -103,6 +105,88 @@ public class ResolverSetUtils {
   }
 
   /**
+   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} that is independent of any particular parameterization.
+   *
+   * @param parameterizedModel the parameterized model.
+   * @param muleContext        the mule context.
+   * @param disableValidations whether validations should be disabled or not.
+   * @param reflectionCache    a reflection cache.
+   * @param expressionManager  the expression manager.
+   * @param parametersOwner    the owner of the parameters from the parameters resolver.
+   * @return the corresponding {@link ResolverSet}
+   */
+  public static ResolverSet getResolverSetForDynamicComponentParameterization(ParameterizedModel parameterizedModel,
+                                                                              MuleContext muleContext,
+                                                                              boolean disableValidations,
+                                                                              ReflectionCache reflectionCache,
+                                                                              ExpressionManager expressionManager,
+                                                                              String parametersOwner)
+      throws ConfigurationException {
+    Map<String, ValueResolver> resolvers = new HashMap<>();
+    ValueResolverFactory valueResolverFactory = new ValueResolverFactory();
+
+    for (ParameterGroupModel parameterGroupModel : parameterizedModel.getParameterGroupModels()) {
+      resolvers
+          .putAll(getParameterGroupDynamicValueResolvers(parameterGroupModel, reflectionCache, muleContext,
+                                                         valueResolverFactory));
+    }
+
+    return fromValues(resolvers,
+                      muleContext,
+                      disableValidations,
+                      reflectionCache,
+                      expressionManager,
+                      parametersOwner).getParametersAsResolverSet(parameterizedModel, muleContext);
+  }
+
+  private static Map<String, ValueResolver> getParameterGroupDynamicValueResolvers(ParameterGroupModel parameterGroupModel,
+                                                                                   ReflectionCache reflectionCache,
+                                                                                   MuleContext muleContext,
+                                                                                   ValueResolverFactory valueResolverFactory) {
+    Map<String, ValueResolver> parameterGroupParametersValueResolvers =
+        getParameterGroupParametersDynamicValueResolvers(parameterGroupModel, reflectionCache, muleContext, valueResolverFactory);
+
+    if (parameterGroupModel.isShowInDsl() && !parameterGroupParametersValueResolvers.isEmpty()) {
+      Map<String, ValueResolver> parameterGroupValueResolver =
+          getResolverForParameterGroupShownInDsl(parameterGroupModel, reflectionCache, muleContext,
+                                                 parameterGroupParametersValueResolvers);
+      if (!parameterGroupValueResolver.isEmpty())
+        return parameterGroupValueResolver;
+    }
+    return parameterGroupParametersValueResolvers;
+  }
+
+  private static Map<String, ValueResolver> getParameterGroupParametersDynamicValueResolvers(ParameterGroupModel parameterGroupModel,
+                                                                                             ReflectionCache reflectionCache,
+                                                                                             MuleContext muleContext,
+                                                                                             ValueResolverFactory valueResolverFactory) {
+    Map<String, ValueResolver> parameterGroupParametersValueResolvers = new HashMap<>();
+    for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
+      ValueResolver<?> valueResolver = getParameterDynamicValueResolver(parameterModel,
+                                                                        reflectionCache,
+                                                                        muleContext,
+                                                                        valueResolverFactory);
+      parameterGroupParametersValueResolvers.put(parameterModel.getName(), valueResolver);
+    }
+    return parameterGroupParametersValueResolvers;
+  }
+
+  private static ValueResolver<?> getParameterDynamicValueResolver(ParameterModel parameterModel, ReflectionCache reflectionCache,
+                                                                   MuleContext muleContext,
+                                                                   ValueResolverFactory valueResolverFactory) {
+    return getValueResolverFor(parameterModel.getName(),
+                               parameterModel.getType(),
+                               new ComponentParameterizationValueResolver<>(parameterModel, reflectionCache, muleContext,
+                                                                            valueResolverFactory),
+                               null,
+                               NOT_SUPPORTED,
+                               false,
+                               parameterModel.getModelProperties(),
+                               false,
+                               valueResolverFactory);
+  }
+
+  /**
    * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters.
    *
    * @param componentParameterization the componentParameterization that describes the model parameter values.
@@ -149,25 +233,11 @@ public class ResolverSetUtils {
                                                   componentParameterization, reflectionCache, muleContext, valueResolverFactory);
 
     if (parameterGroupModel.isShowInDsl() && !parameterGroupParametersValueResolvers.isEmpty()) {
-      Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
-          parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class);
-
-      if (parameterGroupModelProperty.isPresent()) {
-        Optional<Class<?>> parameterGroupDeclaringClass = parameterGroupModelProperty.get()
-            .getDescriptor().getType().getDeclaringClass();
-        if (parameterGroupDeclaringClass.isPresent()) {
-          DefaultObjectBuilder defaultObjectBuilder =
-              new DefaultObjectBuilder(parameterGroupDeclaringClass.get(), reflectionCache);
-
-          for (Map.Entry<String, ValueResolver> stringValueResolverEntry : parameterGroupParametersValueResolvers.entrySet()) {
-            defaultObjectBuilder.addPropertyResolver(stringValueResolverEntry.getKey(),
-                                                     stringValueResolverEntry.getValue());
-
-          }
-          ValueResolver objectBuilderValuerResolver = new ObjectBuilderValueResolver<>(defaultObjectBuilder, muleContext);
-          return of(getGroupName(parameterGroupModelProperty), objectBuilderValuerResolver);
-        }
-      }
+      Map<String, ValueResolver> parameterGroupValueResolver =
+          getResolverForParameterGroupShownInDsl(parameterGroupModel, reflectionCache, muleContext,
+                                                 parameterGroupParametersValueResolvers);
+      if (!parameterGroupValueResolver.isEmpty())
+        return parameterGroupValueResolver;
     }
     return parameterGroupParametersValueResolvers;
   }
@@ -204,6 +274,28 @@ public class ResolverSetUtils {
       }
     }
     return parameterGroupParametersValueResolvers;
+  }
+
+  /**
+   * Creates a {@link ValueResolver} based on the static value of a parameter of a {@link ComponentParameterization}.
+   *
+   * @param parameterModel       the model of the parameter.
+   * @param value                the static value of the component parameter.
+   * @param reflectionCache      a reflection cache.
+   * @param muleContext          the mule context.
+   * @param valueResolverFactory a {@link ValueResolverFactory}.
+   * @return the corresponding {@link ValueResolver}
+   * @throws MuleException if the initialization of the {@link ValueResolver} fails.
+   */
+  public static ValueResolver getValueResolverFromComponentParameter(ParameterModel parameterModel,
+                                                                     Object value,
+                                                                     ReflectionCache reflectionCache,
+                                                                     MuleContext muleContext,
+                                                                     ValueResolverFactory valueResolverFactory)
+      throws MuleException {
+    return getParameterValueResolver(parameterModel.getName(), parameterModel.getType(), value,
+                                     parameterModel.getModelProperties(), reflectionCache, muleContext, valueResolverFactory,
+                                     acceptsReferences(parameterModel));
   }
 
   private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type, Object value,
@@ -418,6 +510,34 @@ public class ResolverSetUtils {
     }
 
     return MapValueResolver.of(mapClass, keyResolvers, valueResolvers, reflectionCache, muleContext);
+  }
+
+  private static Map<String, ValueResolver> getResolverForParameterGroupShownInDsl(ParameterGroupModel parameterGroupModel,
+                                                                                   ReflectionCache reflectionCache,
+                                                                                   MuleContext muleContext,
+                                                                                   Map<String, ValueResolver> parameterGroupParametersValueResolvers) {
+    Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
+        parameterGroupModel.getModelProperty(ParameterGroupModelProperty.class);
+    Optional<Class<?>> parameterGroupDeclaringClass =
+        parameterGroupModelProperty.flatMap(mp -> mp.getDescriptor().getType().getDeclaringClass());
+
+    if (parameterGroupDeclaringClass.isPresent()) {
+      ValueResolver objectBuilderValuerResolver = getResolverForParameterGroupShownInDsl(parameterGroupDeclaringClass.get(),
+                                                                                         reflectionCache,
+                                                                                         muleContext,
+                                                                                         parameterGroupParametersValueResolvers);
+      return of(getGroupName(parameterGroupModelProperty), objectBuilderValuerResolver);
+    }
+    return emptyMap();
+  }
+
+  private static ObjectBuilderValueResolver<?> getResolverForParameterGroupShownInDsl(Class<?> parameterGroupDeclaringClass,
+                                                                                      ReflectionCache reflectionCache,
+                                                                                      MuleContext muleContext,
+                                                                                      Map<String, ValueResolver> parameterGroupParametersValueResolvers) {
+    DefaultObjectBuilder<?> defaultObjectBuilder = new DefaultObjectBuilder<>(parameterGroupDeclaringClass, reflectionCache);
+    parameterGroupParametersValueResolvers.forEach(defaultObjectBuilder::addPropertyResolver);
+    return new ObjectBuilderValueResolver<>(defaultObjectBuilder, muleContext);
   }
 
   public static boolean acceptsReferences(ParameterModel parameterModel) {
