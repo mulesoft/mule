@@ -56,7 +56,7 @@ public class FileMeterExporterConfigurationTestCase {
     FileMeterExporterConfiguration fileSpanExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-        SYSTEM_PROPERTY_VALUE));
+                                                                                                   SYSTEM_PROPERTY_VALUE));
   }
 
   @Test
@@ -65,7 +65,7 @@ public class FileMeterExporterConfigurationTestCase {
     FileMeterExporterConfiguration fileSpanExporterConfiguration =
         new TestFileMeterExporterConfiguration(mock(MuleContext.class));
     assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
-        SYSTEM_PROPERTY_VALUE));
+                                                                                                   SYSTEM_PROPERTY_VALUE));
   }
 
   @Test
