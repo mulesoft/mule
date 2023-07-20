@@ -4,6 +4,7 @@
 package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -19,7 +20,10 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -29,8 +33,11 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -41,6 +48,7 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -66,8 +74,10 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -83,6 +93,7 @@ public class OperationClient implements Lifecycle {
   private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
 
+  private final OperationKey key;
   private final ExecutionMediator<OperationModel> mediator;
   private final ComponentExecutorResolver executorResolver;
   private final ValueReturnDelegate returnDelegate;
@@ -90,6 +101,7 @@ public class OperationClient implements Lifecycle {
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private final LazyValue<CoreEvent> cachedNullEvent;
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
@@ -101,7 +113,7 @@ public class OperationClient implements Lifecycle {
                                      ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                      MuleContext muleContext) {
 
-    return new OperationClient(
+    return new OperationClient(key,
                                createExecutionMediator(
                                                        key,
                                                        extensionConnectionSupplier,
@@ -118,13 +130,15 @@ public class OperationClient implements Lifecycle {
                                muleContext);
   }
 
-  private OperationClient(ExecutionMediator<OperationModel> mediator,
+  private OperationClient(OperationKey key,
+                          ExecutionMediator<OperationModel> mediator,
                           ComponentExecutorResolver executorResolver,
                           ValueReturnDelegate returnDelegate,
                           StreamingManager streamingManager,
                           ExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
                           MuleContext muleContext) {
+    this.key = key;
     this.mediator = mediator;
     this.executorResolver = executorResolver;
     this.returnDelegate = returnDelegate;
@@ -132,14 +146,15 @@ public class OperationClient implements Lifecycle {
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    this.cachedNullEvent = new LazyValue<>(getNullEvent(muleContext));
   }
 
-  public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key, DefaultOperationParameterizer parameterizer) {
+  public <T, A> CompletableFuture<Result<T, A>> execute(DefaultOperationParameterizer parameterizer) {
     boolean shouldCompleteEvent = false;
     CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
     if (contextEvent == null) {
-      contextEvent = getNullEvent(muleContext);
-      shouldCompleteEvent = true;
+      contextEvent = cachedNullEvent.get();
+      // shouldCompleteEvent = true;
     }
 
     OperationModel operationModel = key.getOperationModel();
@@ -208,8 +223,12 @@ public class OperationClient implements Lifecycle {
                                                          Optional<ConfigurationInstance> configurationInstance,
                                                          DefaultOperationParameterizer parameterizer,
                                                          CoreEvent event) {
-    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
-    parameterizer.setValuesOn(paramsBuilder);
+    // Avoids evaluating target and targetValue parameters because those have no effect when using the ExtensionClient and they
+    // can add some noticeable overhead when calling inexpensive operations with otherwise few parameters.
+    FilteredParameterizedModel filteredOperationModel = new FilteredParameterizedModel(operationModel, singleton(OUTPUT));
+    ComponentParameterization.Builder<ParameterizedModel> paramsBuilder =
+        ComponentParameterization.builder(filteredOperationModel);
+    parameterizer.setValuesOn(paramsBuilder, filteredOperationModel::isExcludedParameter);
 
     ResolverSet resolverSet;
     try {
@@ -219,7 +238,8 @@ public class OperationClient implements Lifecycle {
                                                                 true,
                                                                 reflectionCache,
                                                                 expressionManager,
-                                                                "");
+                                                                "",
+                                                                true);
 
       resolverSet.initialise();
     } catch (Exception e) {
@@ -417,6 +437,53 @@ public class OperationClient implements Lifecycle {
     public void triggerProfilingEvent(CoreEvent sourceData,
                                       Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
 
+    }
+  }
+
+  private static class FilteredParameterizedModel implements ParameterizedModel {
+
+    private final ParameterizedModel delegate;
+    private final List<ParameterGroupModel> filteredParameterGroups;
+    private final Set<String> groupsToExclude;
+    private final Set<String> parameterNamesFromExcludedGroups;
+
+    private FilteredParameterizedModel(ParameterizedModel delegate, Set<String> groupsToExclude) {
+      this.delegate = delegate;
+      this.groupsToExclude = groupsToExclude;
+      this.filteredParameterGroups = delegate.getParameterGroupModels().stream()
+          .filter(pg -> !groupsToExclude.contains(pg.getName()))
+          .collect(toList());
+
+      this.parameterNamesFromExcludedGroups = delegate.getParameterGroupModels().stream()
+          .filter(pg -> groupsToExclude.contains(pg.getName()))
+          .flatMap(pg -> pg.getParameterModels().stream())
+          .map(NamedObject::getName)
+          .collect(toSet());
+    }
+
+    @Override
+    public String getDescription() {
+      return delegate.getDescription();
+    }
+
+    @Override
+    public String getName() {
+      return delegate.getName();
+    }
+
+    @Override
+    public List<ParameterGroupModel> getParameterGroupModels() {
+      return filteredParameterGroups;
+    }
+
+    public boolean isExcludedParameter(String group, String name) {
+      // If the parameter was given with a group name, we use that to filter
+      if (group != null) {
+        return groupsToExclude.contains(group);
+      }
+
+      // Otherwise, we check if any of the filtered groups contain a parameter with the same name.
+      return parameterNamesFromExcludedGroups.contains(name);
     }
   }
 }

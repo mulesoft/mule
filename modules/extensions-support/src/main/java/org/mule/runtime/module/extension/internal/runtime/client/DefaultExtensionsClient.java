@@ -135,7 +135,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
     OperationKey key = toOperationKey(extensionName, operationName, parameterizer);
 
-    return operationClientCache.get(key).execute(key, parameterizer);
+    return operationClientCache.get(key).execute(parameterizer);
   }
 
   /**

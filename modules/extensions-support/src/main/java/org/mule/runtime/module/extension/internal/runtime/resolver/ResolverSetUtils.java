@@ -121,13 +121,44 @@ public class ResolverSetUtils {
                                                                         ExpressionManager expressionManager,
                                                                         String parametersOwner)
       throws MuleException {
+    return getResolverSetFromComponentParameterization(componentParameterization,
+                                                       muleContext,
+                                                       disableValidations,
+                                                       reflectionCache,
+                                                       expressionManager,
+                                                       parametersOwner,
+                                                       false);
+  }
+
+  /**
+   * Creates a {@link ResolverSet} of a {@link ParameterizedModel} based on static values of its parameters.
+   *
+   * @param componentParameterization the componentParameterization that describes the model parameter values.
+   * @param muleContext               the mule context.
+   * @param disableValidations        whether validations should be disabled or not.
+   * @param reflectionCache           a reflection cache.
+   * @param expressionManager         the expression manager.
+   * @param parametersOwner           the owner of the parameters from the parameters resolver.
+   * @param skipInitialization        because initialization and injection is an expensive part of this process, this flag can be
+   *                                  used to skip it and do it at a later stage (initializing the result as a whole).
+   * @return the corresponding {@link ResolverSet}
+   * @throws MuleException
+   */
+  public static ResolverSet getResolverSetFromComponentParameterization(ComponentParameterization<?> componentParameterization,
+                                                                        MuleContext muleContext,
+                                                                        boolean disableValidations,
+                                                                        ReflectionCache reflectionCache,
+                                                                        ExpressionManager expressionManager,
+                                                                        String parametersOwner,
+                                                                        boolean skipInitialization)
+      throws MuleException {
     Map<String, ValueResolver> resolvers = new HashMap<>();
     ValueResolverFactory valueResolverFactory = new ValueResolverFactory();
 
     for (ParameterGroupModel parameterGroupModel : componentParameterization.getModel().getParameterGroupModels()) {
       resolvers
           .putAll(getParameterGroupValueResolvers(componentParameterization, parameterGroupModel, reflectionCache, muleContext,
-                                                  valueResolverFactory));
+                                                  valueResolverFactory, skipInitialization));
     }
 
     return fromValues(resolvers,
@@ -142,11 +173,13 @@ public class ResolverSetUtils {
                                                                             ParameterGroupModel parameterGroupModel,
                                                                             ReflectionCache reflectionCache,
                                                                             MuleContext muleContext,
-                                                                            ValueResolverFactory valueResolverFactory)
+                                                                            ValueResolverFactory valueResolverFactory,
+                                                                            boolean skipInitialization)
       throws MuleException {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers =
         getParameterGroupParametersValueResolvers(parameterGroupModel,
-                                                  componentParameterization, reflectionCache, muleContext, valueResolverFactory);
+                                                  componentParameterization, reflectionCache, muleContext, valueResolverFactory,
+                                                  skipInitialization);
 
     if (parameterGroupModel.isShowInDsl() && !parameterGroupParametersValueResolvers.isEmpty()) {
       Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
@@ -188,7 +221,8 @@ public class ResolverSetUtils {
                                                                                       ComponentParameterization componentParameterization,
                                                                                       ReflectionCache reflectionCache,
                                                                                       MuleContext muleContext,
-                                                                                      ValueResolverFactory valueResolverFactory)
+                                                                                      ValueResolverFactory valueResolverFactory,
+                                                                                      boolean skipInitialization)
       throws MuleException {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers = new HashMap<>();
     for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
@@ -200,7 +234,9 @@ public class ResolverSetUtils {
                                                   parameterModel.getModelProperties(),
                                                   reflectionCache,
                                                   muleContext,
-                                                  valueResolverFactory, acceptsReferences(parameterModel)));
+                                                  valueResolverFactory,
+                                                  acceptsReferences(parameterModel),
+                                                  skipInitialization));
       }
     }
     return parameterGroupParametersValueResolvers;
@@ -209,7 +245,8 @@ public class ResolverSetUtils {
   private static ValueResolver getParameterValueResolver(String parameterName, MetadataType type, Object value,
                                                          Set<ModelProperty> modelProperties, ReflectionCache reflectionCache,
                                                          MuleContext muleContext, ValueResolverFactory valueResolverFactory,
-                                                         boolean acceptsReferences)
+                                                         boolean acceptsReferences,
+                                                         boolean skipInitialization)
       throws MuleException {
     Reference<ValueResolver> resolverReference = new Reference<>();
 
@@ -225,13 +262,14 @@ public class ResolverSetUtils {
 
               resolver = getParameterValueResolverForCollection(parameterName, arrayType, (Collection) value,
                                                                 reflectionCache, muleContext,
-                                                                valueResolverFactory);
+                                                                valueResolverFactory, skipInitialization);
               effectivelyAcceptReferences = false;
             } else {
               resolver = new StaticValueResolver(value);
             }
             resolverReference
-                .set(getValueResolverFor(parameterName, arrayType, resolveAndInjectIfStatic(resolver, muleContext),
+                .set(getValueResolverFor(parameterName, arrayType,
+                                         skipInitialization ? resolver : resolveAndInjectIfStatic(resolver, muleContext),
                                          getDefaultValue(type),
                                          getExpressionSupport(arrayType), false, modelProperties, effectivelyAcceptReferences,
                                          valueResolverFactory));
@@ -248,7 +286,7 @@ public class ResolverSetUtils {
             if (isMap(objectType)) {
               if (value instanceof Map) {
                 resolver = getParameterValueResolverForMap(parameterName, objectType, (Map) value, reflectionCache,
-                                                           muleContext, valueResolverFactory);
+                                                           muleContext, valueResolverFactory, skipInitialization);
                 effectivelyAcceptReferences = false;
               } else {
                 resolver = new StaticValueResolver(value);
@@ -256,7 +294,7 @@ public class ResolverSetUtils {
             } else {
               Optional<ValueResolver> pojoResolver =
                   getPojoParameterValueResolver(parameterName, objectType, value, reflectionCache,
-                                                muleContext, valueResolverFactory);
+                                                muleContext, valueResolverFactory, skipInitialization);
               if (pojoResolver.isPresent()) {
                 resolver = pojoResolver.get();
                 effectivelyAcceptReferences = false;
@@ -265,7 +303,8 @@ public class ResolverSetUtils {
               }
             }
             resolverReference
-                .set(getValueResolverFor(parameterName, objectType, resolveAndInjectIfStatic(resolver, muleContext),
+                .set(getValueResolverFor(parameterName, objectType,
+                                         skipInitialization ? resolver : resolveAndInjectIfStatic(resolver, muleContext),
                                          getDefaultValue(type),
                                          getExpressionSupport(objectType), false, modelProperties, effectivelyAcceptReferences,
                                          valueResolverFactory));
@@ -289,7 +328,9 @@ public class ResolverSetUtils {
       resolverReference.set(getValueResolverFor(parameterName, type, convertedValue, null, NOT_SUPPORTED, false, modelProperties,
                                                 false, valueResolverFactory));
     }
-    initialiseIfNeeded(resolverReference.get(), muleContext);
+    if (!skipInitialization) {
+      initialiseIfNeeded(resolverReference.get(), muleContext);
+    }
     return resolverReference.get();
   }
 
@@ -341,7 +382,8 @@ public class ResolverSetUtils {
 
   private static Optional<ValueResolver> getPojoParameterValueResolver(String parameterName, ObjectType objectType, Object value,
                                                                        ReflectionCache reflectionCache, MuleContext muleContext,
-                                                                       ValueResolverFactory valueResolverFactory)
+                                                                       ValueResolverFactory valueResolverFactory,
+                                                                       boolean skipInitialization)
       throws MuleException {
 
     Optional<Class<Object>> pojoClass = getType(objectType);
@@ -356,7 +398,8 @@ public class ResolverSetUtils {
                                                                       valuesMap
                                                                           .get(objectFieldType.getKey().getName().toString()),
                                                                       emptySet(), reflectionCache,
-                                                                      muleContext, valueResolverFactory, false));
+                                                                      muleContext, valueResolverFactory, false,
+                                                                      skipInitialization));
         }
       }
 
@@ -371,7 +414,8 @@ public class ResolverSetUtils {
                                                                       Collection collection,
                                                                       ReflectionCache reflectionCache,
                                                                       MuleContext muleContext,
-                                                                      ValueResolverFactory valueResolverFactory)
+                                                                      ValueResolverFactory valueResolverFactory,
+                                                                      boolean skipInitialization)
       throws MuleException {
     Optional<Class<Object>> expectedType = getType(arrayType);
     if (expectedType.isPresent()) {
@@ -380,7 +424,7 @@ public class ResolverSetUtils {
       for (Object collectionItem : collection) {
         itemsResolvers
             .add(getParameterValueResolver(parameterName, arrayType.getType(), collectionItem, emptySet(), reflectionCache,
-                                           muleContext, valueResolverFactory, false));
+                                           muleContext, valueResolverFactory, false, skipInitialization));
       }
       return CollectionValueResolver.of(type, itemsResolvers);
     } else {
@@ -390,7 +434,8 @@ public class ResolverSetUtils {
 
   private static ValueResolver getParameterValueResolverForMap(String parameterName, ObjectType type, Map<Object, Object> map,
                                                                ReflectionCache reflectionCache,
-                                                               MuleContext muleContext, ValueResolverFactory valueResolverFactory)
+                                                               MuleContext muleContext, ValueResolverFactory valueResolverFactory,
+                                                               boolean skipInitialization)
       throws MuleException {
     Optional<Class<Object>> mapClassOptional = getType(type);
     Class mapClass = mapClassOptional.get();
@@ -401,7 +446,7 @@ public class ResolverSetUtils {
       valueValueResolverFunction = value -> {
         try {
           return getParameterValueResolver(parameterName, valueType, value, emptySet(), reflectionCache,
-                                           muleContext, valueResolverFactory, false);
+                                           muleContext, valueResolverFactory, false, skipInitialization);
         } catch (MuleException e) {
           throw new MuleRuntimeException(e);
         }

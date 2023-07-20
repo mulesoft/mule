@@ -7,7 +7,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.extension.api.ExtensionConstants.SCHEDULING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 
-import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
@@ -48,7 +48,7 @@ class DefaultSourceParameterizer extends BaseComponentParameterizer<SourceParame
   }
 
   @Override
-  public <T extends ComponentModel> void setValuesOn(ComponentParameterization.Builder<T> builder) {
+  public <T extends ParameterizedModel> void setValuesOn(ComponentParameterization.Builder<T> builder) {
     super.setValuesOn(builder);
     if (schedulingStrategy != null) {
       builder.withParameter(SCHEDULING_STRATEGY_PARAMETER_NAME, schedulingStrategy);
