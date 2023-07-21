@@ -102,7 +102,9 @@ public class ApplicationDescriptorFactory
     DomainDescriptor domainDescriptor = domainDescriptorResolver.resolve(configuredDomainName, domainBundleDescriptor.get());
 
     if (domainDescriptor == null) {
-      throw new IllegalStateException(format("Domain '%s' couldn't be fetched", configuredDomainName));
+      throw new IllegalStateException(format("Domain '%s' couldn't be fetched",
+                                             configuredDomainName != null ? configuredDomainName
+                                                 : domainBundleDescriptor.get().getArtifactId()));
     }
 
     if (!isCompatibleBundle(domainDescriptor.getBundleDescriptor(), domainBundleDescriptor.get())) {

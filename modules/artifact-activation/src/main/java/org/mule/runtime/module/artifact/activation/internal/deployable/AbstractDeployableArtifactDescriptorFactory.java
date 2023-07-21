@@ -148,18 +148,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
                            bundleDescriptor));
         } else {
-          BundleDescriptor pluginDescriptor = deployableProjectModel.getDependencies()
-              .stream()
-              .map(BundleDependency::getDescriptor)
-              .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER.equals(dependencyDescriptor.getClassifier().orElse(null)))
-              .filter(pluginDependencyDescriptor -> StringUtils
-                  .equals(bundleDescriptor.getArtifactId(), pluginDependencyDescriptor.getArtifactId())
-                  && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependencyDescriptor.getGroupId())
-                  && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependencyDescriptor.getVersion()))
-              .findFirst()
-              .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Dependency for plugin '%s' not found",
-                                                                                            bundleDescriptor))));
-
           List<BundleDependency> bundleDependencies = bundlePluginDependency.getTransitiveDependenciesList();
           pluginDescriptors
               .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)
