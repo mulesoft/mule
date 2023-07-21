@@ -9,6 +9,7 @@ package org.mule.module.io.internal;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import org.apache.commons.collections4.MultiMap;
 import org.apache.commons.io.IOUtils;
 import org.mule.module.io.internal.dto.ConfigurationDTO;
 import org.mule.module.io.internal.dto.IntegrationConfigDTO;
@@ -99,7 +100,8 @@ public class IntegrationOrchestratorAPI {
         @Override
         public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
           String hostValue = requestContext.getRequest().getHeaderValue("Host");
-          String integrationId = getIntegrationIdForHost(hostValue);
+          String integrationId = requestContext.getRequest().getQueryParams().get("integration");
+
           // TODO make configuration parameterizable
           // TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
           try {
@@ -231,11 +233,6 @@ public class IntegrationOrchestratorAPI {
     } catch (ServerCreationException | IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static String getIntegrationIdForHost(String hostValue) {
-    // TODO hardcoding to data stored
-    return System.getProperty("io.integration.id");
   }
 
   private static String getEnvWithDefault(String key, String defValue) {
