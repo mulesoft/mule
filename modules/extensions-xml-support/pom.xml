@@ -194,6 +194,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-service-artifact-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>${jsonassert.version}</version>
