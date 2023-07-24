@@ -4,11 +4,13 @@
 package org.mule.runtime.metrics.exporter.config.impl;
 
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION;
+import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL;
 import static org.mule.runtime.metrics.exporter.config.api.OpenTelemetryMeterExporterConfigurationProperties.MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.METRICS_EXPORTER;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.System.setProperty;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -17,6 +19,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.nio.file.Path;
@@ -24,15 +27,42 @@ import java.nio.file.Paths;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
 @Story(METRICS_EXPORTER)
 public class FileMeterExporterConfigurationTestCase {
 
   public static final String KEY_NON_SYSTEM_PROPERTY = "keyNonSystemProperty";
+  public static final String KEY_PROPERTY_SYSTEM_PROPERTY = "keySystemProperty";
   public static final String VALUE_NON_SYSTEM_PROPERTY = "valueNonSystemPropertyConfDirectory";
+  public static final String VALUE_SYSTEM_PROPERTY = "valueSystemProperty";
+  public static final String SYSTEM_PROPERTY_VALUE = "system_property_value";
+  public static final String VALUE_INTERVAL = "20";
   public static final String NO_KEY_IN_FILE = "noKeyInFile";
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  @Test
+  public void returnsTheResolvedSystemProperty() {
+    setProperty(VALUE_SYSTEM_PROPERTY, SYSTEM_PROPERTY_VALUE);
+    FileMeterExporterConfiguration fileSpanExporterConfiguration =
+        new TestFileMeterExporterConfiguration(mock(MuleContext.class));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   SYSTEM_PROPERTY_VALUE));
+  }
+
+  @Test
+  public void whenASystemPropertyCannotBeResolvedAnExceptionIsRaised() {
+    expectedException.expect(PropertyNotFoundException.class);
+    FileMeterExporterConfiguration fileSpanExporterConfiguration =
+        new TestFileMeterExporterConfiguration(mock(MuleContext.class));
+    assertThat(fileSpanExporterConfiguration.getStringValue(KEY_PROPERTY_SYSTEM_PROPERTY), equalTo(
+                                                                                                   SYSTEM_PROPERTY_VALUE));
+  }
 
   @Test
   public void returnsTheValueForANonSystemProperty() {
@@ -72,6 +102,16 @@ public class FileMeterExporterConfigurationTestCase {
 
     assertThat(caFileLocationPath.isAbsolute(), is(TRUE));
     assertThat(keyFileLocationPath.isAbsolute(), is(TRUE));
+  }
+
+  @Test
+  public void whenValueCorrespondsToANumberGetsNumberCorrectly() {
+    TestFileMeterExporterConfiguration testfileMeterExporterConfiguration =
+        new TestFileMeterExporterConfiguration(mock(MuleContext.class));
+    String interval =
+        testfileMeterExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL);
+
+    assertThat(interval, is(equalTo(VALUE_INTERVAL)));
   }
 
   private static class TestFileMeterExporterConfiguration extends FileMeterExporterConfiguration {

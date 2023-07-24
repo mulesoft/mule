@@ -5,7 +5,7 @@ package org.mule.runtime.metrics.exporter.config.api;
 
 public class OpenTelemetryMeterExporterConfigurationProperties {
 
-  private static final String MULE_OPEN_TELEMETRY_METER_EXPORTER = "mule.open.telemetry.meter.exporter";
+  private static final String MULE_OPEN_TELEMETRY_METER_EXPORTER = "mule.openTelemetry.meter.exporter";
 
   private OpenTelemetryMeterExporterConfigurationProperties() {}
 
@@ -23,21 +23,21 @@ public class OpenTelemetryMeterExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_ENDPOINT = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".endpoint";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_COMPRESSION_TYPE =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".compression.type";
+      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".compression";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_CA_FILE_LOCATION =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".ca.file.location";
+      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".tls.caFileLocation";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_CERT_FILE_LOCATION =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".cert.file.location";
+      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".tls.certFileLocation";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_KEY_FILE_LOCATION =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".key.file.location";
+      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".tls.keyFileLocation";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_HEADERS = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".headers";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_AGGREGATION_TEMPORALITY =
-      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".aggregation.temporality";
+      MULE_OPEN_TELEMETRY_METER_EXPORTER + ".aggregationTemporality";
 
   public static final String MULE_OPEN_TELEMETRY_METER_EXPORTER_INTERVAL = MULE_OPEN_TELEMETRY_METER_EXPORTER + ".interval";
 }
