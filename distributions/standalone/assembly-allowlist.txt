@@ -448,7 +448,6 @@
 /mule-standalone-${productVersion}/lib/opt/xmltooling-1.4.6.jar
 /mule-standalone-${productVersion}/lib/opt/xqj-api-1.0.jar
 /mule-standalone-${productVersion}/lib/opt/yagi-1.0.44-10.jar
-/mule-standalone-${productVersion}/lib/opt/javax.activation-1.2.0.jar
 /mule-standalone-${productVersion}/lib/opt/spotbugs-annotations-4.7.3.jar
 
 /mule-standalone-${productVersion}/lib/shared
