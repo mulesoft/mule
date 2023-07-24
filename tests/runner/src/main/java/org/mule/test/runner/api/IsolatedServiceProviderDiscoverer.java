@@ -3,19 +3,16 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ImmutableServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
@@ -80,25 +77,8 @@ public class IsolatedServiceProviderDiscoverer implements ServiceProviderDiscove
   }
 
   private ServiceProvider instantiateServiceProvider(ClassLoader classLoader, String className) throws ServiceResolutionError {
-    Object reflectedObject;
-    try {
-      reflectedObject = withContextClassLoader(classLoader, () -> {
-        try {
-          return ClassUtils.instantiateClass(className);
-        } catch (Exception e) {
-          throw new MuleRuntimeException(createStaticMessage("Unable to create service from class: " + className), e);
-        }
-      });
-    } catch (RuntimeException e) {
-      throw new ServiceResolutionError(e.getMessage(), e);
-    }
-
-    if (!(reflectedObject instanceof ServiceProvider)) {
-      throw new ServiceResolutionError(format("Provided service class '%s' does not implement '%s'", className,
-                                              ServiceProvider.class.getName()));
-    }
-
-    return (ServiceProvider) reflectedObject;
+    return (ServiceProvider) withContextClassLoader(classLoader,
+                                                    () -> MuleServiceModelLoader.doInstantiateServiceProvider(className));
   }
 
 }
