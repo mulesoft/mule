@@ -10,6 +10,7 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.load
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
+import org.mule.runtime.module.extension.internal.resources.test.AbstractGeneratedResourceFactoryTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 

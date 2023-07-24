@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources.test;
 
 import static java.util.Arrays.stream;
 import static org.hamcrest.CoreMatchers.is;

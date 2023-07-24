@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources.test;
 
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
