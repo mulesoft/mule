@@ -5,7 +5,6 @@ package org.mule.runtime.module.service.internal.manager;
 
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.internal.util.MethodInvoker;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 
 /**

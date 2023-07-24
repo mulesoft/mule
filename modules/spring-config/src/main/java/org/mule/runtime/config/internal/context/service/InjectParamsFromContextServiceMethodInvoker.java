@@ -14,8 +14,8 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
-import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
-import org.mule.runtime.core.internal.util.MethodInvoker;
+import org.mule.runtime.module.service.internal.manager.DefaultMethodInvoker;
+import org.mule.runtime.module.service.internal.manager.MethodInvoker;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
