@@ -60,14 +60,8 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
    * Log4j tries to instantiate this class using a default constructor.
    */
   public MuleLog4jContextFactory() {
-    this(LOG_SEPARATION_ENABLED);
-  }
-
-  /**
-   * Initializes using a {@link ArtifactAwareContextSelector}
-   */
-  public MuleLog4jContextFactory(boolean logSeparationEnabled) {
-    this(logSeparationEnabled ? new ArtifactAwareContextSelector() : new SimpleContextSelector());
+    super(new ContextSelectorWrapper(), new MuleShutdownCallbackRegistry());
+    initialise();
   }
 
   /**
@@ -76,8 +70,15 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Disp
    * @param contextSelector a {@link ContextSelector}
    */
   public MuleLog4jContextFactory(ContextSelector contextSelector) {
-    super(contextSelector, new MuleShutdownCallbackRegistry());
+    super(new ContextSelectorWrapper(contextSelector), new MuleShutdownCallbackRegistry());
     initialise();
+  }
+
+  public void setContextSelector(ContextSelector contextSelector) {
+    ContextSelector selector = getSelector();
+    if (selector instanceof ContextSelectorWrapper) {
+      ((ContextSelectorWrapper) selector).setDelegate(contextSelector);
+    }
   }
 
   protected void initialise() {

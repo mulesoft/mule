@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.createContextFactory;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
@@ -70,7 +71,7 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void systemProperties() {
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(true);
+    MuleLog4jContextFactory factory = createContextFactory(true);
     assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
     assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
@@ -80,7 +81,7 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   public void customExceptionHandler() {
     final String customHandler = "custom";
     setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(true);
+    MuleLog4jContextFactory factory = createContextFactory(true);
     assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
   }
