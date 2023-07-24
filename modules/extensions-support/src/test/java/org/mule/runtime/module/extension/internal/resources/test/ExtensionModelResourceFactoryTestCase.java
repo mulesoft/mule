@@ -1,16 +1,15 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.extension.internal.resources;
+package org.mule.runtime.module.extension.internal.resources.test;
 
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.EXTENSION_MODEL_JSON_FILE_NAME;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;

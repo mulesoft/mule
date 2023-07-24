@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
+import org.mule.runtime.module.extension.internal.resources.test.ResourcesGeneratorContractTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.OutputStream;
