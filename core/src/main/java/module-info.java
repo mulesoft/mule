@@ -113,6 +113,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.util.queue;
   exports org.mule.runtime.core.api.util.xmlsecurity;
 
+  uses org.mule.runtime.core.api.transaction.TypedTransactionFactory;
+
   provides org.mule.runtime.api.el.AbstractBindingContextBuilderFactory with
       org.mule.runtime.core.api.el.DefaultBindingContextBuilderFactory;
 
