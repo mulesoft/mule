@@ -204,4 +204,9 @@ module org.mule.runtime.core {
 
   opens org.mule.runtime.core.internal.transformer to
       spring.core;
+  opens org.mule.runtime.core.internal.transformer.datatype to
+      spring.beans;
+  opens org.mule.runtime.core.internal.transformer.simple to
+      spring.beans;
+
 }
