@@ -168,6 +168,13 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
       org.mule.test.unit;
+  // TODO W-13824979 Remove spashScreen logic from mule-core
+  exports org.mule.runtime.core.internal.util.splash to
+      org.mule.runtime.launcher,
+      org.mule.runtime.service,
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl,
+      com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -178,6 +185,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model,
       org.mule.runtime.log4j,
       org.mule.runtime.service,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee;

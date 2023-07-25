@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.core.internal.logging;
+package org.mule.runtime.core.internal.util.splash;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
