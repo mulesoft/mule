@@ -80,6 +80,10 @@ public class IntegrationOrchestratorAPI {
       String ioAPIHost = getEnvWithDefault("IO_API_HOST", "localhost");
       int ioAPIPort = Integer.valueOf(getEnvWithDefault("IO_API_PORT", "10101"));
 
+      logger.warn("SERVICE_RCS_URL: " + runtimeConfigurationServiceUrl);
+      logger.warn("IO_API_HOST: " + ioAPIHost);
+      logger.warn("IO_API_PORT: " + ioAPIPort);
+
 
       ArtifactAstDeserializer defaultArtifactAstDeserializer = new ArtifactAstSerializerProvider().getDeserializer();
       HttpServer httpServer = httpServicexSupplier.get().getServerFactory().create(new HttpServerConfiguration.Builder()
@@ -228,7 +232,10 @@ public class IntegrationOrchestratorAPI {
         }
       });
 
+      logger.warn("Starting HTTP client of IO");
       httpClient.start();
+
+      logger.warn("Starting HTTP server of IO");
       httpServer.start();
     } catch (ServerCreationException | IOException e) {
       throw new RuntimeException(e);
@@ -236,7 +243,7 @@ public class IntegrationOrchestratorAPI {
   }
 
   private static String getEnvWithDefault(String key, String defValue) {
-    String value = System.getenv("IO_API_PORT");
+    String value = System.getenv(key);
     return value != null ? value : defValue;
   }
 
