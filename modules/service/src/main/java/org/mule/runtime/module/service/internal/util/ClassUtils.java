@@ -25,24 +25,8 @@ import java.util.Set;
  */
 public class ClassUtils {
 
-  // public static final Object[] NO_ARGS = new Object[] {};
-  // public static final Class<?>[] NO_ARGS_TYPE = new Class<?>[] {};
-  //
   private static final Map<Class<?>, Class<?>> wrapperToPrimitiveMap = new HashMap<>();
   private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
-  // public static final String MULE_DESIGN_MODE = "mule.designMode";
-  //
-  // private static LazyValue<ClassLoaderResourceNotFoundExceptionFactory> resourceNotFoundExceptionFactoryLazyValue =
-  // new LazyValue(() -> {
-  // return stream(((Iterable<ClassLoaderResourceNotFoundExceptionFactory>) () ->
-  // load(ClassLoaderResourceNotFoundExceptionFactory.class,
-  // ClassUtils.class.getClassLoader())
-  // .iterator())
-  // .spliterator(),
-  // false)
-  // .findFirst()
-  // .orElseGet(() -> getDefaultFactory());
-  // });
 
   static {
     wrapperToPrimitiveMap.put(Boolean.class, Boolean.TYPE);
@@ -225,13 +209,6 @@ public class ClassUtils {
       NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
     return instantiateClass(name, constructorArgs, (ClassLoader) null);
   }
-
-  // public static Object instantiateClass(String name, Object[] constructorArgs, Class<?> callingClass)
-  // throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
-  // IllegalAccessException, InvocationTargetException {
-  // Class<?> clazz = loadClass(name, callingClass);
-  // return instantiateClass(clazz, constructorArgs);
-  // }
 
   public static Object instantiateClass(String name, Object[] constructorArgs, ClassLoader classLoader)
       throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
