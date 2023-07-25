@@ -20,6 +20,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.extension.api.connectivity.TransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
@@ -48,7 +49,7 @@ public class ExtensionConnectionSupplier {
   private ConnectionManager connectionManager;
 
   @Inject
-  EventTracer<CoreEvent> coreEventTracer;
+  InternalProfilingService internalProfilingService;
 
   @Inject
   InitialSpanInfoProvider initialSpanInfoProvider;
@@ -71,14 +72,15 @@ public class ExtensionConnectionSupplier {
         initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
-      connectionHandler = new TracedLazyConnection(getConnectionHandler(executionContext), coreEventTracer,
-                                                   getConnectionInitialSpanInfo, executionContext);
+      connectionHandler =
+          new TracedLazyConnection(getConnectionHandler(executionContext), internalProfilingService.getCoreEventTracer(),
+                                   getConnectionInitialSpanInfo, executionContext);
     } else {
-      coreEventTracer.startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
+      internalProfilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {
-        coreEventTracer.endCurrentSpan(executionContext.getEvent());
+        internalProfilingService.getCoreEventTracer().endCurrentSpan(executionContext.getEvent());
       }
     }
     return connectionHandler;
