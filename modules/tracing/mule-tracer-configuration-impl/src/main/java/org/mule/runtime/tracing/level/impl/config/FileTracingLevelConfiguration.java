@@ -7,6 +7,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFI
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -27,13 +28,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
-import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,10 +53,9 @@ import org.slf4j.Logger;
  */
 public class FileTracingLevelConfiguration implements TracingLevelConfiguration, Disposable {
 
-  // private final String CONFIGURATION_FILE_PATH =
-  // getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
-  // getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
-  private final String CONFIGURATION_FILE_PATH = "cualca";
+  private final String CONFIGURATION_FILE_PATH =
+      getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
+                  getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
 
   private final MuleContext muleContext;
 
