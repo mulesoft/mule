@@ -3,8 +3,10 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
 import static java.lang.Boolean.parseBoolean;
@@ -49,7 +51,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
       new OpenTelemetryAutoConfigurableSpanExporterConfiguration(key -> null);
 
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
-      new CapturingSpanExporterWrapper(new OpenTelemetryResources.NoOpSpanExporter());
+      new CapturingSpanExporterWrapper(OpenTelemetryResources.NoOpSpanExporter.getInstance());
 
   private FeatureFlaggingService featureFlaggingService;
   private MuleContext muleContext;
@@ -88,12 +90,19 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
     if (isExportEnabled()) {
-      LOGGER.info("Mule Open Telemetry Tracer Exporter is enabled.");
-      return OpenTelemetryResources.resolveOpenTelemetrySpanProcessor(configuration, privilegedConfiguration,
-                                                                      resolveOpenTelemetrySpanExporter());
+      return resolveSpanProcessor();
     } else {
+      return SimpleSpanProcessor.create(OpenTelemetryResources.NoOpSpanExporter.getInstance());
+    }
+  }
+
+  private SpanProcessor resolveSpanProcessor() {
+    if (getBoolean(USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER)) {
       return SimpleSpanProcessor.create(SNIFFED_EXPORTER);
     }
+    LOGGER.info("Mule Open Telemetry Tracer Exporter is enabled.");
+    return OpenTelemetryResources.resolveOpenTelemetrySpanProcessor(configuration, privilegedConfiguration,
+                                                                    resolveOpenTelemetrySpanExporter());
   }
 
   private boolean isExportEnabled() {

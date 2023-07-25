@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.tracer.exporter.impl.optel.resources;
 
+import static java.lang.System.getProperty;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
@@ -21,6 +22,7 @@ import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
+import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.metrics.OpenTelemetryExportQueueMetrics;
 
@@ -125,6 +127,12 @@ public class OpenTelemetryResources {
    * A dummy span exporter.
    */
   public static class NoOpSpanExporter implements SpanExporter {
+
+    public static SpanExporter getInstance() {
+      return new NoOpSpanExporter();
+    }
+
+    private NoOpSpanExporter() {}
 
     @Override
     public CompletableResultCode export(Collection<SpanData> collection) {
