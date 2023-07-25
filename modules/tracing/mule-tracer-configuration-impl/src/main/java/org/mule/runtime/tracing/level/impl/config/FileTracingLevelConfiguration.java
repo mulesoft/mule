@@ -4,7 +4,6 @@
 package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFIGURATION_PATH;
-import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
@@ -25,14 +24,16 @@ import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPro
 import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
+import org.mule.runtime.core.internal.profiling.ProfilingServiceWrapper;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterFactory;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,9 +52,10 @@ import org.slf4j.Logger;
  */
 public class FileTracingLevelConfiguration implements TracingLevelConfiguration, Disposable {
 
-  private final String CONFIGURATION_FILE_PATH =
-      getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
-                  getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
+  // private final String CONFIGURATION_FILE_PATH =
+  // getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
+  // getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
+  private final String CONFIGURATION_FILE_PATH = "cualca";
 
   private final MuleContext muleContext;
 
@@ -168,18 +170,24 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
           getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
       return loadConfiguration(is);
     } catch (MuleRuntimeException | IOException e) {
-      if (LOGGER.isDebugEnabled()) {
+      boolean tracingEnabled = isTracingEnabled();
+      if (tracingEnabled && LOGGER.isDebugEnabled()) {
         LOGGER
             .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
                           DEFAULT_LEVEL),
                    e);
-      } else {
+      } else if (tracingEnabled) {
         LOGGER
-            .warn(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
+            .info(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
                          DEFAULT_LEVEL));
       }
     }
     return null;
+  }
+
+  private boolean isTracingEnabled() {
+    return ((ProfilingServiceWrapper) ((DefaultMuleContext) muleContext).getRegistry().get("_muleProfilingService"))
+        .isTracingExportEnabled();
   }
 
   private static JsonNode loadConfiguration(InputStream is) throws IOException {
