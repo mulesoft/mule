@@ -3,7 +3,7 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
-import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.createContextFactory;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
 
@@ -72,7 +72,7 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void systemProperties() {
-    MuleLog4jContextFactory factory = createContextFactory(true);
+    MuleLog4jContextFactory factory = createContextFactory();
     assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
     assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
@@ -82,7 +82,7 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   public void customExceptionHandler() {
     final String customHandler = "custom";
     setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
-    MuleLog4jContextFactory factory = createContextFactory(true);
+    MuleLog4jContextFactory factory = createContextFactory();
     assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
   }
@@ -127,5 +127,11 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
     assertThat(executedHooks.get(), is(0));
     factory.dispose();
     assertThat(executedHooks.get(), is(SHUTDOWN_HOOKS_NUMBER));
+  }
+
+  private static MuleLog4jContextFactory createContextFactory() {
+    MuleLog4jContextFactory contextFactory = new MuleLog4jContextFactory();
+    configureSelector(contextFactory, true);
+    return contextFactory;
   }
 }

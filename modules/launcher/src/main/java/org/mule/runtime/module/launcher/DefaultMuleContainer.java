@@ -105,9 +105,7 @@ public class DefaultMuleContainer implements MuleContainer {
   static {
     if (getProperty(MULE_SIMPLE_LOG) == null) {
       log4jContextFactory = (MuleLog4jContextFactory) LogManager.getFactory();
-      System.out.println("Setting selector");
       configureSelector(log4jContextFactory);
-      System.out.println("Selector was set");
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);

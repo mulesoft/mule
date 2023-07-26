@@ -12,22 +12,36 @@ import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
+/**
+ * Utility class used to set the corresponding {@link ContextSelector} to a {@link MuleLog4jContextFactory}, depending on the
+ * value of the system property {@code mule.disableLogSeparation}. It's here instead of be part of {@link MuleLog4jContextFactory}
+ * because that class will be in lib/boot, and the implementations of {@link ContextSelector} are in modules of lib/mule.
+ *
+ * @since 4.5.0
+ */
 public final class MuleLog4jConfiguratorUtils {
 
   private MuleLog4jConfiguratorUtils() {
     // private constructor to avoid wrong instantiations
   }
 
-  public static MuleLog4jContextFactory createContextFactory(boolean logSeparationEnabled) {
-    MuleLog4jContextFactory contextFactory = new MuleLog4jContextFactory();
-    configureSelector(contextFactory, logSeparationEnabled);
-    return contextFactory;
-  }
-
+  /**
+   * Depending on the system property {@code mule.disableLogSeparation} parameter, it sets an {@link ArtifactAwareContextSelector}
+   * or a {@link SimpleContextSelector} to the given {@code contextFactory}.
+   * 
+   * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
+   */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
     configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
   }
 
+  /**
+   * Depending on the given {@code logSeparationEnabled} parameter, it sets an {@link ArtifactAwareContextSelector} or a
+   * {@link SimpleContextSelector} to the given {@code contextFactory}.
+   * 
+   * @param contextFactory       the {@link MuleLog4jContextFactory} where the selector will be set.
+   * @param logSeparationEnabled boolean determining which context selector should be used.
+   */
   public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled) {
     if (logSeparationEnabled) {
       contextFactory.setContextSelector(new ArtifactAwareContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);

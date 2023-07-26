@@ -8,7 +8,7 @@
  * @since 4.5
  */
 module org.mule.runtime.boot.log4j {
-  // Exported. Add "to"?
+  // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 
   // Third party modules
