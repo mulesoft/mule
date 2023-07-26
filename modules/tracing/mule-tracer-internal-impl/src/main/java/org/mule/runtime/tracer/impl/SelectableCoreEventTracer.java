@@ -31,8 +31,8 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 
 /**
- * A {@link CoreEventTracer} that switches among a noop and the implementation of the {@link EventTracer} according to the
- * configuration.
+ * An {@link SelectableCoreEventTracer<CoreEvent>} that switches among a noop and the implementation of the {@link EventTracer}
+ * according to the configuration.
  *
  * @since 4.5.0
  */
@@ -49,12 +49,12 @@ public class SelectableCoreEventTracer implements EventTracer<CoreEvent>, Initia
   public void initialise() throws InitialisationException {
     coreEventTracer = new CoreEventTracer(featureFlaggingService, eventSpanFactory);
     coreEventTracer.initialise();
-    updateConnector();
+    updateSelectedCoreEventTracer();
     spanExporterConfiguration
-        .doOnConfigurationChanged(this::updateConnector);
+        .doOnConfigurationChanged(this::updateSelectedCoreEventTracer);
   }
 
-  private synchronized void updateConnector() {
+  private synchronized void updateSelectedCoreEventTracer() {
     if (isTracingExportEnabled()) {
       this.selectedCoreEventTracer = coreEventTracer;
     } else {
