@@ -134,47 +134,129 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  exports org.mule.runtime.core.internal.cluster to
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.config to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.config.bootstrap to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.test.unit;
+  exports org.mule.runtime.core.internal.config.preferred to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.connection to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.connectivity to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
+      org.mule.runtime.core.mvel,
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
       org.mule.test.unit,
       org.mule.test.runner;
+  exports org.mule.runtime.core.internal.construct to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.context.notification to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component;
   exports org.mule.runtime.core.internal.el to
       org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.el.context to
+      org.mule.runtime.core.mvel;
+  exports org.mule.runtime.core.internal.el.function to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.event to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.exception to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.execution to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.interception to
+      org.mule.runtime.core.components,
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.lifecycle to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.lifecycle.phases to
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.internal.profiling to
-      org.mule.service.scheduler;
-  exports org.mule.runtime.core.internal.registry to
+  exports org.mule.runtime.core.internal.lock to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.management.stats to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  // Required because this is used in test components that end up in the unnamed module
+  exports org.mule.runtime.core.internal.message;
+  exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.processor.interceptor to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.processor.strategy to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.processor.strategy.util to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.profiling to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      org.mule.service.scheduler,
+      spring.beans;
+  exports org.mule.runtime.core.internal.registry to
+      org.mule.runtime.core.mvel,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
       spring.beans,
       org.mule.test.unit,
       org.mule.test.runner;
+  exports org.mule.runtime.core.internal.retry to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.rx to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.security to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.security.filter to
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
-      org.mule.test.unit;
-  // TODO W-13824979 Remove spashScreen logic from mule-core
-  exports org.mule.runtime.core.internal.util.splash to
-      org.mule.runtime.launcher,
-      org.mule.runtime.service,
-      org.mule.runtime.deployment,
-      org.mule.runtime.deployment.model.impl,
-      com.mulesoft.mule.runtime.cluster;
+      org.mule.test.unit,
+      spring.beans;
+  exports org.mule.runtime.core.internal.store to
+      spring.beans;
+  exports org.mule.runtime.core.internal.streaming to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.time to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.transaction to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -186,34 +268,122 @@ module org.mule.runtime.core {
       org.mule.runtime.log4j,
       org.mule.runtime.service,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.plugin,
-      com.mulesoft.mule.service.oauth.ee;
+      com.mulesoft.mule.service.oauth.ee,
+      spring.beans;
+  exports org.mule.runtime.core.internal.util.mediatype to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.util.message to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.util.rx to
+      org.mule.runtime.extensions.support;
+  // TODO W-13824979 Remove spashScreen logic from mule-core
+  exports org.mule.runtime.core.internal.util.splash to
+      org.mule.runtime.launcher,
+      org.mule.runtime.service,
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl,
+      com.mulesoft.mule.runtime.cluster;
+  exports org.mule.runtime.core.internal.util.queue to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.util.store to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.internal.value to
+      org.mule.runtime.spring.config;
 
   exports org.mule.runtime.core.privileged.component to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.privileged.el to
-      org.mule.runtime.extensions.support;
-  exports org.mule.runtime.core.privileged.event;
-  exports org.mule.runtime.core.privileged.exception;
-  exports org.mule.runtime.core.privileged.processor.chain to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.event;
+  exports org.mule.runtime.core.privileged.execution to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.exception;
+  exports org.mule.runtime.core.privileged.lifecycle to
+      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.privileged.processor;
+  exports org.mule.runtime.core.privileged.processor.chain to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.processor.objectfactory;
+  exports org.mule.runtime.core.privileged.processor.simple to
+      org.mule.runtime.core.components;
   exports org.mule.runtime.core.privileged.registry to
       org.mule.runtime.extensions.support,
-      org.mule.test.unit;
+      org.mule.test.unit,
+      spring.beans;
   exports org.mule.runtime.core.privileged.routing to
+      org.mule.runtime.core.components,
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.privileged.transformer to
-      org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.privileged.util to
-      org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.privileged.security to
+      org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
+  exports org.mule.runtime.core.privileged.transaction.xa to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.transformer to
+      org.mule.runtime.spring.config,
+      spring.beans;
+  exports org.mule.runtime.core.privileged.util to
+      org.mule.runtime.extensions.support;
 
+  opens org.mule.runtime.core.api to
+      spring.core;
+  opens org.mule.runtime.core.api.config to
+      spring.core;
+  opens org.mule.runtime.core.api.processor to
+      spring.core;
+  opens org.mule.runtime.core.api.retry.policy to
+      spring.core;
+  opens org.mule.runtime.core.api.streaming to
+      spring.core;
+
+  opens org.mule.runtime.core.privileged.component to
+      spring.core;
+  opens org.mule.runtime.core.privileged.exception to
+      spring.core;
+  opens org.mule.runtime.core.privileged.processor.chain to
+      spring.core;
+
+  opens org.mule.runtime.core.internal.config to
+      spring.core;
+  opens org.mule.runtime.core.internal.connection to
+      spring.core;
+  opens org.mule.runtime.core.internal.context.notification to
+      spring.core;
+  // TODO
+  opens org.mule.runtime.core.internal.el;
+  opens org.mule.runtime.core.internal.el.function to
+      spring.core;
+  // TODO
+  opens org.mule.runtime.core.internal.el.dataweave;
+  opens org.mule.runtime.core.internal.exception to
+      spring.core;
+  opens org.mule.runtime.core.internal.execution to
+      spring.core;
+  opens org.mule.runtime.core.internal.lock to
+      spring.core;
+  opens org.mule.runtime.core.internal.policy to
+      spring.core;
+  opens org.mule.runtime.core.internal.processor.interceptor to
+      spring.core;
+  opens org.mule.runtime.core.internal.processor.strategy to
+      spring.core;
+  opens org.mule.runtime.core.internal.profiling to
+      spring.core;
+  opens org.mule.runtime.core.internal.streaming to
+      spring.core;
   opens org.mule.runtime.core.internal.transformer to
       spring.core;
+  // TODO
   opens org.mule.runtime.core.internal.transformer.datatype to
       spring.beans;
+  // TODO
   opens org.mule.runtime.core.internal.transformer.simple to
       spring.beans;
 
