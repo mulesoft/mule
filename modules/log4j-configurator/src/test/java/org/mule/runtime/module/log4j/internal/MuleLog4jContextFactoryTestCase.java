@@ -18,7 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.module.log4j.api.AsyncLoggerExceptionHandler;
+import org.mule.runtime.module.log4j.boot.api.AsyncLoggerExceptionHandler;
+import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -89,7 +90,8 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void dispose() {
     ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector, selector -> {
+    });
     factory.dispose();
     verify(contextSelector).dispose();
   }
@@ -99,7 +101,8 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   @Description("If any shutdown callback is cancelled while the log is disposing everything should work")
   public void cancelWhileDisposing() {
     ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector, selector -> {
+    });
     ShutdownCallbackRegistry shutdownCallbackRegistry = factory.getShutdownCallbackRegistry();
 
     Latch latch = new Latch();

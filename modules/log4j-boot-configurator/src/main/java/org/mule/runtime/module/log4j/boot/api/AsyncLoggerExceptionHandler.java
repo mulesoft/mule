@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.log4j.api;
+package org.mule.runtime.module.log4j.boot.api;
 
 import com.lmax.disruptor.ExceptionHandler;
 import org.apache.logging.log4j.status.StatusLogger;
@@ -18,7 +18,7 @@ public class AsyncLoggerExceptionHandler implements ExceptionHandler {
 
   @Override
   public void handleEventException(Throwable ex, long sequence, Object event) {
-    LOGGER.error("Failed to asynchronously log message: " + event, ex);
+    LOGGER.error("Failed to asynchronously log message: {}", event, ex);
   }
 
   @Override

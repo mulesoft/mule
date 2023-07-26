@@ -7,14 +7,15 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION
 
 import static java.lang.System.getProperty;
 
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
+
+import org.apache.logging.log4j.core.selector.ContextSelector;
+
 public final class MuleLog4jConfiguratorUtils {
 
   private MuleLog4jConfiguratorUtils() {
     // private constructor to avoid wrong instantiations
-  }
-
-  public static MuleLog4jContextFactory createContextFactory() {
-    return new MuleLog4jContextFactory();
   }
 
   public static MuleLog4jContextFactory createContextFactory(boolean logSeparationEnabled) {
@@ -29,9 +30,15 @@ public final class MuleLog4jConfiguratorUtils {
 
   public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled) {
     if (logSeparationEnabled) {
-      contextFactory.setContextSelector(new ArtifactAwareContextSelector());
+      contextFactory.setContextSelector(new ArtifactAwareContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
     } else {
-      contextFactory.setContextSelector(new SimpleContextSelector());
+      contextFactory.setContextSelector(new SimpleContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
+    }
+  }
+
+  private static void disposeIfDisposable(ContextSelector selector) {
+    if (selector instanceof Disposable) {
+      ((Disposable) selector).dispose();
     }
   }
 }

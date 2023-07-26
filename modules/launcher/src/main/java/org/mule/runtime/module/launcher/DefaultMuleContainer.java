@@ -20,7 +20,6 @@ import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
-import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.createContextFactory;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
@@ -29,8 +28,6 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
-
-import static org.apache.logging.log4j.LogManager.setFactory;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -51,8 +48,8 @@ import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionMa
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.internal.util.SystemUtils;
+import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.reboot.internal.MuleContainer;
-import org.mule.runtime.module.log4j.internal.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
@@ -107,15 +104,10 @@ public class DefaultMuleContainer implements MuleContainer {
 
   static {
     if (getProperty(MULE_SIMPLE_LOG) == null) {
-      // We need to force the creation of a logger before we can change the manager factory.
-      // This is because if not, any logger that will be acquired by MuleLog4jContextFactory code
-      // will fail since it will try to use a null factory.
-      LoggerFactory.getLogger("triggerDefaultFactoryCreation");
-      // We need to set this property so log4j uses the same context factory everywhere
-      setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
-      log4jContextFactory = createContextFactory();
+      log4jContextFactory = (MuleLog4jContextFactory) LogManager.getFactory();
+      System.out.println("Setting selector");
       configureSelector(log4jContextFactory);
-      setFactory(log4jContextFactory);
+      System.out.println("Selector was set");
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);

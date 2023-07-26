@@ -13,6 +13,7 @@ module org.mule.runtime.log4j {
   requires org.mule.runtime.api;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
+  requires org.mule.runtime.boot.log4j;
   requires org.mule.runtime.core;
   requires org.mule.runtime.deployment.model;
 
