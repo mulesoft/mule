@@ -9,9 +9,10 @@ import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.DISTRIBUTED_TRACE_CONTEXT;
 
+import static java.lang.Boolean.TRUE;
+
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
-
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -36,10 +37,10 @@ import java.util.Map;
 public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalTestCase {
 
   @Rule
-  public SystemProperty enableTracing = new SystemProperty(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "true");
+  public SystemProperty enableTracing = new SystemProperty(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
 
   @Rule
-  public SystemProperty enableSniffing = new SystemProperty(USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER, "true");
+  public SystemProperty enableSniffing = new SystemProperty(USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER, TRUE.toString());
 
   private static final List<CoreEvent> EVENTS = new LinkedList<>();
 
