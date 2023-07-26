@@ -15,8 +15,8 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
 /**
- * A wrapper for {@link ContextSelector} that only forwards the methods to a delegate.
- * If a delegate is not set, the logger context getters return a default {@link LoggerContext} with name {@code "boot"}.
+ * A wrapper for {@link ContextSelector} that only forwards the methods to a delegate. If a delegate is not set, the logger
+ * context getters return a default {@link LoggerContext} with name {@code "boot"}.
  *
  * @since 4.5.0
  */
@@ -35,7 +35,8 @@ public class ContextSelectorWrapper implements ContextSelector {
 
   /**
    * Changes the delegate.
-   * @param delegate the new delegate {@link ContextSelector}.
+   * 
+   * @param delegate         the new delegate {@link ContextSelector}.
    * @param delegateDisposer a callback used to dispose the delegate.
    */
   public void setDelegate(ContextSelector delegate, Consumer<ContextSelector> delegateDisposer) {
