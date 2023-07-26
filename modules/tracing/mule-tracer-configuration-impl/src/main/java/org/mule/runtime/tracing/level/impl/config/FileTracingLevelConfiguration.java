@@ -63,8 +63,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
 
   private final MuleContext muleContext;
 
-  @Inject
-  protected SpanExporterConfiguration spanExporterConfiguration;
+  private SpanExporterConfiguration spanExporterConfiguration;
 
   private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
   private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
@@ -84,6 +83,11 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
 
   public FileTracingLevelConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setSpanExporterConfiguration(SpanExporterConfiguration spanExporterConfiguration) {
+    this.spanExporterConfiguration = spanExporterConfiguration;
   }
 
   private Runnable getOnConfigurationChanged() {

@@ -42,8 +42,8 @@ public class FileTracingLevelConfigurationTestCase {
 
   @Test
   public void whenLevelIsSpecifiedInFileItIsReturned() throws InitialisationException {
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestFileTracingLevelConfiguration(mock(MuleContext.class), mock(SpanExporterConfiguration.class));
+    FileTracingLevelConfiguration fileTracingLevelConfiguration = new TestFileTracingLevelConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), equalTo(TracingLevel.OVERVIEW));
   }
@@ -51,7 +51,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class), mock(SpanExporterConfiguration.class));
+        new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
@@ -61,7 +62,8 @@ public class FileTracingLevelConfigurationTestCase {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestNoFileTracingLevelConfiguration(mock(MuleContext.class), spanExporterConfiguration);
+        new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
@@ -69,7 +71,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenLevelIsWrongInFileDefaultLevelIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class), mock(SpanExporterConfiguration.class));
+        new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
@@ -77,7 +80,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenALocationOverrideIsSpecifiedInTheFileTheOverrideIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class), mock(SpanExporterConfiguration.class));
+        new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.MONITORING));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
@@ -86,7 +90,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheDefaultLevelIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class), mock(SpanExporterConfiguration.class));
+        new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.OVERVIEW));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
@@ -95,8 +100,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenALocationOverrideIsSpecifiedAndDuplicatedInTheFileTheLastOverrideIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class),
-                                                                   mock(SpanExporterConfiguration.class));
+        new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class));
+    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.DEBUG));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
@@ -109,9 +114,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_CONF;
 
-    public TestFileTracingLevelConfiguration(MuleContext muleContext, SpanExporterConfiguration spanExporterConfiguration) {
+    public TestFileTracingLevelConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -137,9 +141,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = WRONG_LEVEL_CONF;
 
-    public TestWrongLevelTracingLevelConfiguration(MuleContext muleContext, SpanExporterConfiguration spanExporterConfiguration) {
+    public TestWrongLevelTracingLevelConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -165,9 +168,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_EMPTY_CONF;
 
-    public TestEmptyFileTracingLevelConfiguration(MuleContext muleContext, SpanExporterConfiguration spanExporterConfiguration) {
+    public TestEmptyFileTracingLevelConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -193,9 +195,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = NON_EXISTENT_CONF;
 
-    public TestNoFileTracingLevelConfiguration(MuleContext muleContext, SpanExporterConfiguration spanExporterConfiguration) {
+    public TestNoFileTracingLevelConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -221,10 +222,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_WITH_OVERRIDES_CONF;
 
-    public TestFileTracingLevelWithOverridesConfiguration(MuleContext muleContext,
-                                                          SpanExporterConfiguration spanExporterConfiguration) {
+    public TestFileTracingLevelWithOverridesConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -250,10 +249,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_WITH_WRONG_OVERRIDE_CONF;
 
-    public TestFileTracingLevelWithWrongOverrideConfiguration(MuleContext muleContext,
-                                                              SpanExporterConfiguration spanExporterConfiguration) {
+    public TestFileTracingLevelWithWrongOverrideConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
@@ -279,10 +276,8 @@ public class FileTracingLevelConfigurationTestCase {
 
     public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_WITH_DUPLICATE_OVERRIDE_CONF;
 
-    public TestFileTracingLevelWithDuplicateOverrideConfiguration(MuleContext muleContext,
-                                                                  SpanExporterConfiguration spanExporterConfiguration) {
+    public TestFileTracingLevelWithDuplicateOverrideConfiguration(MuleContext muleContext) {
       super(muleContext);
-      this.spanExporterConfiguration = spanExporterConfiguration;
     }
 
     @Override
