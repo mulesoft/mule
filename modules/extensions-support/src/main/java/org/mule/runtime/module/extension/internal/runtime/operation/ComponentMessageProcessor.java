@@ -94,6 +94,7 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
@@ -218,9 +219,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ExtensionConnectionSupplier extensionConnectionSupplier;
 
   @Inject
-  private ProfilingService profilingService;
+  private InternalProfilingService profilingService;
 
-  @Inject
   private EventTracer<CoreEvent> coreEventEventTracer;
 
   @Inject
@@ -576,6 +576,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
+      coreEventEventTracer = profilingService.getCoreEventTracer();
       initRetryPolicyResolver();
       try {
         transactionConfig = buildTransactionConfig();
