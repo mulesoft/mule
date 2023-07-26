@@ -14,33 +14,16 @@
     <description>Mule Log4j Boot Configurator Module</description>
 
     <properties>
-        <!-- Add visibility required by the tests exclusively -->
-        <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
-            --add-modules=net.bytebuddy.agent
-        </surefire.args>
-
         <javaModuleName>org.mule.runtime.boot.log4j</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
-        <!-- Mule dependencies -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- 3rd party dependencies -->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>it.unimi.dsi</groupId>
-            <artifactId>fastutil</artifactId>
         </dependency>
     </dependencies>
 </project>
