@@ -6,7 +6,7 @@ package org.mule.runtime.module.service.internal.manager;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.util.splash.LogUtil.log;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Proxy.getInvocationHandler;

@@ -3,9 +3,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.core.internal.util.splash.LogUtil.log;
-
-import org.mule.runtime.core.internal.util.splash.LogUtil;
+import static org.mule.runtime.core.internal.logging.LogUtil.log;
+import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.core.internal.util.splash.SimpleLoggingTable;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
 import org.mule.runtime.module.deployment.api.DeploymentService;
