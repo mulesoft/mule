@@ -44,7 +44,6 @@ public class FileTracingLevelConfigurationTestCase {
   public void whenLevelIsSpecifiedInFileItIsReturned() throws InitialisationException {
     FileTracingLevelConfiguration fileTracingLevelConfiguration = new TestFileTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), equalTo(TracingLevel.OVERVIEW));
   }
 
@@ -53,7 +52,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
@@ -64,7 +62,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
@@ -73,7 +70,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
@@ -82,7 +78,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.MONITORING));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
@@ -92,7 +87,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.OVERVIEW));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
@@ -102,7 +96,6 @@ public class FileTracingLevelConfigurationTestCase {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    fileTracingLevelConfiguration.initialise();
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_1), equalTo(TracingLevel.DEBUG));
     assertThat(fileTracingLevelConfiguration.getTracingLevelOverride(LOCATION_2), equalTo(TracingLevel.DEBUG));
   }
