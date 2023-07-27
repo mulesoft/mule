@@ -15,6 +15,7 @@ module org.mule.boot {
   // exports org.mule.runtime.module.reboot.internal to org.mule.boot.tanuki,org.mule.runtime.launcher,com.mulesoft.mule.runtime.plugin;
   exports org.mule.runtime.module.reboot.internal;
 
+  requires org.mule.runtime.boot.log4j;
   requires org.mule.runtime.logging;
   requires org.mule.runtime.jpms.utils;
 

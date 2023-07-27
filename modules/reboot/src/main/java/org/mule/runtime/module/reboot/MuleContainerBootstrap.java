@@ -8,6 +8,7 @@ import static org.mule.runtime.module.reboot.internal.MuleContainerWrapperProvid
 
 import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
 import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
+import org.mule.runtime.module.reboot.internal.MuleLog4jConfigurer;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -54,6 +55,8 @@ public class MuleContainerBootstrap {
       muleContainerWrapper.haltAndCatchFire(1, ex.getMessage());
       return;
     }
+
+    muleContainerWrapper.addBootstrapConfigurer(new MuleLog4jConfigurer());
 
     muleContainerWrapper.configureAndStart(muleContainerFactory, commandLine);
   }

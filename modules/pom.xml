@@ -32,6 +32,7 @@
         <module>javaee</module>
         <module>launcher</module>
         <module>license-api</module>
+        <module>log4j-boot-configurator</module>
         <module>log4j-configurator</module>
         <module>logging</module>
         <module>metadata-support</module>

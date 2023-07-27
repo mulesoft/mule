@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.log4j.internal;
+package org.mule.runtime.module.log4j.boot.internal;
 
 import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static org.mule.test.allure.AllureConstants.Logging.LoggingStory.CONTEXT_FACTORY;
@@ -14,16 +14,17 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.util.concurrent.Latch;
-import org.mule.runtime.module.log4j.api.AsyncLoggerExceptionHandler;
+import org.mule.runtime.module.log4j.boot.api.AsyncLoggerExceptionHandler;
+import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.qameta.allure.Description;
@@ -31,6 +32,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
+import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.core.util.Cancellable;
 import org.apache.logging.log4j.core.util.ShutdownCallbackRegistry;
 import org.junit.After;
@@ -70,9 +72,11 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void systemProperties() {
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(true);
-    assertThat(XmlConfigurationFactory.class.getName(), equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
-    assertThat(AsyncLoggerExceptionHandler.class.getName(), equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory();
+    assertThat(XmlConfigurationFactory.class.getName(),
+               equalTo(getProperty(LOG_CONFIGURATION_FACTORY_PROPERTY)));
+    assertThat(AsyncLoggerExceptionHandler.class.getName(),
+               equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
   }
 
@@ -80,25 +84,28 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   public void customExceptionHandler() {
     final String customHandler = "custom";
     setProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY, customHandler);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(true);
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory();
     assertThat(customHandler, equalTo(getProperty(ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY)));
     factory.dispose();
   }
 
   @Test
   public void dispose() {
-    ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+    AtomicBoolean disposeCallbackWasCalled = new AtomicBoolean(false);
+    ContextSelector contextSelector = mock(ContextSelector.class);
+    MuleLog4jContextFactory factory =
+        new MuleLog4jContextFactory(contextSelector, selector -> disposeCallbackWasCalled.set(true));
     factory.dispose();
-    verify(contextSelector).dispose();
+    assertThat(disposeCallbackWasCalled.get(), is(true));
   }
 
   @Test
   @Issue("MULE-18742")
   @Description("If any shutdown callback is cancelled while the log is disposing everything should work")
   public void cancelWhileDisposing() {
-    ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector);
+    ContextSelector contextSelector = mock(ContextSelector.class);
+    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector, selector -> {
+    });
     ShutdownCallbackRegistry shutdownCallbackRegistry = factory.getShutdownCallbackRegistry();
 
     Latch latch = new Latch();
