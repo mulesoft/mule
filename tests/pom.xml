@@ -20,8 +20,6 @@
         <module>unit</module>
         <module>component-plugin</module>
         <module>functional</module>
-        <module>activemq-broker</module>
-        <module>derby-all</module>
         <module>infrastructure</module>
         <module>performance</module>
         <module>test-extensions</module>
@@ -34,6 +32,25 @@
         <module>http-resource-service</module>
         <module>core-functional-tests</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <!-- W-13799169: Workaround for flaky issue when running in mule-uber failing with allowlist validation having
+            all the services dependencies unpacked inside a folder with name activemq-broker or derby-all, as example
+            'mule-standalone/services/mule-derby-all-4.5.0-SNAPSHOT/ folder', in place of each service folder name -->
+            <id>not-uber</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>!uber</name>
+                </property>
+            </activation>
+            <modules>
+                <module>activemq-broker</module>
+                <module>derby-all</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
