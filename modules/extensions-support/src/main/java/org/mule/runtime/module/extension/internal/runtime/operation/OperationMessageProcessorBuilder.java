@@ -3,8 +3,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -52,7 +54,10 @@ public final class OperationMessageProcessorBuilder
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
     if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth).orElse(null);
+      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
+                                                     initialSpanInfoProvider
+                                                         .getInitialSpanInfo(NULL_COMPONENT, OPERATION_EXECUTION_SPAN_NAME, ""))
+                                                             .orElse(null);
     }
 
     if (supportsOAuth) {

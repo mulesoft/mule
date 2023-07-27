@@ -5,7 +5,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -51,25 +50,23 @@ public class ExtensionConnectionSupplier {
   @Inject
   InternalProfilingService internalProfilingService;
 
-  @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
-
   private boolean lazyConnections;
+
 
   /**
    * Returns the connection to be used with the {@code operationContext}.
    * <p>
    * It accounts for the possibility of the returned connection joining/belonging to an active transaction
    *
-   * @param executionContext an {@link ExecutionContextAdapter}
+   * @param executionContext             an {@link ExecutionContextAdapter}
+   * @param getConnectionInitialSpanInfo a {@link InitialSpanInfo} with the information for tracing the get connection span.
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
-  public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
+  public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
+                                            InitialSpanInfo getConnectionInitialSpanInfo)
       throws ConnectionException, TransactionException {
-    InitialSpanInfo getConnectionInitialSpanInfo =
-        initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =

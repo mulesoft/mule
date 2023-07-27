@@ -116,6 +116,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
@@ -727,9 +728,10 @@ public class MuleExtensionUtils {
    */
   public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
-                                                                       boolean supportsOAuth) {
+                                                                       boolean supportsOAuth,
+                                                                       InitialSpanInfo initialSpanInfo) {
     return operationModel.getModelProperty(PagedOperationModelProperty.class)
-        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
+        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, initialSpanInfo, supportsOAuth));
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,

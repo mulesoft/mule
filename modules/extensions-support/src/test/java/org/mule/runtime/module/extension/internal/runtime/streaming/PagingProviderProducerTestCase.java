@@ -28,6 +28,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
@@ -52,7 +53,8 @@ public class PagingProviderProducerTestCase {
   private PagingProviderProducer<String> producer;
 
   private PagingProviderProducer<String> createProducer() {
-    return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier);
+    return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier,
+                                        mock(InitialSpanInfo.class));
   }
 
   @Before
@@ -67,7 +69,7 @@ public class PagingProviderProducerTestCase {
 
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
-    when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
+    when(extensionConnectionSupplier.getConnection(executionContext, mock(InitialSpanInfo.class))).thenReturn(handler);
   }
 
   @Test
@@ -80,7 +82,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void produceWithDifferentConnections() throws Exception {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     produce();
     produce();
@@ -95,7 +97,7 @@ public class PagingProviderProducerTestCase {
     producer = createProducer();
 
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     produce();
     produce();
@@ -117,7 +119,7 @@ public class PagingProviderProducerTestCase {
   @Test
   public void closeQuietly() throws Exception {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     producer.close();
     verify(delegate).close(any());
@@ -134,7 +136,7 @@ public class PagingProviderProducerTestCase {
   public void connectionIsInvalidatedOnConnectionExceptionInProduce() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new RuntimeException(new ConnectionException("Invalid Connection"))).when(delegate).getPage(any());
 
     try {
@@ -150,7 +152,7 @@ public class PagingProviderProducerTestCase {
   public void connectionIsReleasedOnExceptionInProduce() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
 
     try {
@@ -166,7 +168,7 @@ public class PagingProviderProducerTestCase {
   public void pagingProviderDelegateIsClosedQuietlyOnExceptionInProduceFirstPage() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
     doThrow(new DefaultMuleException("Error while closing delegate")).when(delegate).close(any());
 
@@ -184,7 +186,7 @@ public class PagingProviderProducerTestCase {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
     doThrow(new IllegalArgumentException("There was a problem releasing the connection")).when(connectionHandler).release();
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     producer.close();
     verify(delegate, times(1)).close(any());

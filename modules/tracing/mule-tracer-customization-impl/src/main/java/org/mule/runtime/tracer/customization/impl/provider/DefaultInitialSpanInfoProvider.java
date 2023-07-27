@@ -25,7 +25,7 @@ import javax.inject.Inject;
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
-  private Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> initialSpanInfos = new ConcurrentHashMap<>();
+  private Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> componentInitialSpanInfos = new ConcurrentHashMap<>();
   public static final String API_ID_CONFIGURATION_PROPERTIES_KEY = "apiId";
 
   @Inject
@@ -42,39 +42,42 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
   @Override
   public InitialSpanInfo getInitialSpanInfo(Component component) {
+    return new LazyInitialSpanInfo(() -> doGetInitialSpanInfo(component, null, null));
+  }
+
+  @Override
+  public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
+    return new LazyInitialSpanInfo(() -> doGetInitialSpanInfo(component, suffix, null));
+  }
+
+
+  @Override
+  public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
+    return new LazyInitialSpanInfo(() -> doGetInitialSpanInfo(component, suffix, overriddenName));
+  }
+
+  private InitialSpanInfo doGetInitialSpanInfo(Component component, String suffix, String overriddenName) {
     // TODO: Verify initialisation order in mule context (W-12761329)
     if (!initialisedAttributes) {
       initialiseAttributes();
       initialisedAttributes = true;
     }
-    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, null, null),
-                                            identifier -> new ExecutionInitialSpanInfo(component, apiId,
-                                                                                       tracingLevelConfiguration));
-  }
 
-  @Override
-  public InitialSpanInfo getInitialSpanInfo(Component component, String suffix) {
-    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
-    if (!initialisedAttributes) {
-      initialiseAttributes();
-      initialisedAttributes = true;
+    // TODO: when to change the tracing level from other criteria than location is required, we will probably have to see this.
+    if (component.getLocation() == null) {
+      return new ExecutionInitialSpanInfo(component, apiId, overriddenName, suffix,
+                                          tracingLevelConfiguration);
     }
 
-    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, null),
-                                            identifier -> new ExecutionInitialSpanInfo(component, apiId, null, suffix,
-                                                                                       tracingLevelConfiguration));
-  }
+    ExecutionInitialSpanInfo executionInitialSpanInfo =
+        componentInitialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, overriddenName),
+                                                  identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                                                                             suffix,
+                                                                                             tracingLevelConfiguration));
 
-  @Override
-  public InitialSpanInfo getInitialSpanInfo(Component component, String overriddenName, String suffix) {
-    // TODO: Verify initialisation order in mule context (W-12761329). General registry problem
-    if (!initialisedAttributes) {
-      initialiseAttributes();
-      initialisedAttributes = true;
-    }
-    return initialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, overriddenName),
-                                            identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
-                                                                                       tracingLevelConfiguration));
+    tracingLevelConfiguration.onConfigurationChange(executionInitialSpanInfo::reconfigureInitialSpanInfo);
+
+    return executionInitialSpanInfo;
   }
 
   public void initialiseAttributes() {

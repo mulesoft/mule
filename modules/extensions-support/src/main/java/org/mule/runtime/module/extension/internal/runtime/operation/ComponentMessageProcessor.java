@@ -45,6 +45,7 @@ import static org.mule.runtime.module.extension.internal.util.InterceptorChainUt
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
@@ -73,7 +74,6 @@ import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
@@ -136,6 +136,7 @@ import org.mule.runtime.module.extension.internal.runtime.tracing.TracedResolver
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.EventTracer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
@@ -250,6 +251,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
+  private InitialSpanInfo getParameterResolutionResultSpanInfo;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -576,6 +578,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
+      getParameterResolutionResultSpanInfo =
+          initialSpanInfoProvider.getInitialSpanInfo(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
       coreEventEventTracer = profilingService.getCoreEventTracer();
       initRetryPolicyResolver();
       try {
@@ -587,6 +591,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
+
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -1063,7 +1068,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
                                         createConnectionInterceptorsChain(extensionModel, componentModel,
-                                                                          extensionConnectionSupplier, reflectionCache),
+                                                                          extensionConnectionSupplier, reflectionCache,
+                                                                          initialSpanInfoProvider
+                                                                              .getInitialSpanInfo(this, GET_CONNECTION_SPAN_NAME,
+                                                                                                  "")),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
@@ -1139,7 +1147,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       throws MuleException {
     coreEventEventTracer
         .startComponentSpan(event,
-                            initialSpanInfoProvider.getInitialSpanInfo(this, PARAMETERS_RESOLUTION_SPAN_NAME, ""));
+                            getParameterResolutionResultSpanInfo);
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {

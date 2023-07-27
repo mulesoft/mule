@@ -23,14 +23,8 @@ public class InitialSpanInfoIdentifier {
   private final String stringId;
 
   public InitialSpanInfoIdentifier(Component component, String suffix, String overriddenName) {
-    // If we don't have the location we consider that this is different from
-    // any other initial span info, as it can be retrieved from different places.
-    if (component.getLocation() == null) {
-      this.stringId = randomUUID().toString();
-    } else {
-      this.stringId =
-          getLocationAsString(component.getLocation()) + "-" + defaultString(suffix) + "-" + defaultString(overriddenName);
-    }
+    this.stringId =
+        getLocationAsString(component.getLocation()) + "-" + defaultString(suffix) + "-" + defaultString(overriddenName);
   }
 
   @Override
