@@ -18,15 +18,15 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
  */
 public class DistributedTraceContextManagerResolver implements ArgumentResolver<DistributedTraceContextManager> {
 
-  private final EventTracer<CoreEvent> coreEventTracer;
+  private final EventTracer<CoreEvent> coreEventEventTracer;
 
-  public DistributedTraceContextManagerResolver(EventTracer<CoreEvent> coreEventTracer) {
-    this.coreEventTracer = coreEventTracer;
+  public DistributedTraceContextManagerResolver(EventTracer<CoreEvent> coreEventEventTracer) {
+    this.coreEventEventTracer = coreEventEventTracer;
   }
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
     return new PropagateAllDistributedTraceContextManager(((ExecutionContextAdapter<?>) executionContext)
-        .getEvent(), coreEventTracer);
+        .getEvent(), coreEventEventTracer);
   }
 }

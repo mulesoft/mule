@@ -58,6 +58,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -115,6 +116,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
@@ -217,7 +221,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   errorTypeRepository,
                                   streamingManager,
                                   reflectionCache,
-                                  muleContext);
+                                  muleContext,
+                                  initialSpanInfoProvider);
 
     try {
       initialiseIfNeeded(client);

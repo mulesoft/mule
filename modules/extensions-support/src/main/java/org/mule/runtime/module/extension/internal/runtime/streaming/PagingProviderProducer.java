@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.slf4j.Logger;
 
 /**
@@ -55,6 +56,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
   public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
+  private final InitialSpanInfo getConnectionInitialSpanInfo;
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
@@ -69,15 +71,17 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
-                                ExtensionConnectionSupplier extensionConnectionSupplier) {
-    this(delegate, config, executionContext, extensionConnectionSupplier, false);
+                                ExtensionConnectionSupplier extensionConnectionSupplier,
+                                InitialSpanInfo getConnectionInitialSpanInfo) {
+    this(delegate, config, executionContext, extensionConnectionSupplier, false, getConnectionInitialSpanInfo);
   }
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier extensionConnectionSupplier,
-                                boolean supportsOAuth) {
+                                boolean supportsOAuth,
+                                InitialSpanInfo getConnectionInitialSpanInfo) {
     this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
@@ -86,6 +90,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     connectionSupplierFactory = createConnectionSupplierFactory();
     mutableStats = getMutableConfigurationStats(executionContext);
+    this.getConnectionInitialSpanInfo = getConnectionInitialSpanInfo;
   }
 
   /**
@@ -243,7 +248,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {
-      return new DefaultConnectionSupplier(extensionConnectionSupplier.getConnection(executionContext));
+      return new DefaultConnectionSupplier(extensionConnectionSupplier.getConnection(executionContext,
+                                                                                     getConnectionInitialSpanInfo));
     }
 
     @Override
@@ -261,7 +267,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
       @Override
       public ConnectionSupplier getChecked() throws Throwable {
-        StickyConnectionSupplierFactory.this.connectionHandler = extensionConnectionSupplier.getConnection(executionContext);
+        StickyConnectionSupplierFactory.this.connectionHandler =
+            extensionConnectionSupplier.getConnection(executionContext, getConnectionInitialSpanInfo);
         return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler);
       }
     });

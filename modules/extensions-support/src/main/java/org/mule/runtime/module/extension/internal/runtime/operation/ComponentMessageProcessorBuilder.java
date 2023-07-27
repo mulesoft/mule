@@ -29,6 +29,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
   protected final ReflectionCache reflectionCache;
   protected final MuleContext muleContext;
   protected final ExpressionManager expressionManager;
+  protected final InitialSpanInfoProvider initialSpanInfoProvider;
   protected Registry registry;
   protected final ExtensionConnectionSupplier extensionConnectionSupplier;
   protected ConfigurationProvider configurationProvider;
@@ -77,6 +79,7 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
     this.reflectionCache = reflectionCache;
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();
+    this.initialSpanInfoProvider = registry.lookupByType(InitialSpanInfoProvider.class).get();
     this.expressionManager = expressionManager;
     this.terminationTimeout = muleContext.getConfiguration().getShutdownTimeout();
   }

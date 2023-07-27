@@ -4,8 +4,11 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static java.util.Optional.empty;
+
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +19,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
@@ -75,8 +79,8 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
-    interceptor = new ConnectionInterceptor(connectionSupplier);
-    when(connectionSupplier.getConnection(operationContext)).thenReturn(connectionHandler);
+    interceptor = new ConnectionInterceptor(connectionSupplier, mock(InitialSpanInfo.class));
+    when(connectionSupplier.getConnection(eq(operationContext), any(InitialSpanInfo.class))).thenReturn(connectionHandler);
   }
 
   @Test
@@ -85,7 +89,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
         .thenReturn(Optional.of(new PagedOperationModelProperty()));
 
     interceptor.before(operationContext);
-    verify(connectionSupplier, never()).getConnection(operationContext);
+    verify(connectionSupplier, never()).getConnection(eq(operationContext), any());
   }
 
   @Test
