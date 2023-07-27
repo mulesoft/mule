@@ -90,8 +90,8 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   @Test
   public void dispose() {
     ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector, selector -> {
-    });
+    MuleLog4jContextFactory factory =
+        new MuleLog4jContextFactory(contextSelector, selector -> ((ArtifactAwareContextSelector) selector).dispose());
     factory.dispose();
     verify(contextSelector).dispose();
   }
@@ -101,8 +101,8 @@ public class MuleLog4jContextFactoryTestCase extends AbstractMuleTestCase {
   @Description("If any shutdown callback is cancelled while the log is disposing everything should work")
   public void cancelWhileDisposing() {
     ArtifactAwareContextSelector contextSelector = mock(ArtifactAwareContextSelector.class);
-    MuleLog4jContextFactory factory = new MuleLog4jContextFactory(contextSelector, selector -> {
-    });
+    MuleLog4jContextFactory factory =
+        new MuleLog4jContextFactory(contextSelector, selector -> ((ArtifactAwareContextSelector) selector).dispose());
     ShutdownCallbackRegistry shutdownCallbackRegistry = factory.getShutdownCallbackRegistry();
 
     Latch latch = new Latch();
