@@ -59,4 +59,12 @@ public class LazyInitialSpanInfo implements InitialSpanInfo {
   public void forEachAttribute(BiConsumer<String, String> biConsumer) {
     lazyInitialSpanInfo.get().forEachAttribute(biConsumer);
   }
+
+  public boolean isComputed() {
+    return lazyInitialSpanInfo.isComputed();
+  }
+
+  public InitialSpanInfo getDelegate() {
+    return lazyInitialSpanInfo.get();
+  }
 }

@@ -25,16 +25,13 @@ import javax.inject.Inject;
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
-  private Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> componentInitialSpanInfos = new ConcurrentHashMap<>();
+  private final Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> componentInitialSpanInfos = new ConcurrentHashMap<>();
   public static final String API_ID_CONFIGURATION_PROPERTIES_KEY = "apiId";
 
-  @Inject
   MuleContext muleContext;
 
-  @Inject
   ConfigurationProperties configurationProperties;
 
-  @Inject
   TracingLevelConfiguration tracingLevelConfiguration;
 
   private String apiId;
@@ -88,5 +85,29 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
   private InitialSpanInfoIdentifier getInitialSpanInfoIdentifier(Component location, String suffix, String overriddenName) {
     return new InitialSpanInfoIdentifier(location, suffix, overriddenName);
+  }
+
+  @Inject
+  public void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Inject
+  public void setConfigurationProperties(ConfigurationProperties configurationProperties) {
+    this.configurationProperties = configurationProperties;
+  }
+
+  @Inject
+  public void seTracingLevelConfiguration(TracingLevelConfiguration tracingLevelConfiguration) {
+    this.tracingLevelConfiguration = tracingLevelConfiguration;
+  }
+
+  /**
+   * @param initialSpanInfo the {@link InitialSpanInfo} to verify if it is cached.
+   *
+   * @return whether it is cached.
+   */
+  public boolean isCached(InitialSpanInfo initialSpanInfo) {
+    return componentInitialSpanInfos.containsValue(initialSpanInfo);
   }
 }
