@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
@@ -41,14 +40,14 @@ public class FileTracingLevelConfigurationTestCase {
   private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
 
   @Test
-  public void whenLevelIsSpecifiedInFileItIsReturned() throws InitialisationException {
+  public void whenLevelIsSpecifiedInFileItIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration = new TestFileTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(fileTracingLevelConfiguration.getTracingLevel(), equalTo(TracingLevel.OVERVIEW));
   }
 
   @Test
-  public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() throws InitialisationException {
+  public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
@@ -56,7 +55,7 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenNoFileExistsDefaultLevelIsReturned() throws InitialisationException {
+  public void whenNoFileExistsDefaultLevelIsReturned() {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
@@ -66,7 +65,7 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenLevelIsWrongInFileDefaultLevelIsReturned() throws InitialisationException {
+  public void whenLevelIsWrongInFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
@@ -74,7 +73,7 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenALocationOverrideIsSpecifiedInTheFileTheOverrideIsReturned() throws InitialisationException {
+  public void whenALocationOverrideIsSpecifiedInTheFileTheOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithOverridesConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
@@ -83,7 +82,7 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheDefaultLevelIsReturned() throws InitialisationException {
+  public void whenAWrongLocationOverrideIsSpecifiedInTheFileTheDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithWrongOverrideConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
@@ -92,7 +91,7 @@ public class FileTracingLevelConfigurationTestCase {
   }
 
   @Test
-  public void whenALocationOverrideIsSpecifiedAndDuplicatedInTheFileTheLastOverrideIsReturned() throws InitialisationException {
+  public void whenALocationOverrideIsSpecifiedAndDuplicatedInTheFileTheLastOverrideIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestFileTracingLevelWithDuplicateOverrideConfiguration(mock(MuleContext.class));
     fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
