@@ -104,7 +104,14 @@ public class DefaultMuleContainer implements MuleContainer {
 
   static {
     if (getProperty(MULE_SIMPLE_LOG) == null) {
-      log4jContextFactory = (MuleLog4jContextFactory) LogManager.getFactory();
+      LoggerContextFactory contextFactory = LogManager.getFactory();
+      if (contextFactory instanceof MuleLog4jContextFactory) {
+        log4jContextFactory = (MuleLog4jContextFactory) contextFactory;
+      } else {
+        LoggerFactory.getLogger("triggerDefaultFactoryCreation");
+        setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
+        log4jContextFactory = new MuleLog4jContextFactory();
+      }
       configureSelector(log4jContextFactory);
     }
 
