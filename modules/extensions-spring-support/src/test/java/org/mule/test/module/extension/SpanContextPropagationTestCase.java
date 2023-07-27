@@ -3,13 +3,16 @@
  */
 package org.mule.test.module.extension;
 
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.DISTRIBUTED_TRACE_CONTEXT;
 
+import static java.lang.Boolean.TRUE;
+
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
-
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -17,10 +20,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.LinkedList;
@@ -30,6 +35,12 @@ import java.util.Map;
 @Feature(EVENT_CONTEXT)
 @Story(DISTRIBUTED_TRACE_CONTEXT)
 public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public SystemProperty enableTracing = new SystemProperty(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
+
+  @Rule
+  public SystemProperty enableSniffing = new SystemProperty(USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER, TRUE.toString());
 
   private static final List<CoreEvent> EVENTS = new LinkedList<>();
 
@@ -49,6 +60,7 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
   public static final String W3C_TRACE_PARENT_HEADER = "traceparent";
 
   public static final String W3C_TRACE_STATE_HEADER = "tracestate";
+
 
   @Override
   protected String getConfigFile() {

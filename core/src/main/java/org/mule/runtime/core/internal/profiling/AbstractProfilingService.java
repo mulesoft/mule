@@ -140,10 +140,7 @@ public abstract class AbstractProfilingService
     if (!profilingFeaturesSet.getAndSet(true)) {
       FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
       featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
-                                                  featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                      .filter(muleVersion -> muleVersion
-                                                          .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
-                                                      .isPresent());
+                                                  featureContext -> false);
       featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
                                                   featureContext -> false);
     }

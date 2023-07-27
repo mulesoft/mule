@@ -77,12 +77,8 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
       "Error on executing core event set current span command";
   public static final String ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE =
       "Error on executing core event get distributed context span command";
-
-  @Inject
-  private EventSpanFactory eventSpanFactory;
-
-  @Inject
-  FeatureFlaggingService featureFlaggingService;
+  private final FeatureFlaggingService featureFlaggingService;
+  private final EventSpanFactory eventSpanFactory;
 
   private EventContextStartSpanCommand startCommand;
 
@@ -99,6 +95,11 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   private EventContextSetCurrentSpanNameCommand eventContextSetCurrentSpanNameCommand;
 
   private EventContextGetDistributedTraceContextMapCommand eventContextGetDistributedTraceContextMap;
+
+  public CoreEventTracer(FeatureFlaggingService featureFlaggingService, EventSpanFactory eventSpanFactory) {
+    this.featureFlaggingService = featureFlaggingService;
+    this.eventSpanFactory = eventSpanFactory;
+  }
 
 
   @Override

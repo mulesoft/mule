@@ -126,6 +126,12 @@ public class OpenTelemetryResources {
    */
   public static class NoOpSpanExporter implements SpanExporter {
 
+    public static SpanExporter getInstance() {
+      return new NoOpSpanExporter();
+    }
+
+    private NoOpSpanExporter() {}
+
     @Override
     public CompletableResultCode export(Collection<SpanData> collection) {
       return new CompletableResultCode().succeed();

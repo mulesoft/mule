@@ -14,6 +14,8 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
 
   private OpenTelemetrySpanExporterConfigurationProperties() {}
 
+  public static final String USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER = MULE_OPEN_TELEMETRY_EXPORTER + ".use.sniffer";
+
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_ENABLED = MULE_OPEN_TELEMETRY_EXPORTER + ".enabled";
 
   public static final String MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH =

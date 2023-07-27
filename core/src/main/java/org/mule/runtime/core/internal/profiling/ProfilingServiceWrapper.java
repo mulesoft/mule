@@ -4,9 +4,6 @@
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
-import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
-
-import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
@@ -26,13 +23,11 @@ import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.profiling.tracing.ExecutionContext;
 import org.mule.runtime.api.profiling.tracing.TracingService;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
-import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService;
 
 import java.util.function.Function;
@@ -59,11 +54,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
   @Inject
   protected EventTracer<CoreEvent> coreEventTracer;
 
-  @Inject
-  protected SpanExporterConfiguration spanExporterConfiguration;
-
   private InternalProfilingService profilingService;
-  private EventTracer<CoreEvent> updatableCoreEvenTracer;
 
   @Override
   public <T extends ProfilingEventContext, S> ProfilingDataProducer<T, S> getProfilingDataProducer(
@@ -121,11 +112,7 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public SpanSnifferManager getSpanExportManager() {
-    if (profilingService instanceof PrivilegedProfilingService) {
-      return ((PrivilegedProfilingService) getProfilingService()).getSpanExportManager();
-    }
-
-    return PrivilegedProfilingService.super.getSpanExportManager();
+    return coreEventTracer.getSpanSnifferManager();
   }
 
   private InternalProfilingService initialiseProfilingService() throws MuleRuntimeException {
@@ -170,26 +157,11 @@ public class ProfilingServiceWrapper implements InternalProfilingService, Privil
 
   @Override
   public EventTracer<CoreEvent> getCoreEventTracer() {
-    if (updatableCoreEvenTracer == null) {
-      updatableCoreEvenTracer = resolveUpdatableCoreEventTracer();
-    }
-    return updatableCoreEvenTracer;
+    return coreEventTracer;
   }
 
   private EventTracer<CoreEvent> resolveUpdatableCoreEventTracer() {
-    final SelectableCoreEventTracer selectableCoreEventTracer =
-        new SelectableCoreEventTracer(coreEventTracer, getProfilingService().getCoreEventTracer(), isTracingExportEnabled());
-    spanExporterConfiguration
-        .doOnConfigurationChanged(() -> selectableCoreEventTracer.useFirstCoreEventTracer(isTracingExportEnabled()));
-    return selectableCoreEventTracer;
-  }
-
-  private boolean isTracingExportEnabled() {
-    try {
-      return parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"));
-    } catch (PropertyNotFoundException e) {
-      return false;
-    }
+    return coreEventTracer;
   }
 
   @Override
