@@ -7,6 +7,9 @@ import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
 
+import static org.apache.logging.log4j.LogManager.setFactory;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.module.log4j.boot.internal.ContextSelectorWrapper;
 
 import java.util.ArrayList;
@@ -35,7 +38,8 @@ import org.apache.logging.log4j.spi.LoggerContextFactory;
  * It sets {@link AsyncLoggerExceptionHandler} as the {@link ExceptionHandler} for failing async loggers.
  * </p>
  * <p>
- * It also makes the {@link ContextSelector} dynamically configurable through {@link #setContextSelector(ContextSelector)}.
+ * It also makes the {@link ContextSelector} dynamically configurable through
+ * {@link #setContextSelector(ContextSelector, Consumer)}.
  * </p>
  * <p>
  * Other than that, it's pretty much a copy paste of {@link Log4jContextFactory}, due to that classes' lack of extensibility.
@@ -60,6 +64,23 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Shut
   private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();
   private static final String ASYNC_LOGGER_EXCEPTION_HANDLER_PROPERTY = "AsyncLoggerConfig.ExceptionHandler";
   private static final String DEFAULT_ASYNC_LOGGER_EXCEPTION_HANDLER = AsyncLoggerExceptionHandler.class.getName();
+
+  /**
+   * Creates a new instance and sets it as the factory of the {@link org.apache.logging.log4j.LogManager}.
+   * 
+   * @return the created {@link MuleLog4jContextFactory}.
+   */
+  public static MuleLog4jContextFactory createAndInstall() {
+    // We need to force the creation of a logger before we can change the manager factory.
+    // This is because if not, any logger that will be acquired by MuleLog4jContextFactory code
+    // will fail since it will try to use a null factory.
+    getLogger("triggerDefaultFactoryCreation");
+    // We need to set this property so log4j uses the same context factory everywhere
+    setProperty("log4j2.loggerContextFactory", MuleLog4jContextFactory.class.getName());
+    MuleLog4jContextFactory log4jContextFactory = new MuleLog4jContextFactory();
+    setFactory(log4jContextFactory);
+    return log4jContextFactory;
+  }
 
   /**
    * Log4j tries to instantiate this class using a default constructor.

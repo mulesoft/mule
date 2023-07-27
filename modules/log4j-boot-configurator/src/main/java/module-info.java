@@ -16,4 +16,5 @@ module org.mule.runtime.boot.log4j {
   requires org.apache.logging.log4j.core;
 
   requires transitive org.apache.logging.log4j;
+  requires transitive org.slf4j;
 }
