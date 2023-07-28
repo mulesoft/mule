@@ -171,15 +171,16 @@ public abstract class AbstractOSController {
   }
 
   protected int doExecution(Executor executor, CommandLine commandLine, Map<String, String> env) {
-    try {
-      final StringJoiner paramsJoiner = new StringJoiner(" ");
-      for (String cmdArg : commandLine.toStrings()) {
-        paramsJoiner.add(cmdArg.replaceAll("(?<=\\.password=)(.*)", "****"));
-      }
+    final StringJoiner paramsJoiner = new StringJoiner(" ");
+    for (String cmdArg : commandLine.toStrings()) {
+      paramsJoiner.add(cmdArg.replaceAll("(?<=\\.password=)(.*)", "****"));
+    }
 
+    try {
       logger.info("Executing: {}", paramsJoiner);
       return executor.execute(commandLine, env);
     } catch (ExecuteException e) {
+      logger.error("Error executing " + paramsJoiner, e);
       return e.getExitValue();
     } catch (Exception e) {
       throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " "
