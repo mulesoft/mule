@@ -195,5 +195,26 @@
                 <directory>${basedir}/src/test/resources</directory>
             </testResource>
         </testResources>
+        
+        <plugins>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+							<includes>
+								<include>org/mule/runtime/module/deployment/impl/internal/builder/**</include>
+							</includes>
+                        </configuration>
+                    </execution>
+                </executions>				
+			</plugin>
+			
+		</plugins>
     </build>
 </project>
