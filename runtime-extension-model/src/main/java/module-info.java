@@ -46,15 +46,15 @@ module org.mule.runtime.extension.model {
       com.mulesoft.mule.runtime.ee.extension.model,
       org.mule.runtime.spring.config;
 
-  exports org.mule.runtime.core.api.source.scheduler to
-      org.mule.runtime.core.components,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.core.api.source.scheduler;
+
+  exports org.mule.runtime.core.privileged.extension;
 
   exports org.mule.runtime.core.internal.extension to
       com.mulesoft.mule.runtime.ee.extension.model,
       org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.extensions.xml.support;
+      org.mule.runtime.extensions.xml.support,
+      org.mule.runtime.extensions.mule.support;
   
   // Beans created using Spring
   // TODO avoid opening this to spring libs from applications!

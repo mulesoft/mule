@@ -134,13 +134,12 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  exports org.mule.runtime.core.privileged;
   exports org.mule.runtime.core.privileged.component to
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.privileged.el to
-      org.mule.runtime.extensions.support,
-      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.el;
   exports org.mule.runtime.core.privileged.event;
   exports org.mule.runtime.core.privileged.execution to
       org.mule.runtime.properties.config,
@@ -220,6 +219,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.mvel,
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // TODO TD-0144819 export this only to DW (and org.mule.runtime.core.mvel)
@@ -239,6 +239,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       mule.mvel2,
       spring.beans;
@@ -299,6 +300,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.mule.support,
       org.mule.runtime.spring.config,
       spring.beans,
       org.mule.test.unit,
@@ -315,10 +317,12 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.security to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.security.filter to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
       org.mule.test.unit,
@@ -389,6 +393,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.api.processor to
       spring.core;
   opens org.mule.runtime.core.api.retry.policy to
+      spring.core;
+  opens org.mule.runtime.core.api.security to
       spring.core;
   opens org.mule.runtime.core.api.streaming to
       spring.core;
