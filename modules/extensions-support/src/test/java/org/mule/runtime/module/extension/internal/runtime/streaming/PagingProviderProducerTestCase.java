@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -69,7 +70,7 @@ public class PagingProviderProducerTestCase {
 
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
-    when(extensionConnectionSupplier.getConnection(executionContext, mock(InitialSpanInfo.class))).thenReturn(handler);
+    when(extensionConnectionSupplier.getConnection(eq(executionContext), any())).thenReturn(handler);
   }
 
   @Test

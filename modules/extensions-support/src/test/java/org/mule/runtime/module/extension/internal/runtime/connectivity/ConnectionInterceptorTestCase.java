@@ -89,7 +89,7 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
         .thenReturn(Optional.of(new PagedOperationModelProperty()));
 
     interceptor.before(operationContext);
-    verify(connectionSupplier, never()).getConnection(operationContext, mock(InitialSpanInfo.class));
+    verify(connectionSupplier, never()).getConnection(eq(operationContext), any());
   }
 
   @Test
