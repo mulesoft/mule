@@ -17,8 +17,6 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -45,7 +43,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.slf4j.Logger;
 
 /**
  * A {@link SpanExporterConfiguration} based on a file in the conf folder.
@@ -58,7 +55,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
 
   public final static String MULE_TRACING_CONFIGURATION_PATH = SYSTEM_PROPERTY_PREFIX + "tracer.config.path";
   private final String PROPERTIES_FILE_NAME = getProperty(MULE_TRACING_CONFIGURATION_PATH, "tracer-exporter.conf");
-  private static final Logger LOGGER = getLogger(FileSpanExporterConfiguration.class);
   private ConfigurationPropertiesResolver propertyResolver;
   private JsonNode configuration;
   private ClassLoaderResourceProvider resourceProvider;
@@ -145,8 +141,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         configuration = loadConfiguration(is);
         configurationUrl = getResourceOrFail(getPropertiesFileName(), getExecutionClassLoader(muleContext), true);
       } catch (MuleRuntimeException | IOException e) {
-        LOGGER
-            .info("No tracer exporter config found in the app or in the conf directory. Switching to system property based configuration.");
       }
     } else {
       try {
@@ -155,8 +149,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         configuration = loadConfiguration(is);
         configurationUrl = getResourceAsUrl(resourcePath, FileSpanExporterConfiguration.class, true, true);
       } catch (IOException e) {
-        LOGGER
-            .info("No tracer exporter config found in the conf directory. Switching to system property based configuration.");
       }
     }
   }
