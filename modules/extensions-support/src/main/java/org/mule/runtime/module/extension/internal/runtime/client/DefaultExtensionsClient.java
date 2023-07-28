@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
@@ -21,7 +22,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -224,7 +224,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   streamingManager,
                                   reflectionCache,
                                   muleContext,
-                                  initialSpanInfoProvider.getInitialSpanInfo(NULL_COMPONENT, OPERATION_EXECUTION_SPAN_NAME, ""));
+                                  initialSpanInfoProvider.getInitialSpanInfo(NULL_COMPONENT, GET_CONNECTION_SPAN_NAME, ""));
     try {
       initialiseIfNeeded(client);
       startIfNeeded(client);

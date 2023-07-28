@@ -33,7 +33,6 @@ import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.impl.CoreEventTracer;
 import org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand;
 import org.mule.runtime.tracer.impl.span.command.EventContextAddAttributesCommand;
 import org.mule.runtime.tracer.impl.span.command.EventContextEndSpanCommand;

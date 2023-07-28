@@ -72,8 +72,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier extensionConnectionSupplier,
-                                InitialSpanInfo initialSpanInfo) {
-    this(delegate, config, executionContext, extensionConnectionSupplier, false, initialSpanInfo);
+                                InitialSpanInfo getConnectionInitialSpanInfo) {
+    this(delegate, config, executionContext, extensionConnectionSupplier, false, getConnectionInitialSpanInfo);
   }
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,

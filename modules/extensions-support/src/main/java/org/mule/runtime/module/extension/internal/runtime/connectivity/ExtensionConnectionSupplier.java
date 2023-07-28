@@ -58,22 +58,22 @@ public class ExtensionConnectionSupplier {
    * <p>
    * It accounts for the possibility of the returned connection joining/belonging to an active transaction
    *
-   * @param executionContext             an {@link ExecutionContextAdapter}
-   * @param getConnectionInitialSpanInfo a {@link InitialSpanInfo} with the information for tracing the get connection span.
+   * @param executionContext an {@link ExecutionContextAdapter}
+   * @param initialSpanInfo  a {@link InitialSpanInfo} with the information for tracing the get connection span.
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
   public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
-                                            InitialSpanInfo getConnectionInitialSpanInfo)
+                                            InitialSpanInfo initialSpanInfo)
       throws ConnectionException, TransactionException {
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =
           new TracedLazyConnection(getConnectionHandler(executionContext), internalProfilingService.getCoreEventTracer(),
-                                   getConnectionInitialSpanInfo, executionContext);
+                                   initialSpanInfo, executionContext);
     } else {
-      internalProfilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
+      internalProfilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), initialSpanInfo);
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {

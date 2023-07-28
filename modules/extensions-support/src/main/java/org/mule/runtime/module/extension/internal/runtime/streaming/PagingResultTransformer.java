@@ -23,13 +23,13 @@ public class PagingResultTransformer implements ResultTransformer {
 
   private final ExtensionConnectionSupplier connectionSupplier;
   private final boolean supportsOAuth;
-  private final InitialSpanInfo getConnectioSpanInfo;
+  private final InitialSpanInfo getConnectionSpanInfo;
 
-  public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo getConnectioSpanInfo,
+  public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo getConnectionSpanInfo,
                                  boolean supportsOAuth) {
     this.connectionSupplier = connectionSupplier;
     this.supportsOAuth = supportsOAuth;
-    this.getConnectioSpanInfo = getConnectioSpanInfo;
+    this.getConnectionSpanInfo = getConnectionSpanInfo;
   }
 
   @Override
@@ -43,7 +43,7 @@ public class PagingResultTransformer implements ResultTransformer {
                                                       operationContext,
                                                       connectionSupplier,
                                                       supportsOAuth,
-                                                      getConnectioSpanInfo);
+                                                      getConnectionSpanInfo);
 
     ListConsumer<?> consumer = new ListConsumer(producer);
     consumer.loadNextPage();

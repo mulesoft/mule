@@ -4,6 +4,7 @@
 package org.mule.runtime.tracer.customization.impl.provider;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
+import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
@@ -67,10 +68,11 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
 
     ExecutionInitialSpanInfo executionInitialSpanInfo =
-        componentInitialSpanInfos.computeIfAbsent(getInitialSpanInfoIdentifier(component, suffix, overriddenName),
-                                                  identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
-                                                                                             suffix,
-                                                                                             tracingLevelConfiguration));
+        componentInitialSpanInfos
+            .computeIfAbsent(new InitialSpanInfoIdentifier(getLocationAsString(component.getLocation()), suffix, overriddenName),
+                             identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                                                        suffix,
+                                                                        tracingLevelConfiguration));
 
     tracingLevelConfiguration.onConfigurationChange(executionInitialSpanInfo::reconfigureInitialSpanInfo);
 
@@ -81,10 +83,6 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     if (muleContext.getArtifactType().equals(POLICY)) {
       apiId = configurationProperties.resolveStringProperty(API_ID_CONFIGURATION_PROPERTIES_KEY).orElse(null);
     }
-  }
-
-  private InitialSpanInfoIdentifier getInitialSpanInfoIdentifier(Component location, String suffix, String overriddenName) {
-    return new InitialSpanInfoIdentifier(location, suffix, overriddenName);
   }
 
   @Inject

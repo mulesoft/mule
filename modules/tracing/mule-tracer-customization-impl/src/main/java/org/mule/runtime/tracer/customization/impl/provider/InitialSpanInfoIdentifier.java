@@ -4,11 +4,6 @@
 package org.mule.runtime.tracer.customization.impl.provider;
 
 import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
-
-import static java.util.UUID.randomUUID;
-
-import org.mule.runtime.api.component.Component;
 
 import java.util.Objects;
 
@@ -19,12 +14,11 @@ import java.util.Objects;
  */
 public class InitialSpanInfoIdentifier {
 
-
   private final String stringId;
 
-  public InitialSpanInfoIdentifier(Component component, String suffix, String overriddenName) {
+  public InitialSpanInfoIdentifier(String location, String suffix, String overriddenName) {
     this.stringId =
-        getLocationAsString(component.getLocation()) + "-" + defaultString(suffix) + "-" + defaultString(overriddenName);
+        location + "-" + defaultString(suffix) + "-" + defaultString(overriddenName);
   }
 
   @Override
