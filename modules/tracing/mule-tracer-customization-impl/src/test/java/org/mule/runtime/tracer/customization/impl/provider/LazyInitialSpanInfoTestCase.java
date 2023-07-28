@@ -54,7 +54,7 @@ public class LazyInitialSpanInfoTestCase {
   }
 
   @Test
-  public void whenCoreEventTracerIsUsedLazyInitializationSpanInfoIsNotComputed() throws Exception {
+  public void whenCoreEventTracerIsUsedLazyInitializationSpanInfoIsComputed() throws Exception {
     LazyInitialSpanInfo lazyInitialSpanInfo = new LazyInitialSpanInfo(() -> new InitialSpanInfo() {
 
       @Override
