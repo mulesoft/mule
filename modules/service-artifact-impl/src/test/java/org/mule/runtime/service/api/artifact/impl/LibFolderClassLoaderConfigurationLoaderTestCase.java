@@ -1,12 +1,12 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.service.internal.test.artifact;
+package org.mule.runtime.service.api.artifact.impl;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 import static org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader.LIB_FOLDER;
+import static org.mule.runtime.module.service.api.artifact.impl.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.CLASSLOADER_CONFIGURATION_LOADER;

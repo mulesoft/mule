@@ -18,6 +18,7 @@ module org.mule.test.runner {
   requires org.mule.runtime.jpms.utils;
   requires org.mule.runtime.container;
   requires org.mule.runtime.service;
+  requires org.mule.runtime.service.artifact;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.deployment.model;

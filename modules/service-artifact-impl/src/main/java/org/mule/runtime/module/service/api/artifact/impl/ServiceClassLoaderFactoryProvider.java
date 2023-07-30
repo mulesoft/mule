@@ -1,9 +1,10 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.module.service.api.artifact;
+package org.mule.runtime.module.service.api.artifact.impl;
 
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
 import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
 import org.slf4j.Logger;

@@ -17,7 +17,7 @@ import static org.mule.runtime.module.artifact.activation.api.extension.discover
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.CONTAINER_CLASS_LOADER;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.ArtifactClassLoaderResolverConstants.MODULE_REPOSITORY;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
+import static org.mule.runtime.module.service.api.artifact.impl.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
 import static java.lang.Thread.currentThread;
 
