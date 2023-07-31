@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -57,7 +58,8 @@ class TlsExtensionModelDeclarer {
         .describedAs("Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.\n" +
             "The key store contains the private and public keys of this server/client. The trust store contains\n" +
             "certificates of the trusted servers/clients.")
-        .allowingTopLevelDefinition();
+        .allowingTopLevelDefinition()
+        .withStereotype(CONFIG);
 
     ParameterGroupDeclarer contextParams = context.onDefaultParameterGroup();
     stringParam(contextParams, "name",
