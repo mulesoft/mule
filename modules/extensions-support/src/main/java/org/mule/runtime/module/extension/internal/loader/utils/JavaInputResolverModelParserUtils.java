@@ -9,8 +9,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isStaticResolver;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getFieldsWithGetters;
 
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
+import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -30,7 +33,6 @@ import java.util.Optional;
 public class JavaInputResolverModelParserUtils {
 
   public static List<InputResolverModelParser> parseInputResolversModelParser(MethodElement<?> methodElement) {
-
     List<InputResolverModelParser> parameterInputResolvers = methodElement.getParameters().stream()
         .map(JavaInputResolverModelParserUtils::getResolverParser)
         .filter(Optional::isPresent)
@@ -38,12 +40,23 @@ public class JavaInputResolverModelParserUtils {
         .collect(toList());
 
     List<InputResolverModelParser> parameterGroupInputResolvers = methodElement.getParameterGroups().stream()
+        .flatMap(parameterGroup -> fetchAnnotatedParameter(parameterGroup.getType()).stream())
         .map(JavaInputResolverModelParserUtils::getResolverParser)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(toList());
 
     return concat(parameterInputResolvers.stream(), parameterGroupInputResolvers.stream()).collect(toList());
+  }
+
+  private static List<ExtensionParameter> fetchAnnotatedParameter(Type type) {
+    List<? extends ExtensionParameter> parameters =
+        type.getAnnotatedFields(Parameter.class, org.mule.sdk.api.annotation.param.Parameter.class);
+    if (parameters.isEmpty()) {
+      parameters = getFieldsWithGetters(type);
+    }
+
+    return (List<ExtensionParameter>) parameters;
   }
 
   public static List<InputResolverModelParser> parseInputResolversModelParser(SourceCallbackDeclaration sourceCallbackDeclaration) {
