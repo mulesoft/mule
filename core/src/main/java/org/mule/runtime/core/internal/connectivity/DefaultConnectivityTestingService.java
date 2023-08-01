@@ -6,7 +6,6 @@ package org.mule.runtime.core.internal.connectivity;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
-import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -23,7 +22,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.internal.connectivity.ConnectivityTestingStrategyUtils;
 
 import java.util.Collection;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -38,13 +37,13 @@ import javax.inject.Inject;
  */
 public class DefaultConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
-  private Function<ClassLoader, Stream<ConnectivityTestingStrategy>> serviceRegistry =
+  private Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry =
       ConnectivityTestingStrategyUtils::lookupConnectivityTestingStrategies;
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
   private MuleContext muleContext;
   private ConfigurationComponentLocator locator;
 
-  protected void setServiceRegistry(Function<ClassLoader, Stream<ConnectivityTestingStrategy>> serviceRegistry) {
+  protected void setServiceRegistry(Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
@@ -60,7 +59,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
 
   @Override
   public void initialise() throws InitialisationException {
-    connectivityTestingStrategies = serviceRegistry.apply(currentThread().getContextClassLoader()).collect(toList());
+    connectivityTestingStrategies = serviceRegistry.get().collect(toList());
 
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       try {

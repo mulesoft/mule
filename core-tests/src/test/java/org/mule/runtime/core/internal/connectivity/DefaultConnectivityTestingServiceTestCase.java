@@ -50,7 +50,7 @@ public class DefaultConnectivityTestingServiceTestCase extends AbstractMuleTestC
   @Before
   public void createConnectivityService() throws InitialisationException {
     connectivityTestingService = new DefaultConnectivityTestingService();
-    connectivityTestingService.setServiceRegistry(cl -> asList(mockConnectivityTestingStrategy).stream());
+    connectivityTestingService.setServiceRegistry(() -> asList(mockConnectivityTestingStrategy).stream());
     connectivityTestingService.setMuleContext(mockMuleContext);
     connectivityTestingService.setLocator(mockMuleContext.getConfigurationComponentLocator());
 
