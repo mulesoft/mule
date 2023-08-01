@@ -42,6 +42,14 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
+  exports org.mule.runtime.core.internal.extension to
+      org.mule.runtime.artifact.ast,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support,
+      org.mule.runtime.extensions.mule.support,
+      com.mulesoft.mule.runtime.ee.extension.model,
+      com.mulesoft.mule.runtime.cluster;
+
   exports org.mule.runtime.config.internal.validation to
       com.mulesoft.mule.runtime.ee.extension.model,
       org.mule.runtime.spring.config;
@@ -50,12 +58,6 @@ module org.mule.runtime.extension.model {
 
   exports org.mule.runtime.core.privileged.extension;
 
-  exports org.mule.runtime.core.internal.extension to
-      com.mulesoft.mule.runtime.ee.extension.model,
-      org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.extensions.mule.support;
-  
   // Beans created using Spring
   // TODO avoid opening this to spring libs from applications!
   opens org.mule.runtime.core.api.source.scheduler to

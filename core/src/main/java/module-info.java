@@ -154,11 +154,13 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
   exports org.mule.runtime.core.privileged.registry to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
       spring.beans;
   exports org.mule.runtime.core.privileged.routing;
@@ -168,13 +170,17 @@ module org.mule.runtime.core {
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.transaction;
   exports org.mule.runtime.core.privileged.transaction.xa to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.xa,
+      com.mulesoft.mule.runtime.bti;
   exports org.mule.runtime.core.privileged.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.privileged.util to
       org.mule.runtime.core.components,
-      org.mule.runtime.extensions.support;
+      org.mule.runtime.extensions.support,
+      com.mulesoft.mule.runtime.core.ee,
+      com.mulesoft.mule.runtime.cache;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
@@ -184,6 +190,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.config.bootstrap to
       org.mule.runtime.spring.config;
@@ -199,11 +206,15 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.connectivity to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.connector to
+      com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.construct to
@@ -221,6 +232,8 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.core.ee,
       spring.beans;
   // TODO TD-0144819 export this only to DW (and org.mule.runtime.core.mvel)
   exports org.mule.runtime.core.internal.el.context;
@@ -233,6 +246,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.kyro,
       spring.beans;
   exports org.mule.runtime.core.internal.exception to
       org.mule.runtime.core.components,
@@ -241,6 +255,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
       mule.mvel2,
       spring.beans;
   exports org.mule.runtime.core.internal.execution to
@@ -259,6 +274,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lock to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.cluster,
       spring.beans;
   // TODO W-13824979 Remove splashScreen logic from mule-core
   exports org.mule.runtime.core.internal.logging to
@@ -294,6 +311,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.service.scheduler,
+      com.mulesoft.mule.runtime.batch,
       spring.beans;
   exports org.mule.runtime.core.internal.registry to
       org.mule.runtime.core.components,
@@ -310,9 +328,11 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.outbound to
-      org.mule.runtime.core.components;
+      org.mule.runtime.core.components,
+      com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.routing.split to
-      org.mule.runtime.core.components;
+      org.mule.runtime.core.components,
+      com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
@@ -325,13 +345,25 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
+      com.mulesoft.mule.runtime.kyro,
       org.mule.test.unit,
       spring.beans;
   exports org.mule.runtime.core.internal.store to
+      com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.core.ee,
       spring.beans;
+  exports org.mule.runtime.core.internal.streaming.bytes to
+      com.mulesoft.mule.runtime.core.ee,
+      com.mulesoft.mule.runtime.kyro;
+  exports org.mule.runtime.core.internal.streaming.object to
+      com.mulesoft.mule.runtime.core.ee;
+  exports org.mule.runtime.core.internal.streaming.object.factory to
+      com.mulesoft.mule.runtime.core.ee;
+  exports org.mule.runtime.core.internal.streaming.object.iterator to
+      com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.time to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -356,6 +388,10 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.bti,
+      com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.kyro,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
       spring.beans;
@@ -368,7 +404,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch;
   // TODO W-13824979 Remove splashScreen logic from mule-core
   exports org.mule.runtime.core.internal.util.splash to
       org.mule.runtime.launcher,
@@ -378,9 +415,11 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.util.queue to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.util.store to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
@@ -402,7 +441,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.privileged.component to
       spring.core;
   opens org.mule.runtime.core.privileged.exception to
-      spring.core;
+      spring.core,
+      kryo.shaded;
   opens org.mule.runtime.core.privileged.processor to
       spring.core;
   opens org.mule.runtime.core.privileged.processor.chain to
@@ -419,13 +459,17 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.connectivity to
       spring.core;
   opens org.mule.runtime.core.internal.context.notification to
-      spring.core;
+      spring.core,
+      kryo.shaded;
   opens org.mule.runtime.core.internal.el.function to
       spring.core;
   opens org.mule.runtime.core.internal.exception to
-      spring.core;
+      spring.core,
+      kryo.shaded;
   opens org.mule.runtime.core.internal.execution to
       spring.core;
+  opens org.mule.runtime.core.internal.event to
+      kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
       spring.core;
   // TODO TD-0144819 export this only to DW
@@ -440,6 +484,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.streaming to
       spring.core;
+  opens org.mule.runtime.core.internal.streaming.object to
+      kryo.shaded;
   opens org.mule.runtime.core.internal.transformer to
       spring.core;
   opens org.mule.runtime.core.internal.value to
