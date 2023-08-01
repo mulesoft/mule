@@ -23,4 +23,5 @@ additionalTestConfigs:
     #testJdkTool: OPEN-JDK11
   jdk17:
     testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -Dmule.jvm.version.extension.enforcement=LOOSE
     
