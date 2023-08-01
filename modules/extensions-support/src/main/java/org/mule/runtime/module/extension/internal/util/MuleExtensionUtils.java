@@ -116,7 +116,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 

@@ -72,6 +72,7 @@ import javax.inject.Inject;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.slf4j.Logger;
 
 
@@ -115,6 +116,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
@@ -217,7 +221,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   errorTypeRepository,
                                   streamingManager,
                                   reflectionCache,
-                                  muleContext);
+                                  muleContext,
+                                  initialSpanInfoProvider);
 
     try {
       initialiseIfNeeded(client);

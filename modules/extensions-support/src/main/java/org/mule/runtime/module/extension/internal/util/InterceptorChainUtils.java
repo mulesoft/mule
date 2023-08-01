@@ -50,23 +50,6 @@ public class InterceptorChainUtils {
     return chainBuilder.build();
   }
 
-  /**
-   * Creates an {@link InterceptorChain} with the interceptors necessary for connectable components.
-   *
-   * @param extensionModel     the {@link ExtensionModel}
-   * @param componentModel     the {@link ComponentModel}
-   * @param connectionSupplier the connection supplier
-   * @param reflectionCache    a {@link ReflectionCache}
-   * @return a new {@link InterceptorChain}
-   * @since 4.5.0
-   */
-  public static InterceptorChain createConnectionInterceptorsChain(ExtensionModel extensionModel,
-                                                                   ComponentModel componentModel,
-                                                                   ExtensionConnectionSupplier connectionSupplier,
-                                                                   ReflectionCache reflectionCache) {
-    return createConnectionInterceptorsChain(extensionModel, componentModel, connectionSupplier, reflectionCache, null);
-  }
-
   private static boolean requiresConnectionInterceptors(ExtensionModel extensionModel, ComponentModel componentModel) {
     // Only connectable components that require a connection to be provided beforehand should add the connection interceptors
     if (componentModel instanceof ConnectableComponentModel) {

@@ -25,6 +25,7 @@ public class CorrelationInfoArgumentResolver implements ArgumentResolver<Correla
   public CorrelationInfo resolve(ExecutionContext executionContext) {
     CoreEvent event = ((ExecutionContextAdapter) executionContext).getEvent();
     if (((ExecutionContextAdapter<?>) executionContext).getComponent().equals(NULL_COMPONENT)) {
+      // TODO: W-13837896
       // If this was executed from a null component don't allow to execute any tracing
       // from the connector. This is especially used in the cases where an extension in an
       // operation invokes another extension through an ExtensionsClient.
