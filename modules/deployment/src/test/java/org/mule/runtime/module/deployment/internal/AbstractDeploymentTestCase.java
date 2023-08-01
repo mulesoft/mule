@@ -4,7 +4,6 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
@@ -64,7 +63,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.stream.Collectors.joining;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
-
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -75,9 +73,6 @@ import static org.apache.commons.io.filefilter.FileFileFilter.FILE;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.reflect.FieldUtils.readDeclaredStaticField;
 import static org.apache.commons.lang3.reflect.FieldUtils.writeDeclaredStaticField;
-
-import static org.slf4j.LoggerFactory.getLogger;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayWithSize;
@@ -93,7 +88,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.junit.rules.RuleChain.outerRule;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -102,6 +96,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
@@ -179,11 +174,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
-
 import org.apache.logging.log4j.LogManager;
-
-import org.slf4j.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -193,9 +184,8 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.verification.VerificationMode;
-
+import org.slf4j.Logger;
 import uk.org.lidalia.slf4jext.Level;
 
 /**
@@ -242,10 +232,6 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected static TemporaryFolder compilerWorkFolder = new TemporaryFolder();
   protected static TestServicesSetup testServicesSetup = new TestServicesSetup(compilerWorkFolder);
-
-  @ClassRule
-  public static SystemProperty extensionJdkLooseEnforcement =
-      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement", "LOOSE");
 
   @ClassRule
   public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup);
