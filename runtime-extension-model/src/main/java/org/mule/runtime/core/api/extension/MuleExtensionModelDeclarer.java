@@ -1316,7 +1316,8 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer securityManagerDeclarer = extensionDeclarer.withConstruct("securityManager")
         .allowingTopLevelDefinition()
         .describedAs("The default security manager provides basic support for security functions. Other modules (PGP, "
-            + "Spring) provide more advanced functionality.");
+            + "Spring) provide more advanced functionality.")
+        .withDeprecation(new ImmutableDeprecationModel("Mule Runtime no longer uses this.", "4.4", "5.0"));
 
     ParameterGroupDeclarer customSecurityProviderParameterGroup = securityManagerDeclarer
         .withOptionalComponent("customSecurityProvider")
@@ -1390,7 +1391,8 @@ class MuleExtensionModelDeclarer {
 
   private void declareSecurityFilter(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer encryptionSecurityFilterDeclarer = extensionDeclarer.withConstruct("encryptionSecurityFilter")
-        .describedAs("A filter that provides password-based encyption.");
+        .describedAs("A filter that provides password-based encyption.")
+        .withDeprecation(new ImmutableDeprecationModel("Mule Runtime no longer uses this.", "4.4", "5.0"));
     encryptionSecurityFilterDeclarer.onDefaultParameterGroup()
         .withOptionalParameter("strategy-ref")
         .ofType(STRING_TYPE)
