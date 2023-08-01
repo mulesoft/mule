@@ -3,7 +3,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
@@ -20,6 +19,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;
@@ -52,26 +52,42 @@ public final class OperationMessageProcessorBuilder
     ValueResolver<ConfigurationProvider> configurationProviderResolver = getConfigurationProviderResolver();
     ResultTransformer resultTransformer = null;
 
+    OperationMessageProcessor operationMessageProcessor = null;
+
     final boolean supportsOAuth = supportsOAuth(extensionModel);
-    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
-      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
-                                                     initialSpanInfoProvider
-                                                         .getInitialSpanInfo(NULL_COMPONENT, GET_CONNECTION_SPAN_NAME, ""))
-                                                             .orElse(null);
+    boolean isPagedOperation = operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent();
+
+    if (isPagedOperation) {
+      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth)
+          .orElse(null);
     }
 
     if (supportsOAuth) {
-      return new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target,
-                                                targetValue,
-                                                errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
-                                                nestedChain, classLoader,
-                                                extensionManager, policyManager, reflectionCache, resultTransformer,
-                                                terminationTimeout);
+      operationMessageProcessor =
+          new OAuthOperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target,
+                                             targetValue,
+                                             errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
+                                             nestedChain, classLoader,
+                                             extensionManager, policyManager, reflectionCache, resultTransformer,
+                                             terminationTimeout);
     } else {
-      return new OperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target, targetValue,
-                                           errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
-                                           classLoader, extensionManager, policyManager, reflectionCache, resultTransformer,
-                                           terminationTimeout);
+      operationMessageProcessor =
+          new OperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target, targetValue,
+                                        errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
+                                        classLoader, extensionManager, policyManager, reflectionCache, resultTransformer,
+                                        terminationTimeout);
     }
+
+    // If case it is a paged operation, the initial span info is set so that it is not needed to be retrieved or calculated in
+    // each request.
+    if (isPagedOperation && resultTransformer != null) {
+      ((PagingResultTransformer) resultTransformer).setGetConnectionSpanInfo(
+                                                                             initialSpanInfoProvider
+                                                                                 .getInitialSpanInfo(operationMessageProcessor,
+                                                                                                     GET_CONNECTION_SPAN_NAME,
+                                                                                                     ""));
+    }
+
+    return operationMessageProcessor;
   }
 }

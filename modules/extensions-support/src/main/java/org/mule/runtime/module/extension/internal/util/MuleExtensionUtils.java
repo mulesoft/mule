@@ -728,10 +728,9 @@ public class MuleExtensionUtils {
    */
   public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
-                                                                       boolean supportsOAuth,
-                                                                       InitialSpanInfo initialSpanInfo) {
+                                                                       boolean supportsOAuth) {
     return operationModel.getModelProperty(PagedOperationModelProperty.class)
-        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, initialSpanInfo, supportsOAuth));
+        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,

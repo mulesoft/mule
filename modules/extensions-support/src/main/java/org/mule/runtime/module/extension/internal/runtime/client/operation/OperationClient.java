@@ -303,6 +303,7 @@ public class OperationClient implements Lifecycle {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
+    // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions client.
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
                                                                                 extensionModel,
                                                                                 operationModel,
@@ -314,8 +315,7 @@ public class OperationClient implements Lifecycle {
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 getPagingResultTransformer(operationModel,
                                                                                                            extensionConnectionSupplier,
-                                                                                                           supportsOAuth(extensionModel),
-                                                                                                           null)
+                                                                                                           supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
                                                                                 getNoopCoreEventTracer(),
