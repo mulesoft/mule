@@ -58,6 +58,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -72,7 +73,6 @@ import javax.inject.Inject;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.slf4j.Logger;
 
 
