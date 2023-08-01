@@ -23,5 +23,5 @@ additionalTestConfigs:
     #testJdkTool: OPEN-JDK11
   jdk17:
     testJdkTool: OPEN-JDK17
-    mavenAdditionalArgs: -Dmule.jvm.version.extension.enforcement=LOOSE
+    mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -Dmule.jvm.version.extension.enforcement=LOOSE
     
