@@ -220,10 +220,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.construct to
       org.mule.runtime.core.components,
       org.mule.runtime.spring.config;
-  // TODO TD-0144819 export this only to DW (and org.mule.runtime.extensions.support,
-  // org.mule.runtime.spring.config,
-  // spring.beans;)
-  exports org.mule.runtime.core.internal.context.notification;
+  exports org.mule.runtime.core.internal.context.notification to
+      org.mule.runtime.spring.config,
+      spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component;
   exports org.mule.runtime.core.internal.el to
@@ -235,8 +234,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
-  // TODO TD-0144819 export this only to DW (and org.mule.runtime.core.mvel)
-  exports org.mule.runtime.core.internal.el.context;
+  exports org.mule.runtime.core.internal.el.context to
+      org.mule.runtime.core.mvel;
   exports org.mule.runtime.core.internal.el.dataweave to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.el.function to
@@ -289,8 +288,6 @@ module org.mule.runtime.core {
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
   exports org.mule.runtime.core.internal.message;
-  // TODO TD-0144819 export this only to DW
-  exports org.mule.runtime.core.internal.metadata;
   exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
@@ -472,8 +469,6 @@ module org.mule.runtime.core {
       kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
       spring.core;
-  // TODO TD-0144819 export this only to DW
-  opens org.mule.runtime.core.internal.message;
   opens org.mule.runtime.core.internal.policy to
       spring.core;
   opens org.mule.runtime.core.internal.processor.interceptor to
@@ -490,5 +485,11 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.value to
       spring.core;
+
+  // TODO TD-0144819 add these:
+  // export org.mule.runtime.core.internal.context.notification to DW;
+  // export org.mule.runtime.core.internal.el.context to DW;
+  // export org.mule.runtime.core.internal.metadata to DW;
+  // open org.mule.runtime.core.internal.message to DW;
 
 }

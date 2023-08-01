@@ -59,7 +59,6 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.core.privileged.extension;
 
   // Beans created using Spring
-  // TODO avoid opening this to spring libs from applications!
   opens org.mule.runtime.core.api.source.scheduler to
       spring.beans;
 
