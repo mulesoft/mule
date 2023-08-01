@@ -3,7 +3,6 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTED;
@@ -46,7 +45,6 @@ import org.mule.tck.config.TestNotificationListenerRegistryConfigurationBuilder;
 import org.mule.tck.config.TestPolicyProviderConfigurationBuilder;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,10 +56,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Rule;
 
 public abstract class AbstractConfigurationFailuresTestCase extends AbstractMuleTestCase {
-
-  @Rule
-  public SystemProperty extensionJdkLooseEnforcement =
-      new SystemProperty(SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement", "LOOSE");
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder =
