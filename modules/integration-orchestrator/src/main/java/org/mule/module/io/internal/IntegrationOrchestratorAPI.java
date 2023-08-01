@@ -48,6 +48,7 @@ import org.mule.runtime.http.api.server.async.HttpResponseReadyCallback;
 import org.mule.runtime.http.api.server.async.ResponseStatusCallback;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.sdk.api.annotation.semantics.connectivity.Host;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,21 +122,27 @@ public class IntegrationOrchestratorAPI {
     }
   }
 
-  private void addIoRequestHandler(String runtimeConfigurationServiceUrl, String icaasProtocol, String icaasHost, String icaasPort,
+  private void addIoRequestHandler(String runtimeConfigurationServiceUrl, String icaasProtocol, String icaasHost,
+                                   String icaasPort,
                                    ArtifactAstDeserializer defaultArtifactAstDeserializer, HttpServer httpServer,
                                    HttpClient httpClient) {
     httpServer.addRequestHandler(Collections.singleton("POST"), "/", new RequestHandler() {
 
       @Override
       public void handleRequest(HttpRequestContext requestContext, HttpResponseReadyCallback responseCallback) {
-        String hostValue = requestContext.getRequest().getHeaderValue("Host");
+        String hostValue = requestContext.getRequest().getQueryParams().get("host");
         String integrationId = requestContext.getRequest().getQueryParams().get("integration");
 
         // TODO make configuration parameterizable
         // TODO for now we will use the host value until we have proper way to map the API host to the actual flow/integration
         try {
 
-          Application application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
+          Application application = null;
+          // If newDeployment query param is sent then let's create a new deployment - used to measure memory usage per
+          // deployment.
+          if (requestContext.getRequest().getQueryParams().get("newDeployment") == null) {
+            application = IntegrationOrchestratorAPI.this.deploymentService.findApplication(integrationId);
+          }
           if (application == null) {
             String runtimeConfigurationUrlForFetchingIntegrationConfig =
                 String.format("%s/config/integration/%s", runtimeConfigurationServiceUrl, integrationId);
@@ -168,6 +175,7 @@ public class IntegrationOrchestratorAPI {
             configurationProperties.put("SERVICE_ICAAS_HOST", icaasHost);
             configurationProperties.put("SERVICE_ICAAS_PORT", icaasPort);
             configurationProperties.put("SERVICE_ICAAS_PROTOCOL", icaasProtocol);
+            configurationProperties.put("HOST", hostValue);
             for (ConfigurationDTO configuration : integrationConfigDTO.getConfigurations()) {
               configurationProperties.put(configuration.getIntegrationConfigName(),
                                           configuration.getIcaasConfigId().toString());

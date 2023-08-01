@@ -81,18 +81,22 @@ public class FeatureFlaggingUtils {
    * @return True if the {@link Feature} is enabled.
    */
   private static boolean evaluateFeatureFlag(Feature feature, FeatureContext featureContext) {
-    boolean enabled;
-    Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
-    if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
-      enabled = getBoolean(systemPropertyName.get());
-      LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled,
-                   featureContext.getArtifactName(),
-                   systemPropertyName);
-    } else {
-      enabled = FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations().get(feature).test(featureContext);
-      LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, featureContext.getArtifactName());
+    try {
+      boolean enabled;
+      Optional<String> systemPropertyName = feature.getOverridingSystemPropertyName();
+      if (systemPropertyName.isPresent() && getProperty(systemPropertyName.get()) != null) {
+        enabled = getBoolean(systemPropertyName.get());
+        LOGGER.debug("Setting feature {} = {} for artifact [{}] because of System Property '{}'", feature, enabled,
+                     featureContext.getArtifactName(),
+                     systemPropertyName);
+      } else {
+        enabled = FeatureFlaggingRegistry.getInstance().getFeatureFlagConfigurations().get(feature).test(featureContext);
+        LOGGER.debug("Setting feature {} = {} for artifact [{}]", feature, enabled, featureContext.getArtifactName());
+      }
+      return enabled;
+    } catch (Exception e) {
+      return false;
     }
-    return enabled;
   }
 
   /**
