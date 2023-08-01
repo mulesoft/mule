@@ -18,6 +18,7 @@
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-modules=net.bytebuddy.agent
+            ${surefire.args.base}
         </surefire.args>
 
         <javaModuleName>org.mule.runtime.log4j</javaModuleName>

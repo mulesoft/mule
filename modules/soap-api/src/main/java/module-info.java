@@ -17,6 +17,7 @@ module org.mule.runtime.soap.api {
 
   requires java.xml.soap;
 
+  requires com.google.common;
   requires org.apache.commons.io;
 
   exports org.mule.runtime.soap.api;
