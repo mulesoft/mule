@@ -370,6 +370,7 @@ public class MetadataOperations {
     return null;
   }
 
+  @MediaType(value = ANY, strict = false)
   public Object inputMetadataResolverInParameterInParameterGroup(@ParameterGroup(
       name = "Animal shelter") AnimalShelter animalShelter) {
     return null;
