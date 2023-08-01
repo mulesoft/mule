@@ -38,7 +38,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoa
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
-import org.mule.runtime.module.deployment.impl.internal.domain.TestDomainWrapper;
+import org.mule.runtime.module.deployment.impl.internal.domain.wrapper.TestDomainWrapper;
 import org.mule.runtime.module.deployment.impl.internal.plugin.ArtifactPluginDescriptorLoader;
 import org.mule.runtime.module.license.api.LicenseValidator;
 

@@ -208,7 +208,10 @@
                         </goals>
                         <configuration>
 							<includes>
+								<include>org/mule/runtime/module/deployment/impl/internal/base/**</include>
 								<include>org/mule/runtime/module/deployment/impl/internal/builder/**</include>
+								<include>org/mule/runtime/module/deployment/impl/internal/application/wrapper/**</include>
+								<include>org/mule/runtime/module/deployment/impl/internal/domain/wrapper/**</include>
 							</includes>
                         </configuration>
                     </execution>

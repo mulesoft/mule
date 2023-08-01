@@ -17,7 +17,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration.ClassLoaderConfigurationBuilder;
-import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
+import org.mule.runtime.module.deployment.impl.internal.base.AbstractSplashScreenTestCase;
 
 import java.io.File;
 import java.io.IOException;

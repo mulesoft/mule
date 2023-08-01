@@ -12,7 +12,7 @@ import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnor
 import static org.mule.test.allure.AllureConstants.SplashScreenFeature.SPLASH_SCREEN;
 
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
+import org.mule.runtime.module.deployment.impl.internal.base.AbstractSplashScreenTestCase;
 
 import java.io.File;
 import java.io.IOException;

@@ -4,14 +4,15 @@
 package org.mule.runtime.module.launcher;
 
 import static org.hamcrest.Matchers.not;
+
+import org.mule.runtime.module.deployment.impl.internal.base.AbstractSplashScreenTestCase;
+
 import static org.mule.runtime.container.api.MuleFoldersUtil.ARTIFACT_PATCHES_FOLDER;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.tck.junit4.matcher.StringContainsIgnoringLineBreaks.containsStringIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ArtifactPatchingFeature.ARTIFACT_PATCHING;
 
 import static java.util.Arrays.asList;
-
-import org.mule.runtime.module.deployment.impl.internal.AbstractSplashScreenTestCase;
 
 import java.io.File;
 import java.util.List;
