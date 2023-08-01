@@ -61,7 +61,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMed
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.Map;
 import java.util.Optional;
@@ -95,8 +94,7 @@ public class OperationClient implements Lifecycle {
                                      ErrorTypeRepository errorTypeRepository,
                                      StreamingManager streamingManager,
                                      ReflectionCache reflectionCache,
-                                     MuleContext muleContext,
-                                     InitialSpanInfo getConnectionInitialSpanInfo) {
+                                     MuleContext muleContext) {
 
     return new OperationClient(
                                createExecutionMediator(
@@ -104,8 +102,7 @@ public class OperationClient implements Lifecycle {
                                                        extensionConnectionSupplier,
                                                        errorTypeRepository,
                                                        reflectionCache,
-                                                       muleContext,
-                                                       getConnectionInitialSpanInfo),
+                                                       muleContext),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
                                                               muleContext),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
@@ -302,8 +299,7 @@ public class OperationClient implements Lifecycle {
                                                                            ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                            ErrorTypeRepository errorTypeRepository,
                                                                            ReflectionCache reflectionCache,
-                                                                           MuleContext muleContext,
-                                                                           InitialSpanInfo getConnectionInitialSpanInfo) {
+                                                                           MuleContext muleContext) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
@@ -313,14 +309,13 @@ public class OperationClient implements Lifecycle {
                                                                                 createConnectionInterceptorsChain(extensionModel,
                                                                                                                   operationModel,
                                                                                                                   extensionConnectionSupplier,
-                                                                                                                  reflectionCache,
-                                                                                                                  getConnectionInitialSpanInfo),
+                                                                                                                  reflectionCache),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 getPagingResultTransformer(operationModel,
                                                                                                            extensionConnectionSupplier,
                                                                                                            supportsOAuth(extensionModel),
-                                                                                                           getConnectionInitialSpanInfo)
+                                                                                                           null)
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
                                                                                 getNoopCoreEventTracer(),

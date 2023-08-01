@@ -67,6 +67,10 @@ public class ExtensionConnectionSupplier {
   public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
                                             InitialSpanInfo initialSpanInfo)
       throws ConnectionException, TransactionException {
+    if (initialSpanInfo == null) {
+      return getConnectionHandler(executionContext);
+    }
+
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =

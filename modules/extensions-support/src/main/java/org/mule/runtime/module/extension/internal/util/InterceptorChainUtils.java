@@ -30,6 +30,7 @@ public class InterceptorChainUtils {
    * @param componentModel     the {@link ComponentModel}
    * @param connectionSupplier the connection supplier
    * @param reflectionCache    a {@link ReflectionCache}
+   * @param initialSpanInfo    a {@link InitialSpanInfo} for the span representing the get-connection.
    * @return a new {@link InterceptorChain}
    * @since 4.5.0
    */
@@ -47,6 +48,23 @@ public class InterceptorChainUtils {
     addCursorResetInterceptorsIfRequired(chainBuilder, extensionModel, componentModel, reflectionCache);
 
     return chainBuilder.build();
+  }
+
+  /**
+   * Creates an {@link InterceptorChain} with the interceptors necessary for connectable components.
+   *
+   * @param extensionModel     the {@link ExtensionModel}
+   * @param componentModel     the {@link ComponentModel}
+   * @param connectionSupplier the connection supplier
+   * @param reflectionCache    a {@link ReflectionCache}
+   * @return a new {@link InterceptorChain}
+   * @since 4.5.0
+   */
+  public static InterceptorChain createConnectionInterceptorsChain(ExtensionModel extensionModel,
+                                                                   ComponentModel componentModel,
+                                                                   ExtensionConnectionSupplier connectionSupplier,
+                                                                   ReflectionCache reflectionCache) {
+    return createConnectionInterceptorsChain(extensionModel, componentModel, connectionSupplier, reflectionCache, null);
   }
 
   private static boolean requiresConnectionInterceptors(ExtensionModel extensionModel, ComponentModel componentModel) {

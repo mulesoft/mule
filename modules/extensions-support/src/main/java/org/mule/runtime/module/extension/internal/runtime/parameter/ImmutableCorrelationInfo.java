@@ -3,10 +3,12 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
+import org.mule.runtime.tracer.api.EventTracer;
 
 import java.util.Optional;
 
@@ -22,6 +24,8 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String correlationId;
   private final ItemSequenceInfo itemSequenceInfo;
   private final CoreEvent event;
+  private Optional<EventTracer<CoreEvent>> coreEventEventTracer = empty();
+
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
                                   ItemSequenceInfo itemSequenceInfo, CoreEvent event) {
@@ -30,6 +34,17 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
     this.correlationId = correlationId;
     this.itemSequenceInfo = itemSequenceInfo;
     this.event = event;
+  }
+
+  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
+                                  ItemSequenceInfo itemSequenceInfo, CoreEvent event,
+                                  EventTracer<CoreEvent> coreEventEventTracer) {
+    this.eventId = eventId;
+    this.outboundCorrelationEnabled = outboundCorrelationEnabled;
+    this.correlationId = correlationId;
+    this.itemSequenceInfo = itemSequenceInfo;
+    this.event = event;
+    this.coreEventEventTracer = ofNullable(coreEventEventTracer);
   }
 
   /**
@@ -69,5 +84,9 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
    */
   public CoreEvent getEvent() {
     return event;
+  }
+
+  public Optional<EventTracer<CoreEvent>> getCoreEventEventTracer() {
+    return coreEventEventTracer;
   }
 }

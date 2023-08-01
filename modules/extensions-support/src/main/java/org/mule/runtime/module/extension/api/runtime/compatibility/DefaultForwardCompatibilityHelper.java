@@ -12,6 +12,7 @@ import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
 import org.mule.runtime.module.extension.internal.runtime.parameter.ImmutableCorrelationInfo;
 import org.mule.runtime.module.extension.internal.runtime.source.legacy.LegacySourceCallbackContextAdapter;
 
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
 import org.mule.sdk.compatibility.api.utils.ForwardCompatibilityHelper;
 
@@ -37,8 +38,11 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
 
   public DistributedTraceContextManager getDistributedTraceContextManager(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
     if (correlationInfo instanceof ImmutableCorrelationInfo) {
-      return resolveDistributedTraceContextManager(((ImmutableCorrelationInfo) correlationInfo).getEvent(),
-                                                   profilingService.getCoreEventTracer());
+      ImmutableCorrelationInfo immutableCorrelationInfo = ((ImmutableCorrelationInfo) correlationInfo);
+      EventTracer<CoreEvent> coreEventEventTracer =
+          immutableCorrelationInfo.getCoreEventEventTracer().orElse(profilingService.getCoreEventTracer());
+      return resolveDistributedTraceContextManager((immutableCorrelationInfo.getEvent()),
+                                                   coreEventEventTracer);
     } else {
       throw new IllegalStateException("The given Correlation Info does not posses a Distributed Source Trace Context");
     }

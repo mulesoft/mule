@@ -10,8 +10,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
-import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findSource;
@@ -74,7 +72,6 @@ import javax.inject.Inject;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.slf4j.Logger;
 
 
@@ -118,9 +115,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private MuleContext muleContext;
-
-  @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
@@ -223,8 +217,8 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   errorTypeRepository,
                                   streamingManager,
                                   reflectionCache,
-                                  muleContext,
-                                  initialSpanInfoProvider.getInitialSpanInfo(NULL_COMPONENT, GET_CONNECTION_SPAN_NAME, ""));
+                                  muleContext);
+
     try {
       initialiseIfNeeded(client);
       startIfNeeded(client);
