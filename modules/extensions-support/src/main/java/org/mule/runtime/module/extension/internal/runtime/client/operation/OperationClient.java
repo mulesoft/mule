@@ -304,6 +304,7 @@ public class OperationClient implements Lifecycle {
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
     // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions client.
+    // For now they will not be traced.
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
                                                                                 extensionModel,
                                                                                 operationModel,

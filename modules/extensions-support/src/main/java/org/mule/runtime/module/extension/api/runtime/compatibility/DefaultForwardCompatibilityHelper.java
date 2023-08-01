@@ -40,7 +40,7 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
     if (correlationInfo instanceof ImmutableCorrelationInfo) {
       ImmutableCorrelationInfo immutableCorrelationInfo = ((ImmutableCorrelationInfo) correlationInfo);
       // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions
-      // client.
+      // client. For now they will not be traced.
       EventTracer<CoreEvent> coreEventEventTracer =
           immutableCorrelationInfo.getCoreEventEventTracer().orElse(profilingService.getCoreEventTracer());
       return resolveDistributedTraceContextManager((immutableCorrelationInfo.getEvent()),
