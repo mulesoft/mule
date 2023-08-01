@@ -7,6 +7,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
@@ -312,7 +313,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     configureEnableProfilingService();
 
     return new FeatureFlaggingServiceBuilder()
-        .withContext(new FeatureContext(new MuleVersion("4.6.0-SNAPSHOT"), CONTAINER_FEATURE_CONTEXT_NAME))
+        .withContext(new FeatureContext(new MuleVersion(getProductVersion()), CONTAINER_FEATURE_CONTEXT_NAME))
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
