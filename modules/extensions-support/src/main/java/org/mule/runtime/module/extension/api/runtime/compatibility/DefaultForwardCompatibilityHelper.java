@@ -40,7 +40,8 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
       // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions
       // client. For now they will not be traced.
       return resolveDistributedTraceContextManager((immutableCorrelationInfo.getEvent()),
-                                                   immutableCorrelationInfo.getCoreEventEventTracer());
+                                                   immutableCorrelationInfo.getCoreEventEventTracer()
+                                                       .orElse(profilingService.getCoreEventTracer()));
     } else {
       throw new IllegalStateException("The given Correlation Info does not posses a Distributed Source Trace Context");
     }

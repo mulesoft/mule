@@ -4,7 +4,6 @@
 package org.mule.runtime.module.extension.internal.runtime.parameter;
 
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -25,16 +24,12 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String correlationId;
   private final ItemSequenceInfo itemSequenceInfo;
   private final CoreEvent event;
-  private EventTracer<CoreEvent> coreEventEventTracer = getNoopCoreEventTracer();
+  private final EventTracer<CoreEvent> coreEventEventTracer;
 
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
                                   ItemSequenceInfo itemSequenceInfo, CoreEvent event) {
-    this.eventId = eventId;
-    this.outboundCorrelationEnabled = outboundCorrelationEnabled;
-    this.correlationId = correlationId;
-    this.itemSequenceInfo = itemSequenceInfo;
-    this.event = event;
+    this(eventId, outboundCorrelationEnabled, correlationId, itemSequenceInfo, event, null);
   }
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
@@ -87,7 +82,7 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
     return event;
   }
 
-  public EventTracer<CoreEvent> getCoreEventEventTracer() {
-    return coreEventEventTracer;
+  public Optional<EventTracer<CoreEvent>> getCoreEventEventTracer() {
+    return ofNullable(coreEventEventTracer);
   }
 }
