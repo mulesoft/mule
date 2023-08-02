@@ -93,7 +93,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
    */
   @Override
   public <T> T deserialize(byte[] bytes, ClassLoader classLoader) throws SerializationException {
-    requireNonNull(bytes != null, "The byte[] must not be null");
+    requireNonNull(bytes, "The byte[] must not be null");
     return deserialize(new ByteArrayInputStream(bytes), classLoader);
   }
 
@@ -111,8 +111,8 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
    */
   @Override
   public <T> T deserialize(InputStream inputStream, ClassLoader classLoader) throws SerializationException {
-    requireNonNull(inputStream != null, "Cannot deserialize a null stream");
-    requireNonNull(classLoader != null, "Cannot deserialize with a null classloader");
+    requireNonNull(inputStream, "Cannot deserialize a null stream");
+    requireNonNull(classLoader, "Cannot deserialize with a null classloader");
     try {
       return (T) postInitialize(doDeserialize(inputStream, classLoader));
     } catch (Exception e) {

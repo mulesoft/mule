@@ -158,9 +158,12 @@ public class StacktraceLogChecker extends AbstractLogChecker {
             return false;
           }
           if (thisCall.packageName != null && otherCall.packageName != null) {
-            final Matcher matcher = PACKAGE_WITH_MODULE_PATTERN.matcher(otherCall.packageName);
-            if (!matcher.matches() || !thisCall.packageName.equals(matcher.group(1))) {
-              return false;
+            if (!thisCall.packageName.equals(otherCall.packageName)) {
+              // It may be different because it has module information...
+              final Matcher matcher = PACKAGE_WITH_MODULE_PATTERN.matcher(otherCall.packageName);
+              if (!matcher.matches() || !thisCall.packageName.equals(matcher.group(1))) {
+                return false;
+              }
             }
           }
           if (thisCall.lineNumber != null && otherCall.lineNumber != null && !thisCall.lineNumber.equals(otherCall.lineNumber)) {
