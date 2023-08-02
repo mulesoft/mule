@@ -26,6 +26,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
+import org.mule.test.metadata.extension.model.animals.AnimalShelter;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
@@ -366,6 +367,12 @@ public class MetadataOperations {
   public Object outputMetadataWithKeyIdUsingConfig(@Connection MetadataConnection connection,
                                                    @MetadataKeyId(TestOutputResolverWithKeyResolverUsingConfig.class) String type,
                                                    @Optional @Content Object content) {
+    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public Object inputMetadataResolverInParameterInParameterGroup(@ParameterGroup(
+      name = "Animal shelter") AnimalShelter animalShelter) {
     return null;
   }
 }
