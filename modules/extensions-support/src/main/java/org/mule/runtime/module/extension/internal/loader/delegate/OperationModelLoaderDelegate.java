@@ -14,7 +14,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static java.lang.String.format;
 import static java.util.Optional.of;
 
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
@@ -22,7 +21,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.NestedChainDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
@@ -30,7 +28,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.OperationModelPa
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils;
 
 import java.util.HashMap;
 import java.util.List;

@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.mule.sdk.api.annotation.Alias;
+import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 import org.mule.sdk.api.annotation.Operations;
 import org.mule.sdk.api.annotation.param.Parameter;
@@ -362,6 +363,7 @@ public class JavaOperationModelParserTestCase {
     String configField;
   }
 
+  @Extension(name = "Configuration With Sdk Operations Annotation")
   @Operations(TransactionalOperations.class)
   private static class ConfigurationWithSdkOperationsAnnotation {
   }
