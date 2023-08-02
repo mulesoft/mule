@@ -25,8 +25,17 @@ public class ImmutableCorrelationInfo implements CorrelationInfo {
   private final String correlationId;
   private final ItemSequenceInfo itemSequenceInfo;
   private final CoreEvent event;
-  private final EventTracer<CoreEvent> coreEventEventTracer;
+  private EventTracer<CoreEvent> coreEventEventTracer = getNoopCoreEventTracer();
 
+
+  public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
+                                  ItemSequenceInfo itemSequenceInfo, CoreEvent event) {
+    this.eventId = eventId;
+    this.outboundCorrelationEnabled = outboundCorrelationEnabled;
+    this.correlationId = correlationId;
+    this.itemSequenceInfo = itemSequenceInfo;
+    this.event = event;
+  }
 
   public ImmutableCorrelationInfo(String eventId, boolean outboundCorrelationEnabled, String correlationId,
                                   ItemSequenceInfo itemSequenceInfo, CoreEvent event,
