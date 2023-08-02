@@ -158,8 +158,6 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       new OperationTransactionalActionArgumentResolver();
   private static final ArgumentResolver<org.mule.sdk.api.tx.OperationTransactionalAction> OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER =
       new SdkOperationTransactionalActionArgumentResolver();
-  private static final ArgumentResolver<CorrelationInfo> CORRELATION_INFO_ARGUMENT_RESOLVER =
-      new CorrelationInfoArgumentResolver();
   private static final ArgumentResolver<NotificationEmitter> LEGACY_NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
       new NotificationHandlerArgumentResolver();
   private static final ArgumentResolver<org.mule.sdk.api.notification.NotificationEmitter> NOTIFICATION_HANDLER_ARGUMENT_RESOLVER =
@@ -283,7 +281,7 @@ public final class MethodArgumentResolverDelegate implements ArgumentResolverDel
       } else if (org.mule.sdk.api.tx.OperationTransactionalAction.class.equals(parameterType)) {
         argumentResolver = OPERATION_TRANSACTIONAL_ACTION_ARGUMENT_RESOLVER;
       } else if (isCorrelationInfoType(parameterType)) {
-        argumentResolver = CORRELATION_INFO_ARGUMENT_RESOLVER;
+        argumentResolver = new CorrelationInfoArgumentResolver(profilingService.getCoreEventTracer());
       } else if (isDistributedTraceContextManagerType(parameterType)) {
         argumentResolver = new DistributedTraceContextManagerResolver(profilingService.getCoreEventTracer());
       } else if (NotificationEmitter.class.equals(parameterType)) {
