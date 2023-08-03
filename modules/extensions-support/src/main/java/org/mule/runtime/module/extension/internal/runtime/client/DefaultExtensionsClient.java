@@ -35,6 +35,7 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -58,6 +59,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -112,6 +114,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
 
   @Inject
   private MuleContext muleContext;
@@ -217,6 +222,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   errorTypeRepository,
                                   streamingManager,
                                   reflectionCache,
+                                  componentTracerFactory,
                                   muleContext);
 
     try {

@@ -17,6 +17,7 @@ import static org.mule.runtime.module.extension.internal.runtime.resolver.Resolv
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import static java.util.Optional.empty;
 
@@ -61,6 +62,7 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMed
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.Map;
 import java.util.Optional;
@@ -94,6 +96,7 @@ public class OperationClient implements Lifecycle {
                                      ErrorTypeRepository errorTypeRepository,
                                      StreamingManager streamingManager,
                                      ReflectionCache reflectionCache,
+                                     ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                      MuleContext muleContext) {
 
     return new OperationClient(
@@ -102,6 +105,7 @@ public class OperationClient implements Lifecycle {
                                                        extensionConnectionSupplier,
                                                        errorTypeRepository,
                                                        reflectionCache,
+                                                       componentTracerFactory,
                                                        muleContext),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
                                                               muleContext),
@@ -299,6 +303,7 @@ public class OperationClient implements Lifecycle {
                                                                            ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                            ErrorTypeRepository errorTypeRepository,
                                                                            ReflectionCache reflectionCache,
+                                                                           ComponentTracerFactory<CoreEvent> componentTracerFactory,
                                                                            MuleContext muleContext) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
@@ -318,7 +323,9 @@ public class OperationClient implements Lifecycle {
                                                                                                            supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
-                                                                                DUMMY_COMPONENT_TRACER_INSTANCE,
+                                                                                componentTracerFactory
+                                                                                    .fromComponent(NULL_COMPONENT,
+                                                                                                   GET_CONNECTION_SPAN_NAME, ""),
                                                                                 false);
 
     try {
