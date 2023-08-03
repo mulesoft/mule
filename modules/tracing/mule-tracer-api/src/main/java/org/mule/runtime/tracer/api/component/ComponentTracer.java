@@ -6,7 +6,6 @@ package org.mule.runtime.tracer.api.component;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.profiling.tracing.Span;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
 import java.util.Optional;
@@ -28,7 +27,7 @@ public interface ComponentTracer<T extends Event> {
    * @return the {@link Span} generated for the context of the {@link Event} when it hits the {@link Component} if it could be
    *         created.
    */
-  Optional<InternalSpan> startSpan(T event);
+  Optional<Span> startSpan(T event);
 
   /**
    * Starts a {@link Span} associated to the {@link Component}.

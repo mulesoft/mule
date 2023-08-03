@@ -9,6 +9,7 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -49,7 +50,7 @@ public interface EventTracer<T extends Event> {
    * @param spanInfo the {@link InitialSpanInfo} used for customizing the span.
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startSpan(T event, InitialSpanInfo spanInfo);
+  Optional<Span> startSpan(T event, InitialSpanInfo spanInfo);
 
 
   /**
@@ -61,7 +62,7 @@ public interface EventTracer<T extends Event> {
    *
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startSpan(T event, InitialSpanInfo spanInfo, Assertion assertion);
+  Optional<Span> startSpan(T event, InitialSpanInfo spanInfo, Assertion assertion);
 
   /**
    * @param event ends the current context {@link InternalSpan}.

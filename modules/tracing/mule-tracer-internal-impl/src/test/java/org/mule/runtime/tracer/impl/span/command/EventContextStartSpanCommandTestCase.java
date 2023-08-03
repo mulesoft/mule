@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -30,7 +31,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
 import org.slf4j.Logger;
-
 
 @Feature(PROFILING)
 @Story(DEFAULT_CORE_EVENT_TRACER)
@@ -51,7 +51,7 @@ public class EventContextStartSpanCommandTestCase {
                                                                                     eventContextFactory,
                                                                                     true);
 
-    Optional<InternalSpan> internalSpan = startCommand.execute(eventContext, initialSpanInfo, assertion);
+    Optional<Span> internalSpan = startCommand.execute(eventContext, initialSpanInfo, assertion);
 
     assertThat(internalSpan.isPresent(), equalTo(FALSE));
   }
@@ -77,7 +77,7 @@ public class EventContextStartSpanCommandTestCase {
                                                                                     eventContextFactory,
                                                                                     true);
 
-    Optional<InternalSpan> internalSpan = startCommand.execute((EventContext) eventContext, initialSpanInfo, assertion);
+    Optional<Span> internalSpan = startCommand.execute((EventContext) eventContext, initialSpanInfo, assertion);
 
     if (!internalSpan.isPresent()) {
       fail("No span present");
