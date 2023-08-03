@@ -22,5 +22,6 @@ module org.mule.runtime.tracer.api {
   exports org.mule.runtime.tracer.api.span.exporter;
   exports org.mule.runtime.tracer.api.span.info;
   exports org.mule.runtime.tracer.api.span.validation;
-  
+  exports org.mule.runtime.tracer.api.component;
+
 }

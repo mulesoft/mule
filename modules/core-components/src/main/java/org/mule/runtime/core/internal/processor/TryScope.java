@@ -58,7 +58,7 @@ import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private ProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -228,8 +228,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         initialSpanInfoProvider
-                                                             .getInitialSpanInfo(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
+                                                         componentTracerFactory
+                                                             .fromComponent(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);

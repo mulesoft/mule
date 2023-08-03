@@ -33,12 +33,12 @@ public class NoopCoreEventTracer implements EventTracer<CoreEvent> {
   private NoopCoreEventTracer() {}
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo initialSpanInfo) {
+  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo initialSpanInfo) {
     return empty();
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo initialSpanInfo, Assertion assertion) {
+  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo initialSpanInfo, Assertion assertion) {
     return empty();
   }
 

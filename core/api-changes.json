@@ -151,12 +151,57 @@
         },
         {
           "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
-          "classSimpleName": "InitialSpanInfo",
-          "package": "org.mule.runtime.tracer.api.span.info",
-          "classQualifiedName": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
+          "new": "interface org.mule.runtime.tracer.api.component.ComponentTracer<T extends org.mule.runtime.api.event.Event>",
+          "classSimpleName": "ComponentTracer",
+          "package": "org.mule.runtime.tracer.api.component",
+          "classQualifiedName": "org.mule.runtime.tracer.api.component.ComponentTracer",
           "elementKind": "interface",
-          "justification": "W-13742675: Upgrade revapi version"
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.validation.Assertion",
+          "classSimpleName": "Assertion",
+          "package": "org.mule.runtime.tracer.api.span.validation",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.validation.Assertion",
+          "elementKind": "interface",
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.runtime.tracer.api.span.validation.AssertionFailedException",
+          "classSimpleName": "AssertionFailedException",
+          "package": "org.mule.runtime.tracer.api.span.validation",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.validation.AssertionFailedException",
+          "elementKind": "class",
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.InternalSpan",
+          "classSimpleName": "InternalSpan",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.InternalSpan",
+          "elementKind": "interface",
+          "justification": "W-13762853: As part of the refactor, this validation should be removed."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.InternalSpanCallStack",
+          "classSimpleName": "InternalSpanCallStack",
+          "package": "org.mule.runtime.tracer.api.span",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.InternalSpanCallStack",
+          "elementKind": "interface",
+          "justification": "W-13762853: As part of the refactor, this validation should be removed."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.error.InternalSpanError",
+          "classSimpleName": "InternalSpanError",
+          "package": "org.mule.runtime.tracer.api.span.error",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.error.InternalSpanError",
+          "elementKind": "interface",
+          "justification": "W-13762853: As part of the refactor, this validation should be removed."
         },
         {
           "code": "java.class.removed",

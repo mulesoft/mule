@@ -17,7 +17,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
 import org.mule.runtime.core.privileged.routing.RoutingException;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  ComponentTracerFactory componentTracerFactory;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -60,7 +60,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
+      route.setComponentTracer(componentTracerFactory.fromComponent(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -91,7 +91,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
+    routes.add(new ProcessorRoute(processor, componentTracerFactory));
   }
 
   @Override
@@ -118,7 +118,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, initialSpanInfoProvider);
+      super(publisher, routes, componentTracerFactory);
     }
 
     @Override

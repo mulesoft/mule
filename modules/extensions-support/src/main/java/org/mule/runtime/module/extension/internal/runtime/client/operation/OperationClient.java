@@ -9,7 +9,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
+import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
@@ -20,7 +20,6 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 
 import static java.util.Optional.empty;
 
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -48,6 +47,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -62,8 +62,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMed
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Map;
 import java.util.Optional;
@@ -79,7 +77,7 @@ import org.slf4j.Logger;
  */
 public class OperationClient implements Lifecycle {
 
-  private static Logger LOGGER = getLogger(OperationClient.class);
+  private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
 
   private final ExecutionMediator<OperationModel> mediator;
@@ -97,8 +95,7 @@ public class OperationClient implements Lifecycle {
                                      ErrorTypeRepository errorTypeRepository,
                                      StreamingManager streamingManager,
                                      ReflectionCache reflectionCache,
-                                     MuleContext muleContext,
-                                     InitialSpanInfoProvider initialSpanInfoProvider) {
+                                     MuleContext muleContext) {
 
     return new OperationClient(
                                createExecutionMediator(
@@ -106,8 +103,7 @@ public class OperationClient implements Lifecycle {
                                                        extensionConnectionSupplier,
                                                        errorTypeRepository,
                                                        reflectionCache,
-                                                       muleContext,
-                                                       initialSpanInfoProvider),
+                                                       muleContext),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
                                                               muleContext),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
@@ -299,31 +295,22 @@ public class OperationClient implements Lifecycle {
     disposeIfNeeded(executorResolver, LOGGER);
   }
 
-  private static ExecutionMediator<OperationModel> createExecutionMediator(OperationKey key,
+  private static ExecutionMediator<OperationModel> createExecutionMediator(
+                                                                           OperationKey key,
                                                                            ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                            ErrorTypeRepository errorTypeRepository,
                                                                            ReflectionCache reflectionCache,
-                                                                           MuleContext muleContext,
-                                                                           InitialSpanInfoProvider initialSpanInfoProvider) {
+                                                                           MuleContext muleContext) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
-
-    InitialSpanInfo getConnectionInitialSpanInfo = initialSpanInfoProvider
-        .getInitialSpanInfo(NULL_COMPONENT,
-                            GET_CONNECTION_SPAN_NAME,
-                            "");
-
-    // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions client.
-    // For now they will not be traced.
     ExecutionMediator<OperationModel> mediator = new DefaultExecutionMediator<>(
                                                                                 extensionModel,
                                                                                 operationModel,
                                                                                 createConnectionInterceptorsChain(extensionModel,
                                                                                                                   operationModel,
                                                                                                                   extensionConnectionSupplier,
-                                                                                                                  reflectionCache,
-                                                                                                                  getConnectionInitialSpanInfo),
+                                                                                                                  reflectionCache),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 getPagingResultTransformer(operationModel,
@@ -331,8 +318,7 @@ public class OperationClient implements Lifecycle {
                                                                                                            supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
-                                                                                getNoopCoreEventTracer(),
-                                                                                getConnectionInitialSpanInfo,
+                                                                                DUMMY_COMPONENT_TRACER_INSTANCE,
                                                                                 false);
 
     try {

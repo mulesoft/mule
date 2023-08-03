@@ -5,6 +5,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -27,9 +28,9 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecution
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Optional;
 import javax.inject.Inject;
@@ -50,8 +51,10 @@ public class ExtensionConnectionSupplier {
   @Inject
   InternalProfilingService internalProfilingService;
 
-  private boolean lazyConnections;
+  @Inject
+  private ComponentTracerFactory componentTracerFactory;
 
+  private boolean lazyConnections;
 
   /**
    * Returns the connection to be used with the {@code operationContext}.
@@ -59,25 +62,21 @@ public class ExtensionConnectionSupplier {
    * It accounts for the possibility of the returned connection joining/belonging to an active transaction
    *
    * @param executionContext an {@link ExecutionContextAdapter}
-   * @param initialSpanInfo  a {@link InitialSpanInfo} with the information for tracing the get connection span.
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
-  public ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
-                                            InitialSpanInfo initialSpanInfo)
+  public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
-    if (initialSpanInfo == null) {
-      return getConnectionHandler(executionContext);
-    }
-
+    ComponentTracer connectionComponentTracer =
+        componentTracerFactory.fromComponent(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =
           new TracedLazyConnection(getConnectionHandler(executionContext), internalProfilingService.getCoreEventTracer(),
-                                   initialSpanInfo, executionContext);
+                                   connectionComponentTracer, executionContext);
     } else {
-      internalProfilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), initialSpanInfo);
+      connectionComponentTracer.startSpan(executionContext.getEvent());
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {
@@ -159,19 +158,19 @@ public class ExtensionConnectionSupplier {
     private final ConnectionHandler<T> lazyConnectionHandler;
     private final EventTracer<CoreEvent> eventTracer;
     private final CoreEvent tracedEvent;
-    private final InitialSpanInfo initialSpanInfo;
+    private final ComponentTracer componentTracer;
 
     public TracedLazyConnection(ConnectionHandler<T> lazyConnectionHandler, EventTracer<CoreEvent> eventTracer,
-                                InitialSpanInfo initialSpanInfo, EventedExecutionContext<?> executionContext) {
+                                ComponentTracer componentTracer, EventedExecutionContext<?> executionContext) {
       this.lazyConnectionHandler = lazyConnectionHandler;
       this.eventTracer = eventTracer;
-      this.initialSpanInfo = initialSpanInfo;
+      this.componentTracer = componentTracer;
       this.tracedEvent = executionContext.getEvent();
     }
 
     @Override
     public T getConnection() throws ConnectionException {
-      eventTracer.startComponentSpan(tracedEvent, initialSpanInfo);
+      componentTracer.startSpan(tracedEvent);
       try {
         return lazyConnectionHandler.getConnection();
       } finally {

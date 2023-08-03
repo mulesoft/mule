@@ -71,13 +71,13 @@ public class SelectableCoreEventTracer implements EventTracer<CoreEvent>, Initia
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo spanInfo) {
-    return selectedCoreEventTracer.startComponentSpan(event, spanInfo);
+  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo spanInfo) {
+    return selectedCoreEventTracer.startSpan(event, spanInfo);
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent event, InitialSpanInfo spanInfo, Assertion assertion) {
-    return selectedCoreEventTracer.startComponentSpan(event, spanInfo, assertion);
+  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo spanInfo, Assertion assertion) {
+    return selectedCoreEventTracer.startSpan(event, spanInfo, assertion);
   }
 
   @Override
