@@ -81,11 +81,11 @@ public final class OperationMessageProcessorBuilder
     // If case it is a paged operation, the initial span info is set so that it is not needed to be retrieved or calculated in
     // each request.
     if (isPagedOperation && resultTransformer != null) {
-      ((PagingResultTransformer) resultTransformer).setGetConnectionSpanInfo(
-                                                                             initialSpanInfoProvider
-                                                                                 .getInitialSpanInfo(operationMessageProcessor,
-                                                                                                     GET_CONNECTION_SPAN_NAME,
-                                                                                                     ""));
+      ((PagingResultTransformer) resultTransformer).setOperationConnectionTracer(
+                                                                                 componentTracerFactory
+                                                                                     .fromComponent(operationMessageProcessor,
+                                                                                                    GET_CONNECTION_SPAN_NAME,
+                                                                                                    ""));
     }
 
     return operationMessageProcessor;

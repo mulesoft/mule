@@ -9,9 +9,11 @@ import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
@@ -38,11 +40,11 @@ public class InterceptorChainUtils {
                                                                    ComponentModel componentModel,
                                                                    ExtensionConnectionSupplier connectionSupplier,
                                                                    ReflectionCache reflectionCache,
-                                                                   InitialSpanInfo initialSpanInfo) {
+                                                                   ComponentTracer<CoreEvent> connectionComponentTracer) {
     InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
 
     if (requiresConnectionInterceptors(extensionModel, componentModel)) {
-      addConnectionInterceptors(chainBuilder, connectionSupplier, initialSpanInfo);
+      addConnectionInterceptors(chainBuilder, connectionSupplier, connectionComponentTracer);
     }
 
     addCursorResetInterceptorsIfRequired(chainBuilder, extensionModel, componentModel, reflectionCache);
@@ -61,7 +63,8 @@ public class InterceptorChainUtils {
   }
 
   private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
-                                                ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo initialSpanInfo) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier, initialSpanInfo));
+                                                ExtensionConnectionSupplier connectionSupplier,
+                                                ComponentTracer<CoreEvent> connectionComponentTracer) {
+    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier, connectionComponentTracer));
   }
 }

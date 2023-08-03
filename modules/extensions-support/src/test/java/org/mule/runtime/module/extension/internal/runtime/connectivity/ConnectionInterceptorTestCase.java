@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
@@ -79,8 +79,8 @@ public class ConnectionInterceptorTestCase extends AbstractMuleContextTestCase {
 
     when(operationContext.getTransactionConfig()).thenReturn(empty());
 
-    interceptor = new ConnectionInterceptor(connectionSupplier, mock(InitialSpanInfo.class));
-    when(connectionSupplier.getConnection(eq(operationContext), any(InitialSpanInfo.class))).thenReturn(connectionHandler);
+    interceptor = new ConnectionInterceptor(connectionSupplier, mock(ComponentTracer.class));
+    when(connectionSupplier.getConnection(eq(operationContext), any(ComponentTracer.class))).thenReturn(connectionHandler);
   }
 
   @Test

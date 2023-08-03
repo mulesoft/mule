@@ -5,7 +5,6 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
-import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
@@ -29,7 +28,6 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
-import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.api.EventTracer;
 
 import java.util.Optional;
@@ -51,9 +49,6 @@ public class ExtensionConnectionSupplier {
   @Inject
   InternalProfilingService internalProfilingService;
 
-  @Inject
-  private ComponentTracerFactory componentTracerFactory;
-
   private boolean lazyConnections;
 
   /**
@@ -61,26 +56,26 @@ public class ExtensionConnectionSupplier {
    * <p>
    * It accounts for the possibility of the returned connection joining/belonging to an active transaction
    *
-   * @param executionContext an {@link ExecutionContextAdapter}
+   * @param executionContext          an {@link ExecutionContextAdapter}
+   * @param operationConnectionTracer a {@link ComponentTracer} that will be used to trace the connection obtetnion.
    * @return a {@link ConnectionHandler}
    * @throws ConnectionException  if connection could not be obtained
    * @throws TransactionException if something is wrong with the transaction
    */
-  public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
+  public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
+                                         ComponentTracer<CoreEvent> operationConnectionTracer)
       throws ConnectionException, TransactionException {
-    ComponentTracer connectionComponentTracer =
-        componentTracerFactory.fromComponent(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =
           new TracedLazyConnection(getConnectionHandler(executionContext), internalProfilingService.getCoreEventTracer(),
-                                   connectionComponentTracer, executionContext);
+                                   operationConnectionTracer, executionContext);
     } else {
-      connectionComponentTracer.startSpan(executionContext.getEvent());
+      operationConnectionTracer.startSpan(executionContext.getEvent());
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {
-        internalProfilingService.getCoreEventTracer().endCurrentSpan(executionContext.getEvent());
+        operationConnectionTracer.endCurrentSpan(executionContext.getEvent());
       }
     }
     return connectionHandler;

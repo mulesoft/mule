@@ -47,7 +47,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -310,7 +309,8 @@ public class OperationClient implements Lifecycle {
                                                                                 createConnectionInterceptorsChain(extensionModel,
                                                                                                                   operationModel,
                                                                                                                   extensionConnectionSupplier,
-                                                                                                                  reflectionCache),
+                                                                                                                  reflectionCache,
+                                                                                                                  DUMMY_COMPONENT_TRACER_INSTANCE),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 getPagingResultTransformer(operationModel,

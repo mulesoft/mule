@@ -45,6 +45,7 @@ import static org.mule.runtime.module.extension.internal.util.InterceptorChainUt
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
@@ -93,6 +94,7 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
@@ -247,6 +249,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
+  private ComponentTracer<CoreEvent> operationParametersResolutionTracer =
+      DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -602,10 +606,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       // Since the tracing feature is Component aware at all levels, we cannot do this wrapping earlier (for example, at component
       // building time)
+      operationParametersResolutionTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
       resolverSet = new TracedResolverSet(muleContext,
                                           componentTracerFactory.fromComponent(this, VALUE_RESOLUTION_SPAN_NAME, ""))
                                               .addAll(resolverSet.getResolvers());
-
       initialised = true;
     }
   }
@@ -1058,7 +1062,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
                                         createConnectionInterceptorsChain(extensionModel, componentModel,
-                                                                          extensionConnectionSupplier, reflectionCache),
+                                                                          extensionConnectionSupplier, reflectionCache,
+                                                                          componentTracerFactory
+                                                                              .fromComponent(this, GET_CONNECTION_SPAN_NAME, "")),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
@@ -1130,14 +1136,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    ComponentTracer<CoreEvent> componentTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
-    componentTracer.startSpan(event);
+    operationParametersResolutionTracer.startSpan(event);
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();
     } finally {
-      componentTracer.endCurrentSpan(event);
+      operationParametersResolutionTracer.endCurrentSpan(event);
     }
   }
 

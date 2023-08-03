@@ -49,7 +49,7 @@ public class LazyInitialSpanInfoTestCase {
       }
     });
 
-    getNoopCoreEventTracer().startComponentSpan(mock(CoreEvent.class), lazyInitialSpanInfo);
+    getNoopCoreEventTracer().startSpan(mock(CoreEvent.class), lazyInitialSpanInfo);
     assertThat(lazyInitialSpanInfo.isComputed(), equalTo(false));
   }
 
@@ -70,7 +70,7 @@ public class LazyInitialSpanInfoTestCase {
 
     CoreEventTracer coreEventTracer = new CoreEventTracer(mock(FeatureFlaggingService.class), new TestEventSpanFactory());
     coreEventTracer.initialise();
-    coreEventTracer.startComponentSpan(mock(CoreEvent.class), lazyInitialSpanInfo);
+    coreEventTracer.startSpan(mock(CoreEvent.class), lazyInitialSpanInfo);
     assertThat(lazyInitialSpanInfo.isComputed(), equalTo(true));
     assertThat(lazyInitialSpanInfo.getName(), equalTo(DUMMY_SPAN));
   }

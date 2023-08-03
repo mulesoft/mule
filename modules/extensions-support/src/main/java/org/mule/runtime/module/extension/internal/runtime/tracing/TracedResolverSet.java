@@ -20,23 +20,23 @@ import java.util.Map;
  */
 public class TracedResolverSet extends ResolverSet {
 
-  private final ComponentTracer<CoreEvent> valueResolutionComponentTracer;
+  private final ComponentTracer<CoreEvent> valueResolutionTracer;
 
   public TracedResolverSet(MuleContext muleContext,
-                           ComponentTracer<CoreEvent> valueResolutionComponentTracer) {
+                           ComponentTracer<CoreEvent> valueResolutionTracer) {
     super(muleContext);
-    this.valueResolutionComponentTracer = valueResolutionComponentTracer;
+    this.valueResolutionTracer = valueResolutionTracer;
   }
 
   @Override
   protected Object resolve(Map.Entry<String, ValueResolver<?>> entry, ValueResolvingContext valueResolvingContext)
       throws MuleException {
-    valueResolutionComponentTracer.startSpan(valueResolvingContext.getEvent());
+    valueResolutionTracer.startSpan(valueResolvingContext.getEvent());
     try {
-      valueResolutionComponentTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
+      valueResolutionTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
       return super.resolve(entry, valueResolvingContext);
     } finally {
-      valueResolutionComponentTracer.endCurrentSpan(valueResolvingContext.getEvent());
+      valueResolutionTracer.endCurrentSpan(valueResolvingContext.getEvent());
     }
   }
 }

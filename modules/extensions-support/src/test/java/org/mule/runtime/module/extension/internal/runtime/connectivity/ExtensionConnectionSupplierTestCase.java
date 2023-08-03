@@ -40,7 +40,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionContextConfigurationDecorator;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collection;
@@ -219,7 +219,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     connectionManager.bind(config, connectionProvider);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
-    adapter.getConnection(operationContext, mock(InitialSpanInfo.class));
+    adapter.getConnection(operationContext, mock(ComponentTracer.class));
     verify(transaction, never()).bindResource(any(), any(XAExtensionTransactionalResource.class));
   }
 
@@ -240,7 +240,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     try {
       connectionManager.bind(config, connectionProvider);
       TransactionCoordination.getInstance().bindTransaction(transaction);
-      adapter.getConnection(operationContext, mock(InitialSpanInfo.class));
+      adapter.getConnection(operationContext, mock(ComponentTracer.class));
     } finally {
       verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
       verify(connectionProvider).disconnect(any(XATransactionalConnection.class));
@@ -252,7 +252,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
-    final ConnectionHandler connection = adapter.getConnection(operationContext, mock(InitialSpanInfo.class));
+    final ConnectionHandler connection = adapter.getConnection(operationContext, mock(ComponentTracer.class));
     if (lazyConnections) {
       connection.getConnection();
     }

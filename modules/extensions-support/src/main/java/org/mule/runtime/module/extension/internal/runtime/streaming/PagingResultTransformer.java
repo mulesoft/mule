@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
@@ -11,7 +12,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 /**
  * {@link ResultTransformer} implementation that transforms {@link PagingProvider} instances into
@@ -24,7 +25,7 @@ public class PagingResultTransformer implements ResultTransformer {
   private final ExtensionConnectionSupplier connectionSupplier;
   private final boolean supportsOAuth;
 
-  private InitialSpanInfo getConnectionSpanInfo;
+  private ComponentTracer<CoreEvent> operationConnectionTracer;
 
   public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier,
                                  boolean supportsOAuth) {
@@ -43,14 +44,14 @@ public class PagingResultTransformer implements ResultTransformer {
                                                       operationContext,
                                                       connectionSupplier,
                                                       supportsOAuth,
-                                                      getConnectionSpanInfo);
+                                                      operationConnectionTracer);
 
     ListConsumer<?> consumer = new ListConsumer(producer);
     consumer.loadNextPage();
     return new ConsumerStreamingIterator<>(consumer);
   }
 
-  public void setGetConnectionSpanInfo(InitialSpanInfo getConnectionSpanInfo) {
-    this.getConnectionSpanInfo = getConnectionSpanInfo;
+  public void setOperationConnectionTracer(ComponentTracer<CoreEvent> operationConnectionTracer) {
+    this.operationConnectionTracer = operationConnectionTracer;
   }
 }
