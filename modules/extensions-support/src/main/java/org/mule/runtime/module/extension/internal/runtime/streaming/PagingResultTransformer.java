@@ -11,6 +11,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
  * {@link ResultTransformer} implementation that transforms {@link PagingProvider} instances into
@@ -23,7 +24,10 @@ public class PagingResultTransformer implements ResultTransformer {
   private final ExtensionConnectionSupplier connectionSupplier;
   private final boolean supportsOAuth;
 
-  public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier, boolean supportsOAuth) {
+  private InitialSpanInfo getConnectionSpanInfo;
+
+  public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier,
+                                 boolean supportsOAuth) {
     this.connectionSupplier = connectionSupplier;
     this.supportsOAuth = supportsOAuth;
   }
@@ -38,10 +42,15 @@ public class PagingResultTransformer implements ResultTransformer {
                                                       config,
                                                       operationContext,
                                                       connectionSupplier,
-                                                      supportsOAuth);
+                                                      supportsOAuth,
+                                                      getConnectionSpanInfo);
 
     ListConsumer<?> consumer = new ListConsumer(producer);
     consumer.loadNextPage();
     return new ConsumerStreamingIterator<>(consumer);
+  }
+
+  public void setGetConnectionSpanInfo(InitialSpanInfo getConnectionSpanInfo) {
+    this.getConnectionSpanInfo = getConnectionSpanInfo;
   }
 }

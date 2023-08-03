@@ -17,6 +17,7 @@ import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 import java.util.function.Consumer;
 
@@ -32,8 +33,11 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   private final ExtensionConnectionSupplier connectionSupplier;
 
-  public ConnectionInterceptor(ExtensionConnectionSupplier connectionSupplier) {
+  private final InitialSpanInfo getConnectionInitialSpanInfo;
+
+  public ConnectionInterceptor(ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo getConnectionInitialSpanInfo) {
     this.connectionSupplier = connectionSupplier;
+    this.getConnectionInitialSpanInfo = getConnectionInitialSpanInfo;
   }
 
   /**
@@ -104,6 +108,6 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   private ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> operationContext)
       throws ConnectionException, TransactionException {
-    return connectionSupplier.getConnection(operationContext);
+    return connectionSupplier.getConnection(operationContext, getConnectionInitialSpanInfo);
   }
 }

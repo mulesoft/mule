@@ -12,6 +12,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
  * Utilities related with the creation of interception chains.
@@ -29,17 +30,19 @@ public class InterceptorChainUtils {
    * @param componentModel     the {@link ComponentModel}
    * @param connectionSupplier the connection supplier
    * @param reflectionCache    a {@link ReflectionCache}
+   * @param initialSpanInfo    a {@link InitialSpanInfo} for the span representing the get-connection.
    * @return a new {@link InterceptorChain}
    * @since 4.5.0
    */
   public static InterceptorChain createConnectionInterceptorsChain(ExtensionModel extensionModel,
                                                                    ComponentModel componentModel,
                                                                    ExtensionConnectionSupplier connectionSupplier,
-                                                                   ReflectionCache reflectionCache) {
+                                                                   ReflectionCache reflectionCache,
+                                                                   InitialSpanInfo initialSpanInfo) {
     InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
 
     if (requiresConnectionInterceptors(extensionModel, componentModel)) {
-      addConnectionInterceptors(chainBuilder, connectionSupplier);
+      addConnectionInterceptors(chainBuilder, connectionSupplier, initialSpanInfo);
     }
 
     addCursorResetInterceptorsIfRequired(chainBuilder, extensionModel, componentModel, reflectionCache);
@@ -58,7 +61,7 @@ public class InterceptorChainUtils {
   }
 
   private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
-                                                ExtensionConnectionSupplier connectionSupplier) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier));
+                                                ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo initialSpanInfo) {
+    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier, initialSpanInfo));
   }
 }

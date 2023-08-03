@@ -7,6 +7,8 @@ import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERAT
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getLocationAsString;
 import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUtils.getSpanName;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
@@ -37,6 +39,9 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
 
   public static final String EXECUTE_NEXT = "execute-next";
   public static final String FLOW = "flow";
+  private final Component component;
+  private final String overriddenName;
+  private final String spanNameSuffix;
 
   private InitialExportInfo initialExportInfo;
 
@@ -47,30 +52,17 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
   private final String apiId;
   private int initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT;
 
-  public ExecutionInitialSpanInfo(Component component, String apiId, TracingLevelConfiguration tracingLevelConfiguration) {
-    this(component, apiId, null, "", tracingLevelConfiguration);
-  }
-
-  public ExecutionInitialSpanInfo(Component component, String apiId, String overriddenName,
-                                  TracingLevelConfiguration tracingLevelConfiguration) {
-    this(component, apiId, overriddenName, "", tracingLevelConfiguration);
-  }
-
   public ExecutionInitialSpanInfo(Component component, String apiId,
                                   String overriddenName, String spanNameSuffix,
                                   TracingLevelConfiguration tracingLevelConfiguration) {
 
     this.location = getLocationAsString(component.getLocation());
+    this.component = component;
+    this.overriddenName = overriddenName;
+    this.spanNameSuffix = spanNameSuffix;
     TracingLevelExportInfo tracingLevelExportInfo =
-        getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix, tracingLevelConfiguration);
-
+        getTracingLevelExportInfo(location, component, this.overriddenName, this.spanNameSuffix, tracingLevelConfiguration);
     this.initialExportInfo = resolveInitialExporterInfo(tracingLevelExportInfo);
-    tracingLevelConfiguration
-        .onConfigurationChange(tlc -> {
-          this.initialExportInfo =
-              resolveInitialExporterInfo(getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix,
-                                                                   tracingLevelConfiguration));
-        });
     this.isPolicySpan = isComponentOfName(component, EXECUTE_NEXT) || component instanceof PolicyChain
         || name.equals(OPERATION_EXECUTION_SPAN_NAME);
     this.rootSpan = isComponentOfName(component, FLOW);
@@ -79,6 +71,12 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     if (apiId != null) {
       this.initialAttributesCount = INITIAL_ATTRIBUTES_BASE_COUNT + 1;
     }
+  }
+
+  public void reconfigureInitialSpanInfo(TracingLevelConfiguration tracingLevelConfiguration) {
+    this.initialExportInfo =
+        resolveInitialExporterInfo(getTracingLevelExportInfo(location, component, overriddenName, spanNameSuffix,
+                                                             tracingLevelConfiguration));
   }
 
   private static ExecutionInitialExportInfo resolveInitialExporterInfo(TracingLevelExportInfo tracingLevelExportInfo) {
@@ -99,7 +97,7 @@ public class ExecutionInitialSpanInfo implements InitialSpanInfo {
     }
 
     if (overriddenName == null) {
-      name = getSpanName(component.getIdentifier()) + spanNameSuffix;
+      name = getSpanName(component.getIdentifier()) + defaultString(spanNameSuffix);
       tracingLevelExportInfo.setSpanIdentifier(component);
     } else {
       name = overriddenName;

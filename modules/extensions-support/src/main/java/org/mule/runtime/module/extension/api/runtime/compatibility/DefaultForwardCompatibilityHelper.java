@@ -5,7 +5,6 @@ package org.mule.runtime.module.extension.api.runtime.compatibility;
 
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveDistributedTraceContextManager;
 
-import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.extension.api.runtime.parameter.CorrelationInfo;
 import org.mule.runtime.extension.api.runtime.source.SourceCallbackContext;
@@ -37,8 +36,12 @@ public class DefaultForwardCompatibilityHelper implements ForwardCompatibilityHe
 
   public DistributedTraceContextManager getDistributedTraceContextManager(org.mule.sdk.api.runtime.parameter.CorrelationInfo correlationInfo) {
     if (correlationInfo instanceof ImmutableCorrelationInfo) {
-      return resolveDistributedTraceContextManager(((ImmutableCorrelationInfo) correlationInfo).getEvent(),
-                                                   profilingService.getCoreEventTracer());
+      ImmutableCorrelationInfo immutableCorrelationInfo = ((ImmutableCorrelationInfo) correlationInfo);
+      // TODO: W-13837896: we have to verify here if we want to trace the operations that are invoked through the extensions
+      // client. For now they will not be traced.
+      return resolveDistributedTraceContextManager((immutableCorrelationInfo.getEvent()),
+                                                   immutableCorrelationInfo.getCoreEventEventTracer()
+                                                       .orElse(profilingService.getCoreEventTracer()));
     } else {
       throw new IllegalStateException("The given Correlation Info does not posses a Distributed Source Trace Context");
     }
