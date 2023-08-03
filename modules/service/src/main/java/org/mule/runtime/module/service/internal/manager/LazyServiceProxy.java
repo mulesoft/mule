@@ -26,8 +26,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
-import org.mule.runtime.core.internal.util.MethodInvoker;
 import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;

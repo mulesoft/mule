@@ -70,10 +70,15 @@ public class ObjectFactoryClassRepository {
       String name;
       boolean callingSuper = ObjectTypeProvider.class.isAssignableFrom(objectFactoryType);
 
+      // Make sure the generated class exists in a module that has visibility on all the required superclasses and interfaces.
+      // spring-config has that scope.
+      String packageName = this.getClass().getPackage().getName();
       if (callingSuper) {
-        name = objectFactoryType.getName() + "_ByteBuddy_CallingSuperGetObjectType";
+        name = packageName + "." +
+            objectFactoryType.getSimpleName() + "_ByteBuddy_CallingSuperGetObjectType";
       } else {
-        name = objectFactoryType.getName() + "_ByteBuddy_" + objectTypeClass.getName().replace(".", "_");
+        name = packageName + "." +
+            objectFactoryType.getSimpleName() + "_ByteBuddy_" + objectTypeClass.getName().replace(".", "_");
       }
 
       ClassLoader classLoader = multiParentClassLoaderFor(objectFactoryType.getClassLoader());
@@ -82,7 +87,9 @@ public class ObjectFactoryClassRepository {
       } catch (ClassNotFoundException e) {
         // class doesn't exist, generate
       }
-      return createObjectFactoryDynamicClass(objectFactoryType, name, classLoader, callingSuper, objectTypeClass);
+      final Class createObjectFactoryDynamicClass =
+          createObjectFactoryDynamicClass(objectFactoryType, name, classLoader, callingSuper, objectTypeClass);
+      return createObjectFactoryDynamicClass;
     }
   }
 

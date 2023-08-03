@@ -1,12 +1,13 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.module.service.internal.test.manager;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
+import org.mule.runtime.module.service.internal.manager.DefaultMethodInvoker;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,7 +27,7 @@ public class DefaultMethodInvokerTestCase extends AbstractMuleTestCase {
   @Rule
   public ExpectedException expectedException = none();
 
-  private DefaultMethodInvoker defaultMethodInvoker = new DefaultMethodInvoker();
+  private final DefaultMethodInvoker defaultMethodInvoker = new DefaultMethodInvoker();
 
   @Test
   public void callCorrectMethod() throws Throwable {

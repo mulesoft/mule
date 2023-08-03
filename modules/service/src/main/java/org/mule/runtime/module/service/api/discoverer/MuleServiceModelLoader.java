@@ -5,6 +5,7 @@ package org.mule.runtime.module.service.api.discoverer;
 
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.module.service.internal.util.ClassUtils.instantiateClass;
 
 import static java.lang.String.format;
 
@@ -12,7 +13,6 @@ import org.mule.runtime.api.deployment.meta.MuleServiceContractModel;
 import org.mule.runtime.api.deployment.meta.MuleServiceModel;
 import org.mule.runtime.api.deployment.persistence.MuleServiceModelJsonSerializer;
 import org.mule.runtime.api.service.ServiceProvider;
-import org.mule.runtime.core.api.util.ClassUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,9 +39,13 @@ public class MuleServiceModelLoader {
 
   public static ServiceProvider instantiateServiceProvider(MuleServiceContractModel contractModel) throws ServiceResolutionError {
     final String className = contractModel.getServiceProviderClassName();
+    return doInstantiateServiceProvider(className);
+  }
+
+  public static ServiceProvider doInstantiateServiceProvider(final String className) throws ServiceResolutionError {
     Object reflectedObject;
     try {
-      reflectedObject = ClassUtils.instantiateClass(className);
+      reflectedObject = instantiateClass(className);
     } catch (Exception e) {
       throw new ServiceResolutionError("Unable to create service from class: " + className, e);
     }
@@ -53,4 +57,5 @@ public class MuleServiceModelLoader {
 
     return (ServiceProvider) reflectedObject;
   }
+
 }

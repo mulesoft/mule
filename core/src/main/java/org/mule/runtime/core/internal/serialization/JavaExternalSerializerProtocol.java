@@ -4,12 +4,14 @@
 package org.mule.runtime.core.internal.serialization;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.util.SerializationUtils;
 
 import java.io.IOException;
@@ -64,8 +66,8 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
-    checkArgument(inputStream != null, "Cannot deserialize a null stream");
-    checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
+    requireNonNull(inputStream, "Cannot deserialize a null stream");
+    requireNonNull(classLoader, "Cannot deserialize with a null classloader");
 
     return (T) SerializationUtils.deserialize(inputStream, classLoader, muleContext);
   }

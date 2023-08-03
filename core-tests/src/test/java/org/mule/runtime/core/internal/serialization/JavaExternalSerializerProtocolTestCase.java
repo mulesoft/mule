@@ -19,7 +19,7 @@ import io.qameta.allure.Story;
 
 @Feature(SERIALIZATION)
 @Story(MESSAGE_SERIALIZATION)
-public class JavaExternalSerializerProtocolProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
+public class JavaExternalSerializerProtocolTestCase extends AbstractSerializerProtocolContractTestCase {
 
   @Before
   public void setUp() {
