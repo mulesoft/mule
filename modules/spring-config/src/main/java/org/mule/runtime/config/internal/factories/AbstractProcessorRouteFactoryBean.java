@@ -13,7 +13,7 @@ import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ public abstract class AbstractProcessorRouteFactoryBean<T> extends AbstractCompo
   protected ConfigurationComponentLocator locator;
 
   @Inject
-  protected InitialSpanInfoProvider initialSpanInfoProvider;
+  protected ComponentTracerFactory componentTracerFactory;
 
   private List<Processor> messageProcessors;
 

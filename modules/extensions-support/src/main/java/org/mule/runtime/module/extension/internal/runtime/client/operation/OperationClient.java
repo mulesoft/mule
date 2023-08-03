@@ -9,7 +9,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
-import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
+import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
@@ -47,6 +47,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -76,7 +77,7 @@ import org.slf4j.Logger;
  */
 public class OperationClient implements Lifecycle {
 
-  private static Logger LOGGER = getLogger(OperationClient.class);
+  private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
 
   private final ExecutionMediator<OperationModel> mediator;
@@ -317,8 +318,7 @@ public class OperationClient implements Lifecycle {
                                                                                                            supportsOAuth(extensionModel))
                                                                                                                .orElse(null),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
-                                                                                getNoopCoreEventTracer(),
-                                                                                null,
+                                                                                DUMMY_COMPONENT_TRACER_INSTANCE,
                                                                                 false);
 
     try {

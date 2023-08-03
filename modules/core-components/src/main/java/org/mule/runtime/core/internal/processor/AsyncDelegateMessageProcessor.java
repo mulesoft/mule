@@ -66,7 +66,7 @@ import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -103,7 +103,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
   private FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  ComponentTracerFactory componentTracerFactory;
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -154,7 +154,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
 
     delegateBuilder.setProcessingStrategy(processingStrategy);
     delegateBuilder
-        .setChainInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ASYNC_INNER_CHAIN_SPAN_NAME, ""));
+        .setComponentTracer(componentTracerFactory.fromComponent(this, ASYNC_INNER_CHAIN_SPAN_NAME, ""));
     delegate = delegateBuilder.build();
 
     initialiseIfNeeded(delegate, getMuleContext());

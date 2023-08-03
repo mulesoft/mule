@@ -9,11 +9,11 @@ import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_PROFILING_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_SPAN_EXPORTER_CONFIGURATION_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
@@ -43,7 +43,7 @@ import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaul
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider.getDummyInitialSpanInfoProvider;
+import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.getDummyComponentTracerFactory;
 import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
@@ -105,7 +105,7 @@ import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
@@ -169,7 +169,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     configureCoreTracer(muleContext);
 
-    configureCoreTracerCustomization(muleContext);
+    configureComponentTracerFactory(muleContext);
 
     configureSpanExporterConfiguration(muleContext);
 
@@ -314,9 +314,9 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
   }
 
-  private void configureCoreTracerCustomization(MuleContext muleContext) throws RegistrationException {
-    InitialSpanInfoProvider initialSpanInfoProvider = getDummyInitialSpanInfoProvider();
-    registerObject(MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY, initialSpanInfoProvider, muleContext);
+  private void configureComponentTracerFactory(MuleContext muleContext) throws RegistrationException {
+    ComponentTracerFactory<CoreEvent> componentTracerFactory = getDummyComponentTracerFactory();
+    registerObject(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, componentTracerFactory, muleContext);
   }
 
   protected void configureCoreTracer(MuleContext muleContext) throws RegistrationException {

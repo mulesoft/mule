@@ -83,7 +83,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
     }
   }
 
-  private InitialSpanInfoIdentifier getInitialSpanInfoIdentifier(Component location, String suffix, String overriddenName) {
-    return new InitialSpanInfoIdentifier(location, suffix, overriddenName);
+  private InitialSpanInfoIdentifier getInitialSpanInfoIdentifier(Component component, String suffix, String overriddenName) {
+    return new InitialSpanInfoIdentifier(component, suffix, overriddenName);
   }
 }

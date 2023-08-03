@@ -22,8 +22,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.core.privileged.profiling.tracing.ComponentTracerAware;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import javax.inject.Inject;
 
@@ -48,7 +48,7 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   private List<MessageProcessorChain> routes = emptyList();
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -80,9 +80,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   public void setRoutes(List<MessageProcessorChain> routes) {
     this.routes = routes;
     for (MessageProcessorChain route : routes) {
-      if (route instanceof InitialSpanInfoAware) {
-        ((InitialSpanInfoAware) route)
-            .setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX));
+      if (route instanceof ComponentTracerAware) {
+        ((ComponentTracerAware) route)
+            .setComponentTracer(componentTracerFactory.fromComponent(this, SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX));
       }
     }
   }

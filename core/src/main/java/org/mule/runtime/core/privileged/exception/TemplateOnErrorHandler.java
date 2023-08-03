@@ -12,12 +12,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
-import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
-import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
+
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.buildNewChainWithListOfProcessors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getDefaultProcessingStrategyFactory;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.getProcessingStrategy;
+
+import static org.mule.runtime.core.internal.component.ComponentAnnotations.updateRootContainerName;
+import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.addContext;
+import static org.mule.runtime.core.internal.util.LocationUtils.globalLocation;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -49,16 +51,19 @@ import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
+
+import org.mule.runtime.core.privileged.message.PrivilegedError;
+import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
-import org.mule.runtime.core.privileged.message.PrivilegedError;
-import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,12 +78,8 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -90,7 +91,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
-  private InitialSpanInfo initialSpanInfo;
+  private ComponentTracer<CoreEvent> componentTracer;
 
   private boolean fromGlobalErrorHandler = false;
 
@@ -107,10 +108,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private InternalProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
-
-  private EventTracer<CoreEvent> coreEventEventTracer;
-
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
@@ -150,9 +148,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         onErrorFlux = onErrorFlux.transformDeferred(TemplateOnErrorHandler.this::route);
       } else {
         // We need to start the tracing that would be started by the on error handler MessageProcessorChain.
-        onErrorFlux = onErrorFlux.doOnNext(coreEvent -> coreEventEventTracer
-            .startComponentSpan(coreEvent,
-                                initialSpanInfo));
+        onErrorFlux = onErrorFlux.doOnNext(coreEvent -> componentTracer.startSpan(coreEvent));
       }
 
       onErrorFlux = Flux.from(publisherPostProcessor
@@ -166,9 +162,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
               .doOnNext(result -> {
                 if (getMessageProcessors().isEmpty()) {
                   // We end the current span verifying that the name of the current span is the expected.
-                  coreEventEventTracer
-                      .endCurrentSpan(result,
-                                      new SpanNameAssertion(initialSpanInfo.getName()));
+                  componentTracer
+                      .endCurrentSpan(result);
                 }
                 ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result);
               })))
@@ -203,8 +198,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(TemplateOnErrorHandler.this);
-    coreEventEventTracer = profilingService.getCoreEventTracer();
+    componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
     super.initialise();
   }
 
@@ -346,7 +340,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance(),
-                                          initialSpanInfo);
+                                          componentTracer);
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 

@@ -9,8 +9,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.Map;
 
@@ -21,25 +20,23 @@ import java.util.Map;
  */
 public class TracedResolverSet extends ResolverSet {
 
-  private final EventTracer<CoreEvent> coreEventEventTracer;
-  private final InitialSpanInfo valueResolutionInitialSpanInfo;
+  private final ComponentTracer<CoreEvent> valueResolutionComponentTracer;
 
-  public TracedResolverSet(MuleContext muleContext, EventTracer<CoreEvent> coreEventEventTracer,
-                           InitialSpanInfo valueResolutionInitialSpanInfo) {
+  public TracedResolverSet(MuleContext muleContext,
+                           ComponentTracer<CoreEvent> valueResolutionComponentTracer) {
     super(muleContext);
-    this.coreEventEventTracer = coreEventEventTracer;
-    this.valueResolutionInitialSpanInfo = valueResolutionInitialSpanInfo;
+    this.valueResolutionComponentTracer = valueResolutionComponentTracer;
   }
 
   @Override
   protected Object resolve(Map.Entry<String, ValueResolver<?>> entry, ValueResolvingContext valueResolvingContext)
       throws MuleException {
-    coreEventEventTracer.startComponentSpan(valueResolvingContext.getEvent(), valueResolutionInitialSpanInfo);
+    valueResolutionComponentTracer.startSpan(valueResolvingContext.getEvent());
     try {
-      coreEventEventTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
+      valueResolutionComponentTracer.addCurrentSpanAttribute(valueResolvingContext.getEvent(), "value-name", entry.getKey());
       return super.resolve(entry, valueResolvingContext);
     } finally {
-      coreEventEventTracer.endCurrentSpan(valueResolvingContext.getEvent());
+      valueResolutionComponentTracer.endCurrentSpan(valueResolvingContext.getEvent());
     }
   }
 }

@@ -20,7 +20,6 @@ import static java.lang.Boolean.getBoolean;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -46,8 +45,6 @@ import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -103,13 +100,12 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo spanCustomizationInfo) {
-    return startComponentSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
+  public Optional<InternalSpan> startSpan(CoreEvent coreEvent, InitialSpanInfo spanCustomizationInfo) {
+    return startSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo,
-                                                   Assertion assertion) {
+  public Optional<InternalSpan> startSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo, Assertion assertion) {
     return startCommand.execute(coreEvent.getContext(), enrichInitialSpanInfo(initialSpanInfo, coreEvent), assertion);
   }
 
@@ -144,7 +140,6 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
   @Override
   public void addCurrentSpanAttribute(CoreEvent coreEvent, String key, String value) {
     eventContextAddSpanAttributeCommand.execute(coreEvent.getContext(), key, value);
-
   }
 
   @Override

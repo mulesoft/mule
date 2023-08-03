@@ -28,7 +28,7 @@ import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 
 import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
   private FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private String maxRetries = DEFAULT_RETRIES;
   private String millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
@@ -81,8 +81,7 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     this.nestedChain =
         buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
-                                          initialSpanInfoProvider.getInitialSpanInfo(this,
-                                                                                     UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX));
+                                          componentTracerFactory.fromComponent(this, UNTIL_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFIX));
 
     super.initialise();
 

@@ -28,9 +28,9 @@ import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecution
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionKey;
 import org.mule.runtime.module.extension.internal.runtime.transaction.TransactionBindingDelegate;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Optional;
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ public class ExtensionConnectionSupplier {
   InternalProfilingService internalProfilingService;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private boolean lazyConnections;
 
@@ -68,15 +68,15 @@ public class ExtensionConnectionSupplier {
    */
   public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext)
       throws ConnectionException, TransactionException {
-    InitialSpanInfo getConnectionInitialSpanInfo =
-        initialSpanInfoProvider.getInitialSpanInfo(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
+    ComponentTracer connectionComponentTracer =
+        componentTracerFactory.fromComponent(executionContext.getComponent(), GET_CONNECTION_SPAN_NAME, "");
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =
           new TracedLazyConnection(getConnectionHandler(executionContext), internalProfilingService.getCoreEventTracer(),
-                                   getConnectionInitialSpanInfo, executionContext);
+                                   connectionComponentTracer, executionContext);
     } else {
-      internalProfilingService.getCoreEventTracer().startComponentSpan(executionContext.getEvent(), getConnectionInitialSpanInfo);
+      connectionComponentTracer.startSpan(executionContext.getEvent());
       try {
         connectionHandler = getConnectionHandler(executionContext);
       } finally {
@@ -158,19 +158,19 @@ public class ExtensionConnectionSupplier {
     private final ConnectionHandler<T> lazyConnectionHandler;
     private final EventTracer<CoreEvent> eventTracer;
     private final CoreEvent tracedEvent;
-    private final InitialSpanInfo initialSpanInfo;
+    private final ComponentTracer componentTracer;
 
     public TracedLazyConnection(ConnectionHandler<T> lazyConnectionHandler, EventTracer<CoreEvent> eventTracer,
-                                InitialSpanInfo initialSpanInfo, EventedExecutionContext<?> executionContext) {
+                                ComponentTracer componentTracer, EventedExecutionContext<?> executionContext) {
       this.lazyConnectionHandler = lazyConnectionHandler;
       this.eventTracer = eventTracer;
-      this.initialSpanInfo = initialSpanInfo;
+      this.componentTracer = componentTracer;
       this.tracedEvent = executionContext.getEvent();
     }
 
     @Override
     public T getConnection() throws ConnectionException {
-      eventTracer.startComponentSpan(tracedEvent, initialSpanInfo);
+      componentTracer.startSpan(tracedEvent);
       try {
         return lazyConnectionHandler.getConnection();
       } finally {
