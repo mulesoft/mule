@@ -1,1 +1,1 @@
-org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader
+org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader
