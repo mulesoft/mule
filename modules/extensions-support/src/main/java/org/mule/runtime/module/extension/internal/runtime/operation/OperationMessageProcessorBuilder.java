@@ -15,6 +15,7 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.policy.PolicyManager;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -58,8 +59,9 @@ public final class OperationMessageProcessorBuilder
     boolean isPagedOperation = operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent();
 
     if (isPagedOperation) {
-      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth)
-          .orElse(null);
+      resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
+                                                     DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE)
+                                                         .orElse(null);
     }
 
     if (supportsOAuth) {
@@ -78,8 +80,7 @@ public final class OperationMessageProcessorBuilder
                                         terminationTimeout);
     }
 
-    // If case it is a paged operation, the initial span info is set so that it is not needed to be retrieved or calculated in
-    // each request.
+    // TODO: Make the initial span info non Component dependant (mainly component location but must be think as a general issue)
     if (isPagedOperation && resultTransformer != null) {
       ((PagingResultTransformer) resultTransformer).setOperationConnectionTracer(
                                                                                  componentTracerFactory

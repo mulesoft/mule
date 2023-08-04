@@ -59,9 +59,11 @@ import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContex
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
+import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.Map;
@@ -318,14 +320,12 @@ public class OperationClient implements Lifecycle {
                                                                                                                   DUMMY_COMPONENT_TRACER_INSTANCE),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
-                                                                                getPagingResultTransformer(operationModel,
-                                                                                                           extensionConnectionSupplier,
-                                                                                                           supportsOAuth(extensionModel))
-                                                                                                               .orElse(null),
+                                                                                getResultTransformer(extensionConnectionSupplier,
+                                                                                                     extensionModel,
+                                                                                                     operationModel,
+                                                                                                     componentTracerFactory),
                                                                                 NULL_PROFILING_DATA_PRODUCER,
-                                                                                componentTracerFactory
-                                                                                    .fromComponent(NULL_COMPONENT,
-                                                                                                   GET_CONNECTION_SPAN_NAME, ""),
+                                                                                getOperationConnectionTracer(componentTracerFactory),
                                                                                 false);
 
     try {
@@ -336,6 +336,21 @@ public class OperationClient implements Lifecycle {
     } catch (MuleException e) {
       throw new MuleRuntimeException(createStaticMessage("Could not create mediator for operation " + key), e);
     }
+  }
+
+  private static ComponentTracer<CoreEvent> getOperationConnectionTracer(ComponentTracerFactory<CoreEvent> componentTracerFactory) {
+    return componentTracerFactory
+        .fromComponent(NULL_COMPONENT,
+                       GET_CONNECTION_SPAN_NAME, "");
+  }
+
+  private static ResultTransformer getResultTransformer(ExtensionConnectionSupplier extensionConnectionSupplier,
+                                                        ExtensionModel extensionModel, OperationModel operationModel,
+                                                        ComponentTracerFactory<CoreEvent> componentTracerFactory) {
+    return getPagingResultTransformer(operationModel,
+                                      extensionConnectionSupplier,
+                                      supportsOAuth(extensionModel), getOperationConnectionTracer(componentTracerFactory))
+                                          .orElse(null);
   }
 
   private static abstract class EventCompletingCursorProviderDecorator<T extends Cursor> extends CursorProviderDecorator<T> {

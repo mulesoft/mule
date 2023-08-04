@@ -65,6 +65,12 @@ public class ExtensionConnectionSupplier {
   public ConnectionHandler getConnection(ExecutionContextAdapter<? extends ComponentModel> executionContext,
                                          ComponentTracer<CoreEvent> operationConnectionTracer)
       throws ConnectionException, TransactionException {
+
+    // Tracing cannot break application logic, so we avoid possible tracing related NPEs.
+    if (operationConnectionTracer == null) {
+      return getConnectionHandler(executionContext);
+    }
+
     ConnectionHandler<?> connectionHandler;
     if (lazyConnections) {
       connectionHandler =
