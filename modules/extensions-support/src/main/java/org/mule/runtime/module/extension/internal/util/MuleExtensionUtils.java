@@ -68,6 +68,7 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -116,6 +117,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
@@ -722,14 +724,16 @@ public class MuleExtensionUtils {
    * @param operationModel              the {@link OperationModel}
    * @param extensionConnectionSupplier the connection supplier
    * @param supportsOAuth               whether the given operation supports OAuth authentication
+   * @param operationConnectionTracer   The {@link ComponentTracer} that will be used to trace the connection obtaining.
    * @return an {@link Optional} {@link ResultTransformer}
    * @since 4.5.0
    */
   public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
-                                                                       boolean supportsOAuth) {
+                                                                       boolean supportsOAuth,
+                                                                       ComponentTracer<CoreEvent> operationConnectionTracer) {
     return operationModel.getModelProperty(PagedOperationModelProperty.class)
-        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
+        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,

@@ -12,12 +12,13 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.function.Consumer;
 
@@ -33,11 +34,12 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   private final ExtensionConnectionSupplier connectionSupplier;
 
-  private final InitialSpanInfo getConnectionInitialSpanInfo;
+  private final ComponentTracer<CoreEvent> operationConnectionTracer;
 
-  public ConnectionInterceptor(ExtensionConnectionSupplier connectionSupplier, InitialSpanInfo getConnectionInitialSpanInfo) {
+  public ConnectionInterceptor(ExtensionConnectionSupplier connectionSupplier,
+                               ComponentTracer<CoreEvent> operationConnectionTracer) {
     this.connectionSupplier = connectionSupplier;
-    this.getConnectionInitialSpanInfo = getConnectionInitialSpanInfo;
+    this.operationConnectionTracer = operationConnectionTracer;
   }
 
   /**
@@ -108,6 +110,6 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
 
   private ConnectionHandler<?> getConnection(ExecutionContextAdapter<? extends ComponentModel> operationContext)
       throws ConnectionException, TransactionException {
-    return connectionSupplier.getConnection(operationContext, getConnectionInitialSpanInfo);
+    return connectionSupplier.getConnection(operationContext, operationConnectionTracer);
   }
 }

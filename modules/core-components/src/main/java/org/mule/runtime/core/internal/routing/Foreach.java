@@ -33,7 +33,7 @@ import org.mule.runtime.core.internal.routing.outbound.EventBuilderConfigurerLis
 import org.mule.runtime.core.internal.routing.split.SplittingStrategy;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -80,7 +80,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
   private FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private List<Processor> messageProcessors;
   private String expression = DEFAULT_SPLIT_EXPRESSION;
@@ -122,7 +122,7 @@ public class Foreach extends AbstractMessageProcessorOwner implements Initialisa
     Optional<ProcessingStrategy> processingStrategy = getProcessingStrategy(locator, this);
     nestedChain =
         buildNewChainWithListOfProcessors(processingStrategy, messageProcessors,
-                                          initialSpanInfoProvider.getInitialSpanInfo(this, ITERATION_SPAN_NAME_SUFFIX));
+                                          componentTracerFactory.fromComponent(this, ITERATION_SPAN_NAME_SUFFIX));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, expression);
     super.initialise();
   }

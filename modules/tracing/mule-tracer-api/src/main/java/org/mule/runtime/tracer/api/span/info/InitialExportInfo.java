@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * The export information when starting a {@link org.mule.runtime.tracer.api.span.InternalSpan}.
  *
- * @see org.mule.runtime.tracer.api.EventTracer#startComponentSpan(Event, InitialSpanInfo)
+ * @see org.mule.runtime.tracer.api.EventTracer#startSpan(Event, InitialSpanInfo)
  *
  * @since 4.5.0
  */

@@ -4,7 +4,6 @@
 package org.mule.runtime.tracer.api;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
@@ -41,9 +40,8 @@ import java.util.function.Supplier;
  */
 public interface EventTracer<T extends Event> {
 
-  // TODO: W-13057253: Refactor in order to provide Component related sugars.
-  // TODO: Internal span should not be returned by this interface. Return Span instead. Improve static factories for getting the
-  // internal span if necessary.
+  // TODO: W-13762853: Internal span should not be returned by this interface. Return Span instead. Improve static factories for
+  // getting the internal span if necessary.
   /**
    * Starts a span associated to the {@param component} as the current context span for the {@link Event}.
    *
@@ -51,8 +49,7 @@ public interface EventTracer<T extends Event> {
    * @param spanInfo the {@link InitialSpanInfo} used for customizing the span.
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startComponentSpan(T event,
-                                            InitialSpanInfo spanInfo);
+  Optional<InternalSpan> startSpan(T event, InitialSpanInfo spanInfo);
 
 
   /**
@@ -64,9 +61,7 @@ public interface EventTracer<T extends Event> {
    *
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startComponentSpan(T event,
-                                            InitialSpanInfo spanInfo,
-                                            Assertion assertion);
+  Optional<InternalSpan> startSpan(T event, InitialSpanInfo spanInfo, Assertion assertion);
 
   /**
    * @param event ends the current context {@link InternalSpan}.

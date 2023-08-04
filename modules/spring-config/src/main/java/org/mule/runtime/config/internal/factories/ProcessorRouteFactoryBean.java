@@ -10,6 +10,6 @@ public class ProcessorRouteFactoryBean extends AbstractProcessorRouteFactoryBean
 
   @Override
   protected ProcessorRoute getProcessorRoute(MessageProcessorChain chain) {
-    return new ProcessorRoute(chain, initialSpanInfoProvider);
+    return new ProcessorRoute(chain, componentTracerFactory);
   }
 }

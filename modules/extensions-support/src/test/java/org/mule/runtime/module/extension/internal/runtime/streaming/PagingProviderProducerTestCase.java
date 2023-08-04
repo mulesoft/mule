@@ -29,6 +29,7 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.tck.size.SmallTest;
 
@@ -55,7 +56,7 @@ public class PagingProviderProducerTestCase {
 
   private PagingProviderProducer<String> createProducer() {
     return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier,
-                                        mock(InitialSpanInfo.class));
+                                        mock(ComponentTracer.class));
   }
 
   @Before

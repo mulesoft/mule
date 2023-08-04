@@ -3,15 +3,18 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
+import org.apache.logging.log4j.core.Core;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 /**
  * {@link ResultTransformer} implementation that transforms {@link PagingProvider} instances into
@@ -24,12 +27,18 @@ public class PagingResultTransformer implements ResultTransformer {
   private final ExtensionConnectionSupplier connectionSupplier;
   private final boolean supportsOAuth;
 
-  private InitialSpanInfo getConnectionSpanInfo;
+  private ComponentTracer<CoreEvent> operationConnectionTracer = DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 
   public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier,
                                  boolean supportsOAuth) {
     this.connectionSupplier = connectionSupplier;
     this.supportsOAuth = supportsOAuth;
+  }
+
+  public PagingResultTransformer(ExtensionConnectionSupplier connectionSupplier,
+                                 boolean supportsOAuth, ComponentTracer<CoreEvent> operationConnectionTracer) {
+    this(connectionSupplier, supportsOAuth);
+    this.operationConnectionTracer = operationConnectionTracer;
   }
 
   @Override
@@ -43,14 +52,14 @@ public class PagingResultTransformer implements ResultTransformer {
                                                       operationContext,
                                                       connectionSupplier,
                                                       supportsOAuth,
-                                                      getConnectionSpanInfo);
+                                                      operationConnectionTracer);
 
     ListConsumer<?> consumer = new ListConsumer(producer);
     consumer.loadNextPage();
     return new ConsumerStreamingIterator<>(consumer);
   }
 
-  public void setGetConnectionSpanInfo(InitialSpanInfo getConnectionSpanInfo) {
-    this.getConnectionSpanInfo = getConnectionSpanInfo;
+  public void setOperationConnectionTracer(ComponentTracer<CoreEvent> coreEventComponentTracer) {
+    this.operationConnectionTracer = coreEventComponentTracer;
   }
 }

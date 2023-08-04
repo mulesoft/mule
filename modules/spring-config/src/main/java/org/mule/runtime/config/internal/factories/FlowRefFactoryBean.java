@@ -3,13 +3,6 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -25,6 +18,15 @@ import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
@@ -55,7 +57,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,7 +116,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private ConfigurationComponentLocator locator;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   public void setName(String name) {
     this.refName = name;
@@ -164,11 +166,11 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                            flowRefMessageProcessor);
     }
 
-    // for subflows, we create a new one so it must be initialised manually
+    // for subflows, we create a new one, so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         SubflowMessageProcessorChainBuilder chainBuilder = (SubflowMessageProcessorChainBuilder) referencedFlow;
-        chainBuilder.withInitialSpanInfoProvider(initialSpanInfoProvider);
+        chainBuilder.withComponentTracerFactory(componentTracerFactory);
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> {
               ProcessingStrategy callerFlowPs = f.getProcessingStrategy();

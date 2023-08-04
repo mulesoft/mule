@@ -42,7 +42,7 @@ import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
-import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.security.DefaultMuleSecurityManager;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
@@ -103,7 +103,7 @@ public class QueueManagerLifecycleOrderTestCase extends AbstractMuleContextTestC
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(ErrorTypeRepository.class.getName(),
                                                                          CORE_ERROR_TYPE_REPO.get());
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(InitialSpanInfoProvider.class.getName(),
-                                                                         new DummyInitialSpanInfoProvider());
+                                                                         new DummyComponentTracerFactory());
     FlowConstruct fc = new RecordingFlow("dummy", muleContext);
     fc.setAnnotations(singletonMap(LOCATION_KEY, from("flow")));
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(fc);

@@ -84,7 +84,7 @@ import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorC
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -134,7 +134,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
   private final BackPressureStrategySelector backpressureStrategySelector;
   private final ErrorType FLOW_BACKPRESSURE_ERROR_TYPE;
 
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   public AbstractPipeline(String name, MuleContext muleContext, MessageSource source, List<Processor> processors,
                           Optional<FlowExceptionHandler> exceptionListener,
@@ -148,8 +148,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
       // TODO: verify if the lookup in registry AbstractPipeline can be removed (W-12718088)
       interceptorManager = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InterceptorManager.class);
       notificationFirer = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class);
-      initialSpanInfoProvider =
-          ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(InitialSpanInfoProvider.class);
+      componentTracerFactory = ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(ComponentTracerFactory.class);
     } catch (RegistrationException e) {
       throw new MuleRuntimeException(e);
     }
@@ -194,7 +193,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
     configureMessageProcessors(builder);
     builder.setMessagingExceptionHandler(getExceptionListener());
     builder.setPipelineLocation(getLocation());
-    builder.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this));
+    builder.setComponentTracer(componentTracerFactory.fromComponent(this));
     return builder.build();
   }
 

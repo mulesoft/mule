@@ -94,6 +94,7 @@ import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
@@ -135,9 +136,8 @@ import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDeleg
 import org.mule.runtime.module.extension.internal.runtime.tracing.TracedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.util.Collection;
@@ -222,10 +222,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Inject
   private InternalProfilingService profilingService;
 
-  private EventTracer<CoreEvent> coreEventEventTracer;
-
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -251,7 +249,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
-  private InitialSpanInfo getParameterResolutionResultSpanInfo;
+  private ComponentTracer<CoreEvent> operationParametersResolutionTracer =
+      DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -578,9 +577,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   @Override
   protected void doInitialise() throws InitialisationException {
     if (!initialised) {
-      getParameterResolutionResultSpanInfo =
-          initialSpanInfoProvider.getInitialSpanInfo(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
-      coreEventEventTracer = profilingService.getCoreEventTracer();
       initRetryPolicyResolver();
       try {
         transactionConfig = buildTransactionConfig();
@@ -591,7 +587,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       valueReturnDelegate = getValueReturnDelegate();
       initialiseIfNeeded(resolverSet, muleContext);
       componentExecutor = createComponentExecutor();
-
       executionMediator = createExecutionMediator();
       initialiseIfNeeded(componentExecutor, true, muleContext);
 
@@ -611,11 +606,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       // Since the tracing feature is Component aware at all levels, we cannot do this wrapping earlier (for example, at component
       // building time)
-      resolverSet = new TracedResolverSet(muleContext, coreEventEventTracer,
-                                          initialSpanInfoProvider
-                                              .getInitialSpanInfo(this, VALUE_RESOLUTION_SPAN_NAME, ""))
-                                                  .addAll(resolverSet.getResolvers());
-
+      operationParametersResolutionTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
+      resolverSet = new TracedResolverSet(muleContext,
+                                          componentTracerFactory.fromComponent(this, VALUE_RESOLUTION_SPAN_NAME, ""))
+                                              .addAll(resolverSet.getResolvers());
       initialised = true;
     }
   }
@@ -1069,16 +1063,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         componentModel,
                                         createConnectionInterceptorsChain(extensionModel, componentModel,
                                                                           extensionConnectionSupplier, reflectionCache,
-                                                                          initialSpanInfoProvider
-                                                                              .getInitialSpanInfo(this, GET_CONNECTION_SPAN_NAME,
-                                                                                                  "")),
+                                                                          componentTracerFactory
+                                                                              .fromComponent(this, GET_CONNECTION_SPAN_NAME, "")),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
-                                        coreEventEventTracer,
-                                        initialSpanInfoProvider
-                                            .getInitialSpanInfo(this, OPERATION_EXECUTION_SPAN_NAME, ""),
+                                        componentTracerFactory.fromComponent(this, OPERATION_EXECUTION_SPAN_NAME, ""),
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 
@@ -1145,15 +1136,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
-    coreEventEventTracer
-        .startComponentSpan(event,
-                            getParameterResolutionResultSpanInfo);
+    operationParametersResolutionTracer.startSpan(event);
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();
     } finally {
-      coreEventEventTracer.endCurrentSpan(event);
+      operationParametersResolutionTracer.endCurrentSpan(event);
     }
   }
 

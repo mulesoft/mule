@@ -21,8 +21,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.privileged.processor.chain.UnnamedComponent;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -70,8 +69,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
     if (nestedProcessors != null) {
       nestedChain = newChain(empty(), nestedProcessors,
-                             registry.lookupByType(InitialSpanInfoProvider.class).get()
-                                 .getInitialSpanInfo(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
+                             registry.lookupByType(ComponentTracerFactory.class).get()
+                                 .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
