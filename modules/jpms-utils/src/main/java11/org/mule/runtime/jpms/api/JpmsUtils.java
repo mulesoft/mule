@@ -132,17 +132,17 @@ public final class JpmsUtils {
    * <p>
    * Note: By definition, automatic modules have transitive readability on ALL other modules on the same layer and the parents.
    * This may cause a situation where a layer that is supposed to be isolated will instead be able to read all the modules in the
-   * parent layers. To prevent this, the {@code automaticModulesInTheirOwnLayer} parameter must be passes as {@code true}.
+   * parent layers. To prevent this, the {@code isolateDependenciesInTheirOwnLayer} parameter must be passes as {@code true}.
    * 
-   * @param modulePathEntries               the URLs from which to find the modules
-   * @param parent                          the parent class loader for delegation
-   * @param parentLayer                     a layer of modules that will be visible from the newly created {@link ModuleLayer}.
-   * @param automaticModulesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as parent
-   *                                        will be created for the automatic modules.
+   * @param modulePathEntries                  the URLs from which to find the modules
+   * @param parent                             the parent class loader for delegation
+   * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
+   * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
+   *                                           parent will be created for modules that need to be isolated.
    * @return a new {@link ModuleLayer}.
    */
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
-                                              boolean automaticModulesInTheirOwnLayer,
+                                              boolean isolateDependenciesInTheirOwnLayer,
                                               boolean filterBootModules) {
     final Set<String> bootModules;
     if (filterBootModules) {
