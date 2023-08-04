@@ -26,6 +26,7 @@ module org.mule.runtime.extension.model {
 
   requires com.google.common;
   requires com.google.gson;
+  requires org.apache.commons.lang3;
 
   exports org.mule.runtime.core.api.error;
   exports org.mule.runtime.core.api.extension.provider;
@@ -37,6 +38,9 @@ module org.mule.runtime.extension.model {
 
   provides org.mule.runtime.ast.api.validation.ValidationsProvider with
       org.mule.runtime.config.internal.validation.CoreValidationsProvider;
+
+  provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
+      org.mule.runtime.config.internal.dsl.processor.xml.provider.CoreXmlNamespaceInfoProvider;
 
   exports org.mule.runtime.config.internal.error to
       org.mule.runtime.core,
