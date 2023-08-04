@@ -174,7 +174,7 @@ public final class JpmsUtils {
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
 
     Controller controller;
-    if (automaticModulesInTheirOwnLayer) {
+    if (isolateDependenciesInTheirOwnLayer) {
       // put all automatic modules in their own layer, having only boot layer as parent...
       Path[] automaticModulesPaths = modulesByAutomatic.get(true)
           .stream()
