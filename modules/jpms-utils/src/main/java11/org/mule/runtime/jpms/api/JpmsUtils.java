@@ -170,12 +170,8 @@ public final class JpmsUtils {
         .stream()
         .filter(moduleRef -> !bootModules.contains(moduleRef.descriptor().name()))
         .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
-    System.out.println(" >> Found modules: " + modulesByAutomatic);
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
-    System.out
-        .println(" >> Resolved parent ModuleLayer " + (parentLayer.isEmpty() ? "(boot)" : "") + ": '" + resolvedParentLayer
-            + "'");
 
     Controller controller;
     if (automaticModulesInTheirOwnLayer) {
