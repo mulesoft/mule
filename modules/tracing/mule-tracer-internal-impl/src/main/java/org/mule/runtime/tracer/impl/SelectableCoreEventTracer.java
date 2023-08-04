@@ -13,12 +13,12 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
@@ -71,12 +71,12 @@ public class SelectableCoreEventTracer implements EventTracer<CoreEvent>, Initia
   }
 
   @Override
-  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo spanInfo) {
+  public Optional<Span> startSpan(CoreEvent event, InitialSpanInfo spanInfo) {
     return selectedCoreEventTracer.startSpan(event, spanInfo);
   }
 
   @Override
-  public Optional<InternalSpan> startSpan(CoreEvent event, InitialSpanInfo spanInfo, Assertion assertion) {
+  public Optional<Span> startSpan(CoreEvent event, InitialSpanInfo spanInfo, Assertion assertion) {
     return selectedCoreEventTracer.startSpan(event, spanInfo, assertion);
   }
 

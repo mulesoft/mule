@@ -177,33 +177,6 @@
           "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
         },
         {
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.tracer.api.span.InternalSpan",
-          "classSimpleName": "InternalSpan",
-          "package": "org.mule.runtime.tracer.api.span",
-          "classQualifiedName": "org.mule.runtime.tracer.api.span.InternalSpan",
-          "elementKind": "interface",
-          "justification": "W-13762853: As part of the refactor, this validation should be removed."
-        },
-        {
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.tracer.api.span.InternalSpanCallStack",
-          "classSimpleName": "InternalSpanCallStack",
-          "package": "org.mule.runtime.tracer.api.span",
-          "classQualifiedName": "org.mule.runtime.tracer.api.span.InternalSpanCallStack",
-          "elementKind": "interface",
-          "justification": "W-13762853: As part of the refactor, this validation should be removed."
-        },
-        {
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.tracer.api.span.error.InternalSpanError",
-          "classSimpleName": "InternalSpanError",
-          "package": "org.mule.runtime.tracer.api.span.error",
-          "classQualifiedName": "org.mule.runtime.tracer.api.span.error.InternalSpanError",
-          "elementKind": "interface",
-          "justification": "W-13762853: As part of the refactor, this validation should be removed."
-        },
-        {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.el.context.AbstractMapContext<V>",
           "package": "org.mule.runtime.core.privileged.el.context",

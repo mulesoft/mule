@@ -3,10 +3,10 @@
  */
 package org.mule.runtime.tracer.impl;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
@@ -47,7 +47,7 @@ public class CoreEventComponentTracer implements ComponentTracer<CoreEvent> {
   }
 
   @Override
-  public Optional<InternalSpan> startSpan(CoreEvent coreEvent) {
+  public Optional<Span> startSpan(CoreEvent coreEvent) {
     return coreEventTracer.startSpan(coreEvent, initialSpanInfo, parentComponentSpanAssertion);
   }
 

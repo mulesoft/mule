@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
@@ -28,9 +29,9 @@ import org.apache.commons.lang3.function.TriFunction;
  * @since 4.5.0
  */
 public class EventContextStartSpanCommand extends
-    AbstractFailsafeTriCommand<Optional<InternalSpan>, EventContext, InitialSpanInfo, Assertion> {
+    AbstractFailsafeTriCommand<Optional<Span>, EventContext, InitialSpanInfo, Assertion> {
 
-  private final TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> triFunction;
+  private final TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<Span>> triFunction;
 
   public static EventContextStartSpanCommand getEventContextStartSpanCommandFrom(Logger logger,
                                                                                  String errorMessage,
@@ -63,7 +64,7 @@ public class EventContextStartSpanCommand extends
   }
 
   @Override
-  TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<InternalSpan>> getTriFunction() {
+  TriFunction<EventContext, InitialSpanInfo, Assertion, Optional<Span>> getTriFunction() {
     return triFunction;
   }
 

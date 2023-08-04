@@ -4,10 +4,10 @@
 package org.mule.runtime.core.internal.profiling;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class DummyComponentTracerFactory implements ComponentTracerFactory<CoreE
   private static class DummyComponentTracer implements ComponentTracer<CoreEvent> {
 
     @Override
-    public Optional<InternalSpan> startSpan(CoreEvent event) {
+    public Optional<Span> startSpan(CoreEvent event) {
       return Optional.empty();
     }
 
