@@ -3,7 +3,7 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span.condition;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
 
@@ -23,7 +23,7 @@ public class NullSpanAssertion implements Assertion {
   private NullSpanAssertion() {}
 
   @Override
-  public void assertOnSpan(InternalSpan span) throws AssertionFailedException {
+  public void assertOnSpan(Span span) throws AssertionFailedException {
     if (span != null) {
       throw new AssertionFailedException("Span with name: " + span.getName()
           + " was found while no span was expected.");

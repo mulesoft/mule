@@ -3,7 +3,7 @@
  */
 package org.mule.runtime.core.internal.profiling.tracing.event.span.condition;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
 
@@ -30,7 +30,7 @@ public class ComponentSpanNameAssertion implements Assertion {
   }
 
   @Override
-  public void assertOnSpan(InternalSpan span) throws AssertionFailedException {
+  public void assertOnSpan(Span span) throws AssertionFailedException {
     delegate.assertOnSpan(span);
   }
 }
