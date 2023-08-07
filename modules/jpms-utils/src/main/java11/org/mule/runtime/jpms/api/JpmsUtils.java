@@ -47,6 +47,11 @@ public final class JpmsUtils {
 
   public static final String MULE_SKIP_MODULE_TWEAKING_VALIDATION = "mule.module.tweaking.validation.skip";
 
+  private static final Set<String> SERVICE_MODULE_NAME_PREFIXES =
+      new HashSet<>(asList("org.mule.service.",
+                           "com.mulesoft.mule.service.",
+                           "com.mulesoft.anypoint.gw.service."));
+
   private static final String REQUIRED_ADD_MODULES =
       "--add-modules="
           + "java.se,"
@@ -165,7 +170,7 @@ public final class JpmsUtils {
 
     ModuleFinder modulesFinder = ModuleFinder.of(paths);
 
-    Map<Boolean, List<ModuleReference>> modulesByAutomatic = modulesFinder
+    Map<Boolean, List<ModuleReference>> modulesByIsolation = modulesFinder
         .findAll()
         .stream()
         .filter(moduleRef -> !bootModules.contains(moduleRef.descriptor().name()))
@@ -175,48 +180,48 @@ public final class JpmsUtils {
 
     Controller controller;
     if (isolateDependenciesInTheirOwnLayer) {
-      // put all automatic modules in their own layer, having only boot layer as parent...
-      Path[] automaticModulesPaths = modulesByAutomatic.get(true)
+      // put all modules requiring isolation in their own layer, having only boot layer as parent...
+      Path[] isolatedModulesPaths = modulesByIsolation.get(true)
           .stream()
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
           .map(Optional::get)
           .map(uri -> get(uri))
           .toArray(size -> new Path[size]);
-      ModuleFinder automaticModulesFinder = ModuleFinder.of(automaticModulesPaths);
-      Configuration automaticModulesConfiguration = boot().configuration()
-          .resolve(automaticModulesFinder, ofSystem(), modulesByAutomatic.get(true)
+      ModuleFinder isolatedModulesFinder = ModuleFinder.of(isolatedModulesPaths);
+      Configuration isolatedModulesConfiguration = boot().configuration()
+          .resolve(isolatedModulesFinder, ofSystem(), modulesByIsolation.get(true)
               .stream()
               .map(moduleRef -> moduleRef.descriptor().name())
               .collect(toList()));
-      Controller automaticModulesController = defineModulesWithOneLoader(automaticModulesConfiguration,
-                                                                         singletonList(boot()),
-                                                                         parentLayer.map(layer -> layer.findLoader(layer.modules()
-                                                                             .iterator().next().getName())).orElse(parent));
+      Controller isolatedModulesController = defineModulesWithOneLoader(isolatedModulesConfiguration,
+                                                                        singletonList(boot()),
+                                                                        parentLayer.map(layer -> layer.findLoader(layer.modules()
+                                                                            .iterator().next().getName())).orElse(parent));
 
-      // ... the put the rest of the modules on a new layer with the automatic modules one as parent.
-      Path[] notAutomaticModulesPaths = modulesByAutomatic.get(false)
+      // ... the put the rest of the modules on a new layer with the isolated modules one as parent.
+      Path[] notIsolatedModulesPaths = modulesByIsolation.get(false)
           .stream()
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
           .map(Optional::get)
           .map(uri -> get(uri))
           .toArray(size -> new Path[size]);
-      ModuleFinder notAutomaticModulesFinder = ModuleFinder.of(notAutomaticModulesPaths);
-      Configuration configuration = resolve(notAutomaticModulesFinder,
-                                            asList(automaticModulesController.layer().configuration(),
+      ModuleFinder notIsolatedModulesFinder = ModuleFinder.of(notIsolatedModulesPaths);
+      Configuration configuration = resolve(notIsolatedModulesFinder,
+                                            asList(isolatedModulesController.layer().configuration(),
                                                    resolvedParentLayer.configuration()),
                                             ofSystem(),
-                                            modulesByAutomatic.get(false).stream()
+                                            modulesByIsolation.get(false).stream()
                                                 .map(moduleRef -> moduleRef.descriptor().name())
                                                 .collect(toList()));
       controller = defineModulesWithOneLoader(configuration,
-                                              asList(automaticModulesController.layer(), resolvedParentLayer),
+                                              asList(isolatedModulesController.layer(), resolvedParentLayer),
                                               parentLayer.map(layer -> layer.findLoader(layer.modules()
                                                   .iterator().next().getName())).orElse(parent));
 
     } else {
-      Path[] filteredModulesPaths = modulesByAutomatic.values().stream()
+      Path[] filteredModulesPaths = modulesByIsolation.values().stream()
           .flatMap(Collection::stream)
           .map(ModuleReference::location)
           .filter(Optional::isPresent)
@@ -226,7 +231,7 @@ public final class JpmsUtils {
       ModuleFinder filteredModulesFinder = ModuleFinder.of(filteredModulesPaths);
 
       Configuration configuration = resolvedParentLayer.configuration()
-          .resolve(filteredModulesFinder, ofSystem(), modulesByAutomatic.values().stream()
+          .resolve(filteredModulesFinder, ofSystem(), modulesByIsolation.values().stream()
               .flatMap(Collection::stream)
               .map(modueRef -> modueRef.descriptor().name())
               .collect(toList()));
@@ -239,9 +244,6 @@ public final class JpmsUtils {
 
     return controller.layer();
   }
-
-  private static final Set<String> SERVICE_MODULE_NAME_PREFIXES =
-      new HashSet<>(asList("org.mule.service.", "com.mulesoft.mule.service."));
 
   /**
    * 

@@ -4,6 +4,7 @@
 package org.mule.functional.services;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
@@ -43,6 +44,8 @@ public class TestServicesUtils {
         .compiling(getResourceFile("/org/mule/service/scheduler/MockScheduler.java", tempFolder),
                    getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java", tempFolder),
                    getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java", tempFolder))
+        .including(getResourceFile("/org/mule/service/scheduler/MANIFEST.MF", tempFolder),
+                   "META-INF/MANIFEST.MF")
         .compile("mule-module-service-mock-scheduler-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("schedulerService")
@@ -64,6 +67,8 @@ public class TestServicesUtils {
         .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder))
+        .including(getResourceFile("/org/mule/service/el/MANIFEST.MF", tempFolder),
+                   "META-INF/MANIFEST.MF")
         .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageService")
@@ -86,6 +91,8 @@ public class TestServicesUtils {
         .compiling(getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataServiceProvider.java",
                                    tempFolder))
+        .including(getResourceFile("/org/mule/service/el/metadata/MANIFEST.MF", tempFolder),
+                   "META-INF/MANIFEST.MF")
         .compile("mule-module-service-mock-expression-language-metadata-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageMetadataService")
@@ -106,6 +113,8 @@ public class TestServicesUtils {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
         .compiling(getResourceFile("/org/mule/service/http/MockHttpService.java", tempFolder),
                    getResourceFile("/org/mule/service/http/MockHttpServiceProvider.java", tempFolder))
+        .including(getResourceFile("/org/mule/service/http/MANIFEST.MF", tempFolder),
+                   "META-INF/MANIFEST.MF")
         .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("http-service")
