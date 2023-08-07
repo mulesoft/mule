@@ -3,6 +3,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source.trace;
 
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
+
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.tracer.api.context.SpanContext;
@@ -42,7 +44,7 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
   @Override
   public void addCurrentSpanAttribute(String key, String value) {
     if (spanContext != null) {
-      spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
+      spanContext.getSpan().ifPresent(span -> getAsInternalSpan(span).addAttribute(key, value));
     }
     attributes.put(key, value);
   }

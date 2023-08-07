@@ -3,6 +3,9 @@
  */
 package org.mule.runtime.tracer.exporter.impl.optel.span;
 
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -14,8 +17,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.context.Context;
-import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
  * An OpenTelemetry Span that does not export but propagates the root span.

@@ -3,19 +3,20 @@
  */
 package org.mule.runtime.tracer.impl.context;
 
-import static java.util.Optional.ofNullable;
-
-import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
 
-import java.util.Optional;
+import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
+
+import java.util.Optional;
 
 /**
  * A {@link SpanContext} associated to an event. A {@link org.mule.runtime.core.api.event.CoreEvent} is the component that travels
@@ -61,13 +62,13 @@ public class EventSpanContext implements SpanContext {
   }
 
   @Override
-  public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
+  public void setSpan(Span span, Assertion assertion) throws AssertionFailedException {
     assertion.assertOnSpan(currentSpan);
-    this.currentSpan = span;
+    this.currentSpan = getAsInternalSpan(span);
   }
 
   @Override
-  public Optional<InternalSpan> getSpan() {
+  public Optional<Span> getSpan() {
     return ofNullable(currentSpan);
   }
 
@@ -88,7 +89,6 @@ public class EventSpanContext implements SpanContext {
       this.distributedTraceContextMapGetter = distributedTraceContextMapGetter;
       return this;
     }
-
 
     public EventSpanContextBuilder withPropagateTracingExceptions(boolean propagateTracingExceptions) {
       this.propagateTracingExceptions = propagateTracingExceptions;

@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import org.mule.runtime.api.event.EventContext;
@@ -33,7 +34,7 @@ public class EventContextAddAttributeCommand extends AbstractFailSafeVoidTriComm
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
-        spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
+        spanContext.getSpan().ifPresent(span -> getAsInternalSpan(span).addAttribute(key, value));
       }
 
       return null;
