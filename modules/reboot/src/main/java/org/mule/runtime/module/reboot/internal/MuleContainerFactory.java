@@ -12,10 +12,10 @@ import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
+import static java.util.ServiceLoader.load;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.URL;
 
 /**
@@ -45,18 +45,13 @@ public class MuleContainerFactory {
    *                   exit immediately.
    */
   public MuleContainer create(String[] args) throws Exception {
-    ClassLoader muleSystemCl = createContainerSystemClassLoader(lookupMuleHome(), lookupMuleBase());
-
-    Class<?> muleClass = muleSystemCl.loadClass(CLASSNAME_MULE_CONTAINER);
-    Constructor<?> c = muleClass.getConstructor(String[].class);
+    final MuleContainerProvider containerProvider = load(MuleContainerProvider.class).iterator().next();
 
     ClassLoader originalCl = currentThread().getContextClassLoader();
+    ClassLoader muleSystemCl = createContainerSystemClassLoader(lookupMuleHome(), lookupMuleBase());
     currentThread().setContextClassLoader(muleSystemCl);
     try {
-      // the cast to Object is to disambiguate the fact that the String array must be passed as a single argument instead of
-      // having
-      // them unpacked for the varargs method newInstance
-      return (MuleContainer) c.newInstance((Object) args);
+      return containerProvider.provide(args);
     } finally {
       currentThread().setContextClassLoader(originalCl);
     }

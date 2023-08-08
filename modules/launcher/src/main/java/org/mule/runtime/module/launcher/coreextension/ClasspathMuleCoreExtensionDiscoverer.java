@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.launcher.coreextension;
 
-import static java.lang.String.format;
-import static java.util.Comparator.comparingInt;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.PropertiesUtils.loadProperties;
+
+import static java.lang.String.format;
+import static java.util.Comparator.comparingInt;
+
+import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.container.api.MuleCoreExtension;
-import org.mule.runtime.api.exception.DefaultMuleException;
-import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.launcher.internal.util.ClassUtils;
 
 import java.net.URL;
 import java.util.Enumeration;
@@ -52,7 +54,7 @@ public class ClasspathMuleCoreExtensionDiscoverer implements MuleCoreExtensionDi
     List<MuleCoreExtension> result = new LinkedList<>();
 
     Enumeration<?> e = ClassUtils.getResources(CORE_EXTENSION_RESOURCE_NAME, getClass().getClassLoader());
-    List<Properties> extensions = new LinkedList<Properties>();
+    List<Properties> extensions = new LinkedList<>();
 
     // load ALL of the extension files first
     while (e.hasMoreElements()) {
