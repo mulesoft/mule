@@ -16,8 +16,8 @@ import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MUL
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
