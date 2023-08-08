@@ -105,17 +105,6 @@ public class MessagingException extends EventProcessingException {
         } else {
           if (payload != null) {
             addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getDataType().getType().getName());
-            if (muleContext != null) {
-              // TODO MULE-10266 review how the transformationService is obtained when building an exception.
-              try {
-                addInfo(PAYLOAD_INFO_KEY,
-                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload()
-                            .getValue());
-              } catch (Exception e) {
-                addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
-              }
-              addInfo(PAYLOAD_INFO_KEY, muleMessage.toString());
-            }
           } else {
             addInfo(PAYLOAD_TYPE_INFO_KEY, Objects.toString(null));
             addInfo(PAYLOAD_INFO_KEY, Objects.toString(null));

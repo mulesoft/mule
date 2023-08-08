@@ -256,24 +256,6 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
   }
 
   @Test
-  @Ignore("MULE-10266 review how the transformationService is obtained when building an exception.")
-  public void payloadInfoNonConsumable() throws Exception {
-    MuleException.verboseExceptions = true;
-
-    CoreEvent testEvent = mock(CoreEvent.class);
-    Object payload = mock(Object.class);
-    // This has to be done this way since mockito doesn't allow to verify toString()
-    when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
-    Message muleMessage = of(payload);
-
-    when(transformationService.transform(muleMessage, DataType.STRING)).thenReturn(of(value));
-    when(testEvent.getMessage()).thenReturn(muleMessage);
-    MessagingException e = new MessagingException(createStaticMessage(message), testEvent);
-
-    assertThat(e.getInfo().get(PAYLOAD_INFO_KEY), is(value));
-  }
-
-  @Test
   public void payloadInfoConsumable() throws Exception {
     MuleException.verboseExceptions = true;
 
@@ -287,26 +269,6 @@ public class MessagingExceptionTestCase extends AbstractMuleContextTestCase {
     assertThat((String) e.getInfo().get(PAYLOAD_INFO_KEY), containsString(ByteArrayInputStream.class.getName() + "@"));
 
     verify(transformationService, never()).transform(muleMessage, DataType.STRING);
-  }
-
-  @Test
-  @Ignore("MULE-10266 review how the transformationService is obtained when building an exception.")
-  public void payloadInfoException() throws Exception {
-    MuleException.verboseExceptions = true;
-
-    CoreEvent testEvent = mock(CoreEvent.class);
-    Object payload = mock(Object.class);
-    // This has to be done this way since mockito doesn't allow to verify toString()
-    when(payload.toString()).then(new FailAnswer("toString() expected not to be called."));
-    Message muleMessage = of(payload);
-
-    when(transformationService.transform(muleMessage, DataType.STRING))
-        .thenThrow(new TransformerException(createStaticMessage("exception thrown")));
-    when(testEvent.getMessage()).thenReturn(muleMessage);
-    MessagingException e = new MessagingException(createStaticMessage(message), testEvent);
-
-    assertThat(e.getInfo().get(PAYLOAD_INFO_KEY),
-               is(TransformerException.class.getName() + " while getting payload: exception thrown"));
   }
 
   @Test
