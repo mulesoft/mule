@@ -5,7 +5,6 @@ package org.mule.runtime.tracer.exporter.config.impl;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
@@ -18,38 +17,31 @@ import static java.lang.System.getProperty;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
-import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.exporter.config.impl.FileExporterConfiguration;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
  * A {@link SpanExporterConfiguration} based on a file in the conf folder.
  *
  * @since 4.5.0
  */
-public class FileSpanExporterConfiguration implements SpanExporterConfiguration, Disposable {
+public class FileSpanExporterConfiguration extends FileExporterConfiguration implements SpanExporterConfiguration, Disposable {
 
   private final MuleContext muleContext;
 
@@ -63,10 +55,10 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
   private final CompositeRunnable doOnConfigurationChanged = new CompositeRunnable();
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private String resolvedConfigurationFilePath;
-  private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
   private boolean tracingConfigurationFileWatcherInitialised;
 
   public FileSpanExporterConfiguration(MuleContext muleContext) {
+    super(muleContext);
     this.muleContext = muleContext;
   }
 
@@ -77,58 +69,10 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
       propertiesInitialised = true;
     }
 
-    String value = readStringFromConfigOrSystemProperty(key);
-
-    if (value != null) {
-      // Resolves the actual value when the current one is a system property reference.
-      value = propertyResolver.apply(value);
-
-      if (isAValueCorrespondingToAPath(key)) {
-        // Obtain absolute path and return it if possible.
-        String absolutePath = getAbsolutePath(value);
-        if (absolutePath != null) {
-          return absolutePath;
-        }
-        // Otherwise, return the non-resolved value so that the error message makes sense.
-      }
-      return value;
-    }
-    return null;
+    return super.getStringValue(key);
   }
 
-  private String readStringFromConfigOrSystemProperty(String key) {
-    if (configuration != null) {
-      // We read the yaml configuration
-      String[] path = key.split("\\.");
-      JsonNode configurationValue = configuration;
-      for (int i = 0; i < path.length && configurationValue.get(path[i]) != null; i++) {
-        configurationValue = configurationValue.get(path[i]);
-      }
-      return configurationValue != null && !configurationValue.asText().isEmpty() ? configurationValue.asText() : null;
-    } else {
-      return getProperty(key);
-    }
-  }
-
-  private String getAbsolutePath(String value) {
-    Path path = Paths.get(value);
-
-    try {
-      if (!path.isAbsolute()) {
-        URL url = getExecutionClassLoader(muleContext).getResource(value);
-
-        if (url != null) {
-          return new File(url.toURI()).getAbsolutePath();
-        }
-      }
-    } catch (URISyntaxException e) {
-      return value;
-    }
-
-    return null;
-  }
-
-  private boolean isAValueCorrespondingToAPath(String key) {
+  protected boolean isAValueCorrespondingToAPath(String key) {
     return key.equals(MULE_OPEN_TELEMETRY_EXPORTER_CA_FILE_LOCATION) ||
         key.equals(MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION);
   }
@@ -140,7 +84,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         InputStream is = resourceProvider.getResourceAsStream(getPropertiesFileName());
         configuration = loadConfiguration(is);
         configurationUrl = getResourceOrFail(getPropertiesFileName(), getExecutionClassLoader(muleContext), true);
-      } catch (MuleRuntimeException | IOException e) {
+      } catch (MuleRuntimeException | IOException ignored) {
       }
     } else {
       try {
@@ -148,7 +92,7 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
         InputStream is = getResourceAsStream(resourcePath, FileSpanExporterConfiguration.class);
         configuration = loadConfiguration(is);
         configurationUrl = getResourceAsUrl(resourcePath, FileSpanExporterConfiguration.class, true, true);
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
   }
@@ -163,24 +107,8 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     return resolvedConfigurationFilePath;
   }
 
-  protected String getConfFolder() {
-    return MuleFoldersUtil.getConfFolder().getAbsolutePath();
-  }
-
   protected String getPropertiesFileName() {
     return PROPERTIES_FILE_NAME;
-  }
-
-  private static JsonNode loadConfiguration(InputStream is) throws IOException {
-    if (is == null) {
-      I18nMessage error = objectIsNull("input stream");
-      throw new IOException(error.toString());
-    }
-    try {
-      return configFileMapper.readTree(is);
-    } finally {
-      is.close();
-    }
   }
 
   protected void initialiseProperties() {
@@ -196,10 +124,6 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     }
   }
 
-  protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-    return muleContext.getExecutionClassLoader();
-  }
-
   @Override
   public void doOnConfigurationChanged(Runnable doOnConfigurationChanged) {
     this.doOnConfigurationChanged.addRunnable(doOnConfigurationChanged);
@@ -210,6 +134,16 @@ public class FileSpanExporterConfiguration implements SpanExporterConfiguration,
     if (tracingConfigurationFileWatcher != null) {
       tracingConfigurationFileWatcher.interrupt();
     }
+  }
+
+  @Override
+  protected JsonNode getConfiguration() {
+    return configuration;
+  }
+
+  @Override
+  protected ConfigurationPropertiesResolver getPropertyResolver() {
+    return propertyResolver;
   }
 
   private class CompositeRunnable implements Runnable {
