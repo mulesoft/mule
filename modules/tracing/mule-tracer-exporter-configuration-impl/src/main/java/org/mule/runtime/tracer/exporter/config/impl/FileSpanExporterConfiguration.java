@@ -23,7 +23,7 @@ import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.exporter.config.impl.FileExporterConfiguration;
+import org.mule.runtime.module.observability.FileConfiguration;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * @since 4.5.0
  */
-public class FileSpanExporterConfiguration extends FileExporterConfiguration implements SpanExporterConfiguration, Disposable {
+public class FileSpanExporterConfiguration extends FileConfiguration implements SpanExporterConfiguration, Disposable {
 
   private final MuleContext muleContext;
 

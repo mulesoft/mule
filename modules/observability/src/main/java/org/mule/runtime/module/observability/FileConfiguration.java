@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.exporter.config.impl;
+package org.mule.runtime.module.observability;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 
@@ -24,12 +24,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public abstract class FileExporterConfiguration {
+/**
+ * A class that provides functionality to read configuration from a file.
+ *
+ * @since 4.6.0
+ */
+public abstract class FileConfiguration {
 
   private final MuleContext muleContext;
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
 
-  public FileExporterConfiguration(MuleContext muleContext) {
+  public FileConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
   }
 

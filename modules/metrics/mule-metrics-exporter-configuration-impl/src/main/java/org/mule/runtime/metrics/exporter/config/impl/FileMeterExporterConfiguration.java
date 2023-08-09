@@ -18,7 +18,7 @@ import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.exporter.config.impl.FileExporterConfiguration;
+import org.mule.runtime.module.observability.FileConfiguration;
 import org.mule.runtime.metrics.exporter.config.api.MeterExporterConfiguration;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ import org.slf4j.Logger;
  *
  * @since 4.5.0
  */
-public class FileMeterExporterConfiguration extends FileExporterConfiguration implements MeterExporterConfiguration {
+public class FileMeterExporterConfiguration extends FileConfiguration implements MeterExporterConfiguration {
 
   private static final Logger LOGGER = getLogger(FileMeterExporterConfiguration.class);
   private static final String CONFIGURATION_FILE_NAME = "meter-exporter.conf";
