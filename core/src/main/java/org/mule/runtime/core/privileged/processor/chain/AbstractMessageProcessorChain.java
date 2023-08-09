@@ -110,6 +110,7 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -488,9 +489,10 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     // #4 Wrap execution, including processing strategy, on flow thread.
     interceptors.add((processor, next) -> {
       String processorPath = getProcessorPath((Processor) processor);
+      ComponentTracer<CoreEvent> coreComponentTracer = getComponentTracer(processor, chainComponentTracer);
 
       return stream -> from(stream)
-          .doOnNext(event -> beforeComponentProcessingStrategy((Processor) processor, processorPath, event))
+          .doOnNext(event -> beforeComponentProcessingStrategy((Processor) processor, processorPath, event, coreComponentTracer))
           .transform(next)
           .map(result -> afterComponentProcessingStrategy((Processor) processor, processorPath, result));
     });
@@ -533,12 +535,12 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     }
   }
 
-  private void beforeComponentProcessingStrategy(Processor processor, String processorPath, CoreEvent event) {
+  private void beforeComponentProcessingStrategy(Processor processor, String processorPath, CoreEvent event,
+                                                 ComponentTracer<CoreEvent> componentTracer) {
     // The span corresponding to the processor has to be created here because if the processor
     // cannot process a message (by the canProcessMessage condition below), the exception will be considered
     // part of the execution of the processor.
-    ComponentTracer<CoreEvent> coreComponentTracer = getComponentTracer(processor, chainComponentTracer);
-    coreComponentTracer.startSpan(event);
+    componentTracer.startSpan(event);
 
     if (!canProcessMessage) {
       throw propagate(new MessagingException(event, new LifecycleException(isStopped(name), event.getMessage())));
