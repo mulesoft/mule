@@ -62,8 +62,10 @@ public final class JpmsUtils {
       "--add-exports=org.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
   private static final String REQUIRED_BOOT_ADD_EXPORTS =
       "--add-exports=com.mulesoft.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
-  private static final String REQUIRED_ADD_OPENS =
+  private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT =
+      "--add-opens=java.base/java.security.cert=org.mule.runtime.jpms.utils";
 
   /**
    * Validates that no module tweaking jvm options (i.e: {@code --add-opens}, {@code --add-exports}, ...) have been provided in
@@ -95,7 +97,8 @@ public final class JpmsUtils {
             || arg.equals(REQUIRED_BOOT_ADD_READS)
             || arg.equals(REQUIRED_CE_BOOT_ADD_EXPORTS)
             || arg.equals(REQUIRED_BOOT_ADD_EXPORTS)
-            || arg.equals(REQUIRED_ADD_OPENS)))
+            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
+            || arg.equals(REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT)))
         .collect(toList());
 
     if (!illegalArguments.isEmpty()) {
