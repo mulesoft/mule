@@ -4,7 +4,6 @@
 package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
-import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.api.span.error.InternalSpanError.getInternalSpanError;
 import static org.mule.runtime.tracer.exporter.impl.MutableMuleTraceState.getMutableMuleTraceStateFrom;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.ARTIFACT_ID;
@@ -20,6 +19,7 @@ import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUti
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.THREAD_END_NAME_KEY;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getNameWithoutNamespace;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetryTraceIdUtils.extractContextFromTraceParent;
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -35,8 +35,8 @@ import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
@@ -64,6 +64,7 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 /**
  * A {@link SpanExporter} that exports the spans as Open Telemetry Spans.
@@ -106,20 +107,20 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private MutableMuleTraceState muleTraceState;
 
-  public OpenTelemetrySpanExporter(InternalSpan internalSpan,
+  public OpenTelemetrySpanExporter(Span span,
                                    InitialSpanInfo initialSpanInfo,
                                    String artifactId,
                                    String artifactType,
                                    SpanProcessor spanProcessor,
                                    boolean enableMuleAncestorIdManagement,
                                    Resource resource) {
-    requireNonNull(internalSpan);
+    requireNonNull(span);
     requireNonNull(initialSpanInfo);
     requireNonNull(artifactId);
     requireNonNull(artifactType);
     requireNonNull(spanProcessor);
     requireNonNull(resource);
-    this.internalSpan = internalSpan;
+    this.internalSpan = getAsInternalSpan(span);
     this.noExportUntil = initialSpanInfo.getInitialExportInfo().noExportUntil();
     this.isRootSpan = initialSpanInfo.isRootSpan();
     this.isPolicySpan = initialSpanInfo.isPolicySpan();
@@ -269,7 +270,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       // we have a span that begins again to be exportable), we have to propagate that condition to the
       // child span.
       if (!noExportUntil.isEmpty()
-          && !noExportUntil.contains(getNameWithoutNamespace(childSpanExporter.getInternalSpan().getName()))) {
+          && !noExportUntil.contains(getNameWithoutNamespace(childSpanExporter.getSpan().getName()))) {
         childOpenTelemetrySpanExporter.parentSpanContext = parentSpanContext;
         childOpenTelemetrySpanExporter.noExportUntil = noExportUntil;
         childOpenTelemetrySpanExporter.spanContext = spanContext;
@@ -299,7 +300,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   }
 
   @Override
-  public InternalSpan getInternalSpan() {
+  public InternalSpan getSpan() {
     return internalSpan;
   }
 

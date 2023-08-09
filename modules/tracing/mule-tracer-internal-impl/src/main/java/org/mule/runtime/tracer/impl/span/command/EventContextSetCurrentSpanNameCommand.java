@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.tracer.impl.span.command;
 
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import org.mule.runtime.api.event.EventContext;
@@ -13,15 +14,13 @@ import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 
 /**
- * An {@link AbstractFailSafeVoidBiCommand} that sets the current span name.
- *
- * The carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * An {@link AbstractFailSafeVoidBiCommand} that sets the current span name. The carrier is the {@link EventContext}
  *
  * @since 4.5.0
  */
 public class EventContextSetCurrentSpanNameCommand extends AbstractFailSafeVoidBiCommand<EventContext, String> {
 
-  private BiConsumer<EventContext, String> consumer;
+  private final BiConsumer<EventContext, String> consumer;
 
   public static EventContextSetCurrentSpanNameCommand getEventContextSetCurrentSpanNameCommand(Logger logger,
                                                                                                String errorMessage,
@@ -35,7 +34,7 @@ public class EventContextSetCurrentSpanNameCommand extends AbstractFailSafeVoidB
       SpanContext spanContext = getSpanContextFromEventContextGetter().get(eventContext);
 
       if (spanContext != null) {
-        spanContext.getSpan().ifPresent(span -> span.updateName(name));
+        spanContext.getSpan().ifPresent(span -> getAsInternalSpan(span).updateName(name));
       }
     };
   }

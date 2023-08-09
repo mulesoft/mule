@@ -1297,6 +1297,7 @@ class MuleExtensionModelDeclarer {
   private void declareGlobalProperties(ExtensionDeclarer extensionDeclarer) {
     final ConstructDeclarer globalPropDeclarer = extensionDeclarer.withConstruct("globalProperty")
         .allowingTopLevelDefinition()
+        .withStereotype(APP_CONFIG)
         .describedAs("A global property is a named string. It can be inserted in most attribute values using standard (${key}) property placeholders.");
 
     globalPropDeclarer

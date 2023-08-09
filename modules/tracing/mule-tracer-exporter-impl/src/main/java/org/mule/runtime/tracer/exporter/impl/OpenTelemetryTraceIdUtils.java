@@ -9,7 +9,7 @@ import static java.util.Collections.emptyMap;
 
 import static io.opentelemetry.api.trace.propagation.internal.W3CTraceContextEncoding.encodeTraceState;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.HashSet;
