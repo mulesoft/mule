@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.tracer.api.span;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
 import java.util.Optional;
@@ -15,13 +16,13 @@ import java.util.Optional;
 public interface SpanAware {
 
   /**
-   * @param span      set the {@link InternalSpan}
+   * @param span      set the {@link Span}
    * @param assertion the tracing condition to assert on setting the span
    */
-  void setSpan(InternalSpan span, Assertion assertion);
+  void setSpan(Span span, Assertion assertion);
 
   /**
-   * @return the owned {@link InternalSpan}
+   * @return the owned {@link Span}
    */
-  Optional<InternalSpan> getSpan();
+  Optional<Span> getSpan();
 }

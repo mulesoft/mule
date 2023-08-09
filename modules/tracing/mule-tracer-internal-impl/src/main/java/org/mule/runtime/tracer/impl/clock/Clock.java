@@ -3,10 +3,12 @@
  */
 package org.mule.runtime.tracer.impl.clock;
 
+import org.mule.runtime.tracer.impl.span.InternalSpan;
+
 import static org.mule.runtime.tracer.impl.clock.SystemNanoTimeClock.getInstance;
 
 /**
- * A clock used for tracing and measure the duration of {@link org.mule.runtime.tracer.api.span.InternalSpan}.
+ * A clock used for tracing and measure the duration of {@link InternalSpan}.
  *
  * @since 4.5.0
  */

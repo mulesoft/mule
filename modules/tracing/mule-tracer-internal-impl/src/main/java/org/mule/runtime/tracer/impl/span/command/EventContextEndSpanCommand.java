@@ -8,8 +8,9 @@ import static org.mule.runtime.tracer.impl.span.command.SpanMDCUtils.setCurrentT
 import static org.mule.runtime.tracer.impl.span.command.spancontext.SpanContextFromEventContextGetter.getSpanContextFromEventContextGetter;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
 import java.util.Optional;
@@ -18,8 +19,8 @@ import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 
 /**
- * A {@link AbstractFailSafeVoidBiCommand} that ends the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The
- * carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * A {@link AbstractFailSafeVoidBiCommand} that ends the current {@link InternalSpan}. The carrier is the
+ * {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
@@ -42,18 +43,18 @@ public class EventContextEndSpanCommand extends AbstractFailSafeVoidBiCommand<Ev
 
       if (spanContext != null) {
         spanContext.endSpan(assertion);
+        if (traceIdAndSpanIdInMdc) {
+          resetOrRemoveTraceIdAndSpanIdInMDC(spanContext);
+        }
       }
 
-      if (traceIdAndSpanIdInMdc) {
-        resetOrRemoveTraceIdAndSpanIdInMDC(spanContext);
-      }
     };
   }
 
   private static void resetOrRemoveTraceIdAndSpanIdInMDC(SpanContext spanContext) {
-    Optional<InternalSpan> internalSpan = spanContext.getSpan();
-    if (internalSpan.isPresent()) {
-      setCurrentTracingInformationToMdc(internalSpan.get());
+    Optional<Span> span = spanContext.getSpan();
+    if (span.isPresent()) {
+      setCurrentTracingInformationToMdc(span.get());
     } else {
       removeCurrentTracingInformationFromMdc();
     }

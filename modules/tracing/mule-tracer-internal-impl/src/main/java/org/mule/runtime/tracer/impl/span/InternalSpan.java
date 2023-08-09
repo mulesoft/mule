@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.tracer.api.span;
+package org.mule.runtime.tracer.impl.span;
 
 import static java.util.Collections.emptyMap;
 

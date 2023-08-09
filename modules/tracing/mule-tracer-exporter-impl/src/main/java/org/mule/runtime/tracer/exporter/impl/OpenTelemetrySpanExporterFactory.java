@@ -3,22 +3,22 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
-import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
@@ -83,8 +83,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.featureFlaggingService = featureFlaggingService;
   }
 
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialSpanInfo) {
-    return new OpenTelemetrySpanExporter(internalSpan, initialSpanInfo, artifactId, artifactType, spanProcessor,
+  public SpanExporter getSpanExporter(Span span, InitialSpanInfo initialSpanInfo) {
+    return new OpenTelemetrySpanExporter(span, initialSpanInfo, artifactId, artifactType, spanProcessor,
                                          addMuleAncestorSpanId, resource);
   }
 
