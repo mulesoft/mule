@@ -9,10 +9,14 @@ import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CUSTOMIZATION;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -75,5 +79,29 @@ public class DefaultInitialSpanInfoProviderTestCase {
                equalTo(true));
     assertThat(defaultInitialSpanInfoProvider.isCached(((LazyInitialSpanInfo) initialSpanInfoWithoutLocation).getDelegate()),
                equalTo(false));
+
+    // verify that onConfigurationChange is only invoked once for each newly created spanInfo that is managed
+    // by the provider.
+    verify(mockedTracingLevelConfiguration, times(3)).onConfigurationChange(any());
+
+    // We obtain again each initial span info.
+    InitialSpanInfo newlyObtainedInitialSpanInfo = defaultInitialSpanInfoProvider.getInitialSpanInfo(component);
+    InitialSpanInfo newlyObtainedInitialSpanInfoWithSuffix = defaultInitialSpanInfoProvider.getInitialSpanInfo(component, SUFFIX);
+    InitialSpanInfo newlyObtainedInitialSpanInfoWithOverriddenName =
+        defaultInitialSpanInfoProvider.getInitialSpanInfo(component, OVERRIDDEN_NAME, SUFFIX);
+    InitialSpanInfo newlyObtainedInitialSpanInfoWithoutLocation =
+        defaultInitialSpanInfoProvider.getInitialSpanInfo(UnnamedComponent.getUnnamedComponent(), OVERRIDDEN_NAME, SUFFIX);
+
+    assertThat(((LazyInitialSpanInfo) initialSpanInfo).getDelegate(),
+               sameInstance(((LazyInitialSpanInfo) newlyObtainedInitialSpanInfo).getDelegate()));
+    assertThat(((LazyInitialSpanInfo) initialSpanInfoWithSuffix).getDelegate(),
+               sameInstance(((LazyInitialSpanInfo) newlyObtainedInitialSpanInfoWithSuffix).getDelegate()));
+    assertThat(((LazyInitialSpanInfo) initialSpanInfoWithOverriddenName).getDelegate(),
+               sameInstance(((LazyInitialSpanInfo) newlyObtainedInitialSpanInfoWithOverriddenName).getDelegate()));
+    assertThat(((LazyInitialSpanInfo) initialSpanInfoWithoutLocation).getDelegate(),
+               not(sameInstance(((LazyInitialSpanInfo) newlyObtainedInitialSpanInfoWithoutLocation).getDelegate())));
+
+    // The invocations times of onConfigurationChange remain the same.
+    verify(mockedTracingLevelConfiguration, times(3)).onConfigurationChange(any());
   }
 }
