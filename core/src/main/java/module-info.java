@@ -161,6 +161,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.registry to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.launcher,
       com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
       spring.beans;
@@ -191,6 +193,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.deployment.model.impl,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.config.bootstrap to
@@ -200,6 +203,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config.preferred to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.connection to
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.soap.support,
       org.mule.runtime.spring.config,
@@ -209,18 +213,21 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.connector to
       com.mulesoft.mule.runtime.cluster;
+  exports org.mule.runtime.core.internal.construct to
+      org.mule.runtime.core.components,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
+      org.mule.runtime.launcher,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
       org.mule.test.runner;
-  exports org.mule.runtime.core.internal.construct to
-      org.mule.runtime.core.components,
-      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context.notification to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -274,6 +281,8 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lock to
       org.mule.runtime.spring.config,
+      org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.launcher,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
@@ -294,6 +303,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.http.policy,
       spring.beans;
   exports org.mule.runtime.core.internal.processor.chain to
       org.mule.runtime.spring.config;
@@ -308,6 +318,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.profiling to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.deployment.model.impl,
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
@@ -318,6 +329,10 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.launcher,
       spring.beans,
       org.mule.test.unit,
       org.mule.test.runner;
@@ -379,19 +394,24 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.core.components,
+      org.mule.runtime.artifact,
       org.mule.runtime.container,
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.log4j,
       org.mule.runtime.service,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.repository,
       org.mule.runtime.spring.config,
+      org.mule.runtime.launcher,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kyro,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
+      com.mulesoft.anypoint.gw.module.deployment,
       spring.beans;
   exports org.mule.runtime.core.internal.util.mediatype to
       org.mule.runtime.extensions.support;
