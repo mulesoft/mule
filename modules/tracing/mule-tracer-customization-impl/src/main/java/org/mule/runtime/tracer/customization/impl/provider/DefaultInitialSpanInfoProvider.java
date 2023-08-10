@@ -63,16 +63,20 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
     // TODO: when to change the tracing level from other criteria than location is required, we will probably have to see this.
     if (component.getLocation() == null) {
-      return new ExecutionInitialSpanInfo(component, apiId, overriddenName, suffix,
+      return new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                          suffix,
                                           tracingLevelConfiguration);
     }
 
-    ExecutionInitialSpanInfo executionInitialSpanInfo =
-        componentInitialSpanInfos
-            .computeIfAbsent(new InitialSpanInfoIdentifier(getLocationAsString(component.getLocation()), suffix, overriddenName),
-                             identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
-                                                                        suffix,
-                                                                        tracingLevelConfiguration));
+    return componentInitialSpanInfos
+        .computeIfAbsent(new InitialSpanInfoIdentifier(getLocationAsString(component.getLocation()), suffix, overriddenName),
+                         identifier -> getExecutionInitialSpanInfo(component, suffix, overriddenName));
+  }
+
+  private ExecutionInitialSpanInfo getExecutionInitialSpanInfo(Component component, String suffix, String overriddenName) {
+    ExecutionInitialSpanInfo executionInitialSpanInfo = new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                                                                     suffix,
+                                                                                     tracingLevelConfiguration);
 
     tracingLevelConfiguration.onConfigurationChange(executionInitialSpanInfo::reconfigureInitialSpanInfo);
 
