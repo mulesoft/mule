@@ -5,7 +5,6 @@ package org.mule.runtime.tracer.impl.span;
 
 
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.impl.context.extractor.RuntimeEventTraceExtractors;
 import org.mule.runtime.tracer.impl.context.extractor.TraceContextFieldExtractor;
 

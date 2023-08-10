@@ -12,7 +12,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
@@ -23,8 +23,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.function.TriFunction;
 
 /**
- * An {@link AbstractFailsafeTriCommand} that starts the current {@link org.mule.runtime.tracer.api.span.InternalSpan}. The
- * carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * An {@link AbstractFailsafeTriCommand} that starts the current {@link InternalSpan}. The carrier is the
+ * {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */

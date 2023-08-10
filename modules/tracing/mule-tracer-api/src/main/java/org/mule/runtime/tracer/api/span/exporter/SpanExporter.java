@@ -7,14 +7,14 @@ import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN
 
 import static java.util.Collections.emptyMap;
 
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
 import java.util.Map;
 
 /**
- * An exporter for {@link InternalSpan}.
+ * An exporter for {@link Span}.
  *
  * @since 4.5.0
  */
@@ -38,7 +38,7 @@ public interface SpanExporter {
     }
 
     @Override
-    public InternalSpan getInternalSpan() {
+    public Span getSpan() {
       return null;
     }
 
@@ -49,7 +49,7 @@ public interface SpanExporter {
   };
 
   /**
-   * Exports the {@link InternalSpan}.
+   * Exports the {@link Span}.
    */
   void export();
 
@@ -66,16 +66,16 @@ public interface SpanExporter {
   Map<String, String> exportedSpanAsMap();
 
   /**
-   * Updates the exporter of a child {@link InternalSpan}.
+   * Updates the exporter of a child {@link Span}.
    *
-   * @param childSpanExporter the child {@link InternalSpan} exporter.
+   * @param childSpanExporter the child {@link Span} exporter.
    */
   default void updateChildSpanExporter(SpanExporter childSpanExporter) {}
 
   /**
-   * @return the {@link InternalSpan} to export.
+   * @return the {@link Span} to export.
    */
-  InternalSpan getInternalSpan();
+  Span getSpan();
 
   /**
    * Sets a root attribute in the local trace for the exporter. This is useful in case a root element sets an attribute for the

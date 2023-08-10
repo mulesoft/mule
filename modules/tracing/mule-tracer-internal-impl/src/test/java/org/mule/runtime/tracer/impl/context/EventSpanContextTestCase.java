@@ -5,6 +5,7 @@ package org.mule.runtime.tracer.impl.context;
 
 import static org.mule.runtime.tracer.impl.context.extractor.w3c.TraceParentContextFieldExtractor.TRACEPARENT;
 import static org.mule.runtime.tracer.impl.context.extractor.w3c.TraceStateContextFieldExtractor.TRACESTATE;
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.DISTRIBUTED_TRACE_CONTEXT;
 
@@ -26,7 +27,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
 
@@ -56,7 +57,7 @@ public class EventSpanContextTestCase {
     EventSpanContext spanContext =
         EventSpanContext.builder().withGetter(distributedTraceContextGetter).build();
 
-    Optional<InternalSpan> currentSpan = spanContext.getSpan();
+    Optional<InternalSpan> currentSpan = Optional.ofNullable(getAsInternalSpan(spanContext.getSpan().orElse(null)));
 
     if (!currentSpan.isPresent()) {
       fail("No current span created");

@@ -34,7 +34,9 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
 
   private static final Set<String> SERVICE_MODULE_NAME_PREFIXES =
-      new HashSet<>(asList("org.mule.service.", "com.mulesoft.mule.service."));
+      new HashSet<>(asList("org.mule.service.",
+                           "com.mulesoft.mule.service.",
+                           "com.mulesoft.anypoint.gw.service."));
   private static final String SCHEDULER_SERVICE_MODULE_NAME = "org.mule.service.scheduler";
 
   private static final String CLASSLOADER_SERVICE_JPMS_MODULE_LAYER_DATAWEAVE =

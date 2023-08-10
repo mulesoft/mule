@@ -20,7 +20,7 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;

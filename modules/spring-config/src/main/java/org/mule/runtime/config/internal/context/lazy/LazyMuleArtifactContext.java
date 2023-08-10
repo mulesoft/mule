@@ -612,6 +612,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Handle orphan components without name, rely on the location.
     orphanComponents.stream()
+        .filter(cm -> !isIgnored(cm))
         .forEach(cm -> {
           final SpringComponentModel springCompModel = springComponentModels.get(cm);
           final BeanDefinition beanDef = springCompModel.getBeanDefinition();

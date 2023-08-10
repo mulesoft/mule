@@ -17,7 +17,7 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.Map;
