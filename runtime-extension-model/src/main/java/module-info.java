@@ -46,13 +46,15 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.core,
       org.mule.runtime.artifact.ast.serialization.test;
   
+  // required by modules creating crafted extension models
   exports org.mule.runtime.core.internal.extension to
       org.mule.runtime.artifact.ast,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.extensions.mule.support,
       com.mulesoft.mule.runtime.ee.extension.model,
-      com.mulesoft.mule.runtime.cluster;
+      com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.anypoint.gw.module.autodiscovery;
 
   exports org.mule.runtime.config.internal.validation to
       com.mulesoft.mule.runtime.ee.extension.model,
