@@ -72,12 +72,16 @@ public class DefaultInitialSpanInfoProviderTestCase {
     assertThat(initialSpanInfoWithOverriddenName.getName(), equalTo(OVERRIDDEN_NAME));
     assertThat(initialSpanInfoWithoutLocation.getName(), equalTo(OVERRIDDEN_NAME));
 
-    assertThat(defaultInitialSpanInfoProvider.isCached(((LazyInitialSpanInfo) initialSpanInfo).getDelegate()), equalTo(true));
-    assertThat(defaultInitialSpanInfoProvider.isCached(((LazyInitialSpanInfo) initialSpanInfoWithSuffix).getDelegate()),
+    assertThat(defaultInitialSpanInfoProvider.isDynamicallyConfigurable(((LazyInitialSpanInfo) initialSpanInfo).getDelegate()),
                equalTo(true));
-    assertThat(defaultInitialSpanInfoProvider.isCached(((LazyInitialSpanInfo) initialSpanInfoWithSuffix).getDelegate()),
+    assertThat(defaultInitialSpanInfoProvider
+        .isDynamicallyConfigurable(((LazyInitialSpanInfo) initialSpanInfoWithSuffix).getDelegate()),
                equalTo(true));
-    assertThat(defaultInitialSpanInfoProvider.isCached(((LazyInitialSpanInfo) initialSpanInfoWithoutLocation).getDelegate()),
+    assertThat(defaultInitialSpanInfoProvider
+        .isDynamicallyConfigurable(((LazyInitialSpanInfo) initialSpanInfoWithSuffix).getDelegate()),
+               equalTo(true));
+    assertThat(defaultInitialSpanInfoProvider
+        .isDynamicallyConfigurable(((LazyInitialSpanInfo) initialSpanInfoWithoutLocation).getDelegate()),
                equalTo(false));
 
     // verify that onConfigurationChange is only invoked once for each newly created spanInfo that is managed
