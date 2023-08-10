@@ -23,6 +23,4 @@ module org.mule.boot {
   requires org.mule.runtime.jpms.utils;
 
   requires commons.cli;
-
-  uses org.mule.runtime.module.reboot.internal.MuleContainerProvider;
 }
