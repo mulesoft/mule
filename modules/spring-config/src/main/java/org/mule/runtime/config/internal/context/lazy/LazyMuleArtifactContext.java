@@ -82,7 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -224,36 +223,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  public Object getBean(String name, Object... args) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(name, args);
-  }
-
-  @Override
-  public <T> T getBean(Class<T> requiredType) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(requiredType);
-  }
-
-  @Override
-  public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(requiredType, args);
-  }
-
-  @Override
-  public <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType) {
-    throwIfInitializationAlreadyDone();
-    return super.getBeanProvider(requiredType);
-  }
-
-  @Override
-  public <T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType) {
-    throwIfInitializationAlreadyDone();
-    return super.getBeanProvider(requiredType);
-  }
-
-  @Override
   public boolean containsBean(String name) {
     return tryWithLazyInitializationFallback(name, () -> super.containsBean(name));
   }
@@ -293,12 +262,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   @Override
   public String[] getAliases(String name) {
     return tryWithLazyInitializationFallback(name, () -> super.getAliases(name));
-  }
-
-  private void throwIfInitializationAlreadyDone() {
-    if (currentComponentInitializationState.isInitializationAlreadyDone()) {
-      throw new UnsupportedOperationException("Operation is not supported after initialization");
-    }
   }
 
   private <T> T tryWithLazyInitializationFallback(String name, Supplier<T> supplier) {
