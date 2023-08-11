@@ -74,6 +74,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
   private final Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();
   private final List<MuleContext> disposedContexts = new ArrayList<>();
   private MuleContext domainContext;
+  private ArtifactContext domainArtifactContext;
   private ArtifactInstanceInfrastructure domainInfrastructure;
 
   protected String getDomainConfig() {
@@ -143,7 +144,7 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
         .setDisableXmlValidations(disableXmlValidations())
         .setDomainConfig(getDomainConfigs());
 
-    final ArtifactContext domainArtifactContext = domainContextBuilder.build();
+    domainArtifactContext = domainContextBuilder.build();
     domainContext = domainArtifactContext.getMuleContext();
     domainInfrastructure = new ArtifactInstanceInfrastructure();
     domainContext.getInjector().inject(domainInfrastructure);
@@ -180,6 +181,13 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     applsInfrastructures.clear();
     disposeMuleContext(domainContext);
     domainInfrastructure = null;
+  }
+
+  protected ArtifactInstanceInfrastructure createAppMuleContext(ApplicationConfig applicationConfig) throws Exception {
+    MuleContext muleContext = createAppMuleContext(applicationConfig.applicationResources, domainArtifactContext);
+    ArtifactInstanceInfrastructure appInfrasturcture = new ArtifactInstanceInfrastructure();
+    muleContext.getInjector().inject(appInfrasturcture);
+    return appInfrasturcture;
   }
 
   private MuleContext createAppMuleContext(String[] configResource, ArtifactContext domainArtifactContext) throws Exception {
