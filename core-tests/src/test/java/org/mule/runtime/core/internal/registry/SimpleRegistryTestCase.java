@@ -28,9 +28,11 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 import org.junit.Test;
-import org.slf4j.Logger;
 
 public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
@@ -243,6 +245,7 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
+    @Inject
     public void setMuleContext(MuleContext context) {
       tracker.add("setMuleContext");
     }
