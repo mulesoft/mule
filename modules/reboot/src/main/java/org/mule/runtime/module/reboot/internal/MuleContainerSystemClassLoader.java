@@ -16,15 +16,24 @@ public class MuleContainerSystemClassLoader extends URLClassLoader {
     registerAsParallelCapable();
   }
 
+  private final DefaultMuleClassPathConfig classPath;
+
   public MuleContainerSystemClassLoader(DefaultMuleClassPathConfig classPath) {
     super(new URL[0], createOptClassloader(classPath.getOptURLs()));
 
     for (URL url : classPath.getMuleURLs()) {
       addURL(url);
     }
+
+    this.classPath = classPath;
   }
 
   private static ClassLoader createOptClassloader(List<URL> optUrls) {
     return new URLClassLoader(optUrls.toArray(new URL[optUrls.size()]));
+  }
+
+  @Override
+  public String toString() {
+    return "MuleContainerSystemClassLoader{" + classPath + "}";
   }
 }

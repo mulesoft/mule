@@ -122,4 +122,11 @@ public class DefaultMuleClassPathConfig {
     return emptyList();
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getName() + "{" +
+        "muleLibs: " + getMuleURLs() +
+        "; optLibs: " + getOptURLs() +
+        "}";
+  }
 }

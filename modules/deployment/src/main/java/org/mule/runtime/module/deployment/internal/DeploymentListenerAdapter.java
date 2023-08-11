@@ -3,11 +3,13 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -81,5 +83,11 @@ public class DeploymentListenerAdapter implements DeploymentListener {
   @Override
   public void onArtifactInitialised(String artifactName, Registry registry) {
     artifactDeploymentListener.onArtifactInitialised(artifactType, artifactName, registry);
+  }
+
+  @Override
+  public String toString() {
+    return "DeploymentListenerAdapter('" + artifactDeploymentListener +
+        "' loaded with ClassLoader '" + artifactDeploymentListener.getClass().getClassLoader() + "')";
   }
 }

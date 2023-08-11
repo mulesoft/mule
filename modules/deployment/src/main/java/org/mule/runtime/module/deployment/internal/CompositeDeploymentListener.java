@@ -3,6 +3,8 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
+import static java.lang.String.format;
+
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -18,7 +20,7 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
 
   private transient final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<DeploymentListener>();
+  private final List<DeploymentListener> deploymentListeners = new CopyOnWriteArrayList<>();
 
   @Override
   public void addDeploymentListener(DeploymentListener listener) {
@@ -174,8 +176,8 @@ public class CompositeDeploymentListener implements DeploymentListener, Deployme
   }
 
   private void logNotificationProcessingError(String appName, DeploymentListener listener, String notification, Throwable error) {
-    logger.error(String.format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification,
-                               appName),
+    logger.error(format("Listener '%s' failed to process notification '%s' for application '%s'", listener, notification,
+                        appName),
                  error);
   }
 }
