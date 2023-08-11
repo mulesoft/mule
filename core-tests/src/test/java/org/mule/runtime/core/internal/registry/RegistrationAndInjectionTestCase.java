@@ -103,7 +103,7 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     verify(muleContextAware).setMuleContext(muleContext);
   }
 
-  //TODO W-10781591 Remove this test
+  // TODO W-10781591 Remove this test
   @Test
   public void lifecycleSateAware() throws Exception {
     LifecycleStateAware lifecycleStateAware = mock(LifecycleStateAware.class);
