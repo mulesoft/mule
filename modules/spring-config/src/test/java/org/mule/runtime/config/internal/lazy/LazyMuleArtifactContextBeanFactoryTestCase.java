@@ -138,7 +138,7 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
   }
 
   @Test
-  public void whenCallingUnsupportedOperationsBeforeInitializationThenDelegates() {
+  public void whenCallingOperationsNotSupportingAutomaticInitializationBeforeInitializationThenDelegates() {
     if (beanFactoryMustThrow) {
       verifyException(() -> lazyMuleArtifactContext.getBean(MY_FLOW, 1), NoSuchBeanDefinitionException.class);
       verifyException(() -> lazyMuleArtifactContext.getBean(Object.class), NoSuchBeanDefinitionException.class);
@@ -156,13 +156,9 @@ public class LazyMuleArtifactContextBeanFactoryTestCase extends AbstractLazyMule
   }
 
   @Test
-  public void whenCallingUnsupportedOperationsAfterInitializationThenThrowsException() {
+  public void whenCallingOperationsNotSupportingAutomaticInitializationAfterInitializationThenDelegates() {
     lazyMuleArtifactContext.initializeComponent(builderFromStringRepresentation(ANOTHER_FLOW).build());
-    verifyUnsupportedOperationException(() -> lazyMuleArtifactContext.getBean(MY_FLOW, 1));
-    verifyUnsupportedOperationException(() -> lazyMuleArtifactContext.getBean(Object.class));
-    verifyUnsupportedOperationException(() -> lazyMuleArtifactContext.getBean(Object.class, 1));
-    verifyUnsupportedOperationException(() -> lazyMuleArtifactContext.getBeanProvider(Object.class));
-    verifyUnsupportedOperationException(() -> lazyMuleArtifactContext.getBeanProvider(ResolvableType.forClass(Object.class)));
+    whenCallingOperationsNotSupportingAutomaticInitializationBeforeInitializationThenDelegates();
   }
 
   @Test
