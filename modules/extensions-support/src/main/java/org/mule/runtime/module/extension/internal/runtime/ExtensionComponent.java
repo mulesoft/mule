@@ -416,6 +416,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }

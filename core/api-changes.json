@@ -1,4 +1,50 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [
