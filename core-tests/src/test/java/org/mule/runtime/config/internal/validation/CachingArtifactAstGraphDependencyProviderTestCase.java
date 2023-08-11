@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
+import org.mule.runtime.core.internal.context.ast.CachingArtifactAstGraphDependencyProvider;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;

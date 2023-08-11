@@ -1,7 +1,7 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
-package org.mule.runtime.config.internal.validation.ast;
+package org.mule.runtime.core.internal.context.ast;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
