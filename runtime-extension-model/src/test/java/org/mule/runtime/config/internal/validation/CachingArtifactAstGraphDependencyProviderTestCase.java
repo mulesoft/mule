@@ -13,6 +13,7 @@ import static java.util.stream.Stream.empty;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
@@ -23,6 +24,7 @@ import org.junit.Assert;
 
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
+@Issue("W-12421187")
 public class CachingArtifactAstGraphDependencyProviderTestCase {
 
   @Test
