@@ -26,6 +26,7 @@ import javax.inject.Inject;
  */
 public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
+  // TODO: in the future, this can be exposed in the discovered service (new feature) to show what is being traced and how.
   private final Map<InitialSpanInfoIdentifier, ExecutionInitialSpanInfo> componentInitialSpanInfos = new ConcurrentHashMap<>();
   public static final String API_ID_CONFIGURATION_PROPERTIES_KEY = "apiId";
 
@@ -63,16 +64,20 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
 
     // TODO: when to change the tracing level from other criteria than location is required, we will probably have to see this.
     if (component.getLocation() == null) {
-      return new ExecutionInitialSpanInfo(component, apiId, overriddenName, suffix,
+      return new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                          suffix,
                                           tracingLevelConfiguration);
     }
 
-    ExecutionInitialSpanInfo executionInitialSpanInfo =
-        componentInitialSpanInfos
-            .computeIfAbsent(new InitialSpanInfoIdentifier(getLocationAsString(component.getLocation()), suffix, overriddenName),
-                             identifier -> new ExecutionInitialSpanInfo(component, apiId, overriddenName,
-                                                                        suffix,
-                                                                        tracingLevelConfiguration));
+    return componentInitialSpanInfos
+        .computeIfAbsent(new InitialSpanInfoIdentifier(getLocationAsString(component.getLocation()), suffix, overriddenName),
+                         identifier -> getExecutionInitialSpanInfo(component, suffix, overriddenName));
+  }
+
+  private ExecutionInitialSpanInfo getExecutionInitialSpanInfo(Component component, String suffix, String overriddenName) {
+    ExecutionInitialSpanInfo executionInitialSpanInfo = new ExecutionInitialSpanInfo(component, apiId, overriddenName,
+                                                                                     suffix,
+                                                                                     tracingLevelConfiguration);
 
     tracingLevelConfiguration.onConfigurationChange(executionInitialSpanInfo::reconfigureInitialSpanInfo);
 
@@ -101,11 +106,11 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   /**
-   * @param initialSpanInfo the {@link InitialSpanInfo} to verify if it is cached.
-   *
-   * @return whether it is cached.
+   * @param initialSpanInfo the {@link InitialSpanInfo} to verify if it is dynamically configured, it may be affected by a change
+   *                        in the configuration of tracing.
+   * @return whether it is dynamically configurable.
    */
-  public boolean isCached(InitialSpanInfo initialSpanInfo) {
+  public boolean isDynamicallyConfigurable(InitialSpanInfo initialSpanInfo) {
     return componentInitialSpanInfos.containsValue(initialSpanInfo);
   }
 }
