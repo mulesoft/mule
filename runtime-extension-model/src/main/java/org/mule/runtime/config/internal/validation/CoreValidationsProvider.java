@@ -20,6 +20,8 @@ import org.mule.runtime.ast.api.validation.ArtifactValidation;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
+import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,8 @@ public class CoreValidationsProvider implements ValidationsProvider {
   private ClassLoader artifactRegionClassLoader;
 
   private boolean ignoreParamsWithProperties;
+
+  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new CachingArtifactAstGraphDependencyProvider();
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -138,9 +142,11 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties),
-                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties),
-                  new ReferenceParametersStereotypesValidations());
+                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
+                                                                           artifactAstDependencyGraphProvider),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
+                                                                      artifactAstDependencyGraphProvider),
+                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProvider));
   }
 
   @Override

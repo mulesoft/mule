@@ -17,6 +17,7 @@ import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.Optional;
@@ -28,7 +29,9 @@ public class ConfigReferenceParametersStereotypesValidations extends AbstractRef
   private final boolean ignoreParamsWithProperties;
 
   public ConfigReferenceParametersStereotypesValidations(Optional<FeatureFlaggingService> featureFlaggingService,
-                                                         boolean ignoreParamsWithProperties) {
+                                                         boolean ignoreParamsWithProperties,
+                                                         ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    super(artifactAstDependencyGraphProvider);
     this.featureFlaggingService = featureFlaggingService;
     this.ignoreParamsWithProperties = ignoreParamsWithProperties;
   }
