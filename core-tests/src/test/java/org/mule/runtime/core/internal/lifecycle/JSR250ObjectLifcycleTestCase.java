@@ -3,21 +3,30 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_APPLY_OBJECT_PROCESSOR_PROPERTY;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Test lifecycle behaviour and restrictions on lifecyce methods
  */
+// TODO W-10781591 Remove this test
 public class JSR250ObjectLifcycleTestCase extends AbstractMuleContextTestCase {
+
+  // This tests specifically tests features provided by ObjectProcessors
+  @Rule
+  public SystemProperty disableApplyObjectProcessor = new SystemProperty(DISABLE_APPLY_OBJECT_PROCESSOR_PROPERTY, "false");
 
   @Test
   public void testNormalBehaviour() throws Exception {
