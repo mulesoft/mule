@@ -22,7 +22,7 @@ module org.mule.runtime.extension.model {
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.dependency.graph;
   
-  requires javax.inject;
+  requires java.inject;
 
   requires com.google.common;
   requires com.google.gson;

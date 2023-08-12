@@ -54,13 +54,13 @@ module org.mule.runtime.core {
 
   requires jakarta.activation;
   requires java.annotation;
+  requires java.inject;
   requires java.management;
   // InvalidTransactionException extends java.rmi.RemoteException
   requires java.rmi;
   requires java.transaction;
   // used by DateTime
   requires java.xml.bind;
-  requires javax.inject;
 
   exports org.mule.runtime.core.api;
   exports org.mule.runtime.core.api.artifact;
@@ -230,6 +230,7 @@ module org.mule.runtime.core {
       org.mule.test.unit,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.context.notification to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -323,6 +324,8 @@ module org.mule.runtime.core {
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
+  exports org.mule.runtime.core.internal.profiling.tracing.event.span.condition to
+      org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
