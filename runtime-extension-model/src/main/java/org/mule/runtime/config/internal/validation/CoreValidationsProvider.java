@@ -36,7 +36,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
   private boolean ignoreParamsWithProperties;
 
   @Inject
-  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
+  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new DefaultArtifactAstDependencyGraphProvider();
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
