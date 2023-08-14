@@ -34,7 +34,7 @@ public class ArtifactAstDependencyGraphProviderValidation implements Validation 
 
   @Override
   public String getDescription() {
-    return "Verify that the validation receives a ArtifactAstDependencyGraphProvider";
+    return "Verify that the validation receives an ArtifactAstDependencyGraphProvider";
   }
 
   @Override
