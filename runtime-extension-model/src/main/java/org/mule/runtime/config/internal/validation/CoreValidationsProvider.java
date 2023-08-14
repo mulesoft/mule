@@ -21,6 +21,7 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
+import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +36,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   private boolean ignoreParamsWithProperties;
 
-  @Inject
-  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
+  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new CachingArtifactAstGraphDependencyProvider();
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -47,7 +47,6 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Inject
   @Named("_compatibilityPluginInstalled")
   private Optional<Object> compatibilityPluginInstalled;
-
 
   @Override
   public List<Validation> get() {

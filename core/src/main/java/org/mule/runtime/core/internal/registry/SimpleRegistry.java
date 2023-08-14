@@ -7,7 +7,6 @@ import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGIN
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
-import static org.mule.runtime.core.api.config.MuleProperties.ARTIFACT_AST_DEPENDENCY_GRAPH_PROVIDER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONTEXT;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_NOTIFICATION_HANDLER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
@@ -33,11 +32,9 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
-import org.mule.runtime.core.internal.context.ast.CachingArtifactAstGraphDependencyProvider;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
@@ -102,7 +99,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       defaultEntries.put("_registryProcessor", new RegistryProcessor(getMuleContext()));
       defaultEntries.put(OBJECT_NOTIFICATION_HANDLER, ((PrivilegedMuleContext) getMuleContext()).getNotificationManager());
       defaultEntries.put(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
-      defaultEntries.put(ARTIFACT_AST_DEPENDENCY_GRAPH_PROVIDER, new CachingArtifactAstGraphDependencyProvider());
     }
 
     defaultEntries.put("_muleLifecycleStateInjectorProcessor",

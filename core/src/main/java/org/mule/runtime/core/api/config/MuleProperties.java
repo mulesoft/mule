@@ -224,8 +224,6 @@ public class MuleProperties {
   public static final String OBJECT_STREAMING_MANAGER = "_muleStreamingManager";
   public static final String OBJECT_STREAMING_GHOST_BUSTER = "_muleStreamingGhostBuster";
   public static final String OBJECT_REGISTRY = "_muleRegistry";
-
-  public static final String ARTIFACT_AST_DEPENDENCY_GRAPH_PROVIDER = "_muleArtifactAstDependencyGraphProvider";
   public static final String OBJECT_TRANSFORMATION_SERVICE = "_muleTransformationService";
   public static final String OBJECT_TRANSFORMER_RESOLVER = "_muleTransfromerResolver";
   public static final String OBJECT_COMPONENT_INITIAL_STATE_MANAGER = ComponentInitialStateManager.SERVICE_ID;
