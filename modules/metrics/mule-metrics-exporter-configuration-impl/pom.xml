@@ -52,6 +52,11 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-observability</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <name>Mule Metrics Exporter Configuration Implementation</name>
     <description>Definitions for Mule Metrics Exporter Configuration Implementation</description>
