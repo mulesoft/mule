@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.ast.api.ArtifactAst;
-import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
+import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstDependencyGraphProvider;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -24,12 +24,12 @@ import org.junit.Test;
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
 @Issue("W-12421187")
-public class CachingArtifactAstGraphDependencyProviderTestCase {
+public class CachingArtifactAstDependencyGraphProviderTestCase {
 
   @Test
   public void verifyCachingProvider() {
-    CachingArtifactAstGraphDependencyProvider cachingArtifactAstGraphDependencyProvider =
-        new CachingArtifactAstGraphDependencyProvider();
+    CachingArtifactAstDependencyGraphProvider cachingArtifactAstGraphDependencyProvider =
+        new CachingArtifactAstDependencyGraphProvider();
     ArtifactAst artifactAst = mock(ArtifactAst.class);
     // The double return is done to avoid the consumption of the stream in the first
     // invocation.

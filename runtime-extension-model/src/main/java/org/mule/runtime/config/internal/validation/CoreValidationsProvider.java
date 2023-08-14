@@ -21,7 +21,8 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
-import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstGraphDependencyProvider;
+import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
+import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstDependencyGraphProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +31,13 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class CoreValidationsProvider implements ValidationsProvider {
+public class CoreValidationsProvider implements ValidationsProvider, ArtifactAstGraphDependencyProviderAware {
 
   private ClassLoader artifactRegionClassLoader;
 
   private boolean ignoreParamsWithProperties;
 
-  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new CachingArtifactAstGraphDependencyProvider();
+  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new CachingArtifactAstDependencyGraphProvider();
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -157,5 +158,10 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public void setIgnoreParamsWithProperties(boolean ignoreParamsWithProperties) {
     this.ignoreParamsWithProperties = ignoreParamsWithProperties;
+  }
+
+  @Override
+  public void setArtifactAstDependencyGraphProvider(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    this.artifactAstDependencyGraphProvider = artifactAstDependencyGraphProvider;
   }
 }

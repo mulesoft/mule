@@ -53,7 +53,6 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -101,6 +100,7 @@ import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstDependencyGraphProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -287,13 +287,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       throws ConfigurationException {
 
     final ValidationResult validation = validatorBuilder()
-        .withValidationEnricher(v -> {
-          try {
-            muleContext.getInjector().inject(v);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        })
+        .withValidationEnricher(new RuntimeValidationEnricher(new CachingArtifactAstDependencyGraphProvider(), muleContext))
         .withValidationsFilter(validationsFilter)
         // get the region classloader from the artifact one
         .withArtifactRegionClassLoader(getValidationClassloader())

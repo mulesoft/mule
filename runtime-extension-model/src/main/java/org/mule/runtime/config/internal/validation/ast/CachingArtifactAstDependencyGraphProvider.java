@@ -21,7 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache;
  *
  * @since 4.6.0
  */
-public class CachingArtifactAstGraphDependencyProvider implements ArtifactAstDependencyGraphProvider {
+public class CachingArtifactAstDependencyGraphProvider implements ArtifactAstDependencyGraphProvider {
 
   private Cache<ArtifactAst, ArtifactAstDependencyGraph> dependencyGraphCache = newBuilder().build();
 
