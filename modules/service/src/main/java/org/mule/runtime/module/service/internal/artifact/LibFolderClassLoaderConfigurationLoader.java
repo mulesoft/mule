@@ -6,8 +6,11 @@ package org.mule.runtime.module.service.internal.artifact;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVER_PLUGIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
+
+import static org.apache.commons.lang3.SystemUtils.JAVA_VM_SPECIFICATION_VERSION;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -40,6 +43,7 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
 
   private static final Set<ArtifactType> supportedTypes = new HashSet<>(asList(SERVICE, SERVER_PLUGIN));
 
+  private static final int JVM_SPECIFICATION_VERSION = parseInt(JAVA_VM_SPECIFICATION_VERSION.split("\\.")[0]);
   private static final String LIB_DIR = "lib";
   private static final String JAR_FILE = "*.jar";
 
@@ -58,9 +62,8 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
 
     ClassLoaderConfigurationBuilder classLoaderConfigurationBuilder = new ClassLoaderConfigurationBuilder();
     classLoaderConfigurationBuilder.containing(getUrl(artifactFile));
-    for (URL url : getServiceUrls(artifactFile)) {
-      classLoaderConfigurationBuilder.containing(url);
-    }
+    classLoaderConfigurationBuilder.containing(getServiceUrls(artifactFile));
+    classLoaderConfigurationBuilder.containing(getServiceUrlsForJavaVersion(artifactFile));
 
     return classLoaderConfigurationBuilder.build();
   }
@@ -81,12 +84,27 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
     return urls;
   }
 
+  private List<URL> getServiceUrlsForJavaVersion(File rootFolder) {
+    List<URL> urls = new LinkedList<>();
+
+    final File libJavaVersionsDir = new File(rootFolder, LIB_DIR + "/java-versions");
+    if (libJavaVersionsDir.exists()) {
+      for (File file : libJavaVersionsDir.listFiles()) {
+        if (JVM_SPECIFICATION_VERSION >= parseInt(file.getName())) {
+          loadJarsFromFolder(urls, file);
+        }
+      }
+    }
+
+    return urls;
+  }
+
   private void loadJarsFromFolder(List<URL> urls, File folder) {
     if (!folder.exists()) {
       return;
     }
 
-    FilenameFilter fileFilter = new WildcardFileFilter(JAR_FILE);
+    FilenameFilter fileFilter = WildcardFileFilter.builder().setWildcards(JAR_FILE).get();
     File[] files = folder.listFiles(fileFilter);
     for (File jarFile : files) {
       urls.add(getFileUrl(jarFile));
@@ -100,12 +118,6 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
     } catch (MalformedURLException e) {
       // Should not happen as folder already exists
       throw new IllegalStateException("Cannot create service class loader", e);
-    }
-  }
-
-  private void addDirectoryToClassLoader(List<URL> urls, File classesFolder) {
-    if (classesFolder.exists()) {
-      urls.add(getFileUrl(classesFolder));
     }
   }
 
