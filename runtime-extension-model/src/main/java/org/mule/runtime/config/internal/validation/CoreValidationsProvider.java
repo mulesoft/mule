@@ -22,7 +22,7 @@ import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
-import org.mule.runtime.config.internal.validation.ast.CachingArtifactAstDependencyGraphProvider;
+import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
   private boolean ignoreParamsWithProperties;
 
-  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider = new CachingArtifactAstDependencyGraphProvider();
+  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -142,6 +142,12 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
+    // TODO W-13931931: Create a context for dependencies needed to be injected in deployment
+    // When this is done the artifactAstDependencyGraphProvider will probably be mandatory.
+    if (artifactAstDependencyGraphProvider == null) {
+      artifactAstDependencyGraphProvider = new DefaultArtifactAstDependencyGraphProvider();
+    }
+
     return asList(new ImportValidTarget(),
                   new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
                                                                            artifactAstDependencyGraphProvider),
@@ -161,6 +167,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   }
 
   @Override
+  @Inject
   public void setArtifactAstDependencyGraphProvider(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
     this.artifactAstDependencyGraphProvider = artifactAstDependencyGraphProvider;
   }
