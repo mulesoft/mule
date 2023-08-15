@@ -537,6 +537,17 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
 
+    parseTemplate.onParameterGroup(OUTPUT)
+        .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
+        .ofType(STRING_TYPE)
+        .defaultingTo("#[message]")
+        .withExpressionSupport(REQUIRED)
+        .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
+        .withRole(BEHAVIOUR)
+        .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
+        .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
+        .withModelProperty(new TargetModelProperty());
+
     parseTemplate.onDefaultParameterGroup().withExclusiveOptionals(of("content", "location"), true);
   }
 
