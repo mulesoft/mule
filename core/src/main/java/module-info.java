@@ -186,8 +186,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
       spring.beans;
-  exports org.mule.runtime.core.internal.util.collection to
-      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.config to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
@@ -209,6 +207,11 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.connector to
       com.mulesoft.mule.runtime.cluster;
+  exports org.mule.runtime.core.internal.construct to
+      org.mule.runtime.core.components,
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
@@ -341,6 +344,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.security.filter to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.security.tls to
+      com.mulesoft.anypoint.gw.api;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
       com.mulesoft.mule.runtime.kyro,
@@ -393,6 +398,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.collection to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.mediatype to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.message to
@@ -430,6 +437,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.api.processor to
       spring.core;
   opens org.mule.runtime.core.api.retry.policy to
+      spring.core;
+  opens org.mule.runtime.core.api.retry.async to
       spring.core;
   opens org.mule.runtime.core.api.security to
       spring.core;
