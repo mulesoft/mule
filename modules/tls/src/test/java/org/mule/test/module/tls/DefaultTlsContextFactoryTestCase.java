@@ -200,17 +200,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void defaultIncludesTls12Ciphers() throws Exception {
-    assumeThat(IS_JAVA_1_8, is(true));
-
-    defaultIncludesDEfaultTlsVersionCiphers("TLSv1.2");
-  }
-
-  @Test
   public void defaultIncludesTls13Ciphers() throws Exception {
-    // For versions greater than 8, the default is TLS 1.3
-    assumeThat(IS_JAVA_1_8, is(false));
-
     defaultIncludesDEfaultTlsVersionCiphers("TLSv1.3");
   }
 
