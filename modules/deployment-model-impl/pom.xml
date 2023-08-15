@@ -18,7 +18,7 @@
         <javaModuleName>org.mule.runtime.deployment.model.impl</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <maven.compat.version>3.3.9</maven.compat.version>
+        <maven.compat.version>3.8.1</maven.compat.version>
     </properties>
 
     <dependencies>
