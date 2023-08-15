@@ -168,6 +168,9 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
   @Override
   public void setArtifactAstDependencyGraphProvider(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    // TODO W-13931931: Create a context for dependencies needed to be injected in deployment
+    // This setter and the implementation of the interface will not be needed after that.
+    // We cannot add an inject here because in the muleContext there is no provider.
     this.artifactAstDependencyGraphProvider = of(artifactAstDependencyGraphProvider);
   }
 }

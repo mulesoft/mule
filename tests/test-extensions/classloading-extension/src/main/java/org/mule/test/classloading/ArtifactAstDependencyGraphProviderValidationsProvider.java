@@ -12,7 +12,7 @@ import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
 
 import java.util.List;
 
-public class ArtifactAstDependencyGraphProviderValidationsProvider
+public class  ArtifactAstDependencyGraphProviderValidationsProvider
     implements ValidationsProvider, ArtifactAstGraphDependencyProviderAware {
 
   private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
