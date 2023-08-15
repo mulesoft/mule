@@ -7,7 +7,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
-import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
+import org.mule.runtime.config.internal.validation.ast.ArtifactAstGraphDependencyProviderAware;
 import org.mule.runtime.core.api.MuleContext;
 
 import java.util.function.Consumer;

@@ -15,9 +15,7 @@ import org.mule.test.classloading.api.validation.ClassLoadingValidationsProvider
 @Xml(prefix = "classloading")
 @ConnectionProviders({CLPoolingConnectionProvider.class, CLCachedConnectionProvider.class, CLNoneConnectionProvider.class})
 @Configurations({CLConfiguration.class, CLInvalidConfiguration.class})
-@Export(
-    classes = {ClassLoadingHelper.class, ClassLoadingValidationsProvider.class,
-        ArtifactAstDependencyGraphProviderValidationsProvider.class},
+@Export(classes = {ClassLoadingHelper.class, ClassLoadingValidationsProvider.class},
     resources = {"META-INF/services/org.mule.runtime.ast.api.validation.ValidationsProvider"})
 public class ClassLoadingExtension {
 

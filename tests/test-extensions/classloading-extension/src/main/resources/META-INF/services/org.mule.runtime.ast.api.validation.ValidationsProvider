@@ -1,2 +1,1 @@
 org.mule.test.classloading.api.validation.ClassLoadingValidationsProvider
-org.mule.test.classloading.ArtifactAstDependencyGraphProviderValidationsProvider

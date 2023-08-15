@@ -22,7 +22,7 @@ import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
-import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
+import org.mule.runtime.config.internal.validation.ast.ArtifactAstGraphDependencyProviderAware;
 
 import java.util.ArrayList;
 import java.util.List;
