@@ -3,7 +3,6 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
@@ -11,6 +10,7 @@ import static java.util.stream.Stream.empty;
 
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
