@@ -3,7 +3,10 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
@@ -33,7 +36,7 @@ public class ContainerClassLoaderFactory {
    * @since 4.5
    */
   public ContainerClassLoaderFactory(PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator) {
-    checkArgument(preFilteredContainerClassLoaderCreator != null, "containerClassLoaderCreator cannot be null");
+    requireNonNull(preFilteredContainerClassLoaderCreator, "containerClassLoaderCreator cannot be null");
 
     this.preFilteredContainerClassLoaderCreator = preFilteredContainerClassLoaderCreator;
   }
@@ -78,8 +81,13 @@ public class ContainerClassLoaderFactory {
    */
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
-    return createContainerFilteringClassLoader(parentClassLoader, muleModules, preFilteredContainerClassLoaderCreator
-        .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
+    return createContainerFilteringClassLoader(classloaderContainerJpmsModuleLayer()
+        ? getSystemClassLoader()
+        // Keep previous behavior, even if not correct, to avoid breaking backwards compatibility accidentally
+        : parentClassLoader,
+                                               muleModules,
+                                               preFilteredContainerClassLoaderCreator
+                                                   .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
   }
 
   /**
