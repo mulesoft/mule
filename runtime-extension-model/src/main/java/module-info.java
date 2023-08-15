@@ -60,6 +60,9 @@ module org.mule.runtime.extension.model {
       com.mulesoft.mule.runtime.ee.extension.model,
       org.mule.runtime.spring.config;
 
+  exports org.mule.runtime.config.internal.validation.ast to
+      org.mule.runtime.spring.config;
+
   exports org.mule.runtime.core.api.source.scheduler;
 
   exports org.mule.runtime.core.privileged.extension;
