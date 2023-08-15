@@ -12,6 +12,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -22,7 +23,6 @@ import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ArtifactAstGraphDependencyProviderAware;
-import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,8 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
   private boolean ignoreParamsWithProperties;
 
-  private ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
+  @Inject
+  private Optional<ArtifactAstDependencyGraphProvider> artifactAstDependencyGraphProvider = empty();
 
   @Inject
   private Optional<FeatureFlaggingService> featureFlaggingService = empty();
@@ -144,16 +145,15 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   public List<ArtifactValidation> getArtifactValidations() {
     // TODO W-13931931: Create a context for dependencies needed to be injected in deployment
     // When this is done the artifactAstDependencyGraphProvider will probably be mandatory.
-    if (artifactAstDependencyGraphProvider == null) {
-      artifactAstDependencyGraphProvider = new DefaultArtifactAstDependencyGraphProvider();
-    }
+    ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProviderForValidator =
+        artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
 
     return asList(new ImportValidTarget(),
                   new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
-                                                                           artifactAstDependencyGraphProvider),
+                                                                           artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
-                                                                      artifactAstDependencyGraphProvider),
-                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProvider));
+                                                                      artifactAstDependencyGraphProviderForValidator),
+                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator));
   }
 
   @Override
@@ -167,8 +167,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   }
 
   @Override
-  @Inject
   public void setArtifactAstDependencyGraphProvider(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
-    this.artifactAstDependencyGraphProvider = artifactAstDependencyGraphProvider;
+    this.artifactAstDependencyGraphProvider = of(artifactAstDependencyGraphProvider);
   }
 }
