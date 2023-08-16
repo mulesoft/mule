@@ -81,10 +81,14 @@ public class ContainerClassLoaderFactory {
    */
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
-    return createContainerFilteringClassLoader(classloaderContainerJpmsModuleLayer()
+    // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
+    // compatibility accidentally.
+    // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
+    final ClassLoader containerParentClassLoader = classloaderContainerJpmsModuleLayer()
         ? getSystemClassLoader()
-        // Keep previous behavior, even if not correct, to avoid breaking backwards compatibility accidentally
-        : parentClassLoader,
+        : parentClassLoader;
+
+    return createContainerFilteringClassLoader(containerParentClassLoader,
                                                muleModules,
                                                preFilteredContainerClassLoaderCreator
                                                    .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));

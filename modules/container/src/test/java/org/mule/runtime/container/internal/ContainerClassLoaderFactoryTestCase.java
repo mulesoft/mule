@@ -3,9 +3,13 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
+
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
@@ -164,13 +168,31 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     assumeTrue(isJavaVersionAtLeast(JAVA_17));
 
     final URLClassLoader containerParentClassLoader = new URLClassLoader(new URL[0]);
+    final ArtifactClassLoader containerClassLoader = createContainerClassLoader(containerParentClassLoader);
+    assertThat(containerClassLoader.getClassLoader().getParent(), is(not(containerParentClassLoader)));
+  }
 
+  @Test
+  @Issue("W-13951850")
+  public void actualContainerClassLoaderAccessibleThroughParentsFallback() {
+    assumeTrue(isJavaVersionAtLeast(JAVA_17));
+    setProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false");
+
+    try {
+      final URLClassLoader containerParentClassLoader = new URLClassLoader(new URL[0]);
+      final ArtifactClassLoader containerClassLoader = createContainerClassLoader(containerParentClassLoader);
+      assertThat(containerClassLoader.getClassLoader().getParent(), is(containerParentClassLoader));
+    } finally {
+      clearProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER);
+    }
+  }
+
+  private ArtifactClassLoader createContainerClassLoader(final URLClassLoader containerParentClassLoader) {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
     final ArtifactClassLoader containerClassLoader =
         factory.createContainerClassLoader(containerParentClassLoader).getContainerClassLoader();
-
-    assertThat(containerClassLoader.getClassLoader().getParent(), is(not(containerParentClassLoader)));
+    return containerClassLoader;
   }
 
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
