@@ -9,11 +9,16 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.APP_CONF
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
 
 public class ReferenceParametersStereotypesValidations extends AbstractReferenceParametersStereotypesValidations {
+
+  public ReferenceParametersStereotypesValidations(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    super(artifactAstDependencyGraphProvider);
+  }
 
   @Override
   public String getName() {

@@ -8,6 +8,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static java.lang.String.format;
 
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
@@ -16,7 +17,9 @@ public class ConfigReferenceParametersNonPropertyValueValidations extends Abstra
 
   private final boolean enabled;
 
-  public ConfigReferenceParametersNonPropertyValueValidations(boolean enabled) {
+  public ConfigReferenceParametersNonPropertyValueValidations(boolean enabled,
+                                                              ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    super(artifactAstDependencyGraphProvider);
     this.enabled = enabled;
   }
 
