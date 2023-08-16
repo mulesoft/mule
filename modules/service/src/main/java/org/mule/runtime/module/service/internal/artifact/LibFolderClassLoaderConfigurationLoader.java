@@ -105,10 +105,10 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
         for (File libJavaVersionJar : libJavaVersionDir.listFiles(JAR_FILE_FILTER)) {
           libsByJavaVersion.add(new LibraryByJavaVersion(libsJavaVersion, libJavaVersionJar));
         }
-
-        for (File jvmDependantLib : resolveJvmDependantLibs(JVM_SPECIFICATION_VERSION, libsByJavaVersion)) {
-          urls.add(getFileUrl(jvmDependantLib));
-        }
+      }
+      
+      for (File jvmDependantLib : resolveJvmDependantLibs(JVM_SPECIFICATION_VERSION, libsByJavaVersion)) {
+        urls.add(getFileUrl(jvmDependantLib));
       }
     }
 
