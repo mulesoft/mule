@@ -25,6 +25,7 @@ import java.io.FilenameFilter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,28 +92,32 @@ public class LibFolderClassLoaderConfigurationLoader implements ClassLoaderConfi
 
     final File libJavaVersionsDir = new File(rootFolder, LIB_FOLDER + "/java-versions");
     if (libJavaVersionsDir.exists()) {
-      List<LibraryByJavaVersion> libsByJavaVersion = new ArrayList<>();
-
-      for (File libJavaVersionDir : libJavaVersionsDir.listFiles()) {
-        final int libsJavaVersion;
-        try {
-          libsJavaVersion = parseInt(libJavaVersionDir.getName());
-        } catch (NumberFormatException e) {
-          throw new IllegalStateException(format("Could not obtain a valid Java version from the folder name: %s",
-                                                 libJavaVersionDir.getAbsolutePath()),
-                                          e);
-        }
-        for (File libJavaVersionJar : libJavaVersionDir.listFiles(JAR_FILE_FILTER)) {
-          libsByJavaVersion.add(new LibraryByJavaVersion(libsJavaVersion, libJavaVersionJar));
-        }
-      }
-      
-      for (File jvmDependantLib : resolveJvmDependantLibs(JVM_SPECIFICATION_VERSION, libsByJavaVersion)) {
+      for (File jvmDependantLib : resolveJvmDependantLibs(JVM_SPECIFICATION_VERSION,
+                                                          loadLibsByJavaVersion(libJavaVersionsDir))) {
         urls.add(getFileUrl(jvmDependantLib));
       }
     }
 
     return urls;
+  }
+
+  private Collection<LibraryByJavaVersion> loadLibsByJavaVersion(final File libJavaVersionsDir) {
+    Set<LibraryByJavaVersion> libsByJavaVersion = new HashSet<>();
+
+    for (File libJavaVersionDir : libJavaVersionsDir.listFiles()) {
+      final int libsJavaVersion;
+      try {
+        libsJavaVersion = parseInt(libJavaVersionDir.getName());
+      } catch (NumberFormatException e) {
+        throw new IllegalStateException(format("Could not obtain a valid Java version from the folder name: %s",
+                                               libJavaVersionDir.getAbsolutePath()),
+                                        e);
+      }
+      for (File libJavaVersionJar : libJavaVersionDir.listFiles(JAR_FILE_FILTER)) {
+        libsByJavaVersion.add(new LibraryByJavaVersion(libsJavaVersion, libJavaVersionJar));
+      }
+    }
+    return libsByJavaVersion;
   }
 
   private void loadJarsFromFolder(List<URL> urls, File folder) {
