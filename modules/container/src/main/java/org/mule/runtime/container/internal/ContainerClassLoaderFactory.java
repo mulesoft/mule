@@ -3,7 +3,10 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
@@ -33,7 +36,7 @@ public class ContainerClassLoaderFactory {
    * @since 4.5
    */
   public ContainerClassLoaderFactory(PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator) {
-    checkArgument(preFilteredContainerClassLoaderCreator != null, "containerClassLoaderCreator cannot be null");
+    requireNonNull(preFilteredContainerClassLoaderCreator, "containerClassLoaderCreator cannot be null");
 
     this.preFilteredContainerClassLoaderCreator = preFilteredContainerClassLoaderCreator;
   }
@@ -78,8 +81,17 @@ public class ContainerClassLoaderFactory {
    */
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
-    return createContainerFilteringClassLoader(parentClassLoader, muleModules, preFilteredContainerClassLoaderCreator
-        .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
+    // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
+    // compatibility accidentally.
+    // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
+    final ClassLoader containerParentClassLoader = classloaderContainerJpmsModuleLayer()
+        ? getSystemClassLoader()
+        : parentClassLoader;
+
+    return createContainerFilteringClassLoader(containerParentClassLoader,
+                                               muleModules,
+                                               preFilteredContainerClassLoaderCreator
+                                                   .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
   }
 
   /**

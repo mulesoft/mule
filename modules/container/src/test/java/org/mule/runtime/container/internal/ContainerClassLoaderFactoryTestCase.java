@@ -3,16 +3,24 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
+
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +31,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -30,6 +39,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
@@ -149,6 +160,39 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.mule.extension.validation.api.condition.SomeCondition"),
                instanceOf(ContainerOnlyLookupStrategy.class));
     assertThat(classLoaderLookupPolicy.getClassLookupStrategy("org.xml.sax.test.Bar"), sameInstance(PARENT_FIRST));
+  }
+
+  @Test
+  @Issue("W-13951850")
+  public void actualContainerClassLoaderNotAccessibleThroughParents() {
+    assumeTrue(isJavaVersionAtLeast(JAVA_17));
+
+    final URLClassLoader containerParentClassLoader = new URLClassLoader(new URL[0]);
+    final ArtifactClassLoader containerClassLoader = createContainerClassLoader(containerParentClassLoader);
+    assertThat(containerClassLoader.getClassLoader().getParent(), is(not(containerParentClassLoader)));
+  }
+
+  @Test
+  @Issue("W-13951850")
+  public void actualContainerClassLoaderAccessibleThroughParentsFallback() {
+    assumeTrue(isJavaVersionAtLeast(JAVA_17));
+    setProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false");
+
+    try {
+      final URLClassLoader containerParentClassLoader = new URLClassLoader(new URL[0]);
+      final ArtifactClassLoader containerClassLoader = createContainerClassLoader(containerParentClassLoader);
+      assertThat(containerClassLoader.getClassLoader().getParent(), is(containerParentClassLoader));
+    } finally {
+      clearProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER);
+    }
+  }
+
+  private ArtifactClassLoader createContainerClassLoader(final URLClassLoader containerParentClassLoader) {
+    final ModuleRepository moduleRepository = mock(ModuleRepository.class);
+    final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
+    final ArtifactClassLoader containerClassLoader =
+        factory.createContainerClassLoader(containerParentClassLoader).getContainerClassLoader();
+    return containerClassLoader;
   }
 
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
