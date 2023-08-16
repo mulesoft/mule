@@ -3,6 +3,7 @@
  */
 package org.mule.test.runner;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,71 +133,80 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     if (errorCreatingClassLoaderTestRunner != null) {
       throw errorCreatingClassLoaderTestRunner;
     }
-
-    if (artifactClassLoaderHolder == null) {
-      Map<String, String> originalSystemPropertiesValues = new HashMap<>();
-
-      try {
-        runnerConfiguration = readConfiguration(clazz);
-
-        runnerConfiguration.getSystemProperties().entrySet()
-            .forEach(sp -> {
-              originalSystemPropertiesValues.put(sp.getKey(), getProperty(sp.getKey()));
-              setProperty(sp.getKey(), sp.getValue());
-            });
-
-        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
-      } catch (Exception e) {
-        errorCreatingClassLoaderTestRunner = e;
-        throw e;
-      } finally {
-        // Restore system properties to original values
-        originalSystemPropertiesValues.entrySet()
-            .forEach(sp -> {
-              if (sp.getValue() != null) {
-                setProperty(sp.getKey(), sp.getValue());
-              } else {
-                clearProperty(sp.getKey());
-              }
-            });
-      }
-    } else {
-      checkConfiguration(clazz);
-    }
-
-    final Class<?> isolatedTestClass = getTestClass(clazz);
-    ClassLoader testRunnerClassLoader = artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader();
-    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+    Map<String, String> originalSystemPropertiesValues = emptyMap();
     try {
-      currentThread().setContextClassLoader(testRunnerClassLoader);
-      final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
-          .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
+      if (artifactClassLoaderHolder == null) {
+        try {
+          runnerConfiguration = readConfiguration(clazz);
+          originalSystemPropertiesValues = configureSystemPropertyValues();
 
-      delegate = new AnnotatedBuilder(builder)
-          .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
-    } finally {
-      currentThread().setContextClassLoader(contextClassLoader);
-    }
-
-    if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
-      throw Throwables.propagate(errorWhileSettingClassLoaders);
-    }
-    withContextClassLoader(testRunnerClassLoader, () -> {
-      try {
-        if (!staticFieldsInjected) {
-
-          injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-          injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
+        } catch (Exception e) {
+          errorCreatingClassLoaderTestRunner = e;
+          throw e;
         }
-      } catch (Throwable t) {
-        errorWhileSettingClassLoaders = t;
-        throw Throwables.propagate(t);
-      } finally {
-        staticFieldsInjected = true;
+      } else {
+        checkConfiguration(clazz);
       }
-    });
+
+      final Class<?> isolatedTestClass = getTestClass(clazz);
+      ClassLoader testRunnerClassLoader = artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader();
+      ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+      try {
+        currentThread().setContextClassLoader(testRunnerClassLoader);
+        final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
+            .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
+
+        delegate = new AnnotatedBuilder(builder)
+            .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
+      } finally {
+        currentThread().setContextClassLoader(contextClassLoader);
+      }
+
+      if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
+        throw Throwables.propagate(errorWhileSettingClassLoaders);
+      }
+      withContextClassLoader(testRunnerClassLoader, () -> {
+        try {
+          if (!staticFieldsInjected) {
+
+            injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+            injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+            injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+            injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          }
+        } catch (Throwable t) {
+          errorWhileSettingClassLoaders = t;
+          throw Throwables.propagate(t);
+        } finally {
+          staticFieldsInjected = true;
+        }
+      });
+    } finally {
+      restoreSystemPropertyValues(originalSystemPropertiesValues);
+    }
+  }
+
+  private static Map<String, String> configureSystemPropertyValues() {
+    Map<String, String> originalSystemPropertyValues = new HashMap<>();
+    runnerConfiguration.getSystemProperties().entrySet()
+        .forEach(sp -> {
+          originalSystemPropertyValues.put(sp.getKey(), getProperty(sp.getKey()));
+          setProperty(sp.getKey(), sp.getValue());
+        });
+    return originalSystemPropertyValues;
+  }
+
+  private static void restoreSystemPropertyValues(Map<String, String> originalSystemPropertiesValues) {
+    // Restore system properties to original values
+    originalSystemPropertiesValues.entrySet()
+        .forEach(sp -> {
+          if (sp.getValue() != null) {
+            setProperty(sp.getKey(), sp.getValue());
+          } else {
+            clearProperty(sp.getKey());
+          }
+        });
   }
 
   private void checkConfiguration(Class<?> klass) {
