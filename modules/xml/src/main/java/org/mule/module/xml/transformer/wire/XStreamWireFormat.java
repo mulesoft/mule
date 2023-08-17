@@ -20,13 +20,14 @@ import java.util.Set;
  */
 public class XStreamWireFormat extends TransformerPairWireFormat
 {
+
     public XStreamWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
     }
 
     public XStreamWireFormat(String driverClassName, Map aliases, Set converters)
-      throws IllegalAccessException, InstantiationException, ClassNotFoundException
+        throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         XmlToObject in = new XmlToObject();
         in.setDriverClass(driverClassName);
