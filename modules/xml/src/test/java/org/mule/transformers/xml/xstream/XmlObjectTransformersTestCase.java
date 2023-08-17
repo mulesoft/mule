@@ -6,9 +6,12 @@
  */
 package org.mule.transformers.xml.xstream;
 
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_XSTREAM_DENYLIST;
+
 import org.mule.api.transformer.Transformer;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.transformers.xml.AbstractXmlTransformerTestCase;
 
@@ -16,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -24,6 +28,10 @@ public class XmlObjectTransformersTestCase extends AbstractXmlTransformerTestCas
 {
     private Apple testObject = null;
     private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
+
+    @Rule
+    public SystemProperty setVariableEnableXstreamDenylist =
+      new SystemProperty(MULE_ENABLE_XSTREAM_DENYLIST, "true");
 
     public XmlObjectTransformersTestCase()
     {

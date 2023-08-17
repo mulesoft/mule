@@ -6,6 +6,7 @@
  */
 package org.mule.module.xml.transformer.wire;
 
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XStreamFactory;
 import org.mule.module.xml.transformer.XmlToObject;
@@ -21,15 +22,15 @@ import java.util.Set;
 public class XStreamWireFormat extends TransformerPairWireFormat
 {
     
-    public XStreamWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException
-    {
+    public XStreamWireFormat()
+      throws IllegalAccessException, InstantiationException, ClassNotFoundException, InitialisationException {
         this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);
     }
 
     public XStreamWireFormat(String driverClassName, Map aliases, Set converters)
-        throws IllegalAccessException, InstantiationException, ClassNotFoundException
-    {
+      throws IllegalAccessException, InstantiationException, ClassNotFoundException, InitialisationException {
         XmlToObject in = new XmlToObject();
+        in.initialise();
         in.setDriverClass(driverClassName);
         in.setAliases(aliases);
         in.setConverters(converters);

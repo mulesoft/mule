@@ -6,6 +6,13 @@
  */
 package org.mule.module.xml.transformer;
 
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_XSTREAM_DENYLIST;
+import static org.mule.api.config.MuleProperties.MULE_XSTREAM_ALLOWLIST;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
+
+import org.mule.api.config.MuleProperties;
 import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.config.i18n.MessageFactory;
@@ -13,6 +20,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +39,8 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
     private volatile String driverClass = XStreamFactory.XSTREAM_XPP_DRIVER;
     private volatile Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
     private volatile Set<Class <? extends Converter>> converters = new HashSet<Class <? extends Converter>>();
+    protected boolean isDenylistEnabled = getBoolean(MULE_ENABLE_XSTREAM_DENYLIST);
+    private String allowlist = getProperty(MULE_XSTREAM_ALLOWLIST);
 
     @Override
     public void initialise() throws InitialisationException
@@ -61,6 +71,28 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
                 if (!xstream.compareAndSet(null, instance))
                 {
                     instance = xstream.get();
+                }
+                // Configure security
+                if (isDenylistEnabled) {
+                    instance.addPermission(AnyTypePermission.ANY);
+                    instance.denyTypes(new String[]{ "javax.imageio.ImageIO$ContainsFilter", "sun.awt.datatransfer.DataTransferer$IndexOrderComparator", "com.sun.tools.javac.processing.JavacProcessingEnvironment$NameProcessIterator" });
+                    instance.denyTypes(new Class[]{ java.lang.ProcessBuilder.class, java.beans.EventHandler.class, java.lang.ProcessBuilder.class, java.lang.Void.class, void.class });
+                    instance.denyTypesByRegExp(new String[]{ ".*\\$ServiceNameIterator", "javafx\\.collections\\.ObservableList\\$.*", ".*\\.bcel\\..*\\.util\\.ClassLoader", ".*\\$GetterSetterReflection", ".*\\$LazyIterator", ".*\\$PrivilegedGetter",  ".*\\.ws\\.client\\.sei\\..*", ".*\\$ProxyLazyValue", "com\\.sun\\.jndi\\..*Enumerat(?:ion|tor)", ".*\\$URLData", ".*\\.xsltc\\.trax\\.TemplatesImpl" });
+                    instance.denyTypesByWildcard(new String[]{ "sun.reflect.**", "sun.tracing.**", "com.sun.corba.**" });
+                    instance.denyTypeHierarchy(java.io.InputStream.class);
+                    instance.denyTypeHierarchy(java.nio.channels.Channel.class);
+                    instance.denyTypeHierarchy(javax.activation.DataSource.class);
+                    instance.denyTypeHierarchy(javax.sql.rowset.BaseRowSet.class);
+                } else if (allowlist != null) {
+                    // Parse the allowlist and call allowTypes and allowTypesByWildcard accordingly
+                    String[] allowlistItems = allowlist.split(",");
+                    for (String item : allowlistItems) {
+                        if (item.endsWith("*")) {
+                            instance.allowTypesByWildcard(new String[]{item});
+                        } else {
+                            instance.allowTypes(new String[]{item});
+                        }
+                    }
                 }
             }
             catch (Exception e)
