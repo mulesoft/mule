@@ -16,18 +16,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
@@ -110,7 +116,6 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     assertThat(dataWeaveExpressionLanguageAdaptor, instanceOf(expectedClass));
   }
 
-
   @Test
   public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
     final ArtifactAstConfigurationBuilder configurationBuilder =
@@ -122,6 +127,32 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     artifactContext.getMuleContext().getInjector().inject(memoryManagementInjected);
 
     assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
+  }
+
+  @Test
+  @Issue("W-13969259")
+  public void baseRegistryDisposedOnDeploymentError() throws IOException {
+    final ArtifactAstConfigurationBuilder configurationBuilder =
+        astConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), false);
+
+    final ArgumentCaptor<Registry> registryCaptor = forClass(Registry.class);
+    doNothing()
+        .when((DefaultMuleContext) muleContext)
+        .setRegistry(registryCaptor.capture());
+
+    doThrow(IllegalStateException.class)
+        .when((DefaultMuleContext) muleContext)
+        // some method called within the configuration that uses the baseRegistry
+        .getExtensionManager();
+
+    try {
+      configurationBuilder.configure(muleContext);
+      fail("Expected IllegalStateException");
+    } catch (ConfigurationException e) {
+      assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+      final BaseSpringRegistry baseRegistry = (BaseSpringRegistry) (registryCaptor.getValue());
+      assertThat(baseRegistry.getLifecycleManager().getLastExecutedPhase(), is(Disposable.PHASE_NAME));
+    }
   }
 
   private ArtifactAstConfigurationBuilder astConfigurationBuilderRelativeToPath(File basePath, ArtifactAst artifactAst,
