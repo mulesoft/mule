@@ -440,7 +440,7 @@
 /mule-standalone-${productVersion}/lib/opt/xmlsec-1.5.8.jar
 /mule-standalone-${productVersion}/lib/opt/xsdlib-2010.1.jar
 /mule-standalone-${productVersion}/lib/opt/xstream-1.4.20.jar
-/mule-standalone-${productVersion}/lib/opt/mxparser-1.2.1.jar
+/mule-standalone-${productVersion}/lib/opt/mxparser-1.2.2.jar
 /mule-standalone-${productVersion}/lib/opt/opensaml-2.6.6.jar
 /mule-standalone-${productVersion}/lib/opt/openws-1.5.6.jar
 /mule-standalone-${productVersion}/lib/opt/xmlbeans-3.1.0.jar
