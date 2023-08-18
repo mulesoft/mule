@@ -55,7 +55,12 @@ class FallbackArtifactConfigurationProcessor implements ArtifactConfigurationPro
         LOGGER.warn(message + ": " + e.toString());
       }
 
-      return fallback.createArtifactContext(artifactContextConfiguration);
+      try {
+        return fallback.createArtifactContext(artifactContextConfiguration);
+      } catch (ConfigurationException eFallback) {
+        eFallback.addSuppressed(e);
+        throw eFallback;
+      }
     }
   }
 }
