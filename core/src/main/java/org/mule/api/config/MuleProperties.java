@@ -232,4 +232,18 @@ public class MuleProperties
      */
     public static final String MULE_ENABLE_STATISTICS = SYSTEM_PROPERTY_PREFIX + "enable.statistics";
 
+    /**
+     * When enabled this System Property, xstream will use the insecure default denylist instead of the recommended allowlist.
+     *
+     * @since 3.9.5
+     */
+    public static final String MULE_ENABLE_XSTREAM_DENYLIST = SYSTEM_PROPERTY_PREFIX + "enable.xstream.denylist";
+
+    /**
+     * Define the classes to add to the default allowlist of xstream for deserealization.
+     *
+     * @since 3.9.5
+     */
+    public static final String MULE_XSTREAM_ALLOWLIST = SYSTEM_PROPERTY_PREFIX + "xstream.allowlist";
+
 }

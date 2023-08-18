@@ -7,6 +7,7 @@
 package org.mule.module.xml.transformer;
 
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.InitialisationException;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.types.DataTypeFactory;
 import org.mule.util.store.DeserializationPostInitialisable;
@@ -31,6 +32,19 @@ public class XmlToObject extends AbstractXStreamTransformer
 {
 
     private final DomDocumentToXml domTransformer = new DomDocumentToXml();
+
+    @Override public void initialise() throws InitialisationException {
+        super.initialise();
+
+        if (!isDenylistEnabled) {
+            try {
+                    // Add return type to allowlist
+                    getXStream().allowTypes(new Class[] {returnType.getType()});
+            } catch (TransformerException e) {
+                throw new InitialisationException(e, this);
+            }
+        }
+    }
 
     public XmlToObject()
     {

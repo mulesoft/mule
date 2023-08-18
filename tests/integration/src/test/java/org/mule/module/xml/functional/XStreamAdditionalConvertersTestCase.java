@@ -6,6 +6,8 @@
  */
 package org.mule.module.xml.functional;
 
+import static org.mule.api.config.MuleProperties.MULE_XSTREAM_ALLOWLIST;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -14,6 +16,7 @@ import org.mule.api.client.MuleClient;
 import org.mule.tck.AbstractServiceAndFlowTestCase;
 import org.mule.tck.functional.EventCallback;
 import org.mule.tck.functional.FunctionalTestComponent;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import com.thoughtworks.xstream.converters.extended.ISO8601DateConverter;
 
@@ -23,12 +26,17 @@ import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowTestCase
 {
     private CountDownLatch latch = new CountDownLatch(1);
+
+    @Rule
+    public SystemProperty setVariableEnableXstreamDenylist =
+      new SystemProperty(MULE_XSTREAM_ALLOWLIST, "org.mule.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean");
 
     @Parameters
     public static Collection<Object[]> parameters()

@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class XStreamWireFormat extends TransformerPairWireFormat
 {
-    
+
     public XStreamWireFormat() throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
         this(XStreamFactory.XSTREAM_XPP_DRIVER, null, null);

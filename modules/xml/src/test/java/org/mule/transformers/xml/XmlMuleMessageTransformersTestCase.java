@@ -6,6 +6,8 @@
  */
 package org.mule.transformers.xml;
 
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_XSTREAM_DENYLIST;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -17,14 +19,20 @@ import org.mule.api.config.MuleProperties;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.fruit.Apple;
 
 import java.util.Set;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class XmlMuleMessageTransformersTestCase extends AbstractMuleContextTestCase
 {
+
+    @Rule
+    public SystemProperty setVariableEnableXstreamDenylist =
+      new SystemProperty(MULE_ENABLE_XSTREAM_DENYLIST, "true");
 
     @Test
     public void testMessageSerialization() throws Exception

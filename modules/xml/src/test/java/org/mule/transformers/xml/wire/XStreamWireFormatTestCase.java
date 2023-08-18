@@ -6,6 +6,8 @@
  */
 package org.mule.transformers.xml.wire;
 
+import static org.mule.api.config.MuleProperties.MULE_ENABLE_XSTREAM_DENYLIST;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -14,13 +16,20 @@ import org.mule.api.transformer.wire.WireFormat;
 import org.mule.module.xml.transformer.ObjectToXml;
 import org.mule.module.xml.transformer.XmlToObject;
 import org.mule.module.xml.transformer.wire.XStreamWireFormat;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.fruit.Orange;
 import org.mule.transformer.wire.AbstractMuleMessageWireFormatTestCase;
 
 import java.util.Properties;
 
+import org.junit.Rule;
+
 public class XStreamWireFormatTestCase extends AbstractMuleMessageWireFormatTestCase
 {
+
+    @Rule
+    public SystemProperty setVariableEnableXstreamDenylist =
+      new SystemProperty(MULE_ENABLE_XSTREAM_DENYLIST, "true");
 
     @Override
     protected WireFormat getWireFormat() throws Exception
