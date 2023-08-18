@@ -3,6 +3,7 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
+import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
@@ -48,7 +49,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
   private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
       new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
 
-  private static final String LEGACY_DEFAULT_TARGET_VALUE = "#[message]";
+  private static final String LEGACY_DEFAULT_TARGET_VALUE = "#[" + MESSAGE + "]";
 
   private ExtendedExpressionManager expressionManager;
 
@@ -114,9 +115,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
   }
 
   private void evaluateCorrectArguments() {
-    if (!(isSanitizedPayload(sanitize(targetValue))
-        || (isParseTemplateUseLegacyDefaultTargetValue() && LEGACY_DEFAULT_TARGET_VALUE.equals(sanitize(targetValue))))
-        && target == null) {
+    if (target == null && !(isSanitizedPayload(sanitize(targetValue))
+        || isParseTemplateUseLegacyDefaultTargetValue() && LEGACY_DEFAULT_TARGET_VALUE.equals(targetValue))) {
       throw new IllegalArgumentException("Can't define a targetValue with no target");
     }
   }
