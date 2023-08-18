@@ -3,15 +3,16 @@
  */
 package org.mule.test.infrastructure.deployment;
 
-import static org.apache.logging.log4j.LogManager.shutdown;
-
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 
+import static org.apache.logging.log4j.LogManager.shutdown;
+
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,10 @@ import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 
 public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
+
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
 
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
