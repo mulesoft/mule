@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
+import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetForDynamicComponentParameterization;
@@ -269,6 +270,9 @@ public class OperationClient implements Lifecycle {
       String memberName = getMemberName(parameterModel);
       filteredResolvers.put(memberName, parameterResolvers.get(memberName));
     });
+
+    // Removes the targetValue parameter from the ResolverSet because it has no effect on the extensions client and adds overhead
+    filteredResolvers.remove(TARGET_VALUE_PARAMETER_NAME);
 
     ResolverSet filteredResolverSet = new ResolverSet(muleContext);
     filteredResolverSet.addAll(filteredResolvers);
