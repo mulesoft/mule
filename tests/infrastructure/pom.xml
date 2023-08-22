@@ -79,17 +79,6 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>${awaitilityVersion}</version>
-            <exclusions>
-               <exclusion>
-                   <groupId>org.hamcrest</groupId>
-                   <artifactId>hamcrest-library</artifactId>
-               </exclusion>
-               <exclusion>
-                   <groupId>org.hamcrest</groupId>
-                   <artifactId>hamcrest-core</artifactId>
-               </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -104,7 +93,19 @@
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-scp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-sftp</artifactId>
         </dependency>
 
         <dependency>
