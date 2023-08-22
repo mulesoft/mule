@@ -180,7 +180,7 @@ public abstract class AbstractOSController {
       logger.info("Executing: {}", paramsJoiner);
       return executor.execute(commandLine, env);
     } catch (ExecuteException e) {
-      logger.error("Error executing " + paramsJoiner, e);
+      logger.error("Error executing " + paramsJoiner);
       return e.getExitValue();
     } catch (Exception e) {
       throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " "
