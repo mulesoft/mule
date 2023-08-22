@@ -3,16 +3,6 @@
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import static java.lang.Boolean.parseBoolean;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
 import static org.mule.runtime.api.metadata.MediaType.create;
@@ -24,10 +14,19 @@ import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.ParseTemplateStory.PARSE_TEMPLATE;
 
-import io.qameta.allure.Issue;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import static java.util.Arrays.asList;
+import static java.lang.Boolean.parseBoolean;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -50,13 +49,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
+import io.qameta.allure.Issue;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @Feature(CORE_COMPONENTS)
 @Story(PARSE_TEMPLATE)
@@ -83,7 +85,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   @Parameters(name = "isUseLegacyTargetValueDefaultValue: {0}")
   public static Collection<String> getParameters() {
-    return Arrays.asList("true", "false");
+    return asList("true", "false");
   }
 
   public ParseTemplateProcessorTestCase(String isUseLegacyDefaultTargetValue) {
