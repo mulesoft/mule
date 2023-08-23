@@ -21,6 +21,7 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
@@ -34,6 +35,9 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -44,6 +48,8 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
+import org.mule.runtime.api.util.MultiMap;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -58,6 +64,7 @@ import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.internal.parameterization.ComponentParameterizationBuilder;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
@@ -72,7 +79,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -98,6 +107,7 @@ public class OperationClient implements Lifecycle {
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private final ParameterModelLookupHelper parameterModelLookupHelper = new ParameterModelLookupHelper();
   private Map<String, ValueResolver<?>> parameterValueResolvers;
   private Map<String, ValueResolver<?>> parameterDefaultValueResolvers;
 
@@ -242,7 +252,9 @@ public class OperationClient implements Lifecycle {
                                                          Optional<ConfigurationInstance> configurationInstance,
                                                          DefaultOperationParameterizer parameterizer,
                                                          CoreEvent event) {
-    ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
+    ComponentParameterization.Builder<OperationModel> paramsBuilder =
+        new CachingComponentParameterizationBuilder<OperationModel>(parameterModelLookupHelper)
+            .withModel(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
 
     return evaluate(parameterValueResolvers, parameterDefaultValueResolvers, paramsBuilder.build(), configurationInstance,
@@ -336,6 +348,7 @@ public class OperationClient implements Lifecycle {
     initialiseIfNeeded(mediator, true, muleContext);
     initialiseIfNeeded(executorResolver, true, muleContext);
     initialiseParameterResolvers(key.getOperationModel());
+    parameterModelLookupHelper.populateFrom(key.getOperationModel());
   }
 
   @Override
@@ -473,6 +486,74 @@ public class OperationClient implements Lifecycle {
     public void triggerProfilingEvent(CoreEvent sourceData,
                                       Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
 
+    }
+  }
+
+  private static class CachingComponentParameterizationBuilder<M extends ParameterizedModel>
+      extends ComponentParameterizationBuilder<M> {
+
+    private final ParameterModelLookupHelper parameterModelLookupHelper;
+
+    private CachingComponentParameterizationBuilder(ParameterModelLookupHelper parameterModelLookupHelper) {
+      this.parameterModelLookupHelper = parameterModelLookupHelper;
+    }
+
+    @Override
+    public ComponentParameterization.Builder<M> withParameter(String paramGroupName, String paramName, Object paramValue)
+        throws IllegalArgumentException {
+      Pair<ParameterGroupModel, ParameterModel> parameterKey = parameterModelLookupHelper.get(paramGroupName, paramName);
+      return super.withParameter(parameterKey.getFirst(), parameterKey.getSecond(), paramValue);
+    }
+
+    @Override
+    public ComponentParameterization.Builder<M> withParameter(String paramName, Object paramValue)
+        throws IllegalArgumentException {
+      Pair<ParameterGroupModel, ParameterModel> parameterKey = parameterModelLookupHelper.get(paramName);
+      return super.withParameter(parameterKey.getFirst(), parameterKey.getSecond(), paramValue);
+    }
+  }
+
+  private static class ParameterModelLookupHelper {
+
+    private final Map<String, Pair<ParameterGroupModel, ParameterModel>> paramNameToKey = new HashMap<>();
+    private final Map<Pair<String, String>, Pair<ParameterGroupModel, ParameterModel>> paramGroupAndNameToKey = new HashMap<>();
+    private final MultiMap<String, String> duplicatedParameterNames = new MultiMap<>();
+
+    public void populateFrom(ParameterizedModel model) {
+      for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
+        for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
+          Pair<ParameterGroupModel, ParameterModel> parameterPair = new Pair<>(parameterGroupModel, parameterModel);
+          paramGroupAndNameToKey.put(new Pair<>(parameterGroupModel.getName(), parameterModel.getName()), parameterPair);
+          if (paramNameToKey.putIfAbsent(parameterModel.getName(), parameterPair) != null) {
+            duplicatedParameterNames.put(parameterModel.getName(), parameterGroupModel.getName());
+          }
+        }
+      }
+    }
+
+    public Pair<ParameterGroupModel, ParameterModel> get(String parameterGroupName, String parameterName) {
+      Pair<ParameterGroupModel, ParameterModel> parameterPair =
+          paramGroupAndNameToKey.get(new Pair<>(parameterGroupName, parameterName));
+      if (parameterPair == null) {
+        throw new IllegalArgumentException(format("Parameter {%s:%s} does not exist", parameterGroupName, parameterName));
+      }
+
+      return parameterPair;
+    }
+
+    public Pair<ParameterGroupModel, ParameterModel> get(String parameterName) {
+      List<String> groupsWithGivenParameter = duplicatedParameterNames.getAll(parameterName);
+      if (groupsWithGivenParameter != null && groupsWithGivenParameter.size() > 1) {
+        throw new IllegalArgumentException("Parameter exists in more than one group (" + groupsWithGivenParameter + "): "
+            + parameterName);
+      }
+
+      Pair<ParameterGroupModel, ParameterModel> parameterPair = paramNameToKey.get(parameterName);
+      if (parameterPair == null) {
+        throw new IllegalArgumentException("Parameter does not exist in any group: " + parameterName);
+      }
+
+      return parameterPair;
     }
   }
 }
