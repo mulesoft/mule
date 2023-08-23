@@ -19,6 +19,9 @@ public class JarFileBuilder extends AbstractDependencyFileBuilder<JarFileBuilder
 
   public JarFileBuilder(String artifactId, File jarFile) {
     super(artifactId);
+    if (!jarFile.exists()) {
+      throw new IllegalArgumentException("File '" + jarFile + "' does not exist.");
+    }
     this.artifactFile = jarFile;
   }
 

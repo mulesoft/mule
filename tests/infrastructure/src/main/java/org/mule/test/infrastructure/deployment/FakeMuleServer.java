@@ -28,7 +28,9 @@ import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -141,6 +143,17 @@ public class FakeMuleServer {
                                                   muleArtifactResourcesRegistry.getApplicationFactory(),
                                                   () -> findSchedulerService(serviceManager));
     deploymentListener = mock(DeploymentListener.class);
+    doAnswer(inv -> {
+      final String artifactName = inv.getArgument(0);
+      final Throwable cause = inv.getArgument(1);
+
+      System.err.println("Deployment failure for " + artifactName + ":");
+      cause.printStackTrace();
+
+      return null;
+    })
+        .when(deploymentListener)
+        .onDeploymentFailure(anyString(), any());
     deploymentService.addDeploymentListener(deploymentListener);
     domainDeploymentListener = mock(DeploymentListener.class);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
