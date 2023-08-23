@@ -97,8 +97,8 @@ public class OperationClient implements Lifecycle {
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
-  private ResolverSet parametersResolverSet;
-  private ResolverSet parametersDefaulValuesResolverSet;
+  private Map<String, ValueResolver<?>> parameterValueResolvers;
+  private Map<String, ValueResolver<?>> parameterDefaultValueResolvers;
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
@@ -217,19 +217,21 @@ public class OperationClient implements Lifecycle {
 
   private void initialiseParameterResolvers(OperationModel operationModel) throws InitialisationException {
     try {
-      parametersResolverSet = getResolverSetForDynamicComponentParameterization(operationModel,
-                                                                                muleContext,
-                                                                                true,
-                                                                                reflectionCache,
-                                                                                expressionManager,
-                                                                                "");
+      ResolverSet parametersResolverSet = getResolverSetForDynamicComponentParameterization(operationModel,
+                                                                                            muleContext,
+                                                                                            true,
+                                                                                            reflectionCache,
+                                                                                            expressionManager,
+                                                                                            "");
 
       parametersResolverSet.initialise();
+      parameterValueResolvers = parametersResolverSet.getResolvers();
 
       // These value resolvers are used when the actual value is not present in a specific parameterization
-      parametersDefaulValuesResolverSet = fromValues(emptyMap(), muleContext, reflectionCache, expressionManager, "")
+      ResolverSet parameterDefaultsResolverSet = fromValues(emptyMap(), muleContext, reflectionCache, expressionManager, "")
           .getParametersAsResolverSet(operationModel, muleContext);
-      parametersDefaulValuesResolverSet.initialise();
+      parameterDefaultsResolverSet.initialise();
+      parameterDefaultValueResolvers = parameterDefaultsResolverSet.getResolvers();
     } catch (ConfigurationException e) {
       throw new InitialisationException(createStaticMessage(e.getMessage()), e, this);
     }
@@ -242,12 +244,12 @@ public class OperationClient implements Lifecycle {
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
 
-    return evaluate(parametersResolverSet, parametersDefaulValuesResolverSet, paramsBuilder.build(), configurationInstance,
+    return evaluate(parameterValueResolvers, parameterDefaultValueResolvers, paramsBuilder.build(), configurationInstance,
                     muleContext, event);
   }
 
-  private static Map<String, Object> evaluate(ResolverSet resolverSet,
-                                              ResolverSet defaultValuesResolverSet,
+  private static Map<String, Object> evaluate(Map<String, ValueResolver<?>> parameterResolvers,
+                                              Map<String, ValueResolver<?>> defaultParameterResolvers,
                                               ComponentParameterization componentParameterization,
                                               Optional<ConfigurationInstance> configurationInstance,
                                               MuleContext muleContext,
@@ -256,7 +258,7 @@ public class OperationClient implements Lifecycle {
     configurationInstance.ifPresent(ctxBuilder::withConfig);
 
     // Starts with the resolvers of default values and then overrides with the resolvers for the values that are actually present
-    Map<String, ValueResolver<?>> filteredResolvers = new LinkedHashMap<>(defaultValuesResolverSet.getResolvers());
+    Map<String, ValueResolver<?>> filteredResolvers = new LinkedHashMap<>(defaultParameterResolvers);
 
     componentParameterization.forEachParameter((parameterGroupModel, parameterModel, value) -> {
       // TODO: check if using properties for piggybacking the values is fine, otherwise replace with a specific mechanism.
@@ -265,7 +267,7 @@ public class OperationClient implements Lifecycle {
 
       // Overrides the default resolver with the one that resolves from the current parameterization
       String memberName = getMemberName(parameterModel);
-      filteredResolvers.put(memberName, resolverSet.getResolvers().get(memberName));
+      filteredResolvers.put(memberName, parameterResolvers.get(memberName));
     });
 
     ResolverSet filteredResolverSet = new ResolverSet(muleContext);
