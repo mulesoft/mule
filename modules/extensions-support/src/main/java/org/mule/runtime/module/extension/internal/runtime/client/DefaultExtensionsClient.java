@@ -194,11 +194,12 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private OperationKey toOperationKey(String extensionName,
                                       String operationName,
                                       DefaultOperationParameterizer parameterizer) {
-    return new OperationKey(extensionName,
+    ExtensionModel extensionModel = findExtension(extensionName);
+    OperationModel operationModel = findOperationModel(extensionModel, operationName);
+
+    return new OperationKey(extensionModel,
+                            operationModel,
                             parameterizer.getConfigRef(),
-                            operationName,
-                            this::findExtension,
-                            this::findOperationModel,
                             extensionManager);
   }
 

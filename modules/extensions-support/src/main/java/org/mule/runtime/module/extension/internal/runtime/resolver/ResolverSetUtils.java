@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -121,13 +122,31 @@ public class ResolverSetUtils {
                                                                         ExpressionManager expressionManager,
                                                                         String parametersOwner)
       throws MuleException {
-    Map<String, ValueResolver> resolvers = new HashMap<>();
-    ValueResolverFactory valueResolverFactory = new ValueResolverFactory();
+    return getResolverSetFromComponentSaraza(componentParameterization.getModel(),
+                                             componentParameterization::getParameter,
+                                             muleContext,
+                                             disableValidations,
+                                             reflectionCache,
+                                             expressionManager,
+                                             parametersOwner,
+                                             new ValueResolverFactory());
+  }
 
-    for (ParameterGroupModel parameterGroupModel : componentParameterization.getModel().getParameterGroupModels()) {
-      resolvers
-          .putAll(getParameterGroupValueResolvers(componentParameterization, parameterGroupModel, reflectionCache, muleContext,
-                                                  valueResolverFactory));
+  public static ResolverSet getResolverSetFromComponentSaraza(ParameterizedModel model,
+                                                              BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                                              MuleContext muleContext,
+                                                              boolean disableValidations,
+                                                              ReflectionCache reflectionCache,
+                                                              ExpressionManager expressionManager,
+                                                              String parametersOwner,
+                                                              ValueResolverFactory valueResolverFactory)
+      throws MuleException {
+    Map<String, ValueResolver> resolvers = new HashMap<>();
+
+    for (ParameterGroupModel parameterGroupModel : model.getParameterGroupModels()) {
+      resolvers.putAll(
+                       getParameterGroupValueResolvers(params, parameterGroupModel, reflectionCache, muleContext,
+                                                       valueResolverFactory));
     }
 
     return fromValues(resolvers,
@@ -135,18 +154,17 @@ public class ResolverSetUtils {
                       disableValidations,
                       reflectionCache,
                       expressionManager,
-                      parametersOwner).getParametersAsResolverSet(componentParameterization.getModel(), muleContext);
+                      parametersOwner).getParametersAsResolverSet(model, muleContext);
   }
 
-  private static Map<String, ValueResolver> getParameterGroupValueResolvers(ComponentParameterization componentParameterization,
+  private static Map<String, ValueResolver> getParameterGroupValueResolvers(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
                                                                             ParameterGroupModel parameterGroupModel,
                                                                             ReflectionCache reflectionCache,
                                                                             MuleContext muleContext,
-                                                                            ValueResolverFactory valueResolverFactory)
-      throws MuleException {
+                                                                            ValueResolverFactory valueResolverFactory) {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers =
-        getParameterGroupParametersValueResolvers(parameterGroupModel,
-                                                  componentParameterization, reflectionCache, muleContext, valueResolverFactory);
+        getParameterGroupParametersValueResolvers(parameterGroupModel, params, reflectionCache, muleContext,
+                                                  valueResolverFactory);
 
     if (parameterGroupModel.isShowInDsl() && !parameterGroupParametersValueResolvers.isEmpty()) {
       Optional<ParameterGroupModelProperty> parameterGroupModelProperty =
@@ -185,23 +203,21 @@ public class ResolverSetUtils {
 
 
   private static Map<String, ValueResolver> getParameterGroupParametersValueResolvers(ParameterGroupModel parameterGroupModel,
-                                                                                      ComponentParameterization componentParameterization,
+                                                                                      BiFunction<ParameterGroupModel, ParameterModel, Object> params,
                                                                                       ReflectionCache reflectionCache,
                                                                                       MuleContext muleContext,
-                                                                                      ValueResolverFactory valueResolverFactory)
-      throws MuleException {
+                                                                                      ValueResolverFactory valueResolverFactory) {
     Map<String, ValueResolver> parameterGroupParametersValueResolvers = new HashMap<>();
     for (ParameterModel parameterModel : parameterGroupModel.getParameterModels()) {
-      Object value = componentParameterization.getParameter(parameterGroupModel, parameterModel);
-      if (value != null) {
-        parameterGroupParametersValueResolvers.put(parameterModel
-            .getName(), getParameterValueResolver(parameterModel.getName(), parameterModel.getType(),
-                                                  value,
-                                                  parameterModel.getModelProperties(),
-                                                  reflectionCache,
-                                                  muleContext,
-                                                  valueResolverFactory, acceptsReferences(parameterModel)));
-      }
+      valueResolverFactory.of(params, parameterGroupModel, parameterModel,
+                              value -> getParameterValueResolver(parameterModel.getName(), parameterModel.getType(),
+                                                                 value,
+                                                                 parameterModel.getModelProperties(),
+                                                                 reflectionCache,
+                                                                 muleContext,
+                                                                 valueResolverFactory,
+                                                                 acceptsReferences(parameterModel)))
+          .ifPresent(resolver -> parameterGroupParametersValueResolvers.put(parameterModel.getName(), resolver));
     }
     return parameterGroupParametersValueResolvers;
   }

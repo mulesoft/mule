@@ -12,8 +12,7 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentParameterization;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentSaraza;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
@@ -31,6 +30,8 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -47,6 +48,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -61,6 +63,9 @@ import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecu
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
@@ -69,6 +74,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -83,6 +89,7 @@ public class OperationClient implements Lifecycle {
   private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
 
+  private final OperationModel operationModel;
   private final ExecutionMediator<OperationModel> mediator;
   private final ComponentExecutorResolver executorResolver;
   private final ValueReturnDelegate returnDelegate;
@@ -90,6 +97,7 @@ public class OperationClient implements Lifecycle {
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
+  private final ResolverSet resolverSet;
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
@@ -102,6 +110,7 @@ public class OperationClient implements Lifecycle {
                                      MuleContext muleContext) {
 
     return new OperationClient(
+                               key.getOperationModel(),
                                createExecutionMediator(
                                                        key,
                                                        extensionConnectionSupplier,
@@ -118,13 +127,15 @@ public class OperationClient implements Lifecycle {
                                muleContext);
   }
 
-  private OperationClient(ExecutionMediator<OperationModel> mediator,
+  private OperationClient(OperationModel operationModel,
+                          ExecutionMediator<OperationModel> mediator,
                           ComponentExecutorResolver executorResolver,
                           ValueReturnDelegate returnDelegate,
                           StreamingManager streamingManager,
                           ExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
                           MuleContext muleContext) {
+    this.operationModel = operationModel;
     this.mediator = mediator;
     this.executorResolver = executorResolver;
     this.returnDelegate = returnDelegate;
@@ -132,6 +143,51 @@ public class OperationClient implements Lifecycle {
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
+    resolverSet = createResolverSet();
+  }
+
+  private ResolverSet createResolverSet() {
+    ValueResolverFactory factory = new ValueResolverFactory() {
+
+      @Override
+      public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                        ParameterGroupModel parameterGroupModel, ParameterModel parameterModel,
+                                        CheckedFunction<Object, ValueResolver> resolverFunction) {
+        return Optional.of(new ValueResolver() {
+
+          @Override
+          public Object resolve(ValueResolvingContext context) {
+            ComponentParameterization parameterization = (ComponentParameterization) context.getProperty("zaraza");
+            return parameterization.getParameter(parameterGroupModel, parameterModel);
+          }
+
+          @Override
+          public boolean isDynamic() {
+            return false;
+          }
+        });
+      }
+    };
+
+
+    ResolverSet resolverSet;
+    try {
+
+      resolverSet = getResolverSetFromComponentSaraza(operationModel,
+                                                      (g, p) -> "",
+                                                      muleContext,
+                                                      true,
+                                                      reflectionCache,
+                                                      expressionManager,
+                                                      "",
+                                                      factory);
+
+      resolverSet.initialise();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
+    }
+
+    return resolverSet;
   }
 
   public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key, DefaultOperationParameterizer parameterizer) {
@@ -211,22 +267,15 @@ public class OperationClient implements Lifecycle {
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
 
-    ResolverSet resolverSet;
-    try {
-      resolverSet = getResolverSetFromComponentParameterization(
-                                                                paramsBuilder.build(),
-                                                                muleContext,
-                                                                true,
-                                                                reflectionCache,
-                                                                expressionManager,
-                                                                "");
+    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+    configurationInstance.ifPresent(ctxBuilder::withConfig);
+    ctxBuilder.withProperty("zaraza", paramsBuilder.build());
 
-      resolverSet.initialise();
+    try (ValueResolvingContext ctx = ctxBuilder.build()) {
+      return resolverSet.resolve(ctx).asMap();
     } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
+      throw new MuleRuntimeException(createStaticMessage("Exception found while evaluating parameters:" + e.getMessage()), e);
     }
-
-    return evaluate(resolverSet, configurationInstance, event);
   }
 
   private <T, A> EventCompletingValue<Result<T, A>> asEventCompletingResult(Object value,
@@ -338,7 +387,8 @@ public class OperationClient implements Lifecycle {
     }
   }
 
-  private static ComponentTracer<CoreEvent> getOperationConnectionTracer(ComponentTracerFactory<CoreEvent> componentTracerFactory) {
+  private static ComponentTracer<CoreEvent> getOperationConnectionTracer(
+                                                                         ComponentTracerFactory<CoreEvent> componentTracerFactory) {
     return componentTracerFactory
         .fromComponent(NULL_COMPONENT,
                        GET_CONNECTION_SPAN_NAME, "");

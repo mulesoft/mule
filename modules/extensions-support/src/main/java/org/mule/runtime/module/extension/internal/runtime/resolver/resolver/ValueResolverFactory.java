@@ -3,7 +3,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
@@ -15,9 +14,14 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+import static java.lang.String.format;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
@@ -35,6 +39,7 @@ import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * A Factory that creates different {@link ValueResolver} instances for different parameter types.
@@ -88,6 +93,16 @@ public class ValueResolverFactory {
 
     return resolver;
   }
+
+  public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                    ParameterGroupModel parameterGroupModel,
+                                    ParameterModel parameterModel,
+                                    CheckedFunction<Object, ValueResolver> resolverFunction) {
+
+    Object value = params.apply(parameterGroupModel, parameterModel);
+    return value != null ? Optional.ofNullable(resolverFunction.apply(value)) : Optional.empty();
+  }
+
 
   /**
    * Generates the {@link ValueResolver} for expression based values
