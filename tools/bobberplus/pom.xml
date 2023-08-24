@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tools</groupId>
         <artifactId>mule-tools</artifactId>
-        <version>3.9.1-HF-SNAPSHOT</version>
+        <version>3.9.1-20230823</version>
     </parent>
     <artifactId>bobberplus</artifactId>
     <packaging>maven-plugin</packaging>
