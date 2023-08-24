@@ -3,7 +3,6 @@
  */
 package org.mule.test.runner;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
@@ -14,6 +13,7 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
+import static java.util.Collections.emptyMap;
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
