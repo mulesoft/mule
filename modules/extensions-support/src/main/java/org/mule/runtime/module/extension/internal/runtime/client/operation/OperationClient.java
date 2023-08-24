@@ -156,6 +156,7 @@ public class OperationClient implements Lifecycle {
       public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
                                         ParameterGroupModel parameterGroupModel, ParameterModel parameterModel,
                                         CheckedFunction<Object, ValueResolver> resolverFunction) {
+
         return Optional.of(new ValueResolver() {
 
           @Override
@@ -177,7 +178,7 @@ public class OperationClient implements Lifecycle {
     try {
 
       resolverSet = getResolverSetFromComponentSaraza(operationModel,
-                                                      (g, p) -> "",
+                                                      (g, p) -> null,
                                                       muleContext,
                                                       true,
                                                       reflectionCache,
