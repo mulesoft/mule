@@ -8,6 +8,7 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
+import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.RETRY_COUNT_FOREVER;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
@@ -265,8 +266,8 @@ class UntilSuccessfulRouter {
   private CoreEvent eventWithCurrentContext(CoreEvent event, RetryContext ctx) {
     // Requires: The ctx that corresponds to this router execution is not in the stack, or there's no stack yet
     // Assures: The ctx that corresponds to this router execution is the one on top of the stack
-
-    Map<String, RetryContext> retryCtxContainer = retryContextResolver.getCurrentContextFromEvent(event);
+    // The retryContextContainer should be copied before adding a new element to avoid race conditions (W-14011209)
+    Map<String, RetryContext> retryCtxContainer = copy(retryContextResolver.getCurrentContextFromEvent(event));
     retryCtxContainer.put(event.getContext().getId(), ctx);
 
     return retryContextResolver.eventWithContext(event, retryCtxContainer);
