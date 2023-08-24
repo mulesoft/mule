@@ -221,9 +221,6 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
       org.mule.test.runner;
-  exports org.mule.runtime.core.internal.construct to
-      org.mule.runtime.core.components,
-      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context.notification to
       org.mule.runtime.spring.config,
       spring.beans;
