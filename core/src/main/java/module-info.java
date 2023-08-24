@@ -226,6 +226,7 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.context.notification to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -426,6 +427,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
   // TODO W-13824979 Remove splashScreen logic from mule-core

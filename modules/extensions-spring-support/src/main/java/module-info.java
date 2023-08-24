@@ -40,6 +40,7 @@ module org.mule.runtime.extensions.spring.support {
       org.mule.runtime.module.extension.internal.resources.MulePluginDescriptorGenerator;
 
   exports org.mule.runtime.module.extension.internal.config.dsl to
+      org.mule.runtime.extensions.xml.support,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.connection to
       org.mule.runtime.spring.config,
