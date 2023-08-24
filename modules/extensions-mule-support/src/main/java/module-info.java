@@ -2,7 +2,7 @@
  * Copyright 2023 Salesforce, Inc. All rights reserved.
  */
 /**
- * Mule server and core classes.
+ * Extensions API implementation for writing extensions using the Mule language.
  *
  * @moduleGraph
  * @since 4.5

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.resources;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
+import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Collections.singletonList;
@@ -17,8 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
-import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.test.vegan.extension.VeganExtension;
 
 import java.util.Collection;

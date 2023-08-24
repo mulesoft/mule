@@ -21,8 +21,8 @@ import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 
 import java.util.Collection;
 import java.util.HashMap;
