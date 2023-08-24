@@ -13,11 +13,11 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
-import static java.util.Collections.emptyMap;
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.of;
 
 import static com.google.common.collect.Lists.newArrayList;
