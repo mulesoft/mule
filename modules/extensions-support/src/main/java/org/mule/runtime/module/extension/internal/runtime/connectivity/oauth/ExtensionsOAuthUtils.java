@@ -400,9 +400,7 @@ public final class ExtensionsOAuthUtils {
     try {
       oauthConnectionProvider.refreshToken(resourceOwnerId.orElse(""));
     } catch (Exception refreshException) {
-      String errorMessage = format(
-                                   "AccessToken %s expired %s. Refresh token "
-                                       + "workflow was attempted but failed with the following exception",
+      String errorMessage = format("AccessToken %s expired %s. Refresh token workflow was attempted but failed.",
                                    forResourceOwner(resourceOwnerId),
                                    refreshContext.map(LazyValue::get).orElse(""));
       LOGGER.error(errorMessage, refreshException);
