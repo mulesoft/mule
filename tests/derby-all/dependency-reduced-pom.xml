@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>mule-tests</artifactId>
+    <groupId>org.mule.tests</groupId>
+    <version>4.6.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>mule-derby-all</artifactId>
+  <name>Derby All</name>
+  <description>Shaded Derby with its transitive dependencies to avoid split packages.</description>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <includes>org.apache.derby:*</includes>
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.mule.runtime</groupId>
+      <artifactId>mule-dwb-api</artifactId>
+      <version>2.5.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mule.services</groupId>
+      <artifactId>mule-service-weave</artifactId>
+      <version>2.5.0-SNAPSHOT</version>
+      <classifier>mule-service</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <properties>
+    <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    <javaModuleName>org.mule.test.derby.all</javaModuleName>
+  </properties>
+</project>
