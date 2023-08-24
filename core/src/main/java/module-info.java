@@ -185,6 +185,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.util to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.mule.support,
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.cache;
 
