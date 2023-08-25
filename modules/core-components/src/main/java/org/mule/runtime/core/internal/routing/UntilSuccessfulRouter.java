@@ -181,8 +181,15 @@ class UntilSuccessfulRouter {
     return (error, offendingEvent) -> {
       MessagingException messagingError = (MessagingException) error;
       RetryContext ctx = getRetryContextForEvent(messagingError.getEvent());
-      int retriesLeft =
-          ctx.retryCount.getAndDecrement();
+      int retriesLeft = 0;
+
+      // This is defensive not to get blocked in case a race condition happens.
+      if (ctx != null) {
+        retriesLeft = ctx.retryCount.getAndDecrement();
+      } else {
+        LOGGER
+            .error("The RetryContext was not found. This is probably a race condition. No further attempts for the until successful will be done.");
+      }
 
       if (retriesLeft > 0) {
         LOGGER.error("Retrying execution of event, attempt {} of {}.", ctx.getAttemptNumber(),
@@ -194,7 +201,15 @@ class UntilSuccessfulRouter {
       } else { // Retries exhausted
         // Current context already pooped. No need to re-insert it
         LOGGER.error("Retry attempts exhausted. Failing...");
-        Throwable resolvedError = getThrowableFunction(ctx.event).apply(error);
+        Throwable resolvedError;
+
+        // This is defensive not to get blocked in case a race condition happens.
+        if (ctx != null) {
+          resolvedError = getThrowableFunction(ctx.event).apply(error);
+        } else {
+          resolvedError = getThrowableFunction(messagingError.getEvent()).apply(error);
+        }
+
         // Delete current context from event
         eventWithCurrentContextDeleted(messagingError.getEvent());
         downstreamRecorder.next(left(resolvedError, CoreEvent.class));
