@@ -27,12 +27,6 @@ import java.util.function.Predicate;
  */
 public class NameHasValidCharacters implements Validation {
 
-  private final boolean ignoreParamsWithProperties;
-
-  public NameHasValidCharacters(boolean ignoreParamsWithProperties) {
-    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
-  }
-
   @Override
   public String getName() {
     return "Names have valid characters";
@@ -57,16 +51,14 @@ public class NameHasValidCharacters implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final String nameAttributeValue = component.getComponentId().get();
-    if (ignoreParamsWithProperties && hasPropertyPlaceholder(nameAttributeValue)) {
-      return empty();
-    }
 
     try {
       verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
       return empty();
     } catch (IllegalArgumentException e) {
       return of(create(component, this,
-                       "Invalid global element name '" + nameAttributeValue + "'. Problem is: " + e.getMessage()));
+                       "Invalid global element name '" + nameAttributeValue + "'. Problem is: " + e.getMessage(),
+                       hasPropertyPlaceholder(nameAttributeValue)));
     }
   }
 }

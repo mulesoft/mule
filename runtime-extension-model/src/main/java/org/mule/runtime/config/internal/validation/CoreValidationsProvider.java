@@ -56,7 +56,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new SingletonsAreNotRepeated(),
                                                           new SingletonsPerFileAreNotRepeated(),
                                                           new NamedTopLevelElementsHaveName(),
-                                                          new NameHasValidCharacters(ignoreParamsWithProperties),
+                                                          new NameHasValidCharacters(),
                                                           new NameIsNotRepeated(),
                                                           // make these general for all references via stereotypes
                                                           new FlowRefPointsToNonPropertyValue(ignoreParamsWithProperties),

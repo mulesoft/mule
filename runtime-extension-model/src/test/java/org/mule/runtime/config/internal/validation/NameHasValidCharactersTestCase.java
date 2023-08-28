@@ -6,8 +6,6 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.MULE_DSL;
 
-import static java.util.Arrays.asList;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -15,35 +13,20 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 
-import java.util.List;
 import java.util.Optional;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @Feature(MULE_DSL)
 @Story(DSL_VALIDATION_STORY)
-@RunWith(Parameterized.class)
 public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCase {
-
-  private final boolean ignoreParamsWithProperties;
-
-  public NameHasValidCharactersTestCase(boolean ignoreParamsWithProperties) {
-    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
-  }
 
   @Override
   protected Validation getValidation() {
-    return new NameHasValidCharacters(ignoreParamsWithProperties);
-  }
-
-  @Parameterized.Parameters(name = "eventType: {0}")
-  public static List<Boolean> parameters() {
-    return asList(true, false);
+    return new NameHasValidCharacters();
   }
 
   @Test
@@ -67,6 +50,7 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
 
     assertThat(msg.get().getMessage(),
                containsString("Invalid global element name 'flow/myFlow'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
+    assertThat(msg.get().causedByDynamicArtifact(), is(false));
   }
 
   @Test
@@ -88,11 +72,8 @@ public class NameHasValidCharactersTestCase extends AbstractCoreValidationTestCa
         "</mule>")
             .stream().findFirst();
 
-    if (ignoreParamsWithProperties) {
-      assertThat(msg.isPresent(), is(false));
-    } else {
-      assertThat(msg.get().getMessage(),
-                 containsString("Invalid global element name '${someProperty}'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
-    }
+    assertThat(msg.get().getMessage(),
+               containsString("Invalid global element name '${someProperty}'. Problem is: Invalid character used in location. Invalid characters are /,[,],{,},#"));
+    assertThat(msg.get().causedByDynamicArtifact(), is(true));
   }
 }
