@@ -6,6 +6,7 @@ package org.mule.runtime.config.internal.validation;
 import static org.mule.runtime.api.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.topLevelElement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -25,6 +26,12 @@ import java.util.function.Predicate;
  * 'name' attribute in top-level elements only have valid characters.
  */
 public class NameHasValidCharacters implements Validation {
+
+  private final boolean ignoreParamsWithProperties;
+
+  public NameHasValidCharacters(boolean ignoreParamsWithProperties) {
+    this.ignoreParamsWithProperties = ignoreParamsWithProperties;
+  }
 
   @Override
   public String getName() {
@@ -50,6 +57,9 @@ public class NameHasValidCharacters implements Validation {
   @Override
   public Optional<ValidationResultItem> validate(ComponentAst component, ArtifactAst artifact) {
     final String nameAttributeValue = component.getComponentId().get();
+    if (ignoreParamsWithProperties && hasPropertyPlaceholder(nameAttributeValue)) {
+      return empty();
+    }
 
     try {
       verifyStringDoesNotContainsReservedCharacters(nameAttributeValue);
@@ -59,5 +69,4 @@ public class NameHasValidCharacters implements Validation {
                        "Invalid global element name '" + nameAttributeValue + "'. Problem is: " + e.getMessage()));
     }
   }
-
 }
