@@ -15,12 +15,13 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentSaraza;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -33,8 +34,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -51,7 +50,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -65,19 +63,17 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.Extension
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.resolver.ValueResolverFactory;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -100,7 +96,7 @@ public class OperationClient implements Lifecycle {
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
-  private final ResolverSet resolverSet;
+  private Map<String, ValueResolver<?>> fallbackResolvers;
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
@@ -146,52 +142,36 @@ public class OperationClient implements Lifecycle {
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
-    resolverSet = createResolverSet();
+    fallbackResolvers = createResolverSet();
   }
 
-  private ResolverSet createResolverSet() {
-    ValueResolverFactory factory = new ValueResolverFactory() {
-
-      @Override
-      public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
-                                        ParameterGroupModel parameterGroupModel, ParameterModel parameterModel,
-                                        CheckedFunction<Object, ValueResolver> resolverFunction) {
-
-        return Optional.of(new ValueResolver() {
-
-          @Override
-          public Object resolve(ValueResolvingContext context) {
-            ComponentParameterization parameterization = (ComponentParameterization) context.getProperty("zaraza");
-            return parameterization.getParameter(parameterGroupModel, parameterModel);
-          }
-
-          @Override
-          public boolean isDynamic() {
-            return false;
-          }
-        });
-      }
-    };
-
-
-    ResolverSet resolverSet;
+  private Map<String, ValueResolver<?>> createResolverSet() {
     try {
+      Map<String, ValueResolver<?>> fallbackResolvers = fromValues(emptyMap(),
+                                                                   muleContext,
+                                                                   true,
+                                                                   reflectionCache,
+                                                                   expressionManager,
+                                                                   "")
+                                                                       .getParametersAsResolverSet(operationModel, muleContext)
+                                                                       .getResolvers();
 
-      resolverSet = getResolverSetFromComponentSaraza(operationModel,
-                                                      (g, p) -> null,
-                                                      muleContext,
-                                                      true,
-                                                      reflectionCache,
-                                                      expressionManager,
-                                                      "",
-                                                      factory);
-
-      resolverSet.initialise();
+      for (ValueResolver<?> resolver : fallbackResolvers.values()) {
+        initialiseIfNeeded(resolver, true, muleContext);
+      }
+      // resolverSet = getResolverSetFromComponentSaraza(operationModel,
+      // (g, p) -> null,
+      // muleContext,
+      // true,
+      // reflectionCache,
+      // expressionManager,
+      // "",
+      // factory);
+      // fallbackResolverSet.initialise();
+      return fallbackResolvers;
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
-
-    return resolverSet;
   }
 
   public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key, DefaultOperationParameterizer parameterizer) {
@@ -270,16 +250,27 @@ public class OperationClient implements Lifecycle {
                                                          CoreEvent event) {
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
+    Map<String, Object> resolved = new HashMap<>();
 
-    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
-    configurationInstance.ifPresent(ctxBuilder::withConfig);
-    ctxBuilder.withProperty("zaraza", paramsBuilder.build());
+    ComponentParameterization<OperationModel> parameterization = paramsBuilder.build();
+    parameterization.getParameters().forEach((pair, value) -> resolved.put(pair.getSecond().getName(), value));
 
-    try (ValueResolvingContext ctx = ctxBuilder.build()) {
-      return resolverSet.resolve(ctx).asMap();
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Exception found while evaluating parameters:" + e.getMessage()), e);
+    if (resolved.size() < fallbackResolvers.size()) {
+      ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+      configurationInstance.ifPresent(ctxBuilder::withConfig);
+
+      try (ValueResolvingContext ctx = ctxBuilder.build()) {
+        for (Map.Entry<String, ValueResolver<?>> entry : fallbackResolvers.entrySet()) {
+          String key = entry.getKey();
+          if (!resolved.containsKey(key)) {
+            resolved.put(key, entry.getValue().resolve(ctx));
+          }
+        }
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Exception found while evaluating parameters:" + e.getMessage()), e);
+      }
     }
+    return resolved;
   }
 
   private <T, A> EventCompletingValue<Result<T, A>> asEventCompletingResult(Object value,
