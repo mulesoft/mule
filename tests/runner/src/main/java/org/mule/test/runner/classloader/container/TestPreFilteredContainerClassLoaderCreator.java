@@ -6,12 +6,9 @@ package org.mule.test.runner.classloader.container;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import static java.util.Collections.emptyMap;
-
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -64,11 +61,15 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, parentClassLoader);
-    containerClassLoader = new MuleArtifactClassLoader(artifactDescriptor.getName(), artifactDescriptor,
-                                                       muleUrls,
-                                                       containerOptClassLoader,
-                                                       new MuleClassLoaderLookupPolicy(emptyMap(), getBootPackages()));
+
+    // ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, parentClassLoader);
+    // final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
+
+    containerClassLoader = new MuleArtifactClassLoader("container", artifactDescriptor,
+                                                       new URL[0],
+                                                       parentClassLoader,
+                                                       getLookupPolicy(parentClassLoader, getMuleModules(),
+                                                                       getBootPackages()));
     return containerClassLoader;
   }
 

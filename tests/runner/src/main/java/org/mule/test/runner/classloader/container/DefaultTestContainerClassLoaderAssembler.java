@@ -3,20 +3,16 @@
  */
 package org.mule.test.runner.classloader.container;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
-import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.container.internal.ContainerClassLoaderFilterFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
@@ -24,6 +20,7 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +32,8 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   private final DefaultModuleRepository moduleRepository;
   private final TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator;
   private final ContainerClassLoaderFactory containerClassLoaderFactory;
+  private final URL[] muleUrls;
+  private final URL[] optUrls;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
                                                   List<URL> muleUrls, List<URL> optUrls) {
@@ -42,6 +41,10 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
                                                              new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
                                                                  .getClassLoader())));
+
+    this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
+    this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
+
     testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(extraBootPackages,
                                                        muleUrls.toArray(new URL[muleUrls.size()]),
@@ -65,13 +68,22 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   @Override
   public MuleContainerClassLoaderWrapper createContainerClassLoader() {
     MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
-    final List<MuleModule> muleModules = emptyList();
-    ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
-        .create(testContainerClassLoaderCreator.getBootPackages(), muleModules);
-    final ArtifactClassLoader parentClassLoader =
-        new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList());
+    // final List<MuleModule> muleModules = emptyList();
+    // ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
+    // .create(testContainerClassLoaderCreator.getBootPackages(), muleModules);
+    // final ArtifactClassLoader parentClassLoader =
+    // new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList());
+
+
+    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, launcherArtifact);
+    final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
+
     final ArtifactClassLoader containerClassLoader =
-        containerClassLoaderFactory.createContainerClassLoader(parentClassLoader.getClassLoader()).getContainerClassLoader();
+        containerClassLoaderFactory.createContainerClassLoader(containerSystemClassloader)
+            .getContainerClassLoader();
+
+    // final ArtifactClassLoader containerClassLoader =
+    // containerClassLoaderFactory.createContainerClassLoader(parentClassLoader.getClassLoader()).getContainerClassLoader();
 
     return new TestMuleContainerClassLoaderWrapper(containerClassLoader, testContainerClassLoaderCreator
         .getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader()));
