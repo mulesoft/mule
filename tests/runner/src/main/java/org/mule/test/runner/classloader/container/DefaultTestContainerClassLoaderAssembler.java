@@ -3,6 +3,7 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
@@ -47,9 +48,10 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
 
     testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(extraBootPackages,
-                                                       muleUrls.toArray(new URL[muleUrls.size()]),
-                                                       optUrls.toArray(new URL[optUrls.size()]));
-    containerClassLoaderFactory = new ContainerClassLoaderFactory(testContainerClassLoaderCreator);
+                                                       this.muleUrls,
+                                                       this.optUrls);
+    containerClassLoaderFactory =
+        new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> createLauncherArtifactClassLoader());
   }
 
   /**
@@ -68,25 +70,11 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   @Override
   public MuleContainerClassLoaderWrapper createContainerClassLoader() {
     MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
-    // final List<MuleModule> muleModules = emptyList();
-    // ClassLoaderFilter filteredClassLoaderLauncher = new ContainerClassLoaderFilterFactory()
-    // .create(testContainerClassLoaderCreator.getBootPackages(), muleModules);
-    // final ArtifactClassLoader parentClassLoader =
-    // new FilteringArtifactClassLoader(launcherArtifact, filteredClassLoaderLauncher, emptyList());
-
 
     ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, launcherArtifact);
     final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
 
-    final ArtifactClassLoader containerClassLoader =
-        containerClassLoaderFactory.createContainerClassLoader(containerSystemClassloader)
-            .getContainerClassLoader();
-
-    // final ArtifactClassLoader containerClassLoader =
-    // containerClassLoaderFactory.createContainerClassLoader(parentClassLoader.getClassLoader()).getContainerClassLoader();
-
-    return new TestMuleContainerClassLoaderWrapper(containerClassLoader, testContainerClassLoaderCreator
-        .getContainerClassLoaderLookupPolicy(containerClassLoader.getClassLoader()));
+    return containerClassLoaderFactory.createContainerClassLoader(containerSystemClassloader);
   }
 
   /**

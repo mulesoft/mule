@@ -11,7 +11,6 @@ import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -61,10 +60,6 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   @Override
   public ArtifactClassLoader getPreFilteredContainerClassLoader(ArtifactDescriptor artifactDescriptor,
                                                                 ClassLoader parentClassLoader) {
-
-    // ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, parentClassLoader);
-    // final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
-
     containerClassLoader = new MuleArtifactClassLoader("container", artifactDescriptor,
                                                        new URL[0],
                                                        parentClassLoader,
@@ -79,14 +74,6 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
    */
   public ArtifactClassLoader getBuiltPreFilteredContainerClassLoader() {
     return containerClassLoader;
-  }
-
-  /**
-   * @param parentClassLoader class loader used as parent of the container's. It's the classLoader that will load Mule classes.
-   * @return the lookup policy for the container class loader with the given parent.
-   */
-  public ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy(ClassLoader parentClassLoader) {
-    return getLookupPolicy(parentClassLoader, testContainerModuleRepository.getModules(), getBootPackages());
   }
 
   /**

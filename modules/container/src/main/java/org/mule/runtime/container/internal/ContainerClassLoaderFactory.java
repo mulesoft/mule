@@ -18,6 +18,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Creates the classLoader for the Mule container.
@@ -27,6 +28,7 @@ import java.util.List;
 public class ContainerClassLoaderFactory {
 
   private final PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator;
+  private final Function<ClassLoader, ClassLoader> parentClassLoaderResolver;
 
   /**
    * Creates a custom factory
@@ -35,10 +37,12 @@ public class ContainerClassLoaderFactory {
    *                                               loader. Non-null.
    * @since 4.5
    */
-  public ContainerClassLoaderFactory(PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator) {
+  public ContainerClassLoaderFactory(PreFilteredContainerClassLoaderCreator preFilteredContainerClassLoaderCreator,
+                                     Function<ClassLoader, ClassLoader> parentClassLoaderResolver) {
     requireNonNull(preFilteredContainerClassLoaderCreator, "containerClassLoaderCreator cannot be null");
 
     this.preFilteredContainerClassLoaderCreator = preFilteredContainerClassLoaderCreator;
+    this.parentClassLoaderResolver = parentClassLoaderResolver;
   }
 
   /**
@@ -47,14 +51,13 @@ public class ContainerClassLoaderFactory {
    * @param moduleRepository provides access to the modules available on the container. Non-null.
    */
   public ContainerClassLoaderFactory(ModuleRepository moduleRepository) {
-    this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository));
-  }
-
-  /**
-   * Creates a default factory
-   */
-  public ContainerClassLoaderFactory() {
-    this(new DefaultModuleRepository(new ContainerModuleDiscoverer(ContainerClassLoaderFactory.class.getClassLoader())));
+    this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository),
+         // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
+         // compatibility accidentally.
+         // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
+         classLoader -> classloaderContainerJpmsModuleLayer()
+             ? getSystemClassLoader()
+             : classLoader);
   }
 
   /**
@@ -81,14 +84,7 @@ public class ContainerClassLoaderFactory {
    */
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
-    // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
-    // compatibility accidentally.
-    // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
-    final ClassLoader containerParentClassLoader = classloaderContainerJpmsModuleLayer()
-        ? getSystemClassLoader()
-        : parentClassLoader;
-
-    return createContainerFilteringClassLoader(containerParentClassLoader,
+    return createContainerFilteringClassLoader(parentClassLoaderResolver.apply(parentClassLoader),
                                                muleModules,
                                                preFilteredContainerClassLoaderCreator
                                                    .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
