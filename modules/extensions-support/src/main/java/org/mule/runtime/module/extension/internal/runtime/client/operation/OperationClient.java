@@ -8,7 +8,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
@@ -45,8 +44,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
@@ -79,6 +80,18 @@ import org.slf4j.Logger;
  * @since 4.5.0
  */
 public class OperationClient implements Lifecycle {
+
+  /**
+   * Allows for overriding how parameters are resolved.
+   *
+   * @deprecated should be removed once the performance regression is fixed and there is no more need for the override.
+   */
+  @Deprecated
+  public interface OperationClientParametersResolver {
+
+    Map<String, Object> resolve(OperationModel operationModel, Optional<ConfigurationInstance> configurationInstance,
+                                CoreEvent contextEvent);
+  }
 
   private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
@@ -135,19 +148,27 @@ public class OperationClient implements Lifecycle {
   }
 
   public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key, DefaultOperationParameterizer parameterizer) {
-    boolean shouldCompleteEvent = false;
-    CoreEvent contextEvent = parameterizer.getContextEvent().orElse(null);
-    if (contextEvent == null) {
-      contextEvent = getNullEvent(muleContext);
-      shouldCompleteEvent = true;
-    }
+    return execute(key,
+                   parameterizer.getContextEvent(),
+                   new DefaultOperationClientParametersResolver(parameterizer),
+                   parameterizer.getCursorProviderFactory(streamingManager),
+                   parameterizer.getRetryPolicyTemplate());
+  }
+
+  @Deprecated
+  public <T, A> CompletableFuture<Result<T, A>> execute(OperationKey key,
+                                                        Optional<CoreEvent> coreEvent,
+                                                        OperationClientParametersResolver parametersResolver,
+                                                        CursorProviderFactory<Object> cursorProviderFactory,
+                                                        RetryPolicyTemplate retryPolicyTemplate) {
+    // TODO: simplify with the overloaded version once the performance regression is fixed
+    boolean shouldCompleteEvent = !coreEvent.isPresent();
+    CoreEvent contextEvent = coreEvent.orElseGet(NullEventFactory::getNullEvent);
 
     OperationModel operationModel = key.getOperationModel();
     Optional<ConfigurationInstance> configurationInstance = getConfigurationInstance(key, contextEvent);
 
-    final Map<String, Object> resolvedParams =
-        resolveOperationParameters(operationModel, configurationInstance, parameterizer, contextEvent);
-    CursorProviderFactory<Object> cursorProviderFactory = parameterizer.getCursorProviderFactory(streamingManager);
+    final Map<String, Object> resolvedParams = parametersResolver.resolve(operationModel, configurationInstance, contextEvent);
 
     ExecutionContextAdapter<OperationModel> context = new DefaultExecutionContext<>(
                                                                                     key.getExtensionModel(),
@@ -158,7 +179,7 @@ public class OperationClient implements Lifecycle {
                                                                                     cursorProviderFactory,
                                                                                     streamingManager,
                                                                                     NULL_COMPONENT,
-                                                                                    parameterizer.getRetryPolicyTemplate(),
+                                                                                    retryPolicyTemplate,
                                                                                     IMMEDIATE_SCHEDULER,
                                                                                     empty(),
                                                                                     muleContext);
@@ -417,6 +438,22 @@ public class OperationClient implements Lifecycle {
     public void triggerProfilingEvent(CoreEvent sourceData,
                                       Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
 
+    }
+  }
+
+  @Deprecated
+  private class DefaultOperationClientParametersResolver implements OperationClientParametersResolver {
+
+    private final DefaultOperationParameterizer operationParameterizer;
+
+    private DefaultOperationClientParametersResolver(DefaultOperationParameterizer operationParameterizer) {
+      this.operationParameterizer = operationParameterizer;
+    }
+
+    @Override
+    public Map<String, Object> resolve(OperationModel operationModel, Optional<ConfigurationInstance> configurationInstance,
+                                       CoreEvent contextEvent) {
+      return resolveOperationParameters(operationModel, configurationInstance, operationParameterizer, contextEvent);
     }
   }
 }

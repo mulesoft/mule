@@ -8,9 +8,9 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.evaluate;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findSource;
 
@@ -34,17 +34,20 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.util.TemplateParser;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.client.OperationParameterizer;
 import org.mule.runtime.extension.api.client.OperationParameters;
 import org.mule.runtime.extension.api.client.source.SourceHandler;
 import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultHandler;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -56,18 +59,23 @@ import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultS
 import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ExpressionValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -89,6 +97,7 @@ import org.slf4j.Logger;
  */
 public final class DefaultExtensionsClient implements ExtensionsClient, Initialisable, Disposable {
 
+  private static final TemplateParser TEMPLATE_PARSER = createMuleStyleParser();
   private static final Logger LOGGER = getLogger(DefaultExtensionsClient.class);
 
   @Inject
@@ -202,6 +211,18 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                             extensionManager);
   }
 
+  private OperationKey toOperationKey(ExtensionModel extensionModel,
+                                      OperationModel operationModel,
+                                      String configRef,
+                                      DefaultOperationParameterizer parameterizer) {
+    return new OperationKey(extensionModel.getName(),
+                            configRef,
+                            operationModel.getName(),
+                            extensionName -> extensionModel,
+                            (em, operationName) -> operationModel,
+                            extensionManager);
+  }
+
   private LoadingCache<OperationKey, OperationClient> createOperationClientCache() {
     return Caffeine.newBuilder()
         // Since the removal listener runs asynchronously, force waiting for all cleanup tasks to be complete before proceeding
@@ -268,49 +289,20 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extensionName,
                                                              String operationName,
                                                              OperationParameters parameters) {
-
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
-    return execute(
-                   extensionName,
-                   operationName,
-                   parameterizer -> {
-                     setContextEvent(parameterizer, parameters);
-                     parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                     resolveLegacyParameters(parameterizer, parameters);
-                     configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                   });
-  }
+    DefaultOperationParameterizer parameterizer = new DefaultOperationParameterizer();
+    setContextEvent(parameterizer, parameters);
+    configureLegacyRepeatableStreaming(parameterizer, operationModel);
 
-  protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
-    resolveLegacyParameters(legacyParameters.get(), parameterizer::withParameter);
-  }
-
-  private void resolveLegacyParameters(Map<String, Object> parameters,
-                                       BiConsumer<String, Object> resolvedValueConsumer) {
-    parameters.forEach((paramName, value) -> {
-      if (CONFIG_ATTRIBUTE_NAME.equals(paramName)) {
-        return;
-      }
-
-      if (value instanceof ComplexParameter) {
-        ComplexParameter complex = (ComplexParameter) value;
-        DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(complex.getType(), reflectionCache);
-        resolveLegacyParameters(complex.getParameters(), (propertyName, propertyValue) -> builder
-            .addPropertyResolver(propertyName, new StaticValueResolver<>(propertyValue)));
-
-        value = withNullEvent(event -> {
-          try (ValueResolvingContext ctx = ValueResolvingContext.builder(event).build()) {
-            return builder.build(ctx);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", paramName)), e);
-          }
-        });
-      }
-
-      resolvedValueConsumer.accept(paramName, value);
-    });
+    // TODO: delegate to the new API once the performance degradation is fixed
+    OperationKey key = toOperationKey(extensionModel, operationModel, parameters.getConfigName().orElse(null), parameterizer);
+    return operationClientCache.get(key).execute(key,
+                                                 parameterizer.getContextEvent(),
+                                                 new LegacyOperationClientParametersResolver(parameters, operationModel),
+                                                 parameterizer.getCursorProviderFactory(streamingManager),
+                                                 parameterizer.getRetryPolicyTemplate());
   }
 
   /**
@@ -381,4 +373,86 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
+  // TODO: remove once performance degradation is fixed.
+  @Deprecated
+  private class LegacyOperationClientParametersResolver implements OperationClient.OperationClientParametersResolver {
+
+    private final OperationParameters operationParameters;
+    private final OperationModel operationModel;
+
+    private LegacyOperationClientParametersResolver(OperationParameters operationParameters, OperationModel operationModel) {
+      this.operationParameters = operationParameters;
+      this.operationModel = operationModel;
+    }
+
+    @Override
+    public Map<String, Object> resolve(OperationModel operationModel, Optional<ConfigurationInstance> configurationInstance,
+                                       CoreEvent contextEvent) {
+      Map<String, ValueResolver<?>> parameterResolvers = getParameterResolvers(operationParameters.get(), contextEvent);
+      ResolverSet resolverSet = getArgumentsResolverSet(parameterResolvers);
+      return evaluate(resolverSet, configurationInstance, contextEvent);
+    }
+
+    private Map<String, ValueResolver<?>> getParameterResolvers(Map<String, ?> parameters, CoreEvent event) {
+      Map<String, ValueResolver<?>> resolvers = new LinkedHashMap<>();
+      parameters.forEach((name, value) -> {
+        if (value instanceof ComplexParameter) {
+          resolvers.put(name, getComplexParameterResolver(name, (ComplexParameter) value, event));
+        } else if (value instanceof org.mule.sdk.internal.client.ComplexParameter) {
+          ComplexParameter complexParameter =
+              new ComplexParameter(((org.mule.sdk.internal.client.ComplexParameter) value).getType(),
+                                   ((org.mule.sdk.internal.client.ComplexParameter) value).getParameters());
+          resolvers.put(name, getComplexParameterResolver(name, complexParameter, event));
+        } else {
+          resolvers.put(name, getSimpleParameterResolver(name, value, event));
+        }
+      });
+      return resolvers;
+    }
+
+    private ValueResolver<?> getComplexParameterResolver(String name, ComplexParameter value, CoreEvent event) {
+      Map<String, ValueResolver<?>> objectParameterResolvers = getParameterResolvers(value.getParameters(), event);
+      DefaultObjectBuilder<?> builder = new DefaultObjectBuilder<>(value.getType(), reflectionCache);
+      objectParameterResolvers.forEach(builder::addPropertyResolver);
+      try {
+        return initialise(new StaticValueResolver<>(builder.build(ValueResolvingContext.builder(event).build())));
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(createStaticMessage(format("Could not construct parameter [%s]", name)), e);
+      }
+    }
+
+    private ValueResolver<?> getSimpleParameterResolver(String name, Object value, CoreEvent event) {
+      if (value instanceof String && TEMPLATE_PARSER.isContainsTemplate((String) value)) {
+        return initialise(new ExpressionValueResolver<>((String) value));
+      } else {
+        return initialise(new StaticValueResolver<>(value));
+      }
+    }
+
+    private ValueResolver<?> initialise(ValueResolver<?> valueResolver) {
+      try {
+        initialiseIfNeeded(valueResolver, true, muleContext);
+        return valueResolver;
+      } catch (InitialisationException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }
+
+    private ResolverSet getArgumentsResolverSet(Map<String, ?> parameters) {
+      // This logic is taken from ComponentMessageProcessorBuilder#getArgumentsResolverSet
+      // This is expensive and should only be done once and cached
+      final ParametersResolver parametersResolver =
+          ParametersResolver.fromValues(parameters, muleContext, reflectionCache, expressionManager, operationModel.getName());
+
+      final ResolverSet parametersResolverSet;
+      try {
+        parametersResolverSet = parametersResolver.getParametersAsResolverSet(operationModel, muleContext);
+      } catch (ConfigurationException e) {
+        throw new MuleRuntimeException(createStaticMessage("There was a problem generating the parameters resolver set"), e);
+      }
+      final ResolverSet childsResolverSet = parametersResolver.getNestedComponentsAsResolverSet(operationModel);
+
+      return parametersResolverSet.merge(childsResolverSet);
+    }
+  }
 }
