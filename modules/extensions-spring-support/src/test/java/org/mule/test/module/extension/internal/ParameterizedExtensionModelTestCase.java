@@ -15,6 +15,7 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
