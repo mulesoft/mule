@@ -358,12 +358,27 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     muleContext.getExceptionListener().handleException(exception, getLocation());
 
-    refreshTokenIfNecessary(getConfigurationInstance()
-        .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
+    if (LOGGER.isWarnEnabled()) {
+      LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
+                         sourceAdapter.getName(), getLocation().getRootContainerName()),
+                  exception);
+    }
 
-    LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
-                       sourceAdapter.getName(), getLocation().getRootContainerName()),
-                exception);
+    try {
+      refreshTokenIfNecessary(getConfigurationInstance()
+          .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
+    } catch (Exception refreshException) {
+      if (!(refreshException instanceof MuleException)) {
+        refreshException = new DefaultMuleException(refreshException);
+      }
+
+      if (LOGGER.isErrorEnabled()) {
+        LOGGER.error(format("Message source '%s' on flow '%s' threw exception while trying to refresh OAuth access token: %s",
+                            sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
+                     exception);
+      }
+      muleContext.getExceptionListener().handleException(refreshException, getLocation());
+    }
 
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
