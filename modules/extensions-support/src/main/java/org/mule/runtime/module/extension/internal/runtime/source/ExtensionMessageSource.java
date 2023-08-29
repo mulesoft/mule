@@ -6,11 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static com.google.common.collect.ImmutableMap.copyOf;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
@@ -24,6 +19,13 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toMap;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.function.Function.identity;
+
+import static com.google.common.collect.ImmutableMap.copyOf;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 
@@ -349,12 +351,27 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
     muleContext.getExceptionListener().handleException(exception, getLocation());
 
-    refreshTokenIfNecessary(getConfigurationInstance()
-        .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
+    if (LOGGER.isWarnEnabled()) {
+      LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
+                         sourceAdapter.getName(), getLocation().getRootContainerName()),
+                  exception);
+    }
 
-    LOGGER.warn(format("Message source '%s' on flow '%s' threw exception. Attempting to reconnect...",
-                       sourceAdapter.getName(), getLocation().getRootContainerName()),
-                exception);
+    try {
+      refreshTokenIfNecessary(getConfigurationInstance()
+          .flatMap(configurationInstance -> configurationInstance.getConnectionProvider()).orElse(null), exception);
+    } catch (Exception refreshException) {
+      if (!(refreshException instanceof MuleException)) {
+        refreshException = new DefaultMuleException(refreshException);
+      }
+
+      if (LOGGER.isErrorEnabled()) {
+        LOGGER.error(format("Message source '%s' on flow '%s' threw exception while trying to refresh OAuth access token: %s",
+                            sourceAdapter.getName(), getLocation().getRootContainerName(), exception.getMessage()),
+                     exception);
+      }
+      muleContext.getExceptionListener().handleException(refreshException, getLocation());
+    }
 
     Optional<Publisher<Void>> action = sourceAdapter.getReconnectionAction(exception);
     if (!action.isPresent()) {
