@@ -119,10 +119,11 @@ public class IsolatedClassLoaderFactory {
     final List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters = new ArrayList<>();
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
-    try (final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
-        create(extraBootPackages, extraPrivilegedArtifacts,
-               artifactsUrlClassification.getContainerMuleUrls(),
-               artifactsUrlClassification.getContainerOptUrls())) {
+    try {
+      final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
+          create(extraBootPackages, extraPrivilegedArtifacts,
+                 artifactsUrlClassification.getContainerMuleUrls(),
+                 artifactsUrlClassification.getContainerOptUrls());
 
       ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 

@@ -54,11 +54,6 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
                                         getLookupPolicy(parentClassLoader, getMuleModules(), getBootPackages()));
   }
 
-  @Override
-  public void close() throws Exception {
-    // Nothing to do
-  }
-
   private static final class MuleContainerClassLoader extends MuleArtifactClassLoader {
 
     static {

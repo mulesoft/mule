@@ -4,8 +4,6 @@
 package org.mule.test.runner.classloader.container;
 
 import static java.util.Collections.emptyEnumeration;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
 import static java.util.Collections.list;
 
 import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
@@ -13,16 +11,10 @@ import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,8 +31,7 @@ import com.google.common.collect.ImmutableSet;
 public class DefaultTestContainerClassLoaderAssembler implements TestContainerClassLoaderAssembler {
 
   private final DefaultModuleRepository moduleRepository;
-  private final TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator;
-  private final ContainerClassLoaderFactory containerClassLoaderFactory;
+  private final List<String> extraBootPackages;
   private final URL[] muleUrls;
   private final URL[] optUrls;
 
@@ -51,15 +42,11 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
                                                              new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
                                                                  .getClassLoader())));
 
+    this.extraBootPackages = extraBootPackages;
     this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
     this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
 
-    testContainerClassLoaderCreator =
-        new TestPreFilteredContainerClassLoaderCreator(extraBootPackages,
-                                                       this.muleUrls,
-                                                       this.optUrls);
-    containerClassLoaderFactory =
-        new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> createLauncherArtifactClassLoader());
+    ;
   }
 
   /**
@@ -77,12 +64,19 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
    */
   @Override
   public MuleContainerClassLoaderWrapper createContainerClassLoader() {
-    MuleArtifactClassLoader launcherArtifact = createLauncherArtifactClassLoader();
+    final Set<String> bootPackages = ImmutableSet.<String>builder()
+        .addAll(extraBootPackages)
+        .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
+    ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
     ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, launcherArtifact);
     final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
 
-    return containerClassLoaderFactory.createContainerClassLoader(containerSystemClassloader);
+    TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
+        new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages);
+
+    return new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> launcherArtifact)
+        .createContainerClassLoader(containerSystemClassloader);
   }
 
   /**
@@ -90,83 +84,8 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
    *
    * @return an {@link ArtifactClassLoader} for the launcher, parent of the container.
    */
-  protected MuleArtifactClassLoader createLauncherArtifactClassLoader() {
-    ClassLoader launcherClassLoader = this.getClass().getClassLoader();
-
-    return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
-                                       new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
-
-      private final Set<String> extraBootPackages = ImmutableSet.<String>builder()
-          .addAll(testContainerClassLoaderCreator.getBootPackages())
-          .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
-
-      @Override
-      protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith(bp))) {
-          return super.loadClass(name, resolve);
-        } else {
-          throw new ClassNotFoundException(name);
-        }
-      }
-
-      @Override
-      public URL getResource(String name) {
-        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
-          return super.getResource(name);
-        } else {
-          return null;
-        }
-      }
-
-      @Override
-      public Enumeration<URL> getResources(String name) throws IOException {
-        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
-          return super.getResources(name);
-        } else {
-          return emptyEnumeration();
-        }
-      }
-
-      @Override
-      public Enumeration<URL> findResources(String name) throws IOException {
-        final Enumeration<URL> resourceUrls = super.findResources(name);
-
-        return asEnumeration(list(resourceUrls)
-            .stream()
-            .filter(url -> jreResource(name, url))
-            .iterator());
-      }
-
-      @Override
-      public URL findResource(String name) {
-        URL url = super.findResource(name);
-        if (jreResource(name, url)) {
-          return url;
-        } else {
-          return null;
-        }
-      }
-
-      private boolean jreResource(String name, URL url) {
-        if (url == null && getParent() != null) {
-          url = getParent().getResource(name);
-          // Filter if it is not a resource from the jre
-          if (url != null
-              && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-        return true;
-      }
-    };
-  }
-
-  @Override
-  public LookupStrategy getContainerOnlyLookupStrategy() {
-    return new ContainerOnlyLookupStrategy(testContainerClassLoaderCreator.getBuiltPreFilteredContainerClassLoader()
-        .getClassLoader());
+  protected ClassLoader createLauncherClassLoader(Set<String> extraBootPackages) {
+    return new TestLauncherClassLoader(this.getClass().getClassLoader(), extraBootPackages);
   }
 
   @Override
@@ -174,30 +93,79 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
     return moduleRepository;
   }
 
-  @Override
-  public void close() throws Exception {
-    testContainerClassLoaderCreator.close();
-  }
+  private static final class TestLauncherClassLoader extends ClassLoader {
 
-  private static class TestMuleContainerClassLoaderWrapper implements MuleContainerClassLoaderWrapper {
+    static {
+      registerAsParallelCapable();
+    }
 
-    private final ArtifactClassLoader containerClassLoader;
-    private final ClassLoaderLookupPolicy containerClassLoaderLookupPolicy;
+    private final Set<String> extraBootPackages;
 
-    public TestMuleContainerClassLoaderWrapper(ArtifactClassLoader containerClassLoader,
-                                               ClassLoaderLookupPolicy containerClassLoaderLookupPolicy) {
-      this.containerClassLoader = containerClassLoader;
-      this.containerClassLoaderLookupPolicy = containerClassLoaderLookupPolicy;
+    private TestLauncherClassLoader(ClassLoader parent, Set<String> extraBootPackages) {
+      super(parent);
+      this.extraBootPackages = extraBootPackages;
     }
 
     @Override
-    public ArtifactClassLoader getContainerClassLoader() {
-      return containerClassLoader;
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+      if (extraBootPackages.stream().anyMatch(bp -> name.startsWith(bp))) {
+        return super.loadClass(name, resolve);
+      } else {
+        throw new ClassNotFoundException(name);
+      }
     }
 
     @Override
-    public ClassLoaderLookupPolicy getContainerClassLoaderLookupPolicy() {
-      return containerClassLoaderLookupPolicy;
+    public URL getResource(String name) {
+      if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
+        return super.getResource(name);
+      } else {
+        return null;
+      }
+    }
+
+    @Override
+    public Enumeration<URL> getResources(String name) throws IOException {
+      if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
+        return super.getResources(name);
+      } else {
+        return emptyEnumeration();
+      }
+    }
+
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException {
+      final Enumeration<URL> resourceUrls = super.findResources(name);
+
+      return asEnumeration(list(resourceUrls)
+          .stream()
+          .filter(url -> jreResource(name, url))
+          .iterator());
+    }
+
+    @Override
+    public URL findResource(String name) {
+      URL url = super.findResource(name);
+      if (jreResource(name, url)) {
+        return url;
+      } else {
+        return null;
+      }
+    }
+
+    private boolean jreResource(String name, URL url) {
+      if (url == null && getParent() != null) {
+        url = getParent().getResource(name);
+        // Filter if it is not a resource from the jre
+        if (url != null
+            && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return true;
     }
   }
+
 }
