@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.impl.internal;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.SINGLE_APP_MODE;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
@@ -94,6 +95,8 @@ import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProv
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Registry of mule artifact resources required to construct new artifacts.
  *
@@ -104,6 +107,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private static final String CONTAINER_FEATURE_CONTEXT_NAME = "Container";
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader;
   private final DefaultDomainManager domainManager;
+
+  private final DomainRepository domainRepository;
   private final DefaultDomainFactory domainFactory;
   private final DefaultApplicationFactory applicationFactory;
   private final DeployableArtifactClassLoaderFactory<DomainDescriptor> domainClassLoaderFactory;
@@ -120,9 +125,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
   private final AbstractDeployableDescriptorFactory<MuleApplicationModel, ApplicationDescriptor> toolingApplicationDescriptorFactory;
   private final ServerLockFactory runtimeLockFactory;
+  private final FeatureFlaggingService featureFlaggingService;
   private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
+
+  private static AtomicBoolean singleAppModeSet = new AtomicBoolean(false);
 
 
   /**
@@ -226,9 +234,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     MemoryManagementService artifactMemoryManagementService = new ArtifactMemoryManagementService(this.memoryManagementService);
 
+    this.featureFlaggingService = resolveContainerFeatureFlaggingService();
+
     // Registers the memory management so that this can be injected.
     registerObject(MULE_MEMORY_MANAGEMENT_SERVICE, artifactMemoryManagementService);
-    registerObject(MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE, getContainerFeatureFlaggingService());
+    registerObject(MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE, featureFlaggingService);
 
     runtimeLockFactory = new ServerLockFactory();
 
@@ -237,6 +247,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
     domainManager = new DefaultDomainManager();
+
     this.domainClassLoaderFactory =
         trackDeployableArtifactClassLoaderFactory(domainClassLoaderFactory(name -> getAppDataFolder(name)));
 
@@ -263,6 +274,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                          new DefaultArtifactClassLoaderResolver(containerClassLoader,
                                                                                                 moduleRepository,
                                                                                                 new DefaultNativeLibraryFinderFactory(name -> getAppDataFolder(name))));
+
+    if (featureFlaggingService.isEnabled(SINGLE_APP_MODE)) {
+      domainRepository = new SingleAppDomainRepository(artifactClassLoaderResolver);
+    } else {
+      domainRepository = domainManager;
+    }
 
     pluginClassLoadersFactory = new DefaultRegionPluginClassLoadersFactory(artifactClassLoaderResolver);
     applicationClassLoaderBuilderFactory = new ApplicationClassLoaderBuilderFactory(artifactClassLoaderResolver);
@@ -297,7 +314,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     applicationFactory = new DefaultApplicationFactory(applicationClassLoaderBuilderFactory,
                                                        deployableArtifactDescriptorFactory,
-                                                       domainManager, serviceManager,
+                                                       domainRepository, serviceManager,
                                                        extensionModelLoaderRepository,
                                                        artifactClassLoaderManager, policyTemplateClassLoaderBuilderFactory,
                                                        pluginDependenciesResolver,
@@ -305,14 +322,16 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,
                                                        artifactConfigurationProcessor);
+
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
   }
 
-  private FeatureFlaggingService getContainerFeatureFlaggingService() {
+  private FeatureFlaggingService resolveContainerFeatureFlaggingService() {
     FeatureFlaggingRegistry ffRegistry = getInstance();
 
+    configureSingleAppMode();
     configureEnableProfilingService();
 
     return new FeatureFlaggingServiceBuilder()
@@ -320,6 +339,15 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
+  }
+
+  private static void configureSingleAppMode() {
+    // TODO: Refactor Feature Flagging Service Initialization
+    if (!singleAppModeSet.getAndSet(true)) {
+      FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+      featureFlaggingRegistry.registerFeatureFlag(SINGLE_APP_MODE,
+                                                  featureContext -> false);
+    }
   }
 
   private <T extends ArtifactDescriptor> ArtifactClassLoaderFactory<T> trackArtifactClassLoaderFactory(ArtifactClassLoaderFactory<T> artifactClassLoaderFactory) {
@@ -441,6 +469,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public ProfilingService getContainerProfilingService() {
     return containerProfilingService;
+  }
+
+  public FeatureFlaggingService getContainerFeatureFlaggingService() {
+    return featureFlaggingService;
   }
 
   private SchedulerService getSchedulerService() {
