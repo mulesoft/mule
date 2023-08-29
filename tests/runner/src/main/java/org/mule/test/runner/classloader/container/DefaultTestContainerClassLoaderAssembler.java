@@ -3,15 +3,19 @@
  */
 package org.mule.test.runner.classloader.container;
 
-import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.list;
+
+import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.ContainerOnlyLookupStrategy;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -20,10 +24,14 @@ import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Default implementation of {@link TestContainerClassLoaderAssembler}.
@@ -88,19 +96,69 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
     return new MuleArtifactClassLoader("launcher", new ArtifactDescriptor("launcher"), new URL[0], launcherClassLoader,
                                        new MuleClassLoaderLookupPolicy(emptyMap(), emptySet())) {
 
+      private final Set<String> extraBootPackages = ImmutableSet.<String>builder()
+          .addAll(testContainerClassLoaderCreator.getBootPackages())
+          .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
+
+      @Override
+      protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith(bp))) {
+          return super.loadClass(name, resolve);
+        } else {
+          throw new ClassNotFoundException(name);
+        }
+      }
+
+      @Override
+      public URL getResource(String name) {
+        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
+          return super.getResource(name);
+        } else {
+          return null;
+        }
+      }
+
+      @Override
+      public Enumeration<URL> getResources(String name) throws IOException {
+        if (extraBootPackages.stream().anyMatch(bp -> name.startsWith("META-INF/services/" + bp))) {
+          return super.getResources(name);
+        } else {
+          return emptyEnumeration();
+        }
+      }
+
+      @Override
+      public Enumeration<URL> findResources(String name) throws IOException {
+        final Enumeration<URL> resourceUrls = super.findResources(name);
+
+        return asEnumeration(list(resourceUrls)
+            .stream()
+            .filter(url -> jreResource(name, url))
+            .iterator());
+      }
+
       @Override
       public URL findResource(String name) {
         URL url = super.findResource(name);
+        if (jreResource(name, url)) {
+          return url;
+        } else {
+          return null;
+        }
+      }
+
+      private boolean jreResource(String name, URL url) {
         if (url == null && getParent() != null) {
           url = getParent().getResource(name);
           // Filter if it is not a resource from the jre
-          if (url != null && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
-            return url;
+          if (url != null
+              && url.getFile().matches(".*?\\/jre\\/lib\\/\\w+\\.jar\\!.*")) {
+            return true;
           } else {
-            return null;
+            return false;
           }
         }
-        return url;
+        return true;
       }
     };
   }

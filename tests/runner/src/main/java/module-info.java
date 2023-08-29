@@ -32,6 +32,7 @@ module org.mule.test.runner {
 
   requires com.google.common;
   requires org.apache.commons.codec;
+  requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires semver4j;
