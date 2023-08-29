@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;

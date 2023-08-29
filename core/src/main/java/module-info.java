@@ -161,14 +161,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
-  exports org.mule.runtime.core.privileged.registry to
-      org.mule.runtime.extensions.support,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.deployment.model.impl,
-      org.mule.runtime.launcher,
-      com.mulesoft.mule.runtime.cluster,
-      org.mule.test.unit,
-      spring.beans;
+  exports org.mule.runtime.core.privileged.registry;
   exports org.mule.runtime.core.privileged.routing;
   exports org.mule.runtime.core.privileged.security to
       org.mule.runtime.tls;
@@ -215,6 +208,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
+      org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,

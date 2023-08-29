@@ -4,12 +4,18 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.api.classloader;
+package org.mule.runtime.module.artifact.api.classloader.test;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.tck.util.EnumerationMatcher.equalTo;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.enumeration;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
@@ -18,23 +24,24 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
-import static org.mule.tck.util.EnumerationMatcher.equalTo;
 
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +49,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.CoreMatchers;
 
 @RunWith(Parameterized.class)
 public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
@@ -101,6 +110,28 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     return new FilteringArtifactClassLoader(artifactClassLoader, filter, exportedServices);
   }
 
+  protected Package[] getPackages(FilteringArtifactClassLoader classLoader) {
+    try {
+      final Method getPackagesMethod = FilteringArtifactClassLoader.class.getDeclaredMethod("getPackages");
+      getPackagesMethod.setAccessible(true);
+      return (Package[]) getPackagesMethod.invoke(classLoader);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected Package getPackage(FilteringArtifactClassLoader classLoader, String name) {
+    try {
+      final Method getPackageMethod = FilteringArtifactClassLoader.class.getDeclaredMethod("getPackage", String.class);
+      getPackageMethod.setAccessible(true);
+      return (Package) getPackageMethod.invoke(classLoader, name);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Test
   public void loadsExportedClass() throws ClassNotFoundException {
     TestClassLoader classLoader = new TestClassLoader(null);
@@ -146,7 +177,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
-    Package aPackage = filteringArtifactClassLoader.getPackage(CLASS_PACKAGE_NAME);
+    Package aPackage = getPackage(filteringArtifactClassLoader, CLASS_PACKAGE_NAME);
     assertThat(aPackage.getName(), equalTo(CLASS_PACKAGE_NAME));
   }
 
@@ -161,14 +192,14 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
-    Package[] packageList = filteringArtifactClassLoader.getPackages();
+    Package[] packageList = getPackages(filteringArtifactClassLoader);
     assertThat(packageList.length, is(1));
     assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
 
     // No exported package should return null
-    assertThat(filteringArtifactClassLoader.getPackage(ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
+    assertThat(getPackage(filteringArtifactClassLoader, ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
     // Default package should return null
-    assertThat(filteringArtifactClassLoader.getPackage(""), is(nullValue()));
+    assertThat(getPackage(filteringArtifactClassLoader, ""), is(nullValue()));
   }
 
   @Test
@@ -180,7 +211,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
 
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
-    Package[] packageList = filteringArtifactClassLoader.getPackages();
+    Package[] packageList = getPackages(filteringArtifactClassLoader);
     assertThat(packageList.length, is(0));
   }
 
@@ -210,7 +241,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, equalTo(Collections.EMPTY_LIST));
+    assertThat(resources, equalTo(emptyList()));
   }
 
   @Test
@@ -218,12 +249,12 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = new URL("file:/app.txt");
 
     when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
-    when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(Collections.singleton(resource)));
+    when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(enumeration(singleton(resource)));
 
     filteringArtifactClassLoader = doCreateClassLoader(emptyList());
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
-    assertThat(resources, equalTo(Collections.singletonList(resource)));
+    assertThat(resources, equalTo(singletonList(resource)));
   }
 
   @Test
@@ -236,7 +267,7 @@ public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
     URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
 
     Enumeration<URL> resources = filteringArtifactClassLoader.getResources(SERVICE_RESOURCE_NAME);
-    assertThat(resources, equalTo(Collections.singletonList(resource)));
+    assertThat(resources, equalTo(singletonList(resource)));
 
     verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
     verify(artifactClassLoader, never()).findResources(SERVICE_RESOURCE_NAME);
