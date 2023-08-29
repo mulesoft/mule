@@ -15,12 +15,14 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentSaraza;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -101,6 +103,7 @@ public class OperationClient implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private final ResolverSet resolverSet;
+  private Map<String, ValueResolver<?>> absentParameterResolvers;
 
   public static OperationClient from(OperationKey key,
                                      ExtensionManager extensionManager,
@@ -164,7 +167,11 @@ public class OperationClient implements Lifecycle {
             ComponentParameterization parameterization = (ComponentParameterization) context.getProperty("zaraza");
             Object value = parameterization.getParameter(parameterGroupModel, parameterModel);
 
-            return resolverFunction.apply(value).resolve(context);
+            ValueResolver delegate = value != null
+                ? resolverFunction.apply(value)
+                : absentParameterResolvers.get(parameterModel.getName());
+
+            return delegate.resolve(context);
           }
 
           @Override
@@ -175,10 +182,8 @@ public class OperationClient implements Lifecycle {
       }
     };
 
-
     ResolverSet resolverSet;
     try {
-
       resolverSet = getResolverSetFromComponentSaraza(operationModel,
                                                       (g, p) -> null,
                                                       muleContext,
@@ -189,10 +194,18 @@ public class OperationClient implements Lifecycle {
                                                       factory);
 
       resolverSet.initialise();
+
+      ResolverSet absentResolverSet = fromValues(emptyMap(),
+                                                 muleContext,
+                                                 true,
+                                                 reflectionCache,
+                                                 expressionManager,
+                                                 "").getParametersAsResolverSet(operationModel, muleContext);
+      absentResolverSet.initialise();
+      absentParameterResolvers = absentResolverSet.getResolvers();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage(e.getMessage()), e);
     }
-
     return resolverSet;
   }
 
