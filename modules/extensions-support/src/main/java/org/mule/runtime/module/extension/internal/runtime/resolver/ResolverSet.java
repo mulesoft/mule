@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult.newBuilder;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -101,10 +102,14 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    */
   @Override
   public ResolverSetResult resolve(ValueResolvingContext context) throws MuleException {
-    ResolverSetResult.Builder builder = getResolverSetBuilder();
+    ResolverSetResult.Builder builder = newBuilder();
 
+    final boolean acceptsNullValues = context.acceptsNullValues();
     for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolve(entry, context));
+      Object value = resolve(entry, context);
+      if (value != null || acceptsNullValues) {
+        builder.add(entry.getKey(), value);
+      }
     }
 
     return builder.build();
@@ -147,9 +152,4 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolvers.values(), muleContext);
   }
-
-  ResolverSetResult.Builder getResolverSetBuilder() {
-    return ResolverSetResult.newBuilder();
-  }
-
 }

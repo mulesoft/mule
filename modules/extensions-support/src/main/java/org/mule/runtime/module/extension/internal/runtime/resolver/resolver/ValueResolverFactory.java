@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
@@ -18,9 +17,16 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
@@ -38,6 +44,7 @@ import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * A Factory that creates different {@link ValueResolver} instances for different parameter types.
@@ -91,6 +98,30 @@ public class ValueResolverFactory {
 
     return resolver;
   }
+
+  /**
+   * Uses the {@code params} function to obtain a value for the given {@code parameterGroupModel} and {@code parameterModel}. If
+   * said value is {@code not null}, then the {@link ValueResolver} obtained through the {@code resolverFunction} is returned.
+   *
+   * Otherwise, {@link Optional#empty()} is returned
+   * 
+   * @param params              a {@link BiFunction} to obtain the value of a parameter in a specific group. The group <b>MUST</b>
+   *                            be obtained through the {@code model}
+   * @param parameterGroupModel a {@link ParameterGroupModel}
+   * @param parameterModel      a {@link ParameterModel} contained in the above {@code parameterGroupModel}
+   * @param resolverFunction    a function that maps a value to a {@link ValueResolver}
+   * @return an optional {@link ValueResolver}
+   * @since 4.5.0
+   */
+  public Optional<ValueResolver> ofNullableParameter(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                                     ParameterGroupModel parameterGroupModel,
+                                                     ParameterModel parameterModel,
+                                                     CheckedFunction<Object, ValueResolver> resolverFunction) {
+
+    Object value = params.apply(parameterGroupModel, parameterModel);
+    return value != null ? ofNullable(resolverFunction.apply(value)) : empty();
+  }
+
 
   /**
    * Generates the {@link ValueResolver} for expression based values
