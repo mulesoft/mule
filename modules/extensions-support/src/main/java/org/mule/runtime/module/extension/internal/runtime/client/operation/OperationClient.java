@@ -60,6 +60,7 @@ import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
@@ -98,7 +99,7 @@ public class OperationClient implements Lifecycle {
 
   private final OperationModel operationModel;
   private final ExecutionMediator<OperationModel> mediator;
-  private final ComponentExecutorResolver executorResolver;
+  private final CompletableComponentExecutor<OperationModel> executor;
   private final ValueReturnDelegate returnDelegate;
   private final StreamingManager streamingManager;
   private final ExpressionManager expressionManager;
@@ -130,8 +131,7 @@ public class OperationClient implements Lifecycle {
                                                        reflectionCache,
                                                        componentTracerFactory,
                                                        muleContext),
-                               ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache,
-                                                              muleContext),
+                               ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
                                streamingManager,
                                expressionManager,
@@ -141,7 +141,7 @@ public class OperationClient implements Lifecycle {
 
   private OperationClient(OperationModel operationModel,
                           ExecutionMediator<OperationModel> mediator,
-                          ComponentExecutorResolver executorResolver,
+                          CompletableComponentExecutor<OperationModel> executor,
                           ValueReturnDelegate returnDelegate,
                           StreamingManager streamingManager,
                           ExpressionManager expressionManager,
@@ -149,7 +149,7 @@ public class OperationClient implements Lifecycle {
                           MuleContext muleContext) {
     this.operationModel = operationModel;
     this.mediator = mediator;
-    this.executorResolver = executorResolver;
+    this.executor = executor;
     this.returnDelegate = returnDelegate;
     this.streamingManager = streamingManager;
     this.expressionManager = expressionManager;
@@ -281,7 +281,7 @@ public class OperationClient implements Lifecycle {
       }
     };
 
-    mediator.execute(executorResolver.resolveExecutor(ctx.getParameters()), ctx, callback);
+    mediator.execute(executor, ctx, callback);
     return future;
   }
 
@@ -353,25 +353,25 @@ public class OperationClient implements Lifecycle {
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(mediator, true, muleContext);
-    initialiseIfNeeded(executorResolver, true, muleContext);
+    initialiseIfNeeded(executor, true, muleContext);
   }
 
   @Override
   public void start() throws MuleException {
     startIfNeeded(mediator);
-    startIfNeeded(executorResolver);
+    startIfNeeded(executor);
   }
 
   @Override
   public void stop() throws MuleException {
     stopIfNeeded(mediator);
-    stopIfNeeded(executorResolver);
+    stopIfNeeded(executor);
   }
 
   @Override
   public void dispose() {
     disposeIfNeeded(mediator, LOGGER);
-    disposeIfNeeded(executorResolver, LOGGER);
+    disposeIfNeeded(executor, LOGGER);
   }
 
   private static ExecutionMediator<OperationModel> createExecutionMediator(
