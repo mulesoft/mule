@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal;
+package org.mule.test.module.extension.internal;
 
 import org.mule.test.marvel.model.Villain;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;

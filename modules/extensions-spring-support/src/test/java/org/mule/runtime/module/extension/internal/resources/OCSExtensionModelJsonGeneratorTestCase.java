@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.resources;
 
 import static java.util.Collections.singletonList;
 import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ENABLED;
-import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
+import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 
 import org.mule.test.oauth.TestOAuthExtension;
 

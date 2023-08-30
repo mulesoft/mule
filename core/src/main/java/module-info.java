@@ -175,18 +175,11 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.transaction;
-  exports org.mule.runtime.core.privileged.transaction.xa to
-      org.mule.runtime.spring.config,
-      com.mulesoft.mule.runtime.xa,
-      com.mulesoft.mule.runtime.bti;
+  exports org.mule.runtime.core.privileged.transaction.xa;
   exports org.mule.runtime.core.privileged.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
-  exports org.mule.runtime.core.privileged.util to
-      org.mule.runtime.core.components,
-      org.mule.runtime.extensions.support,
-      com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.cache;
+  exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
@@ -233,6 +226,7 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.context.notification to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -344,6 +338,7 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.retry to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.outbound to
@@ -432,6 +427,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
   // TODO W-13824979 Remove splashScreen logic from mule-core
