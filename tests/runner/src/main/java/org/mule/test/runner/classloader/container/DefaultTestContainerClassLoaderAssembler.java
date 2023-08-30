@@ -45,8 +45,6 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
     this.extraBootPackages = extraBootPackages;
     this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
     this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
-
-    ;
   }
 
   /**
