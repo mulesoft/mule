@@ -6,18 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static javax.lang.model.SourceVersion.RELEASE_8;
 import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+
+import static javax.lang.model.SourceVersion.RELEASE_8;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.resources.validator.ExportedPackagesValidator;
 
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
-
 
 /**
  * {@link BaseExtensionResourcesGeneratorAnnotationProcessor} implementation for default java based extensions.
@@ -32,8 +31,6 @@ public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensi
   @Override
   protected void configureLoadingRequest(ExtensionModelLoadingRequest.Builder requestBuilder) {
     super.configureLoadingRequest(requestBuilder);
-
-    requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
     requestBuilder.addValidator(new ExportedPackagesValidator());
   }
 

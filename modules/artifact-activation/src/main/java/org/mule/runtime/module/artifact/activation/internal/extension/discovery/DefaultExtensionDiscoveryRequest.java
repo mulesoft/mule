@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.internal.util.collection.UnmodifiableMap.unmodifiableMap;
 
 import static java.util.Collections.emptyMap;
@@ -18,7 +17,6 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +27,7 @@ import java.util.Set;
  *
  * @since 4.5
  */
-public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
+public class DefaultExtensionDiscoveryRequest implements InternalExtensionDiscoveryRequest {
 
   private final Collection<ArtifactPluginDescriptor> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
@@ -37,6 +35,7 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final boolean enrichDescriptions;
   private final boolean ocsEnabled;
   private final Map<String, Object> customParameters;
+  private boolean isPerformDesignTimeEnrichment = true;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
@@ -89,6 +88,16 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   @Override
   public boolean isOCSEnabled() {
     return ocsEnabled;
+  }
+
+  @Override
+  public boolean isPerformDesignTimeEnrichment() {
+    return isPerformDesignTimeEnrichment;
+  }
+
+  @Override
+  public void setIsPerformDesignTimeEnrichment(boolean isPerformDesignTimeEnrichment) {
+    this.isPerformDesignTimeEnrichment = isPerformDesignTimeEnrichment;
   }
 
 }

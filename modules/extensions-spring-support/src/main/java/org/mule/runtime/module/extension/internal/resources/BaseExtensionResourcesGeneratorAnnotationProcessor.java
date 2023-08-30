@@ -23,6 +23,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
+
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -36,6 +37,7 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.internal.capability.xml.description.DescriptionDeclarationEnricher;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
 
 import java.util.HashMap;
@@ -214,13 +216,13 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
    * The same builder will later be used to create the {@link ExtensionModelLoadingRequest} used in the
    * {@link ExtensionModelLoader#loadExtensionModel(ExtensionModelLoadingRequest)} invocation.
    * <p>
-   * This default implementation is no-op
    *
    * @param requestBuilder a {@link ExtensionModelLoadingRequest.Builder}
    * @since 4.5.0
    */
   protected void configureLoadingRequest(ExtensionModelLoadingRequest.Builder requestBuilder) {
-    // no-op
+    // TODO: Check for system property
+    requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
   }
 
   /**

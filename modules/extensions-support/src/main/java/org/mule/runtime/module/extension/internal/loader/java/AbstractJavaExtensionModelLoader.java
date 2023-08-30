@@ -101,23 +101,25 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                          new IgnoredExtensionParameterModelValidator(),
                                                                                          new JavaScopeModelValidator()));
 
-  private final List<DeclarationEnricher> customDeclarationEnrichers = unmodifiableList(asList(
-                                                                                               new RefNameDeclarationEnricher(),
-                                                                                               new DefaultEncodingDeclarationEnricher(),
-                                                                                               new RuntimeVersionDeclarationEnricher(),
-                                                                                               // TODO: MOVE TO EXT_API when
-                                                                                               // https://www.mulesoft.org/jira/browse/MULE-13070
-                                                                                               new JavaMimeTypeParametersDeclarationEnricher(),
-                                                                                               new DsqlDynamicMetadataDeclarationEnricher(),
-                                                                                               new RequiredForMetadataDeclarationEnricher(),
-                                                                                               new JavaConfigurationDeclarationEnricher(),
-                                                                                               new JavaOAuthDeclarationEnricher(),
-                                                                                               new ExtensionDescriptionsEnricher(),
-                                                                                               new ValueProvidersParameterDeclarationEnricher(),
-                                                                                               new SampleDataDeclarationEnricher(),
-                                                                                               new ParameterAllowedStereotypesDeclarationEnricher(),
-                                                                                               new JavaObjectStoreParameterDeclarationEnricher(),
-                                                                                               new PollingSourceDeclarationEnricher()));
+  private final List<DeclarationEnricher> designTimeDeclarationEnrichers = unmodifiableList(asList(
+                                                                                                   new DsqlDynamicMetadataDeclarationEnricher(),
+                                                                                                   new ExtensionDescriptionsEnricher(),
+                                                                                                   new RequiredForMetadataDeclarationEnricher(),
+                                                                                                   new SampleDataDeclarationEnricher(),
+                                                                                                   new ValueProvidersParameterDeclarationEnricher()));
+
+  private final List<DeclarationEnricher> runtimeDeclarationEnrichers = unmodifiableList(asList(
+                                                                                                new RefNameDeclarationEnricher(),
+                                                                                                new DefaultEncodingDeclarationEnricher(),
+                                                                                                new RuntimeVersionDeclarationEnricher(),
+                                                                                                // TODO: MOVE TO EXT_API when
+                                                                                                // https://www.mulesoft.org/jira/browse/MULE-13070
+                                                                                                new JavaMimeTypeParametersDeclarationEnricher(),
+                                                                                                new JavaConfigurationDeclarationEnricher(),
+                                                                                                new JavaOAuthDeclarationEnricher(),
+                                                                                                new ParameterAllowedStereotypesDeclarationEnricher(),
+                                                                                                new JavaObjectStoreParameterDeclarationEnricher(),
+                                                                                                new PollingSourceDeclarationEnricher()));
 
   private final String id;
   private final ModelLoaderDelegateFactory modelLoaderDelegateFactory;
@@ -154,7 +156,7 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
     super.configureContextBeforeDeclaration(context);
 
     context.addCustomValidators(customValidators);
-    context.addCustomDeclarationEnrichers(customDeclarationEnrichers);
+    context.addCustomDeclarationEnrichers(runtimeDeclarationEnrichers);
     context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
   }
 
