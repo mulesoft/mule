@@ -125,6 +125,15 @@ public class ValueResolvingContext implements AutoCloseable {
     return resolveCursors;
   }
 
+  /**
+   * Whether the generated {@link ResolverSetResult} should include null values or not.
+   * <p>
+   * If set to {@code false}, the output of {@link ResolverSetResult#asMap()} will not include any entries for which the resolved
+   * value was {@code null}
+   *
+   * @return {@code this} builder
+   * @since 4.5.0
+   */
   public boolean acceptsNullValues() {
     return acceptsNullValues;
   }
@@ -192,6 +201,17 @@ public class ValueResolvingContext implements AutoCloseable {
       return this;
     }
 
+    /**
+     * Whether the generated {@link ResolverSetResult} should include null values or not.
+     * <p>
+     * If set to {@code false}, the output of {@link ResolverSetResult#asMap()} will not include any entries for which the
+     * resolved value was {@code null}.
+     * <p>
+     * Default value if not specified is {@code true}
+     *
+     * @return {@code this} builder
+     * @since 4.5.0
+     */
     public Builder acceptsNullValues(boolean acceptsNullValues) {
       this.acceptsNullValues = acceptsNullValues;
       return this;
