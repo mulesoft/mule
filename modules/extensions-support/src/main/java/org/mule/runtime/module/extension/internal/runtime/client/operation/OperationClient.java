@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.runtime.client.NullComp
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentSaraza;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
@@ -169,9 +170,9 @@ public class OperationClient implements Lifecycle {
 
             ValueResolver delegate = value != null
                 ? resolverFunction.apply(value)
-                : absentParameterResolvers.get(parameterModel.getName());
+                : absentParameterResolvers.get(getMemberName(parameterModel));
 
-            return delegate.resolve(context);
+            return delegate != null ? delegate.resolve(context) : null;
           }
 
           @Override

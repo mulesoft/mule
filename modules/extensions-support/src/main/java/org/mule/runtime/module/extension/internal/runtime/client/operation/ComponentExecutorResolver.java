@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -18,6 +14,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory.extractExecutorInitialisationParams;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.stream.Collectors.toList;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleException;
@@ -67,11 +68,12 @@ abstract class ComponentExecutorResolver {
         key.getOperationModel().getAllParameterModels().stream()
             .filter(p -> p.getModelProperty(FieldOperationParameterModelProperty.class).isPresent())
             .collect(toList());
+    return new StaticComponentExecutorResolver(key, extensionManager, expressionManager, reflectionCache, muleContext);
 
-    return initParameterModels.isEmpty()
-        ? new StaticComponentExecutorResolver(key, extensionManager, expressionManager, reflectionCache, muleContext)
-        : new WithInitParamsComponentExecutorResolver(initParameterModels, key, extensionManager,
-                                                      expressionManager, reflectionCache, muleContext);
+    // return initParameterModels.isEmpty()
+    // ? new StaticComponentExecutorResolver(key, extensionManager, expressionManager, reflectionCache, muleContext)
+    // : new WithInitParamsComponentExecutorResolver(initParameterModels, key, extensionManager,
+    // expressionManager, reflectionCache, muleContext);
   }
 
   private ComponentExecutorResolver(OperationKey key,
@@ -140,7 +142,7 @@ abstract class ComponentExecutorResolver {
                                            ReflectionCache reflectionCache,
                                            MuleContext muleContext) {
       super(key, extensionManager, expressionManager, reflectionCache, muleContext);
-      this.executor = doCreateExecutor(emptyMap());
+      this.executor = doCreateExecutor(new HashMap<>()); // TODO: remove);
     }
 
     @Override
