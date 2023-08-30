@@ -292,9 +292,10 @@ public class OperationClient implements Lifecycle {
     ComponentParameterization.Builder<OperationModel> paramsBuilder = ComponentParameterization.builder(operationModel);
     parameterizer.setValuesOn(paramsBuilder);
 
-    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
+    ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event)
+        .withProperty(PARAMS_PROPERTY_NAME, paramsBuilder.build())
+        .acceptsNullValues(false);
     configurationInstance.ifPresent(ctxBuilder::withConfig);
-    ctxBuilder.withProperty(PARAMS_PROPERTY_NAME, paramsBuilder.build());
 
     try (ValueResolvingContext ctx = ctxBuilder.build()) {
       return resolverSet.resolve(ctx).asMap();
