@@ -105,6 +105,10 @@ public class OperationClient implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private final ResolverSet resolverSet;
+
+  /**
+   * Fallback resolvers to use for parameters not explicitly defined in the input parameterization
+   */
   private Map<String, ValueResolver<?>> absentParameterResolvers;
 
   public static OperationClient from(OperationKey key,
