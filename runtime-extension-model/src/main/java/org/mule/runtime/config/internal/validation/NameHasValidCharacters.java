@@ -1,11 +1,15 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.util.NameValidationUtil.verifyStringDoesNotContainsReservedCharacters;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.topLevelElement;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
@@ -56,8 +60,8 @@ public class NameHasValidCharacters implements Validation {
       return empty();
     } catch (IllegalArgumentException e) {
       return of(create(component, this,
-                       "Invalid global element name '" + nameAttributeValue + "'. Problem is: " + e.getMessage()));
+                       "Invalid global element name '" + nameAttributeValue + "'. Problem is: " + e.getMessage(),
+                       hasPropertyPlaceholder(nameAttributeValue)));
     }
   }
-
 }
