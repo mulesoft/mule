@@ -16,7 +16,7 @@ import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFacto
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.runtime.client.NullComponent.NULL_COMPONENT;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ParametersResolver.fromValues;
-import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromComponentSaraza;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetUtils.getResolverSetFromParameters;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getMemberName;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
@@ -94,6 +94,7 @@ public class OperationClient implements Lifecycle {
 
   private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
+  private static final String PARAMS_PROPERTY_NAME = "parameterization";
 
   private final OperationModel operationModel;
   private final ExecutionMediator<OperationModel> mediator;
@@ -157,15 +158,15 @@ public class OperationClient implements Lifecycle {
     ValueResolverFactory factory = new ValueResolverFactory() {
 
       @Override
-      public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
-                                        ParameterGroupModel parameterGroupModel, ParameterModel parameterModel,
-                                        CheckedFunction<Object, ValueResolver> resolverFunction) {
+      public Optional<ValueResolver> ofNullableParameter(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                                         ParameterGroupModel parameterGroupModel, ParameterModel parameterModel,
+                                                         CheckedFunction<Object, ValueResolver> resolverFunction) {
 
         return Optional.of(new ValueResolver() {
 
           @Override
           public Object resolve(ValueResolvingContext context) throws MuleException {
-            ComponentParameterization parameterization = (ComponentParameterization) context.getProperty("zaraza");
+            ComponentParameterization parameterization = (ComponentParameterization) context.getProperty(PARAMS_PROPERTY_NAME);
             Object value = parameterization.getParameter(parameterGroupModel, parameterModel);
 
             ValueResolver delegate = value != null
@@ -185,14 +186,14 @@ public class OperationClient implements Lifecycle {
 
     ResolverSet resolverSet;
     try {
-      resolverSet = getResolverSetFromComponentSaraza(operationModel,
-                                                      (g, p) -> null,
-                                                      muleContext,
-                                                      true,
-                                                      reflectionCache,
-                                                      expressionManager,
-                                                      "",
-                                                      factory);
+      resolverSet = getResolverSetFromParameters(operationModel,
+                                                 (g, p) -> null,
+                                                 muleContext,
+                                                 true,
+                                                 reflectionCache,
+                                                 expressionManager,
+                                                 "",
+                                                 factory);
 
       resolverSet.initialise();
 
@@ -289,7 +290,7 @@ public class OperationClient implements Lifecycle {
 
     ValueResolvingContext.Builder ctxBuilder = ValueResolvingContext.builder(event);
     configurationInstance.ifPresent(ctxBuilder::withConfig);
-    ctxBuilder.withProperty("zaraza", paramsBuilder.build());
+    ctxBuilder.withProperty(PARAMS_PROPERTY_NAME, paramsBuilder.build());
 
     try (ValueResolvingContext ctx = ctxBuilder.build()) {
       return resolverSet.resolve(ctx).asMap();

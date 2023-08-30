@@ -18,6 +18,8 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.ExpressionSupport;
@@ -97,13 +99,27 @@ public class ValueResolverFactory {
     return resolver;
   }
 
-  public Optional<ValueResolver> of(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
-                                    ParameterGroupModel parameterGroupModel,
-                                    ParameterModel parameterModel,
-                                    CheckedFunction<Object, ValueResolver> resolverFunction) {
+  /**
+   * Uses the {@code params} function to obtain a value for the given {@code parameterGroupModel} and {@code parameterModel}. If
+   * said value is {@code not null}, then the {@link ValueResolver} obtained through the {@code resolverFunction} is returned.
+   *
+   * Otherwise, {@link Optional#empty()} is returned
+   * 
+   * @param params              a {@link BiFunction} to obtain the value of a parameter in a specific group. The group <b>MUST</b>
+   *                            be obtained through the {@code model}
+   * @param parameterGroupModel a {@link ParameterGroupModel}
+   * @param parameterModel      a {@link ParameterModel} contained in the above {@code parameterGroupModel}
+   * @param resolverFunction    a function that maps a value to a {@link ValueResolver}
+   * @return an optional {@link ValueResolver}
+   * @since 4.5.0
+   */
+  public Optional<ValueResolver> ofNullableParameter(BiFunction<ParameterGroupModel, ParameterModel, Object> params,
+                                                     ParameterGroupModel parameterGroupModel,
+                                                     ParameterModel parameterModel,
+                                                     CheckedFunction<Object, ValueResolver> resolverFunction) {
 
     Object value = params.apply(parameterGroupModel, parameterModel);
-    return value != null ? Optional.ofNullable(resolverFunction.apply(value)) : Optional.empty();
+    return value != null ? ofNullable(resolverFunction.apply(value)) : empty();
   }
 
 
