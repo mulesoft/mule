@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
  *
  * @since 4.5
  */
-public interface PreFilteredContainerClassLoaderCreator extends AutoCloseable {
+public interface PreFilteredContainerClassLoaderCreator {
 
   /**
    * Boot packages define all the prefixes that must be loaded from the container classLoader without being filtered
