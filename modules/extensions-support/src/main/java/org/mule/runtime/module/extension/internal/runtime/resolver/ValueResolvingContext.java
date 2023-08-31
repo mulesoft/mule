@@ -30,16 +30,19 @@ public class ValueResolvingContext implements AutoCloseable {
   private final ExpressionManagerSession session;
   private final Map<String, Object> properties;
   private final boolean resolveCursors;
+  private final boolean acceptsNullValues;
 
   private ValueResolvingContext(CoreEvent event,
                                 ExpressionManagerSession session,
                                 ConfigurationInstance config,
                                 boolean resolveCursors,
+                                boolean acceptsNullValues,
                                 Map<String, Object> properties) {
     this.event = event;
     this.session = session;
     this.config = config;
     this.resolveCursors = resolveCursors;
+    this.acceptsNullValues = acceptsNullValues;
     this.properties = properties;
   }
 
@@ -119,6 +122,19 @@ public class ValueResolvingContext implements AutoCloseable {
     return resolveCursors;
   }
 
+  /**
+   * Whether the generated {@link ResolverSetResult} should include null values or not.
+   * <p>
+   * If set to {@code false}, the output of {@link ResolverSetResult#asMap()} will not include any entries for which the resolved
+   * value was {@code null}
+   *
+   * @return {@code this} builder
+   * @since 4.5.0
+   */
+  public boolean acceptsNullValues() {
+    return acceptsNullValues;
+  }
+
   public ExpressionManagerSession getSession() {
     return session;
   }
@@ -137,6 +153,7 @@ public class ValueResolvingContext implements AutoCloseable {
     private Map<String, Object> properties = new HashMap<>();
     private ExpressionManager manager;
     private boolean resolveCursors = true;
+    private boolean acceptsNullValues = true;
     private ComponentLocation location;
 
     public Builder withEvent(CoreEvent event) {
@@ -181,17 +198,33 @@ public class ValueResolvingContext implements AutoCloseable {
       return this;
     }
 
+    /**
+     * Whether the generated {@link ResolverSetResult} should include null values or not.
+     * <p>
+     * If set to {@code false}, the output of {@link ResolverSetResult#asMap()} will not include any entries for which the
+     * resolved value was {@code null}.
+     * <p>
+     * Default value if not specified is {@code true}
+     *
+     * @return {@code this} builder
+     * @since 4.5.0
+     */
+    public Builder acceptsNullValues(boolean acceptsNullValues) {
+      this.acceptsNullValues = acceptsNullValues;
+      return this;
+    }
+
     public ValueResolvingContext build() {
       if (event == null) {
-        return new ValueResolvingContext(null, null, null, true, properties);
+        return new ValueResolvingContext(null, null, null, true, acceptsNullValues, properties);
       } else if (manager == null) {
-        return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors, properties);
+        return new ValueResolvingContext(event, null, config.orElse(null), resolveCursors, acceptsNullValues, properties);
       } else if (location == null) {
         return new ValueResolvingContext(event, manager.openSession(event.asBindingContext()), config.orElse(null),
-                                         resolveCursors, properties);
+                                         resolveCursors, acceptsNullValues, properties);
       } else {
         return new ValueResolvingContext(event, manager.openSession(location, null, event.asBindingContext()),
-                                         config.orElse(null), resolveCursors, properties);
+                                         config.orElse(null), resolveCursors, acceptsNullValues, properties);
       }
     }
   }
