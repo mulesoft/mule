@@ -21,6 +21,7 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -156,19 +157,27 @@ public abstract class AbstractOSController {
   }
 
   protected int runSync(String command, String... args) {
-    Map<String, String> newEnv = copyEnvironmentVariables();
-    return executeSyncCommand(command, args, newEnv, timeout);
-  }
-
-  private int executeSyncCommand(String command, String[] args, Map<String, String> newEnv, int timeout) {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
+    return runSync(commandLine, null);
+  }
+
+  protected int runSync(CommandLine commandLine, OutputStream outAndErr) {
+    Map<String, String> newEnv = copyEnvironmentVariables();
+    return executeSyncCommand(commandLine, newEnv, outAndErr, timeout);
+  }
+
+  private int executeSyncCommand(CommandLine commandLine, Map<String, String> newEnv,
+                                 OutputStream outAndErr, int timeout) {
     Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
 
-    final ByteArrayOutputStream outAndErr = new ByteArrayOutputStream();
+    if (outAndErr == null) {
+      // TODO: review if we should use a NullOutputStream
+      outAndErr = new ByteArrayOutputStream();
+    }
     executor.setStreamHandler(new PumpStreamHandler(outAndErr));
     return doExecution(executor, commandLine, newEnv);
   }

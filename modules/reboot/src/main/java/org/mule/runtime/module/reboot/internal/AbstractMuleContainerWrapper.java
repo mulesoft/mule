@@ -83,7 +83,11 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
 
   public void dispose() {
     for (BootstrapConfigurer bootstrapConfigurer : bootstrapConfigurers) {
-      bootstrapConfigurer.dispose();
+      try {
+        bootstrapConfigurer.dispose();
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
     }
   }
 
