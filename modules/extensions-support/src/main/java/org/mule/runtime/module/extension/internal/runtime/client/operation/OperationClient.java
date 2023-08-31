@@ -4,6 +4,8 @@
 package org.mule.runtime.module.extension.internal.runtime.client.operation;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -31,10 +33,23 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.meta.MuleVersion;
+import org.mule.runtime.api.meta.model.ComponentModelVisitor;
+import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.OutputModel;
+import org.mule.runtime.api.meta.model.data.sample.SampleDataProviderModel;
+import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.display.DisplayModel;
+import org.mule.runtime.api.meta.model.error.ErrorModel;
+import org.mule.runtime.api.meta.model.nested.NestableElementModel;
+import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.api.meta.model.operation.ExecutionType;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
+import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -75,8 +90,11 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -144,7 +162,7 @@ public class OperationClient implements Lifecycle {
                           ExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
                           MuleContext muleContext) {
-    this.operationModel = operationModel;
+    this.operationModel = new FilteredOperationModel(operationModel);
     this.mediator = mediator;
     this.executor = executor;
     this.returnDelegate = returnDelegate;
@@ -490,6 +508,161 @@ public class OperationClient implements Lifecycle {
     public void triggerProfilingEvent(CoreEvent sourceData,
                                       Function<CoreEvent, ComponentThreadingProfilingEventContext> transformation) {
 
+    }
+  }
+
+  private static class FilteredOperationModel implements OperationModel {
+
+    private final OperationModel delegate;
+    private final List<ParameterGroupModel> parameterGroupModels;
+    private final List<ParameterModel> allParameters = new ArrayList<>(20);
+
+    private FilteredOperationModel(OperationModel delegate) {
+      this.delegate = delegate;
+      parameterGroupModels = new ArrayList<>(delegate.getParameterGroupModels().size());
+      for (ParameterGroupModel group : delegate.getParameterGroupModels()) {
+        String name = group.getName();
+        if (OUTPUT.equals(name) || ERROR_MAPPINGS.equals(name)) {
+          continue;
+        }
+        parameterGroupModels.add(group);
+        allParameters.addAll(group.getParameterModels());
+      }
+    }
+
+    @Override
+    public String getDescription() {
+      return delegate.getDescription();
+    }
+
+    @Override
+    public String getName() {
+      return delegate.getName();
+    }
+
+    @Override
+    public ComponentVisibility getVisibility() {
+      return delegate.getVisibility();
+    }
+
+    @Override
+    public List<? extends NestableElementModel> getNestedComponents() {
+      return delegate.getNestedComponents();
+    }
+
+    @Override
+    public boolean isTransactional() {
+      return delegate.isTransactional();
+    }
+
+    @Override
+    public boolean requiresConnection() {
+      return delegate.requiresConnection();
+    }
+
+    @Override
+    public boolean supportsStreaming() {
+      return delegate.supportsStreaming();
+    }
+
+    @Override
+    public <T extends ModelProperty> Optional<T> getModelProperty(Class<T> propertyType) {
+      return delegate.getModelProperty(propertyType);
+    }
+
+    @Override
+    public Set<ModelProperty> getModelProperties() {
+      return delegate.getModelProperties();
+    }
+
+    @Override
+    public OutputModel getOutput() {
+      return delegate.getOutput();
+    }
+
+    @Override
+    public OutputModel getOutputAttributes() {
+      return delegate.getOutputAttributes();
+    }
+
+    @Override
+    public Optional<SampleDataProviderModel> getSampleDataProviderModel() {
+      return delegate.getSampleDataProviderModel();
+    }
+
+    @Override
+    public Set<String> getSemanticTerms() {
+      return delegate.getSemanticTerms();
+    }
+
+    @Override
+    public Optional<DeprecationModel> getDeprecationModel() {
+      return delegate.getDeprecationModel();
+    }
+
+    @Override
+    public boolean isDeprecated() {
+      return delegate.isDeprecated();
+    }
+
+    @Override
+    public Optional<DisplayModel> getDisplayModel() {
+      return delegate.getDisplayModel();
+    }
+
+    @Override
+    public Set<ErrorModel> getErrorModels() {
+      return delegate.getErrorModels();
+    }
+
+    @Override
+    public Set<NotificationModel> getNotificationModels() {
+      return delegate.getNotificationModels();
+    }
+
+    @Override
+    public boolean isBlocking() {
+      return delegate.isBlocking();
+    }
+
+    @Override
+    public ExecutionType getExecutionType() {
+      return delegate.getExecutionType();
+    }
+
+    @Override
+    public void accept(ComponentModelVisitor visitor) {
+      delegate.accept(visitor);
+    }
+
+    @Override
+    public List<ParameterGroupModel> getParameterGroupModels() {
+      return parameterGroupModels;
+    }
+
+    @Override
+    public List<ParameterModel> getAllParameterModels() {
+      return allParameters;
+    }
+
+    @Override
+    public StereotypeModel getStereotype() {
+      return delegate.getStereotype();
+    }
+
+    @Override
+    public Optional<MuleVersion> getMinMuleVersion() {
+      return delegate.getMinMuleVersion();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return delegate.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+      return delegate.hashCode();
     }
   }
 }
