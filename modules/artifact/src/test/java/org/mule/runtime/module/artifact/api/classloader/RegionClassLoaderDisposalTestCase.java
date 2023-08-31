@@ -29,6 +29,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
 import org.mule.tck.util.CollectableReference;
 
 import java.net.MalformedURLException;

@@ -22,6 +22,7 @@
         <module>functional</module>
         <module>infrastructure</module>
         <module>performance</module>
+        <module>test-runtime-extension-model</module>
         <module>test-extensions</module>
         <module>test-plugins</module>
         <module>test-policies</module>

@@ -19,7 +19,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilte
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.TestArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;

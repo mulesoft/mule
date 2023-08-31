@@ -7,13 +7,14 @@
 package org.mule.runtime.container.internal;
 
 import static java.util.Collections.emptyList;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoaderTestCase;
+import org.mule.runtime.module.artifact.api.classloader.test.FilteringArtifactClassLoaderTestCase;
 import org.mule.tck.classlaoder.TestClassLoader;
 import org.mule.tck.util.EnumerationMatcher;
 
