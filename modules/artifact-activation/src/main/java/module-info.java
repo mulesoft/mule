@@ -40,14 +40,20 @@ module org.mule.runtime.artifact.activation {
 
   uses org.mule.runtime.module.artifact.activation.internal.plugin.PluginPatchesResolver;
 
+  exports org.mule.runtime.module.artifact.activation.internal to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast to
       org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.artifact.activation.internal.ast.validation to
-      org.mule.runtime.extensions.mule.support;
+      org.mule.runtime.extensions.mule.support,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.module.artifact.activation.internal.classloader to
+      org.mule.runtime.deployment.model,
+      org.mule.runtime.spring.config,
       org.mule.runtime.log4j,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.activation.internal.nativelib to
+      org.mule.runtime.deployment.model,
       org.mule.test.runner;
 
 }
