@@ -1,14 +1,20 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.api.classloader;
+package org.mule.runtime.module.artifact.api.classloader.test;
+
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.tck.classlaoder.TestClassLoader;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.tck.classlaoder.TestClassLoader;
 
 public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {
 

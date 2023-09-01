@@ -1,5 +1,8 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.capability.xml;
 
@@ -8,7 +11,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
+import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 
 import org.mule.extension.test.extension.reconnection.ReconnectionExtension;
@@ -16,7 +19,6 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.type.TypeCatalog;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
-import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalInnerPojoConnector;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.basic.GlobalPojoConnector;
@@ -30,6 +32,7 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.marvel.MarvelExtension;
 import org.mule.test.metadata.extension.MetadataExtension;
+import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.test.nonimplicit.config.extension.extension.api.NonImplicitConfigExtension;
 import org.mule.test.oauth.TestOAuthExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;

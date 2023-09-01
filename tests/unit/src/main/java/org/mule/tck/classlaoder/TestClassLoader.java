@@ -1,10 +1,14 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.tck.classlaoder;
 
+import static java.util.Collections.enumeration;
+
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +82,7 @@ public class TestClassLoader extends ClassLoader {
   protected Enumeration<URL> findResources(String name) throws IOException {
     invocations.add(new Pair<>("findResources", name));
 
-    return new EnumerationAdapter<>(resources.values());
+    return enumeration(resources.values());
   }
 
   @Override

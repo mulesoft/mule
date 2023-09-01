@@ -1,5 +1,8 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.test.runner.classloader;
 
@@ -119,10 +122,11 @@ public class IsolatedClassLoaderFactory {
     final List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters = new ArrayList<>();
     List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
-    try (final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
-        create(extraBootPackages, extraPrivilegedArtifacts,
-               artifactsUrlClassification.getContainerMuleUrls(),
-               artifactsUrlClassification.getContainerOptUrls())) {
+    try {
+      final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
+          create(extraBootPackages, extraPrivilegedArtifacts,
+                 artifactsUrlClassification.getContainerMuleUrls(),
+                 artifactsUrlClassification.getContainerOptUrls());
 
       ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 
@@ -150,7 +154,7 @@ public class IsolatedClassLoaderFactory {
 
           ClassLoaderLookupPolicy pluginLookupPolicy =
               extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository,
-                                                    testContainerClassLoaderAssembler,
+                                                    containerClassLoaderWrapper,
                                                     pluginUrlClassification);
           pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
@@ -175,7 +179,8 @@ public class IsolatedClassLoaderFactory {
 
         createTestRunnerPlugin(artifactsUrlClassification, appExportedLookupStrategies, childClassLoaderLookupPolicy,
                                regionClassLoader, filteredPluginsArtifactClassLoaders, pluginsArtifactClassLoaders,
-                               pluginArtifactClassLoaderFilters, moduleRepository, testContainerClassLoaderAssembler,
+                               pluginArtifactClassLoaderFilters, moduleRepository,
+                               containerClassLoaderWrapper,
                                testJarInfo.getPackages());
       }
 
@@ -232,7 +237,7 @@ public class IsolatedClassLoaderFactory {
                                       List<ArtifactClassLoader> pluginsArtifactClassLoaders,
                                       List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters,
                                       ModuleRepository moduleRepository,
-                                      TestContainerClassLoaderAssembler testContainerClassLoaderAssembler,
+                                      MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
                                       Set<String> parentExportedPackages) {
 
     JarInfo testRunnerJarInfo = getTestRunnerJarInfo(artifactsUrlClassification);
@@ -252,7 +257,7 @@ public class IsolatedClassLoaderFactory {
 
     ClassLoaderLookupPolicy pluginLookupPolicy =
         extendLookupPolicyForPrivilegedAccess(childClassLoaderLookupPolicy, moduleRepository,
-                                              testContainerClassLoaderAssembler,
+                                              containerClassLoaderWrapper,
                                               testRunnerPluginClassification);
     pluginLookupPolicy = pluginLookupPolicy.extend(appExportedLookupStrategies);
 
@@ -294,9 +299,11 @@ public class IsolatedClassLoaderFactory {
 
   private ClassLoaderLookupPolicy extendLookupPolicyForPrivilegedAccess(ClassLoaderLookupPolicy childClassLoaderLookupPolicy,
                                                                         ModuleRepository moduleRepository,
-                                                                        TestContainerClassLoaderAssembler testContainerClassLoaderAssembler,
+                                                                        MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
                                                                         PluginUrlClassification pluginUrlClassification) {
-    LookupStrategy containerOnlyLookupStrategy = testContainerClassLoaderAssembler.getContainerOnlyLookupStrategy();
+    LookupStrategy containerOnlyLookupStrategy = containerClassLoaderWrapper
+        .getContainerClassLoaderLookupPolicy()
+        .getClassLookupStrategy(ModuleRepository.class.getName());
 
     Map<String, LookupStrategy> privilegedLookupStrategies = new HashMap<>();
     for (MuleModule module : moduleRepository.getModules()) {

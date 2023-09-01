@@ -1,8 +1,12 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 
 import static java.util.Collections.emptyMap;
@@ -19,6 +23,7 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
@@ -32,6 +37,7 @@ import javax.inject.Inject;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 
 public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
 
@@ -69,6 +75,21 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     }
 
   }
+
+  /**
+   * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
+   * it will be for internal use only.
+   *
+   * @since 4.5.0
+   */
+  static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
+  static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
+
+  // This is needed apart from the setting in {@code @ArtifactClassLoaderRunnerConfig} because tha validation also takes place
+  // during extension registering, not only during its discovery.
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_LOOSE);
 
   private final Map<String, MuleContext> muleContexts = new HashMap<>();
   private final Map<String, ArtifactInstanceInfrastructure> applsInfrastructures = new HashMap<>();

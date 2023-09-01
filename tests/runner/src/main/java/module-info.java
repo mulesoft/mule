@@ -1,5 +1,8 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 /**
  * Test Runner for Mule Integration Tests.
@@ -32,6 +35,7 @@ module org.mule.test.runner {
 
   requires com.google.common;
   requires org.apache.commons.codec;
+  requires org.apache.commons.collections4;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires semver4j;

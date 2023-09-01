@@ -13,6 +13,13 @@
     <description>Provides container artifact related functionality</description>
 
     <properties>
+		<!-- open internal required stuff to the test infrastructure -->
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
+
         <javaModuleName>org.mule.runtime.container</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -23,6 +30,12 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core-mvel</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

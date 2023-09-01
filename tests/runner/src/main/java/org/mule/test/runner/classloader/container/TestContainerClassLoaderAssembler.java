@@ -1,5 +1,8 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 package org.mule.test.runner.classloader.container;
 
@@ -7,7 +10,6 @@ import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUti
 
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.net.URL;
 import java.util.Collection;
@@ -19,7 +21,7 @@ import java.util.Set;
  *
  * @since 4.5
  */
-public interface TestContainerClassLoaderAssembler extends AutoCloseable {
+public interface TestContainerClassLoaderAssembler {
 
   static TestContainerClassLoaderAssembler create(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
                                                   List<URL> muleUrls,
@@ -38,11 +40,6 @@ public interface TestContainerClassLoaderAssembler extends AutoCloseable {
    * @return the container class loader with all the configuration needed for the tests.
    */
   MuleContainerClassLoaderWrapper createContainerClassLoader();
-
-  /**
-   * @return a lookup strategy that allows searching for a class only in the container class loader.
-   */
-  LookupStrategy getContainerOnlyLookupStrategy();
 
   /**
    * @return the module repository used for creating the container class loader.

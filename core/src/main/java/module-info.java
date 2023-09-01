@@ -1,5 +1,8 @@
 /*
  * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
  */
 /**
  * Mule server and core classes.
@@ -158,32 +161,18 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
-  exports org.mule.runtime.core.privileged.registry to
-      org.mule.runtime.extensions.support,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.deployment.model.impl,
-      org.mule.runtime.launcher,
-      com.mulesoft.mule.runtime.cluster,
-      org.mule.test.unit,
-      spring.beans;
+  exports org.mule.runtime.core.privileged.registry;
   exports org.mule.runtime.core.privileged.routing;
   exports org.mule.runtime.core.privileged.security to
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.transaction;
-  exports org.mule.runtime.core.privileged.transaction.xa to
-      org.mule.runtime.spring.config,
-      com.mulesoft.mule.runtime.xa,
-      com.mulesoft.mule.runtime.bti;
+  exports org.mule.runtime.core.privileged.transaction.xa;
   exports org.mule.runtime.core.privileged.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
-  exports org.mule.runtime.core.privileged.util to
-      org.mule.runtime.core.components,
-      org.mule.runtime.extensions.support,
-      com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.cache;
+  exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
@@ -219,6 +208,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
+      org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
@@ -230,6 +220,7 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.context.notification to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
@@ -341,6 +332,7 @@ module org.mule.runtime.core {
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.retry to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.soap.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.outbound to
@@ -429,6 +421,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.rx to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
   // TODO W-13824979 Remove splashScreen logic from mule-core
