@@ -102,13 +102,13 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
                                                                                          new JavaScopeModelValidator()));
 
   private final List<DeclarationEnricher> designTimeDeclarationEnrichers = unmodifiableList(asList(
-                                                                                                   new DsqlDynamicMetadataDeclarationEnricher(),
                                                                                                    new ExtensionDescriptionsEnricher(),
                                                                                                    new RequiredForMetadataDeclarationEnricher(),
                                                                                                    new SampleDataDeclarationEnricher(),
                                                                                                    new ValueProvidersParameterDeclarationEnricher()));
 
   private final List<DeclarationEnricher> runtimeDeclarationEnrichers = unmodifiableList(asList(
+                                                                                                new DsqlDynamicMetadataDeclarationEnricher(),
                                                                                                 new RefNameDeclarationEnricher(),
                                                                                                 new DefaultEncodingDeclarationEnricher(),
                                                                                                 new RuntimeVersionDeclarationEnricher(),
@@ -154,8 +154,10 @@ public abstract class AbstractJavaExtensionModelLoader extends AbstractExtension
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     super.configureContextBeforeDeclaration(context);
-
     context.addCustomValidators(customValidators);
+    if (context.isDesignTime()) {
+      context.addCustomDeclarationEnrichers(designTimeDeclarationEnrichers);
+    }
     context.addCustomDeclarationEnrichers(runtimeDeclarationEnrichers);
     context.addCustomDeclarationEnrichers(getPrivilegedDeclarationEnrichers(context));
   }

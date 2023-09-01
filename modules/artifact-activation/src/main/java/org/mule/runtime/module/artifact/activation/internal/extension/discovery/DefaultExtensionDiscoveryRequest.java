@@ -27,7 +27,7 @@ import java.util.Set;
  *
  * @since 4.5
  */
-public class DefaultExtensionDiscoveryRequest implements InternalExtensionDiscoveryRequest {
+public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryRequest {
 
   private final Collection<ArtifactPluginDescriptor> artifactPlugins;
   private final Set<ExtensionModel> parentArtifactExtensions;
@@ -35,24 +35,26 @@ public class DefaultExtensionDiscoveryRequest implements InternalExtensionDiscov
   private final boolean enrichDescriptions;
   private final boolean ocsEnabled;
   private final Map<String, Object> customParameters;
-  private boolean isPerformDesignTimeEnrichment = true;
+  private final boolean isDesignTime;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
-    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, emptyMap());
+    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, emptyMap(), true);
   }
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions, boolean parallelDiscovery,
-                                          boolean enrichDescriptions, boolean ocsEnabled, Map<String, Object> customParameters) {
+                                          boolean enrichDescriptions, boolean ocsEnabled, Map<String, Object> customParameters,
+                                          boolean isDesignTime) {
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
     this.parallelDiscovery = parallelDiscovery;
     this.enrichDescriptions = enrichDescriptions;
     this.ocsEnabled = ocsEnabled;
     this.customParameters = unmodifiableMap(customParameters);
+    this.isDesignTime = isDesignTime;
   }
 
   @Override
@@ -91,13 +93,8 @@ public class DefaultExtensionDiscoveryRequest implements InternalExtensionDiscov
   }
 
   @Override
-  public boolean isPerformDesignTimeEnrichment() {
-    return isPerformDesignTimeEnrichment;
-  }
-
-  @Override
-  public void setIsPerformDesignTimeEnrichment(boolean isPerformDesignTimeEnrichment) {
-    this.isPerformDesignTimeEnrichment = isPerformDesignTimeEnrichment;
+  public boolean isDesignTime() {
+    return isDesignTime;
   }
 
 }

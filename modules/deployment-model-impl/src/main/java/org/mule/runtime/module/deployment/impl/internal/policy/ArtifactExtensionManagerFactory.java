@@ -21,7 +21,6 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
-import org.mule.runtime.module.artifact.activation.internal.extension.discovery.InternalExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
