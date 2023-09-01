@@ -98,9 +98,8 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
         .setArtifactPlugins(artifactPluginsDescriptors)
         .setParallelDiscovery(isParallelExtensionModelLoadingEnabled())
         .setParentArtifactExtensions(parentArtifactExtensions)
+        .setIsDesignTime(false)
         .build();
-    InternalExtensionDiscoveryRequest.getAsInternalExtensionDiscoveryRequest(extensionDiscoveryRequest)
-        .setIsPerformDesignTimeEnrichment(false);
     extensions.addAll(extensionModelDiscoverer
         .discoverPluginsExtensionModels(extensionDiscoveryRequest));
     extensions.forEach(extensionManager::registerExtension);
