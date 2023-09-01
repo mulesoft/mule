@@ -96,7 +96,8 @@ public class ComponentParameterizationUtilsTestCase {
   @Test
   public void parameterizedModelWithDuplicatedParameterName() {
     expectedException.expect(IllegalArgumentException.class);
-    expectedException.expectMessage(format("Parameter '%s' exists in more than one group for component '%s'"));
+    expectedException
+        .expectMessage(format("Parameter '%s' exists in more than one group for component '%s'", PARAMETER_NAME, COMPONENT_NAME));
     when(anotherParameterGroupModelMock.getParameter(PARAMETER_NAME)).thenReturn(of(anotherParameterModelMock));
     Map<String, Object> parameters = new HashMap<>();
     parameters.put(PARAMETER_NAME, PARAMETER_VALUE);
