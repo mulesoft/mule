@@ -246,13 +246,11 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
         .subscribe(eventsConsumer2);
 
     eventsEmitter.start();
+    eventsEmitter2.start();
     try {
-      eventsEmitter2.start();
       eventsConsumer.await();
-      eventsEmitter.stop();
       eventsConsumer2.await();
-      eventsEmitter2.stop();
-    } catch (Throwable t) {
+    } finally {
       eventsEmitter.stop();
       eventsEmitter2.stop();
     }
