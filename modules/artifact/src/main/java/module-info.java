@@ -16,14 +16,11 @@ module org.mule.runtime.artifact {
   requires org.mule.sdk.api;
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.core;
-  requires org.mule.runtime.core.mvel;
   requires org.mule.runtime.jar.handling.utils;
 
   requires java.desktop;
   requires java.management;
   requires java.sql;
-
-  requires mule.mvel2;
 
   exports org.mule.runtime.module.artifact.api;
   exports org.mule.runtime.module.artifact.api.classloader;
@@ -35,10 +32,13 @@ module org.mule.runtime.artifact {
 
   exports org.mule.runtime.module.artifact.internal.classloader to
       org.mule.runtime.artifact.activation,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.deployment.model,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.internal.util to
       org.mule.runtime.container,
       org.mule.runtime.artifact.activation,
+      org.mule.runtime.deployment.model,
       org.mule.test.runner;
 
 }
