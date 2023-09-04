@@ -6,14 +6,13 @@
  */
 package org.mule.module.artifact.classloader;
 
-import static org.mule.mvel2.optimizers.impl.asm.ASMAccessorOptimizer.getMVELClassLoader;
-import static org.mule.mvel2.optimizers.impl.asm.ASMAccessorOptimizer.setMVELClassLoader;
+import static java.lang.Class.forName;
 
-import org.mule.mvel2.optimizers.dynamic.DynamicOptimizer;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +41,17 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
   protected void releaseFromASMAccessOptimizer() {
     ClassLoader mvelCl;
     try {
-      mvelCl = ((ClassLoader) getMVELClassLoader());
-    } catch (NoClassDefFoundError error) {
+      mvelCl = (ClassLoader) forName("org.mule.mvel2.optimizers.impl.asm.ASMAccessorOptimizer")
+          .getMethod("getMVELClassLoader").invoke(null);
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException error) {
       // MVEL is not present in the class loader, nothing to do
       return;
     }
 
     try {
       if (mvelCl != null && mvelCl.getParent() == muleArtifactClassLoader) {
-        setMVELClassLoader(null);
+        forName("org.mule.mvel2.optimizers.impl.asm.ASMAccessorOptimizer")
+            .getMethod("setMVELClassLoader", forName("org.mule.mvel2.util.MVELClassLoader")).invoke(null, new Object[] {null});
       }
     } catch (Throwable t) {
       LOGGER.warn("Unable to clean MVEL's ASMAccessorOptimizer class loader", t);
@@ -60,7 +61,7 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
   protected void releaseFromDynamicOptimizer() throws Exception {
     Field clField;
     try {
-      clField = DynamicOptimizer.class.getDeclaredField("classLoader");
+      clField = forName("org.mule.mvel2.optimizers.dynamic.DynamicOptimizer").getDeclaredField("classLoader");
     } catch (NoClassDefFoundError error) {
       // MVEL is not present in the class loader, nothing to do
       return;
