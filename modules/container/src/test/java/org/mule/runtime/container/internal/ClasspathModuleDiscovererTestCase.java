@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import static java.nio.file.Files.createTempFile;
+import static java.util.Collections.enumeration;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -17,13 +23,11 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -52,10 +56,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void discoversModule() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("invalidModule.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
       expectedException.expect(IllegalArgumentException.class);
       moduleDiscoverer.discover();
@@ -65,14 +69,14 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void discoversModuleWithExportedJavaPackages() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleJavaPackages"));
       assertThat(muleModule.getExportedPackages(), contains("org.foo", "org.bar"));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -85,14 +89,14 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void discoversModuleWithExportedResourcePackages() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleResourcePackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleResourcePackages"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), containsInAnyOrder("META-INF/module.xsd", "README.txt"));
@@ -105,14 +109,14 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void discoversModuleWithExportedPrivilegedApi() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPrivilegedApi.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleJavaPrivilegedApi"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -125,14 +129,14 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void discoversModuleWithExportedServices() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleExportedServices.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleExportedServices"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -162,12 +166,12 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
   @Test
   public void ignoresDuplicateModule() throws Exception {
     runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
+      List<URL> moduleProperties = new ArrayList<>();
       moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
       when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
+          .thenReturn(enumeration(moduleProperties));
 
-      List<MuleModule> modules = moduleDiscoverer.discover();
+      List<MuleContainerModule> modules = moduleDiscoverer.discover();
       assertThat(modules.size(), equalTo(1));
     });
   }

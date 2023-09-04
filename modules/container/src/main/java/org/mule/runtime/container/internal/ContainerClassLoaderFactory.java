@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
@@ -71,7 +72,7 @@ public class ContainerClassLoaderFactory {
    *         mule artifacts.
    */
   public MuleContainerClassLoaderWrapper createContainerClassLoader(final ClassLoader parentClassLoader) {
-    final List<MuleModule> muleModules = preFilteredContainerClassLoaderCreator.getMuleModules();
+    final List<MuleContainerModule> muleModules = preFilteredContainerClassLoaderCreator.getMuleModules();
 
     return new DefaultMuleContainerClassLoaderWrapper(createArtifactClassLoader(parentClassLoader, muleModules,
                                                                                 new ArtifactDescriptor("mule")));
@@ -81,11 +82,12 @@ public class ContainerClassLoaderFactory {
    * Creates an {@link ArtifactClassLoader} that always resolves resources by delegating to the parentClassLoader.
    *
    * @param parentClassLoader  the parent {@link ClassLoader} for the container
-   * @param muleModules        the list of {@link MuleModule}s to be used for defining the filter
+   * @param muleModules        the list of {@link MuleContainerModule}s to be used for defining the filter
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
    * @return a {@link ArtifactClassLoader} to be used in a {@link FilteringContainerClassLoader}
    */
-  protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader, List<MuleModule> muleModules,
+  protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader,
+                                                          List<MuleContainerModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
     return createContainerFilteringClassLoader(parentClassLoaderResolver.apply(parentClassLoader),
                                                muleModules,
@@ -98,14 +100,14 @@ public class ContainerClassLoaderFactory {
    * {@link List<MuleModule>} of muleModules.
    *
    * @param parentClassLoader    the parent {@link ClassLoader} for the container
-   * @param muleModules          the list of {@link MuleModule}s to be used for defining the filter
+   * @param muleModules          the list of {@link MuleContainerModule}s to be used for defining the filter
    * @param containerClassLoader the {@link ArtifactClassLoader} for the container that will be used to delegate by the
    *                             {@link FilteringContainerClassLoader}
    * @return a {@link FilteringContainerClassLoader} that would be the one used as the parent of plugins and applications
    *         {@link ArtifactClassLoader}
    */
   protected FilteringArtifactClassLoader createContainerFilteringClassLoader(final ClassLoader parentClassLoader,
-                                                                             List<MuleModule> muleModules,
+                                                                             List<MuleContainerModule> muleModules,
                                                                              ArtifactClassLoader containerClassLoader) {
     return new FilteringContainerClassLoader(parentClassLoader, containerClassLoader,
                                              new ContainerClassLoaderFilterFactory()
@@ -113,11 +115,13 @@ public class ContainerClassLoaderFactory {
                                              getExportedServices(muleModules));
   }
 
-  private List<ExportedService> getExportedServices(List<MuleModule> muleModules) {
+  private List<ExportedService> getExportedServices(List<MuleContainerModule> muleModules) {
     List<ExportedService> exportedServices = new ArrayList<>();
 
-    for (MuleModule muleModule : muleModules) {
-      exportedServices.addAll(muleModule.getExportedServices());
+    for (MuleContainerModule muleModule : muleModules) {
+      if (muleModule instanceof MuleModule) {
+        exportedServices.addAll(((MuleModule) muleModule).getExportedServices());
+      }
     }
 
     return exportedServices;

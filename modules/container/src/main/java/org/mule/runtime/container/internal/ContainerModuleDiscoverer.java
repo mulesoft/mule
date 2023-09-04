@@ -8,7 +8,7 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ContainerModuleDiscoverer implements ModuleDiscoverer {
   }
 
   @Override
-  public List<MuleModule> discover() {
+  public List<MuleContainerModule> discover() {
     return moduleDiscoverer.discover();
   }
 }

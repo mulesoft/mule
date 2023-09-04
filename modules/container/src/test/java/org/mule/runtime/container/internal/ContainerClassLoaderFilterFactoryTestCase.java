@@ -7,28 +7,30 @@
 package org.mule.runtime.container.internal;
 
 import static java.util.Collections.singleton;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.mule.runtime.container.api.MuleModule;
+
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import com.google.common.collect.ImmutableSet;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.junit.Test;
 
 public class ContainerClassLoaderFilterFactoryTestCase extends AbstractMuleTestCase {
 
-  private ContainerClassLoaderFilterFactory factory = new ContainerClassLoaderFilterFactory();
+  private final ContainerClassLoaderFilterFactory factory = new ContainerClassLoaderFilterFactory();
 
 
   @Test
   public void acceptsExportedModulePackages() throws Exception {
-    final List<MuleModule> muleModules = new ArrayList<>();
+    final List<MuleContainerModule> muleModules = new ArrayList<>();
     muleModules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar.")
         .exportingResources("META-INF/foo.txt", "META-INF/docs1/foo.txt").build());
     muleModules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2")
@@ -55,7 +57,7 @@ public class ContainerClassLoaderFilterFactoryTestCase extends AbstractMuleTestC
 
   @Test
   public void acceptsExportedSystemPackages() throws Exception {
-    final List<MuleModule> muleModules = new ArrayList<>();
+    final List<MuleContainerModule> muleModules = new ArrayList<>();
     final Set<String> bootPackages = singleton("org.foo1");
 
     final ClassLoaderFilter classLoaderFilter = factory.create(bootPackages, muleModules);

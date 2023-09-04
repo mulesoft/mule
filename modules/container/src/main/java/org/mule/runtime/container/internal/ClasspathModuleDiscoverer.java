@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
@@ -109,8 +110,8 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   @Override
-  public List<MuleModule> discover() {
-    List<MuleModule> modules = new LinkedList<>();
+  public List<MuleContainerModule> discover() {
+    List<MuleContainerModule> modules = new LinkedList<>();
     Set<String> moduleNames = new HashSet<>();
 
     try {

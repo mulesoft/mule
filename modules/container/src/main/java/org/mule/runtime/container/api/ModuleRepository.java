@@ -10,6 +10,7 @@ import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.io.File;
 import java.net.URL;
@@ -58,5 +59,5 @@ public interface ModuleRepository {
   /**
    * @return a non null list of {@link MuleModule}
    */
-  List<MuleModule> getModules();
+  List<MuleContainerModule> getModules();
 }

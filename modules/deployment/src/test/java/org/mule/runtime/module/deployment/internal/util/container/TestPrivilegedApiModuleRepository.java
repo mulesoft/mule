@@ -7,8 +7,8 @@
 package org.mule.runtime.module.deployment.internal.util.container;
 
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.test.runner.classloader.container.TestModuleDiscoverer;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public final class TestPrivilegedApiModuleRepository implements ModuleRepository
   }
 
   @Override
-  public List<MuleModule> getModules() {
+  public List<MuleContainerModule> getModules() {
     return moduleRepository.getModules();
   }
 }

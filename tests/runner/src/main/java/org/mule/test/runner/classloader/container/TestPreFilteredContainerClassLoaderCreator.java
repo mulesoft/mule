@@ -9,9 +9,9 @@ package org.mule.test.runner.classloader.container;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
-import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -39,7 +39,7 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
   }
 
   @Override
-  public List<MuleModule> getMuleModules() {
+  public List<MuleContainerModule> getMuleModules() {
     return withContextClassLoader(containerSystemClassloader, testContainerModuleRepository::getModules);
   }
 

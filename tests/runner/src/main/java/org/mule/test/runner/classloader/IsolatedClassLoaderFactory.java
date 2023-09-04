@@ -29,7 +29,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -309,7 +309,7 @@ public class IsolatedClassLoaderFactory {
         .getClassLookupStrategy(ModuleRepository.class.getName());
 
     Map<String, LookupStrategy> privilegedLookupStrategies = new HashMap<>();
-    for (MuleModule module : moduleRepository.getModules()) {
+    for (MuleContainerModule module : moduleRepository.getModules()) {
       if (hasPrivilegedApiAccess(pluginUrlClassification, module)) {
         for (String packageName : module.getPrivilegedExportedPackages()) {
           privilegedLookupStrategies.put(packageName, containerOnlyLookupStrategy);
@@ -324,7 +324,7 @@ public class IsolatedClassLoaderFactory {
     }
   }
 
-  private boolean hasPrivilegedApiAccess(PluginUrlClassification pluginUrlClassification, MuleModule module) {
+  private boolean hasPrivilegedApiAccess(PluginUrlClassification pluginUrlClassification, MuleContainerModule module) {
     return module.getPrivilegedArtifacts().stream()
         .filter(artifact -> pluginUrlClassification.getName().startsWith(artifact + ":")).findFirst().isPresent();
   }

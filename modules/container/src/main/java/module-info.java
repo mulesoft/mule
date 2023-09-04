@@ -18,7 +18,9 @@ module org.mule.runtime.container {
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.jpms.utils;
 
+  requires org.apache.commons.io;
   requires org.apache.commons.lang3;
+  requires com.google.common;
 
   exports org.mule.runtime.container.api;
 

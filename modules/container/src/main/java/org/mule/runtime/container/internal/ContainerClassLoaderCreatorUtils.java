@@ -18,6 +18,7 @@ import static java.util.Arrays.stream;
 import static com.google.common.collect.ImmutableSet.of;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
@@ -56,7 +57,7 @@ public class ContainerClassLoaderCreatorUtils {
    * @return a non-null {@link ClassLoaderLookupPolicy} that contains the lookup policies for boot and system packages, plus
    *         exported packages by the given list of {@link MuleModule}s.
    */
-  public static ClassLoaderLookupPolicy getLookupPolicy(ClassLoader parentClassLoader, List<MuleModule> muleModules,
+  public static ClassLoaderLookupPolicy getLookupPolicy(ClassLoader parentClassLoader, List<MuleContainerModule> muleModules,
                                                         Set<String> bootPackages) {
     final Set<String> parentOnlyPackages = new HashSet<>(bootPackages);
     parentOnlyPackages.addAll(SYSTEM_PACKAGES);
@@ -73,14 +74,14 @@ public class ContainerClassLoaderCreatorUtils {
    * @return a {@link Map} for the packages exported on the container
    */
   private static Map<String, LookupStrategy> buildClassLoaderLookupStrategy(ClassLoader containerClassLoader,
-                                                                            List<MuleModule> modules) {
+                                                                            List<MuleContainerModule> modules) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
     checkArgument(modules != null, "modules cannot be null");
 
     ContainerOnlyLookupStrategy containerOnlyLookupStrategy = new ContainerOnlyLookupStrategy(containerClassLoader);
 
     final Map<String, LookupStrategy> result = new HashMap<>();
-    for (MuleModule muleModule : modules) {
+    for (MuleContainerModule muleModule : modules) {
       for (String exportedPackage : muleModule.getExportedPackages()) {
         LookupStrategy specialLookupStrategy = getSpecialLookupStrategy(exportedPackage);
         result.put(exportedPackage, specialLookupStrategy == null ? containerOnlyLookupStrategy : specialLookupStrategy);
