@@ -18,6 +18,7 @@ import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUT
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.REACTOR;
 
 import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -248,8 +249,8 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     eventsEmitter.start();
     eventsEmitter2.start();
     try {
-      eventsConsumer.await();
-      eventsConsumer2.await();
+      assertThat(eventsConsumer.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+      assertThat(eventsConsumer2.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     } finally {
       eventsEmitter.stop();
       eventsEmitter2.stop();
@@ -296,7 +297,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     eventsEmitter.start();
     try {
-      eventsConsumer.await();
+      assertThat(eventsConsumer.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
     } finally {
       eventsEmitter.stop();
     }
