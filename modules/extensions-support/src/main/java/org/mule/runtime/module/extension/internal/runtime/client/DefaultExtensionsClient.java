@@ -130,10 +130,19 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                         String operationName,
                                                         Consumer<OperationParameterizer> parameters) {
 
+    ExtensionModel extensionModel = findExtension(extensionName);
+    OperationModel operationModel = findOperationModel(extensionModel, operationName);
+
+    return doExecute(extensionModel, operationModel, parameters);
+  }
+
+  private <T, A> CompletableFuture<Result<T, A>> doExecute(ExtensionModel extensionModel,
+                                                           OperationModel operationModel,
+                                                           Consumer<OperationParameterizer> parameters) {
     DefaultOperationParameterizer parameterizer = new DefaultOperationParameterizer();
     parameters.accept(parameterizer);
 
-    OperationKey key = toOperationKey(extensionName, operationName, parameterizer);
+    OperationKey key = new OperationKey(extensionModel, operationModel, parameterizer.getConfigRef());
 
     return operationClientCache.get(key).execute(key, parameterizer);
   }
@@ -189,18 +198,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     } finally {
       sourceClient.dispose();
     }
-  }
-
-  private OperationKey toOperationKey(String extensionName,
-                                      String operationName,
-                                      DefaultOperationParameterizer parameterizer) {
-    ExtensionModel extensionModel = findExtension(extensionName);
-    OperationModel operationModel = findOperationModel(extensionModel, operationName);
-
-    return new OperationKey(extensionModel,
-                            operationModel,
-                            parameterizer.getConfigRef(),
-                            extensionManager);
   }
 
   private LoadingCache<OperationKey, OperationClient> createOperationClientCache() {
@@ -273,15 +270,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
-    return execute(
-                   extensionName,
-                   operationName,
-                   parameterizer -> {
-                     setContextEvent(parameterizer, parameters);
-                     parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                     resolveLegacyParameters(parameterizer, parameters);
-                     configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                   });
+    return doExecute(
+                     extensionModel,
+                     operationModel,
+                     parameterizer -> {
+                       setContextEvent(parameterizer, parameters);
+                       parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+                       resolveLegacyParameters(parameterizer, parameters);
+                       configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                     });
   }
 
   protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
