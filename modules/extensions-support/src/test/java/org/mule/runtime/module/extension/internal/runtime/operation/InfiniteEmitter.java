@@ -68,11 +68,15 @@ class InfiniteEmitter<T> implements Consumer<FluxSink<T>> {
   /**
    * Stops the emission of items and signals the completion of the source.
    * <p>
+   * Stopping an already stopped emitter is a no-op.
+   * <p>
    * Note: it does not support restarting.
    */
   public void stop() throws InterruptedException {
-    stopRequested = true;
-    producerThread.join();
-    sink.complete();
+    if (!stopRequested) {
+      stopRequested = true;
+      producerThread.join();
+      sink.complete();
+    }
   }
 }

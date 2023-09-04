@@ -4,6 +4,7 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -34,14 +35,19 @@ class ItemsConsumer<T> extends BaseSubscriber<T> {
    * <p>
    * If an error is received by this subscriber while waiting, the waiting thread is awakened and a {@link RuntimeException} is
    * raised with the received error as cause.
-   * 
+   *
+   * @param timeout the maximum time to wait.
+   * @param unit    the time unit of the {@code timeout} argument.
+   * @return {@code true} if the expected number of items have been consumed and {@code false} if the waiting time elapsed before
+   *         that happened.
    * @throws InterruptedException if the current thread is interrupted while waiting
    */
-  public void await() throws InterruptedException {
-    expectedItemsConsumedCountDownLatch.await();
+  public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
+    boolean result = expectedItemsConsumedCountDownLatch.await(timeout, unit);
     if (error != null) {
       throw new RuntimeException(error);
     }
+    return result;
   }
 
   @Override
