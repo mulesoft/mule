@@ -25,8 +25,10 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -75,6 +77,7 @@ import org.mule.runtime.core.internal.streaming.CursorProviderDecorator;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -114,16 +117,21 @@ public class OperationClient implements Lifecycle {
   private static final Logger LOGGER = getLogger(OperationClient.class);
   private static final NullProfilingDataProducer NULL_PROFILING_DATA_PRODUCER = new NullProfilingDataProducer();
   private static final String PARAMS_PROPERTY_NAME = "parameterization";
+  private static final BiFunction<ParameterGroupModel, ParameterModel, Object> NULL_PARAMS_FUNCTION = (g, p) -> null;
 
+  private final ExtensionModel extensionModel;
   private final OperationModel operationModel;
   private final ExecutionMediator<OperationModel> mediator;
   private final CompletableComponentExecutor<OperationModel> executor;
   private final ValueReturnDelegate returnDelegate;
   private final StreamingManager streamingManager;
+  private final ExtensionManager extensionManager;
   private final ExpressionManager expressionManager;
   private final ReflectionCache reflectionCache;
   private final MuleContext muleContext;
   private final ResolverSet resolverSet;
+
+  private Optional<ConfigurationProvider> configurationProvider = null;
 
   /**
    * Fallback resolvers to use for parameters not explicitly defined in the input parameterization
@@ -141,6 +149,7 @@ public class OperationClient implements Lifecycle {
                                      MuleContext muleContext) {
 
     return new OperationClient(
+                               key.getExtensionModel(),
                                key.getOperationModel(),
                                createExecutionMediator(
                                                        key,
@@ -152,24 +161,29 @@ public class OperationClient implements Lifecycle {
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
                                streamingManager,
+                               extensionManager,
                                expressionManager,
                                reflectionCache,
                                muleContext);
   }
 
-  private OperationClient(OperationModel operationModel,
+  private OperationClient(ExtensionModel extensionModel,
+                          OperationModel operationModel,
                           ExecutionMediator<OperationModel> mediator,
                           CompletableComponentExecutor<OperationModel> executor,
                           ValueReturnDelegate returnDelegate,
                           StreamingManager streamingManager,
+                          ExtensionManager extensionManager,
                           ExpressionManager expressionManager,
                           ReflectionCache reflectionCache,
                           MuleContext muleContext) {
+    this.extensionModel = extensionModel;
     this.operationModel = new FilteredOperationModel(operationModel);
     this.mediator = mediator;
     this.executor = executor;
     this.returnDelegate = returnDelegate;
     this.streamingManager = streamingManager;
+    this.extensionManager = extensionManager;
     this.expressionManager = expressionManager;
     this.reflectionCache = reflectionCache;
     this.muleContext = muleContext;
@@ -209,7 +223,7 @@ public class OperationClient implements Lifecycle {
     ResolverSet resolverSet;
     try {
       resolverSet = getResolverSetFromParameters(operationModel,
-                                                 (g, p) -> null,
+                                                 NULL_PARAMS_FUNCTION,
                                                  muleContext,
                                                  true,
                                                  reflectionCache,
@@ -365,7 +379,38 @@ public class OperationClient implements Lifecycle {
   }
 
   private Optional<ConfigurationInstance> getConfigurationInstance(OperationKey key, CoreEvent contextEvent) {
-    return key.getConfigurationProvider(contextEvent).map(config -> config.get(contextEvent));
+    return getConfigurationProvider(key, contextEvent).map(config -> config.get(contextEvent));
+  }
+
+  private Optional<ConfigurationProvider> getConfigurationProvider(OperationKey key, CoreEvent contextEvent) {
+    if (configurationProvider != null) {
+      return configurationProvider;
+    }
+
+    synchronized (this) {
+      if (configurationProvider == null) {
+        final String configName = key.getConfigName();
+
+        if (configName != null) {
+          configurationProvider = of(extensionManager.getConfigurationProvider(configName)
+              .map(configurationProvider -> {
+                if (configurationProvider.getExtensionModel() != extensionModel) {
+                  throw new IllegalArgumentException(format(
+                                                            "A config of the '%s' extension was expected but one from '%s' was parameterized instead",
+                                                            extensionModel.getName(),
+                                                            configurationProvider.getExtensionModel().getName()));
+                }
+                return configurationProvider;
+              })
+              .orElseThrow(() -> new MuleRuntimeException(
+                                                          createStaticMessage("No configuration [" + configName + "] found"))));
+        } else {
+          configurationProvider = extensionManager.getConfigurationProvider(extensionModel, operationModel, contextEvent);
+        }
+      }
+    }
+
+    return configurationProvider;
   }
 
 
