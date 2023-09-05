@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 
 /**
@@ -34,13 +35,9 @@ abstract class AbstractSinkRouter {
   private final ExecutableRoute phantomRoute;
   private final Scheduler subscriptionScheduler;
 
-<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/AbstractSinkRouter.java
   protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes,
-                               ComponentTracerFactory componentTracerFactory) {
-=======
-  protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes, Scheduler subscriptionScheduler) {
+                               ComponentTracerFactory componentTracerFactory, Scheduler subscriptionScheduler) {
     this.subscriptionScheduler = subscriptionScheduler;
->>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/AbstractSinkRouter.java
     this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
 
     // This phantomRoute exists so that the subscription/completion mechanism does not interfere with an actual route.
@@ -64,7 +61,7 @@ abstract class AbstractSinkRouter {
       routePublishers.add(nextRoute.getPublisher());
     }
 
-    routePublishers.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router));
+    routePublishers.add(subscribeFluxOnPublisherSubscription(phantomRoute.getPublisher(), router, subscriptionScheduler));
 
     return routePublishers;
   }

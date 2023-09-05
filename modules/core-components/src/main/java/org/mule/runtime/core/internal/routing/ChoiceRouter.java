@@ -6,18 +6,14 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
-=======
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
->>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -43,7 +39,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 
 /**
@@ -63,17 +58,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
-  private ComponentTracerFactory componentTracerFactory;
-
-<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
-  public ChoiceRouter(ComponentTracerFactory componentTracerFactory) {
-=======
+  private final ComponentTracerFactory componentTracerFactory;
   private SchedulerService schedulerService;
+  private Scheduler subscriptionScheduler;
 
-  private Scheduler subscriptionScheduler = null;
-
-  public ChoiceRouter() {
->>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
+  public ChoiceRouter(ComponentTracerFactory componentTracerFactory) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
     this.componentTracerFactory = componentTracerFactory;
   }
@@ -84,13 +73,13 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   @Inject
-  public void setExpressionManager(ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 
   @Inject
-  public void setSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = schedulerService;
+  public void setExpressionManager(ExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
 
   @Override
@@ -184,7 +173,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, componentTracerFactory);
+      super(publisher, routes, componentTracerFactory, subscriptionScheduler);
     }
 
     /**

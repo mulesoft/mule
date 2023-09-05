@@ -45,7 +45,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.util.annotation.Nullable;
@@ -154,18 +153,11 @@ public class RxUtils {
                                                                     @Nullable Runnable completeConsumer,
                                                                     Scheduler subscribeOnScheduler) {
     return triggeringSubscriber
-<<<<<<< Updated upstream
         .transformDeferredContextual((eventPub, ctx) -> eventPub
             .doOnSubscribe(s -> deferredSubscriber
                 .contextWrite(ctx)
-                .subscribe(consumer, errorConsumer, completeConsumer)));
-=======
-        .compose(eventPub -> subscriberContext()
-            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
-                .subscriberContext(ctx)
                 .subscribeOn(subscribeOnScheduler != null ? fromExecutorService(subscribeOnScheduler) : immediate())
-                .subscribe(consumer, errorConsumer, completeConsumer))));
->>>>>>> Stashed changes
+                .subscribe(consumer, errorConsumer, completeConsumer)));
   }
 
   /**
@@ -336,7 +328,7 @@ public class RxUtils {
                                                   } else {
                                                     scheduledCompletion.set(scheduleCompletion.get());
                                                   }
-                                                });
+                                                }, null);
   }
 
   /**

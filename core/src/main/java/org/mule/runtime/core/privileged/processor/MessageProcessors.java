@@ -579,9 +579,9 @@ public class MessageProcessors {
                                                             errorSwitchSinkSinkRef::complete, null)
                                                                 .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
                                                                     .andThen(MessageProcessors::toParentContext));
-              }
-            }));
->>>>>>> Stashed changes
+              }}));>>>>>>>
+
+  Stashed changes
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,
