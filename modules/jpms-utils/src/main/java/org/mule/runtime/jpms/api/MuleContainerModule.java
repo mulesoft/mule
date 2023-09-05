@@ -25,6 +25,4 @@ public interface MuleContainerModule {
 
   public Set<String> getPrivilegedArtifacts();
 
-  // public List<ExportedService> getExportedServices();
-
 }
