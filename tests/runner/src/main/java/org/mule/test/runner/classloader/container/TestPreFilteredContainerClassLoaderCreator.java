@@ -83,14 +83,14 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
           containerSystemClassloader.loadClass(ContainerModuleDiscoverer.class.getName());
 
       final Object moduleDiscoverer = clsContainerModuleDiscoverer
-          .getConstructor(ClassLoader.class)
-          .newInstance(containerSystemClassloader);
+          .getConstructor()
+          .newInstance();
 
       final Class<?> clsClasspathModuleDiscoverer =
           containerSystemClassloader.loadClass(ClasspathModuleDiscoverer.class.getName());
       final Object classpathModuleDiscoverer = clsClasspathModuleDiscoverer
-          .getConstructor(ClassLoader.class, String.class)
-          .newInstance(containerSystemClassloader, TEST_MODULE_PROPERTIES);
+          .getConstructor(String.class)
+          .newInstance(TEST_MODULE_PROPERTIES);
 
       final Class<?> clsModuleDiscoverer =
           containerSystemClassloader.loadClass(ModuleDiscoverer.class.getName());

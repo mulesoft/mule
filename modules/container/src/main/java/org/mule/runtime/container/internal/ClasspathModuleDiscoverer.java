@@ -55,25 +55,23 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
-  private final ClassLoader classLoader;
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
   private final String modulePropertiesResource;
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader) {
-    this(classLoader, createModulesTemporaryFolder());
+  public ClasspathModuleDiscoverer() {
+    this(createModulesTemporaryFolder());
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader, String modulePropertiesResource) {
-    this(classLoader, createModulesTemporaryFolder(), modulePropertiesResource);
+  public ClasspathModuleDiscoverer(String modulePropertiesResource) {
+    this(createModulesTemporaryFolder(), modulePropertiesResource);
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
-    this(classLoader, temporaryFolder, MODULE_PROPERTIES);
+  public ClasspathModuleDiscoverer(File temporaryFolder) {
+    this(temporaryFolder, MODULE_PROPERTIES);
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder, String modulePropertiesResource) {
-    this.classLoader = classLoader;
+  public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource) {
     this.serviceInterfaceToServiceFile =
         serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
                                                                                  TMP_FOLDER_SUFFIX).toFile(),
@@ -91,11 +89,9 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     }
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader,
-                                   Function<String, File> serviceInterfaceToServiceFile,
+  public ClasspathModuleDiscoverer(Function<String, File> serviceInterfaceToServiceFile,
                                    BiFunction<String, File, URL> fileToResource,
                                    String modulePropertiesResource) {
-    this.classLoader = classLoader;
     this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
     this.fileToResource = fileToResource;
     this.modulePropertiesResource = modulePropertiesResource;
@@ -127,7 +123,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     Set<String> moduleNames = new HashSet<>();
 
     try {
-      for (Properties moduleProperties : discoverProperties(classLoader, getModulePropertiesFileName())) {
+      for (Properties moduleProperties : discoverProperties(this.getClass().getClassLoader(), getModulePropertiesFileName())) {
         final MuleModule module = createModule(moduleProperties);
 
         if (moduleNames.contains(module.getName())) {

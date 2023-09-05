@@ -24,7 +24,7 @@ public class ArtifactClassLoaderResolverConstants {
    * A {@link ModuleRepository} for the modules available in the same classpath as this class.
    */
   public static final ModuleRepository MODULE_REPOSITORY =
-      new DefaultModuleRepository(new ContainerModuleDiscoverer(ArtifactClassLoaderResolverConstants.class.getClassLoader()));
+      new DefaultModuleRepository(new ContainerModuleDiscoverer());
 
   /**
    * An {@link ArtifactClassLoader} for the Mule Container with the modules available in {@link #MODULE_REPOSITORY}.

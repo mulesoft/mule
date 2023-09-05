@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
@@ -20,7 +18,6 @@ import java.util.List;
  */
 public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
 
-  private final ClassLoader containerClassLoader;
   private final List<ModuleDiscoverer> moduleDiscoverers;
 
   /**
@@ -28,17 +25,14 @@ public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
    *
    * @param containerClassLoader container classloader used to find modules. Non null.
    */
-  public ContainerModuleDiscoverer(ClassLoader containerClassLoader) {
-    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    this.containerClassLoader = containerClassLoader;
-
+  public ContainerModuleDiscoverer() {
     this.moduleDiscoverers = getModuleDiscoverers();
   }
 
   private List<ModuleDiscoverer> getModuleDiscoverers() {
     List<ModuleDiscoverer> result = new ArrayList<>();
     result.add(new JreModuleDiscoverer());
-    result.add(new ClasspathModuleDiscoverer(containerClassLoader));
+    result.add(new ClasspathModuleDiscoverer());
     return result;
   }
 

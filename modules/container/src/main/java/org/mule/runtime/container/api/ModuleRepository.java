@@ -32,10 +32,9 @@ public interface ModuleRepository {
    * @param temporaryFolder where to write the generated SPI mapping files.
    * @return a new {@link ModuleRepository} with the discovered information from the current runtime context.
    */
-  public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder) {
+  public static ModuleRepository createModuleRepository(File temporaryFolder) {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
-                                                                     new ClasspathModuleDiscoverer(classLoader,
-                                                                                                   temporaryFolder,
+                                                                     new ClasspathModuleDiscoverer(temporaryFolder,
                                                                                                    MODULE_PROPERTIES)));
   }
 
@@ -50,12 +49,10 @@ public interface ModuleRepository {
    * 
    * @since 4.5
    */
-  public static ModuleRepository createModuleRepository(ClassLoader classLoader,
-                                                        Function<String, File> serviceInterfaceToServiceFile,
+  public static ModuleRepository createModuleRepository(Function<String, File> serviceInterfaceToServiceFile,
                                                         BiFunction<String, File, URL> fileToResource) {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
-                                                                     new ClasspathModuleDiscoverer(classLoader,
-                                                                                                   serviceInterfaceToServiceFile,
+                                                                     new ClasspathModuleDiscoverer(serviceInterfaceToServiceFile,
                                                                                                    fileToResource,
                                                                                                    MODULE_PROPERTIES)));
   }

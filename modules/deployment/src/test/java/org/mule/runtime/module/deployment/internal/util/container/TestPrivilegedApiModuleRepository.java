@@ -28,9 +28,8 @@ public final class TestPrivilegedApiModuleRepository implements ModuleRepository
   private final DefaultModuleRepository moduleRepository;
 
   public TestPrivilegedApiModuleRepository(Set<String> privligedArtifactIds) {
-    final ClassLoader classLoader = this.getClass().getClassLoader();
-    final ContainerModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(classLoader);
-    moduleDiscoverer.addModuleDiscoverer(new ClasspathModuleDiscoverer(classLoader, TEST_MODULE_PROPERTIES));
+    final ContainerModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer();
+    moduleDiscoverer.addModuleDiscoverer(new ClasspathModuleDiscoverer(TEST_MODULE_PROPERTIES));
     moduleRepository = new DefaultModuleRepository(new TestModuleDiscoverer(privligedArtifactIds, moduleDiscoverer));
   }
 
