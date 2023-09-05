@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.jpms.api;
 
+<<<<<<< Upstream, based on origin/master
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
+=======
+>>>>>>> ed3aaeb cleanup
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * No-op implementation of JpmsUtils to use when running on JVM 8.
@@ -58,10 +60,6 @@ public final class JpmsUtils {
 
   public static void validateNoBootModuleLayerTweaking() {
     // nothing to do
-  }
-
-  public static List<MuleContainerModule> aaa(Function<InputStream, MuleContainerModule> defaultModuleFactory) {
-    return Collections.emptyList();
   }
 
 }

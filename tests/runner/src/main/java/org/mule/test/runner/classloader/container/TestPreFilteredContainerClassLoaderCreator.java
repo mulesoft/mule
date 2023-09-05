@@ -77,6 +77,8 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
                                                        getBootPackages()));
   }
 
+  // This reflection adapter layer is required because this class runs from the surefire launcher classloader (java app
+  // classloader), while the code in the Discoverer classes has to run within the Mule Container classloader.
   private static ReflectionAdapterModuleDiscoverer createContainerModuleDiscoverer(ClassLoader containerSystemClassloader) {
     try {
       final Class<?> clsContainerModuleDiscoverer =
