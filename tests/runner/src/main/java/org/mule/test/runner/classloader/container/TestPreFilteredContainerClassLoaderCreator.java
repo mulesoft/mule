@@ -9,6 +9,9 @@ package org.mule.test.runner.classloader.container;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
+import org.mule.runtime.container.api.ModuleRepository;
+import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator;
 import org.mule.runtime.jpms.api.MuleContainerModule;
@@ -27,20 +30,31 @@ import java.util.Set;
  */
 public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 
+  private static final String TEST_MODULE_PROPERTIES = "META-INF/mule-test-module.properties";
+
   private final Set<String> bootPackages;
   private final ClassLoader containerSystemClassloader;
   private final DefaultModuleRepository testContainerModuleRepository;
 
-  public TestPreFilteredContainerClassLoaderCreator(ClassLoader containerSystemClassloader, Set<String> bootPackages) {
+  public TestPreFilteredContainerClassLoaderCreator(ClassLoader containerSystemClassloader, Set<String> bootPackages,
+                                                    Set<String> extraPrivilegedArtifacts) {
     this.containerSystemClassloader = containerSystemClassloader;
     this.bootPackages = bootPackages;
+
+    final ContainerModuleDiscoverer moduleDiscoverer = new ContainerModuleDiscoverer(containerSystemClassloader);
+    moduleDiscoverer.addModuleDiscoverer(new ClasspathModuleDiscoverer(containerSystemClassloader, TEST_MODULE_PROPERTIES));
     this.testContainerModuleRepository =
-        new DefaultModuleRepository(new TestContainerModuleDiscoverer(containerSystemClassloader));
+        new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
+                                                             moduleDiscoverer));
   }
 
   @Override
   public List<MuleContainerModule> getMuleModules() {
     return withContextClassLoader(containerSystemClassloader, testContainerModuleRepository::getModules);
+  }
+
+  public ModuleRepository getModuleRepository() {
+    return testContainerModuleRepository;
   }
 
   @Override

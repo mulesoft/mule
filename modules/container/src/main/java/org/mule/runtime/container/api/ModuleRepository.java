@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.container.api;
 
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.MODULE_PROPERTIES;
+
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
@@ -33,7 +35,8 @@ public interface ModuleRepository {
   public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder) {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
                                                                      new ClasspathModuleDiscoverer(classLoader,
-                                                                                                   temporaryFolder)));
+                                                                                                   temporaryFolder,
+                                                                                                   MODULE_PROPERTIES)));
   }
 
   /**
@@ -53,7 +56,8 @@ public interface ModuleRepository {
     return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
                                                                      new ClasspathModuleDiscoverer(classLoader,
                                                                                                    serviceInterfaceToServiceFile,
-                                                                                                   fileToResource)));
+                                                                                                   fileToResource,
+                                                                                                   MODULE_PROPERTIES)));
   }
 
   /**

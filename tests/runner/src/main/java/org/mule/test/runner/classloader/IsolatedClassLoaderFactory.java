@@ -129,8 +129,6 @@ public class IsolatedClassLoaderFactory {
                  artifactsUrlClassification.getContainerMuleUrls(),
                  artifactsUrlClassification.getContainerOptUrls());
 
-      ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
-
       final Map<String, LookupStrategy> pluginsLookupStrategies = new HashMap<>();
 
       for (PluginUrlClassification pluginUrlClassification : artifactsUrlClassification.getPluginUrlClassifications()) {
@@ -138,6 +136,7 @@ public class IsolatedClassLoaderFactory {
       }
 
       containerClassLoaderWrapper = testContainerClassLoaderAssembler.createContainerClassLoader();
+      ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 
       serviceClassLoaderFactory.setParentLayerFrom(containerClassLoaderWrapper.getContainerClassLoader().getClassLoader()
           .loadClass(ServiceClassLoaderFactory.class.getName()));

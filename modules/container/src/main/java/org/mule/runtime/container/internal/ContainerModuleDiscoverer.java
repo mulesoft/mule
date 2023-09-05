@@ -18,9 +18,10 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ContainerModuleDiscoverer implements ModuleDiscoverer {
+public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
 
-  private final CompositeModuleDiscoverer moduleDiscoverer;
+  private final ClassLoader containerClassLoader;
+  private final List<ModuleDiscoverer> moduleDiscoverers;
 
   /**
    * Creates a new instance.
@@ -29,18 +30,24 @@ public class ContainerModuleDiscoverer implements ModuleDiscoverer {
    */
   public ContainerModuleDiscoverer(ClassLoader containerClassLoader) {
     checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    moduleDiscoverer = new CompositeModuleDiscoverer(getModuleDiscoverers(containerClassLoader).toArray(new ModuleDiscoverer[0]));
+    this.containerClassLoader = containerClassLoader;
+
+    this.moduleDiscoverers = getModuleDiscoverers();
   }
 
-  protected List<ModuleDiscoverer> getModuleDiscoverers(ClassLoader containerClassLoader) {
+  private List<ModuleDiscoverer> getModuleDiscoverers() {
     List<ModuleDiscoverer> result = new ArrayList<>();
     result.add(new JreModuleDiscoverer());
     result.add(new ClasspathModuleDiscoverer(containerClassLoader));
     return result;
   }
 
+  public void addModuleDiscoverer(ModuleDiscoverer moduleDiscoverer) {
+    this.moduleDiscoverers.add(moduleDiscoverer);
+  }
+
   @Override
   public List<MuleContainerModule> discover() {
-    return moduleDiscoverer.discover();
+    return new CompositeModuleDiscoverer(this.moduleDiscoverers.toArray(new ModuleDiscoverer[0])).discover();
   }
 }

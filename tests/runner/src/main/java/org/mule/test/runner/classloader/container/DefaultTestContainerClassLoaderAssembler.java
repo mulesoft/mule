@@ -17,7 +17,6 @@ import static org.apache.commons.collections4.IteratorUtils.asEnumeration;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
-import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
@@ -35,19 +34,16 @@ import com.google.common.collect.ImmutableSet;
  */
 public class DefaultTestContainerClassLoaderAssembler implements TestContainerClassLoaderAssembler {
 
-  private final DefaultModuleRepository moduleRepository;
+  private ModuleRepository moduleRepository;
   private final List<String> extraBootPackages;
+  private final Set<String> extraPrivilegedArtifacts;
   private final URL[] muleUrls;
   private final URL[] optUrls;
 
   public DefaultTestContainerClassLoaderAssembler(List<String> extraBootPackages, Set<String> extraPrivilegedArtifacts,
                                                   List<URL> muleUrls, List<URL> optUrls) {
-    moduleRepository =
-        new DefaultModuleRepository(new TestModuleDiscoverer(extraPrivilegedArtifacts,
-                                                             new TestContainerModuleDiscoverer(ContainerClassLoaderFactory.class
-                                                                 .getClassLoader())));
-
     this.extraBootPackages = extraBootPackages;
+    this.extraPrivilegedArtifacts = extraPrivilegedArtifacts;
     this.muleUrls = muleUrls.toArray(new URL[muleUrls.size()]);
     this.optUrls = optUrls.toArray(new URL[optUrls.size()]);
   }
@@ -77,7 +73,8 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
                                                                           launcherArtifact);
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
-        new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages);
+        new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages, extraPrivilegedArtifacts);
+    this.moduleRepository = testContainerClassLoaderCreator.getModuleRepository();
 
     return new ContainerClassLoaderFactory(testContainerClassLoaderCreator, cl -> launcherArtifact)
         .createContainerClassLoader(containerSystemClassloader);

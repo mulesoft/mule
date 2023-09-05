@@ -35,18 +35,6 @@ public class TestModuleDiscoverer implements ModuleDiscoverer {
    *
    * @param privilegedArtifactIds identifiers of the artifacts that will be conceded privileged API access. Non null
    */
-  public TestModuleDiscoverer(Set<String> privilegedArtifactIds) {
-    checkArgument(privilegedArtifactIds != null, "privilegedArtifactIds cannot be null");
-
-    this.privilegedArtifactIds = privilegedArtifactIds;
-    this.delegateModuleDiscoverer = new TestContainerModuleDiscoverer(this.getClass().getClassLoader());
-  }
-
-  /**
-   * Creates a module discoverer
-   *
-   * @param privilegedArtifactIds identifiers of the artifacts that will be conceded privileged API access. Non null
-   */
   public TestModuleDiscoverer(Set<String> privilegedArtifactIds, ModuleDiscoverer moduleDiscoverer) {
     checkArgument(privilegedArtifactIds != null, "privilegedArtifactIds cannot be null");
     checkArgument(moduleDiscoverer != null, "moduleDiscoverer cannot be null");

@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} files resources available in a given classloader.
  */
-public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
+public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   private static final String TMP_FOLDER_SUFFIX = "tmp";
 
@@ -58,12 +58,21 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   private final ClassLoader classLoader;
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
+  private final String modulePropertiesResource;
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader) {
     this(classLoader, createModulesTemporaryFolder());
   }
 
+  public ClasspathModuleDiscoverer(ClassLoader classLoader, String modulePropertiesResource) {
+    this(classLoader, createModulesTemporaryFolder(), modulePropertiesResource);
+  }
+
   public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
+    this(classLoader, temporaryFolder, MODULE_PROPERTIES);
+  }
+
+  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder, String modulePropertiesResource) {
     this.classLoader = classLoader;
     this.serviceInterfaceToServiceFile =
         serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
@@ -71,6 +80,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
                                                             serviceInterface);
     this.fileToResource =
         (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
+    this.modulePropertiesResource = modulePropertiesResource;
   }
 
   private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
@@ -83,10 +93,12 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   public ClasspathModuleDiscoverer(ClassLoader classLoader,
                                    Function<String, File> serviceInterfaceToServiceFile,
-                                   BiFunction<String, File, URL> fileToResource) {
+                                   BiFunction<String, File, URL> fileToResource,
+                                   String modulePropertiesResource) {
     this.classLoader = classLoader;
     this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
     this.fileToResource = fileToResource;
+    this.modulePropertiesResource = modulePropertiesResource;
   }
 
   protected static File createModulesTemporaryFolder() {
@@ -133,7 +145,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   protected String getModulePropertiesFileName() {
-    return MODULE_PROPERTIES;
+    return modulePropertiesResource;
   }
 
   private MuleModule createModule(Properties moduleProperties) {
