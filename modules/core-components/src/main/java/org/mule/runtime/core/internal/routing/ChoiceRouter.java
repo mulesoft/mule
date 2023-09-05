@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
+=======
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+>>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
@@ -17,6 +23,8 @@ import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -57,7 +65,15 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private ExpressionManager expressionManager;
   private ComponentTracerFactory componentTracerFactory;
 
+<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
   public ChoiceRouter(ComponentTracerFactory componentTracerFactory) {
+=======
+  private SchedulerService schedulerService;
+
+  private Scheduler subscriptionScheduler = null;
+
+  public ChoiceRouter() {
+>>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/ChoiceRouter.java
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
     this.componentTracerFactory = componentTracerFactory;
   }
@@ -70,6 +86,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   @Inject
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+  }
+
+  @Inject
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
   }
 
   @Override
@@ -92,6 +113,14 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     }
 
     started.set(true);
+
+    if (isScheduleReactorChainSubscription()) {
+      subscriptionScheduler = schedulerService.cpuLightScheduler();
+    }
+  }
+
+  private boolean isScheduleReactorChainSubscription() {
+    return parseBoolean(getProperty("CHOICE_ROUTER_SUBSCRIBES_IN_DIFFERENT_THREAD", "false"));
   }
 
   @Override
@@ -101,6 +130,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     }
 
     started.set(false);
+
+    if (subscriptionScheduler != null) {
+      subscriptionScheduler.stop();
+    }
   }
 
   @Override

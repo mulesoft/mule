@@ -18,9 +18,11 @@ import static java.util.function.UnaryOperator.identity;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.core.scheduler.Schedulers.immediate;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -87,7 +89,36 @@ public class RxUtils {
    */
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber) {
-    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null);
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null, null);
+  }
+
+  /**
+   * Defers the subscription of the <it>deferredSubscriber</it> until <it>triggeringSubscriber</it> subscribes. Once that occurs
+   * the latter subscription will take place on the same context. For an example of this, look at
+   * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
+   * <p>
+   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
+   * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
+   * initialized, and once B has subscribed.
+   * <p>
+   * A -----> B's Sink -> B -------> downstream chain
+   * <p>
+   * In this method, A corresponds to <it>deferredSubscriber</it>; and B to <it>triggeringSubscriber</it>.
+   *
+   * @param <T>                  the element type of the downstream {@link Flux}
+   * @param <U>                  the element type of the upstream {@link Flux}
+   *
+   * @param triggeringSubscriber the downstream {@link Flux}, whose subscription will trigger the subscription of the
+   *                             <it>deferredSubscriber</it> {@link Flux}, on the same context as the former one.
+   * @param deferredSubscriber   the upstream {@link Flux}, whose subscription will be deferred
+   * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
+   * @since 4.3
+   */
+  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+                                                                    Flux<U> deferredSubscriber,
+                                                                    Scheduler subscribeOnScheduler) {
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null, subscribeOnScheduler);
   }
 
   /**
@@ -120,12 +151,21 @@ public class RxUtils {
                                                                     Flux<U> deferredSubscriber,
                                                                     @Nullable Consumer<? super U> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
-                                                                    @Nullable Runnable completeConsumer) {
+                                                                    @Nullable Runnable completeConsumer,
+                                                                    Scheduler subscribeOnScheduler) {
     return triggeringSubscriber
+<<<<<<< Updated upstream
         .transformDeferredContextual((eventPub, ctx) -> eventPub
             .doOnSubscribe(s -> deferredSubscriber
                 .contextWrite(ctx)
                 .subscribe(consumer, errorConsumer, completeConsumer)));
+=======
+        .compose(eventPub -> subscriberContext()
+            .flatMapMany(ctx -> eventPub.doOnSubscribe(s -> deferredSubscriber
+                .subscriberContext(ctx)
+                .subscribeOn(subscribeOnScheduler != null ? fromExecutorService(subscribeOnScheduler) : immediate())
+                .subscribe(consumer, errorConsumer, completeConsumer))));
+>>>>>>> Stashed changes
   }
 
   /**

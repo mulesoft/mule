@@ -563,6 +563,7 @@ public class MessageProcessors {
                 // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
                 .map(event -> right(MessagingException.class, event));
 
+<<<<<<< Updated upstream
             return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
                                                         completeSuccessEitherIfNeeded(),
                                                         errorSwitchSinkSinkRef::error,
@@ -571,6 +572,16 @@ public class MessageProcessors {
                                                                 .andThen(MessageProcessors::toParentContext));
           }
         });
+=======
+                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
+                                                            completeSuccessEitherIfNeeded(),
+                                                            errorSwitchSinkSinkRef::error,
+                                                            errorSwitchSinkSinkRef::complete, null)
+                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
+                                                                    .andThen(MessageProcessors::toParentContext));
+              }
+            }));
+>>>>>>> Stashed changes
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,

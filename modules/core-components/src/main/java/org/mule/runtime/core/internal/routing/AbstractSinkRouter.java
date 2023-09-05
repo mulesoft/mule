@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static reactor.core.publisher.Flux.from;
 
+import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
@@ -31,9 +32,15 @@ abstract class AbstractSinkRouter {
   private final Flux<CoreEvent> router;
   private final List<ExecutableRoute> routes;
   private final ExecutableRoute phantomRoute;
+  private final Scheduler subscriptionScheduler;
 
+<<<<<<< Updated upstream:modules/core-components/src/main/java/org/mule/runtime/core/internal/routing/AbstractSinkRouter.java
   protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes,
                                ComponentTracerFactory componentTracerFactory) {
+=======
+  protected AbstractSinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes, Scheduler subscriptionScheduler) {
+    this.subscriptionScheduler = subscriptionScheduler;
+>>>>>>> Stashed changes:core/src/main/java/org/mule/runtime/core/internal/routing/AbstractSinkRouter.java
     this.routes = routes.stream().map(ProcessorRoute::toExecutableRoute).collect(toList());
 
     // This phantomRoute exists so that the subscription/completion mechanism does not interfere with an actual route.
