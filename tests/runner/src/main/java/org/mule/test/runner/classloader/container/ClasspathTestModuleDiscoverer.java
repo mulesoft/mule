@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.container.internal;
+package org.mule.test.runner.classloader.container;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 
 /**
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} and {@link #TEST_MODULE_PROPERTIES} files resources

@@ -6,7 +6,6 @@
  */
 package org.mule.test.runner.classloader.container;
 
-import org.mule.runtime.container.internal.ClasspathTestModuleDiscoverer;
 import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.ModuleDiscoverer;
 

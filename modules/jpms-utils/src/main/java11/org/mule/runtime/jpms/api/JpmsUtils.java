@@ -25,6 +25,8 @@ import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ModuleLayer.Controller;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -357,6 +360,24 @@ public final class JpmsUtils {
             bootModule.addOpens(pkg, module);
           }
         });
+  }
+
+  public static List<MuleContainerModule> aaa(Function<InputStream, MuleContainerModule> defaultModuleFactory) {
+    return JpmsUtils.class.getModule().getLayer()
+        .modules()
+        .stream()
+        .map(module -> {
+          if (module.getDescriptor().isAutomatic()) {
+            try {
+              return defaultModuleFactory.apply(module.getResourceAsStream("META-INF/mule-module.properties"));
+            } catch (IOException e) {
+              throw new RuntimeException("Cannot discover mule modules", e);
+            }
+          } else {
+            return new MuleJpmsModule(module);
+          }
+        })
+        .collect(toList());
   }
 
 }
