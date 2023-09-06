@@ -115,7 +115,7 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private static class NotYetAcceptedDelegate<T> implements FluxSinkRecorderDelegate<T> {
 
-    private volatile CompletableFuture<FluxSink<T>> futureFluxSink;
+    private final CompletableFuture<FluxSink<T>> futureFluxSink = new CompletableFuture<>();
     // If a fluxSink as not yet been accepted, events are buffered until one is accepted
     private final List<Runnable> bufferedEvents = new ArrayList<>();
 
