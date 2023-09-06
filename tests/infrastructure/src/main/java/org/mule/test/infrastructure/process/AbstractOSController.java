@@ -46,6 +46,7 @@ public abstract class AbstractOSController {
   protected static final String DUMP_CMD = "dump";
   protected static final String RESTART_CMD = "restart";
   protected static final String STATUS_CMD = "status";
+  protected static final String RESOLVE_SCHEDULER_CONFIG_CMD = "resolve-scheduler-config";
 
   /**
    * These values represent the status returned by running `mule status` for the wrapper and Java processes respectively.

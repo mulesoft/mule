@@ -59,7 +59,7 @@ public class Controller {
   private static final int IS_RUNNING_STATUS_CODE = 0;
   private static final Pattern pattern = compile("wrapper\\.java\\.additional\\.(\\d*)=");
 
-  private final AbstractOSController osSpecificController;
+  protected final AbstractOSController osSpecificController;
 
   protected File serverPluginsDir;
   protected File domainsDir;
