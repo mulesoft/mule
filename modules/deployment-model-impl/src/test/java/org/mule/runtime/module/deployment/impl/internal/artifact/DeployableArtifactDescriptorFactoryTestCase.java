@@ -19,12 +19,14 @@ import static org.mule.tck.MavenTestUtils.installArtifact;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -368,7 +370,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
       throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
+    final String location = "/plugin-dependency-with-additional-dependencies-lightweight-local-repository";
+    populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "local-repository"));
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
   }
 
   @Test
@@ -379,13 +383,43 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+    final String location = "/plugin-dependency-with-additional-dependencies-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
   }
 
   @Test
   @Issue("MULE-19282")
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesInProfileHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-heavyweight");
+    final String location = "/plugin-dependency-with-additional-dependencies-in-profile-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
+  }
+
+  private void populateRepositoryDependencies(String location) throws Exception {
+    populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "repository"));
+  }
+
+  private void populateRepositoryDependencies(final File targetRepository) throws IOException {
+    final Path commonsCollectionsJarLoc = Paths.get(getProperty("commons-collections4"));
+    final File commonsCollectionsInRepo =
+        new File(targetRepository,
+                 Paths.get(getProperty("local-repo"))
+                     .relativize(commonsCollectionsJarLoc.getParent()).toString());
+    commonsCollectionsInRepo.mkdirs();
+    for (File repoFile : commonsCollectionsJarLoc.toFile().getParentFile().listFiles()) {
+      copyFileToDirectory(repoFile, commonsCollectionsInRepo);
+    }
+
+    final Path commonsIoJarLoc = Paths.get(getProperty("commons-io"));
+    final File commonsIoInRepo =
+        new File(targetRepository,
+                 Paths.get(getProperty("local-repo"))
+                     .relativize(commonsIoJarLoc.getParent()).toString());
+    commonsIoInRepo.mkdirs();
+    for (File repoFile : commonsIoJarLoc.toFile().getParentFile().listFiles()) {
+      copyFileToDirectory(repoFile, commonsIoInRepo);
+    }
   }
 
   private void assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
@@ -409,20 +443,22 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .collect(toList()),
                everyItem(exists()));
 
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url).getName())
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls())
+        .map(url -> FileUtils.toFile(url).getName())
         .collect(toList()),
-               hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
-                        equalTo("commons-collections-3.2.1.jar")));
+               hasItems(startsWith("test-empty-plugin-"),
+                        equalTo("commons-io-2.13.0.jar"),
+                        equalTo("commons-collections4-4.4.jar")));
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
 
-    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(19));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(33));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(),
-               hasItems("org.apache.commons.collections",
+               hasItems("org.apache.commons.collections4",
                         "org.apache.commons.io"));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalResources(),
-               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+               hasItems("META-INF/maven/org.apache.commons/commons-collections4/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
@@ -444,13 +480,17 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-heavyweight");
+    final String location = "/plugin-dependency-with-shared-libraries-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(location);
   }
 
   @Test
   @Issue("MULE-19282")
   public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesInProfileHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-heavyweight");
+    final String location = "/plugin-dependency-with-shared-libraries-in-profile-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(location);
   }
 
   private void assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(String location) throws Exception {
@@ -464,16 +504,16 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderConfiguration.getUrls().length, is(3));
 
     assertThat(classLoaderConfiguration.getDependencies().stream()
-        .filter(dep -> "commons-collections".equals(dep.getDescriptor().getArtifactId()))
+        .filter(dep -> "commons-collections4".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
     assertThat(classLoaderConfiguration.getDependencies().stream()
         .filter(dep -> "commons-io".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
 
-    assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections",
+    assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections4",
                                                                         "org.apache.commons.io"));
     assertThat(classLoaderConfiguration.getExportedResources(),
-               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+               hasItems("META-INF/maven/org.apache.commons/commons-collections4/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     assertThat(desc.getPlugins(), hasSize(2));
