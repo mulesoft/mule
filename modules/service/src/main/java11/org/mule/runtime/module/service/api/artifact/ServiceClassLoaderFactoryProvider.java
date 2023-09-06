@@ -44,6 +44,6 @@ public class ServiceClassLoaderFactoryProvider {
   }
 
   private static boolean useModuleLayer() {
-    return parseBoolean(getProperty(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER, "" + isJavaVersionAtLeast(JAVA_17)));
+    return parseBoolean(getProperty(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER, "false"));
   }
 }
