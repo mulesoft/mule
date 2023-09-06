@@ -160,6 +160,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <weaveVersion>2.4.0-HF-SNAPSHOT</weaveVersion>
+        <sshdVersion>2.10.0</sshdVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.4.1-SNAPSHOT</muleDslApiVersion>
@@ -291,6 +292,27 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-core</artifactId>
                 <version>${tikaVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-common</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshdVersion}</version>
             </dependency>
         </dependencies>
 
