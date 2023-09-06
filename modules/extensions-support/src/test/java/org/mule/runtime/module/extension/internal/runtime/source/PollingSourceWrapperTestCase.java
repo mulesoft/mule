@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.store.ObjectStoreSettings.DEFAULT_EXPIRATION_INTERVAL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogMessage;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_COMPARISON_MESSAGE;
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.WATERMARK_SAVED_MESSAGE;
 import static org.mule.sdk.api.runtime.source.PollContext.PollItemStatus.ALREADY_IN_PROCESS;
@@ -50,10 +50,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -61,7 +64,6 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.slf4j.LoggerFactory;
 
 @SmallTest
 @RunWith(MockitoJUnitRunner.class)
@@ -91,11 +93,11 @@ public class PollingSourceWrapperTestCase {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SourceCallback callbackMock;
 
-  private PollingSource pollingSource = mock(PollingSource.class);
-  private SchedulingStrategy schedulingStrategy = mock(SchedulingStrategy.class);
+  private final PollingSource pollingSource = mock(PollingSource.class);
+  private final SchedulingStrategy schedulingStrategy = mock(SchedulingStrategy.class);
 
   @InjectMocks
-  private PollingSourceWrapper<Object, Object> pollingSourceWrapper =
+  private final PollingSourceWrapper<Object, Object> pollingSourceWrapper =
       new PollingSourceWrapper<Object, Object>(pollingSource, schedulingStrategy, 4, mock(SystemExceptionHandler.class));
 
   @Before
@@ -235,27 +237,23 @@ public class PollingSourceWrapperTestCase {
   }
 
   private void stubPollItem(List<String> pollItemIds, List<Serializable> pollItemWatermarks) {
-    doAnswer(new Answer() {
-
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        PollContext pollContext = invocation.getArgument(0, PollContext.class);
-        for (int i = 0; i < pollItemIds.size(); i++) {
-          String id = pollItemIds.get(i);
-          Serializable watermark = pollItemWatermarks.get(i);
-          pollContext
-              .accept(item -> {
-                if (id != null) {
-                  ((PollContext.PollItem) item).setId(id);
-                }
-                if (watermark != null) {
-                  ((PollContext.PollItem) item).setWatermark(watermark);
-                }
-                ((PollContext.PollItem) item).setResult(Result.builder().output("test").build());
-              });
-        } ;
-        return null;
-      }
+    doAnswer(invocation -> {
+      PollContext pollContext = invocation.getArgument(0, PollContext.class);
+      for (int i = 0; i < pollItemIds.size(); i++) {
+        String id = pollItemIds.get(i);
+        Serializable watermark = pollItemWatermarks.get(i);
+        pollContext
+            .accept(item -> {
+              if (id != null) {
+                ((PollContext.PollItem) item).setId(id);
+              }
+              if (watermark != null) {
+                ((PollContext.PollItem) item).setWatermark(watermark);
+              }
+              ((PollContext.PollItem) item).setResult(Result.builder().output("test").build());
+            });
+      } ;
+      return null;
     }).when(pollingSource).poll(any());
   }
 

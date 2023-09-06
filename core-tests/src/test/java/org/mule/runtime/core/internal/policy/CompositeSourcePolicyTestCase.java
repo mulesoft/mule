@@ -24,7 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
+import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static reactor.core.publisher.Mono.error;
 
@@ -37,7 +37,7 @@ import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.execution.SourcePolicyTestUtils;
+import org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;

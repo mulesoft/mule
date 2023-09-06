@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.execution;
+package org.mule.runtime.core.internal.execution.utils;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
 import org.mule.runtime.api.util.Reference;

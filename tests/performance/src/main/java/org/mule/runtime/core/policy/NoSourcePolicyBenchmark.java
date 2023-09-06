@@ -10,7 +10,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
+import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
 
 import org.mule.AbstractBenchmark;
 import org.mule.runtime.api.functional.Either;

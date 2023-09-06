@@ -188,7 +188,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.config.preferred to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.connection to
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
@@ -355,6 +356,7 @@ module org.mule.runtime.core {
       com.mulesoft.anypoint.gw.api;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
+      com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kyro,
       org.mule.test.unit,
       spring.beans;
@@ -423,6 +425,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.batch;
   // TODO W-13824979 Remove splashScreen logic from mule-core
   exports org.mule.runtime.core.internal.util.splash to

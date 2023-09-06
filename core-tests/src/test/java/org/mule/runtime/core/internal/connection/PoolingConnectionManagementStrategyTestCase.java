@@ -6,6 +6,18 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION;
+import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
+import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
+import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
+import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
+import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
+import static org.mule.tck.MuleTestUtils.spyInjector;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -19,17 +31,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_EXHAUSTED_ACTION;
-import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_POOL_INITIALISATION_POLICY;
-import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
-import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
-import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
-import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
-import static org.mule.tck.MuleTestUtils.spyInjector;
 import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -44,6 +45,8 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +54,6 @@ import org.junit.Test;
 
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.slf4j.LoggerFactory;
 
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
