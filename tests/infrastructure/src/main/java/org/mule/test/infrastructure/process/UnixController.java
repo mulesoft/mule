@@ -85,10 +85,6 @@ public class UnixController extends AbstractOSController {
   }
 
   public void resolveSchedulerConfig() {
-    // if (0 != runSync(RESOLVE_SCHEDULER_CONFIG)) {
-    // throw new MuleControllerException("Could not resolve scheduler configuration.");
-    // }
-
     Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
@@ -99,15 +95,6 @@ public class UnixController extends AbstractOSController {
 
     if (this.doExecution(executor, new CommandLine(this.muleBin).addArgument(RESOLVE_SCHEDULER_CONFIG_CMD), newEnv) == 0) {
       System.out.println(outputStream);
-      // Matcher matcher = STATUS_LABELS_PATTERN.matcher(outputStream.toString());
-      // if (matcher.find() && !isEmpty(matcher.group(STATUS_WRAPPER_GROUP_NAME))
-      // && !isEmpty(matcher.group(STATUS_JAVA_GROUP_NAME))) {
-      // return MuleProcessStatus.valueOf(format("%s_%s", matcher.group(STATUS_WRAPPER_GROUP_NAME),
-      // matcher.group(STATUS_JAVA_GROUP_NAME)));
-      // } else {
-      // throw new MuleControllerException("bin/mule resolve-scheduler-config didn't return the expected pattern: " +
-      // STATUS_LABELS);
-      // }
     } else {
       throw new MuleControllerException("Could not resolve scheduler configuration.");
     }
