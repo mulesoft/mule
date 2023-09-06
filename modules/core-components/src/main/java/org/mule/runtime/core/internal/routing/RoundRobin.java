@@ -121,7 +121,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, componentTracerFactory);
+      super(publisher, routes, componentTracerFactory, null);
     }
 
     @Override

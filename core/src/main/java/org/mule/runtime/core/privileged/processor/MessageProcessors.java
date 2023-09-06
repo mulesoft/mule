@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 
@@ -51,6 +52,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorder;
 import org.mule.runtime.core.internal.rx.MonoSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.SinkRecorderToReactorSinkAdapter;
+import org.mule.runtime.core.internal.util.rx.ImmediateScheduler;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
@@ -563,25 +565,14 @@ public class MessageProcessors {
                 // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
                 .map(event -> right(MessagingException.class, event));
 
-<<<<<<< Updated upstream
             return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
                                                         completeSuccessEitherIfNeeded(),
                                                         errorSwitchSinkSinkRef::error,
-                                                        errorSwitchSinkSinkRef::complete)
+                                                        errorSwitchSinkSinkRef::complete, IMMEDIATE_SCHEDULER)
                                                             .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
                                                                 .andThen(MessageProcessors::toParentContext));
           }
         });
-=======
-                return subscribeFluxOnPublisherSubscription(errorSwitchSinkSinkRef.flux(), upstream,
-                                                            completeSuccessEitherIfNeeded(),
-                                                            errorSwitchSinkSinkRef::error,
-                                                            errorSwitchSinkSinkRef::complete, null)
-                                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper()
-                                                                    .andThen(MessageProcessors::toParentContext));
-              }}));>>>>>>>
-
-  Stashed changes
   }
 
   private static void childContextResponseHandler(CoreEvent eventChildCtx,

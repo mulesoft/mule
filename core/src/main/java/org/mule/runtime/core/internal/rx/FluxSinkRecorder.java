@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.rx;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_PRINT_STACK_TRACES_ON_DROP;
 
 import static java.lang.Boolean.getBoolean;
@@ -14,12 +15,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.create;
 import static reactor.util.context.Context.empty;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -112,67 +115,78 @@ public class FluxSinkRecorder<T> implements Consumer<FluxSink<T>> {
 
   private static class NotYetAcceptedDelegate<T> implements FluxSinkRecorderDelegate<T> {
 
-    private volatile FluxSink<T> fluxSink;
-
+    private volatile CompletableFuture<FluxSink<T>> futureFluxSink;
     // If a fluxSink as not yet been accepted, events are buffered until one is accepted
     private final List<Runnable> bufferedEvents = new ArrayList<>();
 
     @Override
     public void accept(FluxSink<T> fluxSink) {
       synchronized (this) {
-        this.fluxSink = fluxSink;
+        futureFluxSink.complete(fluxSink);
       }
       bufferedEvents.forEach(Runnable::run);
     }
 
     @Override
     public synchronized FluxSink<T> getFluxSink() {
-      return fluxSink;
+      try {
+        return futureFluxSink.get();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Error while waiting for subscription", e));
+      }
     }
 
     @Override
     public void next(T response) {
+      handle(response, this::emitBufferedElement);
+    }
+
+    private <V> void handle(V element, Consumer<V> elementConsumer) {
       boolean present = true;
       synchronized (this) {
-        if (fluxSink == null) {
+        if (!futureFluxSink.isDone()) {
           present = false;
-          bufferedEvents.add(() -> fluxSink.next(response));
+          bufferedEvents.add(() -> elementConsumer.accept(element));
         }
       }
 
       if (present) {
-        fluxSink.next(response);
+        elementConsumer.accept(element);
+      }
+    }
+
+    private void emitBufferedElement(T element) {
+      try {
+        futureFluxSink.get().next(element);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Error while submitting buffered event", e));
+      }
+    }
+
+    private void emitBufferedError(Throwable error) {
+      try {
+        futureFluxSink.get().error(error);
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Error while submitting buffered error", e));
+      }
+    }
+
+    private void emitCompletion() {
+      try {
+        futureFluxSink.get().complete();
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Error while submitting buffered error", e));
       }
     }
 
     @Override
     public void error(Throwable error) {
-      boolean present = true;
-      synchronized (this) {
-        if (fluxSink == null) {
-          present = false;
-          bufferedEvents.add(() -> fluxSink.error(error));
-        }
-      }
-
-      if (present) {
-        fluxSink.error(error);
-      }
+      handle(error, this::emitBufferedError);
     }
 
     @Override
     public void complete() {
-      boolean present = true;
-      synchronized (this) {
-        if (fluxSink == null) {
-          present = false;
-          bufferedEvents.add(() -> fluxSink.complete());
-        }
-      }
-
-      if (present) {
-        fluxSink.complete();
-      }
+      handle(null, alwaysNull -> emitCompletion());
     }
   }
 
