@@ -20,6 +20,7 @@ module org.mule.runtime.artifact.activation {
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.jpms.utils;
   requires org.mule.runtime.service;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.container;
