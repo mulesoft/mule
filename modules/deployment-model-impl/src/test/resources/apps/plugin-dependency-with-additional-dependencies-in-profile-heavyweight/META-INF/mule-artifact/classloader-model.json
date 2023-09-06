@@ -6,21 +6,21 @@
       "additionalDependencies": [
         {
           "artifactCoordinates": {
-            "groupId": "commons-collections",
-            "artifactId": "commons-collections",
-            "version": "3.2.1",
+            "groupId": "org.apache.commons",
+            "artifactId": "commons-collections4",
+            "version": "4.4",
             "type": "jar"
           },
-          "uri": "repository/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"
+          "uri": "repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar"
         },
         {
           "artifactCoordinates": {
             "groupId": "commons-io",
             "artifactId": "commons-io",
-            "version": "2.6",
+            "version": "2.13.0",
             "type": "jar"
           },
-          "uri": "repository/commons-io/commons-io/2.6/commons-io-2.6.jar"
+          "uri": "repository/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar"
         }
       ]
     }
