@@ -8,7 +8,7 @@ package org.mule.functional.services;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.SERVICE;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+import static org.mule.runtime.module.service.api.artifact.provider.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 
 import static java.lang.Class.forName;
 import static java.lang.System.getProperty;

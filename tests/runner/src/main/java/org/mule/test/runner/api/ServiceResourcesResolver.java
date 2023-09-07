@@ -6,7 +6,7 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+import static org.mule.runtime.module.service.api.artifact.provider.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.loadServiceModel;
 
 import static java.util.Collections.emptyMap;

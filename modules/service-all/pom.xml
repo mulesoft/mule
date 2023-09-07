@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule</artifactId>
+        <version>4.6.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-module-service-all</artifactId>
+    <packaging>pom</packaging>
+    <name>Mule Service All</name>
+    <description>Modules for implementation of Mule Service Module</description>
+
+    <properties>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <modules>
+        <module>service-base</module>
+        <module>service-java11</module>
+        <module>service</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipDeploy>true</skipDeploy>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

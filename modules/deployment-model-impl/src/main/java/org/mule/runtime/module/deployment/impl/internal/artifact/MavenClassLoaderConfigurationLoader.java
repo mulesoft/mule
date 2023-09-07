@@ -9,7 +9,7 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+import static org.mule.runtime.module.service.api.artifact.provider.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
