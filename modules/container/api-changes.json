@@ -4,20 +4,6 @@
       "ignore": [
         {
           "ignore": true,
-          "code": "java.method.numberOfParametersChanged",
-          "old": "method org.mule.runtime.container.api.ModuleRepository org.mule.runtime.container.api.ModuleRepository::createModuleRepository(java.lang.ClassLoader, java.io.File)",
-          "new": "method org.mule.runtime.container.api.ModuleRepository org.mule.runtime.container.api.ModuleRepository::createModuleRepository(java.io.File)",
-          "justification": "W-14073858: ModuleDiscoverer must work with its own classloader"
-        },
-        {
-          "ignore": true,
-          "code": "java.method.numberOfParametersChanged",
-          "old": "method org.mule.runtime.container.api.ModuleRepository org.mule.runtime.container.api.ModuleRepository::createModuleRepository(java.lang.ClassLoader, java.util.function.Function<java.lang.String, java.io.File>, java.util.function.BiFunction<java.lang.String, java.io.File, java.net.URL>)",
-          "new": "method org.mule.runtime.container.api.ModuleRepository org.mule.runtime.container.api.ModuleRepository::createModuleRepository(java.util.function.Function<java.lang.String, java.io.File>, java.util.function.BiFunction<java.lang.String, java.io.File, java.net.URL>)",
-          "justification": "W-14073858: ModuleDiscoverer must work with its own classloader"
-        },
-        {
-          "ignore": true,
           "code": "java.method.returnTypeTypeParametersChanged",
           "old": "method java.util.List<org.mule.runtime.container.api.MuleModule> org.mule.runtime.container.api.ModuleRepository::getModules()",
           "new": "method java.util.List<org.mule.runtime.jpms.api.MuleContainerModule> org.mule.runtime.container.api.ModuleRepository::getModules()",

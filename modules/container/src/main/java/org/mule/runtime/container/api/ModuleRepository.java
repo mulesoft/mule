@@ -28,7 +28,19 @@ public interface ModuleRepository {
   /**
    * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
    * 
-   * @param classLoader     where to look for modules.
+   * @param classLoader     this is ignored.
+   * @param temporaryFolder where to write the generated SPI mapping files.
+   * @return a new {@link ModuleRepository} with the discovered information from the current runtime context.
+   * @deprecated since 4.6 use {@link #createModuleRepository(File)} instead.
+   */
+  @Deprecated
+  public static ModuleRepository createModuleRepository(ClassLoader classLoader, File temporaryFolder) {
+    return createModuleRepository(temporaryFolder);
+  }
+
+  /**
+   * Creates a ModuleRepository based on the modules available on this class classLoader.
+   * 
    * @param temporaryFolder where to write the generated SPI mapping files.
    * @return a new {@link ModuleRepository} with the discovered information from the current runtime context.
    */
@@ -41,7 +53,28 @@ public interface ModuleRepository {
   /**
    * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
    * 
-   * @param classLoader                   where to look for modules.
+   * @param classLoader                   this is ignored.
+   * @param serviceInterfaceToServiceFile determines the SPI mapping file for the fully qualified interface service name.
+   * @param fileToResource                obtains a {@link URL} from the SPI mapping file and the fully qualified interface
+   *                                      service name
+   * @return a new {@link ModuleRepository} with the discovered information from the current runtime context.
+   * 
+   * @since 4.5
+   * @deprecated since 4.6 use {@link #createModuleRepository(Function, BiFunction)} instead.
+   */
+  @Deprecated
+  public static ModuleRepository createModuleRepository(ClassLoader classLoader,
+                                                        Function<String, File> serviceInterfaceToServiceFile,
+                                                        BiFunction<String, File, URL> fileToResource) {
+    return new DefaultModuleRepository(new CompositeModuleDiscoverer(new JreModuleDiscoverer(),
+                                                                     new ClasspathModuleDiscoverer(serviceInterfaceToServiceFile,
+                                                                                                   fileToResource,
+                                                                                                   MODULE_PROPERTIES)));
+  }
+
+  /**
+   * Creates a ModuleRepository based on the modules available on the provided {@code classLoader}.
+   * 
    * @param serviceInterfaceToServiceFile determines the SPI mapping file for the fully qualified interface service name.
    * @param fileToResource                obtains a {@link URL} from the SPI mapping file and the fully qualified interface
    *                                      service name
