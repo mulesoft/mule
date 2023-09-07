@@ -169,9 +169,7 @@ module org.mule.runtime.core {
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.transaction;
   exports org.mule.runtime.core.privileged.transaction.xa;
-  exports org.mule.runtime.core.privileged.transformer to
-      org.mule.runtime.spring.config,
-      spring.beans;
+  exports org.mule.runtime.core.privileged.transformer;
   exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
