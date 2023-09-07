@@ -43,8 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.function.TriFunction;
-
 /**
  * Utilities related to how Mule uses the Java Module system.
  * 
@@ -178,10 +176,10 @@ public final class JpmsUtils {
    * @return a new classLoader.
    */
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
-                                                         TriFunction<URL[], URL[], ClassLoader, ClassLoader> childClassLoaderFactory,
+                                                         MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          ClassLoader parent) {
     if (!useModuleLayer()) {
-      return childClassLoaderFactory.apply(modulePathEntriesParent, modulePathEntriesChild, parent);
+      return childClassLoaderFactory.create(parent, modulePathEntriesParent, modulePathEntriesChild);
     }
 
     final ModuleLayer parentLayer = createModuleLayer(modulePathEntriesParent, parent, empty(), false, true);
@@ -192,7 +190,8 @@ public final class JpmsUtils {
   }
 
   private static boolean useModuleLayer() {
-    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "" + (JAVA_MAJOR_VERSION >= 17)));
+    // TODO W-13829761, W-13205329, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
+    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false"));
   }
 
   /**

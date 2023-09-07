@@ -10,8 +10,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Set;
 
-import org.apache.commons.lang3.function.TriFunction;
-
 /**
  * No-op implementation of JpmsUtils to use when running on JVM 8.
  * 
@@ -45,9 +43,9 @@ public final class JpmsUtils {
    * @return a new classLoader.
    */
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
-                                                         TriFunction<URL[], URL[], ClassLoader, ClassLoader> childClassLoaderFactory,
+                                                         MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          ClassLoader parent) {
-    return childClassLoaderFactory.apply(modulePathEntriesParent, modulePathEntriesChild, parent);
+    return childClassLoaderFactory.create(parent, modulePathEntriesParent, modulePathEntriesChild);
   }
 
   public static void exploreJdkModules(Set<String> packages) {
