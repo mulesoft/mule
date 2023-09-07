@@ -78,24 +78,7 @@
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jpms-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-container</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -118,15 +101,5 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.mule</groupId>
-            <artifactId>mule-maven-pom-parser-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mule.tools.maven</groupId>
-            <artifactId>mule-classloader-model</artifactId>
-        </dependency>
     </dependencies>
 </project>

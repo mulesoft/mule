@@ -107,6 +107,12 @@
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.mule.tools.maven</groupId>
+            <artifactId>mule-classloader-model</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
