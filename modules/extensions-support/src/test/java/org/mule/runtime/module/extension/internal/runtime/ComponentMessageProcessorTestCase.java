@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -16,6 +17,7 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUTION_ENGINE;
 
 import static java.util.Optional.of;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -35,11 +37,13 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.metadata.cache.MetadataCacheIdGeneratorFactory;
+import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -81,6 +85,10 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   @Rule
   public ExpectedException expected = ExpectedException.none();
 
+  // A cached flow for creating test events. It doesn't even have to contain the processor we are going to test, because we will
+  // be sending the events directly through the processor, without using the flow.
+  private Flow testFlow;
+
   @Before
   public void before() throws MuleException {
     extensionModel = mock(ExtensionModel.class);
@@ -95,6 +103,9 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     mockPolicyManager = mock(PolicyManager.class);
     when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenReturn(noPolicyOperation());
 
+    testFlow = getTestFlow(muleContext);
+    initialiseIfNeeded(testFlow, muleContext);
+
     processor = createProcessor();
     processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
@@ -108,6 +119,9 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   public void after() throws MuleException {
     stopIfNeeded(processor);
     disposeIfNeeded(processor, LOGGER);
+
+    stopIfNeeded(testFlow);
+    disposeIfNeeded(testFlow, LOGGER);
   }
 
   protected ComponentMessageProcessor<ComponentModel> createProcessor() {
@@ -126,6 +140,12 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
         return ProcessingType.CPU_LITE;
       }
     };
+  }
+
+  @Override
+  protected CoreEvent.Builder getEventBuilder() {
+    // Overrides to avoid creating a new test flow for each new test event
+    return InternalEvent.builder(create(testFlow, TEST_CONNECTOR_LOCATION));
   }
 
   @Test
@@ -195,10 +215,13 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
 
     eventsEmitter.start();
     eventsEmitter2.start();
-    eventsConsumer.await();
-    eventsEmitter.stop();
-    eventsConsumer2.await();
-    eventsEmitter2.stop();
+    try {
+      assertThat(eventsConsumer.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+      assertThat(eventsConsumer2.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+    } finally {
+      eventsEmitter.stop();
+      eventsEmitter2.stop();
+    }
   }
 
   @Test
@@ -240,8 +263,11 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
         .subscribe(eventsConsumer);
 
     eventsEmitter.start();
-    eventsConsumer.await();
-    eventsEmitter.stop();
+    try {
+      assertThat(eventsConsumer.await(RECEIVE_TIMEOUT, MILLISECONDS), is(true));
+    } finally {
+      eventsEmitter.stop();
+    }
   }
 
 }
