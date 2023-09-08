@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -17,10 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.slf4j.event.Level.DEBUG;
 
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.setLogger;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
-
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
 import org.mule.runtime.core.internal.logger.CustomLogger;
@@ -28,6 +27,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.slf4j.LoggerFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.slf4j.LoggerFactory;
 
 @SmallTest
 public class PoolingConnectionHandlerTestCase extends AbstractMuleTestCase {

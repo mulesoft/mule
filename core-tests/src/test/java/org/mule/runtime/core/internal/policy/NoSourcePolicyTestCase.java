@@ -14,7 +14,8 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.block;
+import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
+
 import static reactor.core.publisher.Mono.error;
 
 import org.mule.runtime.api.functional.Either;

@@ -99,6 +99,34 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/mule/runtime/core/internal/execution/utils/**</include>
+                                <include>org/mule/runtime/core/internal/logger/**</include>
+                                <include>org/mule/runtime/core/internal/streaming/bytes/test/**</include>
+                                <include>org/mule/runtime/core/internal/streaming/object/test/**</include>
+                                <include>org/mule/slf4j/impl/**</include>
+                                <include>META-INF/services/org.slf4j.spi.SLF4JServiceProvider</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>                
+            </plugin>
+        </plugins>        
+    </build>
+
 </project>
 
 

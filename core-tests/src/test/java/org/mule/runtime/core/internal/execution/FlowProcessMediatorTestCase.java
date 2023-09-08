@@ -18,7 +18,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.internal.construct.AbstractFlowConstruct.FLOW_FLOW_CONSTRUCT_TYPE;
-import static org.mule.runtime.core.internal.execution.SourcePolicyTestUtils.onCallback;
+import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.onCallback;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.tck.junit4.matcher.EitherMatcher.leftMatches;
 import static org.mule.tck.junit4.matcher.EitherMatcher.rightMatches;

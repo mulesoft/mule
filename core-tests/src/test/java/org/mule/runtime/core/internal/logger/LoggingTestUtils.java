@@ -4,16 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.util;
+package org.mule.runtime.core.internal.logger;
 
 import static java.util.Arrays.copyOfRange;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,11 +23,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+
+import org.mockito.stubbing.Answer;
 
 public class LoggingTestUtils {
 

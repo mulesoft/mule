@@ -8,8 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
@@ -79,16 +79,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+
 import org.mockito.InOrder;
-import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {

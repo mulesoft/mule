@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.streaming.bytes;
+package org.mule.runtime.core.internal.streaming.bytes.test;
 
 import static java.lang.Math.min;
 import static java.lang.String.format;
