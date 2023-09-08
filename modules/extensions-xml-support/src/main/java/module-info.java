@@ -30,6 +30,7 @@ module org.mule.runtime.extensions.xml.support {
   requires org.mule.runtime.spring.config;
 
   requires com.google.gson;
+  requires java.inject;
 
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
       org.mule.runtime.extension.internal.ast.MacroExpansionAstPostProcessor;

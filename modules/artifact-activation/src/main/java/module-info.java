@@ -28,6 +28,7 @@ module org.mule.runtime.artifact.activation {
 
   requires mule.classloader.model;
   requires plexus.utils;
+  requires net.bytebuddy;
 
   requires java.xml;
 

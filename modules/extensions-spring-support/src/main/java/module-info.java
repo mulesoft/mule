@@ -29,6 +29,7 @@ module org.mule.runtime.extensions.spring.support {
   requires org.mule.runtime.deployment.model;
 
   requires java.compiler;
+  requires java.inject;
 
   requires com.sun.xml.bind;
 

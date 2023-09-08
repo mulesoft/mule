@@ -27,6 +27,8 @@ module org.mule.runtime.extensions.mule.support {
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.spring.config;
 
+  requires java.inject;
+
   exports org.mule.runtime.module.extension.mule.api.extension;
   exports org.mule.runtime.module.extension.mule.api.loader;
   exports org.mule.runtime.module.extension.mule.api.processor;
