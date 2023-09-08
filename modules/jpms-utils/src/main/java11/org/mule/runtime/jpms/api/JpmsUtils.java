@@ -7,15 +7,20 @@
 package org.mule.runtime.jpms.api;
 
 import static java.lang.Boolean.getBoolean;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
 import static java.lang.ModuleLayer.boot;
 import static java.lang.ModuleLayer.defineModulesWithOneLoader;
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
+import static java.lang.System.getProperty;
 import static java.lang.module.Configuration.resolve;
 import static java.lang.module.ModuleFinder.ofSystem;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -28,6 +33,7 @@ import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,6 +53,10 @@ public final class JpmsUtils {
   private JpmsUtils() {
     // Nothing to do
   }
+
+  private static final int JAVA_MAJOR_VERSION = parseInt(getProperty("java.version").split("\\.")[0]);
+  // this is copied from MuleSystemProperties so we don't have to add the mule-api dependency on the bootstrap.
+  private static final String CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER = "mule.classloader.container.jpmsModuleLayer";
 
   public static final String MULE_SKIP_MODULE_TWEAKING_VALIDATION = "mule.module.tweaking.validation.skip";
 
@@ -136,6 +146,52 @@ public final class JpmsUtils {
               || moduleName.startsWith("jdk.");
         })
         .forEach(module -> packages.addAll(module.getPackages()));
+  }
+
+  /**
+   * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}, and returns a
+   * classLoader from which its modules can be read.
+   * 
+   * @param modulePathEntries the URLs from which to find the modules
+   * @param parent            the parent class loader for delegation
+   * @return a new classLoader.
+   */
+  public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntries, ClassLoader parent) {
+    if (!useModuleLayer()) {
+      return new URLClassLoader(modulePathEntries, parent);
+    }
+
+    final ModuleLayer layer = createModuleLayer(modulePathEntries, parent, empty(), false, true);
+    return layer.findLoader(layer.modules().iterator().next().getName());
+  }
+
+  /**
+   * Creates two {@link ModuleLayer}s for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild} and with
+   * the given {@code parent}, and returns a classLoader from which the child modules can be read.
+   * 
+   * @param modulePathEntriesParent the URLs from which to find the modules of the parent
+   * @param modulePathEntriesChild  the URLs from which to find the modules of the child
+   * @param childClassLoaderFactory how the classLoader for the child is created, if moduleLayers are not used
+   * @param parent                  the parent class loader for delegation
+   * @return a new classLoader.
+   */
+  public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
+                                                         MultiLevelClassLoaderFactory childClassLoaderFactory,
+                                                         ClassLoader parent) {
+    if (!useModuleLayer()) {
+      return childClassLoaderFactory.create(parent, modulePathEntriesParent, modulePathEntriesChild);
+    }
+
+    final ModuleLayer parentLayer = createModuleLayer(modulePathEntriesParent, parent, empty(), false, true);
+    final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, parent, of(parentLayer), false, true);
+    openToModule(childLayer, "kryo.shaded", "java.base", asList("java.lang", "java.security.cert"));
+
+    return childLayer.findLoader(childLayer.modules().iterator().next().getName());
+  }
+
+  private static boolean useModuleLayer() {
+    // TODO W-13829761, W-13205329, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
+    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false"));
   }
 
   /**

@@ -27,4 +27,15 @@ public interface ContainerDependantArtifactClassLoaderFactory<T extends Artifact
    * @return a new class loader for described artifact.
    */
   ArtifactClassLoader create(String artifactId, T descriptor, MuleContainerClassLoaderWrapper containerClassLoader);
+
+  /**
+   * When using a Java version with JPMS support, will put the {@link ModuleLayer} where the given class is found as a parent of
+   * the {@link ModuleLayer} from where the target {@link ClassLoader} will be obtained from.
+   * <p>
+   * If the Java version being used does not support JPMS, this does nothing.
+   * 
+   * @param clazz the class to get the module layer from.
+   */
+  void setParentLayerFrom(Class clazz);
+
 }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.service.api.artifact;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_SERVICE_JPMS_MODULE_LAYER;
+import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
@@ -39,7 +39,9 @@ public class ServiceClassLoaderFactoryProvider {
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
     if (useModuleLayer()) {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
-      return new ServiceModuleLayerFactory();
+      final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
+      serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
+      return serviceModuleLayerFactory;
     } else {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
       return new ServiceClassLoaderFactory();
@@ -47,6 +49,6 @@ public class ServiceClassLoaderFactoryProvider {
   }
 
   private static boolean useModuleLayer() {
-    return parseBoolean(getProperty(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER, "" + isJavaVersionAtLeast(JAVA_17)));
+    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "" + isJavaVersionAtLeast(JAVA_17)));
   }
 }
