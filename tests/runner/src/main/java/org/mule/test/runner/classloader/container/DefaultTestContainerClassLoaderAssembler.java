@@ -6,6 +6,9 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
+import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
+
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
 
@@ -16,13 +19,11 @@ import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
-import org.mule.runtime.jpms.api.JpmsUtils;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
@@ -71,13 +72,9 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader containerSystemClassloader = JpmsUtils.createModuleLayerClassLoader(optUrls, muleUrls,
-                                                                                    (modulePathEntriesParent,
-                                                                                     modulePathEntriesChild,
-                                                                                     parent) -> new URLClassLoader(modulePathEntriesChild,
-                                                                                                                   new URLClassLoader(modulePathEntriesParent,
-                                                                                                                                      parent)),
-                                                                                    launcherArtifact);
+    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(optUrls, muleUrls,
+                                                                          MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
+                                                                          launcherArtifact);
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages);
