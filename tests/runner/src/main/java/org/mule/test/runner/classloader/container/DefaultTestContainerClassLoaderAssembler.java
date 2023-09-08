@@ -6,6 +6,9 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
+import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
+
 import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.list;
 
@@ -21,7 +24,6 @@ import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLo
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
@@ -70,8 +72,9 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
-    ClassLoader containerOptClassLoader = new URLClassLoader(optUrls, launcherArtifact);
-    final ClassLoader containerSystemClassloader = new URLClassLoader(muleUrls, containerOptClassLoader);
+    ClassLoader containerSystemClassloader = createModuleLayerClassLoader(optUrls, muleUrls,
+                                                                          MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
+                                                                          launcherArtifact);
 
     TestPreFilteredContainerClassLoaderCreator testContainerClassLoaderCreator =
         new TestPreFilteredContainerClassLoaderCreator(containerSystemClassloader, bootPackages);
