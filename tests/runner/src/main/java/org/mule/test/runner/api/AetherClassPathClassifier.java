@@ -418,9 +418,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                   // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing
                   // without version
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
-                      .equals(toVersionlessId(artifact)))
-              && !applicationSharedLibUrls.stream()
-                  .anyMatch(applicationSharedLibUrl -> applicationSharedLibUrl.getArtifactId().equals(artifactId)));
+                      .equals(toVersionlessId(artifact))));
         })
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
