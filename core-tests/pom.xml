@@ -117,6 +117,8 @@
                                 <include>org/mule/runtime/core/internal/logger/**</include>
                                 <include>org/mule/runtime/core/internal/streaming/bytes/test/**</include>
                                 <include>org/mule/runtime/core/internal/streaming/object/test/**</include>
+                                <include>org/mule/slf4j/impl/**</include>
+                                <include>META-INF/services/org.slf4j.spi.SLF4JServiceProvider</include>
                             </includes>
                         </configuration>
                     </execution>
