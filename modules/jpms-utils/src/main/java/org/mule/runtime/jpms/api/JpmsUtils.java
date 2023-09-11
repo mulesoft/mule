@@ -6,14 +6,8 @@
  */
 package org.mule.runtime.jpms.api;
 
-<<<<<<< Upstream, based on origin/master
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.List;
-=======
->>>>>>> ed3aaeb cleanup
 import java.util.Set;
 
 /**
