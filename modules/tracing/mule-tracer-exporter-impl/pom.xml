@@ -24,7 +24,7 @@
     <properties>
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
-        <opentelemetryVersion>1.20.1</opentelemetryVersion>
+        <opentelemetryVersion>1.27.0</opentelemetryVersion>
     </properties>
 
     <dependencyManagement>
