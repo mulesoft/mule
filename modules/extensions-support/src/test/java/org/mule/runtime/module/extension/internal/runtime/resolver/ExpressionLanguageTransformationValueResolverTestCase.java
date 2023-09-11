@@ -133,8 +133,16 @@ public class ExpressionLanguageTransformationValueResolverTestCase extends Abstr
       return description;
     }
 
+    public void setDescription(String description) {
+      this.description = description;
+    }
+
     public Integer getDescriptionScore() {
       return descriptionScore;
+    }
+
+    public void setDescriptionScore(Integer descriptionScore) {
+      this.descriptionScore = descriptionScore;
     }
 
     @Override

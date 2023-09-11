@@ -39,6 +39,10 @@ public class Ricin implements Weapon {
     return destination;
   }
 
+  public void setDestination(KnockeableDoor destination) {
+    this.destination = destination;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Ricin) {

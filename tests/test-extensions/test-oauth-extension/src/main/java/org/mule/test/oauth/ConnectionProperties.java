@@ -17,7 +17,7 @@ import javax.inject.Inject;
 public class ConnectionProperties {
 
   @Inject
-  private ExtensionManager extensionManager = null;
+  private final ExtensionManager extensionManager = null;
 
   private String connectionDescription;
   private ConnectionType connectionType;
@@ -44,8 +44,16 @@ public class ConnectionProperties {
     return connectionDescription;
   }
 
+  public void setConnectionDescription(String connectionDescription) {
+    this.connectionDescription = connectionDescription;
+  }
+
   public ConnectionType getConnectionType() {
     return connectionType;
+  }
+
+  public void setConnectionType(ConnectionType connectionType) {
+    this.connectionType = connectionType;
   }
 
   public ExtensionManager getExtensionManager() {
