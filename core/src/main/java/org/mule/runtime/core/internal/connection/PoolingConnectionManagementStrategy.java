@@ -122,6 +122,7 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     GenericObjectPoolConfig<C> config = new GenericObjectPoolConfig<>();
 
     config.setMaxIdle(poolingProfile.getMaxIdle());
+    config.setJmxEnabled(false);
 
     switch (poolingProfile.getExhaustedAction()) {
       case WHEN_EXHAUSTED_GROW:
