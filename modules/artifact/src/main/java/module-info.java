@@ -43,4 +43,7 @@ module org.mule.runtime.artifact {
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
 
+  exports org.mule.module.artifact.classloader to
+      org.mule.runtime.extensions.support;
+
 }

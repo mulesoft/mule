@@ -210,6 +210,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.mvel,
       org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
@@ -364,6 +365,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
@@ -377,6 +379,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.streaming.object.iterator to
       com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.time to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction to
@@ -445,6 +448,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
       spring.beans;
+
+  exports org.mule.runtime.core.internal.profiling.context to
+      org.mule.runtime.extensions.support;
 
   opens org.mule.runtime.core.api to
       spring.core;
