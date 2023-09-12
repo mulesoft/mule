@@ -130,6 +130,7 @@
     </modules>
 
     <properties>
+	<randomProperty>RandomTest</randomProperty>
         <javaVersion>1.8</javaVersion>
         <javaReleaseVersion>8</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
