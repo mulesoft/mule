@@ -12,6 +12,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
+import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
@@ -19,6 +21,7 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
+import org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.Collection;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 /**
@@ -112,6 +116,10 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
                 return macroExpandedRawValue((String) v);
               } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
                 return mapErrorMappings(getDecorated());
+              } else if (getDecorated().getModel().getName().equals(RECONNECTION_CONFIG_PARAMETER_NAME)) {
+                return mapReconnection(getDecorated());
+              } else if (getDecorated().getModel().getName().equals(RECONNECTION_STRATEGY_PARAMETER_NAME)) {
+                return mapReconnectionStrategy(getDecorated());
               }
               return v;
             });
@@ -126,6 +134,19 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
                                                                                  mapping.getTarget())))
                 .collect(toList()))
             .getRight();
+      }
+
+      private Object mapReconnection(final ComponentParameterAst originalParameter) {
+        MacroExpandedComponentAst macroExpandedComponentAst = (MacroExpandedComponentAst) originalParameter.getValue().getRight();
+        return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(macroExpandedComponentAst, UnaryOperator.identity());
+      }
+
+      private Object mapReconnectionStrategy(final ComponentParameterAst originalParameter) {
+        MacroExpandedComponentAst macroExpandedComponentAst =
+            new MacroExpandedComponentAst((ComponentAst) originalParameter.getValue().getRight(), location,
+                                          moduleGlobalElementsNames, defaultGlobalElementSuffix, literalsParameters,
+                                          macroExpandedChildren);
+        return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(macroExpandedComponentAst, UnaryOperator.identity());
       }
 
       @Override
