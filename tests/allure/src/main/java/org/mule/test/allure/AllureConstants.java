@@ -77,6 +77,7 @@ public interface AllureConstants {
     String POLICY_DEPLOYMENT = "Policy Deployment";
     String POLICY_REORDER = "Policy Reorder";
 
+
     interface DeploymentSuccessfulStory {
 
       String DEPLOYMENT_SUCCESS = "Deployment Success";
@@ -87,6 +88,12 @@ public interface AllureConstants {
     interface DeploymentFailureStory {
 
       String DEPLOYMENT_FAILURE = "Deployment Failure";
+
+    }
+
+    interface SingleAppDeploymentStory {
+
+      String SINGLE_APP_DEPLOYMENT = "Single App Deployment";
 
     }
 
