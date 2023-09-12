@@ -34,11 +34,13 @@ module org.mule.runtime.artifact {
       org.mule.runtime.artifact.activation,
       org.mule.runtime.extensions.support,
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.internal.util to
       org.mule.runtime.container,
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
 
 }

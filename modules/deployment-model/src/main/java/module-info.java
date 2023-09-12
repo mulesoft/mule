@@ -35,10 +35,18 @@ module org.mule.runtime.deployment.model {
   exports org.mule.runtime.deployment.model.api.policy;
 
   exports org.mule.runtime.deployment.model.internal to
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.log4j,
       org.mule.test.runner;
   exports org.mule.runtime.deployment.model.internal.artifact to
       org.mule.runtime.log4j,
-      org.mule.runtime.deployment;
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl;
+
+  exports org.mule.runtime.deployment.model.internal.policy to
+      org.mule.runtime.deployment.model.impl;
+
+  exports org.mule.runtime.artifact.activation.internal to
+      org.mule.runtime.deployment.model.impl;
 
 }

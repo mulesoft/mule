@@ -37,6 +37,9 @@ module org.mule.runtime.artifact.activation {
   exports org.mule.runtime.module.artifact.activation.api;
   exports org.mule.runtime.module.artifact.activation.api.ast;
   exports org.mule.runtime.module.artifact.activation.api.classloader;
+  exports org.mule.runtime.module.artifact.activation.api.descriptor;
+  exports org.mule.runtime.module.artifact.activation.api.deployable;
+  exports org.mule.runtime.module.artifact.activation.api.extension.discovery;
   exports org.mule.runtime.module.artifact.activation.api.extension.discovery.boot;
   exports org.mule.runtime.module.artifact.activation.api.plugin;
   exports org.mule.runtime.module.artifact.activation.api.service.config;
@@ -53,11 +56,19 @@ module org.mule.runtime.artifact.activation {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.module.artifact.activation.internal.classloader to
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.log4j,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.activation.internal.nativelib to
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
+
+  exports org.mule.runtime.module.artifact.activation.internal.deployable to
+      org.mule.runtime.deployment.model.impl;
+
+  exports org.mule.runtime.module.artifact.activation.internal.plugin to
+      org.mule.runtime.deployment.model.impl;
 
 }
