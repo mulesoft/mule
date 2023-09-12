@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
+import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.MODULE_PROPERTIES;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import static java.nio.file.Files.createTempFile;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -15,22 +21,16 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.runtime.container.api.MuleFoldersUtil.getModulesTempFolder;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
+
 import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Rule;
@@ -41,8 +41,6 @@ import org.junit.rules.TemporaryFolder;
 @SmallTest
 public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
-  private final ClassLoader classLoader = mock(ClassLoader.class);
-
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
 
@@ -51,12 +49,7 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModule() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("invalidModule.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
+    runTest("invalidModule.properties", moduleDiscoverer -> {
       expectedException.expect(IllegalArgumentException.class);
       moduleDiscoverer.discover();
     });
@@ -64,15 +57,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedJavaPackages() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+    runTest("moduleJavaPackages.properties", moduleDiscoverer -> {
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleJavaPackages"));
       assertThat(muleModule.getExportedPackages(), contains("org.foo", "org.bar"));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -84,15 +72,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedResourcePackages() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("moduleResourcePackages.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+    runTest("moduleResourcePackages.properties", moduleDiscoverer -> {
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleResourcePackages"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), containsInAnyOrder("META-INF/module.xsd", "README.txt"));
@@ -104,15 +87,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedPrivilegedApi() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPrivilegedApi.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+    runTest("moduleJavaPrivilegedApi.properties", moduleDiscoverer -> {
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleJavaPrivilegedApi"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -124,15 +102,10 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void discoversModuleWithExportedServices() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("moduleExportedServices.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
-      List<MuleModule> muleModules = moduleDiscoverer.discover();
+    runTest("moduleExportedServices.properties", moduleDiscoverer -> {
+      List<MuleContainerModule> muleModules = moduleDiscoverer.discover();
       assertThat(muleModules, hasSize(1));
-      MuleModule muleModule = muleModules.get(0);
+      MuleModule muleModule = (MuleModule) muleModules.get(0);
       assertThat(muleModule.getName(), is("moduleExportedServices"));
       assertThat(muleModule.getExportedPackages(), is(empty()));
       assertThat(muleModule.getExportedPaths(), is(empty()));
@@ -147,12 +120,12 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void shouldDeleteTemporaryModuleExportedServicesFilesWhenCreated() throws Exception {
-    testWithMuleHome(moduleDiscoverer -> {
+    testWithMuleHome(MODULE_PROPERTIES, moduleDiscoverer -> {
       assertThat(getModulesTempFolder().list().length, is(0));
 
       File serviceFile = createTempFile(getModulesTempFolder().toPath(), "someService", "tmp").toFile();
       // Creating a new classpath module discoverer will delete any file in the modules temporary folder
-      new ClasspathModuleDiscoverer(classLoader);
+      new ClasspathModuleDiscoverer(MODULE_PROPERTIES);
 
       assertThat(serviceFile.exists(), is(false));
       assertThat(getModulesTempFolder().list().length, is(0));
@@ -161,31 +134,29 @@ public class ClasspathModuleDiscovererTestCase extends AbstractMuleTestCase {
 
   @Test
   public void ignoresDuplicateModule() throws Exception {
-    runTest(moduleDiscoverer -> {
-      List<URL> moduleProperties = new ArrayList();
-      moduleProperties.add(getClass().getClassLoader().getResource("moduleJavaPackages.properties"));
-      when(classLoader.getResources(ClasspathModuleDiscoverer.MODULE_PROPERTIES))
-          .thenReturn(new EnumerationAdapter(moduleProperties));
-
-      List<MuleModule> modules = moduleDiscoverer.discover();
+    runTest("moduleJavaPackages.properties", moduleDiscoverer -> {
+      List<MuleContainerModule> modules = moduleDiscoverer.discover();
       assertThat(modules.size(), equalTo(1));
     });
   }
 
-  private void runTest(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws Exception {
-    testWithMuleHome(testCallback);
-    testWithExplicitFolder(testCallback);
+  private void runTest(String modulePropertiesResource, CheckedConsumer<ClasspathModuleDiscoverer> testCallback)
+      throws Exception {
+    testWithMuleHome(modulePropertiesResource, testCallback);
+    testWithExplicitFolder(modulePropertiesResource, testCallback);
   }
 
-  private void testWithExplicitFolder(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws IOException {
-    ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(classLoader, muleHome.newFolder());
+  private void testWithExplicitFolder(String modulePropertiesResource, CheckedConsumer<ClasspathModuleDiscoverer> testCallback)
+      throws IOException {
+    ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(muleHome.newFolder(), modulePropertiesResource);
     testCallback.accept(moduleDiscoverer);
   }
 
-  private void testWithMuleHome(CheckedConsumer<ClasspathModuleDiscoverer> testCallback) throws Exception {
+  private void testWithMuleHome(String modulePropertiesResource, CheckedConsumer<ClasspathModuleDiscoverer> testCallback)
+      throws Exception {
     testWithSystemProperty(MULE_HOME_DIRECTORY_PROPERTY, muleHome.getRoot().getAbsolutePath(), () -> {
       MuleFoldersUtil.getExecutionFolder().mkdir();
-      ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(classLoader);
+      ClasspathModuleDiscoverer moduleDiscoverer = new ClasspathModuleDiscoverer(modulePropertiesResource);
       testCallback.accept(moduleDiscoverer);
     });
   }

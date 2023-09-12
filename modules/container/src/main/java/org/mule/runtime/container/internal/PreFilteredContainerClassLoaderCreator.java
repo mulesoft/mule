@@ -7,6 +7,7 @@
 package org.mule.runtime.container.internal;
 
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -32,7 +33,7 @@ public interface PreFilteredContainerClassLoaderCreator {
   /**
    * @return the list of {@link MuleModule}s to be used for defining the filter
    */
-  List<MuleModule> getMuleModules();
+  List<MuleContainerModule> getMuleModules();
 
   /**
    * @return a {@link Set} of packages that define all the prefixes that must be loaded from the container classLoader without

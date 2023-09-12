@@ -30,6 +30,8 @@ module org.mule.runtime.artifact.activation {
   requires plexus.utils;
   requires net.bytebuddy;
 
+  requires org.apache.commons.lang3;
+
   requires java.xml;
 
   exports org.mule.runtime.module.artifact.activation.api;

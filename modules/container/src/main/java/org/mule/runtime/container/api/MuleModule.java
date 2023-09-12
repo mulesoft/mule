@@ -12,15 +12,16 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableSet;
 
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.util.List;
 import java.util.Set;
 
 /**
- * Defines a module on the Mule container
+ * Defines a module on the Mule container as defined by a {@code mule-module.properties} descriptor.
  */
-public class MuleModule {
+public class MuleModule implements MuleContainerModule {
 
   private final String name;
   private final Set<String> exportedPackages;
@@ -63,22 +64,27 @@ public class MuleModule {
     return exportedPaths.stream().filter(s -> s.startsWith("META-INF/services")).findAny().isPresent();
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public Set<String> getExportedPackages() {
     return exportedPackages;
   }
 
+  @Override
   public Set<String> getExportedPaths() {
     return exportedPaths;
   }
 
+  @Override
   public Set<String> getPrivilegedExportedPackages() {
     return privilegedExportedPackages;
   }
 
+  @Override
   public Set<String> getPrivilegedArtifacts() {
     return privilegedArtifacts;
   }

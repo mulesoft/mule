@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.io.File;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Discovers {@link MuleModule} searching for {@link #MODULE_PROPERTIES} files resources available in a given classloader.
  */
-public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
+public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
 
   private static final String TMP_FOLDER_SUFFIX = "tmp";
 
@@ -54,22 +55,30 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   public static final String EXPORTED_RESOURCE_PROPERTY = "artifact.export.resources";
   public static final String EXPORTED_SERVICES_PROPERTY = "artifact.export.services";
 
-  private final ClassLoader classLoader;
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
+  private final String modulePropertiesResource;
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader) {
-    this(classLoader, createModulesTemporaryFolder());
+  public ClasspathModuleDiscoverer() {
+    this(createModulesTemporaryFolder());
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader, File temporaryFolder) {
-    this.classLoader = classLoader;
+  public ClasspathModuleDiscoverer(String modulePropertiesResource) {
+    this(createModulesTemporaryFolder(), modulePropertiesResource);
+  }
+
+  public ClasspathModuleDiscoverer(File temporaryFolder) {
+    this(temporaryFolder, MODULE_PROPERTIES);
+  }
+
+  public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource) {
     this.serviceInterfaceToServiceFile =
         serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
                                                                                  TMP_FOLDER_SUFFIX).toFile(),
                                                             serviceInterface);
     this.fileToResource =
         (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
+    this.modulePropertiesResource = modulePropertiesResource;
   }
 
   private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
@@ -80,12 +89,12 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     }
   }
 
-  public ClasspathModuleDiscoverer(ClassLoader classLoader,
-                                   Function<String, File> serviceInterfaceToServiceFile,
-                                   BiFunction<String, File, URL> fileToResource) {
-    this.classLoader = classLoader;
+  public ClasspathModuleDiscoverer(Function<String, File> serviceInterfaceToServiceFile,
+                                   BiFunction<String, File, URL> fileToResource,
+                                   String modulePropertiesResource) {
     this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
     this.fileToResource = fileToResource;
+    this.modulePropertiesResource = modulePropertiesResource;
   }
 
   protected static File createModulesTemporaryFolder() {
@@ -109,12 +118,12 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   @Override
-  public List<MuleModule> discover() {
-    List<MuleModule> modules = new LinkedList<>();
+  public List<MuleContainerModule> discover() {
+    List<MuleContainerModule> modules = new LinkedList<>();
     Set<String> moduleNames = new HashSet<>();
 
     try {
-      for (Properties moduleProperties : discoverProperties(classLoader, getModulePropertiesFileName())) {
+      for (Properties moduleProperties : discoverProperties(this.getClass().getClassLoader(), getModulePropertiesFileName())) {
         final MuleModule module = createModule(moduleProperties);
 
         if (moduleNames.contains(module.getName())) {
@@ -132,7 +141,7 @@ public class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   protected String getModulePropertiesFileName() {
-    return MODULE_PROPERTIES;
+    return modulePropertiesResource;
   }
 
   private MuleModule createModule(Properties moduleProperties) {

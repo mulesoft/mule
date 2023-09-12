@@ -9,11 +9,10 @@ package org.mule.runtime.container.internal;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyEnumeration;
 
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.api.MuleModule;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
@@ -41,7 +40,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
   }
 
   @Override
-  public List<MuleModule> getMuleModules() {
+  public List<MuleContainerModule> getMuleModules() {
     return moduleRepository.getModules();
   }
 
@@ -77,7 +76,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
     @Override
     public Enumeration<URL> findResources(String name) throws IOException {
       // Container classLoader is just an adapter, it does not owns any resource
-      return new EnumerationAdapter<>(emptyList());
+      return emptyEnumeration();
     }
   }
 }

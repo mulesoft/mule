@@ -1,4 +1,17 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.List<org.mule.runtime.container.api.MuleModule> org.mule.runtime.container.api.ModuleRepository::getModules()",
+          "new": "method java.util.List<org.mule.runtime.jpms.api.MuleContainerModule> org.mule.runtime.container.api.ModuleRepository::getModules()",
+          "justification": "W-14073858: ModuleDiscoverer must work with its own classloader"
+        }
+      ]
+    }
+  },
   "4.1.1": {
     "revapi": {
       "ignore": [

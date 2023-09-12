@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.container.api.ModuleRepository;
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -51,7 +51,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void createsClassLoaderLookupPolicy() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
-    final List<MuleModule> modules = new ArrayList<>();
+    final List<MuleContainerModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingPackages("org.foo1", "org.foo1.bar").build());
     modules.add(new TestModuleBuilder("module2").exportingPackages("org.foo2").build());
     when(moduleRepository.getModules()).thenReturn(modules);
@@ -70,7 +70,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void considersJreExtensions() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
-    final List<MuleModule> modules = new ArrayList<>();
+    final List<MuleContainerModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("jre1")
         .exportingPackages("org.w3c.dom.test", "javax.test", "java.applet", "org.w3c.dom", "org.omg.test").build());
     modules.add(new TestModuleBuilder("jre2")
@@ -141,7 +141,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   public void considersSdkApiUsagesInExtensions() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
-    final List<MuleModule> modules = new ArrayList<>();
+    final List<MuleContainerModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("sdk-module")
         .exportingPackages("org.mule.sdk.api.connectivity", "org.mule.sdk.compatibility.api.helper", "org.omg.test").build());
     modules.add(new TestModuleBuilder("other-sdk-module")
@@ -201,7 +201,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   private ContainerClassLoaderFactory createClassLoaderExportingBootstrapProperties() {
     final ModuleRepository moduleRepository = mock(ModuleRepository.class);
     final ContainerClassLoaderFactory factory = new ContainerClassLoaderFactory(moduleRepository);
-    final List<MuleModule> modules = new ArrayList<>();
+    final List<MuleContainerModule> modules = new ArrayList<>();
     modules.add(new TestModuleBuilder("module1").exportingResources(BOOTSTRAP_PROPERTIES).build());
     when(moduleRepository.getModules()).thenReturn(modules);
     return factory;

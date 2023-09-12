@@ -8,7 +8,7 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +33,8 @@ public class CompositeModuleDiscoverer implements ModuleDiscoverer {
   }
 
   @Override
-  public List<MuleModule> discover() {
-    final List<MuleModule> muleModules = new ArrayList<>();
+  public List<MuleContainerModule> discover() {
+    final List<MuleContainerModule> muleModules = new ArrayList<>();
     for (ModuleDiscoverer discoverer : moduleDiscoverers) {
       muleModules.addAll(discoverer.discover());
     }

@@ -9,7 +9,7 @@ package org.mule.runtime.container.internal;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
@@ -30,7 +30,7 @@ public class ContainerClassLoaderFilterFactory {
   private static final String EMPTY_PACKAGE = "";
   private static final char RESOURCE_SEPARATOR = '/';
 
-  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules) {
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules) {
     final Set<String> resources = getExportedResourcePaths(muleModules);
     final Set<String> packages = getModuleExportedPackages(muleModules);
     final ArtifactClassLoaderFilter artifactClassLoaderFilter = new DefaultArtifactClassLoaderFilter(packages, resources);
@@ -38,19 +38,19 @@ public class ContainerClassLoaderFilterFactory {
     return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
   }
 
-  private Set<String> getExportedResourcePaths(List<MuleModule> muleModules) {
+  private Set<String> getExportedResourcePaths(List<MuleContainerModule> muleModules) {
     Set<String> resources = new HashSet<>();
 
-    for (MuleModule muleModule : muleModules) {
+    for (MuleContainerModule muleModule : muleModules) {
       resources.addAll(muleModule.getExportedPaths());
     }
 
     return resources;
   }
 
-  private Set<String> getModuleExportedPackages(List<MuleModule> muleModules) {
+  private Set<String> getModuleExportedPackages(List<MuleContainerModule> muleModules) {
     Set<String> packages = new HashSet<>();
-    for (MuleModule muleModule : muleModules) {
+    for (MuleContainerModule muleModule : muleModules) {
       packages.addAll(muleModule.getExportedPackages());
     }
 
