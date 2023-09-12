@@ -29,5 +29,6 @@ module org.mule.runtime.deployment {
     requires java.desktop;
     requires spring.core;
 
+    exports org.mule.runtime.module.deployment.api;
 
 }
