@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.internal.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
@@ -14,6 +15,9 @@ import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.registry.ServiceRegistry;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
@@ -28,11 +32,15 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+
 /**
  * Provides a {@link DescriptorLoaderRepository} that uses a {@link ServiceRegistry} to detect available implementations of
  * {@link ClassLoaderConfigurationLoader}
  */
-public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoaderRepository {
+public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoaderRepository, Disposable {
+
+  private static final Logger LOGGER = getLogger(ServiceRegistryDescriptorLoaderRepository.class);
 
   private final Function<Class<? extends DescriptorLoader>, Stream<? extends DescriptorLoader>> serviceRegistry;
   private final Class[] descriptorLoaderClasses =
@@ -104,4 +112,11 @@ public class ServiceRegistryDescriptorLoaderRepository implements DescriptorLoad
     return unmodifiableList(serviceRegistry.apply(descriptorLoaderClass)
         .collect(toList()));
   }
+
+  @Override
+  public void dispose() {
+    descriptorLoaders.forEach((descriptorLoaderClass, descriptorLoaders) -> descriptorLoaders
+        .forEach(descriptorLoader -> disposeIfNeeded(descriptorLoader, LOGGER)));
+  }
+
 }

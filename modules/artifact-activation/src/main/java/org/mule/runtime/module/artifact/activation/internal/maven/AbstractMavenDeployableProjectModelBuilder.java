@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
@@ -39,6 +40,7 @@ import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.MavenPomParserProvider;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -112,13 +114,15 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
 
-    MavenClient mavenClient = createMavenClient(mavenConfiguration);
+    try (MavenClient mavenClient = createMavenClient(mavenConfiguration)) {
+      resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
 
-    resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
+      resolveDeployablePluginsData(deployableMavenBundleDependencies);
 
-    resolveDeployablePluginsData(deployableMavenBundleDependencies);
-
-    resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
+      resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
+    }
 
     return doBuild(parser, deployableArtifactCoordinates);
   }

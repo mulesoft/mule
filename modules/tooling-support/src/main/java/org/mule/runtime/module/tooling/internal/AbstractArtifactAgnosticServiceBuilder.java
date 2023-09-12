@@ -9,6 +9,7 @@ package org.mule.runtime.module.tooling.internal;
 import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
@@ -25,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
@@ -33,6 +35,7 @@ import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -156,24 +159,29 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       model.createDeployablePomFile(applicationFolder.toPath());
       model.updateArtifactPom(applicationFolder.toPath());
 
+      MuleVersion muleVersion = new MuleVersion("4.4.0");
+
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
-      ClassLoaderConfiguration classLoaderConfiguration =
-          new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
-              .createMavenClient(GlobalConfigLoader.getMavenConfig())))
-                  .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
-                                                        createTempBundleDescriptor()),
-                        ArtifactType.APP);
+      String artifactJson;
+      try (MavenClient mavenClient = mavenClientProvider.createMavenClient(GlobalConfigLoader.getMavenConfig())) {
+        ClassLoaderConfiguration classLoaderConfiguration =
+            new DeployableMavenClassLoaderConfigurationLoader(of(mavenClient))
+                .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
+                                                      createTempBundleDescriptor()),
+                      ArtifactType.APP);
+        artifactJson =
+            new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
+                                                                              configs,
+                                                                              muleVersion.toCompleteNumericVersion()));
+      } catch (Exception e) {
+        throw new MuleRuntimeException(createStaticMessage("Error while serializing the mule-artifact.json"), e);
+      }
 
       File destinationFolder =
           applicationFolder.toPath().resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
       createDirectories(destinationFolder.toPath());
 
-      MuleVersion muleVersion = new MuleVersion("4.4.0");
-      String artifactJson =
-          new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
-                                                                            configs,
-                                                                            muleVersion.toCompleteNumericVersion()));
       try (FileWriter fileWriter = new FileWriter(new File(destinationFolder, "mule-artifact.json"))) {
         fileWriter.write(artifactJson);
       }
