@@ -15,14 +15,30 @@ import java.util.Set;
  */
 public interface MuleContainerModule {
 
+  /**
+   * @return the name of the module, as defined in the module itself.
+   */
   public String getName();
 
+  /**
+   * @return the Java packages exported by this module.
+   */
   public Set<String> getExportedPackages();
 
+  /**
+   * @return the Java resources exported by this module.
+   */
   public Set<String> getExportedPaths();
 
+  /**
+   * @return the Java packages exported by this module to {@link #getPrivilegedArtifacts() privileged artifacts} only.
+   */
   public Set<String> getPrivilegedExportedPackages();
 
+  /**
+   * @return the artifacts with privileged access to the API. Each artifact is defined using the artifact's Maven
+   *         {@code groupId:artifactId}.
+   */
   public Set<String> getPrivilegedArtifacts();
 
 }
