@@ -32,6 +32,8 @@ module org.mule.runtime.deployment.model.impl {
 
   requires com.google.gson;
 
+  exports org.mule.runtime.module.deployment.impl.internal to
+      org.mule.runtime.launcher;
   exports org.mule.runtime.module.deployment.impl.internal.application to
       org.mule.runtime.deployment;
   exports org.mule.runtime.module.deployment.impl.internal.artifact to
