@@ -316,6 +316,8 @@ module org.mule.runtime.core {
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
+  exports org.mule.runtime.core.internal.profiling.context to
+          org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.profiling.tracing.event.span.condition to
       org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
@@ -448,9 +450,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
       spring.beans;
-
-  exports org.mule.runtime.core.internal.profiling.context to
-      org.mule.runtime.extensions.support;
 
   opens org.mule.runtime.core.api to
       spring.core;
