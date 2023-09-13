@@ -201,6 +201,7 @@ public final class LifecycleAwareConfigurationInstance implements ConfigurationI
   private void doInitialise() throws InitialisationException {
     if (connectionProvider.isPresent()) {
       initialiseIfNeeded(connectionProvider, true, muleContext);
+      initialiseIfNeeded(connectionManager);
       connectionManager.bind(value, connectionProvider.get());
     }
 

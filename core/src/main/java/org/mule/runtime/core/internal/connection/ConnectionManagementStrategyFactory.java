@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.model.connection.ConnectionManagementTyp
 import static org.mule.runtime.api.meta.model.connection.ConnectionManagementType.POOLING;
 import static org.mule.runtime.core.api.connection.util.ConnectionProviderUtils.unwrapProviderWrapper;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -43,14 +44,16 @@ final class ConnectionManagementStrategyFactory {
   /**
    * Returns the management strategy that should be used for the given {@code connectionProvider}
    *
-   * @param connectionProvider a {@link ConnectionProvider}
-   * @param <C>                the generic type of the connections to be managed
+   * @param <C>                    the generic type of the connections to be managed
+   * @param connectionProvider     a {@link ConnectionProvider}
+   * @param featureFlaggingService the {@link FeatureFlaggingService}
    * @return a {@link ConnectionManagementStrategy}
    */
-  public <C> ConnectionManagementStrategy<C> getStrategy(ConnectionProvider<C> connectionProvider) {
+  public <C> ConnectionManagementStrategy<C> getStrategy(ConnectionProvider<C> connectionProvider,
+                                                         FeatureFlaggingService featureFlaggingService) {
     ConnectionManagementType managementType = getManagementType(connectionProvider);
     if (managementType == POOLING) {
-      return pooling(connectionProvider);
+      return pooling(connectionProvider, featureFlaggingService);
     }
     if (managementType == CACHED) {
       return cached(connectionProvider);
@@ -69,7 +72,8 @@ final class ConnectionManagementStrategyFactory {
     return new NullConnectionManagementStrategy<>(connectionProvider, muleContext);
   }
 
-  private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider) {
+  private <C> ConnectionManagementStrategy<C> pooling(ConnectionProvider<C> connectionProvider,
+                                                      FeatureFlaggingService featureFlaggingService) {
     String ownerConfigName = "";
     PoolingProfile poolingProfile = defaultPoolingProfile;
     if (connectionProvider instanceof ConnectionProviderWrapper) {
@@ -81,7 +85,7 @@ final class ConnectionManagementStrategyFactory {
         : new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile,
                                                     (PoolingListener<C>) unwrapProviderWrapper(connectionProvider,
                                                                                                PoolingConnectionProvider.class),
-                                                    muleContext, ownerConfigName);
+                                                    muleContext, ownerConfigName, featureFlaggingService);
   }
 
   private <C> ConnectionManagementType getManagementType(ConnectionProvider<C> connectionProvider) {

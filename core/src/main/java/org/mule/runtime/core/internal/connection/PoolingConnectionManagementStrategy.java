@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.connection;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.min;
+
+import static org.mule.runtime.api.config.MuleRuntimeFeature.COMMONS_POOL2_DISABLEJMX;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
@@ -15,6 +17,7 @@ import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_GROW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -28,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -50,22 +52,25 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   private final GenericObjectPool<C> pool;
   private final String poolId;
   private final PoolingListener<C> poolingListener;
+  private GenericObjectPoolConfig<C> config;
 
   /**
    * Creates a new instance
-   *
-   * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-   * @param poolingProfile     the {@link PoolingProfile} which configures the {@link #pool}
-   * @param poolingListener    a {@link PoolingListener}
-   * @param muleContext        the application's {@link MuleContext}
+   * 
+   * @param connectionProvider     the {@link ConnectionProvider} used to manage the connections
+   * @param poolingProfile         the {@link PoolingProfile} which configures the {@link #pool}
+   * @param poolingListener        a {@link PoolingListener}
+   * @param muleContext            the application's {@link MuleContext}
+   * @param featureFlaggingService the {@link FeatureFlaggingService}
    */
   PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, PoolingProfile poolingProfile,
-                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName) {
+                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName,
+                                      FeatureFlaggingService featureFlaggingService) {
     super(connectionProvider, muleContext);
     this.poolingProfile = poolingProfile;
     this.poolingListener = poolingListener;
     this.poolId = ownerConfigName.concat("-").concat(generateId());
-    this.pool = createPool(ownerConfigName);
+    this.pool = createPool(ownerConfigName, featureFlaggingService);
   }
 
   /**
@@ -118,11 +123,15 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     }
   }
 
-  private GenericObjectPool<C> createPool(String ownerConfigName) {
+  private GenericObjectPool<C> createPool(String ownerConfigName,
+                                          FeatureFlaggingService featureFlaggingService) {
     GenericObjectPoolConfig<C> config = new GenericObjectPoolConfig<>();
+    this.config = config;
 
     config.setMaxIdle(poolingProfile.getMaxIdle());
-    config.setJmxEnabled(false);
+    if (featureFlaggingService.isEnabled(COMMONS_POOL2_DISABLEJMX)) {
+      config.setJmxEnabled(false);
+    }
 
     switch (poolingProfile.getExhaustedAction()) {
       case WHEN_EXHAUSTED_GROW:
@@ -217,6 +226,10 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   private String generateId() {
     return UUID.randomUUID().toString();
+  }
+
+  public boolean isJmxEnabled() {
+    return config.getJmxEnabled();
   }
 
 }

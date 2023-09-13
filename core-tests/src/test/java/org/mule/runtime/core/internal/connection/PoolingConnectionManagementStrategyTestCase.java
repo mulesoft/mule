@@ -22,7 +22,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -304,6 +306,18 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                    DEFAULT_POOL_INITIALISATION_POLICY);
   }
 
+  @Test
+  public void jmxEnabled() {
+    initStrategy();
+    assertTrue(strategy.isJmxEnabled());
+  }
+
+  @Test
+  public void jmxDisabled() {
+    initStrategyJmxDisabled();
+    assertFalse(strategy.isJmxEnabled());
+  }
+
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
@@ -313,7 +327,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private void initStrategy() {
     strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
-                                                         ownerConfigName);
+                                                         ownerConfigName, f -> false);
+  }
+
+  private void initStrategyJmxDisabled() {
+    // enable mule.commons.pool2.disableJmx feature flag
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+                                                         ownerConfigName, f -> true);
   }
 
   private void verifyConnections(int numToCreate) throws ConnectionException {
