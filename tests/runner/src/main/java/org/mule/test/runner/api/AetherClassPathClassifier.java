@@ -109,7 +109,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class AetherClassPathClassifier implements ClassPathClassifier {
+public class AetherClassPathClassifier implements ClassPathClassifier, AutoCloseable {
 
   private static final String POM = "pom";
   private static final String POM_XML = POM + ".xml";
@@ -1356,4 +1356,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
   }
 
+  @Override
+  public void close() throws Exception {
+    dependencyResolver.close();
+    artifactClassificationTypeResolver.close();
+  }
 }

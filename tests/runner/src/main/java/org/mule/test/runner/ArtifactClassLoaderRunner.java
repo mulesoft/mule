@@ -9,6 +9,7 @@ package org.mule.test.runner;
 import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
@@ -27,6 +28,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
@@ -286,11 +288,15 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     final DependencyResolver dependencyResolver =
         new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
-    builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
-                                                                 new ArtifactClassificationTypeResolver(
-                                                                                                        dependencyResolver)));
+    try (AetherClassPathClassifier classPathClassifier = new AetherClassPathClassifier(dependencyResolver,
+                                                                                       new ArtifactClassificationTypeResolver(
+                                                                                                                              dependencyResolver))) {
+      builder.setClassPathClassifier(classPathClassifier);
 
-    return builder.build();
+      return builder.build();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while building the 'ArtifactClassLoaderHolder'"), e);
+    }
   }
 
   /**

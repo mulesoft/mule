@@ -33,7 +33,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
  *
  * @since 4.0
  */
-public class ArtifactClassificationTypeResolver {
+public class ArtifactClassificationTypeResolver implements AutoCloseable {
 
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
   private static final String MULE_MODULE_PROPERTIES = "META-INF/mule-module.properties";
@@ -138,5 +138,10 @@ public class ArtifactClassificationTypeResolver {
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Couldn't generate the URL for artifact: " + artifact);
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    dependencyResolver.close();
   }
 }

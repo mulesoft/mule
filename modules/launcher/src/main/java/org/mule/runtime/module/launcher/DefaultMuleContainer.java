@@ -14,6 +14,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
@@ -387,6 +388,10 @@ public class DefaultMuleContainer implements MuleContainer {
 
     if (log4jContextFactory != null && log4jContextFactory != defaultLogManagerFactory) {
       log4jContextFactory.dispose();
+    }
+
+    if (artifactResourcesRegistry.getDescriptorLoaderRepository() != null) {
+      disposeIfNeeded(artifactResourcesRegistry.getDescriptorLoaderRepository(), logger);
     }
   }
 
