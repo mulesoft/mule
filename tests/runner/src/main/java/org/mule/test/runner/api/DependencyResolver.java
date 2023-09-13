@@ -64,13 +64,14 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class DependencyResolver {
+public class DependencyResolver implements AutoCloseable {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final MuleMavenResolutionContext resolutionContext;
   private final MuleMavenRepositoryState repositoryState;
   private final MuleMavenRepositoryStateFactory repositoryStateFactory;
+  private boolean closed = false;
 
   /**
    * Creates an instance of the resolver.
@@ -417,6 +418,14 @@ public class DependencyResolver {
         logger.warn("Dependency path to not resolved artifacts -> {}", unresolvedArtifactPath.toString());
       }
     });
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (!closed) {
+      repositoryStateFactory.close();
+      closed = true;
+    }
   }
 
 }
