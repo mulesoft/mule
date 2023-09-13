@@ -49,8 +49,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -71,6 +69,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
   private static final int MAX_ACTIVE = 2;
   private static final String ownerConfigName = "SomeConfigName";
+  public static final String POOL_NAME = "org.apache.commons.pool2:type=GenericObjectPool,name=pool";
 
   private ConnectionProvider<Object> connectionProvider;
 
@@ -96,8 +95,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   @After
-  public void restoreLogger() {
+  public void after() throws Exception {
     logger.resetLevel();
+    ObjectName objectName = new ObjectName(POOL_NAME);
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    if (mBeanServer.isRegistered(objectName)) {
+      mBeanServer.unregisterMBean(objectName);
+    }
   }
 
   @Test
@@ -317,26 +321,16 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   @Test
   @Issue("W-12422473")
-  public void jmxEnabled() throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
-    ObjectName objectName = new ObjectName("org.apache.commons.pool2:type=GenericObjectPool,name=pool");
-    MBeanServer mBeanServer = getPlatformMBeanServer();
-    if (mBeanServer.isRegistered(objectName)) {
-      mBeanServer.unregisterMBean(objectName);
-    }
+  public void jmxEnabled() throws MalformedObjectNameException {
     initStrategy();
-    assertTrue(getPlatformMBeanServer().isRegistered(objectName));
+    assertTrue(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
   }
 
   @Test
   @Issue("W-12422473")
-  public void jmxDisabled() throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
-    ObjectName objectName = new ObjectName("org.apache.commons.pool2:type=GenericObjectPool,name=pool");
-    MBeanServer mBeanServer = getPlatformMBeanServer();
-    if (mBeanServer.isRegistered(objectName)) {
-      mBeanServer.unregisterMBean(objectName);
-    }
+  public void jmxDisabled() throws MalformedObjectNameException {
     initStrategyJmxDisabled();
-    assertFalse(getPlatformMBeanServer().isRegistered(objectName));
+    assertFalse(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
   }
 
   private void resetConnectionProvider() throws ConnectionException {
