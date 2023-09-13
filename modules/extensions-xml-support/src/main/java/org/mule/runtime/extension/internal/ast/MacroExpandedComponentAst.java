@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.extension.internal.ast;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.functional.Either.right;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
@@ -21,7 +24,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
-import org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.Collection;
@@ -29,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 /**
@@ -138,7 +139,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
       private Object mapReconnection(final ComponentParameterAst originalParameter) {
         MacroExpandedComponentAst macroExpandedComponentAst = (MacroExpandedComponentAst) originalParameter.getValue().getRight();
-        return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(macroExpandedComponentAst, UnaryOperator.identity());
+        return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
       }
 
       private Object mapReconnectionStrategy(final ComponentParameterAst originalParameter) {
@@ -146,7 +147,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
             new MacroExpandedComponentAst((ComponentAst) originalParameter.getValue().getRight(), location,
                                           moduleGlobalElementsNames, defaultGlobalElementSuffix, literalsParameters,
                                           macroExpandedChildren);
-        return MuleArtifactAstCopyUtils.copyComponentTreeRecursively(macroExpandedComponentAst, UnaryOperator.identity());
+        return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
       }
 
       @Override
