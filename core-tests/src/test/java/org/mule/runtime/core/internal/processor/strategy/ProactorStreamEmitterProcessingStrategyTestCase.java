@@ -38,7 +38,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -46,7 +45,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
@@ -609,9 +609,9 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
       new PollingProber(10000, 10)
           .check(new JUnitLambdaProbe(() -> cpuIntensive.executor.toString().contains("queued tasks = 2")));
-
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(1000);
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> latchedProcessor.getInvocations() >= 2));
 
       expectedException
           .expectMessage("Flow \"flow\" is unable to accept new events at this time. Reason: REQUIRED_SCHEDULER_BUSY");
@@ -655,7 +655,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> latchedProcessor.getInvocations() >= 3));
 
       latchedProcessor.release();
 

@@ -6,23 +6,18 @@
  */
 package org.mule.runtime.core.internal.processor.strategy;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.util.Collections.singleton;
-import static java.util.Optional.empty;
-import static org.hamcrest.CoreMatchers.notNullValue;
-
 import static org.mule.runtime.api.component.AbstractComponent.ANNOTATION_NAME;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_PRE_INVOKE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.FLOW_EXECUTED;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_FLOW_MESSAGE_PASSING;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_OPERATION_EXECUTED;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_SCHEDULING_OPERATION_EXECUTION;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.PS_STARTING_OPERATION_EXECUTION;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_FLOW_EXECUTION;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -44,25 +39,25 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.DEFAULT_TIMEOUT;
 import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.Optional.empty;
 
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -81,11 +76,9 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.notification.IntegerAction;
 import org.mule.runtime.api.notification.MessageProcessorNotification;
 import org.mule.runtime.api.notification.MessageProcessorNotificationListener;
@@ -122,7 +115,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
-import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,20 +139,25 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableMap;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
+
+import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.junit.Assert;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+
 import org.mockito.InOrder;
+
 import reactor.core.publisher.Flux;
 
 @RunWith(Parameterized.class)
@@ -896,6 +893,10 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
 
     public Latch getUnlatchedInvocationLatch() throws InterruptedException {
       return unlatchedInvocationLatch;
+    }
+
+    public int getInvocations() {
+      return invocations.get();
     }
 
     @Override
