@@ -25,6 +25,8 @@ module org.mule.runtime.deployment.model {
 
   requires org.apache.commons.lang3;
 
+  uses org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider;
+
   exports org.mule.runtime.deployment.model.api;
   exports org.mule.runtime.deployment.model.api.application;
   exports org.mule.runtime.deployment.model.api.artifact;

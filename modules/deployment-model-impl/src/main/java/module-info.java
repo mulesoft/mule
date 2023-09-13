@@ -42,4 +42,7 @@ module org.mule.runtime.deployment.model.impl {
       org.mule.runtime.deployment;
   exports org.mule.runtime.module.deployment.impl.internal.util to
       org.mule.runtime.deployment;
+
+  provides org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider with
+      org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 }
