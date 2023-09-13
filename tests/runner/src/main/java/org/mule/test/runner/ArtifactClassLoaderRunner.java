@@ -286,7 +286,7 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
       LOGGER.debug("Using MavenConfiguration: {}", mavenConfiguration);
     }
 
-    DependencyResolver dependencyResolver =
+    final DependencyResolver dependencyResolver =
         new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
     try (AetherClassPathClassifier classPathClassifier = new AetherClassPathClassifier(dependencyResolver,
                                                                                        new ArtifactClassificationTypeResolver(
