@@ -75,6 +75,8 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
   }
 
   private void createClassLoaderConfigurationLoaders() {
+    // This method might be invoked more than once if the Maven configuration changes, so the previous mavenClient instance (if
+    // any) must be disposed
     closeMavenClient();
     mavenClient = createMavenClient(mavenRuntimeConfig);
 
