@@ -60,14 +60,12 @@ module org.mule.runtime.artifact.activation {
       org.mule.runtime.spring.config,
       org.mule.runtime.log4j,
       org.mule.test.runner;
+  exports org.mule.runtime.module.artifact.activation.internal.deployable to
+          org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.module.artifact.activation.internal.nativelib to
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
-
-  exports org.mule.runtime.module.artifact.activation.internal.deployable to
-      org.mule.runtime.deployment.model.impl;
-
   exports org.mule.runtime.module.artifact.activation.internal.plugin to
       org.mule.runtime.deployment.model.impl;
 

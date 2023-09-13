@@ -30,6 +30,8 @@ module org.mule.runtime.artifact {
   exports org.mule.runtime.module.artifact.api.plugin;
   exports org.mule.runtime.module.artifact.api.serializer;
 
+  exports org.mule.module.artifact.classloader to
+          org.mule.runtime.extensions.support;
   exports org.mule.runtime.module.artifact.internal.classloader to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.extensions.support,
@@ -42,8 +44,5 @@ module org.mule.runtime.artifact {
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
-
-  exports org.mule.module.artifact.classloader to
-      org.mule.runtime.extensions.support;
 
 }

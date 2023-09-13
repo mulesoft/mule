@@ -12,7 +12,7 @@
  */
 module org.mule.runtime.deployment.model.impl {
 
-    //requires org.mule.runtime.api;
+    requires org.mule.runtime.api;
     requires org.mule.runtime.artifact;
     requires org.mule.runtime.artifact.activation;
     requires org.mule.runtime.artifact.declaration;
@@ -32,15 +32,12 @@ module org.mule.runtime.deployment.model.impl {
 
     requires com.google.gson;
 
-    exports org.mule.runtime.module.deployment.impl.internal.util to
-        org.mule.runtime.deployment;
-
+    exports org.mule.runtime.module.deployment.impl.internal.application to
+            org.mule.runtime.deployment;
     exports org.mule.runtime.module.deployment.impl.internal.artifact to
         org.mule.runtime.deployment;
-
-    exports org.mule.runtime.module.deployment.impl.internal.application to
-        org.mule.runtime.deployment;
-
     exports org.mule.runtime.module.deployment.impl.internal.domain to
         org.mule.runtime.deployment;
+    exports org.mule.runtime.module.deployment.impl.internal.util to
+            org.mule.runtime.deployment;
 }

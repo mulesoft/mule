@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
-import org.apache.logging.log4j.core.Core;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.runtime.core.api.streaming.iterator.ListConsumer;

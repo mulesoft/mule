@@ -26,6 +26,7 @@ module org.mule.runtime.deployment {
     requires org.mule.runtime.properties.config;
     requires org.mule.runtime.spring.config;
 
+    // package java.beans package is used
     requires java.desktop;
     requires spring.core;
 

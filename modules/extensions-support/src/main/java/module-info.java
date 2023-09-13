@@ -37,13 +37,14 @@ module org.mule.runtime.extensions.support {
     requires org.mule.sdk.api;
     requires org.mule.sdk.compatibility.api;
 
-    requires org.apache.logging.log4j.core;
     requires org.joda.time;
     requires com.github.benmanes.caffeine;
     requires com.google.common;
     requires spring.core;
 
+    // packages javax.lang.model.element, javax.annotation.processing and javax.lang.model.type are used
     requires java.compiler;
+    // package java.beans is used
     requires java.desktop;
     requires java.xml.bind;
 }
