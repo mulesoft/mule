@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.connection;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.min;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.COMMONS_POOL2_DISABLEJMX;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
@@ -52,7 +52,6 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   private final GenericObjectPool<C> pool;
   private final String poolId;
   private final PoolingListener<C> poolingListener;
-  private GenericObjectPoolConfig<C> config;
 
   /**
    * Creates a new instance
@@ -126,10 +125,9 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
   private GenericObjectPool<C> createPool(String ownerConfigName,
                                           FeatureFlaggingService featureFlaggingService) {
     GenericObjectPoolConfig<C> config = new GenericObjectPoolConfig<>();
-    this.config = config;
 
     config.setMaxIdle(poolingProfile.getMaxIdle());
-    if (featureFlaggingService.isEnabled(COMMONS_POOL2_DISABLEJMX)) {
+    if (featureFlaggingService != null && featureFlaggingService.isEnabled(DISABLE_JMX_FOR_COMMONS_POOL2)) {
       config.setJmxEnabled(false);
     }
 
@@ -226,10 +224,6 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   private String generateId() {
     return UUID.randomUUID().toString();
-  }
-
-  public boolean isJmxEnabled() {
-    return config.getJmxEnabled();
   }
 
 }

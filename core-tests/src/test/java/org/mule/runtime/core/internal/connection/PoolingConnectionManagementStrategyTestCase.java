@@ -18,6 +18,8 @@ import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -47,6 +49,13 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
+import io.qameta.allure.Issue;
 import org.slf4j.LoggerFactory;
 
 import org.junit.After;
@@ -307,15 +316,27 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   @Test
-  public void jmxEnabled() {
+  @Issue("W-12422473")
+  public void jmxEnabled() throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
+    ObjectName objectName = new ObjectName("org.apache.commons.pool2:type=GenericObjectPool,name=pool");
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    if (mBeanServer.isRegistered(objectName)) {
+      mBeanServer.unregisterMBean(objectName);
+    }
     initStrategy();
-    assertTrue(strategy.isJmxEnabled());
+    assertTrue(getPlatformMBeanServer().isRegistered(objectName));
   }
 
   @Test
-  public void jmxDisabled() {
+  @Issue("W-12422473")
+  public void jmxDisabled() throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
+    ObjectName objectName = new ObjectName("org.apache.commons.pool2:type=GenericObjectPool,name=pool");
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    if (mBeanServer.isRegistered(objectName)) {
+      mBeanServer.unregisterMBean(objectName);
+    }
     initStrategyJmxDisabled();
-    assertFalse(strategy.isJmxEnabled());
+    assertFalse(getPlatformMBeanServer().isRegistered(objectName));
   }
 
   private void resetConnectionProvider() throws ConnectionException {
