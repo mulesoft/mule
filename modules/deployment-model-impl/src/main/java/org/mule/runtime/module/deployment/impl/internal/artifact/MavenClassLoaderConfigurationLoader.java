@@ -14,8 +14,11 @@ import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFac
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -26,8 +29,9 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassL
 
 import java.io.File;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.StampedLock;
+
+import org.slf4j.Logger;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -36,12 +40,15 @@ import java.util.concurrent.locks.StampedLock;
  * @since 4.0
  */
 // TODO MULE-11878 - consolidate with other aether usages in mule.
-public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
+public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader, Disposable {
+
+  protected static final Logger LOGGER = getLogger(MavenClassLoaderConfigurationLoader.class);
 
   private DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader;
   private PluginMavenClassLoaderConfigurationLoader pluginMavenClassLoaderConfigurationLoader;
   private ClassLoaderConfigurationLoader libFolderClassLoaderConfigurationLoader;
   private volatile MavenConfiguration mavenRuntimeConfig;
+  private volatile MavenClient mavenClient;
 
   private final StampedLock lock = new StampedLock();
 
@@ -68,10 +75,13 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
   }
 
   private void createClassLoaderConfigurationLoaders() {
-    Optional<MavenClient> mavenClient = ofNullable(createMavenClient(mavenRuntimeConfig));
+    // This method might be invoked more than once if the Maven configuration changes, so the previous mavenClient instance (if
+    // any) must be disposed
+    closeMavenClient();
+    mavenClient = createMavenClient(mavenRuntimeConfig);
 
-    deployableMavenClassLoaderConfigurationLoader = new DeployableMavenClassLoaderConfigurationLoader(mavenClient);
-    pluginMavenClassLoaderConfigurationLoader = new PluginMavenClassLoaderConfigurationLoader(mavenClient);
+    deployableMavenClassLoaderConfigurationLoader = new DeployableMavenClassLoaderConfigurationLoader(ofNullable(mavenClient));
+    pluginMavenClassLoaderConfigurationLoader = new PluginMavenClassLoaderConfigurationLoader(ofNullable(mavenClient));
 
     libFolderClassLoaderConfigurationLoader = serviceClassLoaderConfigurationLoader();
   }
@@ -106,4 +116,18 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
         || libFolderClassLoaderConfigurationLoader.supportsArtifactType(artifactType);
   }
 
+  @Override
+  public void dispose() {
+    closeMavenClient();
+  }
+
+  private void closeMavenClient() {
+    if (mavenClient != null) {
+      try {
+        mavenClient.close();
+      } catch (Exception e) {
+        LOGGER.error("Error while disposing 'mavenClient'", e);
+      }
+    }
+  }
 }

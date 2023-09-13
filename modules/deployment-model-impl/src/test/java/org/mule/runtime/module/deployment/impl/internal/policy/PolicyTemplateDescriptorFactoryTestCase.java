@@ -43,6 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
@@ -71,6 +72,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,6 +98,7 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
 
   private final ArtifactPluginDescriptorLoader artifactPluginDescriptorLoader = mock(ArtifactPluginDescriptorLoader.class);
   private final DescriptorLoaderRepository descriptorLoaderRepository = mock(ServiceRegistryDescriptorLoaderRepository.class);
+  private MavenClient mavenClient;
 
   private static File getResourceFile(String resource) {
     return toFile(PolicyTemplateDescriptorFactoryTestCase.class.getResource(resource));
@@ -111,17 +114,23 @@ public class PolicyTemplateDescriptorFactoryTestCase extends AbstractMuleTestCas
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, ClassLoaderConfigurationLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
     MavenClientProvider mavenClientProvider = MavenClientProvider.discoverProvider(currentThread().getContextClassLoader());
+    mavenClient = mavenClientProvider
+        .createMavenClient(newMavenConfigurationBuilder()
+            .localMavenRepositoryLocation(mavenClientProvider
+                .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
+            .build());
     when(descriptorLoaderRepository.get(MULE_LOADER_ID, POLICY, ClassLoaderConfigurationLoader.class))
-        .thenReturn(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
-            .createMavenClient(newMavenConfigurationBuilder()
-                .localMavenRepositoryLocation(mavenClientProvider
-                    .getLocalRepositorySuppliers().environmentMavenRepositorySupplier().get())
-                .build()))));
+        .thenReturn(new DeployableMavenClassLoaderConfigurationLoader(of(mavenClient)));
 
     when(descriptorLoaderRepository.get(PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenReturn(new PropertiesBundleDescriptorLoader());
     when(descriptorLoaderRepository.get(INVALID_LOADER_ID, POLICY, BundleDescriptorLoader.class))
         .thenThrow(new LoaderNotFoundException(INVALID_LOADER_ID));
+  }
+
+  @After
+  public void cleanUp() throws Exception {
+    mavenClient.close();
   }
 
   @Test
