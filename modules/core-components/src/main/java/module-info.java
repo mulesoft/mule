@@ -12,13 +12,13 @@
  */
 module org.mule.runtime.core.components {
 
-    requires org.mule.runtime.api;
-    requires org.mule.runtime.core;
-    requires org.mule.runtime.extension.model;
-    requires org.mule.runtime.tracer.api;
-    requires org.mule.runtime.tracer.customization.api;
+  requires org.mule.runtime.api;
+  requires org.mule.runtime.core;
+  requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.tracer.api;
+  requires org.mule.runtime.tracer.customization.api;
 
-    requires jakarta.activation;
-    requires java.xml;
-    requires org.apache.log4j;
+  requires jakarta.activation;
+  requires java.xml;
+  requires org.apache.log4j;
 }

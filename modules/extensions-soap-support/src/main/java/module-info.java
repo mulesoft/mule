@@ -12,23 +12,23 @@
  */
 module org.mule.runtime.extensions.soap.support {
 
-    requires org.mule.runtime.core;
-    requires org.mule.runtime.extensions.api;
-    requires org.mule.runtime.extensions.soap.api;
-    requires org.mule.runtime.extensions.support;
-    requires org.mule.runtime.http.api;
-    requires org.mule.runtime.metadata.model.api;
-    requires org.mule.runtime.metadata.model.java;
-    requires org.mule.runtime.metadata.support;
-    requires org.mule.runtime.soap.api;
-    requires org.mule.sdk.api;
+  requires org.mule.runtime.core;
+  requires org.mule.runtime.extensions.api;
+  requires org.mule.runtime.extensions.soap.api;
+  requires org.mule.runtime.extensions.support;
+  requires org.mule.runtime.http.api;
+  requires org.mule.runtime.metadata.model.api;
+  requires org.mule.runtime.metadata.model.java;
+  requires org.mule.runtime.metadata.support;
+  requires org.mule.runtime.soap.api;
+  requires org.mule.sdk.api;
 
-    exports org.mule.runtime.module.extension.soap.internal.loader to
-        org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.module.extension.soap.internal.loader to
+      org.mule.runtime.extensions.spring.support;
 
-    exports org.mule.runtime.module.extension.soap.internal.loader.property to
-        org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.module.extension.soap.internal.loader.property to
+      org.mule.runtime.extensions.spring.support;
 
-    exports org.mule.runtime.module.extension.soap.internal.runtime.connection to
-        org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.module.extension.soap.internal.runtime.connection to
+      org.mule.runtime.extensions.spring.support;
 }

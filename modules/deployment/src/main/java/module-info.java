@@ -12,24 +12,24 @@
  */
 module org.mule.runtime.deployment {
 
-    requires org.mule.runtime.api;
-    requires org.mule.runtime.artifact;
-    requires org.mule.runtime.artifact.activation;
-    requires org.mule.runtime.artifact.ast;
-    requires org.mule.runtime.artifact.ast.serialization;
-    requires org.mule.runtime.artifact.ast.xmlParser;
-    requires org.mule.runtime.artifact.declaration;
-    requires org.mule.runtime.container;
-    requires org.mule.runtime.core;
-    requires org.mule.runtime.deployment.model;
-    requires org.mule.runtime.deployment.model.impl;
-    requires org.mule.runtime.properties.config;
-    requires org.mule.runtime.spring.config;
+  requires org.mule.runtime.api;
+  requires org.mule.runtime.artifact;
+  requires org.mule.runtime.artifact.activation;
+  requires org.mule.runtime.artifact.ast;
+  requires org.mule.runtime.artifact.ast.serialization;
+  requires org.mule.runtime.artifact.ast.xmlParser;
+  requires org.mule.runtime.artifact.declaration;
+  requires org.mule.runtime.container;
+  requires org.mule.runtime.core;
+  requires org.mule.runtime.deployment.model;
+  requires org.mule.runtime.deployment.model.impl;
+  requires org.mule.runtime.properties.config;
+  requires org.mule.runtime.spring.config;
 
-    // package java.beans package is used
-    requires java.desktop;
-    requires spring.core;
+  // package java.beans package is used
+  requires java.desktop;
+  requires spring.core;
 
-    exports org.mule.runtime.module.deployment.api;
+  exports org.mule.runtime.module.deployment.api;
 
 }
