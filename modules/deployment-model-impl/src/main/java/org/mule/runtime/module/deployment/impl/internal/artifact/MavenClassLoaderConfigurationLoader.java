@@ -14,6 +14,8 @@ import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFac
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -27,8 +29,9 @@ import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassL
 
 import java.io.File;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.StampedLock;
+
+import org.slf4j.Logger;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -38,6 +41,8 @@ import java.util.concurrent.locks.StampedLock;
  */
 // TODO MULE-11878 - consolidate with other aether usages in mule.
 public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader, Disposable {
+
+  protected static final Logger LOGGER = getLogger(MavenClassLoaderConfigurationLoader.class);
 
   private DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader;
   private PluginMavenClassLoaderConfigurationLoader pluginMavenClassLoaderConfigurationLoader;
@@ -119,8 +124,7 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
       try {
         mavenClient.close();
       } catch (Exception e) {
-        // TODO - log or throw?
-        // throw new MuleRuntimeException(createStaticMessage("Error while disposing 'mavenClient'", e));
+        LOGGER.error("Error while disposing 'mavenClient'", e);
       }
     }
   }

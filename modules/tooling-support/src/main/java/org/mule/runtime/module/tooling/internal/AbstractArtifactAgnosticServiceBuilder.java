@@ -159,28 +159,26 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
       model.createDeployablePomFile(applicationFolder.toPath());
       model.updateArtifactPom(applicationFolder.toPath());
 
-      MuleVersion muleVersion = new MuleVersion("4.4.0");
-
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
-      String artifactJson;
+      ClassLoaderConfiguration classLoaderConfiguration;
       try (MavenClient mavenClient = mavenClientProvider.createMavenClient(GlobalConfigLoader.getMavenConfig())) {
-        ClassLoaderConfiguration classLoaderConfiguration =
+        classLoaderConfiguration =
             new DeployableMavenClassLoaderConfigurationLoader(of(mavenClient))
                 .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
                                                       createTempBundleDescriptor()),
                       ArtifactType.APP);
-        artifactJson =
-            new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
-                                                                              configs,
-                                                                              muleVersion.toCompleteNumericVersion()));
-      } catch (Exception e) {
-        throw new MuleRuntimeException(createStaticMessage("Error while serializing the mule-artifact.json"), e);
       }
 
       File destinationFolder =
           applicationFolder.toPath().resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
       createDirectories(destinationFolder.toPath());
+
+      MuleVersion muleVersion = new MuleVersion("4.4.0");
+      String artifactJson =
+          new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
+                                                                            configs,
+                                                                            muleVersion.toCompleteNumericVersion()));
 
       try (FileWriter fileWriter = new FileWriter(new File(destinationFolder, "mule-artifact.json"))) {
         fileWriter.write(artifactJson);
