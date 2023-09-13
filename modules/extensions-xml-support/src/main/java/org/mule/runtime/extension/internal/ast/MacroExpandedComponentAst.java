@@ -9,8 +9,6 @@ package org.mule.runtime.extension.internal.ast;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_CONFIG_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.RECONNECTION_STRATEGY_PARAMETER_NAME;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -24,8 +22,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -112,18 +112,20 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         }
 
         return (Either<String, T>) originalValue
-            .mapRight(v -> {
-              if (v instanceof String) {
-                return macroExpandedRawValue((String) v);
-              } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
-                return mapErrorMappings(getDecorated());
-              } else if (getDecorated().getModel().getName().equals(RECONNECTION_CONFIG_PARAMETER_NAME)) {
-                return mapReconnection(getDecorated());
-              } else if (getDecorated().getModel().getName().equals(RECONNECTION_STRATEGY_PARAMETER_NAME)) {
-                return mapReconnectionStrategy(getDecorated());
-              }
-              return v;
-            });
+            .mapRight(this::mapComponent);
+      }
+
+      private <T> Object mapComponent(T rawValue) {
+        if (rawValue instanceof ArrayList) {
+          return rawValue;
+        } else if (rawValue instanceof String) {
+          return macroExpandedRawValue((String) rawValue);
+        } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
+          return mapErrorMappings(getDecorated());
+        } else if (isComplexComponent()) {
+          return copyComplexComponentTreeRecursively();
+        }
+        return rawValue;
       }
 
       private Object mapErrorMappings(final ComponentParameterAst originalParameter) {
@@ -137,16 +139,16 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
             .getRight();
       }
 
-      private Object mapReconnection(final ComponentParameterAst originalParameter) {
-        MacroExpandedComponentAst macroExpandedComponentAst = (MacroExpandedComponentAst) originalParameter.getValue().getRight();
-        return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
+      private boolean isComplexComponent() {
+        Optional<DslElementSyntax> dslElementSyntax = getDecorated().getGenerationInformation().getSyntax();
+        return dslElementSyntax.map(DslElementSyntax::supportsChildDeclaration).orElse(false);
       }
 
-      private Object mapReconnectionStrategy(final ComponentParameterAst originalParameter) {
+      private Object copyComplexComponentTreeRecursively() {
+        ComponentAst component = (ComponentAst) getDecorated().getValue().getRight();
         MacroExpandedComponentAst macroExpandedComponentAst =
-            new MacroExpandedComponentAst((ComponentAst) originalParameter.getValue().getRight(), location,
-                                          moduleGlobalElementsNames, defaultGlobalElementSuffix, literalsParameters,
-                                          macroExpandedChildren);
+            new MacroExpandedComponentAst(component, location, moduleGlobalElementsNames, defaultGlobalElementSuffix,
+                                          literalsParameters, macroExpandedChildren);
         return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
       }
 
