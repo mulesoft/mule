@@ -35,6 +35,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -58,6 +59,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -82,20 +84,22 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   private AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> descriptorFactory;
   private final MavenClientProvider mavenClientProvider =
       MavenClientProvider.discoverProvider(ArtifactPluginDescriptorFactoryTestCase.class.getClassLoader());
+  private MavenClient mavenClient;
 
   @Before
   public void setUp() throws Exception {
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
+    mavenClient = mavenClientProvider
+        .createMavenClient(newMavenConfigurationBuilder()
+            .localMavenRepositoryLocation(mavenClientProvider
+                .getLocalRepositorySuppliers()
+                .environmentMavenRepositorySupplier()
+                .get())
+            .build());
     when(descriptorLoaderRepository.get(MULE_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
-        .thenReturn(new PluginMavenClassLoaderConfigurationLoader(of(mavenClientProvider
-            .createMavenClient(newMavenConfigurationBuilder()
-                .localMavenRepositoryLocation(mavenClientProvider
-                    .getLocalRepositorySuppliers()
-                    .environmentMavenRepositorySupplier()
-                    .get())
-                .build()))));
+        .thenReturn(new PluginMavenClassLoaderConfigurationLoader(of(mavenClient)));
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderConfigurationLoader());
@@ -110,6 +114,11 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     descriptorFactory =
         artifactDescriptorFactoryProvider()
             .createArtifactPluginDescriptorFactory(descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
+  }
+
+  @After
+  public void cleanUp() throws Exception {
+    mavenClient.close();
   }
 
   @Test

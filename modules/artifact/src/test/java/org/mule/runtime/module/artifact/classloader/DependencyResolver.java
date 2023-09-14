@@ -45,18 +45,16 @@ public class DependencyResolver {
     MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
         newMavenConfigurationBuilder().globalSettingsLocation(toFile(settingsUrl));
 
-    MavenClient mavenClient = mavenClientProvider
-        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
-
     BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder()
         .setGroupId(groupId)
         .setArtifactId(artifactId)
         .setVersion(version)
         .build();
 
-    try {
+    try (MavenClient mavenClient = mavenClientProvider
+        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build())) {
       return mavenClient.resolveBundleDescriptor(bundleDescriptor).getBundleUri().toURL();
-    } catch (MalformedURLException e) {
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

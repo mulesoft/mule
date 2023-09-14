@@ -72,6 +72,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
@@ -441,6 +443,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public ProfilingService getContainerProfilingService() {
     return containerProfilingService;
+  }
+
+  /**
+   * @return a {@link DescriptorLoaderRepository} that detects available implementations of
+   *         {@link ClassLoaderConfigurationLoader}.
+   */
+  public DescriptorLoaderRepository getDescriptorLoaderRepository() {
+    return descriptorLoaderRepository;
   }
 
   private SchedulerService getSchedulerService() {
