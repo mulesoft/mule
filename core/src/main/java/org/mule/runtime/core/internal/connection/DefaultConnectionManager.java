@@ -12,6 +12,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -57,6 +59,9 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final ConnectionManagementStrategyFactory managementStrategyFactory;
   private final ReconnectionConfig defaultReconnectionConfig = ReconnectionConfig.getDefault();
 
+  @Inject
+  protected FeatureFlaggingService featureFlaggingService;
+
   /**
    * Creates a new instance
    *
@@ -80,7 +85,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
     connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
-    ConnectionManagementStrategy<C> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
+    ConnectionManagementStrategy<C> managementStrategy =
+        managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService);
 
     ConnectionManagementStrategy<C> previous;
 
@@ -124,7 +130,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     return doTestConnectivity(() -> {
       try {
         return doTestConnectivity(connectionProvider,
-                                  managementStrategyFactory.getStrategy(connectionProvider)
+                                  managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService)
                                       .getConnectionHandler());
       } catch (ConnectionException e) {
         return failure(e.getMessage(), e.getErrorType().orElse(null), e);
@@ -164,7 +170,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
         try {
           connectionHandler = hasBinding(config)
               ? getConnection(config)
-              : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+              : managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService).getConnectionHandler();
         } finally {
           readLock.unlock();
         }

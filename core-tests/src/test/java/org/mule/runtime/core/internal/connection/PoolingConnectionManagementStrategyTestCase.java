@@ -18,11 +18,15 @@ import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
 import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
 
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -45,6 +49,11 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
+import io.qameta.allure.Issue;
 import org.slf4j.LoggerFactory;
 
 import org.junit.After;
@@ -60,6 +69,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
   private static final int MAX_ACTIVE = 2;
   private static final String ownerConfigName = "SomeConfigName";
+  public static final String POOL_NAME = "org.apache.commons.pool2:type=GenericObjectPool,name=pool";
 
   private ConnectionProvider<Object> connectionProvider;
 
@@ -85,8 +95,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   @After
-  public void restoreLogger() {
+  public void after() throws Exception {
     logger.resetLevel();
+    ObjectName objectName = new ObjectName(POOL_NAME);
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    if (mBeanServer.isRegistered(objectName)) {
+      mBeanServer.unregisterMBean(objectName);
+    }
   }
 
   @Test
@@ -304,6 +319,20 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                    DEFAULT_POOL_INITIALISATION_POLICY);
   }
 
+  @Test
+  @Issue("W-12422473")
+  public void jmxEnabled() throws MalformedObjectNameException {
+    initStrategy();
+    assertTrue(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
+  }
+
+  @Test
+  @Issue("W-12422473")
+  public void jmxDisabled() throws MalformedObjectNameException {
+    initStrategyJmxDisabled();
+    assertFalse(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
+  }
+
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
@@ -313,7 +342,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
 
   private void initStrategy() {
     strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
-                                                         ownerConfigName);
+                                                         ownerConfigName, f -> false);
+  }
+
+  private void initStrategyJmxDisabled() {
+    // enable mule.commons.pool2.disableJmx feature flag
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+                                                         ownerConfigName, f -> true);
   }
 
   private void verifyConnections(int numToCreate) throws ConnectionException {

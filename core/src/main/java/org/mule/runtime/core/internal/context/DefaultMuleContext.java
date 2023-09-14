@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
@@ -352,6 +353,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configurePutTraceIdAndSpanIdInMdc();
       configureAddMuleSpecificTracingInformationInTraceState();
       configureCreateChildPolicyContextForParallelScopes();
+      configureCommonsPool2DisableJmx();
     }
   }
 
@@ -1559,6 +1561,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configurePutTraceIdAndSpanIdInMdc() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC, featureContext -> false);
+  }
+
+  private static void configureCommonsPool2DisableJmx() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_JMX_FOR_COMMONS_POOL2, minMuleVersion("4.6.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

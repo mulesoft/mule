@@ -9,6 +9,8 @@ package org.mule.runtime.core.internal.connection;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -34,11 +36,13 @@ import javax.inject.Inject;
  */
 public final class DelegateConnectionManagerAdapter implements ConnectionManagerAdapter {
 
+  private final MuleContext muleContext;
   private ConnectionManagerAdapter delegate;
   private ConnectionManagerAdapter connectionManagerAdapterStrategy;
 
   @Inject
   public DelegateConnectionManagerAdapter(MuleContext muleContext) {
+    this.muleContext = muleContext;
     delegate = new DefaultConnectionManager(muleContext);
     if (parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"))) {
       connectionManagerAdapterStrategy = new LazyConnectionManagerAdapter();
@@ -178,7 +182,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public void initialise() throws InitialisationException {
-      delegate.initialise();
+      initialiseIfNeeded(delegate, true, muleContext);
     }
 
     @Override
@@ -268,7 +272,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public void initialise() throws InitialisationException {
-      delegate.initialise();
+      initialiseIfNeeded(delegate, true, muleContext);
     }
 
     @Override
