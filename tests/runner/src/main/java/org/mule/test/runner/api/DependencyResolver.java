@@ -20,6 +20,7 @@ import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.MuleMavenRepositoryState;
+import org.mule.maven.client.internal.MuleMavenRepositoryStateFactory;
 import org.mule.maven.client.internal.MuleMavenResolutionContext;
 import org.mule.runtime.api.util.Pair;
 
@@ -63,14 +64,14 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class DependencyResolver {
+public class DependencyResolver implements AutoCloseable {
 
   protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  private final MavenClient mavenClient;
-
   private final MuleMavenResolutionContext resolutionContext;
   private final MuleMavenRepositoryState repositoryState;
+  private final MuleMavenRepositoryStateFactory repositoryStateFactory;
+  private boolean closed = false;
 
   /**
    * Creates an instance of the resolver.
@@ -81,22 +82,22 @@ public class DependencyResolver {
   public DependencyResolver(MavenConfiguration mavenConfiguration, Optional<WorkspaceReader> workspaceReader) {
     requireNonNull(mavenConfiguration, "mavenConfiguration cannot be null");
 
-    this.mavenClient = discoverProvider(MavenClientProvider.class.getClassLoader()).createMavenClient(mavenConfiguration);
-
     this.resolutionContext = new MuleMavenResolutionContext(mavenConfiguration);
-    this.repositoryState = new MuleMavenRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
-                                                        resolutionContext.getAuthenticatorSelector(),
-                                                        resolutionContext.getProxySelector(),
-                                                        resolutionContext.getMirrorSelector(),
-                                                        mavenConfiguration.getForcePolicyUpdateNever(),
-                                                        mavenConfiguration.getForcePolicyUpdateAlways(),
-                                                        mavenConfiguration.getOfflineMode(),
-                                                        mavenConfiguration
-                                                            .getIgnoreArtifactDescriptorRepositories(),
-                                                        empty(),
-                                                        session -> {
-                                                        },
-                                                        mavenConfiguration.getGlobalChecksumPolicy());
+    this.repositoryStateFactory = new MuleMavenRepositoryStateFactory();
+    this.repositoryState =
+        repositoryStateFactory.createMavenRepositoryState(resolutionContext.getLocalRepositoryLocation(), workspaceReader,
+                                                          resolutionContext.getAuthenticatorSelector(),
+                                                          resolutionContext.getProxySelector(),
+                                                          resolutionContext.getMirrorSelector(),
+                                                          mavenConfiguration.getForcePolicyUpdateNever(),
+                                                          mavenConfiguration.getForcePolicyUpdateAlways(),
+                                                          mavenConfiguration.getOfflineMode(),
+                                                          mavenConfiguration
+                                                              .getIgnoreArtifactDescriptorRepositories(),
+                                                          empty(),
+                                                          session -> {
+                                                          },
+                                                          mavenConfiguration.getGlobalChecksumPolicy());
 
     if (logger.isDebugEnabled()) {
       resolutionContext.getAuthenticatorSelector()
@@ -417,6 +418,14 @@ public class DependencyResolver {
         logger.warn("Dependency path to not resolved artifacts -> {}", unresolvedArtifactPath.toString());
       }
     });
+  }
+
+  @Override
+  public void close() throws Exception {
+    if (!closed) {
+      repositoryStateFactory.close();
+      closed = true;
+    }
   }
 
 }
