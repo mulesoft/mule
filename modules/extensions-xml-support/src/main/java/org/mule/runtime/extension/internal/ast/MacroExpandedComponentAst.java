@@ -147,8 +147,8 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       private Object copyComplexComponentTreeRecursively() {
         ComponentAst component = (ComponentAst) getDecorated().getValue().getRight();
         MacroExpandedComponentAst macroExpandedComponentAst =
-            new MacroExpandedComponentAst(component, location, moduleGlobalElementsNames, defaultGlobalElementSuffix,
-                                          literalsParameters, macroExpandedChildren);
+            new MacroExpandedComponentAst(component, component.getLocation(), moduleGlobalElementsNames,
+                                          defaultGlobalElementSuffix, literalsParameters, macroExpandedChildren);
         return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
       }
 
