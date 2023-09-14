@@ -21,5 +21,6 @@ module org.mule.runtime.global.config {
 
   exports org.mule.runtime.globalconfig.api;
   exports org.mule.runtime.globalconfig.api.cluster;
+  exports org.mule.runtime.globalconfig.api.maven;
 
 }
