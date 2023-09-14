@@ -13,6 +13,17 @@
 
     <properties>
         <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=org.mule.runtime.container
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.lifecycle=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.util=ALL-UNNAMED
+            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=ALL-UNNAMED
+            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
 
         <javaModuleName>org.mule.runtime.tls</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
@@ -49,6 +60,12 @@
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-container</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- test dependencies -->
