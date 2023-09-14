@@ -69159,6 +69159,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69171,7 +69172,6 @@
           "genericTypes": [],
           "isMap": false
         },
-        "label": "Person",
         "typeId": "http://example.com/example.json"
       },
       "open": {
@@ -69248,9 +69248,6 @@
           },
           "model": {
             "type": "String"
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
           }
         },
         {
@@ -69319,9 +69316,6 @@
                 "isMap": false
               }
             }
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
           }
         },
         {
@@ -69543,9 +69537,6 @@
                       },
                       "model": {
                         "type": "String"
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
                       }
                     },
                     {
@@ -69614,9 +69605,6 @@
                             "isMap": false
                           }
                         }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
                       }
                     },
                     {
@@ -69795,9 +69783,6 @@
                             },
                             "model": {
                               "type": "String"
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -69866,9 +69851,6 @@
                                   "isMap": false
                                 }
                               }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70084,9 +70066,6 @@
                             },
                             "model": {
                               "type": "String"
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70155,9 +70134,6 @@
                                   "isMap": false
                                 }
                               }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70414,9 +70390,6 @@
                         },
                         "model": {
                           "type": "String"
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -70485,9 +70458,6 @@
                               "isMap": false
                             }
                           }
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -70707,9 +70677,6 @@
                         },
                         "model": {
                           "type": "String"
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -70778,9 +70745,6 @@
                               "isMap": false
                             }
                           }
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {

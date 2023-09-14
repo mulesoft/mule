@@ -46,12 +46,24 @@ public class KnockeableDoor implements Serializable {
     return knock(victim);
   }
 
+  public void setVictim(String victim) {
+    this.victim = victim;
+  }
+
   public String getVictim() {
     return victim;
   }
 
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
   public String getAddress() {
     return address;
+  }
+
+  public void setPrevious(KnockeableDoor previous) {
+    this.previous = previous;
   }
 
   public KnockeableDoor getPrevious() {

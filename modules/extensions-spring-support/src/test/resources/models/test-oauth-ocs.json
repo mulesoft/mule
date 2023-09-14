@@ -69416,7 +69416,6 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
-        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69428,7 +69427,8 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        }
+        },
+        "typeId": "#root:shiporder"
       },
       "fields": [
         {
@@ -69579,7 +69579,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
-        "typeId": "http://example.com/example.json",
+        "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69592,7 +69592,7 @@
           "genericTypes": [],
           "isMap": false
         },
-        "label": "Person"
+        "typeId": "http://example.com/example.json"
       },
       "open": {
         "type": "Any"
@@ -69668,9 +69668,6 @@
           },
           "model": {
             "type": "String"
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
           }
         },
         {
@@ -69739,9 +69736,6 @@
                 "isMap": false
               }
             }
-          },
-          "annotations": {
-            "visibility": "READ_ONLY"
           }
         },
         {
@@ -69963,9 +69957,6 @@
                       },
                       "model": {
                         "type": "String"
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
                       }
                     },
                     {
@@ -70034,9 +70025,6 @@
                             "isMap": false
                           }
                         }
-                      },
-                      "annotations": {
-                        "visibility": "READ_ONLY"
                       }
                     },
                     {
@@ -70215,9 +70203,6 @@
                             },
                             "model": {
                               "type": "String"
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70286,9 +70271,6 @@
                                   "isMap": false
                                 }
                               }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70504,9 +70486,6 @@
                             },
                             "model": {
                               "type": "String"
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70575,9 +70554,6 @@
                                   "isMap": false
                                 }
                               }
-                            },
-                            "annotations": {
-                              "visibility": "READ_ONLY"
                             }
                           },
                           {
@@ -70834,9 +70810,6 @@
                         },
                         "model": {
                           "type": "String"
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -70905,9 +70878,6 @@
                               "isMap": false
                             }
                           }
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -71127,9 +71097,6 @@
                         },
                         "model": {
                           "type": "String"
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {
@@ -71198,9 +71165,6 @@
                               "isMap": false
                             }
                           }
-                        },
-                        "annotations": {
-                          "visibility": "READ_ONLY"
                         }
                       },
                       {

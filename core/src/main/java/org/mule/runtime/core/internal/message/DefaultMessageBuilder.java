@@ -385,7 +385,8 @@ public final class DefaultMessageBuilder
   /**
    * <code>MuleMessageImplementation</code> is a wrapper that contains a payload and properties associated with the payload.
    */
-  private static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
+  // This is public so that DataWeave can get and invoke its methods and not fallback to change the accessibility of its fields
+  public static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
 
     private static final String NOT_SET = "<not set>";
 

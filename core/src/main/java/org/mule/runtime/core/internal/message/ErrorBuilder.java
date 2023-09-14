@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -389,7 +391,8 @@ public final class ErrorBuilder {
   /**
    * Default and only non-deprecated implementation of {@link Error}.
    */
-  static final class DeserializableErrorImplementation implements PrivilegedError {
+  // This is public so that DataWeave can get and invoke its methods and not fallback to change the accessibility of its fields
+  public static final class DeserializableErrorImplementation implements PrivilegedError {
 
     private static final long serialVersionUID = 6703483143042822990L;
 
@@ -449,6 +452,10 @@ public final class ErrorBuilder {
      */
     @Override
     public Throwable getCause() {
+      return exception;
+    }
+
+    public Throwable getException() {
       return exception;
     }
 
