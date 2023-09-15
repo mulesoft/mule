@@ -23,6 +23,7 @@ module org.mule.runtime.container {
   requires com.google.common;
 
   exports org.mule.runtime.container.api;
+  exports org.mule.runtime.container.api.discoverer;
 
   exports org.mule.runtime.container.internal to
       org.mule.runtime.artifact.activation,
