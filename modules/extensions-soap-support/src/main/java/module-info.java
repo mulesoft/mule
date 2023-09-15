@@ -33,6 +33,10 @@
    exports org.mule.runtime.module.extension.soap.internal.runtime.connection to
        org.mule.runtime.extensions.spring.support;
 
+   opens org.mule.runtime.module.extension.soap.internal.runtime.connection to spring.core;
+   opens org.mule.runtime.module.extension.soap.api.runtime.connection.transport to spring.core;
+   opens org.mule.runtime.module.extension.soap.internal.runtime.operation to spring.core;
+
    provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
        org.mule.runtime.module.extension.soap.api.loader.SoapExtensionModelLoaderProvider;
  }
