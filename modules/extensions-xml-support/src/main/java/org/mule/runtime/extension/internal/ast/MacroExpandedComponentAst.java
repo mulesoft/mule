@@ -110,22 +110,9 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
             .mapRight(v -> {
               if (v instanceof String) {
                 return macroExpandedRawValue((String) v);
-              } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
-                return mapErrorMappings(getDecorated());
               }
               return v;
             });
-      }
-
-      private Object mapErrorMappings(final ComponentParameterAst originalParameter) {
-        return originalParameter.getValue()
-            .mapRight(mappings -> ((List<ErrorMapping>) mappings)
-                .stream()
-                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource()),
-                                                 literalsParameters.getOrDefault(mapping.getTarget(),
-                                                                                 mapping.getTarget())))
-                .collect(toList()))
-            .getRight();
       }
 
       @Override
