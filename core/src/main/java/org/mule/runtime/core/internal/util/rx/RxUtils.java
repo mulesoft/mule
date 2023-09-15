@@ -10,6 +10,7 @@ import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber.MULTI_FLUX_SUBSCRIBER;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -17,12 +18,14 @@ import static java.util.function.UnaryOperator.identity;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.core.scheduler.Schedulers.immediate;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -34,6 +37,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,10 +48,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
+import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.util.annotation.Nullable;
+import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Reactor specific utils
@@ -152,12 +160,49 @@ public class RxUtils {
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer,
                                                                     Scheduler subscribeOnScheduler) {
+
     return triggeringSubscriber
-        .transformDeferredContextual((eventPub, ctx) -> eventPub
-            .doOnSubscribe(s -> deferredSubscriber
-                .contextWrite(ctx)
-                .subscribeOn(subscribeOnScheduler != null ? fromExecutorService(subscribeOnScheduler) : immediate())
-                .subscribe(consumer, errorConsumer, completeConsumer)));
+        .transformDeferredContextual((eventPub, ctx) -> eventPub.doOnSubscribe(s -> {
+          startPendingSubscription(ctx);
+          just(ctx)
+              .publishOn(subscribeOnScheduler != null ? fromExecutorService(subscribeOnScheduler) : immediate())
+              .doOnNext(c -> deferredSubscriber
+                  .contextWrite(ctx)
+                  .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer))
+              .subscribe(RxUtils::completePendingSubscription, throwable -> failPendingSubscription(throwable, ctx));
+        }));
+  }
+
+  private static void handleSubscriptionError(Throwable throwable, Consumer<? super Throwable> errorConsumer, ContextView ctx) {
+    try {
+      failPendingSubscription(throwable, ctx);
+    } finally {
+      if (errorConsumer != null) {
+        errorConsumer.accept(throwable);
+      }
+    }
+  }
+
+  private static void failPendingSubscription(Throwable throwable, ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.failPendingSubscription(throwable);
+    }
+  }
+
+  private static void completePendingSubscription(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.completePendingSubscription();
+    }
+  }
+
+  private static ContextView startPendingSubscription(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null) {
+      multiFluxSubscriber.startPendingSubscription();
+    }
+    return ctx;
   }
 
   /**
@@ -436,6 +481,76 @@ public class RxUtils {
     return result -> result.reduce(me -> {
       throw propagateWrappingFatal(me);
     }, identity());
+  }
+
+  public static class MultiFluxSubscriber<T> implements CoreSubscriber<T> {
+
+    public static String MULTI_FLUX_SUBSCRIBER = "MULTI_FLUX_SUBSCRIBER";
+
+    private Throwable lastSubscriptionError;
+
+    private final Latch completionLatch;
+    private final Phaser subscriptionPhaser = new Phaser(1);
+    private boolean subscribed = false;
+
+    public MultiFluxSubscriber(Latch completionLatch) {
+      this.completionLatch = completionLatch;
+    }
+
+    @Override
+    public Context currentContext() {
+      return CoreSubscriber.super.currentContext().put(MULTI_FLUX_SUBSCRIBER, this);
+    }
+
+    @Override
+    public void onSubscribe(Subscription s) {
+      // Protect the subscriptionPhaser from potential extra calls.
+      synchronized (this) {
+        if (!subscribed) {
+          subscribed = true;
+          s.request(Long.MAX_VALUE);
+          subscriptionPhaser.arrive();
+        }
+      }
+    }
+
+    @Override
+    public void onNext(T t) {
+      // Nothing to do.
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+      lastSubscriptionError = throwable;
+      completionLatch.release();
+      subscriptionPhaser.forceTermination();
+    }
+
+    @Override
+    public void onComplete() {
+      completionLatch.release();
+      subscriptionPhaser.forceTermination();
+    }
+
+    public void startPendingSubscription() {
+      subscriptionPhaser.register();
+    }
+
+    public void completePendingSubscription() {
+      subscriptionPhaser.arrive();
+    }
+
+    public void awaitAllSubscriptions() {
+      subscriptionPhaser.awaitAdvance(0);
+    }
+
+    public void failPendingSubscription(Throwable throwable) {
+      this.onError(throwable);
+    }
+
+    public Throwable getLastSubscriptionError() {
+      return lastSubscriptionError;
+    }
   }
 
 }

@@ -24,8 +24,8 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import static org.slf4j.LoggerFactory.getLogger;
+
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 
@@ -42,6 +42,7 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.util.rx.RejectionCallbackExecutorServiceDecorator;
+import org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayList;
@@ -49,7 +50,6 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntUnaryOperator;
@@ -58,7 +58,6 @@ import java.util.function.Supplier;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
-
 import reactor.core.publisher.EmitterProcessor;
 
 /**
@@ -234,13 +233,16 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferQueueSize);
-        AtomicReference<Throwable> failedSubscriptionCause = new AtomicReference<>();
-        processor.transform(function)
-            .subscribe(null, getThrowableConsumer(flowConstruct, completionLatch, failedSubscriptionCause),
-                       () -> completionLatch.release());
 
-        if (!processor.hasDownstreams()) {
-          throw resolveSubscriptionErrorCause(failedSubscriptionCause);
+        MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = getCoreEventMultiFluxSubscriber(flowConstruct, completionLatch);
+
+        processor.transform(function)
+            .subscribe(multiFluxSubscriber);
+
+        multiFluxSubscriber.awaitAllSubscriptions();
+
+        if (!processor.hasDownstreams() || multiFluxSubscriber.getLastSubscriptionError() != null) {
+          throw resolveSubscriptionErrorCause(multiFluxSubscriber);
         }
 
         ReactorSink<CoreEvent> sink =
@@ -256,6 +258,29 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
 
       activeSinksCount.addAndGet(sinksCount);
       return new RoundRobinReactorSink<>(sinks);
+    }
+
+    private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(FlowConstruct flowConstruct, Latch completionLatch) {
+      return new MultiFluxSubscriber<>(completionLatch) {
+
+        @Override
+        public void onError(Throwable throwable) {
+          try {
+            getSubscriptionErrorConsumer(flowConstruct, completionLatch).accept(throwable);
+          } finally {
+            super.onError(throwable);
+          }
+        }
+
+        @Override
+        public void onComplete() {
+          try {
+            completionLatch.release();
+          } finally {
+            super.onComplete();
+          }
+        }
+      };
     }
 
     @Override
@@ -303,23 +328,21 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return min(maxConcurrency, coresLoad);
     }
 
-    protected MuleRuntimeException resolveSubscriptionErrorCause(AtomicReference<Throwable> failedSubscriptionCause) {
+    protected MuleRuntimeException resolveSubscriptionErrorCause(MultiFluxSubscriber<CoreEvent> multiFluxSubscriber) {
       MuleRuntimeException exceptionToThrow;
-      if (failedSubscriptionCause.get() != null) {
+      if (multiFluxSubscriber.getLastSubscriptionError() != null) {
+        // Considerar cambiar el mensaje por uno que aclare que hubo errores en la suscripcion
         exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
-                                                    failedSubscriptionCause.get());
+                                                    multiFluxSubscriber.getLastSubscriptionError());
       } else {
         exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR));
       }
       return exceptionToThrow;
     }
 
-    protected Consumer<Throwable> getThrowableConsumer(FlowConstruct flowConstruct, Latch completionLatch,
-                                                       AtomicReference<Throwable> failedSubscriptionCause) {
+    protected Consumer<Throwable> getSubscriptionErrorConsumer(FlowConstruct flowConstruct, Latch completionLatch) {
       return e -> {
         LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
-
-        failedSubscriptionCause.set(e);
         completionLatch.release();
       };
     }
