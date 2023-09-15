@@ -261,7 +261,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     }
 
     private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(FlowConstruct flowConstruct, Latch completionLatch) {
-      return new MultiFluxSubscriber<>(completionLatch) {
+      return new MultiFluxSubscriber<CoreEvent>(completionLatch) {
 
         @Override
         public void onError(Throwable throwable) {
