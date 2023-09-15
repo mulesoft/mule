@@ -43,6 +43,8 @@ module org.mule.runtime.extensions.spring.support {
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
       org.mule.runtime.module.extension.internal.resources.MulePluginDescriptorGenerator;
 
+  exports org.mule.runtime.module.extension.internal.capability.xml.description to
+      org.mule.runtime.ast.extension;
   exports org.mule.runtime.module.extension.internal.config.dsl to
       org.mule.runtime.extensions.xml.support,
       spring.beans;
@@ -63,6 +65,10 @@ module org.mule.runtime.extensions.spring.support {
   exports org.mule.runtime.module.extension.internal.config.dsl.source to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.module.extension.internal.resources to
+      org.mule.runtime.ast.extension;
+  exports org.mule.runtime.module.extension.internal.resources.validator to
+      org.mule.runtime.ast.extension;
 
   opens org.mule.runtime.module.extension.internal.capability.xml.schema.model to
       java.xml.bind;
