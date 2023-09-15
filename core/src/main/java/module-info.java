@@ -493,6 +493,8 @@ module org.mule.runtime.core {
       kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
       spring.core;
+  opens org.mule.runtime.core.internal.message to
+      kryo.shaded;
   opens org.mule.runtime.core.internal.policy to
       spring.core;
   opens org.mule.runtime.core.internal.processor.interceptor to
