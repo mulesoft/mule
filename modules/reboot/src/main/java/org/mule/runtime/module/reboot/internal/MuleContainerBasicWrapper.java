@@ -10,8 +10,11 @@ import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementation of {@link MuleContainerWrapper} that interacts with the {@link MuleContainer} directly. Other implementations
@@ -77,9 +80,9 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
   }
 
   private void startWithContainerClassLoader() throws Exception {
-    // TODO: add Java PID
-    List<String> additionalSplashEntries = asList(format("Wrapper PID: %s", "Running Wrapperless"),
-                                                  format("Java PID: %s", "N/A"));
+    Optional<Long> javaPid = getPid();
+    List<String> additionalSplashEntries = asList("Wrapper PID: Running Wrapperless",
+                                                  format("Java PID: %s", javaPid.map(String::valueOf).orElse("N/A")));
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(muleContainer.getClass().getClassLoader());
     try {
@@ -87,6 +90,17 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
       isStarted = true;
     } finally {
       currentThread().setContextClassLoader(originalClassLoader);
+    }
+  }
+
+  private Optional<Long> getPid() {
+    try {
+      // We need to use reflection because this API is not available in Java 8 or less.
+      Class<?> processHandleCls = Class.forName("java.lang.ProcessHandle");
+      Object currentProcessHandle = processHandleCls.getMethod("current").invoke(null);
+      return of((long) processHandleCls.getMethod("pid").invoke(currentProcessHandle));
+    } catch (ReflectiveOperationException e) {
+      return empty();
     }
   }
 }
