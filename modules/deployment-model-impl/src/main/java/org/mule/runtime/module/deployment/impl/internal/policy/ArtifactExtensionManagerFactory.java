@@ -94,13 +94,14 @@ public class ArtifactExtensionManagerFactory implements ExtensionManagerFactory 
     final Set<ExtensionModel> extensions = new HashSet<>();
     discoverRuntimeExtensionModels()
         .forEach(extensionManager::registerExtension);
+    ExtensionDiscoveryRequest extensionDiscoveryRequest = ExtensionDiscoveryRequest.builder()
+        .setArtifactPlugins(artifactPluginsDescriptors)
+        .setParallelDiscovery(isParallelExtensionModelLoadingEnabled())
+        .setParentArtifactExtensions(parentArtifactExtensions)
+        .setIsDesignTime(false)
+        .build();
     extensions.addAll(extensionModelDiscoverer
-        .discoverPluginsExtensionModels(
-                                        ExtensionDiscoveryRequest.builder()
-                                            .setArtifactPlugins(artifactPluginsDescriptors)
-                                            .setParallelDiscovery(isParallelExtensionModelLoadingEnabled())
-                                            .setParentArtifactExtensions(parentArtifactExtensions)
-                                            .build()));
+        .discoverPluginsExtensionModels(extensionDiscoveryRequest));
     extensions.forEach(extensionManager::registerExtension);
     return extensionManager;
   }

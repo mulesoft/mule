@@ -88,6 +88,8 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isOCSEnabled();
 
+  boolean isDesignTime();
+
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
@@ -97,6 +99,8 @@ public interface ExtensionDiscoveryRequest {
     private boolean enrichDescriptions = true;
     private boolean ocsEnabled = false;
     private final Map<String, Object> customParameters = new HashMap<>();
+
+    private boolean isDesignTime = true;
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
       this.artifactPlugins = artifactPlugins;
@@ -120,6 +124,11 @@ public interface ExtensionDiscoveryRequest {
 
     public ExtensionDiscoveryRequestBuilder setOCSEnabled(boolean ocsEnabled) {
       this.ocsEnabled = ocsEnabled;
+      return this;
+    }
+
+    public ExtensionDiscoveryRequestBuilder setIsDesignTime(boolean isDesignTime) {
+      this.isDesignTime = isDesignTime;
       return this;
     }
 
@@ -152,7 +161,8 @@ public interface ExtensionDiscoveryRequest {
 
     public ExtensionDiscoveryRequest build() {
       return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled, customParameters);
+                                                  parallelDiscovery, enrichDescriptions, ocsEnabled, customParameters,
+                                                  isDesignTime);
     }
   }
 }
