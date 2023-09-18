@@ -16,7 +16,6 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.artifact.activation.internal.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil;
 import org.mule.runtime.deployment.model.api.artifact.DescriptorLoaderRepositoryFactory;
@@ -38,6 +37,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.classloader.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;

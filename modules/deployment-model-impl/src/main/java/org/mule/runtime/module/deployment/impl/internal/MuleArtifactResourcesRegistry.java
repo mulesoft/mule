@@ -34,7 +34,6 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.artifact.activation.internal.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
@@ -81,6 +80,7 @@ import org.mule.runtime.module.deployment.impl.internal.application.DefaultAppli
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.classloader.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
