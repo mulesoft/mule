@@ -476,8 +476,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.privileged.event to
       kryo.shaded;
   opens org.mule.runtime.core.privileged.exception to
-      spring.core,
-      kryo.shaded;
+      kryo.shaded,
+      spring.core;
   opens org.mule.runtime.core.privileged.processor to
       spring.core;
   opens org.mule.runtime.core.privileged.processor.chain to
@@ -494,15 +494,15 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.connectivity to
       spring.core;
   opens org.mule.runtime.core.internal.context.notification to
-      spring.core,
-      kryo.shaded;
+      kryo.shaded,
+      spring.core;
   opens org.mule.runtime.core.internal.el.datetime to
       kryo.shaded;
   opens org.mule.runtime.core.internal.el.function to
       spring.core;
   opens org.mule.runtime.core.internal.exception to
-      spring.core,
-      kryo.shaded;
+      kryo.shaded,
+      spring.core;
   opens org.mule.runtime.core.internal.execution to
       spring.core;
   opens org.mule.runtime.core.internal.event to
@@ -520,8 +520,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.profiling to
       spring.core;
   opens org.mule.runtime.core.internal.streaming to
-      spring.core,
-      kryo.shaded;
+      kryo.shaded,
+      spring.core;
   opens org.mule.runtime.core.internal.streaming.object to
       kryo.shaded;
   opens org.mule.runtime.core.internal.transformer to
