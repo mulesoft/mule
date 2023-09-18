@@ -24,7 +24,20 @@ module org.mule.runtime.tls {
 
   exports org.mule.runtime.module.tls.api;
 
+  exports org.mule.runtime.module.tls.internal.config to
+      org.mule.runtime.spring.config,
+      spring.beans;
+
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
       org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
+
+  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+      org.mule.runtime.module.tls.api.extension.TlsRuntimeExtensionModelProvider;
+
+  provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
+      org.mule.runtime.module.tls.internal.config.TlsComponentBuildingDefinitionProvider;
+
+  provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
+      org.mule.runtime.module.tls.internal.config.TlsXmlNamespaceInfoProvider;
 
 }
