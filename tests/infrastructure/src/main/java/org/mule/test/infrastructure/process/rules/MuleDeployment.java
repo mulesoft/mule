@@ -131,6 +131,10 @@ public class MuleDeployment extends MuleInstallation {
       deployment = new MuleDeployment(zippedDistribution);
     }
 
+    Builder(MuleDeployment deployment) {
+      this.deployment = deployment;
+    }
+
     /**
      * Deploys and starts the Mule instance with the specified configuration.
      *
@@ -291,6 +295,9 @@ public class MuleDeployment extends MuleInstallation {
     return new Builder(zippedDistribution);
   }
 
+  public static MuleDeployment.Builder builder(MuleDeployment deployment) {
+    return new Builder(deployment);
+  }
 
   protected MuleDeployment() {
     super();
