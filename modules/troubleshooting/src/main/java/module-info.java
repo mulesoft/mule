@@ -18,7 +18,7 @@ module org.mule.runtime.troubleshooting {
   requires org.mule.runtime.deployment.model;
 
   requires org.json;
-  //requires com.google.gson;
+  requires com.google.gson;
 
   exports org.mule.runtime.module.troubleshooting.api;
 }
