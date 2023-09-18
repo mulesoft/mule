@@ -24,6 +24,7 @@ import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,18 +51,25 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
   @Rule
   public final ExpectedException expected = none();
 
-  private final boolean async;
+  private final boolean asyncDownstreamPublisher;
 
-  @Parameters(name = "async: {0}")
-  public static Boolean[] params() {
-    return new Boolean[] {false, true};
+  private final boolean asyncSubscriber;
+
+  @Parameters(name = "async downstream Publisher (will do publishOn): {0} - async downstream Subscriber (will do subscribeOn)")
+  public static List<boolean[]> params() {
+    return Arrays.asList(
+                         new boolean[] {false, false},
+                         new boolean[] {false, true},
+                         new boolean[] {true, false},
+                         new boolean[] {true, true});
   }
 
   private ScheduledExecutorService scheduledExecutor;
   private ScheduledExecutorService publisherExecutor;
 
-  public RxUtilsTestCase(boolean async) {
-    this.async = async;
+  public RxUtilsTestCase(boolean withAsyncPublisher, boolean withAsyncSubscriber) {
+    this.asyncDownstreamPublisher = withAsyncPublisher;
+    this.asyncSubscriber = withAsyncSubscriber;
   }
 
   @Before
@@ -237,7 +245,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
   private Publisher<String> transformer(final FluxSinkRecorder<String> emitter, Publisher<String> pub) {
     Flux<String> transformedPub = Flux.from(pub);
 
-    if (async) {
+    if (asyncDownstreamPublisher) {
       transformedPub = transformedPub.publishOn(fromExecutorService(publisherExecutor));
     }
 
