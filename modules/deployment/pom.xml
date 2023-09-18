@@ -217,6 +217,8 @@
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
                         <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>
                     </systemPropertyVariables>
+                    <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer
+                    for the JVM -->
                     <useModulePath>false</useModulePath>
                 </configuration>
             </plugin>
