@@ -351,6 +351,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.security.tls to
+      org.mule.runtime.tls,
       com.mulesoft.anypoint.gw.api;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
@@ -402,6 +403,7 @@ module org.mule.runtime.core {
       org.mule.runtime.repository,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
+      org.mule.runtime.tls,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
