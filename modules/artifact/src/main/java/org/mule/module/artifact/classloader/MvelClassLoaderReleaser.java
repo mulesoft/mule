@@ -58,11 +58,11 @@ public class MvelClassLoaderReleaser implements ResourceReleaser {
     }
   }
 
-  protected void releaseFromDynamicOptimizer() throws Exception {
+  protected void releaseFromDynamicOptimizer() {
     Field clField;
     try {
       clField = forName("org.mule.mvel2.optimizers.dynamic.DynamicOptimizer").getDeclaredField("classLoader");
-    } catch (NoClassDefFoundError error) {
+    } catch (ClassNotFoundException | NoSuchFieldException | SecurityException error) {
       // MVEL is not present in the class loader, nothing to do
       return;
     }
