@@ -18,7 +18,7 @@ module org.mule.runtime.global.config {
   requires org.mule.runtime.core;
   requires org.mule.runtime.maven.client.api;
 
-  // Typesafe dependency:
+  // com.typesafe:config dependency:
   requires config;
 
   exports org.mule.runtime.globalconfig.api;
