@@ -17,6 +17,11 @@
 
     <properties>
         <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.retry.policies=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
