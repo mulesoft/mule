@@ -167,6 +167,7 @@ module org.mule.runtime.core {
       org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.security.tls to
       org.mule.runtime.tls;
+  exports org.mule.runtime.core.privileged.store;
   exports org.mule.runtime.core.privileged.transaction;
   exports org.mule.runtime.core.privileged.transaction.xa;
   exports org.mule.runtime.core.privileged.transformer;
@@ -213,6 +214,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
+      com.mulesoft.mule.runtime.kyro,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
@@ -221,6 +223,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.kyro,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component;
@@ -244,6 +247,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.kyro,
       spring.beans;
   exports org.mule.runtime.core.internal.exception to
@@ -289,6 +293,8 @@ module org.mule.runtime.core {
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
   exports org.mule.runtime.core.internal.message;
+  exports org.mule.runtime.core.internal.metadata to
+      com.mulesoft.mule.runtime.kyro;
   exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
@@ -369,7 +375,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kyro;
   exports org.mule.runtime.core.internal.streaming.object to
-      com.mulesoft.mule.runtime.core.ee;
+      com.mulesoft.mule.runtime.core.ee,
+      com.mulesoft.mule.runtime.kyro;
   exports org.mule.runtime.core.internal.streaming.object.factory to
       com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.streaming.object.iterator to
@@ -384,6 +391,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.transformer.compression to
+      com.mulesoft.mule.runtime.kyro;
   exports org.mule.runtime.core.internal.transformer.datatype to
       spring.beans;
   exports org.mule.runtime.core.internal.transformer.simple to
@@ -431,6 +440,7 @@ module org.mule.runtime.core {
       org.mule.runtime.service,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
+      com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.util.queue to
       org.mule.runtime.spring.config,
@@ -448,6 +458,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.api.config to
       spring.core;
+  opens org.mule.runtime.core.api.context.notification to
+      kryo.shaded;
   opens org.mule.runtime.core.api.processor to
       spring.core;
   opens org.mule.runtime.core.api.retry.policy to
@@ -461,6 +473,8 @@ module org.mule.runtime.core {
 
   opens org.mule.runtime.core.privileged.component to
       spring.core;
+  opens org.mule.runtime.core.privileged.event to
+      kryo.shaded;
   opens org.mule.runtime.core.privileged.exception to
       spring.core,
       kryo.shaded;
@@ -481,6 +495,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.context.notification to
       spring.core,
+      kryo.shaded;
+  opens org.mule.runtime.core.internal.el.datetime to
       kryo.shaded;
   opens org.mule.runtime.core.internal.el.function to
       spring.core;
@@ -504,7 +520,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.profiling to
       spring.core;
   opens org.mule.runtime.core.internal.streaming to
-      spring.core;
+      spring.core,
+      kryo.shaded;
   opens org.mule.runtime.core.internal.streaming.object to
       kryo.shaded;
   opens org.mule.runtime.core.internal.transformer to
