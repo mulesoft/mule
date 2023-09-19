@@ -33,6 +33,7 @@ module org.mule.runtime.artifact {
   exports org.mule.runtime.module.artifact.internal.classloader to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model,
       org.mule.runtime.launcher,
       org.mule.test.runner;

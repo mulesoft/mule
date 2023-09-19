@@ -185,6 +185,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config.bootstrap to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
+      org.mule.runtime.spring.config,
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.config.preferred to
       org.mule.runtime.spring.config,
@@ -267,7 +268,8 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.interception to
       org.mule.runtime.core.components,
-      org.mule.runtime.extensions.support;
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lifecycle to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
@@ -366,6 +368,7 @@ module org.mule.runtime.core {
       org.mule.test.unit,
       spring.beans;
   exports org.mule.runtime.core.internal.store to
+      org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
@@ -421,6 +424,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.service.oauth.ee,
       com.mulesoft.anypoint.gw.module.deployment,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.cache to
+      org.mule.runtime.metadata.support;
   exports org.mule.runtime.core.internal.util.collection to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.mediatype to
@@ -455,6 +460,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.value.cache to
+      org.mule.runtime.metadata.support,
+      org.mule.runtime.spring.config;
 
   opens org.mule.runtime.core.api to
       spring.core;
