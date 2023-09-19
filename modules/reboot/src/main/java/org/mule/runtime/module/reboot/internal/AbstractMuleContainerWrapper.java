@@ -82,12 +82,20 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
   }
 
   public void dispose() {
+    RuntimeException disposalException = null;
     for (BootstrapConfigurer bootstrapConfigurer : bootstrapConfigurers) {
       try {
         bootstrapConfigurer.dispose();
       } catch (Throwable t) {
-        t.printStackTrace();
+        // Records the first exception but don't throw just yet, to let the other Configurers to run their disposal.
+        if (disposalException == null) {
+          disposalException = new RuntimeException(t);
+        }
       }
+    }
+
+    if (disposalException != null) {
+      throw disposalException;
     }
   }
 

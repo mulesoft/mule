@@ -58,11 +58,29 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
 
   @Override
   public void stop(int exitCode) {
-    dispose();
+    Throwable shutdownException = null;
+    try {
+      dispose();
+    } catch (Throwable t) {
+      // Record the error but continue so the Container can be properly shutdown.
+      shutdownException = t;
+    }
 
     // Gracefully shutdowns the container
-    doStop();
-    muleContainer = null;
+    try {
+      doStop();
+      muleContainer = null;
+    } catch (Throwable t) {
+      shutdownException = t;
+    }
+
+    if (shutdownException != null) {
+      shutdownException.printStackTrace();
+      // Quits the JVM but ensuring the exit code indicates an abnormal termination
+      // If we rethrow and don't call exit, at most the current Thread may be terminated (and maybe not even that if the
+      // exception is caught somewhere).
+      exit(-1);
+    }
 
     // Quits the JVM now
     exit(exitCode);
