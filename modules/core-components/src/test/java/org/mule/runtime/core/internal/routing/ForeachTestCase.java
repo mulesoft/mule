@@ -15,7 +15,7 @@ import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VAR
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
-import static org.mule.runtime.core.internal.util.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
+import static org.mule.runtime.core.internal.test.util.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
