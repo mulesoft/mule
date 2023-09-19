@@ -9,12 +9,16 @@ package org.mule.test.crafted.config.properties.deprecated.extension;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 
+import static java.util.Arrays.asList;
+
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
+
+import java.util.HashSet;
 
 public class TestConfigPropertiesExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
@@ -25,6 +29,7 @@ public class TestConfigPropertiesExtensionLoadingDelegate implements ExtensionLo
     ConfigurationDeclarer configurationDeclarer = extensionDeclarer.named(EXTENSION_NAME)
         .describedAs("Crafted Config Properties Extension Deprecated")
         .onVersion("1.0.0")
+        .supportingJavaVersions(new HashSet<>(asList("1.8", "11", "17")))
         .withCategory(COMMUNITY)
         .fromVendor("Mulesoft")
         .withConfig("secure-configuration-properties");

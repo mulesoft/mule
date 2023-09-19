@@ -8,10 +8,13 @@ package org.mule.test.crafted.extension;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 
-import org.mule.runtime.api.meta.MuleVersion;
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
+
+import java.util.HashSet;
 
 public class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
@@ -22,6 +25,7 @@ public class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
     extensionDeclarer.named(EXTENSION_NAME)
         .describedAs("Crafted Extension")
         .onVersion("1.0.0")
+        .supportingJavaVersions(new HashSet<>(asList("1.8", "11", "17")))
         .withCategory(COMMUNITY)
         .fromVendor("Mulesoft");
   }

@@ -6,6 +6,10 @@
  */
 package org.mule.test.subtypes.extension;
 
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Import;
@@ -15,6 +19,7 @@ import org.mule.runtime.extension.api.annotation.SubTypeMapping;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.heisenberg.extension.model.Ricin;
 import org.mule.test.heisenberg.extension.model.Weapon;
@@ -24,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @Extension(name = "SubtypesConnector")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations(SubTypesTestOperations.class)
 @Sources(SubtypesSource.class)
 @ConnectionProviders(SubTypesConnectionProvider.class)

@@ -6,7 +6,6 @@
  */
 package org.mule.functional.api.extension;
 
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -24,6 +23,9 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -48,6 +50,8 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
+import java.util.HashSet;
+
 /**
  * An {@link ExtensionDeclarer} for the Test Component Plugin
  *
@@ -61,6 +65,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .named("Test Component Plugin")
         .describedAs("Test component for performing assertions")
         .onVersion(MULE_VERSION)
+        .supportingJavaVersions(new HashSet<>(asList("1.8", "11", "17")))
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
         .withXmlDsl(XmlDslModel.builder()

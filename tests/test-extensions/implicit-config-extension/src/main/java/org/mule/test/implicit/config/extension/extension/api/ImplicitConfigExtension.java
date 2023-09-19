@@ -6,6 +6,10 @@
  */
 package org.mule.test.implicit.config.extension.extension.api;
 
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -20,11 +24,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.RefName;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitConnectionProvider;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitOperations;
 import org.mule.test.implicit.config.extension.extension.internal.ImplicitStatefulOperation;
 
 @Extension(name = "implicit")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations({ImplicitOperations.class, ImplicitStatefulOperation.class})
 @Xml(namespace = "http://www.mulesoft.org/schema/mule/implicit", prefix = "implicit")
 @ConnectionProviders(ImplicitConnectionProvider.class)

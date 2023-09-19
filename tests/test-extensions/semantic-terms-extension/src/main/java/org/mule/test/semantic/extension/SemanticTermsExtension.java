@@ -6,10 +6,15 @@
  */
 package org.mule.test.semantic.extension;
 
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.Sources;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.test.semantic.extension.connection.ApiKeySemanticConnectionProvider;
 import org.mule.test.semantic.extension.connection.BasicAuthSemanticConnectionProvider;
 import org.mule.test.semantic.extension.connection.ClientSecretSemanticConnectionProvider;
@@ -19,6 +24,7 @@ import org.mule.test.semantic.extension.connection.KerberosSemanticConnectionPro
 import org.mule.test.semantic.extension.connection.UnsecuredSemanticConnectionProvider;
 
 @Extension(name = "Semantic Terms")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations(SemanticTermsOperations.class)
 @ConnectionProviders({BasicAuthSemanticConnectionProvider.class, ApiKeySemanticConnectionProvider.class,
     ClientSecretSemanticConnectionProvider.class, CustomAuthSemanticConnectionProvider.class,

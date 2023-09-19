@@ -6,13 +6,19 @@
  */
 package org.mule.test.ram;
 
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.extension.api.soap.WebServiceDefinition.builder;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
+import static java.util.Collections.singletonList;
+
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.SoapMessageDispatcherProviders;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 import org.mule.sdk.api.annotation.semantics.connectivity.Endpoint;
 import org.mule.sdk.api.annotation.semantics.connectivity.Port;
@@ -21,6 +27,7 @@ import org.mule.sdk.api.annotation.semantics.connectivity.Url;
 import java.util.List;
 
 @Extension(name = "RAM")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Xml(prefix = "ram")
 @SoapMessageDispatcherProviders({MiniverseDispatcherProvider.class,
     DefaultPortalGunDispatcherProvider.class,
