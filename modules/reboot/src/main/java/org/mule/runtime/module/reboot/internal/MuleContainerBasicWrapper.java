@@ -9,7 +9,7 @@ package org.mule.runtime.module.reboot.internal;
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -80,9 +80,8 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
   }
 
   private void startWithContainerClassLoader() throws Exception {
-    Optional<Long> javaPid = getPid();
-    List<String> additionalSplashEntries = asList("Wrapper PID: Running Wrapperless",
-                                                  format("Java PID: %s", javaPid.map(String::valueOf).orElse("N/A")));
+    String javaPid = getPid().map(String::valueOf).orElse("N/A");
+    List<String> additionalSplashEntries = singletonList(format("Java PID: %s", javaPid));
     ClassLoader originalClassLoader = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(muleContainer.getClass().getClassLoader());
     try {
