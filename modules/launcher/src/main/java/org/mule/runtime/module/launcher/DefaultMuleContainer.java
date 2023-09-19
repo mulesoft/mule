@@ -393,6 +393,10 @@ public class DefaultMuleContainer implements MuleContainer {
     if (artifactResourcesRegistry.getDescriptorLoaderRepository() != null) {
       disposeIfNeeded(artifactResourcesRegistry.getDescriptorLoaderRepository(), logger);
     }
+
+    if (repositoryService != null) {
+      disposeIfNeeded(repositoryService, logger);
+    }
   }
 
   public Logger getLogger() {
