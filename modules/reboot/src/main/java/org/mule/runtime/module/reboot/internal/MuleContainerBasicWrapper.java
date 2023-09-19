@@ -48,7 +48,7 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
     // Mimics the message printed by the Tanuki Wrapper (we have tests expecting this string)
     System.out.println("JVM requested a restart.");
 
-    // TODO: NO-OP for now until we define if we actually need to support it.
+    // TODO W-14142823: NO-OP for now until we define if we actually need to support it.
     // Starting a new JVM will not be really achievable without some kind of wrapper.
     // We could aim for gracefully shutting down the current Container and creating a new Container from a new ClassLoader, but
     // we may face CL leaks (actually a quick test confirmed that, but we didn't want to spend additional time investigating for
