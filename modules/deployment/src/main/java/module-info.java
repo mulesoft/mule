@@ -31,7 +31,9 @@ module org.mule.runtime.deployment {
   requires spring.core;
 
   exports org.mule.runtime.module.deployment.api;
-  exports org.mule.runtime.module.deployment.internal to org.mule.runtime.launcher;
-  exports org.mule.runtime.module.deployment.internal.processor to org.mule.runtime.launcher;
+  exports org.mule.runtime.module.deployment.internal to
+      org.mule.runtime.launcher;
+  exports org.mule.runtime.module.deployment.internal.processor to
+      org.mule.runtime.launcher;
 
 }
