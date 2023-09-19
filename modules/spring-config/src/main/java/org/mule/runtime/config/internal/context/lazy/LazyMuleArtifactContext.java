@@ -718,7 +718,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       try {
         unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
-        logger.error(
+        LOGGER.error(
                      format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
                             beanName, e.getMessage()));
         throw new MuleRuntimeException(I18nMessageFactory
