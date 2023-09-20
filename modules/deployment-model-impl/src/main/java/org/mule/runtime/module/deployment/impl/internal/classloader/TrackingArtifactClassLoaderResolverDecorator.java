@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.artifact.activation.internal;
+package org.mule.runtime.module.deployment.impl.internal.classloader;
 
 import static java.util.Objects.requireNonNull;
 

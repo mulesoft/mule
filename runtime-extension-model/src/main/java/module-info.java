@@ -50,6 +50,7 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.config.internal.error to
       org.mule.runtime.core,
       org.mule.runtime.extensions.mule.support,
+      org.mule.runtime.spring.config,
       org.mule.runtime.artifact.ast.serialization.test;
   
   // required by modules creating crafted extension models

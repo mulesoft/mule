@@ -37,7 +37,12 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   private final Deque<FlowStackElement> innerStack;
 
-  public DefaultFlowCallStack() {
+  // The no-arg constructor is made public to prevent an issue with Kryo generated access classes and the module system.
+  public static DefaultFlowCallStack newDefaultFlowCallStack() {
+    return new DefaultFlowCallStack();
+  }
+
+  private DefaultFlowCallStack() {
     this.innerStack = new ArrayDeque<>(4);
   }
 
@@ -97,6 +102,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    *
    * @return the top-most element of this stack, or null if this stack is empty.
    */
+  @Override
   public FlowStackElement peek() {
     synchronized (innerStack) {
       return innerStack.peek();

@@ -36,8 +36,14 @@ module org.mule.runtime.deployment.model {
 
   exports org.mule.runtime.deployment.model.internal to
       org.mule.runtime.log4j,
+      org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
   exports org.mule.runtime.deployment.model.internal.artifact to
+      org.mule.runtime.spring.config,
       org.mule.runtime.log4j;
+  exports org.mule.runtime.deployment.model.internal.policy to
+      org.mule.runtime.deployment.model.impl;
+
+  uses org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider;
 
 }

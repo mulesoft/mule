@@ -200,7 +200,7 @@
         <source.plugin.version>3.1.0</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
         <shade.plugin.version>3.4.1</shade.plugin.version>
-        <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
+        <build.helper.maven.plugin.version>3.2.0</build.helper.maven.plugin.version>
         <maven.help.plugin.version>2.2</maven.help.plugin.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
@@ -252,6 +252,13 @@
             --add-opens=java.base/java.lang=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.test.unit.open.args>
+        <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
+        <surefire.slf4j.module.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${org.slf4j:slf4j-api:jar}
+            --add-modules=org.slf4j
+            ${surefire.args.base}
+        </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
         <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->

@@ -1224,4 +1224,15 @@ public interface AllureConstants {
       String JDK_ENVIRONMENT_CONFIGURATION = "JDK environment configuration";
     }
   }
+
+  interface WrapperlessBootstrapFeature {
+
+    String WRAPPERLESS_BOOTSTRAP = "Wrapper-less bootstrapping";
+
+    interface WrapperlessBootstrapStory {
+
+      String WRAPPERLESS_CONTAINER_MANAGEMENT = "Managing a container bootstrapped in wrapper-less mode";
+      String WRAPPERLESS_PARAMETERS_RESOLUTION = "Resolution of parameters to use in a wrapper-less bootstrapping";
+    }
+  }
 }

@@ -21,17 +21,22 @@ import org.mule.tck.probe.PollingProber;
 import org.mule.tck.probe.Probe;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -156,53 +161,93 @@ public abstract class AbstractOSController {
   }
 
   protected int runSync(String command, String... args) {
-    Map<String, String> newEnv = copyEnvironmentVariables();
-    return executeSyncCommand(command, args, newEnv, timeout);
-  }
-
-  private int executeSyncCommand(String command, String[] args, Map<String, String> newEnv, int timeout) {
     CommandLine commandLine = new CommandLine(muleBin);
     commandLine.addArgument(command);
     commandLine.addArguments(args, false);
+    return runSync(commandLine, null);
+  }
+
+  protected int runSync(CommandLine commandLine, ExecuteStreamHandler streamHandler) {
+    Map<String, String> newEnv = copyEnvironmentVariables();
+    return executeSyncCommand(commandLine, newEnv, streamHandler, timeout);
+  }
+
+  protected Process runAsync(CommandLine commandLine, ExecuteStreamHandler streamHandler) {
+    Map<String, String> newEnv = copyEnvironmentVariables();
+    return executeAsyncCommand(commandLine, newEnv, streamHandler);
+  }
+
+  private int executeSyncCommand(CommandLine commandLine, Map<String, String> newEnv, ExecuteStreamHandler streamHandler,
+                                 int timeout) {
     Executor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
 
-    final ByteArrayOutputStream outAndErr = new ByteArrayOutputStream();
-    executor.setStreamHandler(new PumpStreamHandler(outAndErr));
+    setStreamHandler(executor, streamHandler);
     return doExecution(executor, commandLine, newEnv);
   }
 
+  private Process executeAsyncCommand(CommandLine commandLine, Map<String, String> newEnv, ExecuteStreamHandler streamHandler) {
+    ProcessCapturingExecutor executor = new ProcessCapturingExecutor();
+
+    // We don't want to set up a watchdog in this mode because the process is allowed to last as long as the test lasts
+    // The timeout specified in the constructor of this class is sized for short-lived processes like "mule start", not the mule
+    // process itself.
+
+    setStreamHandler(executor, streamHandler);
+    doAsyncExecution(executor, commandLine, newEnv);
+    return executor.getProcess();
+  }
+
+  private void setStreamHandler(Executor executor, ExecuteStreamHandler streamHandler) {
+    if (streamHandler == null) {
+      // TODO W-14142832: review if we should use a NullOutputStream for improved performance
+      streamHandler = new PumpStreamHandler(new ByteArrayOutputStream());
+    }
+    executor.setStreamHandler(streamHandler);
+  }
+
   protected int doExecution(Executor executor, CommandLine commandLine, Map<String, String> env) {
+    String maskedCommandLine = getMaskedCommandLineForLogging(commandLine);
+
+    try {
+      logger.info("Executing: {}", maskedCommandLine);
+      return executor.execute(commandLine, env);
+    } catch (ExecuteException e) {
+      logger.error("Error executing {}", maskedCommandLine);
+      return e.getExitValue();
+    } catch (Exception e) {
+      throw new MuleControllerException(format("Error executing [%s]", maskedCommandLine), e);
+    }
+  }
+
+  private void doAsyncExecution(Executor executor, CommandLine commandLine, Map<String, String> env) {
+    String maskedCommandLine = getMaskedCommandLineForLogging(commandLine);
+
+    try {
+      logger.info("Executing: {}", maskedCommandLine);
+      executor.execute(commandLine, env, new DefaultExecuteResultHandler());
+    } catch (ExecuteException e) {
+      logger.error("Error executing {}", maskedCommandLine);
+    } catch (Exception e) {
+      throw new MuleControllerException(format("Error executing [%s]", maskedCommandLine), e);
+    }
+  }
+
+  private String getMaskedCommandLineForLogging(CommandLine commandLine) {
     final StringJoiner paramsJoiner = new StringJoiner(" ");
     for (String cmdArg : commandLine.toStrings()) {
       paramsJoiner.add(cmdArg.replaceAll("(?<=\\.password=)(.*)", "****"));
     }
-
-    try {
-      logger.info("Executing: {}", paramsJoiner);
-      return executor.execute(commandLine, env);
-    } catch (ExecuteException e) {
-      logger.error("Error executing " + paramsJoiner);
-      return e.getExitValue();
-    } catch (Exception e) {
-      throw new MuleControllerException("Error executing [" + commandLine.getExecutable() + " "
-          + Arrays.toString(commandLine.getArguments())
-          + "]", e);
-    }
+    return paramsJoiner.toString();
   }
 
   protected Map<String, String> copyEnvironmentVariables() {
     Map<String, String> env = System.getenv();
-    Map<String, String> newEnv = new HashMap<>();
-    for (Map.Entry<String, String> it : env.entrySet()) {
-      newEnv.put(it.getKey(), it.getValue());
-    }
+    Map<String, String> newEnv = new HashMap<>(env);
 
     if (this.testEnvVars != null) {
-      for (Map.Entry<String, String> it : this.testEnvVars.entrySet()) {
-        newEnv.put(it.getKey(), it.getValue());
-      }
+      newEnv.putAll(this.testEnvVars);
     }
 
     newEnv.put(MULE_HOME_VARIABLE, muleHome);
@@ -210,7 +255,6 @@ public abstract class AbstractOSController {
       newEnv.put(MULE_APP_VARIABLE, muleAppName);
       newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
     }
-
 
     // Use the jvm running the tests as configured in surefire to run the Mule Runtime...
     String jvmProperty = System.getProperty("jvm");
@@ -224,5 +268,25 @@ public abstract class AbstractOSController {
     }
 
     return newEnv;
+  }
+
+  private static class ProcessCapturingExecutor extends DefaultExecutor {
+
+    private final CompletableFuture<Process> processFuture = new CompletableFuture<>();
+
+    @Override
+    protected Process launch(CommandLine command, Map<String, String> env, File dir) throws IOException {
+      Process process = super.launch(command, env, dir);
+      processFuture.complete(process);
+      return process;
+    }
+
+    public Process getProcess() {
+      try {
+        return processFuture.get();
+      } catch (InterruptedException | ExecutionException e) {
+        throw new MuleControllerException(e.getCause());
+      }
+    }
   }
 }

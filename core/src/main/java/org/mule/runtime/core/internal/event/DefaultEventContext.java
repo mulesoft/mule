@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+import static org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack.newDefaultFlowCallStack;
 
 import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;
@@ -15,6 +16,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -29,20 +31,19 @@ import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.management.stats.ProcessingTime;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.streaming.EventStreamingState;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.internal.streaming.StreamingGhostBuster;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.tracer.api.context.SpanContext;
+import org.mule.runtime.tracer.api.context.SpanContextAware;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.context.SpanContext;
 import org.slf4j.Logger;
 
 /**
@@ -110,7 +111,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   private final String serverId;
   private final ComponentLocation location;
 
-  private ProcessingTime processingTime;
+  private final ProcessingTime processingTime;
 
   private transient EventStreamingState streamingState;
 
@@ -197,7 +198,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     if (flow != null && flow.getMuleContext() != null) {
       eventContextMaintain(flow.getMuleContext().getEventContextService());
     }
-    this.flowCallStack = new DefaultFlowCallStack();
+    this.flowCallStack = newDefaultFlowCallStack();
     createStreamingState();
   }
 
@@ -226,7 +227,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     if (flow != null && flow.getMuleContext() != null) {
       eventContextMaintain(flow.getMuleContext().getEventContextService());
     }
-    this.flowCallStack = new DefaultFlowCallStack();
+    this.flowCallStack = newDefaultFlowCallStack();
     createStreamingState();
   }
 
@@ -270,7 +271,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     this.location = location;
     this.processingTime = null;
     this.correlationId = correlationId;
-    this.flowCallStack = new DefaultFlowCallStack();
+    this.flowCallStack = newDefaultFlowCallStack();
     createStreamingState();
   }
 
@@ -326,6 +327,7 @@ public final class DefaultEventContext extends AbstractEventContext implements S
     return distributedTraceContext;
   }
 
+  @Override
   public void setSpanContext(SpanContext distributedTraceContext) {
     this.distributedTraceContext = distributedTraceContext;
   }
