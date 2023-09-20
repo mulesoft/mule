@@ -21,6 +21,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -181,19 +182,40 @@ public final class JpmsUtils {
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          ClassLoader parent) {
+    return createModuleLayerClassLoader(modulePathEntriesParent, modulePathEntriesChild, childClassLoaderFactory, parent,
+                                        empty());
+  }
+
+  /**
+   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, with the layer
+   * from the given {@code clazz} as parent, if any, or the given {@code parentClassLoader}. A classLoader from which the child
+   * modules can be read is returned.
+   *
+   * @param modulePathEntriesParent the URLs from which to find the modules of the parent
+   * @param modulePathEntriesChild  the URLs from which to find the modules of the child
+   * @param childClassLoaderFactory how the classLoader for the child is created, if moduleLayers are not used
+   * @param parentClassLoader       the parent class loader for delegation
+   * @param clazz                   the class from which to get the parent layer.
+   * @return a new classLoader.
+   */
+  public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
+                                                         MultiLevelClassLoaderFactory childClassLoaderFactory,
+                                                         ClassLoader parentClassLoader, Optional<Class> clazz) {
     if (!useModuleLayer()) {
-      return childClassLoaderFactory.create(parent, modulePathEntriesParent, modulePathEntriesChild);
+      return childClassLoaderFactory.create(parentClassLoader, modulePathEntriesParent, modulePathEntriesChild);
     }
 
-    final ModuleLayer parentLayer = createModuleLayer(modulePathEntriesParent, parent, empty(), false, true);
-    final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, parent, of(parentLayer), false, true);
+    ModuleLayer resolvedParentLayer = clazz.map(cl -> cl.getModule().getLayer()).orElse(null);
+    final ModuleLayer parentLayer =
+        createModuleLayer(modulePathEntriesParent, parentClassLoader, ofNullable(resolvedParentLayer), false, true);
+    final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, parentClassLoader, of(parentLayer), false, true);
     openToModule(childLayer, "kryo.shaded", "java.base", asList("java.lang", "java.lang.reflect", "java.security.cert"));
     openToModule(childLayer, "kryo.shaded", "jakarta.activation", asList("javax.activation"));
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
 
-  private static boolean useModuleLayer() {
+  public static boolean useModuleLayer() {
     // TODO W-13829761, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
     return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false"));
   }
