@@ -26,6 +26,7 @@ import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
+import org.mule.test.infrastructure.process.MuleProcessControllerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -109,6 +110,7 @@ public class MuleDeployment extends MuleInstallation {
   private final List<String> domains = new ArrayList<>();
   private final List<String> domainBundles = new ArrayList<>();
   private final List<String> libraries = new ArrayList<>();
+  private MuleProcessControllerFactory muleProcessControllerFactory = new MuleProcessControllerFactory();
   private MuleProcessController mule;
   private final Map<String, String> properties = new HashMap<>();
   private final Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
@@ -127,6 +129,10 @@ public class MuleDeployment extends MuleInstallation {
 
     Builder(String zippedDistribution) {
       deployment = new MuleDeployment(zippedDistribution);
+    }
+
+    Builder(MuleDeployment deployment) {
+      this.deployment = deployment;
     }
 
     /**
@@ -274,6 +280,11 @@ public class MuleDeployment extends MuleInstallation {
       return this;
     }
 
+    public Builder withMuleProcessControllerFactory(MuleProcessControllerFactory muleProcessControllerFactory) {
+      deployment.muleProcessControllerFactory = muleProcessControllerFactory;
+      return this;
+    }
+
   }
 
   public static MuleDeployment.Builder builder() {
@@ -284,6 +295,9 @@ public class MuleDeployment extends MuleInstallation {
     return new Builder(zippedDistribution);
   }
 
+  public static MuleDeployment.Builder builder(MuleDeployment deployment) {
+    return new Builder(deployment);
+  }
 
   protected MuleDeployment() {
     super();
@@ -325,9 +339,9 @@ public class MuleDeployment extends MuleInstallation {
     super.before();
     prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
     if (locationSuffix != null && !locationSuffix.isEmpty()) {
-      mule = new MuleProcessController(getMuleHome(), locationSuffix);
+      mule = muleProcessControllerFactory.create(getMuleHome(), locationSuffix);
     } else {
-      mule = new MuleProcessController(getMuleHome());
+      mule = muleProcessControllerFactory.create(getMuleHome());
     }
     addShutdownHooks();
     try {
