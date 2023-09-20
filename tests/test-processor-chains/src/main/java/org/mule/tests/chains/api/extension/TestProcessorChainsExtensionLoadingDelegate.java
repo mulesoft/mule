@@ -7,10 +7,10 @@
 package org.mule.tests.chains.api.extension;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.tests.chains.api.config.TestProcessorChainsNamespaceInfoProvider.TEST_PROCESSOR_CHAINS_NAMESPACE;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -20,8 +20,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
-
-import java.util.HashSet;
 
 public class TestProcessorChainsExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
@@ -51,7 +49,7 @@ public class TestProcessorChainsExtensionLoadingDelegate implements ExtensionLoa
         .describedAs(EXTENSION_DESCRIPTION)
         .fromVendor(VENDOR)
         .onVersion(VERSION)
-        .supportingJavaVersions(new HashSet<>(asList("1.8", "11", "17")))
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withCategory(COMMUNITY)
         .withXmlDsl(xmlDslModel);
 

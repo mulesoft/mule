@@ -7,14 +7,11 @@
 package org.mule.test.crafted.extension;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-
-import static java.util.Arrays.asList;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingDelegate;
-
-import java.util.HashSet;
 
 public class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
 
@@ -25,7 +22,7 @@ public class TestExtensionLoadingDelegate implements ExtensionLoadingDelegate {
     extensionDeclarer.named(EXTENSION_NAME)
         .describedAs("Crafted Extension")
         .onVersion("1.0.0")
-        .supportingJavaVersions(new HashSet<>(asList("1.8", "11", "17")))
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withCategory(COMMUNITY)
         .fromVendor("Mulesoft");
   }
