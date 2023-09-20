@@ -25,7 +25,6 @@ import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -116,16 +115,35 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       }
 
       private <T> Object mapComponent(T rawValue) {
-        if (rawValue instanceof ArrayList) {
-          return rawValue;
-        } else if (rawValue instanceof String) {
+        if (isAnExpression(rawValue)) {
           return macroExpandedRawValue((String) rawValue);
-        } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
+        } else if (isAnErrorMappings()) {
           return mapErrorMappings(getDecorated());
-        } else if (isComplexComponent()) {
-          return copyComplexComponentTreeRecursively();
+        } else if (supportsChildDeclaration() && !isAKnownType(rawValue)) {
+          return copyMacroExpandedComponentTreeRecursively();
         }
         return rawValue;
+      }
+
+      private <T> boolean isAnExpression(T rawValue) {
+        // Evaluates if the parameter is not declared as a child and can be an expression so that it is resolved.
+        // In that case, the raw value is always a String.
+        return rawValue instanceof String;
+      }
+
+      private boolean isAnErrorMappings() {
+        return getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME);
+      }
+
+      private <T> boolean isAKnownType(T rawValue) {
+        // These cases are resolved by a MetadataTypeVisitor in MuleAstUtils.
+        // See the visitArrayType and visitObject methods.
+        return rawValue instanceof List || rawValue instanceof Map;
+      }
+
+      private boolean supportsChildDeclaration() {
+        Optional<DslElementSyntax> dslElementSyntax = getDecorated().getGenerationInformation().getSyntax();
+        return dslElementSyntax.map(DslElementSyntax::supportsChildDeclaration).orElse(false);
       }
 
       private Object mapErrorMappings(final ComponentParameterAst originalParameter) {
@@ -139,12 +157,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
             .getRight();
       }
 
-      private boolean isComplexComponent() {
-        Optional<DslElementSyntax> dslElementSyntax = getDecorated().getGenerationInformation().getSyntax();
-        return dslElementSyntax.map(DslElementSyntax::supportsChildDeclaration).orElse(false);
-      }
-
-      private Object copyComplexComponentTreeRecursively() {
+      private Object copyMacroExpandedComponentTreeRecursively() {
         ComponentAst component = (ComponentAst) getDecorated().getValue().getRight();
         MacroExpandedComponentAst macroExpandedComponentAst =
             new MacroExpandedComponentAst(component, component.getLocation(), moduleGlobalElementsNames,
