@@ -8,10 +8,13 @@ package org.mule.runtime.module.repository.internal;
 
 import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.maven.client.api.BundleDependenciesResolutionException;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.exception.BundleDependencyNotFoundException;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.repository.api.BundleNotFoundException;
 import org.mule.runtime.module.repository.api.RepositoryConnectionException;
@@ -20,12 +23,16 @@ import org.mule.runtime.module.repository.api.RepositoryServiceDisabledException
 
 import java.io.File;
 
+import org.slf4j.Logger;
+
 /**
  * Default implementation for {@code RepositoryService}.
  *
  * @since 4.0
  */
-public class DefaultRepositoryService implements RepositoryService {
+public class DefaultRepositoryService implements RepositoryService, Disposable {
+
+  private static final Logger LOGGER = getLogger(DefaultRepositoryService.class);
 
   private final MavenClient mavenClient;
 
@@ -63,6 +70,15 @@ public class DefaultRepositoryService implements RepositoryService {
         .setType(bundleDescriptor.getType())
         .setClassifier(bundleDescriptor.getClassifier().orElse(null))
         .build();
+  }
+
+  @Override
+  public void dispose() {
+    try {
+      mavenClient.close();
+    } catch (Exception e) {
+      LOGGER.error("Error while disposing 'mavenClient'", e);
+    }
   }
 
 }
