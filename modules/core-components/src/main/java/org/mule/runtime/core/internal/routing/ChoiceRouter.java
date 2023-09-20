@@ -11,16 +11,12 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.management.stats.RouterStatistics.TYPE_OUTBOUND;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
-import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -39,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+
 import reactor.core.publisher.Flux;
 
 /**
@@ -58,9 +55,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
-  private final ComponentTracerFactory componentTracerFactory;
-  private SchedulerService schedulerService;
-  private Scheduler subscriptionScheduler;
+  private ComponentTracerFactory componentTracerFactory;
 
   public ChoiceRouter(ComponentTracerFactory componentTracerFactory) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
@@ -70,11 +65,6 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   @Override
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
-  }
-
-  @Inject
-  public void setSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = schedulerService;
   }
 
   @Inject
@@ -102,14 +92,6 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     }
 
     started.set(true);
-
-    if (isScheduleReactorChainSubscription()) {
-      subscriptionScheduler = schedulerService.cpuLightScheduler();
-    }
-  }
-
-  private boolean isScheduleReactorChainSubscription() {
-    return parseBoolean(getProperty("CHOICE_ROUTER_SUBSCRIBES_IN_DIFFERENT_THREAD", "false"));
   }
 
   @Override
@@ -119,10 +101,6 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     }
 
     started.set(false);
-
-    if (subscriptionScheduler != null) {
-      subscriptionScheduler.stop();
-    }
   }
 
   @Override
@@ -173,7 +151,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, componentTracerFactory, subscriptionScheduler);
+      super(publisher, routes, componentTracerFactory);
     }
 
     /**

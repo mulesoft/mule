@@ -76,7 +76,7 @@ public class RxUtils {
    * the latter subscription will take place on the same context. For an example of this, look at
    * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
    * <p>
-   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
    * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
    * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
    * initialized, and once B has subscribed.
@@ -104,7 +104,7 @@ public class RxUtils {
    * the latter subscription will take place on the same context. For an example of this, look at
    * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
    * <p>
-   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
    * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
    * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
    * initialized, and once B has subscribed.
@@ -159,13 +159,13 @@ public class RxUtils {
                                                                     @Nullable Consumer<? super U> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer,
-                                                                    Scheduler subscribeOnScheduler) {
+                                                                    Scheduler subscriptionScheduler) {
 
     return triggeringSubscriber
         .transformDeferredContextual((eventPub, ctx) -> eventPub.doOnSubscribe(s -> {
           startPendingSubscription(ctx);
           just(ctx)
-              .publishOn(subscribeOnScheduler != null ? fromExecutorService(subscribeOnScheduler) : immediate())
+              .publishOn(subscriptionScheduler != null ? fromExecutorService(subscriptionScheduler) : immediate())
               .doOnNext(c -> deferredSubscriber
                   .contextWrite(ctx)
                   .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer))
@@ -237,7 +237,7 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0),
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null);
+                                 () -> null, null);
   }
 
   /**
@@ -269,7 +269,8 @@ public class RxUtils {
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         AtomicInteger inflightCounter,
                                                         CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback) {
+                                                        CheckedConsumer<Throwable> errorCallback,
+                                                        Scheduler subscriptionScheduler) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -279,7 +280,7 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  inflightCounter,
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null);
+                                 () -> null, subscriptionScheduler);
   }
 
   /**
@@ -332,14 +333,15 @@ public class RxUtils {
                                    LOGGER.debug("Propagating completion after {} milliseconds\nDSL Source:\n{}",
                                                 completionTimeoutMillis, dslSource);
                                    completer.runOnce();
-                                 }, completionTimeoutMillis, MILLISECONDS));
+                                 }, completionTimeoutMillis, MILLISECONDS), null);
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                            Function<Publisher<U>, Publisher<T>> transformer,
                                                            AtomicInteger inflightCounter,
                                                            final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
-                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion) {
+                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion,
+                                                           final Scheduler subscriptionScheduler) {
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
 
@@ -373,7 +375,7 @@ public class RxUtils {
                                                   } else {
                                                     scheduledCompletion.set(scheduleCompletion.get());
                                                   }
-                                                }, null);
+                                                }, subscriptionScheduler);
   }
 
   /**

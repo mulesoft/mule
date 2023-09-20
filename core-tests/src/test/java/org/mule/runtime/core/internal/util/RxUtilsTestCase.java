@@ -56,12 +56,12 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
   private final boolean asyncSubscriber;
 
   @Parameters(name = "async downstream Publisher (will do publishOn): {0} - async downstream Subscriber (will do subscribeOn)")
-  public static List<boolean[]> params() {
+  public static List<Object[]> params() {
     return Arrays.asList(
-                         new boolean[] {false, false},
-                         new boolean[] {false, true},
-                         new boolean[] {true, false},
-                         new boolean[] {true, true});
+                         new Boolean[] {false, false},
+                         new Boolean[] {false, true},
+                         new Boolean[] {true, false},
+                         new Boolean[] {true, true});
   }
 
   private ScheduledExecutorService scheduledExecutor;
