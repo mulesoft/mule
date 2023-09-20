@@ -22,6 +22,7 @@ module org.mule.runtime.log4j {
 
   // Third party modules
   requires com.github.benmanes.caffeine;
+  requires com.google.common;
   requires com.lmax.disruptor;
   requires it.unimi.dsi.fastutil;
   requires org.apache.commons.lang3;

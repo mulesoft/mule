@@ -194,7 +194,7 @@ public final class JpmsUtils {
   }
 
   private static boolean useModuleLayer() {
-    // TODO W-13829761, W-13205329, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
+    // TODO W-13829761, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
     return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false"));
   }
 
@@ -204,7 +204,7 @@ public final class JpmsUtils {
    * Note: By definition, automatic modules have transitive readability on ALL other modules on the same layer and the parents.
    * This may cause a situation where a layer that is supposed to be isolated will instead be able to read all the modules in the
    * parent layers. To prevent this, the {@code isolateDependenciesInTheirOwnLayer} parameter must be passes as {@code true}.
-   * 
+   *
    * @param modulePathEntries                  the URLs from which to find the modules
    * @param parent                             the parent class loader for delegation
    * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
@@ -312,7 +312,7 @@ public final class JpmsUtils {
   }
 
   /**
-   * 
+   *
    * @param moduleRef
    * @param containerLayer
    * @return {@code true} the the referenced module is automatic or does not read any module from the container.
@@ -338,7 +338,7 @@ public final class JpmsUtils {
   }
 
   /**
-   * 
+   *
    * @param layer          the layer containing the module to open the {@code packages} to.
    * @param moduleName     the name of the module within {@code layer} to open the {@code packages} to.
    * @param bootModuleName the name of the module in the boot layer to open the {@code packages} from.
