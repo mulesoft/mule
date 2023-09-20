@@ -82,6 +82,8 @@ public final class JpmsUtils {
       "--add-exports=com.mulesoft.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
+  private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
+      "--add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT =
       "--add-opens=java.base/java.security.cert=org.mule.runtime.jpms.utils";
 
@@ -116,6 +118,7 @@ public final class JpmsUtils {
             || arg.equals(REQUIRED_CE_BOOT_ADD_EXPORTS)
             || arg.equals(REQUIRED_BOOT_ADD_EXPORTS)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
+            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT)))
         .collect(toList());
 
