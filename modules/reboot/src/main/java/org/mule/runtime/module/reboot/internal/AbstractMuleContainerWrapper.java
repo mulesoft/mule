@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import static java.lang.String.format;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.joining;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import org.apache.commons.cli.CommandLine;
@@ -82,20 +85,31 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
   }
 
   public void dispose() {
-    RuntimeException disposalException = null;
+    List<ConfigurerDisposalException> disposalExceptions = new ArrayList<>();
     for (BootstrapConfigurer bootstrapConfigurer : bootstrapConfigurers) {
       try {
         bootstrapConfigurer.dispose();
       } catch (Throwable t) {
-        // Records the first exception but don't throw just yet, to let the other Configurers to run their disposal.
-        if (disposalException == null) {
-          disposalException = new RuntimeException(t);
-        }
+        // Records the exceptions but don't throw just yet, to let the other Configurers to run their disposal.
+        disposalExceptions.add(new ConfigurerDisposalException(bootstrapConfigurer, t));
       }
     }
 
-    if (disposalException != null) {
-      throw disposalException;
+    if (!disposalExceptions.isEmpty()) {
+      if (disposalExceptions.size() == 1) {
+        // If there was only 1 exception, just put it as the cause.
+        throw new RuntimeException(format("Error disposing configurer: %s", disposalExceptions.get(0)),
+                                   disposalExceptions.get(0));
+      } else {
+        // If there were multiple, put all of them as suppressed, so they are at the same level.
+        String joinedMsgs = disposalExceptions.stream()
+            .map(Throwable::toString)
+            .collect(joining(",\n\t"));
+        RuntimeException disposalException =
+            new RuntimeException(format("Found multiple errors disposing the configurers: [\n\t%s\n]", joinedMsgs));
+        disposalExceptions.forEach(disposalException::addSuppressed);
+        throw disposalException;
+      }
     }
   }
 
@@ -106,4 +120,19 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
    * @param args                 The arguments to pass to the {@link MuleContainer}.
    */
   protected abstract void start(MuleContainerFactory muleContainerFactory, String[] args);
+
+  private static class ConfigurerDisposalException extends Exception {
+
+    private final String configurerClassName;
+
+    public ConfigurerDisposalException(BootstrapConfigurer configurer, Throwable cause) {
+      super(cause);
+      this.configurerClassName = configurer.getClass().getName();
+    }
+
+    @Override
+    public String toString() {
+      return format("%s: %s", configurerClassName, super.toString());
+    }
+  }
 }
