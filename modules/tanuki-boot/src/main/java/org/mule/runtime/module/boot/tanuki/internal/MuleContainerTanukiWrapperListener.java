@@ -7,6 +7,7 @@
 package org.mule.runtime.module.boot.tanuki.internal;
 
 import static java.lang.String.format;
+import static java.lang.System.exit;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 
@@ -83,14 +84,28 @@ class MuleContainerTanukiWrapperListener implements WrapperListener {
    */
   @Override
   public int stop(int exitCode) {
+    Throwable shutdownException = null;
     try {
       onStop.run();
+    } catch (Throwable t) {
+      // Record the error but continue so the Container can be properly shutdown.
+      shutdownException = t;
+    }
+
+    try {
       if (muleContainer != null) {
         muleContainer.shutdown();
         muleContainer = null;
       }
     } catch (Throwable t) {
-      // ignore
+      shutdownException = t;
+    }
+
+    if (shutdownException != null) {
+      shutdownException.printStackTrace();
+      // Adjusts the exit code indicating an abnormal termination
+      // Tanuki's Wrapper does not expect us to throw here.
+      return -1;
     }
 
     return exitCode;
