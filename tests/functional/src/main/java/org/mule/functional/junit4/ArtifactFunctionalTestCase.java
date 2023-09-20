@@ -240,6 +240,7 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
     return service.isPresent() ? (T) service.get() : null;
   }
 
+  // TODO W-14161254 review this
   protected void configureSpringConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
     if (builder instanceof ComponentBuildingDefinitionRegistryFactoryAware) {

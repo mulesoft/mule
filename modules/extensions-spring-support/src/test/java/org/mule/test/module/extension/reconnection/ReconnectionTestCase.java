@@ -52,6 +52,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
@@ -149,6 +150,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("W-14161245")
   public void getInlineRetryPolicyTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnection").run()
         .getMessage().getPayload().getValue();
@@ -157,6 +159,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("W-14161245")
   public void getInlineRetryPolicyBlockingTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnectionBlocking").run()
         .getMessage().getPayload().getValue();

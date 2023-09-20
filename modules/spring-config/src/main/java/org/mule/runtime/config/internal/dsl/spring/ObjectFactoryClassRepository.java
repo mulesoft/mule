@@ -74,8 +74,11 @@ public class ObjectFactoryClassRepository {
       boolean callingSuper = ObjectTypeProvider.class.isAssignableFrom(objectFactoryType);
 
       // Make sure the generated class exists in a module that has visibility on all the required superclasses and interfaces.
-      // spring-config has that scope.
-      String packageName = this.getClass().getPackage().getName();
+      String packageName = objectFactoryType.getPackage().getName();
+      if (packageName.startsWith("org.mule.runtime.core")) {
+        // for classes from mule-core module, we will need visibility on mule-spring-config
+        packageName = this.getClass().getPackage().getName();
+      }
       if (callingSuper) {
         name = packageName + "." +
             objectFactoryType.getSimpleName() + "_ByteBuddy_CallingSuperGetObjectType";

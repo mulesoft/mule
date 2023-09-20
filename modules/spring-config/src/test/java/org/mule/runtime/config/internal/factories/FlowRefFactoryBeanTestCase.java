@@ -52,6 +52,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -112,6 +113,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -138,6 +140,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  private static final Logger LOGGER = getLogger(FlowRefFactoryBeanTestCase.class);
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
       withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
@@ -448,6 +452,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       stopIfNeeded(flowRefProcessor);
       disposeIfNeeded(flowRefProcessor, null);
     } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
       throw new RuntimeException("Error sending events to a flowRef", e);
     }
   }

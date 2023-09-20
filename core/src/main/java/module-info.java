@@ -372,6 +372,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
@@ -386,6 +387,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.streaming.object.iterator to
       com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.time to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction to
@@ -401,6 +403,7 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.transformer.simple to
       org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.core.components,

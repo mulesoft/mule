@@ -38,12 +38,10 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
@@ -55,16 +53,16 @@ import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -75,6 +73,14 @@ import org.mockito.ArgumentCaptor;
 import io.qameta.allure.Issue;
 
 public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase {
+
+  @BeforeClass
+  public static void configureTestSchemaLoader()
+      throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+    final Field schemaGeneratorField = AstXmlParser.Builder.class.getDeclaredField("SCHEMA_GENERATOR");
+    schemaGeneratorField.setAccessible(true);
+    schemaGeneratorField.set(null, of(new TestExtensionSchemagenerator()));
+  }
 
   @Rule
   public TemporaryFolder tempFolder = new TemporaryFolder();

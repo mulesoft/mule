@@ -27,12 +27,14 @@ module org.mule.runtime.extensions.spring.support {
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.deployment.model;
+  requires org.mule.runtime.spring.config;
 
   requires java.compiler;
   requires java.inject;
 
   requires com.sun.xml.bind;
 
+  requires com.google.common;
   requires org.jsoup;
   requires dom4j;
 
@@ -55,7 +57,8 @@ module org.mule.runtime.extensions.spring.support {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.construct to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.operation to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -74,11 +77,20 @@ module org.mule.runtime.extensions.spring.support {
       java.xml.bind;
   opens org.mule.runtime.module.extension.internal.config.dsl to
       spring.core;
+  opens org.mule.runtime.module.extension.internal.config.dsl.config to
+      net.bytebuddy;
   opens org.mule.runtime.module.extension.internal.config.dsl.connection to
+      net.bytebuddy,
       spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.construct to
+      net.bytebuddy,
       spring.core;
+  opens org.mule.runtime.module.extension.internal.config.dsl.operation to
+      net.bytebuddy;
   opens org.mule.runtime.module.extension.internal.config.dsl.parameter to
+      net.bytebuddy,
       spring.core;
+  opens org.mule.runtime.module.extension.internal.config.dsl.source to
+      net.bytebuddy;
 
 }

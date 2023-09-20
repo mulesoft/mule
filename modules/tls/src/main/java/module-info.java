@@ -17,6 +17,7 @@ module org.mule.runtime.tls {
   requires org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.spring.config;
 
   // QName
   requires java.xml;
@@ -39,5 +40,8 @@ module org.mule.runtime.tls {
 
   provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
       org.mule.runtime.module.tls.internal.config.TlsXmlNamespaceInfoProvider;
+
+  opens org.mule.runtime.module.tls.internal.config to
+      net.bytebuddy;
 
 }

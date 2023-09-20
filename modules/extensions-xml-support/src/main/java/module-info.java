@@ -42,12 +42,16 @@ module org.mule.runtime.extensions.xml.support {
       org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider;
 
   exports org.mule.runtime.extension.internal.config.dsl to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.extension.internal.factories to
       org.mule.runtime.spring.config,
       spring.beans;
 
+  opens org.mule.runtime.extension.internal.config.dsl to
+      net.bytebuddy;
   opens org.mule.runtime.extension.internal.factories to
+      net.bytebuddy,
       spring.core;
   opens org.mule.runtime.extension.internal.processor to
       spring.core;

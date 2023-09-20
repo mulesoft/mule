@@ -18,7 +18,6 @@
     <properties>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.retry.policies=ALL-UNNAMED
             ${surefire.test.unit.open.args}
         </surefire.args>
 

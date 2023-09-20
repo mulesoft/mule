@@ -48,6 +48,8 @@ module org.mule.runtime.extensions.mule.support {
   exports org.mule.runtime.module.extension.mule.internal.config.provider to
       spring.beans;
 
+  opens org.mule.runtime.module.extension.mule.internal.config.factory to
+      net.bytebuddy;
   opens org.mule.runtime.module.extension.mule.internal.execution to
       spring.core;
 }
