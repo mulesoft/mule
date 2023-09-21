@@ -16,7 +16,6 @@ import static org.mule.runtime.properties.internal.loader.ConfigurationPropertie
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
-import static java.util.ServiceLoader.load;
 import static java.util.stream.Collectors.toList;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -33,6 +32,7 @@ import org.mule.runtime.properties.api.ConfigurationPropertiesProviderFactory;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,16 +152,14 @@ public class PropertiesResolverUtils {
     // This may happen only on environments where the runtime modules are uses as libs in some tool, but not when inside the
     // Runtime.
     if (PROVIDER_FACTORY_IFACE_OLD != null) {
-      ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
-          (ServiceLoader<? extends ConfigurationPropertiesProviderFactory>) load(PROVIDER_FACTORY_IFACE_OLD);
-      providerFactoriesOld.forEach(service -> {
-        ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
-        if (providerFactoriesMap.containsKey(componentIdentifier)) {
-          // skipping already present factory with the newer api
-          return;
-        }
-        providerFactoriesMap.put(componentIdentifier, service);
-      });
+      try {
+        PROVIDER_FACTORY_IFACE_OLD
+            .getMethod("loadDeprecatedProviderFactories", Map.class)
+            .invoke(null, providerFactoriesMap);
+      } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+          | SecurityException e) {
+        throw new MuleRuntimeException(e);
+      }
     }
 
     return providerFactoriesMap;

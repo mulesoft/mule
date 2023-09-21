@@ -8,6 +8,8 @@ package org.mule.runtime.config.api.dsl.model.properties;
 
 import static org.mule.runtime.config.internal.dsl.model.properties.ConfigurationPropertiesProviderFactoryUtils.resolveConfigurationParameters;
 
+import static java.util.ServiceLoader.load;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.config.api.dsl.model.ConfigurationParameters;
@@ -15,6 +17,8 @@ import org.mule.runtime.config.internal.dsl.model.DefaultConfigurationParameters
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ResourceProvider;
 
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.function.UnaryOperator;
 
 /**
@@ -74,4 +78,25 @@ public interface ConfigurationPropertiesProviderFactory
    */
   org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider createProvider(ConfigurationParameters parameters,
                                                                                                   org.mule.runtime.config.api.dsl.model.ResourceProvider externalResourceProvider);
+
+  /**
+   * Support of the old deprecated interface. This may happen only on environments where the runtime modules are uses as libs in
+   * some tool, but not when inside the Runtime.
+   * 
+   * @param providerFactoriesMap where the found providers will be added;
+   */
+  public static void loadDeprecatedProviderFactories(Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap) {
+    ServiceLoader<? extends ConfigurationPropertiesProviderFactory> providerFactoriesOld =
+        load(ConfigurationPropertiesProviderFactory.class);
+    providerFactoriesOld.forEach(service -> {
+      ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
+      if (providerFactoriesMap.containsKey(componentIdentifier)) {
+        // skipping already present factory with the newer api
+        return;
+      }
+      providerFactoriesMap.put(componentIdentifier, service);
+    });
+
+  }
+
 }

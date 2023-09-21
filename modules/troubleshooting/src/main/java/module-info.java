@@ -21,4 +21,8 @@ module org.mule.runtime.troubleshooting {
   requires com.google.gson;
 
   exports org.mule.runtime.module.troubleshooting.api;
+
+  exports org.mule.runtime.module.troubleshooting.internal to
+      org.mule.runtime.launcher;
+
 }

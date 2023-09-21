@@ -14,6 +14,32 @@
     </description>
     
     <properties>
+        <!-- Add visibility required by the tests exclusively -->
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${org.yaml:snakeyaml:jar}
+            --add-modules=net.bytebuddy.agent,org.yaml.snakeyaml
+            --add-reads=org.mule.runtime.spring.config=org.yaml.snakeyaml
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
+            --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=ALL-UNNAMED
+            --add-opens=org.mule.runtime.artifact.ast.xmlParser/org.mule.runtime.ast.api.xml=org.mule.runtime.spring.config
+            --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.utils=org.mule.runtime.core,org.mule.runtime.service,org.mule.runtime.container
+            --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.spring=net.bytebuddy
+            ${surefire.args.base}
+        </surefire.args>
+
         <javaModuleName>org.mule.runtime.spring.config</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
