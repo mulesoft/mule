@@ -6,6 +6,8 @@
  */
 package org.mule.test.functional;
 
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
@@ -13,8 +15,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 
 import java.util.Collection;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
+@Feature(XML_SDK)
+@Issue("W-13681772")
 public class ModuleUsingListTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override

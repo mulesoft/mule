@@ -115,17 +115,17 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       }
 
       private <T> Object mapComponent(T rawValue) {
-        if (isAnExpression(rawValue)) {
+        if (mustMacroExpandRawValue(rawValue)) {
           return macroExpandedRawValue((String) rawValue);
         } else if (isAnErrorMappings()) {
           return mapErrorMappings(getDecorated());
-        } else if (supportsChildDeclaration() && !isAKnownType(rawValue)) {
+        } else if (supportsChildDeclaration() && !isResolvedByMetadataVisitor(rawValue)) {
           return copyMacroExpandedComponentTreeRecursively();
         }
         return rawValue;
       }
 
-      private <T> boolean isAnExpression(T rawValue) {
+      private <T> boolean mustMacroExpandRawValue(T rawValue) {
         // Evaluates if the parameter is not declared as a child and can be an expression so that it is resolved.
         // In that case, the raw value is always a String.
         return rawValue instanceof String;
@@ -135,7 +135,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         return getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME);
       }
 
-      private <T> boolean isAKnownType(T rawValue) {
+      private <T> boolean isResolvedByMetadataVisitor(T rawValue) {
         // These cases are resolved by a MetadataTypeVisitor in MuleAstUtils.
         // See the visitArrayType and visitObject methods.
         return rawValue instanceof List || rawValue instanceof Map;

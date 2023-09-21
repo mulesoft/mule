@@ -6,14 +6,20 @@
  */
 package org.mule.test.functional;
 
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.test.petstore.extension.PetCage;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
+@Feature(XML_SDK)
+@Issue("W-13681772")
 public class ModuleUsingMapTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
