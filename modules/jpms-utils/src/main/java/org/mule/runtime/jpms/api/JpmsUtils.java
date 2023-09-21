@@ -76,8 +76,4 @@ public final class JpmsUtils {
     // nothing to do
   }
 
-  private static UnaryOperator<ClassLoader> useResolvedClassLoaderIfAvailable(ClassLoader parent) {
-    return resolved -> resolved != null ? resolved : parent;
-  }
-
 }
