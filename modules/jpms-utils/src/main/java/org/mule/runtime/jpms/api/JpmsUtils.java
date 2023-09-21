@@ -51,8 +51,8 @@ public final class JpmsUtils {
   }
 
   /**
-   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, with the layer
-   * from the given {@code clazz} as parent, if any, or the given {@code parentClassLoader}.
+   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, and with the
+   * parent class loader obtained from the given {@code parentClassLoaderResolver}.
    *
    * @param modulePathEntriesParent   the URLs from which to find the modules of the parent
    * @param modulePathEntriesChild    the URLs from which to find the modules of the child
