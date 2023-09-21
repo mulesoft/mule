@@ -291,6 +291,8 @@ public final class JpmsUtils {
         .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
+    ClassLoader resolvedParentClassLoader = parentClassLoaderResolver
+        .apply(parentLayer.map(layer -> layer.findLoader(layer.modules().iterator().next().getName())).orElse(null));
 
     Controller controller;
     if (isolateDependenciesInTheirOwnLayer) {
@@ -310,10 +312,7 @@ public final class JpmsUtils {
               .collect(toList()));
       Controller isolatedModulesController = defineModulesWithOneLoader(isolatedModulesConfiguration,
                                                                         singletonList(boot()),
-                                                                        parentClassLoaderResolver.apply(parentLayer
-                                                                            .map(layer -> layer.findLoader(layer.modules()
-                                                                                .iterator().next().getName()))
-                                                                            .orElse(null)));
+                                                                        resolvedParentClassLoader);
 
       // ... the put the rest of the modules on a new layer with the isolated modules one as parent.
       Path[] notIsolatedModulesPaths = modulesByIsolation.get(false)
@@ -333,9 +332,7 @@ public final class JpmsUtils {
                                                 .collect(toList()));
       controller = defineModulesWithOneLoader(configuration,
                                               asList(isolatedModulesController.layer(), resolvedParentLayer),
-                                              parentClassLoaderResolver.apply(parentLayer
-                                                  .map(layer -> layer.findLoader(layer.modules().iterator().next().getName()))
-                                                  .orElse(null)));
+                                              resolvedParentClassLoader);
 
     } else {
       Path[] filteredModulesPaths = modulesByIsolation.values().stream()
@@ -354,9 +351,7 @@ public final class JpmsUtils {
               .collect(toList()));
       controller = defineModulesWithOneLoader(configuration,
                                               singletonList(resolvedParentLayer),
-                                              parentClassLoaderResolver.apply(parentLayer
-                                                  .map(layer -> layer.findLoader(layer.modules().iterator().next().getName()))
-                                                  .orElse(null)));
+                                              resolvedParentClassLoader);
     }
 
 
