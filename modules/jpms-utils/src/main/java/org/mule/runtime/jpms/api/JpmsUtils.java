@@ -65,7 +65,8 @@ public final class JpmsUtils {
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          UnaryOperator<ClassLoader> parentClassLoaderResolver,
                                                          Optional<Class> clazz) {
-    return childClassLoaderFactory.create(parentClassLoaderResolver.apply(null), modulePathEntriesParent, modulePathEntriesChild);
+    return childClassLoaderFactory.create(parentClassLoaderResolver.apply(clazz.map(Class::getClassLoader).orElse(null)),
+                                          modulePathEntriesParent, modulePathEntriesChild);
   }
 
   public static void exploreJdkModules(Set<String> packages) {

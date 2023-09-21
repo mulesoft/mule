@@ -205,8 +205,8 @@ public final class JpmsUtils {
                                                          UnaryOperator<ClassLoader> parentClassLoaderResolver,
                                                          Optional<Class> clazz) {
     if (!useModuleLayer()) {
-      return childClassLoaderFactory.create(parentClassLoaderResolver.apply(null), modulePathEntriesParent,
-                                            modulePathEntriesChild);
+      return childClassLoaderFactory.create(parentClassLoaderResolver.apply(clazz.map(Class::getClassLoader).orElse(null)),
+                                            modulePathEntriesParent, modulePathEntriesChild);
     }
 
     ModuleLayer resolvedParentLayer = clazz.map(cl -> cl.getModule().getLayer()).orElse(null);
