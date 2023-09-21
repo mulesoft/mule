@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-reboot</artifactId>
+            <artifactId>mule-module-boot-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

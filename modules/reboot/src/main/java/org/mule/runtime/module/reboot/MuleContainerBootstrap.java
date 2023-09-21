@@ -7,11 +7,14 @@
 package org.mule.runtime.module.reboot;
 
 import static org.mule.runtime.jpms.api.JpmsUtils.validateNoBootModuleLayerTweaking;
-import static org.mule.runtime.module.reboot.internal.MuleContainerWrapperProvider.getMuleContainerWrapper;
+import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_BASE_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider.getMuleContainerWrapper;
 
-import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
-import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
-import org.mule.runtime.module.reboot.internal.MuleLog4jConfigurer;
+import org.mule.runtime.module.boot.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
+import org.mule.runtime.module.boot.internal.MuleLog4jConfigurer;
+import org.mule.runtime.module.reboot.internal.CEMuleContainerFactory;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -27,16 +30,13 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public class MuleContainerBootstrap {
 
-  public static final String MULE_HOME_DIRECTORY_PROPERTY = "mule.home";
-  public static final String MULE_BASE_DIRECTORY_PROPERTY = "mule.base";
-
   public static final String[][] CLI_OPTIONS = {{"main", "true", "Main Class"},
       {"production", "false", "Modify the system class loader for production use (as in Mule 2.x)"},
       {"version", "false", "Show product and version information"}};
 
   public static void main(String[] args) throws Exception {
     MuleContainerFactory muleContainerFactory =
-        new MuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
+        new CEMuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
     MuleContainerWrapper muleContainerWrapper = getMuleContainerWrapper();
 
     // TODO W-12412001: move this into a configurer

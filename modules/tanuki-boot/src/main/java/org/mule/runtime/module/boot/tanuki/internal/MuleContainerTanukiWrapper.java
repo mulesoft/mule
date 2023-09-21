@@ -8,9 +8,9 @@ package org.mule.runtime.module.boot.tanuki.internal;
 
 import static org.tanukisoftware.wrapper.WrapperManager.addWrapperEventListener;
 
-import org.mule.runtime.module.reboot.internal.AbstractMuleContainerWrapper;
-import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
-import org.mule.runtime.module.reboot.internal.MuleContainerWrapper;
+import org.mule.runtime.module.boot.internal.AbstractMuleContainerWrapper;
+import org.mule.runtime.module.boot.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
 
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;

@@ -7,7 +7,6 @@
 package org.mule.runtime.module.boot.tanuki.internal;
 
 import static java.lang.String.format;
-import static java.lang.System.exit;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 
@@ -16,8 +15,8 @@ import static org.tanukisoftware.wrapper.WrapperManager.getJavaPID;
 import static org.tanukisoftware.wrapper.WrapperManager.getWrapperPID;
 import static org.tanukisoftware.wrapper.WrapperManager.log;
 
-import org.mule.runtime.module.reboot.internal.MuleContainer;
-import org.mule.runtime.module.reboot.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.internal.MuleContainer;
+import org.mule.runtime.module.boot.internal.MuleContainerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

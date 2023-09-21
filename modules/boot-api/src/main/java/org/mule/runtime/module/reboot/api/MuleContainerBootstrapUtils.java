@@ -6,10 +6,8 @@
  */
 package org.mule.runtime.module.reboot.api;
 
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_BASE_DIRECTORY_PROPERTY;
-import static org.mule.runtime.module.reboot.MuleContainerBootstrap.MULE_HOME_DIRECTORY_PROPERTY;
-
-import org.mule.runtime.module.reboot.MuleContainerBootstrap;
+import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_BASE_DIRECTORY_PROPERTY;
+import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME_DIRECTORY_PROPERTY;
 
 import java.io.File;
 import java.io.IOException;
@@ -116,7 +114,7 @@ public final class MuleContainerBootstrapUtils {
 
   //////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are intentionally duplicated from org.mule.runtime.core.util so that
-  // mule-module-reboot has no external dependencies at system startup.
+  // mule-module-boot-api has no external dependencies at system startup.
   //////////////////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -130,7 +128,8 @@ public final class MuleContainerBootstrapUtils {
 
     if (url == null) {
       url = AccessController
-          .doPrivileged((PrivilegedAction<URL>) () -> MuleContainerBootstrap.class.getClassLoader().getResource(resourceName));
+          .doPrivileged((PrivilegedAction<URL>) () -> MuleContainerBootstrapUtils.class.getClassLoader()
+              .getResource(resourceName));
     }
 
     if (url == null) {
