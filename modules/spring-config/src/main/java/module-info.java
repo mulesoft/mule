@@ -27,26 +27,35 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
 )
 module org.mule.runtime.spring.config {
 
-  requires org.mule.runtime.metadata.model.api;
-  requires org.mule.runtime.metadata.model.java;
   requires org.mule.runtime.api;
-  requires org.mule.runtime.artifact.declaration;
-  requires org.mule.sdk.api;
-  requires org.mule.runtime.extensions.api;
-  requires org.mule.runtime.properties.api;
-  requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast.dependency.graph;
   requires org.mule.runtime.artifact.ast.xmlParser;
-  requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.artifact.declaration;
+  requires org.mule.runtime.dsl.api;
+  requires org.mule.runtime.extensions.api;
+  requires org.mule.runtime.metadata.model.api;
+  requires org.mule.runtime.metadata.model.java;
+  requires org.mule.runtime.properties.api;
+  requires org.mule.sdk.api;
+
+  requires org.mule.runtime.artifact;
+  requires org.mule.runtime.artifact.activation;
+  requires org.mule.runtime.container;
   requires org.mule.runtime.core;
   requires org.mule.runtime.core.components;
   requires org.mule.runtime.core.mvel;
+  requires org.mule.runtime.deployment.model;
+  requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.featureManagement;
   requires org.mule.runtime.memory.management;
+  requires org.mule.runtime.metadata.support;
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.metrics.exporter.api;
   requires org.mule.runtime.metrics.exporter.impl;
   requires org.mule.runtime.metrics.internal.impl;
+  requires org.mule.runtime.properties.config;
+  requires org.mule.runtime.service;
   requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.configuration.api;
   requires org.mule.runtime.tracer.configuration.impl;
@@ -54,14 +63,6 @@ module org.mule.runtime.spring.config {
   requires org.mule.runtime.tracer.customization.impl;
   requires org.mule.runtime.tracer.exporter.impl;
   requires org.mule.runtime.tracer.internal.impl;
-  requires org.mule.runtime.extensions.support;
-  requires org.mule.runtime.metadata.support;
-  requires org.mule.runtime.properties.config;
-  requires org.mule.runtime.artifact;
-  requires org.mule.runtime.artifact.activation;
-  requires org.mule.runtime.deployment.model;
-  requires org.mule.runtime.container;
-  requires org.mule.runtime.service;
 
   requires spring.beans;
   requires spring.context;
