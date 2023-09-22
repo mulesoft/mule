@@ -16,8 +16,5 @@ module org.mule.runtime.license.api {
   exports org.mule.runtime.module.license.api.exception;
 
   uses org.mule.runtime.module.license.api.LicenseValidator;
-
-  provides org.mule.runtime.module.license.api.LicenseValidator with
-      org.mule.runtime.module.license.internal.DefaultLicenseValidator;
-
+  
 }
