@@ -215,7 +215,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.launcher,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       org.mule.test.unit,
@@ -224,7 +224,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component;
@@ -249,7 +249,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.exception to
       org.mule.runtime.core.components,
@@ -296,7 +296,7 @@ module org.mule.runtime.core {
   // Required because this is used in test components that end up in the unnamed module
   exports org.mule.runtime.core.internal.message;
   exports org.mule.runtime.core.internal.metadata to
-      com.mulesoft.mule.runtime.kyro;
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
@@ -364,7 +364,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
       com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       org.mule.test.unit,
       spring.beans;
   exports org.mule.runtime.core.internal.store to
@@ -378,10 +378,10 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.streaming.bytes to
       com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.kyro;
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.streaming.object to
       com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.kyro;
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.streaming.object.factory to
       com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.streaming.object.iterator to
@@ -398,7 +398,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.transformer.compression to
-      com.mulesoft.mule.runtime.kyro;
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.transformer.datatype to
       spring.beans;
   exports org.mule.runtime.core.internal.transformer.simple to
@@ -422,7 +422,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
       com.mulesoft.anypoint.gw.module.deployment,

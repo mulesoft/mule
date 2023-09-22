@@ -117,7 +117,7 @@ module org.mule.runtime.spring.config {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.tls,
       com.mulesoft.mule.runtime.spring.config.ee,
-      com.mulesoft.mule.runtime.kyro,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.config.internal.el to
       spring.beans;
