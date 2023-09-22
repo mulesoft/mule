@@ -44,4 +44,7 @@ module org.mule.runtime.artifact {
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
 
+  uses org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+  uses org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
+
 }

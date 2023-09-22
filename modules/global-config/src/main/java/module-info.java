@@ -20,6 +20,8 @@ module org.mule.runtime.global.config {
 
   // com.typesafe:config dependency:
   requires config;
+  requires org.everit.json.schema;
+  requires org.json;
 
   exports org.mule.runtime.globalconfig.api;
   exports org.mule.runtime.globalconfig.api.cluster;

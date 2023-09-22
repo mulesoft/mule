@@ -8,7 +8,9 @@ package org.mule.runtime.jpms.api;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * No-op implementation of JpmsUtils to use when running on JVM 8.
@@ -46,6 +48,25 @@ public final class JpmsUtils {
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          ClassLoader parent) {
     return childClassLoaderFactory.create(parent, modulePathEntriesParent, modulePathEntriesChild);
+  }
+
+  /**
+   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, and with the
+   * parent class loader obtained from the given {@code parentClassLoaderResolver}.
+   *
+   * @param modulePathEntriesParent   the URLs from which to find the modules of the parent
+   * @param modulePathEntriesChild    the URLs from which to find the modules of the child
+   * @param childClassLoaderFactory   how the classLoader for the child is created
+   * @param parentClassLoaderResolver the parent class loader for delegation
+   * @param clazz                     the class from which to get the parent layer.
+   * @return a new classLoader.
+   */
+  public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
+                                                         MultiLevelClassLoaderFactory childClassLoaderFactory,
+                                                         UnaryOperator<ClassLoader> parentClassLoaderResolver,
+                                                         Optional<Class> clazz) {
+    return childClassLoaderFactory.create(parentClassLoaderResolver.apply(clazz.map(Class::getClassLoader).orElse(null)),
+                                          modulePathEntriesParent, modulePathEntriesChild);
   }
 
   public static void exploreJdkModules(Set<String> packages) {
