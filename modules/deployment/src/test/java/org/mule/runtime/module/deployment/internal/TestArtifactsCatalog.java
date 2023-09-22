@@ -118,41 +118,42 @@ public final class TestArtifactsCatalog {
                            new JarCompiler().compiling(getResourceFile("/org/bar2/BarUtils.java")).compile("bar-2.0.jar"))
                                .getArtifactFile();
 
-    barUtilsJavaxClassFile = new SingleClassCompiler().compile(getResourceFile("/javax/annotation/BarUtils.java"));
+    barUtilsJavaxClassFile = new SingleClassCompiler().compile(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"));
     barUtilsJavaxJarFile =
-        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java")).compile("bar-javax.jar");
+        new JarCompiler().compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java")).compile("bar-javax.jar");
 
-    barUtilsForbiddenJavaClassFile = new SingleClassCompiler().compile(getResourceFile("/java/lang/BarUtils.java"));
+    barUtilsForbiddenJavaClassFile =
+        new SingleClassCompiler().compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
     barUtilsForbiddenJavaJarFile =
-        new JarCompiler().compiling(getResourceFile("/java/lang/BarUtils.java")).compile("bar-javaForbidden.jar");
+        new JarCompiler().compiling(getResourceFile("/packagetesting/java/lang/BarUtils.java")).compile("bar-javaForbidden.jar");
 
     barUtilsForbiddenMuleContainerClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"));
+        new SingleClassCompiler().compile(getResourceFile("/packagetesting/org/mule/runtime/api/util/BarUtils.java"));
     barUtilsForbiddenMuleContainerJarFile =
-        new JarCompiler().compiling(getResourceFile("/org/mule/runtime/api/util/BarUtils.java"))
+        new JarCompiler().compiling(getResourceFile("/packagetesting/org/mule/runtime/api/util/BarUtils.java"))
             .compile("bar-muleContainerForbidden.jar");
 
     barUtilsForbiddenMuleThirdPartyClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/org/slf4j/BarUtils.java"));
+        new SingleClassCompiler().compile(getResourceFile("/packagetesting/org/slf4j/BarUtils.java"));
     barUtilsForbiddenMuleThirdPartyJarFile =
-        new JarCompiler().compiling(getResourceFile("/org/slf4j/BarUtils.java"))
+        new JarCompiler().compiling(getResourceFile("/packagetesting/org/slf4j/BarUtils.java"))
             .compile("bar-muleThirdPartyForbidden.jar");
 
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
     defaulServiceEchoJarFile = new JarCompiler()
-        .compiling(getResourceFile("/org/mule/echo/DefaultEchoService.java"),
-                   getResourceFile("/org/mule/echo/EchoServiceProvider.java"))
-        .including(getResourceFile("/org/mule/echo/MANIFEST.MF"),
+        .compiling(getResourceFile("/packagetesting/org/mule/echo/DefaultEchoService.java"),
+                   getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"))
+        .including(getResourceFile("/packagetesting/org/mule/echo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
-        .compiling(getResourceFile("/org/mule/service/foo/DefaultFooService.java"),
-                   getResourceFile("/org/mule/service/foo/FooServiceProvider.java"))
+        .compiling(getResourceFile("/packagetesting/org/mule/service/foo/DefaultFooService.java"),
+                   getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"))
         .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
-        .including(getResourceFile("/org/mule/service/foo/MANIFEST.MF"),
+        .including(getResourceFile("/packagetesting/org/mule/service/foo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
         .compile("mule-module-service-foo-4.0-SNAPSHOT.jar");
 

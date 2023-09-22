@@ -20,7 +20,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.extension.api.ExtensionConstants.EXPIRATION_POLICY_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.NAME_PARAM_DESCRIPTION;
 import static org.mule.runtime.extension.api.annotation.Extension.DEFAULT_CONFIG_DESCRIPTION;
-import static org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
+import static org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor.EXTENSION_VERSION;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.compareXML;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 

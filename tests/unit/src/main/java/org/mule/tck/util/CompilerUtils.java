@@ -55,7 +55,7 @@ public class CompilerUtils {
   // Class used to compile extension annotations. This class must be in the classpath only when
   // a jar is compiled as an extension.
   private static final String EXTENSION_ANNOTATION_PROCESSOR_CLASSNAME =
-      "org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor";
+      "org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor";
 
   private static final List<String> CLASS_PATH_ENTRIES;
   private static final String PATH_SEPARATOR;

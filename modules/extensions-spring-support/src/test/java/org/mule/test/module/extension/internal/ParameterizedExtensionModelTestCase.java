@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
-import static org.mule.runtime.module.extension.internal.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
+import static org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor.COMPILATION_MODE;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;

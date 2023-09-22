@@ -35,7 +35,7 @@ public final class AnnotationProcessorProblemsHandler implements ProblemsHandler
 
   private final Messager messager;
 
-  AnnotationProcessorProblemsHandler(ProcessingEnvironment processingEnvironment) {
+  public AnnotationProcessorProblemsHandler(ProcessingEnvironment processingEnvironment) {
     messager = processingEnvironment.getMessager();
   }
 
