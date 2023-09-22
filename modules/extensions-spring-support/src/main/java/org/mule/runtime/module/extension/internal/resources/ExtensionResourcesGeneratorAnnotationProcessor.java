@@ -29,18 +29,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 @SupportedSourceVersion(RELEASE_8)
 @SupportedOptions(EXTENSION_VERSION)
 @Deprecated
-public class ExtensionResourcesGeneratorAnnotationProcessor extends ClassExtensionResourcesGeneratorAnnotationProcessor {
+public class ExtensionResourcesGeneratorAnnotationProcessor
+    extends org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor {
 
-  @Override
-  protected void configureLoadingRequest(ExtensionModelLoadingRequest.Builder requestBuilder) {
-    super.configureLoadingRequest(requestBuilder);
-
-    requestBuilder.addEnricher(new DescriptionDeclarationEnricher());
-    requestBuilder.addValidator(new ExportedPackagesValidator());
-  }
-
-  @Override
-  protected ExtensionModelLoader getExtensionModelLoader() {
-    return fetchJavaExtensionModelLoader();
-  }
 }
