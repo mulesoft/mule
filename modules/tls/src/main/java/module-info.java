@@ -21,6 +21,8 @@ module org.mule.runtime.tls {
 
   // QName
   requires java.xml;
+  requires java.inject;
+
   requires com.google.common;
 
   exports org.mule.runtime.module.tls.api;
