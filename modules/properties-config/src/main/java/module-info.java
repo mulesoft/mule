@@ -23,6 +23,7 @@ module org.mule.runtime.properties.config {
 
   // QName used to process annotations from Mule DSL
   requires java.xml;
+  requires java.inject;
 
   exports org.mule.runtime.config.api.properties;
 
@@ -39,6 +40,7 @@ module org.mule.runtime.properties.config {
       org.mule.runtime.tracer.exporter.config.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.extensions.xml.support,
+      org.mule.runtime.deployment,
       spring.beans;
   exports org.mule.runtime.config.internal.model.properties to
       org.mule.runtime.spring.config;
