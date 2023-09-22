@@ -6,12 +6,16 @@
  */
 package org.mule.test.marvel;
 
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Export;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.test.marvel.drstrange.DrStrange;
 import org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition;
 import org.mule.test.marvel.drstrange.DrStrangeTypeWithCustomStereotype;
@@ -19,6 +23,7 @@ import org.mule.test.marvel.ironman.IronMan;
 import org.mule.test.marvel.xmen.XMen;
 
 @Extension(name = MARVEL_EXTENSION)
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Configurations({IronMan.class, DrStrange.class, XMen.class})
 @ErrorTypes(DrStrangeErrorTypeDefinition.class)
 @Export(classes = {IronMan.class, DrStrangeTypeWithCustomStereotype.class})

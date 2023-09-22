@@ -13,8 +13,8 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
@@ -117,12 +117,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.hamcrest.Matcher;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(SDK)
@@ -355,7 +357,7 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @Test
   @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
   public void defaultJavaVersionSupport() {
-    assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(DEFAULT_SUPPORTED_JAVA_VERSIONS));
+    assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(ALL_SUPPORTED_JAVA_VERSIONS));
   }
 
   @Test

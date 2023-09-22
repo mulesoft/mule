@@ -6,7 +6,8 @@
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
     "1.8",
-    "11"
+    "11",
+    "17"
   ],
   "category": "COMMUNITY",
   "xmlDsl": {
@@ -370,7 +371,7 @@
         }
       ],
       "externalLibraryModels": [],
-      "minMuleVersion": "4.1.1",
+      "minMuleVersion": "4.5.0",
       "operations": [
         {
           "blocking": true,
@@ -413,7 +414,7 @@
               }
             }
           },
-          "minMuleVersion": "4.4.0",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [
@@ -1271,7 +1272,7 @@
               }
             }
           },
-          "minMuleVersion": "4.1.1",
+          "minMuleVersion": "4.5.0",
           "parameterGroupModels": [
             {
               "parameters": [

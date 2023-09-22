@@ -6,7 +6,8 @@
   "category": "COMMUNITY",
   "supportedJavaVersions": [
     "1.8",
-    "11"
+    "11",
+    "17"
   ],
   "xmlDsl": {
     "prefix": "module-global-element",

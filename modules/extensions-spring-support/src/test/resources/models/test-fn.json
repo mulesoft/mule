@@ -6,7 +6,8 @@
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
     "1.8",
-    "11"
+    "11",
+    "17"
   ],
   "category": "COMMUNITY",
   "xmlDsl": {
@@ -155,7 +156,7 @@
         }
       ],
       "externalLibraryModels": [],
-      "minMuleVersion": "4.1.1",
+      "minMuleVersion": "4.5.0",
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],

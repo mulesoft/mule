@@ -6,10 +6,14 @@
  */
 package org.mule.test.heisenberg.extension;
 
-import static com.google.common.collect.ImmutableList.copyOf;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.sdk.api.meta.Category.SELECT;
 import static org.mule.sdk.api.meta.ExternalLibraryType.NATIVE;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
+import static com.google.common.collect.ImmutableList.copyOf;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -33,12 +37,12 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureContext;
 import org.mule.sdk.api.annotation.Export;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.ExternalLib;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.OnException;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.annotation.param.display.Text;
 import org.mule.sdk.api.meta.ExpressionSupport;
-import org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.exception.SdkHeisenbergConnectionExceptionEnricher;
 import org.mule.test.heisenberg.extension.model.BarberPreferences;
 import org.mule.test.heisenberg.extension.model.CarDealer;
@@ -62,6 +66,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations({HeisenbergOperations.class, MoneyLaunderingOperation.class,
     KillingOperations.class, HeisenbergScopes.class, HeisenbergRouters.class, HeisenbergOperationLifecycleValidator.class})
 @OnException(SdkHeisenbergConnectionExceptionEnricher.class)
