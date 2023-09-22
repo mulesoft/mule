@@ -12,12 +12,12 @@
  */
 module org.mule.runtime.repository {
 
-    requires org.mule.runtime.api;
-    requires org.mule.runtime.artifact;
-    requires org.mule.runtime.core;
-    requires org.mule.runtime.maven.client.api;
-    requires org.slf4j;
+  requires org.mule.runtime.api;
+  requires org.mule.runtime.artifact;
+  requires org.mule.runtime.core;
+  requires org.mule.runtime.maven.client.api;
+  requires org.slf4j;
 
-    exports org.mule.runtime.module.repository.api;
+  exports org.mule.runtime.module.repository.api;
 
 }
