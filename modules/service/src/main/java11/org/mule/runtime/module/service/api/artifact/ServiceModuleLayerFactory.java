@@ -87,8 +87,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
                                            lookupPolicy);
       }
 
-      List<URL> serviceUrls = asList(classLoaderConfigurationUrls);
-
       final Map<Boolean, List<URL>> serviceUrlsByJpmsValidity = Stream.of(classLoaderConfigurationUrls)
           .collect(partitioningBy(url -> {
             final String fileName;
