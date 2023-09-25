@@ -16,7 +16,6 @@
     <properties>
         <javaModuleName>org.mule.boot.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
