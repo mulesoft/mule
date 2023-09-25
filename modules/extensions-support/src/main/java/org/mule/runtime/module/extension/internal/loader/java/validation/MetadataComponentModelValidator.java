@@ -302,11 +302,12 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         .collect(toSet());
 
     if (names.size() > 1) {
-      problemsReporter.addError(new Problem(componentModel,
-                                            format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
-                                                   capitalize(getComponentModelTypeName(componentModel)),
-                                                   componentModel.getName(),
-                                                   join(names, ","))));
+      // TODO W-14178663 - analyze if this should be an error
+      problemsReporter.addWarning(new Problem(componentModel,
+                                              format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
+                                                     capitalize(getComponentModelTypeName(componentModel)),
+                                                     componentModel.getName(),
+                                                     join(names, ","))));
     }
   }
 
