@@ -394,6 +394,8 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.core.internal.transaction.xa to
+      com.mulesoft.mule.runtime.bti;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -454,6 +456,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.util.queue to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.util.store to

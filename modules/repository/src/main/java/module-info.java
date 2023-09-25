@@ -20,4 +20,7 @@ module org.mule.runtime.repository {
 
   exports org.mule.runtime.module.repository.api;
 
+  exports org.mule.runtime.module.repository.internal to
+      org.mule.runtime.launcher;
+
 }

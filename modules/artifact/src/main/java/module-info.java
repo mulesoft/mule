@@ -35,6 +35,7 @@ module org.mule.runtime.artifact {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.launcher,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.internal.util to
