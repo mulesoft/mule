@@ -12,10 +12,9 @@
  */
 module org.mule.boot.tanuki {
 
-  exports org.mule.runtime.module.boot.tanuki.internal to org.mule.boot, com.mulesoft.mule.boot;
+  exports org.mule.runtime.module.boot.tanuki.internal to org.mule.boot.api;
 
-  // This requirement is static because at runtime it may be changed to the EE version (which contains the same packages)
-  requires static org.mule.boot;
+  requires org.mule.boot.api;
 
   // Tanuki wrapper
   requires wrapper;

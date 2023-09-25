@@ -4,46 +4,33 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.reboot.internal;
+package org.mule.runtime.module.boot.internal;
 
-import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
-import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
-
-import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.URL;
 
 /**
- * A factory for {@link MuleContainer} instances. Responsible for choosing the right implementation class and setting up its
- * {@link ClassLoader}.
+ * A base class for implementing {@link MuleContainerFactory}.
  *
- * @since 4.5
+ * @since 4.6
  */
-public class MuleContainerFactory {
+public abstract class AbstractMuleContainerFactory implements MuleContainerFactory {
 
   private static final String CLASSNAME_MULE_CONTAINER = "org.mule.runtime.module.launcher.DefaultMuleContainer";
 
   private final String muleHomeDirectoryPropertyName;
   private final String muleBaseDirectoryPropertyName;
 
-  public MuleContainerFactory(String muleHomeDirectoryPropertyName, String muleBaseDirectoryPropertyName) {
+  public AbstractMuleContainerFactory(String muleHomeDirectoryPropertyName, String muleBaseDirectoryPropertyName) {
     this.muleHomeDirectoryPropertyName = muleHomeDirectoryPropertyName;
     this.muleBaseDirectoryPropertyName = muleBaseDirectoryPropertyName;
   }
 
-  /**
-   * Creates the {@link MuleContainer} instance.
-   *
-   * @param args Any arguments to forward to the Container (that have not been yet processed by the bootstrapping application).
-   * @return A new {@link MuleContainer} instance.
-   * @throws Exception If there is any problem creating the {@link MuleContainer} instance. The bootstrapping application should
-   *                   exit immediately.
-   */
+  @Override
   public MuleContainer create(String[] args) throws Exception {
     ClassLoader muleSystemCl = createContainerSystemClassLoader(lookupMuleHome(), lookupMuleBase());
 
@@ -69,14 +56,7 @@ public class MuleContainerFactory {
    * @param muleBase The location of the MULE_BASE directory.
    * @return A {@link ClassLoader} suitable for loading the {@link MuleContainer} class and all its dependencies.
    */
-  protected ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
-    DefaultMuleClassPathConfig config = new DefaultMuleClassPathConfig(muleHome, muleBase);
-
-    return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
-                                        config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
-                                        MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                        getSystemClassLoader());
-  }
+  protected abstract ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase);
 
   private File lookupMuleHome() throws IOException {
     return lookupMuleDirectoryLocation(muleHomeDirectoryPropertyName, "%MULE_HOME%");

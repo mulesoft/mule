@@ -74,15 +74,6 @@ public final class JpmsUtils {
           + "org.mule.boot.tanuki,"
           + "org.mule.runtime.jpms.utils,"
           + "com.fasterxml.jackson.core";
-  // TODO W-13718989: these reads to the org.mule.boot/com.mulesoft.mule.boot should be declared in the reading module
-  private static final String REQUIRED_CE_BOOT_ADD_READS =
-      "--add-reads=org.mule.boot.tanuki=org.mule.boot";
-  private static final String REQUIRED_BOOT_ADD_READS =
-      "--add-reads=org.mule.boot.tanuki=com.mulesoft.mule.boot";
-  private static final String REQUIRED_CE_BOOT_ADD_EXPORTS =
-      "--add-exports=org.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
-  private static final String REQUIRED_BOOT_ADD_EXPORTS =
-      "--add-exports=com.mulesoft.mule.boot/org.mule.runtime.module.reboot=ALL-UNNAMED";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
@@ -116,10 +107,6 @@ public final class JpmsUtils {
             || arg.startsWith("--add-reads")
             || arg.startsWith("--patch-module"))
         .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
-            || arg.equals(REQUIRED_CE_BOOT_ADD_READS)
-            || arg.equals(REQUIRED_BOOT_ADD_READS)
-            || arg.equals(REQUIRED_CE_BOOT_ADD_EXPORTS)
-            || arg.equals(REQUIRED_BOOT_ADD_EXPORTS)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT)))
