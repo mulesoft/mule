@@ -14,6 +14,10 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,6 +52,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.model.ImmutableOutputModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
@@ -395,15 +400,16 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
 
   @Test
   public void metadataResolverWithDifferentCategories() {
-    exception.expect(IllegalModelDefinitionException.class);
-    exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
     setValidKeyId(EMPTY);
     mockMetadataResolverFactory(sourceModel,
                                 new DefaultMetadataResolverFactory(ResolverSupplier.of(DifferentCategoryResolver.class),
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NULL_RESOLVER_SUPPLIER));
-    validate(extensionModel, validator);
+    ProblemsReporter reporter = validate(extensionModel, validator);
+    assertThat(reporter.getWarnings(), hasSize(1));
+    assertThat(reporter.getWarningsAsString(),
+               containsString("specifies metadata resolvers that doesn't belong to the same category"));
   }
 
   @Test
