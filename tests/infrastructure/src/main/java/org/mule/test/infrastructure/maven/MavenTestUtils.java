@@ -57,6 +57,7 @@ public class MavenTestUtils {
         }
       });
 
+  private static final List<String> EFFECTIVE_POM_GOALS = singletonList("help:effective-pom");
   private static final List<String> INSTALL_GOALS = singletonList("install");
   private static final List<String> CLEAN_GOALS = singletonList("clean");
 
@@ -99,6 +100,9 @@ public class MavenTestUtils {
    * @return the installed artifact on the Maven repository.
    */
   public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor, Properties props) {
+    if (LOGGER.isDebugEnabled()) {
+      runMavenGoal(EFFECTIVE_POM_GOALS, baseDirectory, props);
+    }
     runMavenGoal(INSTALL_GOALS, baseDirectory, props);
     runMavenGoal(CLEAN_GOALS, baseDirectory, props);
     return findMavenArtifact(descriptor);
