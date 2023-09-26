@@ -427,6 +427,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
+      com.mulesoft.anypoint.gw.core,
       com.mulesoft.anypoint.gw.module.deployment,
       spring.beans;
   exports org.mule.runtime.core.internal.util.cache to
