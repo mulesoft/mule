@@ -60,7 +60,6 @@ import org.mule.runtime.core.api.construct.Pipeline;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.DefaultFlowCallStack;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.processor.Processor;
@@ -82,6 +81,7 @@ import org.mule.runtime.core.internal.processor.interceptor.FlowInterceptorFacto
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;

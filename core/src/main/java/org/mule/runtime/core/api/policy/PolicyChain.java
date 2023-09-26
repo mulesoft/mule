@@ -30,13 +30,13 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.context.notification.ServerNotificationHandler;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.DefaultFlowCallStack;
 import org.mule.runtime.core.api.exception.BaseExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.PolicyNotificationHelper;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 

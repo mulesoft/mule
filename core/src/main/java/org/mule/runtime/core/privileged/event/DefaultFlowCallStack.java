@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.event;
+package org.mule.runtime.core.privileged.event;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
@@ -14,7 +14,6 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;

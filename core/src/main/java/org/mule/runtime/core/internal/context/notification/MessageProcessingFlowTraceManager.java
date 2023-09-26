@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowTraceManager;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.DefaultFlowCallStack;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
 
 import java.util.HashMap;

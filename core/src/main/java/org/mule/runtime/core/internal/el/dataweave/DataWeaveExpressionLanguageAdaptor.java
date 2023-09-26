@@ -37,7 +37,6 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.dataweave.DataWeaveArtifactContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
@@ -46,6 +45,7 @@ import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
+import org.mule.runtime.core.privileged.el.DataWeaveArtifactContext;
 
 import java.util.Iterator;
 import java.util.function.Function;

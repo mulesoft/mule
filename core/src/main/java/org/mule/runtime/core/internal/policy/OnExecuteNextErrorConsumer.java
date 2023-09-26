@@ -11,8 +11,8 @@ import static org.mule.runtime.api.notification.PolicyNotification.AFTER_NEXT;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.event.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
