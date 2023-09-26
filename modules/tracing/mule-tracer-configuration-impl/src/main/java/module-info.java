@@ -26,4 +26,8 @@ module org.mule.runtime.tracer.configuration.impl {
   requires java.inject;
   requires org.slf4j;
 
+  exports org.mule.runtime.tracing.level.impl.config to
+      org.mule.runtime.spring.config,
+      spring.beans;
+
 }
