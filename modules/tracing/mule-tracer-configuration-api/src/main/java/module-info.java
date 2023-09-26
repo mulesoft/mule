@@ -6,13 +6,13 @@
  */
 
 /**
- * Api for the internal tracer exporter configuration.
+ * Api to configure tracing generation.
  *
  * @moduleGraph
- * @since 4.5
+ * @since 4.6
  */
-module org.mule.runtime.tracer.exporter.configuration.api {
-  
-  exports org.mule.runtime.tracer.exporter.config.api;
+module org.mule.runtime.tracer.configuration.api {
+
+  exports org.mule.runtime.tracing.level.api.config;
 
 }
