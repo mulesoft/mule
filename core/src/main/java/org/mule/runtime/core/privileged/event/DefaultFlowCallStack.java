@@ -127,6 +127,10 @@ public class DefaultFlowCallStack implements FlowCallStack {
     return doToString(FlowStackElement::toString);
   }
 
+  /**
+   * Same as {@link #toString()} but including the milliseconds elapsed between its creation and now
+   * ({@link FlowStackElement#getElapsedTimeLong()}.
+   */
   public String toStringWithElapsedTime() {
     return doToString(FlowStackElement::toStringWithElapsedTime);
   }
