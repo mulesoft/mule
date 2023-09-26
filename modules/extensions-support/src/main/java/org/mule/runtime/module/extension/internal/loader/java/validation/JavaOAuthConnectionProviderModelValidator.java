@@ -100,7 +100,7 @@ public class JavaOAuthConnectionProviderModelValidator implements ExtensionModel
                                          Field field,
                                          ProblemsReporter problemsReporter) {
     if (getExpressionSupport(field)
-        .filter(expression -> expression == NOT_SUPPORTED)
+        .filter(expression -> expression != NOT_SUPPORTED)
         .isPresent()) {
       problemsReporter.addError(new Problem(parameter, format(
                                                               "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "
