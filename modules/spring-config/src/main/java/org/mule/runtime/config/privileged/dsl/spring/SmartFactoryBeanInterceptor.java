@@ -11,24 +11,44 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
- * This interface is used to implement the getters and setters of the fields added with Byte Buddy. It also extends from
- * {@link SmartFactoryBean}.
+ * This interface is used to implement the getters and setters of the fields added with Byte Buddy.
  *
  * @since 4.6.0
  */
 public interface SmartFactoryBeanInterceptor {
 
+  /**
+   * @see SmartFactoryBean#isSingleton()
+   */
   Boolean getIsSingleton();
 
+  /**
+   * @see SmartFactoryBean#isSingleton()
+   */
   void setIsSingleton(Boolean isSingleton);
 
+  /**
+   * @see SmartFactoryBean#getObjectType()
+   */
   Class getObjectTypeClass();
 
+  /**
+   * @see SmartFactoryBean#isPrototype()
+   */
   boolean getIsPrototype();
 
+  /**
+   * @see SmartFactoryBean#isPrototype()
+   */
   void setIsPrototype(Boolean isPrototype);
 
+  /**
+   * @see SmartFactoryBean#isEagerInit()
+   */
   Supplier getIsEagerInit();
 
+  /**
+   * @see SmartFactoryBean#isEagerInit()
+   */
   void setIsEagerInit(Supplier isEagerInit);
 }
