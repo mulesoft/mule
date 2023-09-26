@@ -10,7 +10,6 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.el.context.AbstractArtifactContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.context.AbstractMapContext;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -23,25 +22,41 @@ import java.util.Set;
  *
  * @since 4.0
  */
-public class MVELArtifactContext extends AbstractArtifactContext {
+public class MVELArtifactContext {
+
+  private final MuleContext muleContext;
 
   public MVELArtifactContext(MuleContext muleContext) {
-    super(muleContext, null);
+    this.muleContext = muleContext;
   }
 
-  @Override
+  public String getName() {
+    return muleContext.getConfiguration().getId();
+  }
+
+  public String getWorkDir() {
+    return muleContext.getConfiguration().getWorkingDirectory();
+  }
+
+  public String getEncoding() {
+    return muleContext.getConfiguration().getDefaultEncoding();
+  }
+
+  public boolean isStandalone() {
+    return muleContext.getConfiguration().isStandalone();
+  }
+
   public Map<String, Object> getRegistry() {
     return new RegistryWrapperMap(((MuleContextWithRegistry) muleContext).getRegistry());
   }
 
-  @Override
   protected Map<String, Object> createRegistry(Registry registry) {
     return new RegistryWrapperMap(((MuleContextWithRegistry) muleContext).getRegistry());
   }
 
   protected static class RegistryWrapperMap extends AbstractMapContext<Object> {
 
-    private MuleRegistry registry;
+    private final MuleRegistry registry;
 
     public RegistryWrapperMap(MuleRegistry registry) {
       this.registry = registry;

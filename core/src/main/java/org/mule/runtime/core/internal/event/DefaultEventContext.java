@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.event;
 
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
-import static org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack.newDefaultFlowCallStack;
+import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDefaultFlowCallStack;
 
 import static java.lang.System.identityHashCode;
 import static java.lang.System.lineSeparator;

@@ -45,6 +45,7 @@ import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
 import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
 import org.mule.runtime.core.internal.el.context.ServerContext;
+import org.mule.runtime.core.privileged.el.DataWeaveArtifactContext;
 
 import java.util.Iterator;
 import java.util.function.Function;

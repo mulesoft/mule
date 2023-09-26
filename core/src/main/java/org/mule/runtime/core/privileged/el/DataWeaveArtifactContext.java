@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.el.dataweave;
+package org.mule.runtime.core.privileged.el;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.el.context.AbstractArtifactContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,14 +24,33 @@ import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
  *
  * @since 4.0
  */
-public class DataWeaveArtifactContext extends AbstractArtifactContext {
+public class DataWeaveArtifactContext {
+
+  private final MuleContext muleContext;
+  private final Registry registry;
 
   public DataWeaveArtifactContext(MuleContext muleContext, Registry registry) {
-    super(muleContext, registry);
+    this.muleContext = muleContext;
+    this.registry = registry;
   }
 
-  @Override
-  protected Map<String, Object> createRegistry(Registry registry) {
+  public String getName() {
+    return muleContext.getConfiguration().getId();
+  }
+
+  public String getWorkDir() {
+    return muleContext.getConfiguration().getWorkingDirectory();
+  }
+
+  public String getEncoding() {
+    return muleContext.getConfiguration().getDefaultEncoding();
+  }
+
+  public boolean isStandalone() {
+    return muleContext.getConfiguration().isStandalone();
+  }
+
+  public Map<String, Object> getRegistry() {
     return new RegistryWrapperMap(registry);
   }
 
@@ -41,7 +59,7 @@ public class DataWeaveArtifactContext extends AbstractArtifactContext {
    */
   protected static class RegistryWrapperMap implements Map<String, Object> {
 
-    private Registry registry;
+    private final Registry registry;
 
     public RegistryWrapperMap(Registry registry) {
       this.registry = registry;

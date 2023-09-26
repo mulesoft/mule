@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.context.notification;
+package org.mule.runtime.core.privileged.event;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_STACK_MAX_DEPTH;
 
@@ -14,7 +14,6 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -27,8 +26,6 @@ import java.util.function.Function;
  * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
  * for an application developer.
  */
-// This is the previous implementaion (< 4.6). This is still here so any existing serialized instances can still be
-// deserialized.
 public class DefaultFlowCallStack implements FlowCallStack {
 
   private static final long serialVersionUID = -8683711977929802819L;
@@ -130,6 +127,10 @@ public class DefaultFlowCallStack implements FlowCallStack {
     return doToString(FlowStackElement::toString);
   }
 
+  /**
+   * Same as {@link #toString()} but including the milliseconds elapsed between its creation and now
+   * ({@link FlowStackElement#getElapsedTimeLong()}.
+   */
   public String toStringWithElapsedTime() {
     return doToString(FlowStackElement::toStringWithElapsedTime);
   }
