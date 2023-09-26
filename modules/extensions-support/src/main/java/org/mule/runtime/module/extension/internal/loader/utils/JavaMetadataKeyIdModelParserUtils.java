@@ -13,6 +13,8 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isStaticResolver;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
@@ -38,12 +40,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+
 /**
  * Helper class for introspecting metadata keys
  *
  * @since 4.5
  */
 public class JavaMetadataKeyIdModelParserUtils {
+
+  private static final Logger LOGGER = getLogger(JavaMetadataKeyIdModelParserUtils.class);
 
   public static Optional<MetadataKeyModelParser> parseKeyIdResolverModelParser(ExtensionParameter extensionParameter,
                                                                                String categoryName,
@@ -234,7 +240,8 @@ public class JavaMetadataKeyIdModelParserUtils {
       return inputResolverModelParser.getInputResolver().getCategoryName();
     }
 
-    throw new IllegalModelDefinitionException("Unable to create Keys Resolver. A Keys Resolver is being defined " +
-        "without defining an Output Resolver, Input Resolver nor Attributes Resolver");
+    LOGGER.warn("A Keys Resolver is being defined without defining an Output Resolver, Input Resolver nor Attributes Resolver");
+
+    return "";
   }
 }
