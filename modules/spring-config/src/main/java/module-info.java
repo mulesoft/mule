@@ -16,6 +16,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
     privilegedPackages = {
         "org.mule.runtime.config.privileged.dsl",
         "org.mule.runtime.config.privileged.dsl.processor",
+        "org.mule.runtime.config.privileged.dsl.spring",
         // TODO W-14161254 remove this these
         "org.mule.runtime.config.internal",
         "org.mule.runtime.config.internal.model"
@@ -95,6 +96,7 @@ module org.mule.runtime.spring.config {
 
   exports org.mule.runtime.config.privileged.dsl;
   exports org.mule.runtime.config.privileged.dsl.processor;
+  exports org.mule.runtime.config.privileged.dsl.spring;
   // Required by test infrastructure
   // TODO W-14161254 remove these
   exports org.mule.runtime.config.internal;

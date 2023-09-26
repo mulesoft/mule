@@ -22,6 +22,7 @@ import static net.bytebuddy.implementation.MethodDelegation.toField;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
+import org.mule.runtime.config.privileged.dsl.spring.SmartFactoryBeanInterceptor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
@@ -115,6 +116,7 @@ public class ObjectFactoryClassRepository {
         // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields. This interface extends
         // from SmartFactoryBean.
         .implement(SmartFactoryBeanInterceptor.class).intercept(ofBeanProperty())
+        .implement(SmartFactoryBean.class)
         // Implements the SmartFactoryBean methods and delegates to the fields.
         .method(named(IS_SINGLETON).and(isDeclaredBy(FactoryBean.class))).intercept(toField(IS_SINGLETON))
         .method(named("getObjectType").and(isDeclaredBy(FactoryBean.class)))
@@ -136,29 +138,6 @@ public class ObjectFactoryClassRepository {
     public Object invoke(@This Object object, @Origin Method method, @AllArguments Object[] args) throws Throwable {
       return ((SmartFactoryBeanInterceptor) object).getIsEagerInit().get();
     }
-  }
-
-  /**
-   * This interface is used to implement the getters and setters of the fields added with Byte Buddy. It also extends from
-   * {@link SmartFactoryBean}.
-   *
-   * @since 4.5.0
-   */
-  public interface SmartFactoryBeanInterceptor extends SmartFactoryBean {
-
-    Boolean getIsSingleton();
-
-    void setIsSingleton(Boolean isSingleton);
-
-    Class getObjectTypeClass();
-
-    boolean getIsPrototype();
-
-    void setIsPrototype(Boolean isPrototype);
-
-    Supplier getIsEagerInit();
-
-    void setIsEagerInit(Supplier isEagerInit);
   }
 
 }
