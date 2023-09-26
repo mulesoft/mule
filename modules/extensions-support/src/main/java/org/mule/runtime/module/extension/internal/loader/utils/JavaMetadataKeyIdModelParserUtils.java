@@ -164,59 +164,57 @@ public class JavaMetadataKeyIdModelParserUtils {
                                                                               ExtensionElement extensionElement,
                                                                               String elementName,
                                                                               String elementType) {
+    Optional<MetadataKeyModelParser> keyIdResolverModelParser;
+    String categoryName = getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
 
-    Optional<MetadataKeyModelParser> keyIdResolverModelParser = empty();
-    if (outputResolverModelParser != null || !inputResolverModelParsers.isEmpty()) {
-      String categoryName = getCategoryName(outputResolverModelParser, attributesResolverModelParser, inputResolverModelParsers);
+    keyIdResolverModelParser = (Optional<MetadataKeyModelParser>) parameterGroupModelParsers.stream()
+        .map(parameterGroupModelParser -> {
+          if (parameterGroupModelParser instanceof HasExtensionParameter) {
+            return parseKeyIdResolverModelParser(((HasExtensionParameter) parameterGroupModelParser).getExtensionParameter(),
+                                                 categoryName, parameterGroupModelParser.getName());
+          }
+          return empty();
+        })
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
 
+    if (!keyIdResolverModelParser.isPresent()) {
       keyIdResolverModelParser = (Optional<MetadataKeyModelParser>) parameterGroupModelParsers.stream()
-          .map(parameterGroupModelParser -> {
-            if (parameterGroupModelParser instanceof HasExtensionParameter) {
-              return parseKeyIdResolverModelParser(((HasExtensionParameter) parameterGroupModelParser).getExtensionParameter(),
-                                                   categoryName, parameterGroupModelParser.getName());
+          .map(ParameterGroupModelParser::getParameterParsers)
+          .flatMap(List::stream)
+          .collect(toList())
+          .stream()
+          .map(parameterModelParser -> {
+
+            if (parameterModelParser instanceof ParameterModelParserDecorator) {
+              parameterModelParser = ((ParameterModelParserDecorator) parameterModelParser).getDecoratee();
+            }
+            if (parameterModelParser instanceof HasExtensionParameter) {
+              return parseKeyIdResolverModelParser(((HasExtensionParameter) parameterModelParser).getExtensionParameter(),
+                                                   categoryName, null);
             }
             return empty();
           })
           .filter(Optional::isPresent)
           .map(Optional::get)
           .findFirst();
+    }
 
-      if (!keyIdResolverModelParser.isPresent()) {
-        keyIdResolverModelParser = (Optional<MetadataKeyModelParser>) parameterGroupModelParsers.stream()
-            .map(ParameterGroupModelParser::getParameterParsers)
-            .flatMap(List::stream)
-            .collect(toList())
-            .stream()
-            .map(parameterModelParser -> {
-
-              if (parameterModelParser instanceof ParameterModelParserDecorator) {
-                parameterModelParser = ((ParameterModelParserDecorator) parameterModelParser).getDecoratee();
-              }
-              if (parameterModelParser instanceof HasExtensionParameter) {
-                return parseKeyIdResolverModelParser(((HasExtensionParameter) parameterModelParser).getExtensionParameter(),
-                                                     categoryName, null);
-              }
-              return empty();
-            })
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findFirst();
-      }
-
-      if (keyIdResolverModelParser.isPresent() && !keyIdResolverModelParser.get().hasKeyIdResolver()) {
-        Optional<MetadataKeyModelParser> enclosingKeyIdResolverModelParser =
-            parseKeyIdResolverModelParser(extensionElement, componentType, elementType, elementName, extensionElement.getName());
-        if (enclosingKeyIdResolverModelParser.isPresent()) {
-          keyIdResolverModelParser = of(new JavaMetadataKeyModelParser(
-                                                                       keyIdResolverModelParser.get().getParameterName(),
-                                                                       categoryName,
-                                                                       keyIdResolverModelParser.get().getMetadataType(),
-                                                                       ((JavaMetadataKeyModelParser) enclosingKeyIdResolverModelParser
-                                                                           .get())
-                                                                               .keyIdResolverDeclarationClass()));
-        }
+    if (keyIdResolverModelParser.isPresent() && !keyIdResolverModelParser.get().hasKeyIdResolver()) {
+      Optional<MetadataKeyModelParser> enclosingKeyIdResolverModelParser =
+          parseKeyIdResolverModelParser(extensionElement, componentType, elementType, elementName, extensionElement.getName());
+      if (enclosingKeyIdResolverModelParser.isPresent()) {
+        keyIdResolverModelParser = of(new JavaMetadataKeyModelParser(
+                                                                     keyIdResolverModelParser.get().getParameterName(),
+                                                                     categoryName,
+                                                                     keyIdResolverModelParser.get().getMetadataType(),
+                                                                     ((JavaMetadataKeyModelParser) enclosingKeyIdResolverModelParser
+                                                                         .get())
+                                                                             .keyIdResolverDeclarationClass()));
       }
     }
+
     return keyIdResolverModelParser;
   }
 
