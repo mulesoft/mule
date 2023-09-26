@@ -474,6 +474,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.api.config to
       spring.core;
+  opens org.mule.runtime.core.api.policy to
+      spring.core;
   opens org.mule.runtime.core.api.context.notification to
       kryo.shaded;
   opens org.mule.runtime.core.api.processor to
