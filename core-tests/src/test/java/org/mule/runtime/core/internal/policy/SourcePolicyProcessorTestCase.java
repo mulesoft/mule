@@ -39,9 +39,9 @@ import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.context.notification.FlowStackElement;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.event.DefaultFlowCallStack;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 
 import java.lang.ref.Reference;

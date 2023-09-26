@@ -79,6 +79,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.api.context.thread.notification;
   exports org.mule.runtime.core.api.data.sample;
   exports org.mule.runtime.core.api.el;
+  exports org.mule.runtime.core.api.el.dataweave;
   exports org.mule.runtime.core.api.event;
   exports org.mule.runtime.core.api.exception;
   exports org.mule.runtime.core.api.execution;
@@ -546,8 +547,6 @@ module org.mule.runtime.core {
       spring.core;
 
   // TODO TD-0144819 add these:
-  // export org.mule.runtime.core.internal.context.notification to DW;
-  // export org.mule.runtime.core.internal.el.context to DW;
   // export org.mule.runtime.core.internal.metadata to DW;
   // open org.mule.runtime.core.internal.message to DW;
 

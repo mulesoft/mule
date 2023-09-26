@@ -37,6 +37,7 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.el.dataweave.DataWeaveArtifactContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
