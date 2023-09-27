@@ -12,10 +12,11 @@ import static org.mule.runtime.jpms.api.JpmsUtils.openToModule;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.partitioningBy;
 
+import org.mule.api.annotation.jpms.RequiredOpens;
+import org.mule.api.annotation.jpms.ServiceModule;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -23,6 +24,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -88,26 +91,62 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
     ModuleLayer artifactLayer = createModuleLayer(classLoaderConfigurationUrls, parent,
                                                   parentLayer, true, true);
 
+    final Class<? extends Annotation> serviceModuleAnnotationClass = getServiceModuleAnnotationClass(parent);
+
     final Module serviceModule = artifactLayer.modules()
         .stream()
-        .filter(module -> SERVICE_MODULE_NAME_PREFIXES.stream().anyMatch(module.getName()::startsWith))
+        .filter(module -> module.isAnnotationPresent(serviceModuleAnnotationClass))
         .findAny()
-        .orElseThrow(() -> new NoSuchElementException("No module with an expected prefix (" + SERVICE_MODULE_NAME_PREFIXES
-            + ") for '" + artifactId + "'"));
+        .orElseThrow(() -> new NoSuchElementException("No module annotated with 'ServiceModule' for '" + artifactId + "'"));
 
     String serviceModuleName = serviceModule.getName();
-    if (serviceModuleName.equals(SCHEDULER_SERVICE_MODULE_NAME)) {
-      openToModule(artifactLayer,
-                   serviceModuleName,
-                   "java.base",
-                   singletonList("java.lang"));
-    }
+
+    propagateOpensToService(parent, artifactLayer, serviceModuleAnnotationClass, serviceModule, serviceModuleName);
 
     return new MuleServiceClassLoader(artifactId,
                                       descriptor,
                                       new URL[0],
                                       artifactLayer.findLoader(serviceModuleName),
                                       lookupPolicy);
+  }
+
+  // this relies on reflection because the annotation in the services is loaded with the container classloader, but this code may
+  // be running in another classloader.
+  private Class<? extends Annotation> getServiceModuleAnnotationClass(ClassLoader parent) {
+    try {
+      // Use the annotation from the appropriate classloader
+      return (Class<? extends Annotation>) parent.loadClass(ServiceModule.class.getName());
+    } catch (ClassNotFoundException e) {
+      throw new MuleRuntimeException(e);
+    }
+  }
+
+  // this relies on reflection because the annotation in the services is loaded with the container classloader, but this code may
+  // be running in another classloader.
+  private void propagateOpensToService(ClassLoader parent,
+                                       ModuleLayer artifactLayer,
+                                       final Class<? extends Annotation> serviceModuleAnnotationClass,
+                                       final Module serviceModule,
+                                       String serviceModuleName) {
+    try {
+      final Class<? extends Annotation> requiredOpensAnnotationClass =
+          (Class<? extends Annotation>) parent.loadClass(RequiredOpens.class.getName());
+      final Annotation serviceModuleAnnotation = serviceModule.getAnnotation(serviceModuleAnnotationClass);
+      final Object[] requiredOpensAll =
+          (Object[]) serviceModuleAnnotationClass.getMethod("requiredOpens").invoke(serviceModuleAnnotation);
+
+      for (Object requiredOpens : requiredOpensAll) {
+        final String moduleName = (String) requiredOpensAnnotationClass.getMethod("moduleName").invoke(requiredOpens);
+        final String[] packageNames = (String[]) requiredOpensAnnotationClass.getMethod("packageNames").invoke(requiredOpens);
+
+        openToModule(artifactLayer,
+                     serviceModuleName,
+                     moduleName,
+                     asList(packageNames));
+      }
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      throw new MuleRuntimeException(e);
+    }
   }
 
   /**
