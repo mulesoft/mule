@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.el.mvel.context;
 
 
-import org.mule.runtime.core.internal.el.context.ServerContext;
 import org.mule.runtime.core.internal.el.datetime.DateTime;
+import org.mule.runtime.core.privileged.el.ServerContext;
 
 /**
  * This is for compatibility mode only adds the missing functionality that 3.x supports.
