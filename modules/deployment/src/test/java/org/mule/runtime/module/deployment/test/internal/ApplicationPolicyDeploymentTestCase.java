@@ -86,7 +86,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
-import org.mule.runtime.module.deployment.test.internal.util.Utils;
 import org.mule.runtime.module.extension.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
@@ -193,15 +192,15 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   @BeforeClass
   public static void compileTestClasses() throws Exception {
-    simpleExtensionJarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(Utils.getResourceFile("/org/foo/simple/SimpleExtension.java"),
-                                                        Utils.getResourceFile("/org/foo/simple/SimpleOperation.java"))
-            .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
+    simpleExtensionJarFile = new CompilerUtils.ExtensionCompiler()
+        .compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
+                   getResourceFile("/org/foo/simple/SimpleOperation.java"))
+        .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
 
     withErrorDeclarationExtensionJarFile =
         new CompilerUtils.ExtensionCompiler()
-            .compiling(Utils.getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationExtension.java"),
-                       Utils.getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationOperation.java"))
+            .compiling(getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationExtension.java"),
+                       getResourceFile("/org/foo/withErrorDeclaration/WithErrorDeclarationOperation.java"))
             .compile("mule-module-with-error-declaration-4.0-SNAPSHOT.jar", "1.0.0");
   }
 
@@ -227,10 +226,10 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
-                                                      Utils.getResourceFile("/policyWithOperation.xml"), emptyList()));
+                                                      getResourceFile("/policyWithOperation.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(2));
@@ -251,7 +250,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     List<Policy> policy = policyManager.findOperationPolicies(applicationFileBuilder.getId(), new PolicyPointcutParameters(null));
 
@@ -276,10 +275,10 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
     policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2, emptyMap(),
-                                                      Utils.getResourceFile("/barPolicy.xml"), emptyList()));
+                                                      getResourceFile("/barPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(2);
   }
@@ -299,7 +298,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     expectedEx.expect(PolicyRegistrationException.class);
     expectedEx.expectMessage(format("Error occured registering policy '%s'", FOO_POLICY_ID));
@@ -311,7 +310,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
   }
 
   @Test
@@ -329,7 +328,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(POLICY_PROPERTY_KEY, FOO_POLICY_NAME);
@@ -338,7 +337,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 2,
                                                       parameters,
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
     assertThat(policyParametrization, startsWith(POLICY_PROPERTY_VALUE));
@@ -360,12 +359,12 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, FOO_POLICY_NAME),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     policyManager.addPolicy(applicationFileBuilder.getId(), barPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, poinparameters -> true, 2,
                                                       singletonMap(POLICY_PROPERTY_KEY, BAR_POLICY_NAME),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(2);
     assertThat(policyParametrization, startsWith(FOO_POLICY_NAME + BAR_POLICY_NAME));
@@ -377,7 +376,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 3,
                                                       parameters,
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     policyParametrization = "";
     assertManualExecutionsCount(4);
@@ -405,7 +404,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"),
+                                                      getResourceFile("/fooPolicy.xml"),
                                                       singletonList(notificationListener)));
 
     assertManualExecutionsCount(1);
@@ -447,7 +446,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), brokenPolicyFileBuilder.getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1, emptyMap(),
-                                                        Utils.getResourceFile("/brokenPolicy.xml"), emptyList()));
+                                                        getResourceFile("/brokenPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
@@ -477,7 +476,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
 
@@ -501,7 +500,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, parameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
 
@@ -538,7 +537,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyUsingAppPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
   }
@@ -557,7 +556,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -579,7 +578,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -599,7 +598,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
   }
@@ -619,7 +618,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingByePlugin.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/module-using-bye-policy.xml"), emptyList()));
+                                                      getResourceFile("/module-using-bye-policy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -640,7 +639,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingByePlugin.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/module-using-bye-policy.xml"), emptyList()));
+                                                      getResourceFile("/module-using-bye-policy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -663,7 +662,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
+                                                      getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
       executeApplicationFlow("main");
       fail("Flow execution was expected to throw an exception");
@@ -690,7 +689,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), exceptionThrowingPluginImportingPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(EXCEPTION_POLICY_NAME, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
+                                                      getResourceFile("/exceptionThrowingPolicy.xml"), emptyList()));
     try {
       executeApplicationFlow("main");
       fail("Flow execution was expected to throw an exception");
@@ -714,7 +713,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                        Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                        getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
@@ -740,7 +739,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     executeApplicationFlow("main");
     assertThat(invocationCount, equalTo(1));
@@ -763,7 +762,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-using-policy-class-in-expression.xml"),
+                                                      getResourceFile("/policy-using-policy-class-in-expression.xml"),
                                                       emptyList()));
 
     executeApplicationFlow("main");
@@ -817,7 +816,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-with-colliding-error.xml"),
+                                                      getResourceFile("/policy-with-colliding-error.xml"),
                                                       emptyList()));
 
     executeApplicationFlow("main");
@@ -850,7 +849,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder
         .dependingOn(withErrorDeclarationExtensionPlugin).getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-with-error-declaration-extension.xml"),
+                                                      getResourceFile("/policy-with-error-declaration-extension.xml"),
                                                       emptyList()));
 
     executeApplicationFlow("main");
@@ -936,7 +935,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPluginUsingObjectStore().getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-using-object-store.xml"),
+                                                      getResourceFile("/policy-using-object-store.xml"),
                                                       emptyList()));
 
     executeApplicationFlow("main");
@@ -960,14 +959,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     PolicyParametrization parameters = new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                                 Utils.getResourceFile("/policy-using-object-store.xml"),
+                                                                 getResourceFile("/policy-using-object-store.xml"),
                                                                  emptyList());
     policyManager.addPolicy(applicationFileBuilder.getId(), templateDescriptor100, parameters);
 
     executeApplicationFlow("main");
 
     PolicyParametrization newParameters = new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                                    Utils.getResourceFile("/policy-using-object-store.xml"),
+                                                                    getResourceFile("/policy-using-object-store.xml"),
                                                                     emptyList());
     policyManager.addPolicy(applicationFileBuilder.getId(), templateDescriptor101, newParameters);
     policyManager.removePolicy(applicationFileBuilder.getId(), parameters.getId());
@@ -990,7 +989,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     assertApplicationDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
 
     PolicyParametrization policy = new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                             Utils.getResourceFile("/policy-using-security-manager.xml"),
+                                                             getResourceFile("/policy-using-security-manager.xml"),
                                                              emptyList());
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(), policy);
@@ -1026,7 +1025,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointcut, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile(policyFile), emptyList()));
+                                                      getResourceFile(policyFile), emptyList()));
 
 
     executeApplicationFlow("main");
@@ -1146,8 +1145,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
   private ArtifactPluginFileBuilder createInjectedHelloExtensionPluginFileBuilder() throws URISyntaxException {
     File injectedHelloExtensionJarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(Utils.getResourceFile("/org/foo/injected/InjectedHelloExtension.java"),
-                                                        Utils.getResourceFile("/org/foo/injected/InjectedHelloOperation.java"))
+        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/injected/InjectedHelloExtension.java"),
+                                                        getResourceFile("/org/foo/injected/InjectedHelloOperation.java"))
             .compile("mule-module-hello-1.0.jar", "1.0");
 
     MulePluginModel.MulePluginModelBuilder mulePluginModelBuilder = new MulePluginModel.MulePluginModelBuilder()
@@ -1200,7 +1199,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-with-error-mapping.xml"),
+                                                      getResourceFile("/policy-with-error-mapping.xml"),
                                                       emptyList()));
   }
 
@@ -1221,7 +1220,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(BAR_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/policy-with-error-mapping.xml"),
+                                                      getResourceFile("/policy-with-error-mapping.xml"),
                                                       emptyList()));
   }
 
@@ -1246,7 +1245,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPolicyIsolationFileBuilder
         .dependingOn(policyDependencyInjectionDependencyPlugin).getArtifactId(),
                             new PolicyParametrization(ISOLATED_POLICY_NAME, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/" + policyConfigurationFileName),
+                                                      getResourceFile("/" + policyConfigurationFileName),
                                                       emptyList()));
   }
 
@@ -1266,7 +1265,7 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
     policyManager.addPolicy(applicationFileBuilder.getId(), policyWithPolicyIsolationFileBuilder
         .dependingOn(policyConfigurationExtensionDependencyPlugin).getArtifactId(),
                             new PolicyParametrization(ISOLATED_POLICY_NAME, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/" + policyConfigurationFileName),
+                                                      getResourceFile("/" + policyConfigurationFileName),
                                                       emptyList()));
   }
 

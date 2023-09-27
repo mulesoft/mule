@@ -7,6 +7,8 @@
 package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.withBrokenLifecycleListenerPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.withLifecycleListenerPlugin;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.tck.junit4.rule.LogCleanup.clearAllLogs;
 import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
@@ -23,7 +25,6 @@ import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
-import org.mule.runtime.module.deployment.test.internal.util.Utils;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactDisposalContext;
 import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -61,7 +62,7 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
 
   private static File getArtifactDisposalTrackerClassFile() {
     try {
-      return new SingleClassCompiler().compile(Utils.getResourceFile("/org/foo/ArtifactDisposalTracker.java"));
+      return new SingleClassCompiler().compile(getResourceFile("/org/foo/ArtifactDisposalTracker.java"));
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -82,8 +83,7 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
   @Test
   public void whenExtensionIsInAppThenLifecycleListenerGetsCalledOnAppUndeploy() throws Exception {
     // Prepares an application that depends on an extension that declares an ArtifactLifecycleListener
-    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
-        .dependingOn(TestArtifactsCatalog.withLifecycleListenerPlugin);
+    ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder().dependingOn(withLifecycleListenerPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     // Starts the deployment
@@ -155,8 +155,8 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
     // Prepares an application that depends on two extensions with lifecycle listeners, one which fails and another one which
     // is necessary to avoid a leak
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder()
-        .dependingOn(TestArtifactsCatalog.withLifecycleListenerPlugin)
-        .dependingOn(TestArtifactsCatalog.withBrokenLifecycleListenerPlugin);
+        .dependingOn(withLifecycleListenerPlugin)
+        .dependingOn(withBrokenLifecycleListenerPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     // Starts the deployment
@@ -196,7 +196,7 @@ public class ArtifactLifecycleListenerTestCase extends AbstractDeploymentTestCas
   private DomainFileBuilder getDomainDependingOnExtensionWithLifecycleListenerFileBuilder() {
     return domainDeploymentListener.getBaseFileBuilder()
         .definedBy("empty-domain-config.xml")
-        .dependingOn(TestArtifactsCatalog.withLifecycleListenerPlugin)
+        .dependingOn(withLifecycleListenerPlugin)
         // Adds the tracker class to the artifact's ClassLoader.
         .containingClass(ARTIFACT_DISPOSAL_TRACKER_CLASS_FILE, ARTIFACT_DISPOSAL_TRACKER_CLASS_LOCATION);
   }

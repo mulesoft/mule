@@ -87,8 +87,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.hamcrest.core.Is;
-import org.mockito.Mockito;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleFatalException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -108,8 +106,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFi
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
-import org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils;
-import org.mule.runtime.module.deployment.test.internal.util.Utils;
 import org.mule.tck.probe.PollingProber;
 
 import java.io.BufferedReader;
@@ -758,8 +754,8 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     Properties initialDeploymentProperties = new Properties();
     initialDeploymentProperties.put(COMPONENT_NAME, COMPONENT_CLASS);
-    DeploymentServiceTestUtils.deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(),
-                                      initialDeploymentProperties);
+    deploy(deploymentService, dummyDomainApp1FileBuilder.getArtifactFile().getAbsoluteFile().toURI(),
+           initialDeploymentProperties);
 
     assertDeploymentSuccess(domainDeploymentListener, dummyDomainFileBuilder.getId());
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyDomainApp1FileBuilder.getId());
@@ -776,7 +772,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     assertStatus(dummyDomainApp1FileBuilder.getId(), STARTED);
     Properties finalDeploymentProperties = resolveDeploymentProperties(dummyDomainApp1FileBuilder.getId(), empty());
     assertThat(finalDeploymentProperties.get(START_ARTIFACT_ON_DEPLOYMENT_PROPERTY), is(nullValue()));
-    assertThat(finalDeploymentProperties.get(COMPONENT_NAME), Is.is(COMPONENT_CLASS));
+    assertThat(finalDeploymentProperties.get(COMPONENT_NAME), is(COMPONENT_CLASS));
   }
 
   @Test
@@ -1025,7 +1021,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
   }
@@ -1053,7 +1049,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
   }
@@ -1082,7 +1078,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
     policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingPluginFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                      Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                      getResourceFile("/appPluginPolicy.xml"), emptyList()));
 
     assertManualExecutionsCount(1);
   }
@@ -1112,7 +1108,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
     try {
       policyManager.addPolicy(applicationFileBuilder.getId(), policyIncludingHelloPluginV2FileBuilder.getArtifactId(),
                               new PolicyParametrization(FOO_POLICY_ID, s -> true, 1, emptyMap(),
-                                                        Utils.getResourceFile("/appPluginPolicy.xml"), emptyList()));
+                                                        getResourceFile("/appPluginPolicy.xml"), emptyList()));
       fail("Policy application should have failed");
     } catch (PolicyRegistrationException expected) {
     }
@@ -1515,7 +1511,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   @Issue("MULE-19040")
   @Description("When a domain is restarted, if its apps were stopped before restart, they should not get started")
   public void redeployDomainWithStoppedAppsShouldNotPersistStoppedStateAndShouldNotStartApps() throws Exception {
-    DeploymentListener mockDeploymentListener = Mockito.spy(new DeploymentStatusTracker());
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
     addPackedDomainFromBuilder(dummyDomainFileBuilder);
 
@@ -2114,7 +2110,7 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
   }
 
   private void assertObtainedResourceIsCorrect(String correctResourceLocation, String flowName) throws Exception {
-    File resourceFile = Utils.getResourceFile(correctResourceLocation);
+    File resourceFile = getResourceFile(correctResourceLocation);
     BufferedReader reader = Files.newBufferedReader(resourceFile.toPath(), defaultCharset());
 
     CoreEvent result = executeApplicationFlow(flowName, null);
@@ -2269,15 +2265,15 @@ public class DomainDeploymentTestCase extends AbstractDeploymentTestCase {
 
   @Override
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    DeploymentServiceTestUtils.deployDomain(deploymentService, uri, deploymentProperties);
+    deployDomain(deploymentService, uri, deploymentProperties);
   }
 
   @Override
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      DeploymentServiceTestUtils.redeployDomain(deploymentService, id);
+      redeployDomain(deploymentService, id);
     } else {
-      DeploymentServiceTestUtils.redeployDomain(deploymentService, id, deploymentProperties);
+      redeployDomain(deploymentService, id, deploymentProperties);
     }
   }
 

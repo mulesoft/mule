@@ -18,9 +18,9 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveFlowDeploymentProperties;
 import static org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener.START_FLOW_ON_DEPLOYMENT_PROPERTY;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.DEPLOYMENT_CONFIGURATION;
-import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowStatePersistenceStory.FLOW_STATE_PERSISTENCE;
 
+import org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener;
 import java.io.File;
 import java.util.Properties;
 
@@ -29,9 +29,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.mule.runtime.module.deployment.internal.FlowStoppedDeploymentPersistenceListener;
 
 @Issue("MULE-19127")
 @Feature(DEPLOYMENT_CONFIGURATION)

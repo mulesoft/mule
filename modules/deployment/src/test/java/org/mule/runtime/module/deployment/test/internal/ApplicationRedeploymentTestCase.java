@@ -8,6 +8,8 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.PROPERTY_CONFIG_RESOURCES;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.SERIALIZED_ARTIFACT_AST_LOCATION;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
@@ -26,12 +28,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Assert;
-import org.mockito.Mockito;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
-import org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
@@ -77,18 +76,16 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .containingClass(TestArtifactsCatalog.echoTestClassFile,
-                         "org/foo/EchoTest.class");
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
         .definedBy("dummy-app-with-props-dependencies-config.xml");
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .containingClass(TestArtifactsCatalog.echoTestClassFile,
-                         "org/foo/EchoTest.class");
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   }
 
   @Parameters(name = "Parallel: {0}")
@@ -106,7 +103,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
-    Assert.assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
@@ -130,14 +127,14 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertApplicationDeploymentSuccess(applicationDeploymentListener, emptyAppFileBuilder.getId());
 
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
-    Assert.assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
     addPackedAppFromBuilder(emptyAppFileBuilder);
 
     assertApplicationRedeploymentSuccess(emptyAppFileBuilder.getId());
-    Assert.assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {emptyAppFileBuilder.getId()}, true);
   }
 
@@ -338,7 +335,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     assertApplicationDeploymentSuccess(applicationDeploymentListener, dummyAppDescriptorFileBuilder.getId());
 
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
-    Assert.assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
 
     reset(applicationDeploymentListener);
 
@@ -347,7 +344,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     configFile.setLastModified(configFile.lastModified() + FILE_TIMESTAMP_PRECISION_MILLIS);
 
     assertApplicationRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
-    Assert.assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
+    assertEquals("Application has not been properly registered with Mule", 1, deploymentService.getApplications().size());
     assertAppsDir(NONE, new String[] {dummyAppDescriptorFileBuilder.getId()}, true);
   }
 
@@ -486,7 +483,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
 
   @Test
   public void redeployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
-    DeploymentListener mockDeploymentListener = Mockito.spy(new DeploymentStatusTracker());
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (packed)
@@ -501,7 +498,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     reset(mockDeploymentListener);
 
     // Redeploy by using redeploy method
-    DeploymentServiceTestUtils.redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
@@ -522,7 +519,7 @@ public class ApplicationRedeploymentTestCase extends AbstractApplicationDeployme
     verify(mockDeploymentListener, times(0)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());
 
     // Redeploy by using redeploy method
-    DeploymentServiceTestUtils.redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
+    redeploy(deploymentService, dummyAppDescriptorFileBuilder.getArtifactFile().toURI());
 
     // Application was redeployed
     verify(mockDeploymentListener, times(1)).onRedeploymentSuccess(dummyAppDescriptorFileBuilder.getId());

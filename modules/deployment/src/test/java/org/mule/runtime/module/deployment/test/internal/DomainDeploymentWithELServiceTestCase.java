@@ -10,6 +10,8 @@ import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.classloaderConnectExtensionPlugin;
 import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
@@ -73,27 +75,27 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
   private final DomainFileBuilder domainWithConfigsFileBuilder =
       new DomainFileBuilder("domain-with-configs")
           .definedBy("domain-with-configs-config.xml")
-          .dependingOn(TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin)
-          .dependingOn(TestArtifactsCatalog.classloaderConnectExtensionPlugin);
+          .dependingOn(classloaderConfigConnectExtensionPlugin)
+          .dependingOn(classloaderConnectExtensionPlugin);
 
   private final ApplicationFileBuilder appWithConfigRefToDomain = new ApplicationFileBuilder("app-with-config-ref-to-domain")
       .definedBy("app-with-config-ref-to-domain.xml")
       .dependingOn(domainWithConfigsFileBuilder)
-      .dependingOn(TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin);
+      .dependingOn(classloaderConfigConnectExtensionPlugin);
   private final ApplicationFileBuilder appWithConfigRefExpressionToDomain =
       new ApplicationFileBuilder("app-with-config-ref-expr-to-domain")
           .definedBy("app-with-config-ref-expr-to-domain.xml")
           .dependingOn(domainWithConfigsFileBuilder)
-          .dependingOn(TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin);
+          .dependingOn(classloaderConfigConnectExtensionPlugin);
   private final ApplicationFileBuilder appWithConfigRefToNonExistant =
       new ApplicationFileBuilder("app-with-config-ref-to-non-existent")
           .definedBy("app-with-config-ref-to-non-existent.xml")
           .dependingOn(domainWithConfigsFileBuilder)
-          .dependingOn(TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin);
+          .dependingOn(classloaderConfigConnectExtensionPlugin);
   private final ApplicationFileBuilder appWithConfigRefToInvalid = new ApplicationFileBuilder("app-with-config-ref-to-invalid")
       .definedBy("app-with-config-ref-to-invalid.xml")
       .dependingOn(domainWithConfigsFileBuilder)
-      .dependingOn(TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin);
+      .dependingOn(classloaderConfigConnectExtensionPlugin);
 
   public DomainDeploymentWithELServiceTestCase(boolean parallelDeployment) {
     super(parallelDeployment);

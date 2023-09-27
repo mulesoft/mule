@@ -35,9 +35,21 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaulServiceEchoJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultFooServiceJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV2Plugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.correlationIdCount;
+import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.invocationCount;
+import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.policyParametrization;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.redeploy;
+import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.undeploy;
 import static org.mule.tck.junit4.AbstractMuleContextTestCase.TEST_MESSAGE;
 
 import static java.lang.String.format;
@@ -89,7 +101,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.slf4j.LoggerFactory.getLogger;
 
-import org.hamcrest.MatcherAssert;
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.functional.config.TestComponentBuildingDefinitionProvider;
 import org.mule.runtime.api.artifact.Registry;
@@ -123,8 +134,14 @@ import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
+import org.mule.runtime.module.deployment.internal.ArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
+import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
+import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
+import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListenerFactory;
 import org.mule.runtime.module.deployment.test.api.TestDeploymentListener;
-import org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils;
 import org.mule.runtime.module.deployment.test.internal.util.container.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
@@ -136,7 +153,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
-import org.mule.runtime.module.deployment.internal.*;
+import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
@@ -278,19 +295,19 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       .definedBy("dummy-app-config.xml")
       .configuredWith("myCustomProp", "someValue")
       .containingResource("serialized/dummy-app.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
-      .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-      .containingClass(TestArtifactsCatalog.echoTestClassFile, "org/foo/EchoTest.class");
+      .dependingOn(callbackExtensionPlugin)
+      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   protected final ApplicationFileBuilder dummyAppWithBrokenAstDescriptorFileBuilder = new ApplicationFileBuilder("dummy-app")
       .definedBy("dummy-app-config.xml")
       .configuredWith("myCustomProp", "someValue")
       .containingResource("serialized/broken.ast", SERIALIZED_ARTIFACT_AST_LOCATION)
-      .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-      .containingClass(TestArtifactsCatalog.echoTestClassFile, "org/foo/EchoTest.class");
+      .dependingOn(callbackExtensionPlugin)
+      .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   protected final ApplicationFileBuilder dummyFlowErrorAppDescriptorFileBuilder =
       new ApplicationFileBuilder("dummy-error-flow-app")
           .definedBy("dummy-app-several-flows.xml").configuredWith("myCustomProp", "someValue")
-          .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-          .containingClass(TestArtifactsCatalog.echoTestClassFile, "org/foo/EchoTest.class");
+          .dependingOn(callbackExtensionPlugin)
+          .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   protected final ApplicationFileBuilder dummyErrorAppOnStartDescriptorFileBuilder =
       new ApplicationFileBuilder("dummy-error-app-start")
           .definedBy("dummy-error-app-start.xml").configuredWith("myCustomProp", "someValue");
@@ -300,7 +317,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
       new DomainFileBuilder("dummy-domain").definedBy("empty-domain-config.xml");
   protected final DomainFileBuilder exceptionThrowingPluginImportingDomain =
       new DomainFileBuilder("exception-throwing-plugin-importing-domain").definedBy("empty-domain-config.xml")
-          .dependingOn(TestArtifactsCatalog.exceptionThrowingPlugin);
+          .dependingOn(exceptionThrowingPlugin);
 
   // Policy file builders
   protected final PolicyFileBuilder barPolicyFileBuilder = createPolicyFileBuilder(BAR_POLICY_NAME);
@@ -397,16 +414,15 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                                               createDescriptorLoaderRepository(),
                                                                               ArtifactDescriptorValidatorBuilder.builder()));
     // Reset test component state
-    TestPolicyProcessor.invocationCount = 0;
-    TestPolicyProcessor.correlationIdCount.clear();
-    TestPolicyProcessor.policyParametrization = "";
+    invocationCount = 0;
+    correlationIdCount.clear();
+    policyParametrization = "";
   }
 
   @After
   public void undeployApps() {
     if (deploymentService != null) {
-      deploymentService.getApplications()
-          .forEach(app -> DeploymentServiceTestUtils.undeploy(deploymentService, app.getArtifactName()));
+      deploymentService.getApplications().forEach(app -> undeploy(deploymentService, app.getArtifactName()));
     }
     TestApplicationFactory.after();
   }
@@ -479,12 +495,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void installFooService() throws IOException {
     installService("fooService", "org.mule.runtime.service.test.api.FooService", "org.mule.service.foo.FooServiceProvider",
-                   TestArtifactsCatalog.defaultFooServiceJarFile);
+                   defaultFooServiceJarFile);
   }
 
   protected void installEchoService() throws IOException {
     installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
-                   TestArtifactsCatalog.defaulServiceEchoJarFile);
+                   defaulServiceEchoJarFile);
   }
 
   private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,
@@ -1222,22 +1238,22 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private PolicyFileBuilder createPolicyIncludingHelloPluginV2FileBuilder() {
-    return createPolicyFileBuilder(BAZ_POLICY_NAME, emptyMap(), TestArtifactsCatalog.helloExtensionV2Plugin);
+    return createPolicyFileBuilder(BAZ_POLICY_NAME, emptyMap(), helloExtensionV2Plugin);
   }
 
   private PolicyFileBuilder createExceptionThrowingPluginImportingPolicyFileBuilder() {
-    return createPolicyFileBuilder(EXCEPTION_POLICY_NAME, emptyMap(), TestArtifactsCatalog.callbackExtensionPlugin);
+    return createPolicyFileBuilder(EXCEPTION_POLICY_NAME, emptyMap(), callbackExtensionPlugin);
   }
 
   private PolicyFileBuilder createPolicyIncludingPluginFileBuilder() {
-    return createPolicyFileBuilder(BAZ_POLICY_NAME, emptyMap(), TestArtifactsCatalog.helloExtensionV1Plugin);
+    return createPolicyFileBuilder(BAZ_POLICY_NAME, emptyMap(), helloExtensionV1Plugin);
   }
 
   private PolicyFileBuilder createPolicyIncludingDependantPluginFileBuilder() {
     ArtifactPluginFileBuilder dependantPlugin = new ArtifactPluginFileBuilder("dependantPlugin")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .containingClass(TestArtifactsCatalog.pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
-        .dependingOn(TestArtifactsCatalog.helloExtensionV1Plugin);
+        .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
+        .dependingOn(helloExtensionV1Plugin);
 
     return createPolicyFileBuilder(BAZ_POLICY_NAME, emptyMap(), dependantPlugin);
   }
@@ -1282,14 +1298,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   protected void deployURI(URI uri, Properties deploymentProperties) throws IOException {
-    DeploymentServiceTestUtils.deploy(deploymentService, uri, deploymentProperties);
+    deploy(deploymentService, uri, deploymentProperties);
   }
 
   protected void redeployId(String id, Properties deploymentProperties) throws IOException {
     if (deploymentProperties == null) {
-      DeploymentServiceTestUtils.redeploy(deploymentService, id);
+      redeploy(deploymentService, id);
     } else {
-      DeploymentServiceTestUtils.redeploy(deploymentService, id, deploymentProperties);
+      redeploy(deploymentService, id, deploymentProperties);
     }
   }
 
@@ -1319,11 +1335,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected void assertManualExecutionsCount(int expectedInvokations) throws Exception {
     executeApplicationFlow("main", MANUAL_EXECUTION_CORRELATION_ID);
     if (expectedInvokations > 0) {
-      MatcherAssert.assertThat(TestPolicyProcessor.correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(true));
-      MatcherAssert.assertThat(TestPolicyProcessor.correlationIdCount.get(MANUAL_EXECUTION_CORRELATION_ID).get(),
-                               is(expectedInvokations));
+      assertThat(correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(true));
+      assertThat(correlationIdCount.get(MANUAL_EXECUTION_CORRELATION_ID).get(), is(expectedInvokations));
     } else {
-      MatcherAssert.assertThat(TestPolicyProcessor.correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(false));
+      assertThat(correlationIdCount.containsKey(MANUAL_EXECUTION_CORRELATION_ID), is(false));
     }
   }
 

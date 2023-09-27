@@ -85,7 +85,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mockito.Mockito;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -1673,7 +1672,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(APPLICATION_REDEPLOYMENT)
   public void deployMethodRedeploysIfApplicationIsAlreadyDeployedPacked() throws Exception {
-    DeploymentListener mockDeploymentListener = Mockito.spy(new DeploymentStatusTracker());
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
 
     // Deploy an application (packed)

@@ -17,6 +17,33 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtils1_0JarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtils2_0JarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtilsForbiddenJavaJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusForbidden;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusForbiddenContainerClass;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusForbiddenThirdPartyClass;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin2Echo;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin2EchoAndBar2;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlusPlugin3Echo;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPomFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoPlugin;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoPluginWithJavaxLib;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoPluginWithLib1;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho1ClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho2ClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEcho3ClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginEchoSpiTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.pluginForbiddenMuleThirdPartyEchoTestClassFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.privilegedExtensionV1JarFile;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
@@ -41,9 +68,8 @@ import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.runtime.module.deployment.test.internal.util.Utils;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.tck.util.CompilerUtils;
+import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
 
 import java.io.File;
@@ -98,8 +124,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     waitAppFileBuilder = appFileBuilder("wait-app").definedBy("wait-app-config.xml");
     dummyAppDescriptorWithPropsFileBuilder = appFileBuilder("dummy-app-with-props")
         .definedBy("dummy-app-with-props-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .containingClass(TestArtifactsCatalog.echoTestClassFile,
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile,
                          "org/foo/EchoTest.class");
     dummyAppDescriptorWithPropsDependencyFileBuilder = appFileBuilder("dummy-app-with-props-dependencies")
         .withMinMuleVersion("4.3.0") // MULE-19038
@@ -107,22 +133,21 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     dummyAppDescriptorWithStoppedFlowFileBuilder = appFileBuilder("dummy-app-with-stopped-flow-config")
         .withMinMuleVersion("4.3.0") // MULE-19127
         .definedBy("dummy-app-with-stopped-flow-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .containingClass(TestArtifactsCatalog.echoTestClassFile,
-                         "org/foo/EchoTest.class");
+        .dependingOn(callbackExtensionPlugin)
+        .containingClass(echoTestClassFile, "org/foo/EchoTest.class");
   }
 
   @Test
   public void deploysAppWithPluginSharedLibrary() throws Exception {
     final ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
-        .containingClass(TestArtifactsCatalog.pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     final ApplicationFileBuilder sharedLibPluginAppFileBuilder = appFileBuilder("shared-plugin-lib-app")
         .definedBy("app-with-echo1-plugin-config.xml")
         .dependingOn(echoPluginWithoutLib1)
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", TestArtifactsCatalog.barUtils1_0JarFile));
+        .dependingOn(callbackExtensionPlugin)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", barUtils1_0JarFile));
 
     addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
 
@@ -140,13 +165,13 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     // Defines a plugin that exports org.bar which is also exported on the application
     ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-        .containingClass(TestArtifactsCatalog.pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     ApplicationFileBuilder sharedLibPluginAppFileBuilder = appFileBuilder("shared-plugin-lib-app")
         .definedBy("app-with-echo1-plugin-config.xml")
         .dependingOn(echoPluginWithoutLib1)
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", TestArtifactsCatalog.barUtils1_0JarFile));
+        .dependingOn(callbackExtensionPlugin)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", barUtils1_0JarFile));
 
     addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
 
@@ -164,14 +189,14 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     // Defines a plugin that contains org.bar package, which is also exported on the application
     ArtifactPluginFileBuilder echoPluginWithoutLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-        .containingClass(TestArtifactsCatalog.pluginEcho1ClassFile, "org/foo/Plugin1Echo.class")
-        .dependingOn(new JarFileBuilder("barUtils2_0", TestArtifactsCatalog.barUtils2_0JarFile));
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class")
+        .dependingOn(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
     ApplicationFileBuilder sharedLibPluginAppFileBuilder = appFileBuilder("shared-plugin-lib-app")
         .definedBy("app-with-echo1-plugin-config.xml")
         .dependingOn(echoPluginWithoutLib1)
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
-        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", TestArtifactsCatalog.barUtils1_0JarFile));
+        .dependingOn(callbackExtensionPlugin)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils", barUtils1_0JarFile));
 
     addPackedAppFromBuilder(sharedLibPluginAppFileBuilder);
 
@@ -191,9 +216,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginWithDependencyAndConflictingVersionSharedByApp() throws Exception {
     final ApplicationFileBuilder differentLibPluginAppFileBuilder = appFileBuilder("appWithLibDifferentThanPlugin")
         .definedBy("app-plugin-different-lib-config.xml")
-        .dependingOn(TestArtifactsCatalog.echoPluginWithLib1)
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlusPlugin2Echo)
-        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", TestArtifactsCatalog.barUtils2_0JarFile));
+        .dependingOn(echoPluginWithLib1)
+        .dependingOn(callbackExtensionPlusPlugin2Echo)
+        .dependingOnSharedLibrary(new JarFileBuilder("barUtils2_0", barUtils2_0JarFile));
 
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
 
@@ -210,9 +235,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void appOverridingContainerClassAlsoPluginLocal() throws Exception {
     final ApplicationFileBuilder withJavaxEchoPlugin = appFileBuilder("appWithJavaxEchoPlugin")
         .definedBy("app-with-javax-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "javax.annotation")
-        .dependingOn(TestArtifactsCatalog.echoPluginWithJavaxLib)
+        .dependingOn(echoPluginWithJavaxLib)
         .dependingOn(new JarFileBuilder("barUtilsJavaxB",
                                         new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java"))
                                             .compile("bar-javax-b.jar")));
@@ -231,8 +256,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginDependingAndExportingFromOtherPlugin() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-        .dependingOn(new JarFileBuilder("barUtils2", TestArtifactsCatalog.barUtils2_0JarFile))
-        .containingClass(TestArtifactsCatalog.pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     // this plugin depends on a version of bar but will actually use the one from the dependant plugin
     ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2")
@@ -240,11 +265,11 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         // Similar to how the dependency beteween http and sockets work.
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo,org.foo,org.bar")
         .dependingOn(echoPluginWithLib1)
-        .containingClass(TestArtifactsCatalog.pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
 
     final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin3")
         .definedBy("app-with-echo2-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(echoPluginWithLib2);
 
     addPackedAppFromBuilder(usesPlugin2);
@@ -261,18 +286,18 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginNotDependingAndExportingFromOtherPlugin() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib1 = new ArtifactPluginFileBuilder("echoPlugin1")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo,org.bar")
-        .dependingOn(new JarFileBuilder("barUtils1", TestArtifactsCatalog.barUtils1_0JarFile))
-        .containingClass(TestArtifactsCatalog.pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
+        .dependingOn(new JarFileBuilder("barUtils1", barUtils1_0JarFile))
+        .containingClass(pluginEcho1ClassFile, "org/foo/Plugin1Echo.class");
 
     // this plugin depends on a version of bar but will actually use the one from the dependant plugin
     ArtifactPluginFileBuilder echoPluginWithLib2 = new ArtifactPluginFileBuilder("echoPlugin2")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .dependingOn(new JarFileBuilder("barUtils2", TestArtifactsCatalog.barUtils2_0JarFile))
-        .containingClass(TestArtifactsCatalog.pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
+        .dependingOn(new JarFileBuilder("barUtils2", barUtils2_0JarFile))
+        .containingClass(pluginEcho2ClassFile, "org/foo/echo/Plugin2Echo.class");
 
     final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin3")
         .definedBy("app-with-echo2-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(echoPluginWithLib1)
         .dependingOn(echoPluginWithLib2);
 
@@ -312,10 +337,10 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void deploysMultiPluginVersionLib() throws Exception {
     final ArtifactPluginFileBuilder echoPluginWithLib2 =
         new ArtifactPluginFileBuilder("echoPlugin2").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .dependingOn(TestArtifactsCatalog.callbackExtensionPlusPlugin2EchoAndBar2);
+            .dependingOn(callbackExtensionPlusPlugin2EchoAndBar2);
 
     final ApplicationFileBuilder multiLibPluginAppFileBuilder = appFileBuilder("multiPluginLibVersion")
-        .definedBy("multi-plugin-app-config.xml").dependingOn(TestArtifactsCatalog.echoPluginWithLib1)
+        .definedBy("multi-plugin-app-config.xml").dependingOn(echoPluginWithLib1)
         .dependingOn(echoPluginWithLib2);
 
     addPackedAppFromBuilder(multiLibPluginAppFileBuilder);
@@ -331,12 +356,12 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void deploysApplicationWithPluginDependingOnPlugin() throws Exception {
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(TestArtifactsCatalog.pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
-            .dependingOn(TestArtifactsCatalog.echoPlugin);
+            .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
+            .dependingOn(echoPlugin);
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(dependantPlugin);
     addPackedAppFromBuilder(artifactFileBuilder);
 
@@ -351,36 +376,30 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void deploysLightApplicationWithPluginDependingOnPlugin() throws Exception {
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .dependingOn(TestArtifactsCatalog.callbackExtensionPlusPlugin3Echo)
-            .dependingOn(TestArtifactsCatalog.echoPlugin);
+            .dependingOn(callbackExtensionPlusPlugin3Echo)
+            .dependingOn(echoPlugin);
 
     File mavenRepoFolder = Paths.get(getMuleBaseFolder().getAbsolutePath(), "repository").toFile();
     File testGroupIdRepoFolder = Paths.get(mavenRepoFolder.getAbsolutePath(), "org", "mule", "test").toFile();
 
-    JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", TestArtifactsCatalog.echoTestJarFile);
+    JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", echoTestJarFile);
     copyFile(testJarFileDependency.getArtifactPomFile(),
              Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.pom").toFile());
     copyFile(testJarFileDependency.getArtifactFile(),
              Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.jar").toFile());
 
-    FileUtils.copyFile(TestArtifactsCatalog.echoPlugin.getArtifactPomFile(),
-                       Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom")
-                           .toFile());
-    FileUtils.copyFile(TestArtifactsCatalog.echoPlugin.getArtifactFile(),
-                       Paths
-                           .get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0",
-                                "echoPlugin-1.0.0-mule-plugin.jar")
-                           .toFile());
+    copyFile(echoPlugin.getArtifactPomFile(),
+             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom").toFile());
+    copyFile(echoPlugin.getArtifactFile(), Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0-mule-plugin.jar").toFile());
 
-    copyCallbackExtensionFiles(TestArtifactsCatalog.callbackExtensionPlusPlugin3Echo, testGroupIdRepoFolder);
+    copyCallbackExtensionFiles(callbackExtensionPlusPlugin3Echo, testGroupIdRepoFolder);
 
-    copyFile(dependantPlugin.getArtifactPomFile(),
-             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0", "dependantPlugin-1.0.0.pom")
-                 .toFile());
-    copyFile(dependantPlugin.getArtifactFile(),
-             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0",
-                       "dependantPlugin-1.0.0-mule-plugin.jar")
-                 .toFile());
+    copyFile(dependantPlugin.getArtifactPomFile(), Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0", "dependantPlugin-1.0.0.pom").toFile());
+    copyFile(dependantPlugin.getArtifactFile(), Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "dependantPlugin", "1.0.0", "dependantPlugin-1.0.0-mule-plugin.jar")
+        .toFile());
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml").dependingOn(dependantPlugin).usingLightWeightPackage();
@@ -395,25 +414,16 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
 
   private void copyCallbackExtensionFiles(ArtifactPluginFileBuilder pluginFileBuilder, File testGroupIdRepoFolder)
       throws IOException {
-    copyFile(pluginFileBuilder.getArtifactPomFile(),
-             Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtensionPlugin", "1.0.0",
-                       "callbackExtensionPlugin-1.0.0.pom")
-                 .toFile());
-    copyFile(pluginFileBuilder.getArtifactFile(),
-             Paths
-                 .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtensionPlugin", "1.0.0",
-                      "callbackExtensionPlugin-1.0.0-mule-plugin.jar")
-                 .toFile());
-    FileUtils.copyFile(TestArtifactsCatalog.callbackExtensionJarFile,
-                       Paths
-                           .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtension", "1.0.0",
-                                "callbackExtension-1.0.0.jar")
-                           .toFile());
-    FileUtils.copyFile(TestArtifactsCatalog.callbackExtensionPomFile,
-                       Paths
-                           .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtension", "1.0.0",
-                                "callbackExtension-1.0.0.pom")
-                           .toFile());
+    copyFile(pluginFileBuilder.getArtifactPomFile(), Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtensionPlugin", "1.0.0", "callbackExtensionPlugin-1.0.0.pom")
+        .toFile());
+    copyFile(pluginFileBuilder.getArtifactFile(), Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtensionPlugin",
+                                                            "1.0.0", "callbackExtensionPlugin-1.0.0-mule-plugin.jar")
+        .toFile());
+    copyFile(callbackExtensionJarFile, Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtension", "1.0.0", "callbackExtension-1.0.0.jar").toFile());
+    copyFile(callbackExtensionPomFile, Paths
+        .get(testGroupIdRepoFolder.getAbsolutePath(), "callbackExtension", "1.0.0", "callbackExtension-1.0.0.pom").toFile());
   }
 
   @Test
@@ -430,9 +440,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
 
   public void applicationServicesVisibleFromPlugin(boolean lightweight) throws Exception {
     final File spiApiJarFile =
-        new JarCompiler().compiling(Utils.getResourceFile("/org/foo/spi/SpiInterface.java")).compile("spi-api.jar");
+        new JarCompiler().compiling(getResourceFile("/org/foo/spi/SpiInterface.java")).compile("spi-api.jar");
     final File spiImplJarFile =
-        new JarCompiler().compiling(Utils.getResourceFile("/org/foo/spi/impl/SpiImplementation.java"))
+        new JarCompiler().compiling(getResourceFile("/org/foo/spi/impl/SpiImplementation.java"))
             .including(new File(ApplicationDeploymentClassloadingTestCase.class
                 .getResource("/org/foo/spi/META-INF/services/org.foo.spi.SpiInterface").toURI()),
                        "META-INF/services/org.foo.spi.SpiInterface")
@@ -441,14 +451,14 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
 
     ArtifactPluginFileBuilder spiUserPlugin =
         new ArtifactPluginFileBuilder("spiUserPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(TestArtifactsCatalog.pluginEchoSpiTestClassFile, "org/foo/echo/PluginSpiEcho.class")
-            .dependingOn(TestArtifactsCatalog.echoPlugin)
+            .containingClass(pluginEchoSpiTestClassFile, "org/foo/echo/PluginSpiEcho.class")
+            .dependingOn(echoPlugin)
             .dependingOn(new JarFileBuilder("spi-api", spiApiJarFile))
             .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.spi,org.foo.echo");
 
     ApplicationFileBuilder artifactFileBuilder = appFileBuilder("plugin-using-app-spi-impl")
         .definedBy("plugin-using-app-spi-impl-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(spiUserPlugin)
         .dependingOnSharedLibrary(new JarFileBuilder("spi-impl", spiImplJarFile))
         .configuredWith(EXPORTED_PACKAGES, "org.foo.spi.impl");
@@ -469,20 +479,20 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
       copyFile(spiImplJarFileDependency.getArtifactFile(),
                Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spi-impl", "1.0.0", "spi-impl-1.0.0.jar").toFile());
 
-      JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", TestArtifactsCatalog.echoTestJarFile);
+      JarFileBuilder testJarFileDependency = new JarFileBuilder("echoTestJar", echoTestJarFile);
       copyFile(testJarFileDependency.getArtifactPomFile(),
                Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.pom").toFile());
       copyFile(testJarFileDependency.getArtifactFile(),
                Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoTestJar", "1.0.0", "echoTestJar-1.0.0.jar").toFile());
 
-      FileUtils.copyFile(TestArtifactsCatalog.echoPlugin.getArtifactPomFile(),
-                         Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom")
-                             .toFile());
-      FileUtils.copyFile(TestArtifactsCatalog.echoPlugin.getArtifactFile(),
-                         Paths
-                             .get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0",
-                                  "echoPlugin-1.0.0-mule-plugin.jar")
-                             .toFile());
+      copyFile(echoPlugin.getArtifactPomFile(),
+               Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0", "echoPlugin-1.0.0.pom")
+                   .toFile());
+      copyFile(echoPlugin.getArtifactFile(),
+               Paths
+                   .get(testGroupIdRepoFolder.getAbsolutePath(), "echoPlugin", "1.0.0",
+                        "echoPlugin-1.0.0-mule-plugin.jar")
+                   .toFile());
 
       copyFile(spiUserPlugin.getArtifactPomFile(),
                Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spiUserPlugin", "1.0.0", "spiUserPlugin-1.0.0.pom").toFile());
@@ -490,7 +500,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
                Paths.get(testGroupIdRepoFolder.getAbsolutePath(), "spiUserPlugin", "1.0.0", "spiUserPlugin-1.0.0-mule-plugin.jar")
                    .toFile());
 
-      copyCallbackExtensionFiles(TestArtifactsCatalog.callbackExtensionPlugin, testGroupIdRepoFolder);
+      copyCallbackExtensionFiles(callbackExtensionPlugin, testGroupIdRepoFolder);
 
       artifactFileBuilder = artifactFileBuilder.usingLightWeightPackage();
     } else {
@@ -512,16 +522,16 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     ArtifactPluginFileBuilder echoPlugin = new ArtifactPluginFileBuilder("echoPlugin")
         .configuredWith(PRIVILEGED_EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo")
         .configuredWith(PRIVILEGED_ARTIFACTS_PROPERTY, "org.mule.test:dependantPlugin")
-        .dependingOn(new JarFileBuilder("echoTestJar", TestArtifactsCatalog.echoTestJarFile));
+        .dependingOn(new JarFileBuilder("echoTestJar", echoTestJarFile));
 
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(TestArtifactsCatalog.pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
+            .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class")
             .dependingOn(echoPlugin);
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(dependantPlugin);
     addPackedAppFromBuilder(artifactFileBuilder);
 
@@ -536,11 +546,11 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void failsToDeployApplicationWithMissingPluginDependencyOnPlugin() throws Exception {
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-            .containingClass(TestArtifactsCatalog.pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class");
+            .containingClass(pluginEcho3ClassFile, "org/foo/echo/Plugin3Echo.class");
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(dependantPlugin);
     addPackedAppFromBuilder(artifactFileBuilder);
 
@@ -562,11 +572,11 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void failsToDeployApplicationWithPluginDependantOnPluginNotShipped() throws Exception {
     ArtifactPluginFileBuilder dependantPlugin =
         new ArtifactPluginFileBuilder("dependantPlugin")
-            .dependingOn(TestArtifactsCatalog.echoPlugin);
+            .dependingOn(echoPlugin);
 
     final TestArtifactDescriptor artifactFileBuilder = appFileBuilder("plugin-depending-on-plugin-app")
         .definedBy("plugin-depending-on-plugin-app-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(dependantPlugin);
     addPackedAppFromBuilder(artifactFileBuilder);
 
@@ -579,8 +589,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void deploysAppWithLibDifferentThanPlugin() throws Exception {
     final ApplicationFileBuilder differentLibPluginAppFileBuilder =
         appFileBuilder("appWithLibDifferentThanPlugin").definedBy("app-plugin-different-lib-config.xml")
-            .dependingOn(TestArtifactsCatalog.echoPluginWithLib1)
-            .dependingOn(TestArtifactsCatalog.callbackExtensionPlusPlugin2EchoAndBar2);
+            .dependingOn(echoPluginWithLib1)
+            .dependingOn(callbackExtensionPlusPlugin2EchoAndBar2);
 
     addPackedAppFromBuilder(differentLibPluginAppFileBuilder);
 
@@ -610,7 +620,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   @Test
   public void deploysAppProvidingResourceForPlugin() throws Exception {
     File resourceConsumerClassFile =
-        new CompilerUtils.SingleClassCompiler().compile(Utils.getResourceFile("/org/foo/resource/ResourceConsumer.java"));
+        new SingleClassCompiler().compile(getResourceFile("/org/foo/resource/ResourceConsumer.java"));
 
     final ArtifactPluginFileBuilder pluginUsingAppResource =
         new ArtifactPluginFileBuilder("appResourcePlugin").configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.resource")
@@ -619,10 +629,10 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
     final TestArtifactDescriptor artifactFileBuilder =
         appFileBuilder("appProvidingResourceForPlugin")
             .definedBy("app-providing-resource-for-plugin.xml")
-            .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+            .dependingOn(callbackExtensionPlugin)
             .dependingOn(pluginUsingAppResource)
             .configuredWith(EXPORTED_RESOURCES, "META-INF/app-resource.txt")
-            .usingResource(Utils.getResourceFile("/test-resource.txt").toString(), "META-INF/app-resource.txt");
+            .usingResource(getResourceFile("/test-resource.txt").toString(), "META-INF/app-resource.txt");
     addPackedAppFromBuilder(artifactFileBuilder);
 
     startDeployment();
@@ -669,8 +679,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void appIncludingForbiddenJavaClass() throws Exception {
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
-        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", TestArtifactsCatalog.barUtilsForbiddenJavaJarFile))
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlusForbidden);
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile))
+        .dependingOn(callbackExtensionPlusForbidden);
 
     addPackedAppFromBuilder(forbidden);
 
@@ -692,9 +702,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void appIncludingForbiddenMuleContainerClass() throws Exception {
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlusForbiddenContainerClass)
+        .dependingOn(callbackExtensionPlusForbiddenContainerClass)
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile",
-                                        TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile));
+                                        barUtilsForbiddenMuleContainerJarFile));
 
     addPackedAppFromBuilder(forbidden);
 
@@ -716,9 +726,9 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void appIncludingForbiddenMuleContainerThirdParty() throws Exception {
     final ApplicationFileBuilder forbidden = appFileBuilder("forbidden")
         .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlusForbiddenThirdPartyClass)
+        .dependingOn(callbackExtensionPlusForbiddenThirdPartyClass)
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile",
-                                        TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile));
+                                        barUtilsForbiddenMuleThirdPartyJarFile));
 
     addPackedAppFromBuilder(forbidden);
 
@@ -740,12 +750,12 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginIncludingForbiddenJavaClass() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .containingClass(TestArtifactsCatalog.pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
-        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", TestArtifactsCatalog.barUtilsForbiddenJavaJarFile));
+        .containingClass(pluginForbiddenJavaEchoTestClassFile, "org/foo/echo/PluginForbiddenJavaEcho.class")
+        .dependingOn(new JarFileBuilder("barUtilsForbiddenJavaJarFile", barUtilsForbiddenJavaJarFile));
 
     final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
         .definedBy("app-with-forbidden-java-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(echoPluginWithLib);
 
     addPackedAppFromBuilder(usesPlugin2);
@@ -768,14 +778,14 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginIncludingForbiddenMuleContainerClass() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .containingClass(TestArtifactsCatalog.pluginForbiddenMuleContainerEchoTestClassFile,
+        .containingClass(pluginForbiddenMuleContainerEchoTestClassFile,
                          "org/foo/echo/PluginForbiddenMuleContainerEcho.class")
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleContainerJarFile",
-                                        TestArtifactsCatalog.barUtilsForbiddenMuleContainerJarFile));
+                                        barUtilsForbiddenMuleContainerJarFile));
 
     final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
         .definedBy("app-with-forbidden-mule-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(echoPluginWithLib);
 
     addPackedAppFromBuilder(usesPlugin2);
@@ -798,14 +808,14 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
   public void pluginIncludingForbiddenMuleContainerThirdParty() throws Exception {
     ArtifactPluginFileBuilder echoPluginWithLib = new ArtifactPluginFileBuilder("echoPlugin2")
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "org.foo.echo")
-        .containingClass(TestArtifactsCatalog.pluginForbiddenMuleThirdPartyEchoTestClassFile,
+        .containingClass(pluginForbiddenMuleThirdPartyEchoTestClassFile,
                          "org/foo/echo/PluginForbiddenMuleThirdPartyEcho.class")
         .dependingOn(new JarFileBuilder("barUtilsForbiddenMuleThirdPartyJarFile",
-                                        TestArtifactsCatalog.barUtilsForbiddenMuleThirdPartyJarFile));
+                                        barUtilsForbiddenMuleThirdPartyJarFile));
 
     final ApplicationFileBuilder usesPlugin2 = appFileBuilder("usesPlugin2")
         .definedBy("app-with-forbidden-mule3rd-echo-plugin-config.xml")
-        .dependingOn(TestArtifactsCatalog.callbackExtensionPlugin)
+        .dependingOn(callbackExtensionPlugin)
         .dependingOn(echoPluginWithLib);
 
     addPackedAppFromBuilder(usesPlugin2);
@@ -843,7 +853,7 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         .addProperty("type", "org.foo.hello.PrivilegedExtension")
         .addProperty("version", "1.0");
     return new ArtifactPluginFileBuilder(PRIVILEGED_EXTENSION_ARTIFACT_ID)
-        .dependingOn(new JarFileBuilder("privilegedExtensionV1", TestArtifactsCatalog.privilegedExtensionV1JarFile))
+        .dependingOn(new JarFileBuilder("privilegedExtensionV1", privilegedExtensionV1JarFile))
         .describedBy(mulePluginModelBuilder.build());
   }
 

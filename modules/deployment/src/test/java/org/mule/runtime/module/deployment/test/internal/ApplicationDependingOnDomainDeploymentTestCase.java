@@ -20,7 +20,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mockito.Mockito;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.application.ApplicationStatus;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -235,7 +234,7 @@ public class ApplicationDependingOnDomainDeploymentTestCase extends AbstractDepl
 
   @Test
   public void stoppedApplicationsAreNotStartedWhenDomainIsRedeployed() throws Exception {
-    DeploymentListener mockDeploymentListener = Mockito.spy(new DeploymentStatusTracker());
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     deploymentService.addDeploymentListener(mockDeploymentListener);
     deployDomainAndApplication(emptyDomain100FileBuilder, appDependingOnDomain100FileBuilder);
 

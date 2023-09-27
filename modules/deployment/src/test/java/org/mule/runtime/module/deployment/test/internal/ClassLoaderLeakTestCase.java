@@ -11,6 +11,7 @@ import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorC
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.helloExtensionV1Plugin;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
@@ -27,7 +28,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.mockito.Mockito;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
@@ -44,7 +44,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.deployment.test.internal.util.Utils;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -86,8 +85,8 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   @BeforeClass
   public static void compileTestClasses() throws Exception {
     simpleExtensionJarFile =
-        new CompilerUtils.ExtensionCompiler().compiling(Utils.getResourceFile("/org/foo/simple/SimpleExtension.java"),
-                                                        Utils.getResourceFile("/org/foo/simple/SimpleOperation.java"))
+        new CompilerUtils.ExtensionCompiler().compiling(getResourceFile("/org/foo/simple/SimpleExtension.java"),
+                                                        getResourceFile("/org/foo/simple/SimpleOperation.java"))
             .compile("mule-module-simple-4.0-SNAPSHOT.jar", "1.0.0");
   }
 
@@ -156,7 +155,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
     policyManager.addPolicy(applicationFileBuilder.getId(), fooPolicyFileBuilder.getArtifactId(),
                             new PolicyParametrization(FOO_POLICY_ID, pointparameters -> true, 1,
                                                       singletonMap(POLICY_PROPERTY_KEY, POLICY_PROPERTY_VALUE),
-                                                      Utils.getResourceFile("/fooPolicy.xml"), emptyList()));
+                                                      getResourceFile("/fooPolicy.xml"), emptyList()));
 
     assertThat(removeAppAnchorFile(appName), is(true));
     triggerDirectoryWatcher();
@@ -174,7 +173,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
   @Issue("MULE-18480")
   @Description("When an artifact is redeployed by changing it in the filesystem, objects associated to the original deployment are released befroe deploying the new one.")
   public void redeployByConfigChangePreviousAppEagerlyGCd() throws Exception {
-    DeploymentListener mockDeploymentListener = Mockito.spy(new DeploymentStatusTracker());
+    DeploymentListener mockDeploymentListener = spy(new DeploymentStatusTracker());
     AtomicReference<Throwable> redeploymentSuccessThrown = new AtomicReference<>();
 
     ApplicationFileBuilder applicationFileBuilder = getApplicationFileBuilder();
@@ -263,7 +262,7 @@ public abstract class ClassLoaderLeakTestCase extends AbstractDeploymentTestCase
 
   private ApplicationFileBuilder getApplicationFileBuilder() throws Exception {
     if (useEchoPluginInApp) {
-      return createExtensionApplicationWithServices(xmlFile + ".xml", TestArtifactsCatalog.helloExtensionV1Plugin);
+      return createExtensionApplicationWithServices(xmlFile + ".xml", helloExtensionV1Plugin);
     } else {
       return new ApplicationFileBuilder(xmlFile)
           .definedBy(xmlFile + ".xml");
