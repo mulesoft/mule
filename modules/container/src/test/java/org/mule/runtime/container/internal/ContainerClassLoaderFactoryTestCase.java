@@ -7,6 +7,7 @@
 package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
@@ -168,7 +169,7 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("W-13951850")
   @Ignore("W-13829761, W-13205329, W-13829740")
-          // TODO W-13829761, W-13205329, W-13829740 Uncomment this test
+  // TODO W-13829761, W-13205329, W-13829740 Uncomment this test
   public void actualContainerClassLoaderNotAccessibleThroughParents() {
     assumeTrue(isJavaVersionAtLeast(JAVA_17));
 
