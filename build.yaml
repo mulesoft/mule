@@ -2,7 +2,7 @@ upstreamProjects:
   Mule-runtime/metadata-model-api/support/1.5.x,
   Mule-runtime/mule-profiling-api/support/1.1.x,
   Mule-runtime/mule-api/1.5.0,
-  Mule-runtime/mule-extensions-api/support/1.5.x,
+  Mule-runtime/mule-extensions-api/1.5.0,
   Mule-runtime/mule-artifact-ast/1.1.0,
   Mule-runtime/mule-properties-api/master,
   DataWeave/data-weave/master,
