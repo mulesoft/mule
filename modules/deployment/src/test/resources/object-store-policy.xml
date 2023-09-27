@@ -8,9 +8,9 @@
     <test-policy:proxy name="policy">
         <test-policy:operation>
 
-            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.StoreOperationProcessor" />
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.StoreOperationProcessor" />
 
-            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
 
             <test-policy:execute-next/>
 

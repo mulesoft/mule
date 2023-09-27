@@ -10,7 +10,7 @@
     <test-policy:proxy name="policy-configuration-extension">
         <test-policy:operation>
                 <test-policy:execute-next/>
-                <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
                 <policy-configuration:check-explicit-configuration config-ref="test"/>
         </test-policy:operation>
     </test-policy:proxy>

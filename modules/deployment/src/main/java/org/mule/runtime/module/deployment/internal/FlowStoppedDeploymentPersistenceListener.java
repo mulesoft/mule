@@ -32,7 +32,7 @@ public class FlowStoppedDeploymentPersistenceListener implements FlowStoppedPers
   private AtomicBoolean shouldPersist;
   private String flowName;
   private String appName;
-  static final String START_FLOW_ON_DEPLOYMENT_PROPERTY = "startFlowOnDeployment";
+  public static final String START_FLOW_ON_DEPLOYMENT_PROPERTY = "startFlowOnDeployment";
   private String propertyName;
   private AtomicBoolean shouldStart;
 

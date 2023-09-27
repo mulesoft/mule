@@ -9,6 +9,9 @@ package org.mule.runtime.container.api;
 import org.mule.runtime.container.internal.ContainerClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 
+import java.util.Set;
+
+
 /**
  * Provides a way to create {@link ArtifactClassLoader} for a Mule Runtime container.
  * 
@@ -29,6 +32,19 @@ public class ContainerClassLoaderProvider {
   }
 
   /**
+   * Creates the classLoader to represent the Mule container, with this class classloader as the parent classloader.
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non-null.
+   * @param bootPackages     provides a set of packages that define all the prefixes that must be loaded from the container
+   *                         classLoader without being filtered.
+   * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
+   *         artifacts.
+   */
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, Set<String> bootPackages) {
+    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader(), bootPackages);
+  }
+
+  /**
    * Creates the classLoader to represent the Mule container.
    *
    * @param moduleRepository  provides access to the modules available on the container. Non-null.
@@ -38,6 +54,22 @@ public class ContainerClassLoaderProvider {
    */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader) {
     return new ContainerClassLoaderFactory(moduleRepository).createContainerClassLoader(parentClassLoader)
+        .getContainerClassLoader();
+  }
+
+  /**
+   * Creates the classLoader to represent the Mule container.
+   *
+   * @param moduleRepository  provides access to the modules available on the container. Non-null.
+   * @param parentClassLoader parent classLoader. Can be null.
+   * @param bootPackages      provides a set of packages that define all the prefixes that must be loaded from the container
+   *                          classLoader without being filtered.
+   * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
+   *         artifacts.
+   */
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader,
+                                                               Set<String> bootPackages) {
+    return new ContainerClassLoaderFactory(moduleRepository, bootPackages).createContainerClassLoader(parentClassLoader)
         .getContainerClassLoader();
   }
 }

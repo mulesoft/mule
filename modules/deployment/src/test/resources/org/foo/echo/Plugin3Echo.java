@@ -6,7 +6,7 @@
  */
 package org.foo.echo;
 
-import org.mule.runtime.module.deployment.api.EventCallback;
+import org.mule.runtime.module.deployment.test.api.EventCallback;
 
 import org.foo.EchoTest;
 

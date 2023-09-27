@@ -11,7 +11,7 @@
 
     <test-policy:proxy name="policy">
         <test-policy:operation>
-            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
             <hello:print-message config-ref="default"/>
         </test-policy:operation>
     </test-policy:proxy>

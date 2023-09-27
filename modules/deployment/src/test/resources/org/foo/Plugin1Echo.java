@@ -6,7 +6,7 @@
  */
 package org.foo;
 
-import org.mule.runtime.module.deployment.api.EventCallback;
+import org.mule.runtime.module.deployment.test.api.EventCallback;
 
 import org.bar.BarUtils;
 
