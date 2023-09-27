@@ -237,8 +237,6 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
-  exports org.mule.runtime.core.internal.el.context to
-      org.mule.runtime.core.mvel;
   exports org.mule.runtime.core.internal.el.dataweave to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.el.function to
