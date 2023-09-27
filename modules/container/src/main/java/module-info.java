@@ -28,6 +28,7 @@ module org.mule.runtime.container {
   exports org.mule.runtime.container.internal to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.deployment.model,
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.test.runner;
 
