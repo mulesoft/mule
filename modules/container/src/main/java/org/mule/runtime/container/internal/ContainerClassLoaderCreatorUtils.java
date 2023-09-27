@@ -9,6 +9,7 @@ package org.mule.runtime.container.internal;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
 import static java.lang.Boolean.parseBoolean;
@@ -37,6 +38,7 @@ public class ContainerClassLoaderCreatorUtils {
   private static final String DEFAULT_JRE_EXTENSION_PACKAGES = "javax.,org.w3c.dom,org.omg.,org.xml.sax,org.ietf.jgss";
   private static final String MULE_SDK_API_PACKAGE = "org.mule.sdk.api";
   private static final String MULE_SDK_COMPATIBILITY_API_PACKAGE = "org.mule.sdk.compatibility.api";
+  private static final String MULE_OAUTH_CLIENT_API_PACKAGE = "org.mule.runtime.oauth.api";
   private static final boolean ALLOW_JRE_EXTENSION = parseBoolean(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
   private static final String[] JRE_EXTENDABLE_PACKAGES =
       getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
@@ -101,6 +103,15 @@ public class ContainerClassLoaderCreatorUtils {
     if (exportedPackage.startsWith(MULE_SDK_API_PACKAGE) || exportedPackage.startsWith(MULE_SDK_COMPATIBILITY_API_PACKAGE)) {
       return PARENT_FIRST;
     }
+
+    // If an extension uses a class provided by the mule-oauth-client or mule-oauth-client-api artifacts, the container
+    // classloader should use the class from the extension, even if it is present in the distribution.
+    // This is to avoid backward compatibility issues with extensions that were using the classes that were moved to a different
+    // package to avoid a split-package issue.
+    if (exportedPackage.startsWith(MULE_OAUTH_CLIENT_API_PACKAGE)) {
+      return CHILD_FIRST;
+    }
+
     // Let artifacts extend non "java." JRE packages
     if (ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
       return PARENT_FIRST;
