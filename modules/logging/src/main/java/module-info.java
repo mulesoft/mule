@@ -16,7 +16,7 @@ module org.mule.runtime.logging {
   requires jdk.unsupported;
 
   // Logging framework
-  requires transitive org.slf4j;
+  requires org.slf4j;
   requires transitive org.apache.logging.log4j;
 
   // Log bridges
