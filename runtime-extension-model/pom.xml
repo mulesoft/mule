@@ -15,8 +15,9 @@
         <!-- xml parser is a test dependency so it is not in the module-path, open its required packages -->
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
-            --add-opens=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
+            --add-exports=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
+            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.spi=ALL-UNNAMED
+            --add-exports=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
 
