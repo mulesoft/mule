@@ -177,6 +177,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.config to
+      org.mule.runtime.deployment,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl,
@@ -536,6 +537,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.message to
       kryo.shaded;
   opens org.mule.runtime.core.internal.policy to
+      org.mule.runtime.deployment,
       spring.core;
   opens org.mule.runtime.core.internal.processor.interceptor to
       spring.core;
@@ -552,6 +554,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.internal.value to
       spring.core;
+
+  uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 
   // TODO TD-0144819 add these:
   // export org.mule.runtime.core.internal.metadata to DW;
