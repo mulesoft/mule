@@ -28,7 +28,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-log4j-boot-configurator</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
