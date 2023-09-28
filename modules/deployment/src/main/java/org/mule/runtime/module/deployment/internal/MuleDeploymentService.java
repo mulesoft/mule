@@ -192,7 +192,7 @@ public class MuleDeploymentService implements DeploymentService {
    *
    * @param startDirectoryWatcher whether to start the directory watcher or not.
    */
-  void start(boolean startDirectoryWatcher) {
+  public void start(boolean startDirectoryWatcher) {
     DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
     addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
     addDomainDeploymentListener(deploymentStatusTracker.getDomainDeploymentStatusTracker());
@@ -212,7 +212,7 @@ public class MuleDeploymentService implements DeploymentService {
    * Triggers one pass of the directory watcher once in the current thread. It takes the lock in order to avoid the option of
    * "waiting to the next poll" present in the run implementation.
    */
-  void triggerDirectoryWatcher() {
+  public void triggerDirectoryWatcher() {
     deploymentLock.lock();
     try {
       deploymentDirectoryWatcher.run();
@@ -221,7 +221,7 @@ public class MuleDeploymentService implements DeploymentService {
     }
   }
 
-  protected void notifyStartupListeners() {
+  public void notifyStartupListeners() {
     for (StartupListener listener : startupListeners) {
       try {
         listener.onAfterStartup();
@@ -269,11 +269,11 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * @return URL/lastModified of apps which previously failed to deploy
    */
-  Map<String, Map<URI, Long>> getZombieApplications() {
+  public Map<String, Map<URI, Long>> getZombieApplications() {
     return applicationDeployer.getArtifactsZombieMap();
   }
 
-  Map<String, Map<URI, Long>> getZombieDomains() {
+  public Map<String, Map<URI, Long>> getZombieDomains() {
     return domainDeployer.getArtifactsZombieMap();
   }
 
@@ -397,11 +397,11 @@ public class MuleDeploymentService implements DeploymentService {
     this.domainDeployer.setArtifactFactory(domainFactory);
   }
 
-  void undeploy(Application app) {
+  public void undeploy(Application app) {
     applicationDeployer.undeployArtifact(app.getArtifactName());
   }
 
-  void undeploy(Domain domain) {
+  public void undeploy(Domain domain) {
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 

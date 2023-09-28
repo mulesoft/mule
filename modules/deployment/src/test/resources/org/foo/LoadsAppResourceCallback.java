@@ -8,7 +8,7 @@ package org.foo;
 
 import static java.lang.Thread.currentThread;
 
-import org.mule.runtime.module.deployment.api.EventCallback;
+import org.mule.runtime.module.deployment.test.api.EventCallback;
 
 public class LoadsAppResourceCallback implements EventCallback {
 

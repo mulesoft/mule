@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.internal.ContainerClassLoaderCreatorUtils.getLookupPolicy;
 
@@ -21,6 +22,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,11 +34,17 @@ import java.util.Set;
 public class DefaultPreFilteredContainerClassLoaderCreator implements PreFilteredContainerClassLoaderCreator {
 
   private final ModuleRepository moduleRepository;
+  private Set<String> bootPackages = emptySet();
 
   public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository) {
     checkArgument(moduleRepository != null, "moduleRepository cannot be null");
 
     this.moduleRepository = moduleRepository;
+  }
+
+  public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository, Set<String> bootPackages) {
+    this(moduleRepository);
+    this.bootPackages = bootPackages;
   }
 
   @Override
@@ -46,7 +54,13 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
 
   @Override
   public Set<String> getBootPackages() {
-    return BOOT_PACKAGES;
+    if (bootPackages.isEmpty()) {
+      return BOOT_PACKAGES;
+    }
+    Set<String> finalBootPackages = new HashSet<>();
+    finalBootPackages.addAll(BOOT_PACKAGES);
+    finalBootPackages.addAll(bootPackages);
+    return finalBootPackages;
   }
 
   @Override

@@ -8,7 +8,7 @@
 
     <description>Failing Mule Application</description>
 
-    <object class="org.mule.runtime.module.deployment.internal.ApplicationDeploymentTestCase.FailingProcessorTest" name="FailingProcessor">
+    <object class="org.mule.runtime.module.deployment.test.internal.ApplicationDeploymentTestCase.FailingProcessorTest" name="FailingProcessor">
     </object>
 
     <flow name="test1">

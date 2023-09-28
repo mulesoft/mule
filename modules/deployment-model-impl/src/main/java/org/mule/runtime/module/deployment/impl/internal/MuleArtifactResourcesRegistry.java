@@ -96,6 +96,9 @@ import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProv
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Registry of mule artifact resources required to construct new artifacts.
  *
@@ -135,6 +138,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ModuleRepository moduleRepository;
     private ArtifactConfigurationProcessor artifactConfigurationProcessor;
     private ProfiledMemoryManagementService memoryManagementService;
+    private Set<String> bootPackages = new HashSet<>();
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -177,6 +181,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       return this;
     }
 
+    public Builder withBootPackage(String pkg) {
+      this.bootPackages.add(pkg);
+      return this;
+    }
+
     /**
      * Builds the desired instance
      *
@@ -187,8 +196,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       if (moduleRepository == null) {
         moduleRepository = MODULE_REPOSITORY;
         containerClassLoader = CONTAINER_CLASS_LOADER;
-      } else {
+      } else if (bootPackages.isEmpty()) {
         containerClassLoader = createContainerClassLoader(moduleRepository);
+      } else {
+        containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages);
       }
 
       try {

@@ -59,7 +59,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
   private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
-  static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
+  public static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
 
   private final ArtifactDeployer<T> deployer;
   private final ArtifactArchiveInstaller artifactArchiveInstaller;

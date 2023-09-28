@@ -22,6 +22,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -56,6 +57,23 @@ public class ContainerClassLoaderFactory {
    */
   public ContainerClassLoaderFactory(ModuleRepository moduleRepository) {
     this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository),
+         // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
+         // compatibility accidentally.
+         // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
+         classLoader -> classloaderContainerJpmsModuleLayer()
+             ? getSystemClassLoader()
+             : classLoader);
+  }
+
+  /**
+   * Creates a custom factory
+   *
+   * @param moduleRepository provides access to the modules available on the container. Non-null.
+   * @param bootPackages     provides a set of packages that define all the prefixes that must be loaded from the container
+   *                         classLoader without being filtered.
+   */
+  public ContainerClassLoaderFactory(ModuleRepository moduleRepository, Set<String> bootPackages) {
+    this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository, bootPackages),
          // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
          // compatibility accidentally.
          // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
