@@ -18,7 +18,14 @@ module org.mule.boot.api {
   // exports org.mule.runtime.module.reboot.internal to org.mule.boot.tanuki,org.mule.runtime.launcher,com.mulesoft.mule.runtime.plugin;
   exports org.mule.runtime.module.boot.internal;
 
+  // Needed by the MuleLog4jConfigurer
   requires org.mule.runtime.boot.log4j;
+
+  // Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader
+  requires org.mule.runtime.jpms.utils;
+
+  // Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer
+  requires org.mule.runtime.logging;
 
   requires commons.cli;
 }

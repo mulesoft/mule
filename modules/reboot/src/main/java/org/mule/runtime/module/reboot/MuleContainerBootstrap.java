@@ -6,21 +6,21 @@
  */
 package org.mule.runtime.module.reboot;
 
-import static org.mule.runtime.jpms.api.JpmsUtils.validateNoBootModuleLayerTweaking;
 import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_BASE_DIRECTORY_PROPERTY;
 import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME_DIRECTORY_PROPERTY;
 import static org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider.getMuleContainerWrapper;
 
+import org.mule.runtime.module.boot.internal.BootModuleLayerValidationBootstrapConfigurer;
 import org.mule.runtime.module.boot.internal.MuleContainerFactory;
 import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
 import org.mule.runtime.module.boot.internal.MuleLog4jConfigurer;
+import org.mule.runtime.module.boot.internal.SLF4JBridgeHandlerBootstrapConfigurer;
 import org.mule.runtime.module.reboot.internal.CEMuleContainerFactory;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * Determine which is the main class to run and delegate control to the Java Service Wrapper. If OSGi is not being used to boot
@@ -34,21 +34,10 @@ public class MuleContainerBootstrap {
       {"production", "false", "Modify the system class loader for production use (as in Mule 2.x)"},
       {"version", "false", "Show product and version information"}};
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     MuleContainerFactory muleContainerFactory =
         new CEMuleContainerFactory(MULE_HOME_DIRECTORY_PROPERTY, MULE_BASE_DIRECTORY_PROPERTY);
     MuleContainerWrapper muleContainerWrapper = getMuleContainerWrapper();
-
-    // TODO W-12412001: move this into a configurer
-    // Optionally remove existing handlers attached to j.u.l root logger
-    SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
-
-    // add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
-    // the initialization phase of your application
-    SLF4JBridgeHandler.install();
-
-    // TODO W-12412001: move this into a configurer
-    validateNoBootModuleLayerTweaking();
 
     CommandLine commandLine;
     try {
@@ -59,6 +48,8 @@ public class MuleContainerBootstrap {
       return;
     }
 
+    muleContainerWrapper.addBootstrapConfigurer(new SLF4JBridgeHandlerBootstrapConfigurer());
+    muleContainerWrapper.addBootstrapConfigurer(new BootModuleLayerValidationBootstrapConfigurer());
     muleContainerWrapper.addBootstrapConfigurer(new MuleLog4jConfigurer());
 
     muleContainerWrapper.configureAndStart(muleContainerFactory, commandLine);

@@ -6,17 +6,11 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
-import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
-import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
-
-import static java.lang.ClassLoader.getSystemClassLoader;
-
 import org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory;
 import org.mule.runtime.module.boot.internal.DefaultMuleClassPathConfig;
 import org.mule.runtime.module.boot.internal.MuleContainer;
 
 import java.io.File;
-import java.net.URL;
 
 /**
  * A factory for {@link MuleContainer} instances. Responsible for choosing the right implementation class and setting up its
@@ -30,20 +24,8 @@ public class CEMuleContainerFactory extends AbstractMuleContainerFactory {
     super(muleHomeDirectoryPropertyName, muleBaseDirectoryPropertyName);
   }
 
-  /**
-   * Creates the Container's {@link ClassLoader} from the given MULE_HOME and MULE_BASE locations.
-   *
-   * @param muleHome The location of the MULE_HOME directory.
-   * @param muleBase The location of the MULE_BASE directory.
-   * @return A {@link ClassLoader} suitable for loading the {@link MuleContainer} class and all its dependencies.
-   */
   @Override
-  protected ClassLoader createContainerSystemClassLoader(File muleHome, File muleBase) {
-    DefaultMuleClassPathConfig config = new DefaultMuleClassPathConfig(muleHome, muleBase);
-
-    return createModuleLayerClassLoader(config.getOptURLs().toArray(new URL[config.getOptURLs().size()]),
-                                        config.getMuleURLs().toArray(new URL[config.getMuleURLs().size()]),
-                                        MULTI_LEVEL_URL_CLASSLOADER_FACTORY,
-                                        getSystemClassLoader());
+  protected DefaultMuleClassPathConfig createMuleClassPathConfig(File muleHome, File muleBase) {
+    return new DefaultMuleClassPathConfig(muleHome, muleBase);
   }
 }

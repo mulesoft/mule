@@ -21,7 +21,6 @@ import java.util.List;
 /**
  * Constructs a default set of JAR Urls located under Mule home folder.
  */
-// TODO this duplicates DefaultMuleClassPathConfig in the boot module. See if this class can be moved to mule-core
 public class DefaultMuleClassPathConfig {
 
   private static final String JAVA_8_VERSION = "1.8";
