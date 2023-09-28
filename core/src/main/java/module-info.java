@@ -316,6 +316,7 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.tracer.customization.impl,
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
