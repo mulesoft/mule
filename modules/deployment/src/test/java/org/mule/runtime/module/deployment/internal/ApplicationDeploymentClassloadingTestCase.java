@@ -78,13 +78,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 /**
  * Contains test for application classloading isolation scenarios
@@ -238,7 +239,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "javax.annotation")
         .dependingOn(echoPluginWithJavaxLib)
         .dependingOn(new JarFileBuilder("barUtilsJavaxB",
-                                        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java"))
+                                        new JarCompiler()
+                                            .compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
                                             .compile("bar-javax-b.jar")));
 
     addPackedAppFromBuilder(withJavaxEchoPlugin);

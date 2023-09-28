@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_MOCKS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,10 +49,12 @@ import java.net.URLClassLoader;
 
 import org.apache.logging.log4j.core.LifeCycle;
 import org.apache.logging.log4j.core.LoggerContext;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -200,7 +201,7 @@ public class ArtifactAwareContextSelectorTestCase extends AbstractMuleTestCase {
   public void returnsParentContextForPolicyClassloader() throws MalformedURLException {
     ClassLoader childClassLoader = new URLClassLoader(new URL[0], regionClassLoader);
     PolicyTemplateDescriptor policyTemplateDescriptor = new PolicyTemplateDescriptor(POLICY_TEMPLATE_NAME);
-    RegionClassLoader policyRegionClassLoader = spy(getPolicyRegionClassLoader(policyTemplateDescriptor));
+    RegionClassLoader policyRegionClassLoader = getPolicyRegionClassLoader(policyTemplateDescriptor);
     MuleArtifactClassLoader policyClassLoader = getPolicyArtifactClassLoader(policyTemplateDescriptor, policyRegionClassLoader);
 
     LoggerContext appCtx = selector.getContext("", childClassLoader, true);

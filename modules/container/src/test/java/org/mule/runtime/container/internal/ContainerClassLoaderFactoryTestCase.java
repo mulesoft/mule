@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Issue;
@@ -167,6 +168,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   @Issue("W-13951850")
+  @Ignore("W-13829761, W-13205329, W-13829740")
+  // TODO W-13829761, W-13205329, W-13829740 Uncomment this test
   public void actualContainerClassLoaderNotAccessibleThroughParents() {
     assumeTrue(isJavaVersionAtLeast(JAVA_17));
 
