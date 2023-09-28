@@ -26,6 +26,7 @@ module org.mule.runtime.tracer.internal.impl {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.tracer.impl.span to
+      com.mulesoft.mule.runtime.batch,
       org.mule.runtime.extensions.support,
       org.mule.runtime.tracer.exporter.impl;
   exports org.mule.runtime.tracer.impl.span.factory to
