@@ -21,13 +21,11 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-boot-api</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-jpms-utils</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- TODO W-12412001: remove this once we move the JUL to SLF4J bridge setup to a configurer -->
