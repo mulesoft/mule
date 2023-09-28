@@ -47,7 +47,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
-    if (isDisableDscriptionsEnrichment(loadingContext)) {
+    if (isDisableDescriptionsEnrichment(loadingContext)) {
       return;
     }
 
@@ -67,7 +67,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     }
   }
 
-  public boolean isDisableDscriptionsEnrichment(ExtensionLoadingContext loadingContext) {
+  public boolean isDisableDescriptionsEnrichment(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(DISABLE_DESCRIPTIONS_ENRICHMENT)
         .map(v -> v instanceof Boolean ? (Boolean) v : false)
         .orElse(false);
