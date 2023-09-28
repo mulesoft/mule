@@ -31,11 +31,13 @@ module org.mule.runtime.properties.config {
       org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory;
 
   exports org.mule.runtime.config.internal.model.dsl to
+      org.mule.runtime.metrics.exporter.configuration.impl,
       org.mule.runtime.tracer.configuration.impl,
       org.mule.runtime.tracer.exporter.config.impl,
       org.mule.runtime.spring.config,
       org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.config.internal.model.dsl.config to
+      org.mule.runtime.metrics.exporter.configuration.impl,
       org.mule.runtime.tracer.configuration.impl,
       org.mule.runtime.tracer.exporter.config.impl,
       org.mule.runtime.spring.config,
