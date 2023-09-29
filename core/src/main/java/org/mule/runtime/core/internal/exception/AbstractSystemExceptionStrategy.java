@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -59,7 +63,9 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   private void doHandleException(Exception ex, RollbackSourceCallback rollbackMethod, ComponentLocation componentLocation) {
     fireNotification(ex, getCurrentEvent(), componentLocation);
 
-    resolveAndLogException(ex);
+    if (!isCurrentEventFromScheduler()) {
+      resolveAndLogException(ex);
+    }
 
     logger.debug("Rolling back transaction");
     rollback(ex, rollbackMethod);
@@ -74,6 +80,16 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
     if (ex instanceof ConnectException) {
       ((ConnectException) ex).handleReconnection(retryScheduler);
     }
+  }
+
+  private static boolean isCurrentEventFromScheduler() {
+    return (getCurrentEvent() != null) &&
+        (getCurrentEvent().getContext() != null) &&
+        (getCurrentEvent().getContext().getOriginatingLocation() != null) &&
+        (getCurrentEvent().getContext().getOriginatingLocation().getComponentIdentifier() != null) &&
+        (getCurrentEvent().getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier() != null) &&
+        (getCurrentEvent().getContext().getOriginatingLocation().getComponentIdentifier().getIdentifier().getName()
+            .equals("scheduler"));
   }
 
   @Override
