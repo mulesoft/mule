@@ -26,23 +26,34 @@ module org.mule.runtime.core.components {
   // QName
   requires java.xml;
   requires java.desktop;
+  requires reactor.core;
+  requires org.reactivestreams;
 
   exports org.mule.runtime.core.internal.routing to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.routing.forkjoin to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.source.scheduler to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.processor to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
   exports org.mule.runtime.core.internal.processor.simple to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.core,
+      org.mule.runtime.spring.config,
+      spring.beans;
 
   opens org.mule.runtime.core.internal.routing to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      spring.core;
   opens org.mule.runtime.core.internal.source.scheduler to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      spring.core;
   opens org.mule.runtime.core.internal.processor to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      spring.core;
 
 }
