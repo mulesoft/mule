@@ -337,10 +337,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     protected BackPressureReason checkCapacity(CoreEvent event) {
       // are there any retries pending?
       if (lastRetryTimestamp.get() != MIN_VALUE) {
-        System.out.println("Retries still pending");
         // did enough time not pass since the last rejection?
         if (lastRetryTimestamp.updateAndGet(lastRetryTimestampCheckOperator) != MIN_VALUE) {
-          System.out.println("NO enough time since last rejection");
           // If there is maxConcurrency value set, honor it and don't buffer here
           if (!maxConcurrencyEagerCheck) {
             // TODO MULE-17265 Make this configurable in the flow
@@ -357,11 +355,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
           } else {
             return REQUIRED_SCHEDULER_BUSY;
           }
-        } else {
-          System.out.println("Enough time since last rejection");
         }
-      } else {
-        System.out.println("NO Retries still pending");
       }
 
       return super.checkCapacity(event);

@@ -24,6 +24,8 @@ module org.mule.runtime.tls {
   requires java.inject;
 
   requires com.google.common;
+  // needed because byte-buddy generated classes for this module need to use spring SmartFactoryBean
+  requires spring.beans;
 
   exports org.mule.runtime.module.tls.api;
 
