@@ -27,6 +27,11 @@
             <artifactId>mule-module-jpms-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- TODO W-12412001: remove this once we move the JUL to SLF4J bridge setup to a configurer -->
         <dependency>

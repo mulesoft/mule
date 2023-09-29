@@ -14,6 +14,7 @@ module org.mule.boot {
 
   requires org.mule.boot.api;
   requires org.mule.runtime.jpms.utils;
+  requires org.mule.runtime.logging;
 
   requires commons.cli;
 
