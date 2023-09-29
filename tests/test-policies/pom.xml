@@ -27,7 +27,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <!-- This tests have stuff that is expected to be within the mule container, and so they don't work in the modular world -->
+                        <!-- These tests have stuff that is expected to be within the mule container, and so they don't work in the modular world -->
                         <mule.classloader.container.jpmsModuleLayer>false</mule.classloader.container.jpmsModuleLayer>
                     </systemPropertyVariables>
                 </configuration>
