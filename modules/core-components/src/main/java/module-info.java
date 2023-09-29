@@ -27,14 +27,22 @@ module org.mule.runtime.core.components {
   requires java.xml;
   requires java.desktop;
 
-  opens org.mule.runtime.core.internal.routing to
-      org.mule.runtime.core;
   exports org.mule.runtime.core.internal.routing to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.routing.forkjoin to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.source.scheduler to
       org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.internal.processor to org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.internal.processor.simple to org.mule.runtime.spring.config;
-  exports org.mule.runtime.core.internal.routing.forkjoin to org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.processor to
+      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.internal.processor.simple to
+      org.mule.runtime.spring.config;
+
+  opens org.mule.runtime.core.internal.routing to
+      org.mule.runtime.core;
+  opens org.mule.runtime.core.internal.source.scheduler to
+      org.mule.runtime.core;
+  opens org.mule.runtime.core.internal.processor to
+      org.mule.runtime.core;
 
 }
