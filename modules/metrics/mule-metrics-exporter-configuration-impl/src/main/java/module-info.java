@@ -6,7 +6,7 @@
  */
 
 /**
- * Mule Metrics Exporter Configuration implementation.
+ * Definitions for Mule Metrics Exporter Configuration Implementation.
  *
  * @moduleGraph
  * @since 4.6
