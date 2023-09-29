@@ -130,10 +130,10 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
               Map<String, Object> attributes = new HashMap<>();
               attributes.putAll(finder.getParams());
               attributes.putAll(extensionLoadingContextParameters);
+              attributes.put(DISABLE_DESCRIPTIONS_ENRICHMENT, Boolean.TRUE);
               ExtensionModel extension =
                   finder.getLoader().loadExtensionModel(builder(classLoader, getDefault(ImmutableSet.copyOf(extensionModels)))
                       .addParameters(attributes)
-                      .addParameter(DISABLE_DESCRIPTIONS_ENRICHMENT, "true")
                       .build());
               extensionModels.add(extension);
             } else {

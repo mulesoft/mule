@@ -20,6 +20,21 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- This tests have stuff that is expected to be within the mule container, and so they don't work in the modular world -->
+                        <mule.classloader.container.jpmsModuleLayer>false</mule.classloader.container.jpmsModuleLayer>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>                    
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
