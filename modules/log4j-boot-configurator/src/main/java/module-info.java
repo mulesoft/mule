@@ -19,5 +19,8 @@ module org.mule.runtime.boot.log4j {
   requires org.apache.logging.log4j.core;
 
   requires transitive org.apache.logging.log4j;
-  requires org.slf4j;
+  requires transitive org.slf4j;
+
+  // Allows usage of Unsafe for caffeine and disruptor libraries, used by the logging framework
+  requires jdk.unsupported;
 }
