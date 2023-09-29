@@ -46,6 +46,6 @@ final class SchedulerFlowProcessingTemplate extends FlowProcessingTemplate {
   @Override
   public void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
                                           CompletableCallback<Void> callback) {
-    callback.error(exception);
+    callback.complete(null);
   }
 }
