@@ -9,6 +9,7 @@ package org.mule.runtime.core.internal.source.scheduler;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -27,12 +28,15 @@ import java.util.Map;
 final class SchedulerFlowProcessingTemplate extends FlowProcessingTemplate {
 
   private final DefaultSchedulerMessageSource defaultSchedulerMessageSource;
+  private final FeatureFlaggingService featureFlaggingService;
 
   SchedulerFlowProcessingTemplate(Processor messageProcessor,
                                   List<NotificationFunction> notificationFunctions,
-                                  DefaultSchedulerMessageSource defaultSchedulerMessageSource) {
+                                  DefaultSchedulerMessageSource defaultSchedulerMessageSource,
+                                  FeatureFlaggingService featureFlaggingService) {
     super(messageProcessor, notificationFunctions);
     this.defaultSchedulerMessageSource = defaultSchedulerMessageSource;
+    this.featureFlaggingService = featureFlaggingService;
   }
 
   @Override
@@ -48,8 +52,7 @@ final class SchedulerFlowProcessingTemplate extends FlowProcessingTemplate {
   @Override
   public void sendFailureResponseToClient(MessagingException exception, Map<String, Object> parameters,
                                           CompletableCallback<Void> callback) {
-    if (defaultSchedulerMessageSource.featureFlaggingService != null
-        && defaultSchedulerMessageSource.featureFlaggingService.isEnabled(DISABLE_SCHEDULER_LOGGING)) {
+    if (featureFlaggingService != null && featureFlaggingService.isEnabled(DISABLE_SCHEDULER_LOGGING)) {
       exception.getExceptionInfo().setAlreadyLogged(true);
     }
     callback.error(exception);

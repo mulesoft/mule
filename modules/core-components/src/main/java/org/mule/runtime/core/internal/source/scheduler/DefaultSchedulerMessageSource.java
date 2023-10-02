@@ -81,7 +81,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private MessageProcessingManager messageProcessingManager;
 
   @Inject
-  protected FeatureFlaggingService featureFlaggingService;
+  private FeatureFlaggingService featureFlaggingService;
 
   private boolean started;
   private volatile boolean executing = false;
@@ -208,7 +208,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
         .ifPresent(flow -> this.flowConstruct = flow);
 
     // Flow execution configurations
-    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
+    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this, featureFlaggingService);
     this.flowProcessContext = new SchedulerProcessContext();
 
     createScheduler();
