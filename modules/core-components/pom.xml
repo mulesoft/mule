@@ -16,6 +16,7 @@
     <properties>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=net.bytebuddy.agent
             --add-opens=java.base/java.lang=ALL-UNNAMED
             --add-opens=org.mule.runtime.api/org.mule.runtime.api.lifecycle=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
@@ -106,6 +107,16 @@
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-runner</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
