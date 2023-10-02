@@ -446,7 +446,8 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.core.ee,
-      com.mulesoft.mule.runtime.batch;
+      com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.cache;
   // TODO W-13824979 Remove splashScreen logic from mule-core
   exports org.mule.runtime.core.internal.util.splash to
       org.mule.runtime.launcher,
