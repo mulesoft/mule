@@ -17,6 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -78,6 +79,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   @Inject
   private MessageProcessingManager messageProcessingManager;
+
+  @Inject
+  protected FeatureFlaggingService featureFlaggingService;
 
   private boolean started;
   private volatile boolean executing = false;
