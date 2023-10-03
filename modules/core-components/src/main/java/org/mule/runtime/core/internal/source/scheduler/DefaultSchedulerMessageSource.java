@@ -17,6 +17,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -78,6 +79,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
 
   @Inject
   private MessageProcessingManager messageProcessingManager;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private boolean started;
   private volatile boolean executing = false;
@@ -204,7 +208,7 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
         .ifPresent(flow -> this.flowConstruct = flow);
 
     // Flow execution configurations
-    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this);
+    this.flowProcessingTemplate = new SchedulerFlowProcessingTemplate(listener, emptyList(), this, featureFlaggingService);
     this.flowProcessContext = new SchedulerProcessContext();
 
     createScheduler();
