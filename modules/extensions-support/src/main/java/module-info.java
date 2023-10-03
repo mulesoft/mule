@@ -12,6 +12,36 @@
  */
 module org.mule.runtime.extensions.support {
 
+  requires org.mule.oauth.client.api;
+  requires org.mule.runtime.artifact;
+  requires org.mule.runtime.artifact.ast;
+  requires org.mule.runtime.core;
+  requires org.mule.runtime.dsl.api;
+  requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.extensions.api;
+  requires org.mule.runtime.extensions.api.persistence;
+  requires org.mule.runtime.http.api;
+  requires org.mule.runtime.metadata.model.catalog;
+  requires org.mule.runtime.metadata.model.java;
+  requires org.mule.runtime.metadata.model.json;
+  requires org.mule.runtime.metadata.model.message;
+  requires org.mule.runtime.metadata.model.xml;
+  requires org.mule.runtime.metadata.support;
+  requires org.mule.runtime.oauth.api;
+  requires org.mule.runtime.policy.api;
+  requires org.mule.runtime.profiling.api;
+  requires org.mule.runtime.tracer.api;
+  requires org.mule.runtime.tracer.customization.api;
+  requires org.mule.runtime.tracer.internal.impl;
+  requires org.mule.sdk.api;
+  requires org.mule.sdk.compatibility.api;
+
+  requires java.compiler;
+  requires java.xml.bind;
+  requires org.joda.time;
+  requires spring.core;
+  requires java.desktop;
+
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;
   exports org.mule.runtime.module.extension.api.loader.java.property;

@@ -210,6 +210,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.mvel,
       org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
@@ -322,6 +323,8 @@ module org.mule.runtime.core {
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
+  exports org.mule.runtime.core.internal.profiling.context to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.profiling.tracing.event.span.condition to
       org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
