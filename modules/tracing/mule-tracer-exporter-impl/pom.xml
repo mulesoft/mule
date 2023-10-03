@@ -24,7 +24,6 @@
     <properties>
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
-        <opentelemetryVersion>1.27.0</opentelemetryVersion>
     </properties>
 
     <dependencyManagement>
@@ -82,7 +81,21 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
+            <exclusions>
+				<!-- excluded to prevent a split-package with okio-jvm -->
+                <exclusion>
+                    <groupId>com.squareup.okio</groupId>
+                    <artifactId>okio</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!-- Added back because this was brought transitively by okio -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio-jvm</artifactId>
+            <version>3.2.0</version>
+            <scope>runtime</scope>
+		</dependency>
         <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
         <dependency>
             <groupId>io.helidon.grpc</groupId>
