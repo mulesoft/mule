@@ -13,12 +13,6 @@
 module org.mule.boot {
 
   requires org.mule.boot.api;
-  requires org.mule.runtime.jpms.utils;
-  requires org.mule.runtime.logging;
 
   requires commons.cli;
-
-  // TODO W-12412001: remove these once we move the JUL to SLF4J bridge setup to a configurer
-  requires jul.to.slf4j;
-  requires java.logging;
 }
