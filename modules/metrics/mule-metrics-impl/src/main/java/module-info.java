@@ -22,6 +22,10 @@ module org.mule.runtime.metrics.internal.impl {
   requires java.inject;
 
   exports org.mule.runtime.metrics.impl to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      spring.beans;
+
+  opens org.mule.runtime.metrics.impl to
+      spring.core;
 
 }
