@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -59,7 +60,9 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   private void doHandleException(Exception ex, RollbackSourceCallback rollbackMethod, ComponentLocation componentLocation) {
     fireNotification(ex, getCurrentEvent(), componentLocation);
 
-    resolveAndLogException(ex);
+    if ((ex instanceof MessagingException) && !(((MessagingException) ex).getExceptionInfo().isAlreadyLogged())) {
+      resolveAndLogException(ex);
+    }
 
     logger.debug("Rolling back transaction");
     rollback(ex, rollbackMethod);
