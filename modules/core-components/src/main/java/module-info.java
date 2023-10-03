@@ -25,7 +25,6 @@ module org.mule.runtime.core.components {
   requires jakarta.activation;
   // QName
   requires java.xml;
-  requires java.desktop;
   requires reactor.core;
   requires org.reactivestreams;
 
