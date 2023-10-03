@@ -16,7 +16,7 @@
     <properties>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-modules=net.bytebuddy.agent
+            --add-modules=net.bytebuddy.agent,java.desktop
             --add-opens=java.base/java.lang=ALL-UNNAMED
             --add-opens=org.mule.runtime.api/org.mule.runtime.api.lifecycle=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
