@@ -14,6 +14,7 @@ module org.mule.runtime.extensions.support {
 
   requires org.mule.oauth.client.api;
   requires org.mule.runtime.artifact;
+  requires org.mule.runtime.artifact.activation;
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
@@ -51,9 +52,9 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
 
-//  provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
-//      org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
-//  provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
-//      org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
+  provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
+      org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
+  provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
+      org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
     
 }
