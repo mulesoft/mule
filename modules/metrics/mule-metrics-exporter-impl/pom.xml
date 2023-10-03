@@ -17,7 +17,6 @@
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
-        <opentelemetryVersion>1.27.0</opentelemetryVersion>
         <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
     
