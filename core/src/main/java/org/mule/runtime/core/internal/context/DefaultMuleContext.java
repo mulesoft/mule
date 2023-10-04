@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJEC
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
@@ -352,6 +353,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configurePutTraceIdAndSpanIdInMdc();
       configureAddMuleSpecificTracingInformationInTraceState();
       configureCreateChildPolicyContextForParallelScopes();
+      configureDisableSchedulerLogging();
     }
   }
 
@@ -1559,6 +1561,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configurePutTraceIdAndSpanIdInMdc() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC, featureContext -> false);
+  }
+
+  private static void configureDisableSchedulerLogging() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_SCHEDULER_LOGGING, minMuleVersion("4.6.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
