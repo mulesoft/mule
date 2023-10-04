@@ -154,8 +154,9 @@ public class PropertiesResolverUtils {
                   + componentIdentifier + "`: `" + previous.toString() + "` loaded by `" + previous.getClass().getClassLoader()
                   + "` and `" + service.toString() + "` loaded by `" + service.getClass().getClassLoader() + "`."));
             }
+          } else {
+            providerFactoriesMap.put(componentIdentifier, service);
           }
-          providerFactoriesMap.put(componentIdentifier, service);
         });
 
     // Support of the old deprecated interface only if it is available in the classpath.
