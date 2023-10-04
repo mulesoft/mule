@@ -52,6 +52,30 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
 
+  exports org.mule.runtime.module.extension.internal.runtime.client to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.connectivity to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
+      org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.util to
+      org.mule.runtime.core;
+
+  opens org.mule.runtime.module.extension.internal.runtime.client to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.connectivity to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth to
+       org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
+      org.mule.runtime.core;
+
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
       org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
   provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
