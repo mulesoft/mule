@@ -30,6 +30,7 @@ module org.mule.runtime.core.components {
 
   exports org.mule.runtime.core.internal.routing to
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch,
       spring.beans;
   exports org.mule.runtime.core.internal.routing.forkjoin to
       org.mule.runtime.spring.config,
