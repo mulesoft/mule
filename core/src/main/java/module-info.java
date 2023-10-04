@@ -382,8 +382,11 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming.bytes to
+      org.mule.runtime.extensions.support,
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo;
+  exports org.mule.runtime.core.internal.streaming.bytes.factory to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.streaming.object to
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo;

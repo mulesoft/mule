@@ -23,6 +23,7 @@
             --add-modules=net.bytebuddy.agent
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
             ${surefire.test.unit.open.args}

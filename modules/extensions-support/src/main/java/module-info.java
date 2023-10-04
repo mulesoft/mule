@@ -66,6 +66,8 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.util to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.transaction to
+      org.mule.runtime.core;
 
   opens org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core;
@@ -74,6 +76,10 @@ module org.mule.runtime.extensions.support {
   opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth to
        org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.source to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime to
       org.mule.runtime.core;
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
