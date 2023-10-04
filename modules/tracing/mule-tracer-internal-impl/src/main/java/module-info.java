@@ -21,6 +21,7 @@ module org.mule.runtime.tracer.internal.impl {
 
   requires java.inject;
   requires org.apache.commons.lang3;
+  requires com.google.common;
 
   exports org.mule.runtime.tracer.impl to
       org.mule.runtime.spring.config,

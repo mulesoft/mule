@@ -21,6 +21,7 @@ module org.mule.runtime.extensions.support {
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.api.persistence;
+  requires org.mule.runtime.featureManagement;
   requires org.mule.runtime.http.api;
   requires org.mule.runtime.metadata.model.catalog;
   requires org.mule.runtime.metadata.model.java;
@@ -42,6 +43,8 @@ module org.mule.runtime.extensions.support {
   requires org.joda.time;
   requires spring.core;
   requires java.desktop;
+  requires net.bytebuddy;
+  requires com.google.gson;
 
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;
@@ -69,7 +72,11 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.transaction to
       org.mule.runtime.core;
 
+  opens org.mule.runtime.module.extension.internal.runtime to
+      org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.client to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.config to
       org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core;
@@ -77,9 +84,13 @@ module org.mule.runtime.extensions.support {
        org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
       org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.source to
+  opens org.mule.runtime.module.extension.internal.runtime.execution to
       org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime to
+  opens org.mule.runtime.module.extension.internal.runtime.operation to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.resolver to
+      org.mule.runtime.core;
+  opens org.mule.runtime.module.extension.internal.runtime.source to
       org.mule.runtime.core;
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
