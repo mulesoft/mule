@@ -35,6 +35,7 @@ import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWat
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.PARALLEL_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
+import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaulServiceEchoJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultFooServiceJarFile;
@@ -46,7 +47,6 @@ import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCata
 import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.correlationIdCount;
 import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.invocationCount;
 import static org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor.policyParametrization;
-import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.deploy;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.redeploy;
 import static org.mule.runtime.module.deployment.test.internal.util.DeploymentServiceTestUtils.undeploy;
@@ -114,6 +114,7 @@ import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.config.api.properties.PropertiesResolverUtils;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.container.internal.MuleClassLoaderLookupPolicy;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -134,15 +135,6 @@ import org.mule.runtime.module.artifact.builder.TestArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
-import org.mule.runtime.module.deployment.internal.ArchiveDeployer;
-import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
-import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
-import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
-import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
-import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
-import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListenerFactory;
-import org.mule.runtime.module.deployment.test.api.TestDeploymentListener;
-import org.mule.runtime.module.deployment.test.internal.util.container.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
@@ -153,8 +145,17 @@ import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilde
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultMuleDomain;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateDescriptorFactory;
+import org.mule.runtime.module.deployment.internal.ArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
+import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
+import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListenerFactory;
+import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
+import org.mule.runtime.module.deployment.test.api.TestDeploymentListener;
+import org.mule.runtime.module.deployment.test.internal.util.container.TestPrivilegedApiModuleRepository;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
 import org.mule.runtime.module.service.builder.ServiceFileBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -250,6 +251,10 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @ClassRule
   public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup);
+
+  @ClassRule
+  public static SystemProperty duplicateProvidersLax =
+      new SystemProperty(PropertiesResolverUtils.class.getName() + ".duplicateProvidersLax", "true");
 
   private static final ExecutorService executor = newSingleThreadExecutor();
 
