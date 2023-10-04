@@ -97,5 +97,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;
   provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
       org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
-    
+  provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
+      org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
+
 }
