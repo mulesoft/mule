@@ -396,6 +396,8 @@ public class DefaultMuleContainer implements MuleContainer {
     if (repositoryService != null) {
       disposeIfNeeded(repositoryService, logger);
     }
+
+    disposeIfNeeded(artifactResourcesRegistry, logger);
   }
 
   public Logger getLogger() {
