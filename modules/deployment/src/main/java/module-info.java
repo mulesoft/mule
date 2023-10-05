@@ -21,6 +21,7 @@ module org.mule.runtime.deployment {
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.core.components;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.extension.model;
@@ -31,6 +32,7 @@ module org.mule.runtime.deployment {
   requires org.mule.runtime.policy.api;
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.spring.config;
+  requires org.mule.sdk.api;
 
   // package java.beans package is used
   requires java.desktop;
