@@ -13,16 +13,13 @@ upstreamProjects:
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C
 mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
-# TODO W-13029381 Change to 17
 jdkTool: OPEN-JDK11
 testJdkTool: OPEN-JDK8
 additionalTestConfigs:
   jdk11:
     testJdkTool: OPEN-JDK11
-    mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -Pjava11tests
-# TODO W-13029381 uncomment when default changes to java 17
-  #jdk11:
-    #testJdkTool: OPEN-JDK11
+    mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -P!testJdkWithoutXmlModule -Pjava11tests
   jdk17:
     testJdkTool: OPEN-JDK17
+    mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C -P!testJdkWithoutXmlModule
     
