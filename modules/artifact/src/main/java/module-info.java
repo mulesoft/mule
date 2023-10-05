@@ -41,6 +41,7 @@ module org.mule.runtime.artifact {
   exports org.mule.runtime.module.artifact.internal.util to
       org.mule.runtime.container,
       org.mule.runtime.artifact.activation,
+      org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;

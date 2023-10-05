@@ -16,6 +16,40 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.deployment</javaModuleName>
+
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
+            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=ALL-UNNAMED
+            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.function=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.policy=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer.datatype=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer.simple=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.simple=ALL-UNNAMED
+            --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.core.internal.extension=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=ALL-UNNAMED
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.api=ALL-UNNAMED
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=ALL-UNNAMED
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.beans
+            --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
+            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
+            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
+            ${surefire.args.base}
+        </surefire.args>
+
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
@@ -103,7 +137,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-extensions-spring-support</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>jboss</groupId>

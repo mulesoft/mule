@@ -107,6 +107,7 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.bean to
       spring.beans;
   exports org.mule.runtime.config.internal.context to
+      org.mule.runtime.deployment,
       spring.beans;
   exports org.mule.runtime.config.internal.context.metrics to
       spring.beans;

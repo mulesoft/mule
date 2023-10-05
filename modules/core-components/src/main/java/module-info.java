@@ -39,6 +39,7 @@ module org.mule.runtime.core.components {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.processor to
+      org.mule.runtime.deployment,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.processor.simple to

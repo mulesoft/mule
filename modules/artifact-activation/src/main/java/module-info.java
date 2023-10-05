@@ -56,6 +56,7 @@ module org.mule.runtime.artifact.activation {
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.module.artifact.activation.internal.classloader to
+      org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
@@ -64,6 +65,7 @@ module org.mule.runtime.artifact.activation {
   exports org.mule.runtime.module.artifact.activation.internal.deployable to
       org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.module.artifact.activation.internal.nativelib to
+      org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.test.runner;
