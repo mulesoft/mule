@@ -37,6 +37,7 @@
             --add-opens=org.mule.runtime.artifact.ast.xmlParser/org.mule.runtime.ast.api.xml=org.mule.runtime.spring.config
             --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.utils=org.mule.runtime.core,org.mule.runtime.service,org.mule.runtime.container
             --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.spring=net.bytebuddy
+            --add-opens=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
 
