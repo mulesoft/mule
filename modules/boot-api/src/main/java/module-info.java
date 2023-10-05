@@ -14,9 +14,14 @@ module org.mule.boot.api {
 
   exports org.mule.runtime.module.reboot.api;
 
-  // TODO W-13151134: export only to modules that require it once org.mule.runtime.launcher is modularized
-  // exports org.mule.runtime.module.reboot.internal to org.mule.boot.tanuki,org.mule.runtime.launcher,com.mulesoft.mule.runtime.plugin;
-  exports org.mule.runtime.module.boot.internal;
+  // This directs some exports to modules that are loaded in the container layer. Those are used for compile-time validation and
+  // then directed programmatically by JpmsUtils
+  exports org.mule.runtime.module.boot.internal to
+      org.mule.boot,
+      org.mule.boot.tanuki,
+      org.mule.runtime.launcher, // container layer!
+      com.mulesoft.mule.boot,
+      com.mulesoft.mule.runtime.plugin; // container layer!
 
   // Needed by the MuleLog4jConfigurer
   requires org.mule.runtime.boot.log4j;
@@ -28,4 +33,11 @@ module org.mule.boot.api {
   requires org.mule.runtime.logging;
 
   requires commons.cli;
+
+  uses org.mule.runtime.module.boot.internal.MuleContainerProvider;
+
+  // Required to programmatically propagate accessibility by JpmsUtils
+  opens org.mule.runtime.module.boot.internal to
+      org.mule.runtime.jpms.utils;
+
 }

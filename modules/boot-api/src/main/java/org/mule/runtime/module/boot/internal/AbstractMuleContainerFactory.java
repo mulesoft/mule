@@ -8,15 +8,19 @@ package org.mule.runtime.module.boot.internal;
 
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
+import static org.mule.runtime.module.boot.internal.util.SystemUtils.getCommandLineOptions;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
+import static java.util.ServiceLoader.load;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * A base class for implementing {@link MuleContainerFactory}.
@@ -25,7 +29,22 @@ import java.net.URL;
  */
 public abstract class AbstractMuleContainerFactory implements MuleContainerFactory {
 
-  private static final String CLASSNAME_MULE_CONTAINER = "org.mule.runtime.module.launcher.DefaultMuleContainer";
+  public static final String[][] CLI_OPTIONS = {
+      {"builder", "true", "Configuration Builder Type"},
+      {"config", "true", "Configuration File"},
+      {"idle", "false", "Whether to run in idle (unconfigured) mode"},
+      {"main", "true", "Main Class"},
+      {"mode", "true", "Run Mode"},
+      {"props", "true", "Startup Properties"},
+      {"production", "false", "Production Mode"},
+      {"debug", "false", "Configure Mule for JPDA remote debugging."},
+      {"app", "true", "Application to start"}
+  };
+
+  static final String APP_COMMAND_LINE_OPTION = "app";
+  static final String DEPLOYMENT_APPLICATION_PROPERTY = "mule.deploy.applications";
+  static final String INVALID_DEPLOY_APP_CONFIGURATION_ERROR =
+      format("Cannot set both '%s' option and '%s' property", APP_COMMAND_LINE_OPTION, DEPLOYMENT_APPLICATION_PROPERTY);
 
   private final String muleHomeDirectoryPropertyName;
   private final String muleBaseDirectoryPropertyName;
@@ -36,19 +55,32 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
   }
 
   @Override
-  public MuleContainer create(String[] args) throws Exception {
+  public final MuleContainer create(String[] args) throws Exception {
+    validateCommnadLineOptions(args);
+
+    return createMuleContainer();
+  }
+
+  private void validateCommnadLineOptions(String[] args) {
+    Map<String, Object> commandlineOptions = getCommandLineOptions(args, CLI_OPTIONS);
+    String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
+    if (appOption != null) {
+      if (getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
+        throw new IllegalArgumentException(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
+      }
+      setProperty(DEPLOYMENT_APPLICATION_PROPERTY, appOption);
+    }
+  }
+
+  MuleContainer createMuleContainer() throws IOException, Exception {
     ClassLoader muleSystemCl = createContainerSystemClassLoader(lookupMuleHome(), lookupMuleBase());
 
-    Class<?> muleClass = muleSystemCl.loadClass(CLASSNAME_MULE_CONTAINER);
-    Constructor<?> c = muleClass.getConstructor(String[].class);
+    final MuleContainerProvider containerProvider = load(MuleContainerProvider.class, muleSystemCl).iterator().next();
 
     ClassLoader originalCl = currentThread().getContextClassLoader();
     currentThread().setContextClassLoader(muleSystemCl);
     try {
-      // the cast to Object is to disambiguate the fact that the String array must be passed as a single argument instead of
-      // having
-      // them unpacked for the varargs method newInstance
-      return (MuleContainer) c.newInstance((Object) args);
+      return containerProvider.provide();
     } finally {
       currentThread().setContextClassLoader(originalCl);
     }
