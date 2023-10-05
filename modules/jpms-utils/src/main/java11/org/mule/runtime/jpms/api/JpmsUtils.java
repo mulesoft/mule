@@ -207,8 +207,7 @@ public final class JpmsUtils {
   }
 
   private static boolean useModuleLayer() {
-    // TODO W-13829761, W-13829740 Change default to `JAVA_MAJOR_VERSION >= 17`
-    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false"));
+    return parseBoolean(getProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "" + (JAVA_MAJOR_VERSION >= 17)));
   }
 
   /**
