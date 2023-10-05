@@ -117,17 +117,22 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
     final BaseMuleArtifactContext baseMuleArtifactContext =
         createBaseContext(muleContext, applicationObjectController, parentConfigurationProperties);
     serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
-    createBaseRegistry(muleContext, baseMuleArtifactContext);
+    BaseSpringRegistry baseRegistry = createBaseRegistry(muleContext, baseMuleArtifactContext);
 
-    muleArtifactContext = createApplicationContext(muleContext,
-                                                   applicationObjectController,
-                                                   baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
-                                                   baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
-                                                   baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
-                                                   baseMuleArtifactContext.getBean(FeatureFlaggingService.class),
-                                                   baseMuleArtifactContext.getBean(ExpressionLanguageMetadataService.class));
-    muleArtifactContext.setParent(baseMuleArtifactContext);
-    createSpringRegistry((DefaultMuleContext) muleContext, baseMuleArtifactContext, muleArtifactContext);
+    try {
+      muleArtifactContext = createApplicationContext(muleContext,
+                                                     applicationObjectController,
+                                                     baseMuleArtifactContext.getBean(BaseConfigurationComponentLocator.class),
+                                                     baseMuleArtifactContext.getBean(ContributedErrorTypeRepository.class),
+                                                     baseMuleArtifactContext.getBean(ContributedErrorTypeLocator.class),
+                                                     baseMuleArtifactContext.getBean(FeatureFlaggingService.class),
+                                                     baseMuleArtifactContext.getBean(ExpressionLanguageMetadataService.class));
+      muleArtifactContext.setParent(baseMuleArtifactContext);
+      createSpringRegistry((DefaultMuleContext) muleContext, baseMuleArtifactContext, muleArtifactContext);
+    } catch (Exception e) {
+      baseRegistry.dispose();
+      throw e;
+    }
   }
 
   private BaseMuleArtifactContext createBaseContext(MuleContext muleContext,
