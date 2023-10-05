@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 
 /**
  * No-op implementation of JpmsUtils to use when running on JVM 8.
