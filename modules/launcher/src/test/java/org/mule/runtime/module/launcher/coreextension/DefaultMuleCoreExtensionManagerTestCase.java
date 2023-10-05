@@ -26,6 +26,7 @@ import org.mule.runtime.container.api.CoreExtensionsAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -195,6 +196,14 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
     coreExtensionManager.initialise();
 
     verify(extension, atLeastOnce()).setService(service);
+  }
+
+  @Test
+  public void injectsServerLockFactoryOnExtension() throws Exception {
+    Consumer<ServerLockFactory> setServiceFunction = coreExtensionManager::setServerLockFactory;
+    BiConsumer<List<TestLockFactoryExtension>, ServerLockFactory> verificationFunction =
+        (extensions, service) -> verify(extensions.get(0), atLeastOnce()).setServerLockFactory(service);
+    testServiceInjection(ServerLockFactory.class, TestLockFactoryExtension.class, setServiceFunction, verificationFunction);
   }
 
   @Test
@@ -424,6 +433,12 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
 
     @Inject
     void setDeploymentService(DeploymentService deploymentService);
+  }
+
+  public interface TestLockFactoryExtension extends MuleCoreExtension {
+
+    @Inject
+    void setServerLockFactory(ServerLockFactory serverLockFactory);
   }
 
   public interface TestRepositoryServiceAwareExtension extends MuleCoreExtension, RepositoryServiceAware {

@@ -35,6 +35,10 @@ public class ServerLockFactory implements LockFactory, Disposable {
     }
   }
 
+  public void setLockProvider(LockProvider lockProvider) {
+    lockGroup = new InstanceLockGroup(lockProvider);
+  }
+
   private static class LockAdapter implements Lock {
 
     private final String lockId;

@@ -11,6 +11,7 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.ArtifactClassLoaderManagerAware;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.deployment.api.DeploymentServiceAware;
 import org.mule.runtime.module.repository.api.RepositoryServiceAware;
 import org.mule.runtime.module.tooling.api.ToolingServiceAware;
@@ -36,4 +37,11 @@ public interface MuleCoreExtensionManagerServer
    * @param serviceRepository not null service repository.
    */
   void setServiceRepository(ServiceRepository serviceRepository);
+
+  /**
+   * Allows {@link ServerLockFactory} injection.
+   * 
+   * @param serverLockFactory
+   */
+  void setServerLockFactory(ServerLockFactory serverLockFactory);
 }
