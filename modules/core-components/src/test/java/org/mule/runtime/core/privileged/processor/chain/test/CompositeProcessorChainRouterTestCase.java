@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.processor;
+package org.mule.runtime.core.privileged.processor.chain.test;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
@@ -28,6 +28,7 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.processor.AsyncDelegateMessageProcessor;
+import org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
