@@ -13,6 +13,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.properties.internal.loader.ConfigurationPropertiesProviderFactoryLoader.loadConfigurationPropertiesProviderFactories;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -49,6 +50,11 @@ import org.slf4j.Logger;
  * @since 4.5
  */
 public class PropertiesResolverUtils {
+
+  /**
+   * This is intended to address some situations in the Mule Runtime testing, not to use in production.
+   */
+  private static final String DUPLICATE_PROVIDERS_LAX = PropertiesResolverUtils.class.getName() + ".duplicateProvidersLax";
 
   public static final String GLOBAL_PROPERTY = "global-property";
   private static final Logger LOGGER = getLogger(PropertiesResolverUtils.class);
@@ -142,10 +148,15 @@ public class PropertiesResolverUtils {
         .forEach(service -> {
           ComponentIdentifier componentIdentifier = service.getSupportedComponentIdentifier();
           if (providerFactoriesMap.containsKey(componentIdentifier)) {
-            throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component: "
-                + componentIdentifier));
+            final ConfigurationPropertiesProviderFactory previous = providerFactoriesMap.get(componentIdentifier);
+            if (!getBoolean(DUPLICATE_PROVIDERS_LAX)) {
+              throw new MuleRuntimeException(createStaticMessage("Multiple configuration providers for component `"
+                  + componentIdentifier + "`: `" + previous.toString() + "` loaded by `" + previous.getClass().getClassLoader()
+                  + "` and `" + service.toString() + "` loaded by `" + service.getClass().getClassLoader() + "`."));
+            }
+          } else {
+            providerFactoriesMap.put(componentIdentifier, service);
           }
-          providerFactoriesMap.put(componentIdentifier, service);
         });
 
     // Support of the old deprecated interface only if it is available in the classpath.

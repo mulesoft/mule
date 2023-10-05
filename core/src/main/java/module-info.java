@@ -238,6 +238,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
   exports org.mule.runtime.core.internal.el.dataweave to
+      org.mule.runtime.core.components,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.el.function to
       org.mule.runtime.spring.config,
@@ -313,6 +314,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.processor.strategy.util to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.profiling to
+      org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl,
@@ -371,6 +373,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
+      org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.core.ee,
@@ -528,6 +531,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.event to
       kryo.shaded;
   opens org.mule.runtime.core.internal.lock to
+      org.mule.runtime.core.components,
       spring.core;
   opens org.mule.runtime.core.internal.message to
       kryo.shaded;

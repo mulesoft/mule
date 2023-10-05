@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.transformer.simple;
+package org.mule.runtime.core.internal.transformer.test;
 
 import static java.nio.charset.StandardCharsets.UTF_16;
 import static org.hamcrest.CoreMatchers.nullValue;
