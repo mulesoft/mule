@@ -44,12 +44,14 @@
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.api=ALL-UNNAMED
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=ALL-UNNAMED
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.beans
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.maven=ALL-UNNAMED
             --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
             --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
             --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
-
             --add-reads=org.mule.runtime.deployment=org.mule.runtime.service
             --add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment
+            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=ALL-UNNAMED
+            --add-reads=org.mule.runtime.deployment=org.mule.runtime.license.api
             ${surefire.args.base}
         </surefire.args>
 

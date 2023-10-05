@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.domain;
+package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.deployment.model.api.domain.DomainDescriptor.DEFAULT_DOMAIN_NAME;
@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import org.mockito.Mockito;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -33,7 +34,7 @@ import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilder;
 import org.mule.runtime.deployment.model.api.builder.DomainClassLoaderBuilderFactory;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.deployment.model.api.domain.DomainDescriptor;
-import org.mule.runtime.deployment.model.internal.domain.AbstractDomainTestCase;
+import org.mule.runtime.deployment.model.internal.domain.test.AbstractDomainTestCase;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorCreator;
 import org.mule.runtime.module.artifact.activation.api.descriptor.DeployableArtifactDescriptorFactory;
@@ -41,6 +42,10 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.EmptyDomainDescriptor;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -51,9 +56,7 @@ import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @Feature(DOMAIN_CREATION)
 @Story(HEAVYWEIGHT)
@@ -65,7 +68,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
-  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(mock(DomainDescriptorFactory.class),
+  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(Mockito.mock(DomainDescriptorFactory.class),
                                                                               deployableArtifactDescriptorFactory,
                                                                               new DefaultDomainManager(),
                                                                               null,

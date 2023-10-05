@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> extends SplashScreen {
 
-  protected abstract void createMessage(D descriptor);
+  public abstract void createMessage(D descriptor);
 
   protected List<String> getLibraries(File artifactLibFolder) {
     if (artifactLibFolder.exists()) {

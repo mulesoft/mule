@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.artifact.internal.util;
+package org.mule.runtime.module.artifact.internal.util.test;
 
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.Feature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
+import org.mule.runtime.module.artifact.internal.util.FeatureFlaggingUtils;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
