@@ -45,6 +45,8 @@
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=ALL-UNNAMED
             --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.beans
             --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
+            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
+            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
             ${surefire.args.base}
         </surefire.args>
 

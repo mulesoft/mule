@@ -32,7 +32,4 @@ module org.mule.runtime.container {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
       org.mule.test.runner;
-
-  opens org.mule.runtime.container.internal to
-      org.apache.commons.lang3;
 }

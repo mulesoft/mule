@@ -49,5 +49,4 @@ module org.mule.runtime.artifact {
   uses org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
   uses org.mule.runtime.module.artifact.api.descriptor.BundleDescriptorLoader;
 
-  opens org.mule.runtime.module.artifact.api.classloader to org.apache.commons.lang3;
 }
