@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
@@ -128,6 +129,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
+  private final LicenseValidator licenseValidator;
 
 
   /**
@@ -211,6 +213,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     }
   }
 
+  @Override
+  protected void doDispose() {
+    disposeIfNeeded(licenseValidator, logger);
+    super.doDispose();
+  }
+
   /**
    * Creates a repository for resources required for mule artifacts.
    */
@@ -247,7 +255,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.containerClassLoader = containerClassLoader;
     artifactClassLoaderManager = new DefaultClassLoaderManager();
-    LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
+    licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory =
