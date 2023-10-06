@@ -27,6 +27,8 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.troubleshooting;
   requires org.mule.runtime.tooling.support;
 
+  exports org.mule.runtime.module.launcher to
+      org.mule.distribution.embedded.impl;
   exports org.mule.runtime.module.launcher.coreextension to
       org.mule.runtime.core,
       com.mulesoft.mule.runtime.plugin;
