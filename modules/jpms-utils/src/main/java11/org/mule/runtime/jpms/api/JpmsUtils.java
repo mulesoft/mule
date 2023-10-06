@@ -200,8 +200,8 @@ public final class JpmsUtils {
     final ModuleLayer parentLayer =
         createModuleLayer(modulePathEntriesParent, parentClassLoaderResolver, ofNullable(resolvedParentLayer), false, true);
     final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, identity(), of(parentLayer), false, true);
-    openToModule(childLayer, "kryo.shaded", "java.base", asList("java.lang", "java.lang.reflect", "java.security.cert"));
-    openToModule(childLayer, "kryo.shaded", "jakarta.activation", asList("javax.activation"));
+    // openToModule(childLayer, "kryo.shaded", "java.base", asList("java.lang", "java.lang.reflect", "java.security.cert"));
+    // openToModule(childLayer, "kryo.shaded", "jakarta.activation", asList("javax.activation"));
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
