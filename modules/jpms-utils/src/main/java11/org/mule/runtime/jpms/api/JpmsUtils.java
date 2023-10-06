@@ -200,8 +200,12 @@ public final class JpmsUtils {
     final ModuleLayer parentLayer =
         createModuleLayer(modulePathEntriesParent, parentClassLoaderResolver, ofNullable(resolvedParentLayer), false, true);
     final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, identity(), of(parentLayer), false, true);
-    openToModule(childLayer, "kryo.shaded", "java.base", asList("java.lang", "java.lang.reflect", "java.security.cert"));
-    openToModule(childLayer, "kryo.shaded", "jakarta.activation", asList("javax.activation"));
+    openToModule(childLayer, "org.mule.runtime.launcher", "org.mule.boot.api",
+                 asList("org.mule.runtime.module.boot.internal"));
+    openToModule(childLayer, "kryo.shaded", "java.base",
+                 asList("java.lang", "java.lang.reflect", "java.security.cert"));
+    openToModule(childLayer, "kryo.shaded", "jakarta.activation",
+                 asList("javax.activation"));
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
@@ -386,14 +390,12 @@ public final class JpmsUtils {
     }
 
     layer.findModule(moduleName)
-        .ifPresent(module -> {
-          boot().findModule(bootModuleName)
-              .ifPresent(bootModule -> {
-                for (String pkg : packages) {
-                  bootModule.addOpens(pkg, module);
-                }
-              });
-        });
+        .ifPresent(module -> boot().findModule(bootModuleName)
+            .ifPresent(bootModule -> {
+              for (String pkg : packages) {
+                bootModule.addOpens(pkg, module);
+              }
+            }));
   }
 
   private static UnaryOperator<ClassLoader> useResolvedClassLoaderIfAvailable(ClassLoader parent) {
