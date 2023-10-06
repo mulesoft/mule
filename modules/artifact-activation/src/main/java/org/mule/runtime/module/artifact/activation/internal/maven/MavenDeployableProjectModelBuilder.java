@@ -194,6 +194,7 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     builder.setConfigs(applicationModel.getConfigs() != null ? applicationModel.getConfigs() : muleConfigs);
     builder.setRedeploymentEnabled(applicationModel.isRedeploymentEnabled());
     builder.setSecureProperties(applicationModel.getSecureProperties());
+    builder.setSupportedJavaVersions(applicationModel.getSupportedJavaVersions());
     builder.setLogConfigFile(applicationModel.getLogConfigFile());
     return builder.build();
   }

@@ -210,6 +210,7 @@ public class DefaultToolingService implements ToolingService {
     builder.setMinMuleVersion(muleApplicationModel.getMinMuleVersion());
     builder.setRequiredProduct(muleApplicationModel.getRequiredProduct());
     builder.setSecureProperties(muleApplicationModel.getSecureProperties());
+    builder.setSupportedJavaVersions(muleApplicationModel.getSupportedJavaVersions());
     builder.setLogConfigFile(muleApplicationModel.getLogConfigFile());
     builder.withBundleDescriptorLoader(muleApplicationModel.getBundleDescriptorLoader());
     builder.withClassLoaderModelDescriptorLoader(muleApplicationModel.getClassLoaderModelLoaderDescriptor());

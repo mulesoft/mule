@@ -6,20 +6,20 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import static org.apache.commons.lang3.SystemUtils.JAVA_SPECIFICATION_VERSION;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -44,7 +44,6 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +127,14 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
 
     if (!isMuleFramework()) {
       descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
+    }
+
+    if (getArtifactModel().getSupportedJavaVersions() != null
+        && !getArtifactModel().getSupportedJavaVersions().isEmpty()) {
+      descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
+    } else {
+      // If the model doesn't have this data assume the current jvm is good for this deployment.
+      descriptor.setSupportedJavaVersions(singleton(JAVA_SPECIFICATION_VERSION));
     }
   }
 

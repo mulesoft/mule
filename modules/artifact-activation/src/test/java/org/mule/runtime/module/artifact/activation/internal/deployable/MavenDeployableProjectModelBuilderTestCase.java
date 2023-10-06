@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SupportedJavaVersions.JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.CLASSLOADING_ISOLATION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
@@ -36,13 +37,14 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_DESCRIPTORS)
@@ -254,6 +256,14 @@ public class MavenDeployableProjectModelBuilderTestCase extends AbstractMuleTest
     DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/configs-in-model");
 
     assertThat(deployableProjectModel.getDeployableModel().getConfigs(), containsInAnyOrder("config.xml"));
+  }
+
+  @Test
+  @Story(JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT)
+  public void supportedJavaVersions() throws Exception {
+    DeployableProjectModel deployableProjectModel = getDeployableProjectModel("apps/basic-with-supported-java-versions");
+
+    assertThat(deployableProjectModel.getDeployableModel().getSupportedJavaVersions(), hasItems("1.8", "11", "17"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath,

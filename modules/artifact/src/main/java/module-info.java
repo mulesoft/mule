@@ -22,6 +22,10 @@ module org.mule.runtime.artifact {
   requires java.management;
   requires java.sql;
 
+  requires com.google.common;
+  requires org.apache.commons.io;
+  requires org.apache.commons.lang3;
+
   exports org.mule.runtime.module.artifact.api;
   exports org.mule.runtime.module.artifact.api.classloader;
   exports org.mule.runtime.module.artifact.api.classloader.exception;
