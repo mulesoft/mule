@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher;
 import static org.hamcrest.Matchers.not;
 
 import org.mule.runtime.module.deployment.impl.internal.base.AbstractSplashScreenTestCase;
+import org.mule.runtime.module.launcher.splash.MuleContainerStartupSplashScreen;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.ARTIFACT_PATCHES_FOLDER;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
