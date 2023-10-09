@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.launcher;
+package org.mule.runtime.module.launcher.splash;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
