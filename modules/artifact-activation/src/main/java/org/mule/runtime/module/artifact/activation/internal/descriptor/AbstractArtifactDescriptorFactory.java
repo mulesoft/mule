@@ -39,6 +39,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
         .validateMinMuleVersion()
         .validateMuleProduct()
         .validateVersionFormat()
+        .validateSupportedJavaVersions()
         .build();
   }
 

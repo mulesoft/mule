@@ -9,11 +9,12 @@ package org.mule.runtime.module.artifact.api.descriptor;
 import org.mule.runtime.module.artifact.internal.descriptor.CompositeArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.MinMuleVersionArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.MuleProductArtifactDescriptorValidator;
+import org.mule.runtime.module.artifact.internal.descriptor.SupportedJvmArtifactDescriptorValidator;
 import org.mule.runtime.module.artifact.internal.descriptor.VersionFormatArtifactDescriptorValidator;
 
-import com.google.common.collect.ImmutableList;
-
 import java.util.function.Supplier;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Builder that allows to create a {@link ArtifactDescriptorValidator} with different aspects: from checking minMuleVersion to
@@ -31,6 +32,8 @@ public final class ArtifactDescriptorValidatorBuilder {
 
   private boolean validateVersionFormat;
   private boolean doNotFailIfBundleDescriptorNotPresent;
+
+  private boolean validateSupportedJavaVersions;
 
   private ArtifactDescriptorValidatorBuilder() {}
 
@@ -111,6 +114,18 @@ public final class ArtifactDescriptorValidatorBuilder {
   }
 
   /**
+   * Sets a validation for the supportedJavaVersions of the artifact against the currently running JVM.
+   * 
+   * @return this
+   * 
+   * @since 4.6
+   */
+  public ArtifactDescriptorValidatorBuilder validateSupportedJavaVersions() {
+    this.validateSupportedJavaVersions = true;
+    return this;
+  }
+
+  /**
    * @return a {@link ArtifactDescriptorValidator} with the constraints defined by this builder.
    */
   public ArtifactDescriptorValidator build() {
@@ -128,6 +143,9 @@ public final class ArtifactDescriptorValidatorBuilder {
     }
     if (validateVersionFormat) {
       builder.add(new VersionFormatArtifactDescriptorValidator(doNotFailIfBundleDescriptorNotPresent));
+    }
+    if (validateSupportedJavaVersions) {
+      builder.add(new SupportedJvmArtifactDescriptorValidator());
     }
     return new CompositeArtifactDescriptorValidator(builder.build());
   }

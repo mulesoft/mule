@@ -95,6 +95,16 @@ public interface AllureConstants {
       String UNDEPLOYMENT = "Undeployment";
 
     }
+
+    interface SupportedJavaVersions {
+
+      String JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT =
+          "Supported Java Versions are reflected in the ApplicationModel or DomainModel";
+
+      String ENFORCE_DEPLOYABLE_ARTIFACT_JAVA_VERSION =
+          "Validate that a deployable artifact supports the Java version Mule is running on";
+    }
+
   }
 
   interface DeploymentTypeFeature {

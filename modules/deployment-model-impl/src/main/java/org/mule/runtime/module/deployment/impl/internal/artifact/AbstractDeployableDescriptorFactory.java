@@ -66,6 +66,8 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
       throw new IllegalStateException(e);
     }
     descriptor.setLogConfigFile(getLogConfigFile(artifactModel));
+
+    descriptor.setSupportedJavaVersions(artifactModel.getSupportedJavaVersions());
   }
 
   protected File getLogConfigFile(M artifactModel) {

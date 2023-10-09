@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.api.descriptor;
 
 import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toSet;
 
@@ -38,6 +39,7 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
   private Set<ArtifactPluginDescriptor> plugins = new HashSet<>();
   private File logConfigFile;
   private Optional<Properties> deploymentProperties = empty();
+  private Set<String> supportedJavaVersions = emptySet();
 
   /**
    * Creates a new deployable artifact descriptor
@@ -146,6 +148,14 @@ public class DeployableArtifactDescriptor extends ArtifactDescriptor {
 
   public Optional<Properties> getDeploymentProperties() {
     return deploymentProperties;
+  }
+
+  public Set<String> getSupportedJavaVersions() {
+    return supportedJavaVersions;
+  }
+
+  public void setSupportedJavaVersions(Set<String> supportedJavaVersions) {
+    this.supportedJavaVersions = requireNonNull(supportedJavaVersions);
   }
 
 }
