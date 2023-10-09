@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
-import static org.mule.runtime.module.extension.api.loader.java.type.MethodElement.Scope.PRIVATE;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
 
 import static java.util.Collections.emptyList;
@@ -354,9 +353,6 @@ public final class MinMuleVersionUtils {
 
   private static ResolvedMinMuleVersion calculateMethodMinMuleVersion(MethodElement<?> method) {
     ResolvedMinMuleVersion methodMMV = resolveToDefaultMMV("Method", method.getName());
-    if (method.getScope() == PRIVATE) {
-      return methodMMV;
-    }
 
     Optional<ResolvedMinMuleVersion> annotationMMV =
         method.getAnnotations().map(MinMuleVersionUtils::getEnforcedMinMuleVersion)

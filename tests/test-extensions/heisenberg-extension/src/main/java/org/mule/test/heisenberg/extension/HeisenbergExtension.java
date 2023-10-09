@@ -20,7 +20,6 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.internal.event.DefaultEventContext;
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Expression;
 import org.mule.runtime.extension.api.annotation.Operations;
@@ -65,6 +64,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+
+import sun.misc.Unsafe;
 
 @Extension(name = HeisenbergExtension.HEISENBERG, category = SELECT)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
@@ -218,8 +219,8 @@ public class HeisenbergExtension implements Lifecycle {
   private final List<org.mule.sdk.api.runtime.source.BackPressureContext> sdkBackPressureContexts = new LinkedList<>();
 
 
-  public String jj(DefaultEventContext ctx) {
-    return ctx.toString();
+  public String jj(Unsafe unsafe) {
+    return unsafe.toString();
   }
 
   public void onBackPressure(BackPressureContext ctx) {
