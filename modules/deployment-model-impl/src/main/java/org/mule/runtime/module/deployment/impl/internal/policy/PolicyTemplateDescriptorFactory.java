@@ -9,7 +9,10 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
+import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.lang3.SystemUtils.JAVA_SPECIFICATION_VERSION;
 
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.deployment.persistence.AbstractMuleArtifactModelJsonSerializer;
@@ -75,6 +78,9 @@ public class PolicyTemplateDescriptorFactory
   protected void doDescriptorConfig(MulePolicyModel artifactModel, PolicyTemplateDescriptor descriptor, File artifactLocation) {
     descriptor.setRootFolder(artifactLocation);
     descriptor.setPlugins(parseArtifactPluginDescriptors(descriptor));
+
+    // Policy model doesn't have this data, assume the current jvm is good for this deployment.
+    descriptor.setSupportedJavaVersions(singleton(JAVA_SPECIFICATION_VERSION));
   }
 
   private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(PolicyTemplateDescriptor descriptor) {
