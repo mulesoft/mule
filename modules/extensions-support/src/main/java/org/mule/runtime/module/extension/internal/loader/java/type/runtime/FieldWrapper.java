@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
+
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.module.extension.internal.loader.java.contributor.InfrastructureTypeResolver.getInfrastructureType;
+
 import static org.springframework.core.ResolvableType.forField;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -24,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.lang.model.element.VariableElement;
@@ -37,12 +38,11 @@ import javax.lang.model.element.VariableElement;
 public class FieldWrapper implements FieldElement {
 
   private final Field field;
-  private final FieldSetter fieldSetter;
   private final ClassTypeLoader typeLoader;
+  private FieldSetter fieldSetter;
 
   public FieldWrapper(Field field, ClassTypeLoader typeLoader) {
     this.field = field;
-    this.fieldSetter = new FieldSetter<>(field);
     this.typeLoader = typeLoader;
   }
 
@@ -56,6 +56,9 @@ public class FieldWrapper implements FieldElement {
 
   @Override
   public void set(Object object, Object value) {
+    if (fieldSetter == null) {
+      fieldSetter = new FieldSetter<>(field);
+    }
     fieldSetter.set(object, value);
   }
 
