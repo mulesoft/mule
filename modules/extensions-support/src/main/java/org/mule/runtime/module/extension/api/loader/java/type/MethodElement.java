@@ -27,6 +27,10 @@ import javax.lang.model.element.ExecutableElement;
 public interface MethodElement<T extends Type>
     extends WithParameters, WithReturnType, NamedObject, WithAnnotations, WithAlias, WithDeclaringClass, WithElement {
 
+  enum Scope {
+    PRIVATE, PROTECTED, PUBLIC, PACKAGE
+  }
+
   /**
    * @return The represented method
    */
@@ -54,4 +58,6 @@ public interface MethodElement<T extends Type>
   default MetadataType getAttributesMetadataType() {
     return getMethodReturnAttributesType(this);
   }
+
+  Scope getScope();
 }

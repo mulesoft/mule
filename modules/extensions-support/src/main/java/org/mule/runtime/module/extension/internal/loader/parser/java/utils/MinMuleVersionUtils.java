@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java.utils;
 
+import static org.mule.runtime.module.extension.api.loader.java.type.MethodElement.Scope.PRIVATE;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.extension.api.annotation.Configurations;
@@ -32,7 +38,6 @@ import org.mule.sdk.api.annotation.DoNotEnforceMinMuleVersion;
 import org.mule.sdk.api.annotation.Extension;
 import org.mule.sdk.api.annotation.MinMuleVersion;
 
-import javax.inject.Inject;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,9 +46,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+import javax.inject.Inject;
 
 /**
  * Utils class to create {@link ResolvedMinMuleVersion}s from {@link Type}s.
@@ -351,6 +354,10 @@ public final class MinMuleVersionUtils {
 
   private static ResolvedMinMuleVersion calculateMethodMinMuleVersion(MethodElement<?> method) {
     ResolvedMinMuleVersion methodMMV = resolveToDefaultMMV("Method", method.getName());
+    if (method.getScope() == PRIVATE) {
+      return methodMMV;
+    }
+
     Optional<ResolvedMinMuleVersion> annotationMMV =
         method.getAnnotations().map(MinMuleVersionUtils::getEnforcedMinMuleVersion)
             .reduce(MinMuleVersionUtils::max);

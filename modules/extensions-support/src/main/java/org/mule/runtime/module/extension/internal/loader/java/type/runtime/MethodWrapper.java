@@ -6,11 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static org.mule.runtime.module.extension.api.loader.java.type.MethodElement.Scope.PRIVATE;
+import static org.mule.runtime.module.extension.api.loader.java.type.MethodElement.Scope.PROTECTED;
+import static org.mule.runtime.module.extension.api.loader.java.type.MethodElement.Scope.PUBLIC;
+
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+
 import static org.springframework.core.ResolvableType.forMethodReturnType;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -20,8 +27,6 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.internal.loader.utils.ParameterUtils;
 
-import javax.lang.model.element.ExecutableElement;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -30,6 +35,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import javax.lang.model.element.ExecutableElement;
 
 /**
  * Wrapper for {@link Method} that provide utility methods to facilitate the introspection of a {@link Method}
@@ -157,6 +164,17 @@ public class MethodWrapper<T extends Type> implements MethodElement<T> {
   @Override
   public Type getReturnType() {
     return new TypeWrapper(forMethodReturnType(method), typeLoader);
+  }
+
+  @Override
+  public Scope getScope() {
+    final int mod = method.getModifiers();
+    if (isPublic(mod)) {
+      return PUBLIC;
+    } else if (isPrivate(mod)) {
+      return PRIVATE;
+    }
+    return PROTECTED;
   }
 
   @Override
