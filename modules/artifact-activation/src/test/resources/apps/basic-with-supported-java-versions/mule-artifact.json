@@ -6,8 +6,7 @@
     "id": "mule",
     "attributes": {
       "exportedResources": [
-        "app.xml",
-        "test-script.dwl"
+        "app.xml"
       ]
     }
   },

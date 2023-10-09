@@ -11,11 +11,8 @@ import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvi
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-
-import static org.apache.commons.lang3.SystemUtils.JAVA_SPECIFICATION_VERSION;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
@@ -129,13 +126,7 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
       descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
     }
 
-    if (getArtifactModel().getSupportedJavaVersions() != null
-        && !getArtifactModel().getSupportedJavaVersions().isEmpty()) {
-      descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
-    } else {
-      // If the model doesn't have this data assume the current jvm is good for this deployment.
-      descriptor.setSupportedJavaVersions(singleton(JAVA_SPECIFICATION_VERSION));
-    }
+    descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
   }
 
   private File getLogConfigFile(M artifactModel) {

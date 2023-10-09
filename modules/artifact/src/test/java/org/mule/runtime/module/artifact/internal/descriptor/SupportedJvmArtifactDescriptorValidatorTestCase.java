@@ -13,6 +13,7 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOM
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SupportedJavaVersions.ENFORCE_DEPLOYABLE_ARTIFACT_JAVA_VERSION;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
@@ -62,6 +63,16 @@ public class SupportedJvmArtifactDescriptorValidatorTestCase extends AbstractMul
     validator.validate(descriptor);
   }
 
+  @Test
+  public void strictEmptyCollection() {
+    final DeployableArtifactDescriptor descriptor = mock(DeployableArtifactDescriptor.class);
+    when(descriptor.getSupportedJavaVersions()).thenReturn(emptySet());
+    when(descriptor.getName()).thenReturn("myArtifact");
+
+    new SupportedJvmArtifactDescriptorValidator("1.8", JVM_ENFORCEMENT_STRICT)
+        .validate(descriptor);
+    // no exception thrown
+  }
 
   @Test
   public void loose() {

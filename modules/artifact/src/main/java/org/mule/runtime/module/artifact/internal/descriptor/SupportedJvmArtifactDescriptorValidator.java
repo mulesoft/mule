@@ -40,9 +40,10 @@ public class SupportedJvmArtifactDescriptorValidator implements ArtifactDescript
    * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
    * it will be for internal use only.
    *
-   * @since 4.5.0
+   * @since 4.6
    */
-  static final String DEPLOYABLE_ARTIFACT_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
+  static final String DEPLOYABLE_ARTIFACT_JVM_ENFORCEMENT_PROPERTY =
+      SYSTEM_PROPERTY_PREFIX + "jvm.version.deployableArtifact.enforcement";
   static final String JVM_ENFORCEMENT_STRICT = "STRICT";
   static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
   static final String JVM_ENFORCEMENT_DISABLED = "DISABLED";
@@ -65,7 +66,7 @@ public class SupportedJvmArtifactDescriptorValidator implements ArtifactDescript
     if (descriptor instanceof DeployableArtifactDescriptor) {
       final Set<String> supportedJavaVersions = ((DeployableArtifactDescriptor) descriptor).getSupportedJavaVersions();
 
-      if (supportedJavaVersions.contains(runningJdkVersion)) {
+      if (supportedJavaVersions.isEmpty() || supportedJavaVersions.contains(runningJdkVersion)) {
         return;
       }
 

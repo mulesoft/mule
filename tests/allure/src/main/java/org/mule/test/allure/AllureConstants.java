@@ -102,7 +102,7 @@ public interface AllureConstants {
           "Supported Java Versions are reflected in the ApplicationModel or DomainModel";
 
       String ENFORCE_DEPLOYABLE_ARTIFACT_JAVA_VERSION =
-          "Validate that all registered extensions support the Java version Mule is running on";
+          "Validate that a deployable artifact supports the Java version Mule is running on";
     }
 
   }

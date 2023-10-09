@@ -10,10 +10,7 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 
 import static java.lang.String.format;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
-
-import static org.apache.commons.lang3.SystemUtils.JAVA_SPECIFICATION_VERSION;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
@@ -70,13 +67,7 @@ public abstract class AbstractDeployableDescriptorFactory<M extends MuleDeployab
     }
     descriptor.setLogConfigFile(getLogConfigFile(artifactModel));
 
-    if (artifactModel.getSupportedJavaVersions() != null
-        && !artifactModel.getSupportedJavaVersions().isEmpty()) {
-      descriptor.setSupportedJavaVersions(artifactModel.getSupportedJavaVersions());
-    } else {
-      // If the model doesn't have this data assume the current jvm is good for this deployment.
-      descriptor.setSupportedJavaVersions(singleton(JAVA_SPECIFICATION_VERSION));
-    }
+    descriptor.setSupportedJavaVersions(artifactModel.getSupportedJavaVersions());
   }
 
   protected File getLogConfigFile(M artifactModel) {
