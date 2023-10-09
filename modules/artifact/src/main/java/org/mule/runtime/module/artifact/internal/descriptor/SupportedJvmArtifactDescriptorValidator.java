@@ -66,7 +66,9 @@ public class SupportedJvmArtifactDescriptorValidator implements ArtifactDescript
     if (descriptor instanceof DeployableArtifactDescriptor) {
       final Set<String> supportedJavaVersions = ((DeployableArtifactDescriptor) descriptor).getSupportedJavaVersions();
 
-      if (supportedJavaVersions.isEmpty() || supportedJavaVersions.contains(runningJdkVersion)) {
+      // if the versions set is empty, assume any jvm version is good
+      if (supportedJavaVersions.isEmpty()
+          || supportedJavaVersions.contains(runningJdkVersion)) {
         return;
       }
 
