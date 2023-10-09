@@ -9,8 +9,6 @@ package org.mule.runtime.module.launcher.coreextension;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
-import org.mule.metadata.api.builder.TypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.MuleCoreExtension;
