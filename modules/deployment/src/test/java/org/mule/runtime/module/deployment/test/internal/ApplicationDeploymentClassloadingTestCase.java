@@ -239,7 +239,8 @@ public class ApplicationDeploymentClassloadingTestCase extends AbstractApplicati
         .configuredWith(EXPORTED_CLASS_PACKAGES_PROPERTY, "javax.annotation")
         .dependingOn(echoPluginWithJavaxLib)
         .dependingOn(new JarFileBuilder("barUtilsJavaxB",
-                                        new JarCompiler().compiling(getResourceFile("/javax/annotation/BarUtils.java"))
+                                        new JarCompiler()
+                                            .compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
                                             .compile("bar-javax-b.jar")));
 
     addPackedAppFromBuilder(withJavaxEchoPlugin);
