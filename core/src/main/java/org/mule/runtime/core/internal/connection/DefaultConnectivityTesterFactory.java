@@ -11,6 +11,8 @@ import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -88,7 +90,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
           public void doWork(RetryContext context) throws Exception {
             try {
               if (testConnectivityLock != null) {
-                final boolean lockAcquired = testConnectivityLock.tryLock();
+                final boolean lockAcquired = testConnectivityLock.tryLock(10, SECONDS);
                 if (lockAcquired) {
                   LOGGER.debug("Doing testConnectivity() for config '{}'", name);
                   try {
