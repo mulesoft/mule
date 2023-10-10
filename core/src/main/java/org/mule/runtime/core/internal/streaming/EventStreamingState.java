@@ -71,7 +71,7 @@ public class EventStreamingState {
         LOGGER.info("Added ManagedCursorProvider: {} for delegate: {} opened by: {}", k, identityHashCode(innerDelegate),
                     originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
       }
-      return ghostBuster.track(provider);
+      return ghostBuster.track(provider, providers);
     }).get();
   }
 
