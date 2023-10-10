@@ -10,6 +10,7 @@ import static org.mule.functional.services.TestServicesUtils.buildExpressionLang
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
+import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 
 import static org.apache.logging.log4j.LogManager.shutdown;
 
@@ -34,6 +35,12 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Rule
   public SystemProperty jvmVersionExtensionEnforcementLoose =
       new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
+
+  // These tests just create a container form the test classpath. There are no modules involved in these tests, so code relying on
+  // modules from the container doesn't work (i.e.: class.getModule().getLayer() returns null).
+  @Rule
+  public SystemProperty classloaderContainerJpmsModuleLayer =
+      new SystemProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false");
 
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
