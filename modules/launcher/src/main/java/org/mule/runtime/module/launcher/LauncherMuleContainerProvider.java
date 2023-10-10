@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.launcher;
 
-import org.mule.runtime.module.boot.internal.MuleContainer;
-import org.mule.runtime.module.boot.internal.MuleContainerProvider;
+import org.mule.runtime.module.boot.api.MuleContainer;
+import org.mule.runtime.module.boot.api.MuleContainerProvider;
 
 /**
  * Default imolementation to create the MuleConteiner.

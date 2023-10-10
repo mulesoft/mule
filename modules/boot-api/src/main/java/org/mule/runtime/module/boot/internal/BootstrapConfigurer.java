@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.boot.internal;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+
 /**
  * Allows for executing bootstrapping code before the creation of the {@link MuleContainer}.
  * <p>

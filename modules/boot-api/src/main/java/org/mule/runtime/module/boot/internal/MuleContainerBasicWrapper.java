@@ -13,6 +13,8 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+
 import java.util.List;
 import java.util.Optional;
 

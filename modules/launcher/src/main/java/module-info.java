@@ -34,7 +34,7 @@ module org.mule.runtime.launcher {
       org.mule.runtime.core,
       com.mulesoft.mule.runtime.plugin;
 
-  provides org.mule.runtime.module.boot.internal.MuleContainerProvider with
+  provides org.mule.runtime.module.boot.api.MuleContainerProvider with
       org.mule.runtime.module.launcher.LauncherMuleContainerProvider;
 
 }

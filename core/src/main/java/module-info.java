@@ -154,10 +154,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.processor;
   exports org.mule.runtime.core.privileged.processor.chain;
   exports org.mule.runtime.core.privileged.processor.objectfactory;
-  exports org.mule.runtime.core.privileged.processor.simple to
-      org.mule.runtime.core.components,
-      org.mule.runtime.spring.config,
-      spring.beans;
+  exports org.mule.runtime.core.privileged.processor.simple;
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;

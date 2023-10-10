@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.reboot.internal;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory;
 import org.mule.runtime.module.boot.internal.DefaultMuleClassPathConfig;
-import org.mule.runtime.module.boot.internal.MuleContainer;
 
 import java.io.File;
 

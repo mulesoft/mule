@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.boot.internal;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+
 /**
  * A factory for {@link MuleContainer} instances. Responsible for choosing the right implementation class and setting up its
  * {@link ClassLoader}.

@@ -10,6 +10,8 @@ import static java.lang.String.format;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.stream.Collectors.joining;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

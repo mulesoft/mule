@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.boot.internal;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapper;
+
 import org.apache.commons.cli.CommandLine;
 
 /**
@@ -17,7 +20,7 @@ import org.apache.commons.cli.CommandLine;
  *
  * @since 4.5
  */
-public interface MuleContainerWrapper {
+public interface MuleContainerWrapper extends MuleContainerLifecycleWrapper {
 
   /**
    * Adds a {@link BootstrapConfigurer} to execute before starting.
@@ -57,6 +60,7 @@ public interface MuleContainerWrapper {
    * Requests that the JVM be restarted but then returns. This allows components to initiate a JVM exit and then continue,
    * allowing a normal shutdown initiated by the JVM via shutdown hooks.
    */
+  @Override
   void restart();
 
   /**
@@ -65,5 +69,6 @@ public interface MuleContainerWrapper {
    *
    * @param exitCode The exit code that the bootstrapping application should return to the OS.
    */
+  @Override
   void stop(int exitCode);
 }
