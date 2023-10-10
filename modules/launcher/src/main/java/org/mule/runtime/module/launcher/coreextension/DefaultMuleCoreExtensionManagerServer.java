@@ -19,6 +19,7 @@ import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -55,6 +56,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
   private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
+  private ServerLockFactory serverLockFactory;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -195,6 +197,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
         .withEventContextService(eventContextService)
         .withToolingService(toolingService)
+        .withServerLockFactory(serverLockFactory)
         .build();
   }
 
@@ -231,6 +234,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setTroubleshootingService(TroubleshootingService troubleshootingService) {
     this.troubleshootingService = troubleshootingService;
+  }
+
+  @Override
+  public void setServerLockFactory(ServerLockFactory serverLockFactory) {
+    this.serverLockFactory = serverLockFactory;
   }
 
   /**

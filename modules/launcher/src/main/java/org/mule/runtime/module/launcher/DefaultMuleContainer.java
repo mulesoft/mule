@@ -209,6 +209,7 @@ public class DefaultMuleContainer implements MuleContainer {
       coreExtensionManager.setToolingService(toolingService);
       coreExtensionManager.setServiceRepository(serviceManager);
       coreExtensionManager.setTroubleshootingService(troubleshootingService);
+      coreExtensionManager.setServerLockFactory(muleLockFactory);
 
       // Waits for all bootstrapping configurations to be ready before progressing any further
       if (!configurationsReady.get()) {

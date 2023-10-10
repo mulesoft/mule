@@ -8,11 +8,13 @@ package org.mule.runtime.module.launcher.coreextension;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
@@ -119,6 +121,12 @@ public class ContainerInjectorBuilder<T extends ContainerInjectorBuilder> {
 
   public T withTroubleshootingService(TroubleshootingService troubleshootingService) {
     registerObject(TroubleshootingService.class.getName(), troubleshootingService);
+
+    return getThis();
+  }
+
+  public T withServerLockFactory(ServerLockFactory serverLockFactory) {
+    registerObject(ServerLockFactory.class.getName(), serverLockFactory);
 
     return getThis();
   }

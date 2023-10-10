@@ -1245,4 +1245,25 @@ public interface AllureConstants {
       String WRAPPERLESS_PARAMETERS_RESOLUTION = "Resolution of parameters to use in a wrapper-less bootstrapping";
     }
   }
+
+  interface CoreExtensionsFeature {
+
+    String CORE_EXTENSIONS = "Core Extensions";
+
+    interface CoreExtensionsStory {
+
+      String CORE_EXTENSIONS_DEPENDENCY_INJECTION = "Dependency injection for core extensions";
+
+    }
+  }
+
+  interface LockFactoryFeature {
+
+    String LOCK_FACTORY = "Lock factory";
+
+    interface LockFactoryStory {
+
+      String SERVER_LOCK_FACTORY = "Container level lock factory";
+    }
+  }
 }
