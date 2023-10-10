@@ -19,6 +19,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CORE_EXTENSIONS;
+import static org.mule.test.allure.AllureConstants.CoreExtensionsFeature.CoreExtensionsStory.CORE_EXTENSIONS_DEPENDENCY_INJECTION;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LOCK_FACTORY;
+import static org.mule.test.allure.AllureConstants.LockFactoryFeature.LockFactoryStory.SERVER_LOCK_FACTORY;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceRepository;
@@ -47,12 +52,17 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 
 @SmallTest
+@Feature(CORE_EXTENSIONS)
+@Story(CORE_EXTENSIONS_DEPENDENCY_INJECTION)
 public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCase {
 
   private final MuleCoreExtensionDiscoverer coreExtensionDiscoverer = mock(MuleCoreExtensionDiscoverer.class);
@@ -199,6 +209,9 @@ public class DefaultMuleCoreExtensionManagerTestCase extends AbstractMuleTestCas
   }
 
   @Test
+  @Issue("W-14237711")
+  @Feature(LOCK_FACTORY)
+  @Story(SERVER_LOCK_FACTORY)
   public void injectsServerLockFactoryOnExtension() throws Exception {
     Consumer<ServerLockFactory> setServiceFunction = coreExtensionManager::setServerLockFactory;
     BiConsumer<List<TestLockFactoryExtension>, ServerLockFactory> verificationFunction =
