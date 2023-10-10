@@ -15,17 +15,18 @@ module org.mule.runtime.launcher {
 
   requires org.mule.boot.api;
   requires org.mule.runtime.api;
-  requires org.mule.runtime.core;
-  requires org.mule.runtime.repository;
   requires org.mule.runtime.artifact;
   requires org.mule.runtime.artifact.activation;
+  requires org.mule.runtime.boot.log4j;
   requires org.mule.runtime.container;
+  requires org.mule.runtime.core;
   requires org.mule.runtime.deployment;
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.log4j;
-  requires org.mule.runtime.boot.log4j;
-  requires org.mule.runtime.troubleshooting;
+  requires org.mule.runtime.repository;
+  requires org.mule.runtime.service;
   requires org.mule.runtime.tooling.support;
+  requires org.mule.runtime.troubleshooting;
 
   // Embedded uses this
   exports org.mule.runtime.module.launcher;
