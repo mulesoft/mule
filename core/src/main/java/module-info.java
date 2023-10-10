@@ -187,6 +187,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       org.mule.test.unit;
   exports org.mule.runtime.core.internal.config.preferred to
       org.mule.runtime.spring.config,
@@ -248,6 +249,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
@@ -512,6 +514,7 @@ module org.mule.runtime.core {
       spring.core;
 
   opens org.mule.runtime.core.internal.config to
+      org.mule.runtime.tooling.support,
       spring.core;
   opens org.mule.runtime.core.internal.connection to
       spring.core;

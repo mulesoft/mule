@@ -37,6 +37,7 @@ module org.mule.runtime.metadata.support {
       spring.beans;
   exports org.mule.runtime.metadata.internal.cache to
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       spring.beans;
   exports org.mule.runtime.metadata.internal.cache.lazy to
       org.mule.runtime.spring.config;
