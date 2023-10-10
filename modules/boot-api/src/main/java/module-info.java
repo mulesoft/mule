@@ -12,6 +12,7 @@
  */
 module org.mule.boot.api {
 
+  exports org.mule.runtime.module.boot.api;
   exports org.mule.runtime.module.reboot.api;
 
   // This directs some exports to modules that are loaded in the container layer. Those are used for compile-time validation and
@@ -34,7 +35,7 @@ module org.mule.boot.api {
 
   requires commons.cli;
 
-  uses org.mule.runtime.module.boot.internal.MuleContainerProvider;
+  uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 
   // Required to programmatically propagate accessibility by JpmsUtils
   opens org.mule.runtime.module.boot.internal to

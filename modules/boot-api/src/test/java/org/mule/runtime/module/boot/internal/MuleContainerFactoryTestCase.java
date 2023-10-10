@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.size.SmallTest;
 

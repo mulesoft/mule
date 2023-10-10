@@ -9,8 +9,6 @@ package org.mule.runtime.module.boot.internal;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
-import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
-
 /**
  * Helps with the creation and provisioning of the {@link MuleContainerWrapper} implementation instance as a singleton.
  * <p>

@@ -17,6 +17,9 @@ import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
 import static java.util.ServiceLoader.load;
 
+import org.mule.runtime.module.boot.api.MuleContainer;
+import org.mule.runtime.module.boot.api.MuleContainerProvider;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;

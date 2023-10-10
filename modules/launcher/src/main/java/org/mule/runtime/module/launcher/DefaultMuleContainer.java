@@ -45,7 +45,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
-import org.mule.runtime.module.boot.internal.MuleContainer;
+import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
