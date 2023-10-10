@@ -63,7 +63,8 @@ module org.mule.runtime.artifact.activation {
       org.mule.runtime.log4j,
       org.mule.test.runner;
   exports org.mule.runtime.module.artifact.activation.internal.deployable to
-      org.mule.runtime.deployment.model.impl;
+      org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.artifact.activation.internal.nativelib to
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,

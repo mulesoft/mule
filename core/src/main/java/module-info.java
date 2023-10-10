@@ -248,6 +248,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
