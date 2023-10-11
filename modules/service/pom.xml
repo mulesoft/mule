@@ -46,7 +46,7 @@
                         <configuration>
                             <release>11</release>
                             <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                                <compileSourceRoot>${project.build.java11SourceDirectory}</compileSourceRoot>
                             </compileSourceRoots>
                             <multiReleaseOutput>true</multiReleaseOutput>
                         </configuration>
