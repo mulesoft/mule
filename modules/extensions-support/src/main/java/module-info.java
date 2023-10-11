@@ -55,6 +55,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
 
+  exports org.mule.runtime.module.extension.internal.loader.java to
+      org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
