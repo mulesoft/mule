@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+
 import static java.lang.Boolean.valueOf;
 import static java.lang.Integer.getInteger;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -49,11 +50,17 @@ import org.slf4j.Logger;
 public class DefaultConnectivityTesterFactory implements ConnectivityTesterFactory {
 
   public static final String DO_TEST_CONNECTIVITY_PROPERTY_NAME = "doTestConnectivity";
+  private static final String ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT_PROPERTY =
+      SYSTEM_PROPERTY_PREFIX + "async.test.connectivity.lock.timeout";
 
   private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT = 30000;
+  private static final Integer DEFAULT_ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT = 10000;
 
   private static final int ASYNC_TEST_CONNECTIVITY_TIMEOUT =
       getInteger(ASYNC_TEST_CONNECTIVITY_TIMEOUT_PROPERTY, DEFAULT_ASYNC_TEST_CONNECTIVITY_TIMEOUT);
+
+  private static final int ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT =
+      getInteger(ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT_PROPERTY, DEFAULT_ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT);
 
   private static final Logger LOGGER = getLogger(DefaultConnectivityTesterFactory.class);
 
@@ -102,7 +109,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
           public void doWork(RetryContext context) throws Exception {
             try {
               if (testConnectivityLock != null) {
-                final boolean lockAcquired = testConnectivityLock.tryLock(10, SECONDS);
+                final boolean lockAcquired = testConnectivityLock.tryLock(ASYNC_TEST_CONNECTIVITY_LOCK_TIMEOUT, MILLISECONDS);
                 if (lockAcquired) {
                   LOGGER.debug("Doing testConnectivity() for config '{}'", name);
                   try {
