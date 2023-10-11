@@ -32,7 +32,6 @@ import javax.inject.Inject;
 
 import org.mule.runtime.api.streaming.CursorProvider;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import org.slf4j.Logger;
 
 /**
@@ -106,12 +105,12 @@ public class StreamingGhostBuster implements Lifecycle {
   /**
    * Tracks the given {@code cursorProvider}
    *
-   * @param cursorProvider    a {@link ManagedCursorProvider}
-   * @param callbackOnDispose callback to be called when the {@link StreamingWeakReference} is disposed.
+   * @param cursorProvider a {@link ManagedCursorProvider}
+   * @param callOnDispose  callback to be called when the {@link StreamingWeakReference} is disposed.
    * @return a {@link WeakReference} wrapping the {@code cursorProvider}
    */
-  public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider, Runnable callbackOnDispose) {
-    return new StreamingWeakReference(cursorProvider, referenceQueue, callbackOnDispose);
+  public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider, Runnable callOnDispose) {
+    return new StreamingWeakReference(cursorProvider, referenceQueue, callOnDispose);
   }
 
   private void bustGhosts() {
@@ -164,22 +163,22 @@ public class StreamingGhostBuster implements Lifecycle {
     private final int id;
     private final CursorProviderJanitor janitor;
     private boolean clear = false;
-    private final Runnable callback;
+    private final Runnable callOnDispose;
 
     public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue,
-                                  Runnable callbackOnDispose) {
+                                  Runnable callOnDispose) {
       super(referent, referenceQueue);
       this.janitor = referent.getJanitor();
       this.id = referent.getId();
-      this.callback = callbackOnDispose;
+      this.callOnDispose = callOnDispose;
     }
 
     public void dispose() {
       if (!clear) {
         clear = true;
         janitor.releaseResources();
-        if (callback != null) {
-          callback.run();
+        if (callOnDispose != null) {
+          callOnDispose.run();
         }
       }
     }

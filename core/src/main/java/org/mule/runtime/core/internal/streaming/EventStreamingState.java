@@ -29,7 +29,7 @@ public class EventStreamingState {
 
   private final static Logger LOGGER = getLogger(EventStreamingState.class);
 
-  private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
+  protected final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
   /**
    * Registers the given {@code provider} as one associated to the owning event.
