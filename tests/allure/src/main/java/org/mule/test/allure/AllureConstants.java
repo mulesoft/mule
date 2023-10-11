@@ -1022,6 +1022,11 @@ public interface AllureConstants {
 
     }
 
+    interface ConnectivityTestingStory {
+
+      String CONNECTIVITY_TEST = "Connectivity test";
+    }
+
   }
 
   interface XmlSdk {

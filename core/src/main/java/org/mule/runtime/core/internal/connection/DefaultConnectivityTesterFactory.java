@@ -57,16 +57,28 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
 
   private static final Logger LOGGER = getLogger(DefaultConnectivityTesterFactory.class);
 
-  @Inject
   private ConnectionManagerAdapter connectionManager;
 
-  @Inject
   private LockFactory lockFactory;
 
-  @Inject
   private SchedulerService schedulerService;
 
   private final LazyValue<Boolean> doTestConnectivity = new LazyValue<>(this::getDoTestConnectivityProperty);
+
+  @Inject
+  public void setSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = schedulerService;
+  }
+
+  @Inject
+  public void setLockFactory(LockFactory lockFactory) {
+    this.lockFactory = lockFactory;
+  }
+
+  @Inject
+  public void setConnectionManager(ConnectionManagerAdapter connectionManager) {
+    this.connectionManager = connectionManager;
+  }
 
   @Override
   public ConnectivityTester create(String name) {
