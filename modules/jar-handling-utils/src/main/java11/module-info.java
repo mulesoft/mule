@@ -14,7 +14,6 @@
 module org.mule.runtime.jar.handling.utils {
 
   requires org.apache.commons.io;
-  requires org.slf4j;
 
   exports org.mule.runtime.core.internal.util.jar to
       org.mule.runtime.artifact.activation,
