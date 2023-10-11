@@ -11,17 +11,32 @@
 
     <artifactId>mule-jar-handling-utils</artifactId>
     <packaging>jar</packaging>
-    <name>Mule jar handling utils</name>
+    <name>Mule JAR handling utils</name>
     <description>
-        This is a multi release module that allows handling of JDK internal jar classes needed for Java 8 runtime and a cleaner way in 11+.
+        This is a multi release module that allows handling of JDK internal JAR classes needed for Java 8 runtime and a cleaner way in 11+.
     </description>
 
     <properties>
         <javaModuleName>org.mule.runtime.jar.handling.utils</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <project.build.java11Sources>src/main/java11</project.build.java11Sources>
+        <project.build.java11SourceDirectory>${project.basedir}/${project.build.java11Sources}</project.build.java11SourceDirectory>
+        <project.build.java11TestSourceDirectory>${project.basedir}/src/test/java11</project.build.java11TestSourceDirectory>
     </properties>
     <build>
         <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <configuration>
+                    <directories>
+                        <directory>${project.build.sourceDirectory}</directory>
+                        <directory>${project.build.testSourceDirectory}</directory>
+                        <directory>${project.build.java11SourceDirectory}</directory>
+                        <directory>${project.build.java11TestSourceDirectory}</directory>
+                    </directories>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -34,7 +49,7 @@
                         </goals>
                         <configuration>
                             <!-- In order to compile with full Java 8 compliance with access to jdk internal classes we need to clear the release 11 setting from parent pom -->
-                            <release combine.self="override"></release>
+                            <release combine.self="override"/>
                             <source>${javaVersion}</source>
                             <target>${javaVersion}</target>
                         </configuration>
@@ -43,8 +58,9 @@
                         <id>base-compile</id>
                         <configuration>
                             <release>11</release>
+                            <excludes combine.self="override"/>
                             <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                                <compileSourceRoot>${project.build.java11SourceDirectory}</compileSourceRoot>
                             </compileSourceRoots>
                             <multiReleaseOutput>true</multiReleaseOutput>
                         </configuration>
@@ -81,7 +97,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/java11</source>
+                                <source>${project.build.java11Sources}</source>
                             </sources>
                         </configuration>
                     </execution>
