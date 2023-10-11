@@ -9,12 +9,10 @@ package org.mule.test.infrastructure.process;
 import static org.mule.test.infrastructure.process.AbstractOSController.MuleProcessStatus.STARTED_STARTED;
 
 import static java.lang.String.format;
-import static java.nio.file.FileSystems.getDefault;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.compile;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.junit.Assert.fail;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.tck.probe.PollingProber;
@@ -29,7 +27,6 @@ import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.exec.CommandLine;
@@ -69,9 +66,6 @@ public abstract class AbstractOSController {
              STATUS_PID_GROUP_NAME, STATUS_WRAPPER_GROUP_NAME, STATUS_JAVA_GROUP_NAME);
   protected static final Pattern STATUS_LABELS_PATTERN = compile(STATUS_LABELS);
   private static final int DEFAULT_TIMEOUT = 30000;
-  private static final String JAVA_HOME_VARIABLE = "JAVA_HOME";
-  private static final String SEPARATOR = getDefault().getSeparator();
-  private static final Pattern JAVA_HOME_PATTERN = compile("(.*?)\\" + SEPARATOR + "bin\\" + SEPARATOR + ".*");
 
   private static final String MULE_HOME_VARIABLE = "MULE_HOME";
   private static final String MULE_APP_VARIABLE = "MULE_APP";
@@ -255,17 +249,6 @@ public abstract class AbstractOSController {
     if (isNotEmpty(muleAppName) && isNotEmpty(muleAppLongName)) {
       newEnv.put(MULE_APP_VARIABLE, muleAppName);
       newEnv.put(MULE_APP_LONG_VARIABLE, muleAppLongName);
-    }
-
-    // Use the jvm running the tests as configured in surefire to run the Mule Runtime...
-    String jvmProperty = System.getProperty("jvm");
-    if (jvmProperty != null) {
-      final Matcher javaHomeMatcher = JAVA_HOME_PATTERN.matcher(jvmProperty);
-      if (javaHomeMatcher.matches()) {
-        newEnv.put(JAVA_HOME_VARIABLE, javaHomeMatcher.group(1));
-      } else {
-        fail("Could not extract `JAVA_HOME` from `jvm` property:" + jvmProperty);
-      }
     }
 
     return newEnv;
