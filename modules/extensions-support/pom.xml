@@ -29,6 +29,11 @@
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.execution=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.execution.executor=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.resolver=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.resolver=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.source=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.operation=org.mule.runtime.core
             --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.privileged.extension=org.mule.runtime.core
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED

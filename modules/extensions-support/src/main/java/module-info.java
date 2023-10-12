@@ -91,17 +91,13 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
       org.mule.runtime.core;
-  exports org.mule.runtime.module.extension.internal.util to
+  exports org.mule.runtime.module.extension.internal.runtime.source to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.transaction to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.util to
+      org.mule.runtime.core;
 
-  opens org.mule.runtime.module.extension.internal.runtime.execution to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.resolver to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.source to
-      org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       java.xml.bind;
 
