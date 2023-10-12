@@ -84,10 +84,18 @@ public class MuleManifest {
     return getManifestProperty("Supported-Jdks");
   }
 
+  /**
+   * @deprecated use {@link #getRecommendedJdks()} instead.
+   */
+  @Deprecated
   public static String getRecommndedJdks() {
     return getManifestProperty("Recommended-Jdks");
   }
 
+  public static String getRecommendedJdks() {
+    return getManifestProperty("Recommended-Jdks");
+  }
+  
   // synchronize this method as manifest initialized here.
   public static synchronized Manifest getManifest() {
     if (manifest == null) {
