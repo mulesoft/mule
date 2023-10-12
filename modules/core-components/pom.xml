@@ -53,7 +53,11 @@
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-extensions-mime-types</artifactId>
+            <version>${muleExtensionsApiVersion}</version>
+        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-logging</artifactId>
