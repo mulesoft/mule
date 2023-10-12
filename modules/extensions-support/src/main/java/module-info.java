@@ -4,12 +4,31 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+import org.mule.api.annotation.jpms.PrivilegedApi;
+
 /**
  * Default implementation of the Mule Extension API.
  *
  * @moduleGraph
  * @since 4.6
  */
+@PrivilegedApi(
+  privilegedPackages = {
+      "org.mule.runtime.module.extension.api.runtime.privileged"
+  },
+  privilegedArtifactIds = {
+      "com.mulesoft.mule.modules:mule-compatibility-module",
+      "com.mulesoft.munit:munit-runner",
+      "com.mulesoft.munit:munit-tools",
+      "com.mulesoft.munit:mtf-tools",
+      "org.mule.modules:mule-scripting-module",
+      "org.mule.modules:mule-validation-module",
+      "org.mule.modules:mule-soapkit-module",
+      "org.mule.modules:mule-aggregators-module",
+      "org.mule.tests.plugin:mule-tests-component-plugin",
+      "org.mule.modules:mule-streaming-utils-module",
+      "org.mule.modules:mule-tracing-module"
+  })
 module org.mule.runtime.extensions.support {
 
   requires org.mule.oauth.client.api;
