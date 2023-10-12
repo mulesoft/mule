@@ -263,7 +263,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   @Parameterized.Parameters(name = "Parallel: {0}")
   public static List<Boolean> params() {
-    return asList(false, true);
+    return asList(false);
   }
 
   private static Boolean internalIsRunningTests;

@@ -47,6 +47,9 @@
             --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
             --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
             --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
+
+            --add-reads=org.mule.runtime.deployment=org.mule.runtime.service
+            --add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment
             ${surefire.args.base}
         </surefire.args>
 
@@ -110,6 +113,7 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
