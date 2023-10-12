@@ -30,6 +30,7 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.processor.strategy=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
