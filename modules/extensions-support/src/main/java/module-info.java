@@ -38,13 +38,16 @@ module org.mule.runtime.extensions.support {
   requires org.mule.sdk.api;
   requires org.mule.sdk.compatibility.api;
 
+  // Usage of TypeElement, VariableElement and other
   requires java.compiler;
+  // XML documentation classes
   requires java.xml.bind;
+  // Date Times and formats
   requires org.joda.time;
   requires spring.core;
+  // Usage of java.beans
   requires java.desktop;
   requires net.bytebuddy;
-  requires com.google.gson;
 
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;

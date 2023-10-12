@@ -21,6 +21,7 @@
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-modules=net.bytebuddy.agent
+            --add-reads=org.mule.runtime.extensions.support=com.google.gson
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.validation=org.mule.runtime.core
             --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.privileged.extension=org.mule.runtime.core
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
