@@ -39,6 +39,7 @@ public class NonCachingURLStreamHandlerFactory implements URLStreamHandlerFactor
   public URLStreamHandler createURLStreamHandler(String protocol) {
     return new NonCachingJarResourceURLStreamHandler();
   }
+
 }
 
 
