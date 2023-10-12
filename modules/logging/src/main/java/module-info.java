@@ -19,6 +19,12 @@ module org.mule.runtime.logging {
   requires org.slf4j;
   requires transitive org.apache.logging.log4j;
 
+  // These logging implementations have to be exported so any artifact code using those libs is hooked to Mule's logging
+  // mechanism.
+  // Otherwise, code from an application lib using, for instance, commons-logging, will use its own commons-logging instead of the
+  // slf4j bridge from the container.
+  requires transitive org.apache.logging.log4j.core;
+
   // Log bridges
   requires transitive jul.to.slf4j;
   requires transitive java.logging;

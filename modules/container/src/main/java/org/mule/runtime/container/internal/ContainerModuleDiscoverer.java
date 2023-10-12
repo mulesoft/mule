@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.container.internal;
 
+import static org.mule.runtime.container.internal.ContainerModulesDiscovererProvider.containerModulesDiscoverer;
+
 import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
   private List<ModuleDiscoverer> getModuleDiscoverers() {
     List<ModuleDiscoverer> result = new ArrayList<>();
     result.add(new JreModuleDiscoverer());
-    result.add(new ClasspathModuleDiscoverer());
+    result.add(containerModulesDiscoverer());
     return result;
   }
 
