@@ -244,6 +244,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.config.bootstrap to
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,
       org.mule.test.unit;
@@ -265,12 +266,14 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
       org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config,
@@ -351,6 +354,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.management.stats to
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
@@ -383,6 +387,8 @@ module org.mule.runtime.core {
       org.mule.service.scheduler,
       com.mulesoft.mule.runtime.batch,
       spring.beans;
+  exports org.mule.runtime.core.internal.profiling.context to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.profiling.tracing.event.span.condition to
       org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
@@ -440,12 +446,16 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.core.ee,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming.bytes to
+      org.mule.runtime.extensions.support,
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo;
+  exports org.mule.runtime.core.internal.streaming.bytes.factory to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.streaming.object to
       com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.streaming.object.factory to
+      org.mule.runtime.extensions.support,
       com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.streaming.object.iterator to
       com.mulesoft.mule.runtime.batch;

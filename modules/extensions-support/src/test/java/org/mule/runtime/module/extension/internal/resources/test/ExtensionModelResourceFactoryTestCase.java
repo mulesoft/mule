@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
-public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedResourceFactoryTestCase {
+public class ExtensionModelResourceFactoryTestCase {
 
   private static final String RESOURCE_NAME = "heisenberg-extension-descriptions.xml";
   private ExtensionDocumentationResourceGenerator resourceFactory = new ExtensionDocumentationResourceGenerator();
@@ -33,11 +33,6 @@ public class ExtensionModelResourceFactoryTestCase extends AbstractGeneratedReso
   @Before
   public void before() {
     extensionModel = loadExtension(HeisenbergExtension.class);
-  }
-
-  @Override
-  protected Class<? extends GeneratedResourceFactory>[] getResourceFactoryTypes() {
-    return new Class[] {ExtensionDocumentationResourceGenerator.class};
   }
 
   @Test
