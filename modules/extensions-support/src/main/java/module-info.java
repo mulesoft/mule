@@ -96,21 +96,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.transaction to
       org.mule.runtime.core;
 
-  opens org.mule.runtime.module.extension.internal.runtime to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.client to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.config to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.connectivity to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth to
-       org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
-      org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.execution to
-      org.mule.runtime.core;
-  opens org.mule.runtime.module.extension.internal.runtime.operation to
       org.mule.runtime.core;
   opens org.mule.runtime.module.extension.internal.runtime.resolver to
       org.mule.runtime.core;

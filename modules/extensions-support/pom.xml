@@ -23,6 +23,13 @@
             --add-modules=net.bytebuddy.agent
             --add-reads=org.mule.runtime.extensions.support=com.google.gson
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.validation=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.client=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.config=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.operation=org.mule.runtime.core
             --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.privileged.extension=org.mule.runtime.core
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
