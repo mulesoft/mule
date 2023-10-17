@@ -12,7 +12,6 @@ import static org.mule.runtime.core.internal.util.FilenameUtils.normalizeDecoded
 
 import static java.io.File.separator;
 
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.SystemUtils.getUserDir;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -74,7 +73,7 @@ public class FilenameUtilsTestCase extends AbstractMuleTestCase {
   public void addsSlashAtBeginningInUnix() {
     String path = "file:/etc/zaraza";
     assertThat(normalizeDecodedPath(path, false),
-               is((IS_OS_WINDOWS ? separator + separator : "/") + "etc/zaraza"));
+               is(separator + "etc/zaraza"));
   }
 
   @Test
