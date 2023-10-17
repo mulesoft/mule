@@ -24,6 +24,7 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.global.config;
   requires org.mule.runtime.http.policy.api;
+  requires org.mule.runtime.jar.handling.utils;
   requires org.mule.runtime.license.api;
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.memory.management;
@@ -55,7 +56,8 @@ module org.mule.runtime.deployment.model.impl {
   exports org.mule.runtime.module.deployment.impl.internal.plugin to
       org.mule.runtime.deployment;
   exports org.mule.runtime.module.deployment.impl.internal.policy to
-      org.mule.runtime.deployment;
+      org.mule.runtime.deployment,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.deployment.impl.internal.util to
       org.mule.runtime.deployment;
 

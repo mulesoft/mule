@@ -23,6 +23,7 @@ module org.mule.runtime.tooling.support {
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.global.config;
+  requires org.mule.runtime.license.api;
   requires org.mule.runtime.maven.client.api;
   requires org.mule.runtime.maven.pom.parser.api;
   requires org.mule.runtime.metadata.model.api;
