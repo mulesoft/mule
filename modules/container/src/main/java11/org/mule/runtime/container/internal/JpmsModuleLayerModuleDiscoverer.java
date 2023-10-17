@@ -8,6 +8,7 @@ package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 
+import static java.lang.ModuleLayer.boot;
 import static java.lang.module.ModuleDescriptor.Requires.Modifier.TRANSITIVE;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
@@ -43,7 +44,7 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
       return fallbackClasspathModuleDiscoverer.discover();
     }
 
-    return this.getClass().getModule().getLayer().modules()
+    final List<MuleContainerModule> discoveredModules = this.getClass().getModule().getLayer().modules()
         .stream()
         .map(jpmsModule -> {
           if (jpmsModule.getDescriptor().isAutomatic()) {
@@ -65,6 +66,17 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
           }
         })
         .collect(toList());
+
+    // In standalone, consider boot modules as well.
+    boot()
+        .modules()
+        .stream()
+        .filter(jpmsModule -> jpmsModule.getName().startsWith("org.mule.runtime.")
+            || jpmsModule.getName().startsWith("com.mulesoft.mule."))
+        .map(JpmsMuleContainerModule::new)
+        .forEach(discoveredModules::add);
+
+    return discoveredModules;
   }
 
 
