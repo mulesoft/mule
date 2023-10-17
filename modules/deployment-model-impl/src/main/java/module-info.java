@@ -29,6 +29,7 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.memory.management;
   requires org.mule.runtime.policy.api;
   requires org.mule.runtime.profiling.api;
+  requires org.mule.runtime.service;
 
   // For deserialization of patching model:
   requires com.google.gson;
@@ -37,15 +38,20 @@ module org.mule.runtime.deployment.model.impl {
       org.mule.runtime.deployment,
       org.mule.runtime.launcher;
   exports org.mule.runtime.module.deployment.impl.internal.application to
-      org.mule.runtime.deployment;
+      org.mule.runtime.deployment,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.deployment.impl.internal.artifact to
       org.mule.runtime.deployment,
+      org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.module.deployment.impl.internal.classloader to
       org.mule.runtime.deployment;
   exports org.mule.runtime.module.deployment.impl.internal.domain to
       org.mule.runtime.deployment,
-      org.mule.runtime.launcher;
+      org.mule.runtime.launcher,
+      org.mule.runtime.tooling.support;
+  exports org.mule.runtime.module.deployment.impl.internal.maven to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.deployment.impl.internal.plugin to
       org.mule.runtime.deployment;
   exports org.mule.runtime.module.deployment.impl.internal.policy to
