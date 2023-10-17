@@ -33,6 +33,7 @@ module org.mule.runtime.artifact.activation {
 
   requires com.google.common;
   requires org.apache.commons.lang3;
+  requires org.jgrapht.core;
 
   requires java.xml;
 
