@@ -22,6 +22,7 @@ module org.mule.runtime.artifact {
   requires java.management;
   requires java.sql;
 
+  requires com.github.benmanes.caffeine;
   requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
