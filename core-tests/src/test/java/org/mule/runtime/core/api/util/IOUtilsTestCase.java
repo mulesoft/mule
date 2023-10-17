@@ -13,6 +13,7 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
 
+import static java.io.File.pathSeparator;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
@@ -157,9 +158,9 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       String classPath = getProperty("java.class.path");
       String modulePath = getProperty("jdk.module.path");
       List<String> classPathEntries = (modulePath != null
-          ? concat(Stream.of(classPath.split(":")),
-                   Stream.of(modulePath.split(":")))
-          : Stream.of(classPath.split(":")))
+          ? concat(Stream.of(classPath.split(pathSeparator)),
+                   Stream.of(modulePath.split(pathSeparator)))
+          : Stream.of(classPath.split(pathSeparator)))
               .filter(StringUtils::isNotBlank)
               .collect(toList());
 
