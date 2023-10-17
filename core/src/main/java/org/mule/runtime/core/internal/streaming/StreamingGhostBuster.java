@@ -31,11 +31,12 @@ import java.util.concurrent.RejectedExecutionException;
 import javax.inject.Inject;
 
 import org.mule.runtime.api.streaming.CursorProvider;
+
 import org.slf4j.Logger;
 
 /**
- * Tracks instances of {@link ManagedCursorProvider} through the {@link #track(ManagedCursorProvider)} method. This class uses a
- * {@link ReferenceQueue} so that when each of those instances are garbage collected, we can make sure that
+ * Tracks instances of {@link ManagedCursorProvider} through the {@link #track(ManagedCursorProvider, Runnable)} method. This
+ * class uses a {@link ReferenceQueue} so that when each of those instances are garbage collected, we can make sure that
  * {@link ManagedCursorProvider#releaseResources()} is invoked.
  * <p>
  * This is useful in cases of long running flows in which cursor providers are open and dereferenced long before the flow ends
@@ -98,7 +99,18 @@ public class StreamingGhostBuster implements Lifecycle {
    * @return a {@link WeakReference} wrapping the {@code cursorProvider}
    */
   public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider) {
-    return new StreamingWeakReference(cursorProvider, referenceQueue);
+    return track(cursorProvider, null);
+  }
+
+  /**
+   * Tracks the given {@code cursorProvider}
+   *
+   * @param cursorProvider a {@link ManagedCursorProvider}
+   * @param callOnDispose  callback to be called when the {@link StreamingWeakReference} is disposed.
+   * @return a {@link WeakReference} wrapping the {@code cursorProvider}
+   */
+  public WeakReference<ManagedCursorProvider> track(ManagedCursorProvider cursorProvider, Runnable callOnDispose) {
+    return new StreamingWeakReference(cursorProvider, referenceQueue, callOnDispose);
   }
 
   private void bustGhosts() {
@@ -151,17 +163,23 @@ public class StreamingGhostBuster implements Lifecycle {
     private final int id;
     private final CursorProviderJanitor janitor;
     private boolean clear = false;
+    private final Runnable callOnDispose;
 
-    public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue) {
+    public StreamingWeakReference(ManagedCursorProvider referent, ReferenceQueue<ManagedCursorProvider> referenceQueue,
+                                  Runnable callOnDispose) {
       super(referent, referenceQueue);
       this.janitor = referent.getJanitor();
       this.id = referent.getId();
+      this.callOnDispose = callOnDispose;
     }
 
     public void dispose() {
       if (!clear) {
         clear = true;
         janitor.releaseResources();
+        if (callOnDispose != null) {
+          callOnDispose.run();
+        }
       }
     }
 
