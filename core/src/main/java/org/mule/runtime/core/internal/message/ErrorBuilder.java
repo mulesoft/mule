@@ -401,6 +401,7 @@ public final class ErrorBuilder {
     private final Message muleMessage;
     private final List<Error> errors;
     private final List<Error> suppressedErrors;
+    private final String dslSource;
 
     private DeserializableErrorImplementation(Throwable exception, String description, String detailedDescription,
                                               Component failingComponent, ErrorType errorType,
@@ -413,6 +414,15 @@ public final class ErrorBuilder {
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
       this.suppressedErrors = unmodifiableList(suppressedErrors);
+      this.dslSource = failingComponent != null ? failingComponent.getDslSource() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDslSource() {
+      return dslSource;
     }
 
     /**
