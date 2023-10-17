@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,7 +70,7 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
   public void before() {
     cursorManager = new CursorManager(statistics, ghostBuster);
     ctx = new DefaultEventContext("id", "server", location, "", empty());
-    when(ghostBuster.track(any())).thenAnswer(inv -> new WeakReference<>(inv.getArgument(0)));
+    when(ghostBuster.track(any(), any())).thenAnswer(inv -> new WeakReference<>(inv.getArgument(0)));
   }
 
   @After
@@ -113,19 +114,19 @@ public class CursorManagerTestCase extends AbstractMuleTestCase {
     assertThat(unwrap(managedProvider), is(sameInstance(cursorProvider)));
     assertThat(managedProviders.stream().allMatch(p -> p == managedProvider), is(true));
 
-    verify(ghostBuster).track(managedProvider);
+    verify(ghostBuster).track(eq(managedProvider), any());
   }
 
   @Test
   @Issue("MULE-17687")
   public void remanageCollectedDecorator() {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
-    when(ghostBuster.track(any())).thenReturn(new WeakReference<>(null));
+    when(ghostBuster.track(any(), any())).thenReturn(new WeakReference<>(null));
 
     cursorManager.manage(provider, ctx);
 
     ArgumentCaptor<ManagedCursorProvider> managedDecoratorCaptor = forClass(ManagedCursorProvider.class);
-    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture());
+    verify(ghostBuster, times(2)).track(managedDecoratorCaptor.capture(), any());
 
     List<ManagedCursorProvider> captured = managedDecoratorCaptor.getAllValues();
     assertThat(captured, hasSize(2));
