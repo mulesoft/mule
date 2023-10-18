@@ -36,6 +36,7 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
+import org.mule.runtime.core.internal.metadata.SimpleDataType;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
@@ -273,7 +274,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
   }
 
   private static void addNewVariable(Map<String, TypedValue<?>> routeVars, String key, TypedValue<?> typedValue) {
-    if (typedValue.getValue() instanceof List) {
+    if (typedValue.getValue() instanceof List && !(typedValue.getDataType() instanceof SimpleDataType)) {
       // If the new variable is an instance of a List it creates a modifiable list with all the contained values to avoid adding
       // unmodifiable lists.
       List<?> newList = new ArrayList<>((List<?>) typedValue.getValue());
