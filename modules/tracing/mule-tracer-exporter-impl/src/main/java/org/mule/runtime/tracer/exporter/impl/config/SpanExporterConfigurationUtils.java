@@ -15,7 +15,6 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Long.parseLong;
 import static java.time.Duration.ofSeconds;
 
-import io.opentelemetry.sdk.common.export.RetryPolicy;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
@@ -23,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import io.opentelemetry.sdk.common.export.RetryPolicy;
 
 public class SpanExporterConfigurationUtils {
 
