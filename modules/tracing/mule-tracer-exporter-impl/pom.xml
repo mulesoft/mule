@@ -88,15 +88,8 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
-            <exclusions>
-                <!-- excluded to prevent a split-package with okio-jvm -->
-                <exclusion>
-                    <groupId>com.squareup.okio</groupId>
-                    <artifactId>okio</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!-- Added back because this was brought transitively by okio -->
+<!--         Added back because this was brought transitively by okio-->
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
