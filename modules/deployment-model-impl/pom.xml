@@ -34,6 +34,8 @@
             --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
             --add-reads=org.mule.runtime.deployment.model.impl=org.mule.runtime.artifact.ast
             --add-reads=org.mule.runtime.deployment.model.impl=org.mule.runtime.spring.config
+            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.core
+            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.core
             ${surefire.args.base}
         </surefire.args>
         <skipExportTests>false</skipExportTests>

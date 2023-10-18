@@ -72,11 +72,6 @@ module org.mule.runtime.deployment.model.impl {
   provides org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader with
       org.mule.runtime.module.deployment.impl.internal.artifact.MavenClassLoaderConfigurationLoader;
 
-  opens org.mule.runtime.module.deployment.impl.internal.application to
-      org.mule.runtime.core,
-      org.mule.runtime.deployment;
-  opens org.mule.runtime.module.deployment.impl.internal.artifact to
-      org.mule.runtime.core;
   opens org.mule.runtime.module.deployment.impl.internal.plugin to
       com.google.gson;
 }

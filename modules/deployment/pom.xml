@@ -51,6 +51,7 @@
             --add-reads=org.mule.runtime.deployment=org.mule.runtime.service
             --add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment
             --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=ALL-UNNAMED
+            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment
             --add-reads=org.mule.runtime.deployment=org.mule.runtime.license.api
             ${surefire.args.base}
         </surefire.args>
