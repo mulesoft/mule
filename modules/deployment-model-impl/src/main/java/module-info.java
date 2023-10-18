@@ -77,4 +77,6 @@ module org.mule.runtime.deployment.model.impl {
       org.mule.runtime.deployment;
   opens org.mule.runtime.module.deployment.impl.internal.artifact to
       org.mule.runtime.core;
+  opens org.mule.runtime.module.deployment.impl.internal.plugin to
+      com.google.gson;
 }
