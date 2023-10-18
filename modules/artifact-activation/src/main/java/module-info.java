@@ -33,6 +33,7 @@ module org.mule.runtime.artifact.activation {
 
   requires com.google.common;
   requires org.apache.commons.lang3;
+  requires org.jgrapht.core;
 
   requires java.xml;
 
@@ -60,6 +61,7 @@ module org.mule.runtime.artifact.activation {
       org.mule.runtime.deployment,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
+      org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.log4j,
       org.mule.test.runner;

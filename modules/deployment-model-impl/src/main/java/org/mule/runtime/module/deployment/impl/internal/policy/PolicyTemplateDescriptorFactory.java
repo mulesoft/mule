@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.policy;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.deployment.meta.MulePolicyModel;
@@ -76,9 +75,7 @@ public class PolicyTemplateDescriptorFactory
   protected void doDescriptorConfig(MulePolicyModel artifactModel, PolicyTemplateDescriptor descriptor, File artifactLocation) {
     descriptor.setRootFolder(artifactLocation);
     descriptor.setPlugins(parseArtifactPluginDescriptors(descriptor));
-
-    // Policy model doesn't have this data.
-    descriptor.setSupportedJavaVersions(emptySet());
+    descriptor.setSupportedJavaVersions(artifactModel.getSupportedJavaVersions());
   }
 
   private Set<ArtifactPluginDescriptor> parseArtifactPluginDescriptors(PolicyTemplateDescriptor descriptor) {

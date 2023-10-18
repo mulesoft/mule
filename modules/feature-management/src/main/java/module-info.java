@@ -21,7 +21,8 @@ module org.mule.runtime.featureManagement {
   exports org.mule.runtime.feature.api.management;
   
   exports org.mule.runtime.feature.internal.config to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.feature.internal.config.profiling to
       org.mule.runtime.core;
   exports org.mule.runtime.feature.internal.togglz.config to

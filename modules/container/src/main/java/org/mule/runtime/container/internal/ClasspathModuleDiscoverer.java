@@ -144,7 +144,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     return modulePropertiesResource;
   }
 
-  private MuleModule createModule(Properties moduleProperties) {
+  public MuleModule createModule(Properties moduleProperties) {
     final String moduleName = (String) moduleProperties.get("module.name");
     Set<String> modulePackages = getExportedPackageByProperty(moduleProperties, EXPORTED_CLASS_PACKAGES_PROPERTY);
     Set<String> modulePaths = getExportedResourcePaths(moduleProperties);

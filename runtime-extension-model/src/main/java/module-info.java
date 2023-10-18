@@ -4,6 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+import org.mule.api.annotation.jpms.PrivilegedApi;
+
 /**
  * Extension model for the core Mule Runtime components.
  *
@@ -12,6 +14,13 @@
  * @moduleGraph
  * @since 4.5
  */
+@PrivilegedApi(
+    privilegedPackages = {
+        "org.mule.runtime.core.privileged.extension"
+    },
+    privilegedArtifactIds = {
+        "com.mulesoft.munit:munit-runner"
+    })
 module org.mule.runtime.extension.model {
 
   requires org.mule.sdk.api;

@@ -17,6 +17,43 @@
     <properties>
         <javaModuleName>org.mule.runtime.extensions.support</javaModuleName>
         <!-- Required by mule-extension-ast-loader -->
+
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=net.bytebuddy.agent
+            --add-reads=org.mule.runtime.extensions.support=com.google.gson
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.validation=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.client=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.config=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.execution=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.execution.executor=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.resolver=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.resolver=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.source=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.operation=org.mule.runtime.core
+            --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.privileged.extension=org.mule.runtime.core
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.processor.strategy=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
+            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
+            ${surefire.test.unit.open.args}
+        </surefire.args>
+
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>

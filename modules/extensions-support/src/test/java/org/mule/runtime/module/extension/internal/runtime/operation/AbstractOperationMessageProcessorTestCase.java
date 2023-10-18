@@ -156,8 +156,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(lenient = true)
   protected CompletableComponentExecutorFactory operationExecutorFactory;
 
-  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class, OperationArgumentResolverFactory.class}, lenient = true)
-  protected CompletableComponentExecutor operationExecutor;
+  @Mock(lenient = true)
+  protected CompletableComponentExecutorOperationArgumentResolverFactory operationExecutor;
 
   @Mock(lenient = true)
   protected ExecutorCallback executorCallback;
@@ -436,6 +436,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     verify((Stoppable) operationExecutor).stop();
     verify((Disposable) operationExecutor).dispose();
+  }
+
+  public interface CompletableComponentExecutorOperationArgumentResolverFactory
+      extends CompletableComponentExecutor, Lifecycle, MuleContextAware, OperationArgumentResolverFactory {
+
   }
 
 }

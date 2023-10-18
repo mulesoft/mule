@@ -22,6 +22,7 @@ module org.mule.runtime.artifact {
   requires java.management;
   requires java.sql;
 
+  requires com.github.benmanes.caffeine;
   requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
@@ -34,6 +35,8 @@ module org.mule.runtime.artifact {
   exports org.mule.runtime.module.artifact.api.plugin;
   exports org.mule.runtime.module.artifact.api.serializer;
 
+  exports org.mule.module.artifact.classloader to
+      org.mule.runtime.extensions.support;
   exports org.mule.runtime.module.artifact.internal.classloader to
       org.mule.runtime.artifact.activation,
       org.mule.runtime.extensions.support,

@@ -84,7 +84,18 @@ public class MuleManifest {
     return getManifestProperty("Supported-Jdks");
   }
 
+  /**
+   * @deprecated use {@link #getRecommendedJdks()} instead.
+   */
+  @Deprecated
   public static String getRecommndedJdks() {
+    return getManifestProperty("Recommended-Jdks");
+  }
+
+  /**
+   * @since 4.6
+   */
+  public static String getRecommendedJdks() {
     return getManifestProperty("Recommended-Jdks");
   }
 
