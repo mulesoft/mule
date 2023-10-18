@@ -42,7 +42,7 @@ public class DomainMuleContextBuilder extends DefaultMuleContextBuilder {
   }
 
   @Override
-  protected MuleConfiguration getMuleConfiguration() {
+  public MuleConfiguration getMuleConfiguration() {
     DefaultMuleConfiguration defaultMuleConfiguration = new DefaultMuleConfiguration(true);
     defaultMuleConfiguration.setDomainId(domainId);
     defaultMuleConfiguration.setId(domainId);

@@ -400,6 +400,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
             .withBootPackage("org.mule.runtime.module.deployment.test.internal")
             .withBootPackage("org.mule.runtime.module.deployment.test.api")
             .withBootPackage("org.mule.runtime.service.test.api")
+            .withBootPackage("org.mule.functional.api.component")
             .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();

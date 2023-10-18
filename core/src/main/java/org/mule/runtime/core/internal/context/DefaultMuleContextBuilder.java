@@ -154,7 +154,7 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     this.notificationManager = notificationManager;
   }
 
-  protected MuleConfiguration getMuleConfiguration() {
+  public MuleConfiguration getMuleConfiguration() {
     if (config != null) {
       return config;
     } else {
