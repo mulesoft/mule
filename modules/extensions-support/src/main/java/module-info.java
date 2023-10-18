@@ -61,8 +61,10 @@ module org.mule.runtime.extensions.support {
   requires java.compiler;
   // XML documentation classes
   requires java.xml.bind;
+  requires com.google.common;
   // Date Times and formats
   requires org.joda.time;
+  requires reactor.core;
   requires spring.core;
   // Usage of java.beans
   requires java.desktop;
