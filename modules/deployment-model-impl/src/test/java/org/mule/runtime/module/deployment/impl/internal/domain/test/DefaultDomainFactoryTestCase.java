@@ -26,7 +26,6 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import org.mockito.Mockito;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -68,7 +67,7 @@ public class DefaultDomainFactoryTestCase extends AbstractDomainTestCase {
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
-  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(Mockito.mock(DomainDescriptorFactory.class),
+  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(mock(DomainDescriptorFactory.class),
                                                                               deployableArtifactDescriptorFactory,
                                                                               new DefaultDomainManager(),
                                                                               null,

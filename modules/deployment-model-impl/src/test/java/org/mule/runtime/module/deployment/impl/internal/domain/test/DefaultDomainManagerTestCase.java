@@ -22,7 +22,6 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import org.mockito.Mockito;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -39,7 +38,11 @@ import org.mule.runtime.module.artifact.activation.internal.classloader.MuleAppl
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.deployment.impl.internal.domain.*;
+import org.mule.runtime.module.deployment.impl.internal.domain.AmbiguousDomainReferenceException;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainNotFoundException;
 import org.mule.runtime.module.license.api.LicenseValidator;
 
 import java.io.File;
@@ -64,7 +67,7 @@ public class DefaultDomainManagerTestCase extends AbstractDomainTestCase {
   private final DomainClassLoaderBuilderFactory domainClassLoaderBuilderFactory = mock(DomainClassLoaderBuilderFactory.class);
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository = mock(ExtensionModelLoaderRepository.class);
   private final LicenseValidator licenseValidator = mock(LicenseValidator.class);
-  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(Mockito.mock(DomainDescriptorFactory.class),
+  private final DefaultDomainFactory domainFactory = new DefaultDomainFactory(mock(DomainDescriptorFactory.class),
                                                                               deployableArtifactDescriptorFactory,
                                                                               new DefaultDomainManager(),
                                                                               null,
