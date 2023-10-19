@@ -242,6 +242,7 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
   exports org.mule.runtime.core.internal.config.bootstrap to
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
       org.mule.runtime.extensions.support,
@@ -338,6 +339,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       org.mule.test.runner;
   exports org.mule.runtime.core.internal.lifecycle.phases to
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.lock to
       org.mule.runtime.spring.config,

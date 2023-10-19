@@ -19,7 +19,7 @@ import org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactStarted
 public class DomainStartedSplashScreen extends ArtifactStartedSplashScreen<DomainDescriptor> {
 
   @Override
-  protected void createMessage(DomainDescriptor descriptor) {
+  public void createMessage(DomainDescriptor descriptor) {
     doBody(String.format("Started domain '%s'", descriptor.getName()));
     if (RUNTIME_VERBOSE_PROPERTY.isEnabled()) {
       listPlugins("Domain", descriptor);

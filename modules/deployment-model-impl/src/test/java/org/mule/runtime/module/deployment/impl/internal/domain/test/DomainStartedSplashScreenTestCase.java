@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.domain;
+package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.is;
@@ -24,6 +24,7 @@ import io.qameta.allure.Feature;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.mule.runtime.module.deployment.impl.internal.domain.DomainStartedSplashScreen;
 
 @Feature(SPLASH_SCREEN)
 public class DomainStartedSplashScreenTestCase extends AbstractSplashScreenTestCase<DomainStartedSplashScreen> {

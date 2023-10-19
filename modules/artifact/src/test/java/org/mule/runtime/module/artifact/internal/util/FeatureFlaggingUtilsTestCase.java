@@ -20,9 +20,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.artifact.internal.util.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
-import static org.mule.runtime.module.artifact.internal.util.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE;
-import static org.mule.runtime.module.artifact.internal.util.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE_OVERRIDE;
+import static org.mule.runtime.module.artifact.internal.util.test.DeploymentTestingFeatures.ALWAYS_ON_FEATURE;
+import static org.mule.runtime.module.artifact.internal.util.test.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE;
+import static org.mule.runtime.module.artifact.internal.util.test.DeploymentTestingFeatures.OVERRIDEABLE_FEATURE_OVERRIDE;
 import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FeatureFlaggingStory.FEATURE_FLAGGING;
 
 @SmallTest

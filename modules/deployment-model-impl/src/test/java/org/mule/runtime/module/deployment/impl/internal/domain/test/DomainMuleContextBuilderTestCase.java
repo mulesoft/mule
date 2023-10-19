@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.domain;
+package org.mule.runtime.module.deployment.impl.internal.domain.test;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
