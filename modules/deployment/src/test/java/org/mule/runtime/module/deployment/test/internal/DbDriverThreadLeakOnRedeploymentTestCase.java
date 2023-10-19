@@ -44,7 +44,7 @@ public class DbDriverThreadLeakOnRedeploymentTestCase extends DbDriverThreadLeak
 
   @Override
   public void oracleDriverTimerThreadsReleasedOnUndeploy() throws Exception {
-    // TODO Remove this assume (entire override)
+    // TODO (W-14331417) Remove this assume (entire override)
     assumeThat(isJavaVersionAtLeast(JAVA_17), is(false));
     super.oracleDriverTimerThreadsReleasedOnUndeploy();
   }
