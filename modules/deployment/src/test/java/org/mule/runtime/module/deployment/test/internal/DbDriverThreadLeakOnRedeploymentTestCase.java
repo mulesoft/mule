@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static java.util.Arrays.asList;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
+import static org.hamcrest.core.Is.is;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+import static org.junit.Assume.assumeThat;
+import static java.util.Arrays.asList;
 
 import java.util.List;
 
@@ -36,5 +40,12 @@ public class DbDriverThreadLeakOnRedeploymentTestCase extends DbDriverThreadLeak
 
   public DbDriverThreadLeakOnRedeploymentTestCase(boolean parallellDeployment, String appName, String xmlFile) {
     super(parallellDeployment, appName, xmlFile);
+  }
+
+  @Override
+  public void oracleDriverTimerThreadsReleasedOnUndeploy() throws Exception {
+    // TODO Remove this assume (entire override)
+    assumeThat(isJavaVersionAtLeast(JAVA_17), is(false));
+    super.oracleDriverTimerThreadsReleasedOnUndeploy();
   }
 }

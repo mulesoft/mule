@@ -11,10 +11,13 @@ import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import static java.util.Collections.emptySet;
 
 /**
  * Creates a container class loader without adding a filter to it.
@@ -40,6 +43,10 @@ public interface PreFilteredContainerClassLoaderCreator {
    *         being filtered
    */
   Set<String> getBootPackages();
+
+  default Set<String> getExtraResourceDirectories() {
+    return emptySet();
+  }
 
   /**
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.

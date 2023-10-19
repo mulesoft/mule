@@ -40,8 +40,10 @@ public class ContainerClassLoaderProvider {
    * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
    *         artifacts.
    */
-  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, Set<String> bootPackages) {
-    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader(), bootPackages);
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, Set<String> bootPackages,
+                                                               Set<String> extraResourceDirs) {
+    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader(), bootPackages,
+                                      extraResourceDirs);
   }
 
   /**
@@ -68,8 +70,8 @@ public class ContainerClassLoaderProvider {
    *         artifacts.
    */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader,
-                                                               Set<String> bootPackages) {
-    return new ContainerClassLoaderFactory(moduleRepository, bootPackages).createContainerClassLoader(parentClassLoader)
-        .getContainerClassLoader();
+                                                               Set<String> bootPackages, Set<String> resourceDirs) {
+    return new ContainerClassLoaderFactory(moduleRepository, bootPackages, resourceDirs)
+        .createContainerClassLoader(parentClassLoader).getContainerClassLoader();
   }
 }
