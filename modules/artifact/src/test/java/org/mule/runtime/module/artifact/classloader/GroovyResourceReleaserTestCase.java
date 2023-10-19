@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,7 +9,7 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
@@ -26,11 +26,9 @@ import static org.mockito.Mockito.mock;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.model.BundleDependency;
-import org.mule.maven.client.api.model.BundleDescriptor;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -42,7 +40,6 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import io.qameta.allure.Feature;
@@ -70,28 +67,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   public GroovyResourceReleaserTestCase(String groovyVersion) {
     this.groovyVersion = groovyVersion;
-    this.testLookupPolicy = new ClassLoaderLookupPolicy() {
-
-      @Override
-      public LookupStrategy getClassLookupStrategy(String className) {
-        return CHILD_FIRST;
-      }
-
-      @Override
-      public LookupStrategy getPackageLookupStrategy(String packageName) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-        return null;
-      }
-    };
+    this.testLookupPolicy = CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
   }
 
   @Parameterized.Parameters(name = "Testing artifact {0}")
@@ -99,8 +75,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     return new String[] {
         "2.4.21",
         "2.5.22",
-        "3.0.0",
-        "3.0.17"
+        "3.0.19"
     };
   }
 
@@ -119,8 +94,9 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     MavenClient mavenClient = mavenClientProvider
         .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
 
-    BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder().setGroupId(GROOVY_GROUP_ID)
-        .setArtifactId(GROOVY_ARTIFACT_ID).setVersion(groovyVersion).build();
+    org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor =
+        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder().setGroupId(GROOVY_GROUP_ID)
+            .setArtifactId(GROOVY_ARTIFACT_ID).setVersion(groovyVersion).build();
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
     artifactClassLoader =
