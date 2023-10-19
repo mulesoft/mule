@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
@@ -31,7 +32,13 @@ public class ContainerClassLoaderFilterFactory {
   private static final char RESOURCE_SEPARATOR = '/';
 
   public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules) {
+    return create(bootPackages, muleModules, emptySet());
+  }
+
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules,
+                                  Set<String> additionalResources) {
     final Set<String> resources = getExportedResourcePaths(muleModules);
+    resources.addAll(additionalResources);
     final Set<String> packages = getModuleExportedPackages(muleModules);
     final ArtifactClassLoaderFilter artifactClassLoaderFilter = new DefaultArtifactClassLoaderFilter(packages, resources);
 
