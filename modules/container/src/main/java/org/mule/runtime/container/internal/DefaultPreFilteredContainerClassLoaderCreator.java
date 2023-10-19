@@ -67,7 +67,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
   }
 
   @Override
-  public Set<String> getAdditionallyExportedResourceDirectories() {
+  public Set<String> getAdditionalExportedResourceDirectories() {
     return resourceDirs;
   }
 

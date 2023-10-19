@@ -133,7 +133,7 @@ public class ContainerClassLoaderFactory {
                                              new ContainerClassLoaderFilterFactory()
                                                  .create(preFilteredContainerClassLoaderCreator.getBootPackages(), muleModules,
                                                          preFilteredContainerClassLoaderCreator
-                                                             .getAdditionallyExportedResourceDirectories()),
+                                                             .getAdditionalExportedResourceDirectories()),
                                              getExportedServices(muleModules));
   }
 

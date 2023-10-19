@@ -11,7 +11,6 @@ import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +46,7 @@ public interface PreFilteredContainerClassLoaderCreator {
   /**
    * @return a {@link Set} of directories of resources that should be additionally exported.
    */
-  default Set<String> getAdditionallyExportedResourceDirectories() {
+  default Set<String> getAdditionalExportedResourceDirectories() {
     return emptySet();
   }
 
