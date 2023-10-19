@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,9 +18,9 @@ import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -75,7 +75,8 @@ public class GroovyResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private void unregisterInvokerHelperRemoveClassMethod(Method removeClassMethod, Method getTheClassMethod, Collection<?> classes) {
+  private void unregisterInvokerHelperRemoveClassMethod(Method removeClassMethod, Method getTheClassMethod,
+                                                        Collection<?> classes) {
     for (Object classInfo : classes) {
       Object clazz = null;
       try {
@@ -91,7 +92,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   private void cleanSpisEngines() {
     try {
       Class<?> abstractManager = loadClass(LOGGER_ABSTRACT_MANAGER, this.classLoader);
-      HashMap<?, ?> hashMap = getStaticFieldValue(abstractManager, "MAP", true);
+      Map<?, ?> hashMap = getStaticFieldValue(abstractManager, "MAP", true);
       Class<?> streamManagerClass = loadClass(LOGGER_STREAM_MANAGER, this.classLoader);
       Object rfmInstance;
       for (Object manager : hashMap.values()) {
@@ -114,9 +115,10 @@ public class GroovyResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private void cleanGroovyEngines(Object scriptManager) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+  private void cleanGroovyEngines(Object scriptManager)
+      throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
     Object manager = getFieldValue(scriptManager, "manager", true);
-    HashSet<?> engineSpis = getFieldValue(manager, "engineSpis", true);
+    Set<?> engineSpis = getFieldValue(manager, "engineSpis", true);
     Class<?> groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
     Iterator<?> engineSpisIterator = engineSpis.iterator();
     while (engineSpisIterator.hasNext()) {
