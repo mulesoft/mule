@@ -44,10 +44,10 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
   }
 
   public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository, Set<String> bootPackages,
-                                                       Set<String> resourceDirs) {
+                                                       Set<String> additionalExportedResourceDirectories) {
     this(moduleRepository);
     this.bootPackages = bootPackages;
-    this.resourceDirs = resourceDirs;
+    this.resourceDirs = additionalExportedResourceDirectories;
   }
 
   @Override
@@ -67,7 +67,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
   }
 
   @Override
-  public Set<String> getExtraResourceDirectories() {
+  public Set<String> getAdditionallyExportedResourceDirectories() {
     return resourceDirs;
   }
 

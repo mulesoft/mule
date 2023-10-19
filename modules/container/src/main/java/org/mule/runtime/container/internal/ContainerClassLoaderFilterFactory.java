@@ -35,9 +35,10 @@ public class ContainerClassLoaderFilterFactory {
     return create(bootPackages, muleModules, emptySet());
   }
 
-  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules, Set<String> extraResources) {
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules,
+                                  Set<String> additionalResources) {
     final Set<String> resources = getExportedResourcePaths(muleModules);
-    resources.addAll(extraResources);
+    resources.addAll(additionalResources);
     final Set<String> packages = getModuleExportedPackages(muleModules);
     final ArtifactClassLoaderFilter artifactClassLoaderFilter = new DefaultArtifactClassLoaderFilter(packages, resources);
 

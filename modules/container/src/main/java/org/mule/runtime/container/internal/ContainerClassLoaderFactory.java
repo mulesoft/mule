@@ -68,12 +68,14 @@ public class ContainerClassLoaderFactory {
   /**
    * Creates a custom factory
    *
-   * @param moduleRepository provides access to the modules available on the container. Non-null.
-   * @param bootPackages     provides a set of packages that define all the prefixes that must be loaded from the container
-   *                         classLoader without being filtered.
+   * @param moduleRepository                      provides access to the modules available on the container. Non-null.
+   * @param bootPackages                          provides a set of packages that define all the prefixes that must be loaded from
+   *                                              the container classLoader without being filtered.
+   * @param additionalExportedResourceDirectories provides a set of directories of resources that should be additionally exported.
    */
-  public ContainerClassLoaderFactory(ModuleRepository moduleRepository, Set<String> bootPackages, Set<String> resourceDirs) {
-    this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository, bootPackages, resourceDirs),
+  public ContainerClassLoaderFactory(ModuleRepository moduleRepository, Set<String> bootPackages,
+                                     Set<String> additionalExportedResourceDirectories) {
+    this(new DefaultPreFilteredContainerClassLoaderCreator(moduleRepository, bootPackages, additionalExportedResourceDirectories),
          // Keep previous behavior, even if not correct, when using classloaders instead of modules to avoid breaking backwards
          // compatibility accidentally.
          // This is just the criteria to use to toggle the fix, since FeatureFlags are not available at this point.
@@ -130,7 +132,8 @@ public class ContainerClassLoaderFactory {
     return new FilteringContainerClassLoader(parentClassLoader, containerClassLoader,
                                              new ContainerClassLoaderFilterFactory()
                                                  .create(preFilteredContainerClassLoaderCreator.getBootPackages(), muleModules,
-                                                         preFilteredContainerClassLoaderCreator.getExtraResourceDirectories()),
+                                                         preFilteredContainerClassLoaderCreator
+                                                             .getAdditionallyExportedResourceDirectories()),
                                              getExportedServices(muleModules));
   }
 

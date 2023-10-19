@@ -44,7 +44,10 @@ public interface PreFilteredContainerClassLoaderCreator {
    */
   Set<String> getBootPackages();
 
-  default Set<String> getExtraResourceDirectories() {
+  /**
+   * @return a {@link Set} of directories of resources that should be additionally exported.
+   */
+  default Set<String> getAdditionallyExportedResourceDirectories() {
     return emptySet();
   }
 
