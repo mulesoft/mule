@@ -55,7 +55,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
 
   @Override
   public void release() {
-    unregisterInvokerHelper();
+    unregisterAllClassesFromInvokerHelper();
     cleanSpisEngines();
   }
 
@@ -68,7 +68,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Method removeClassMethod = invokerHelperClass.getMethod("removeClass", Class.class);
       Object classInfos = getAllClassInfoMethod.invoke(null);
       if (classInfos instanceof Collection) {
-        unregisterClassesFromInvokerHelper(removeClassMethod, getTheClassMethod, (Collection) classInfos);
+        unregisterInvokerHelperRemoveClassMethod(removeClassMethod, getTheClassMethod, (Collection) classInfos);
       }
     } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
       LOGGER.warn("Error trying to remove the Groovy's InvokerHelper classes", e);

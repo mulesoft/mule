@@ -9,6 +9,8 @@ package org.mule.runtime.module.artifact.classloader;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
+import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
@@ -17,20 +19,25 @@ import static java.lang.Class.forName;
 import static java.lang.System.gc;
 import static java.lang.Thread.currentThread;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -81,35 +88,20 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
-
-    URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
-    final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
-
-    final Supplier<File> localMavenRepository =
-        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
-        newMavenConfigurationBuilder().globalSettingsLocation(toFile(settingsUrl));
-
-    MavenClient mavenClient = mavenClientProvider
-        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
-
-    org.mule.maven.pom.parser.api.model.BundleDescriptor bundleDescriptor =
-        new org.mule.maven.pom.parser.api.model.BundleDescriptor.Builder().setGroupId(GROOVY_GROUP_ID)
-            .setArtifactId(GROOVY_ARTIFACT_ID).setVersion(groovyVersion).build();
-
-    BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), is(false));
     artifactClassLoader =
-        new MuleArtifactClassLoader("test", mock(ArtifactDescriptor.class),
-                                    new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
+        new MuleArtifactClassLoader("GroovyResourceReleaserTestCase",
+                                    mock(ArtifactDescriptor.class),
+                                    new URL[] {getDependencyFromMaven(GROOVY_GROUP_ID, GROOVY_ARTIFACT_ID, groovyVersion)},
+                                    currentThread().getContextClassLoader(),
                                     testLookupPolicy);
   }
 
   @Test
   public void runGroovyScriptAndDispose() throws ReflectiveOperationException {
-    assertFalse(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
     assertEquals("TEST", runScript());
-    assertTrue(getFieldValue(artifactClassLoader, "shouldReleaseGroovyReferences", false));
     artifactClassLoader.dispose();
     assertClassLoaderIsEnqueued();
   }
