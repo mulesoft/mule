@@ -8,7 +8,11 @@ package org.mule.runtime.config.internal.factories;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
@@ -19,6 +23,8 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
+import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
@@ -78,8 +84,12 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
     registry.inject(tryProcessorFactoryBean);
 
     TryScope tryMessageProcessor = tryProcessorFactoryBean.getObject();
+    when(muleContextMock.getConfiguration().getDefaultTransactionTimeout()).thenReturn(30000);
     initialiseIfNeeded(tryMessageProcessor, muleContextMock);
     tryMessageProcessor.start();
+    TransactionConfig transactionConfig = tryMessageProcessor.getTransactionConfig();
+    assertThat(transactionConfig.getFactory(), is(instanceOf(DelegateTransactionFactory.class)));
+    assertThat(transactionConfig.getTimeout(), is(30000));
   }
 
 }
