@@ -6,21 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java;
 
-import static java.lang.Boolean.TRUE;
-import static java.lang.String.valueOf;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -53,6 +38,25 @@ import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.t
 import static org.mule.test.vegan.extension.VeganExtension.APPLE;
 import static org.mule.test.vegan.extension.VeganExtension.BANANA;
 
+import static java.lang.Boolean.TRUE;
+import static java.lang.String.valueOf;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+
 import org.mule.metadata.api.builder.NumberTypeBuilder;
 import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
@@ -72,12 +76,16 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithOperationsDeclaration;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.extension.api.annotation.Configuration;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
+import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
@@ -87,6 +95,7 @@ import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
+import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.SourceClusterSupportModelProperty;
 import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
@@ -438,6 +447,21 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertThat(backPressureStrategyModelProperty.getSupportedModes(), hasItems(FAIL, DROP));
   }
 
+  @Test
+  public void handlingOfMetadataKeyIdWithoutOutputAndInputResolvers() {
+    ExtensionDeclarer declarer = declarerFor(ExtensionWithMetadataKeyIdWithoutOutputAndInputResolvers.class);
+    OperationDeclaration operation = getOperation(declarer.getDeclaration(), "withParameterWithMetadataKeyId");
+    java.util.Optional<MetadataKeyIdModelProperty> metadataKeyIdModelProperty =
+        operation.getModelProperty(MetadataKeyIdModelProperty.class);
+    if (isJavaVersionAtLeast(JAVA_17)) {
+      assertThat(metadataKeyIdModelProperty.isPresent(), is(false));
+    } else {
+      assertThat(metadataKeyIdModelProperty.isPresent(), is(true));
+      assertThat(metadataKeyIdModelProperty.get().getCategoryName().isPresent(), is(false));
+      assertThat(metadataKeyIdModelProperty.get().getParameterName(), is("someMetadataKeyId"));
+    }
+  }
+
   private SourceDeclaration getSourceDeclarationWithName(String sourceName) {
     ExtensionDeclarer declarer = declareExtension();
     ExtensionDeclaration extensionDeclaration = declarer.getDeclaration();
@@ -587,7 +611,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(withOperationsDeclaration, "failAtClosePagedOperation", "");
     assertOperation(withOperationsDeclaration, "failingConnectivityPagedOperation", "");
     assertOperation(withOperationsDeclaration, "nameAsStreamConnected", "");
-    assertOperation(withOperationsDeclaration, "getSecondBarberPreferences", "");
+    assertOperation(withOperationsDeclaration, GET_SECOND_BARBER_PREFERENCE, "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));
@@ -1070,4 +1094,31 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     @ParameterGroup(name = "recursive")
     private RecursiveParameterGroup recursiveParameterGroup;
   }
+
+  @Extension(name = "Extension With MetadataKeyId Without Output And Input Resolvers")
+  @Operations({OperationWithMetadataKeyId.class})
+  public static class ExtensionWithMetadataKeyIdWithoutOutputAndInputResolvers {
+
+  }
+
+  public static class OperationWithMetadataKeyId {
+
+    public void withParameterWithMetadataKeyId(@MetadataKeyId(MetadataResolver.class) String someMetadataKeyId) {}
+
+  }
+
+  public static class MetadataResolver implements TypeKeysResolver {
+
+    @Override
+    public String getCategoryName() {
+      return null;
+    }
+
+    @Override
+    public Set<MetadataKey> getKeys(MetadataContext context) {
+      return null;
+    }
+
+  }
+
 }

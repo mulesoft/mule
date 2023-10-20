@@ -15,6 +15,8 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
@@ -406,10 +408,18 @@ public class MetadataComponentModelValidatorTestCase extends AbstractMuleTestCas
                                                                    emptyMap(),
                                                                    SIMPLE_OUTPUT_RESOLVER,
                                                                    NULL_RESOLVER_SUPPLIER));
-    ProblemsReporter reporter = validate(extensionModel, validator);
-    assertThat(reporter.getWarnings(), hasSize(1));
-    assertThat(reporter.getWarningsAsString(),
-               containsString("specifies metadata resolvers that doesn't belong to the same category"));
+
+    if (isJavaVersionAtLeast(JAVA_17)) {
+      exception.expect(IllegalModelDefinitionException.class);
+      exception.expectMessage("specifies metadata resolvers that doesn't belong to the same category");
+
+      validate(extensionModel, validator);
+    } else {
+      ProblemsReporter reporter = validate(extensionModel, validator);
+      assertThat(reporter.getWarnings(), hasSize(1));
+      assertThat(reporter.getWarningsAsString(),
+                 containsString("specifies metadata resolvers that doesn't belong to the same category"));
+    }
   }
 
   @Test
