@@ -59,7 +59,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
     cleanSpisEngines();
   }
 
-  private void unregisterInvokerHelper() {
+  private void unregisterAllClassesFromInvokerHelper() {
     try {
       Class<?> classInfoClass = this.classLoader.loadClass(GROOVY_CLASS_INFO);
       Method getAllClassInfoMethod = classInfoClass.getMethod("getAllClassInfo");
