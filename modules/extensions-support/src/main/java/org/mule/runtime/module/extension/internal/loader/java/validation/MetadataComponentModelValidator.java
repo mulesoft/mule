@@ -9,9 +9,13 @@ package org.mule.runtime.module.extension.internal.loader.java.validation;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isVoid;
 import static org.mule.runtime.extension.api.metadata.MetadataResolverUtils.getAllResolvers;
@@ -302,12 +306,15 @@ public class MetadataComponentModelValidator implements ExtensionModelValidator 
         .collect(toSet());
 
     if (names.size() > 1) {
-      // TODO W-14178663 - analyze if this should be an error
-      problemsReporter.addWarning(new Problem(componentModel,
-                                              format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
-                                                     capitalize(getComponentModelTypeName(componentModel)),
-                                                     componentModel.getName(),
-                                                     join(names, ","))));
+      Problem problem =
+          new Problem(componentModel,
+                      format("%s '%s' specifies metadata resolvers that doesn't belong to the same category. The following categories were the ones found '%s'",
+                             capitalize(getComponentModelTypeName(componentModel)), componentModel.getName(), join(names, ",")));
+      if (isJavaVersionAtLeast(JAVA_17)) {
+        problemsReporter.addError(problem);
+      } else {
+        problemsReporter.addWarning(problem);
+      }
     }
   }
 

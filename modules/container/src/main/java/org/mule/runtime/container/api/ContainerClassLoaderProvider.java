@@ -34,14 +34,17 @@ public class ContainerClassLoaderProvider {
   /**
    * Creates the classLoader to represent the Mule container, with this class classloader as the parent classloader.
    *
-   * @param moduleRepository provides access to the modules available on the container. Non-null.
-   * @param bootPackages     provides a set of packages that define all the prefixes that must be loaded from the container
-   *                         classLoader without being filtered.
+   * @param moduleRepository                      provides access to the modules available on the container. Non-null.
+   * @param bootPackages                          provides a set of packages that define all the prefixes that must be loaded from
+   *                                              the container classLoader without being filtered.
+   * @param additionalExportedResourceDirectories provides a set of directories of resources that should be additionally exported.
    * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
    *         artifacts.
    */
-  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, Set<String> bootPackages) {
-    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader(), bootPackages);
+  public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, Set<String> bootPackages,
+                                                               Set<String> additionalExportedResourceDirectories) {
+    return createContainerClassLoader(moduleRepository, ContainerClassLoaderProvider.class.getClassLoader(), bootPackages,
+                                      additionalExportedResourceDirectories);
   }
 
   /**
@@ -60,16 +63,18 @@ public class ContainerClassLoaderProvider {
   /**
    * Creates the classLoader to represent the Mule container.
    *
-   * @param moduleRepository  provides access to the modules available on the container. Non-null.
-   * @param parentClassLoader parent classLoader. Can be null.
-   * @param bootPackages      provides a set of packages that define all the prefixes that must be loaded from the container
-   *                          classLoader without being filtered.
+   * @param moduleRepository                      provides access to the modules available on the container. Non-null.
+   * @param parentClassLoader                     parent classLoader. Can be null.
+   * @param bootPackages                          provides a set of packages that define all the prefixes that must be loaded from
+   *                                              the container classLoader without being filtered.
+   * @param additionalExportedResourceDirectories provides a set of directories of resources that should be additionally exported.
    * @return an {@link ArtifactClassLoader} containing container code that can be used as parent classLoader for other Mule
    *         artifacts.
    */
   public static ArtifactClassLoader createContainerClassLoader(ModuleRepository moduleRepository, ClassLoader parentClassLoader,
-                                                               Set<String> bootPackages) {
-    return new ContainerClassLoaderFactory(moduleRepository, bootPackages).createContainerClassLoader(parentClassLoader)
-        .getContainerClassLoader();
+                                                               Set<String> bootPackages,
+                                                               Set<String> additionalExportedResourceDirectories) {
+    return new ContainerClassLoaderFactory(moduleRepository, bootPackages, additionalExportedResourceDirectories)
+        .createContainerClassLoader(parentClassLoader).getContainerClassLoader();
   }
 }

@@ -35,6 +35,7 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
 
   private final ModuleRepository moduleRepository;
   private Set<String> bootPackages = emptySet();
+  private Set<String> resourceDirs = emptySet();
 
   public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository) {
     checkArgument(moduleRepository != null, "moduleRepository cannot be null");
@@ -42,9 +43,11 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
     this.moduleRepository = moduleRepository;
   }
 
-  public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository, Set<String> bootPackages) {
+  public DefaultPreFilteredContainerClassLoaderCreator(ModuleRepository moduleRepository, Set<String> bootPackages,
+                                                       Set<String> additionalExportedResourceDirectories) {
     this(moduleRepository);
     this.bootPackages = bootPackages;
+    this.resourceDirs = additionalExportedResourceDirectories;
   }
 
   @Override
@@ -61,6 +64,11 @@ public class DefaultPreFilteredContainerClassLoaderCreator implements PreFiltere
     finalBootPackages.addAll(BOOT_PACKAGES);
     finalBootPackages.addAll(bootPackages);
     return finalBootPackages;
+  }
+
+  @Override
+  public Set<String> getAdditionalExportedResourceDirectories() {
+    return resourceDirs;
   }
 
   @Override

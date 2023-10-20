@@ -140,7 +140,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ModuleRepository moduleRepository;
     private ArtifactConfigurationProcessor artifactConfigurationProcessor;
     private ProfiledMemoryManagementService memoryManagementService;
-    private Set<String> bootPackages = new HashSet<>();
+    private final Set<String> bootPackages = new HashSet<>();
+    private final Set<String> additionalResourceDirectories = new HashSet<>();
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -188,6 +189,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       return this;
     }
 
+    public Builder withAdditionalResourceDirectory(String resourceDirectory) {
+      this.additionalResourceDirectories.add(resourceDirectory);
+      return this;
+    }
+
     /**
      * Builds the desired instance
      *
@@ -198,10 +204,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       if (moduleRepository == null) {
         moduleRepository = MODULE_REPOSITORY;
         containerClassLoader = CONTAINER_CLASS_LOADER;
-      } else if (bootPackages.isEmpty()) {
+      } else if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
         containerClassLoader = createContainerClassLoader(moduleRepository);
       } else {
-        containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages);
+        containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages, additionalResourceDirectories);
       }
 
       try {

@@ -16,6 +16,8 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import static java.util.Collections.emptySet;
+
 /**
  * Creates a container class loader without adding a filter to it.
  *
@@ -40,6 +42,13 @@ public interface PreFilteredContainerClassLoaderCreator {
    *         being filtered
    */
   Set<String> getBootPackages();
+
+  /**
+   * @return a {@link Set} of directories of resources that should be additionally exported.
+   */
+  default Set<String> getAdditionalExportedResourceDirectories() {
+    return emptySet();
+  }
 
   /**
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
