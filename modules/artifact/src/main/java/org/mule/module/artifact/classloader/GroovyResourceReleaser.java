@@ -66,9 +66,9 @@ public class GroovyResourceReleaser implements ResourceReleaser {
       Method getTheClassMethod = classInfoClass.getMethod("getTheClass");
       Class<?> invokerHelperClass = this.classLoader.loadClass(GROOVY_INVOKER_HELPER);
       Method removeClassMethod = invokerHelperClass.getMethod("removeClass", Class.class);
-      Object classes = getAllClassInfoMethod.invoke(null);
-      if (classes instanceof Collection) {
-        unregisterInvokerHelperRemoveClassMethod(removeClassMethod, getTheClassMethod, (Collection) classes);
+      Object classInfos = getAllClassInfoMethod.invoke(null);
+      if (classInfos instanceof Collection) {
+        unregisterClassesFromInvokerHelper(removeClassMethod, getTheClassMethod, (Collection) classInfos);
       }
     } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
       LOGGER.warn("Error trying to remove the Groovy's InvokerHelper classes", e);
