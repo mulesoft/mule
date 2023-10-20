@@ -29,7 +29,7 @@ import org.slf4j.Logger;
  *
  * @since 4.4.0
  * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
- *             that are using the IBM MQ driver. We still keep it to support legacy extensions.
+ *             that are using the Groovy scripting engine. We still keep it to support legacy extensions.
  */
 @Deprecated
 public class GroovyResourceReleaser implements ResourceReleaser {
