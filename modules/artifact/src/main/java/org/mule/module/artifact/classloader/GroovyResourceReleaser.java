@@ -118,7 +118,7 @@ public class GroovyResourceReleaser implements ResourceReleaser {
   private void cleanGroovyEngines(Object scriptManager)
       throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
     Object manager = getFieldValue(scriptManager, "manager", true);
-    Set<?> engineSpis = getFieldValue(manager, "engineSpis", true);
+    Iterable<?> engineSpis = getFieldValue(manager, "engineSpis", true);
     Class<?> groovy = loadClass(GROOVY_SCRIPT_ENGINE_FACTORY, this.classLoader);
     Iterator<?> engineSpisIterator = engineSpis.iterator();
     while (engineSpisIterator.hasNext()) {
