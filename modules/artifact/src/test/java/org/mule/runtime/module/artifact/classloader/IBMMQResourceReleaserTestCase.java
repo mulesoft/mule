@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -54,6 +55,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
+import org.apache.commons.lang3.ThreadUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,6 +78,8 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   private final static String DRIVER_GROUP_ID = "com.ibm.mq";
   private final static String DRIVER_ARTIFACT_ID = "com.ibm.mq.allclient";
   private final static String IBM_MQ_MBEAN_DOMAIN = "IBM MQ";
+  private final static String IBM_WORKER_CLASS = "com.ibm.msg.client.commonservices.workqueue.WorkQueueManager";
+  private static final String JMSCC_THREAD_POOL_MAIN_NAME = "JMSCCThreadPoolMaster";
 
   String driverVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
@@ -177,6 +181,12 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Description("When removing an application which contains the IBM MQ Driver, there should not be mbeans references registered")
   public void mBeansTest() throws Exception {
     assertThat(countMBeans(artifactClassLoader), is(0));
+  }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  public void threadWorkerTest() throws Exception {
+    assertThat(countWorkerThreads(artifactClassLoader), is(0));
   }
 
   protected void beforeClassLoaderDisposal() {
@@ -306,4 +316,10 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     return counter;
   }
 
+  private int countWorkerThreads(ClassLoader artifactClassLoader) {
+    List<Thread> threads = ThreadUtils.getAllThreads().stream()
+        .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
+        .collect(Collectors.toList());
+    return threads.size();
+  }
 }
