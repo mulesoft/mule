@@ -31,9 +31,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -58,6 +60,9 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     @Inject
     private NotificationListenerRegistry notificationListenerRegistry;
 
+    @Inject
+    private Optional<TransactionManager> transactionManager;
+
     public Registry getRegistry() {
       return registry;
     }
@@ -67,11 +72,15 @@ public abstract class DomainFunctionalTestCase extends AbstractMuleTestCase {
     }
 
     public SchedulerService getSchedulerService() {
-      return getMuleContext().getSchedulerService();
+      return schedulerService;
     }
 
     public NotificationListenerRegistry getNotificationListenerRegistry() {
       return notificationListenerRegistry;
+    }
+
+    public TransactionManager getTransactionManager() {
+      return transactionManager.orElse(null);
     }
 
   }

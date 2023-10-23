@@ -116,6 +116,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
+    processor.setMuleConfiguration(muleContext.getConfiguration());
 
     initialiseIfNeeded(processor, muleContext);
 

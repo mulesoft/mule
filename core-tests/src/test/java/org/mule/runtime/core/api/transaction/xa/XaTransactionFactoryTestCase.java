@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.core.api.transaction.xa;
 
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
@@ -34,11 +34,10 @@ public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
     final MuleContext muleContext = mockContextWithServices();
 
     final TransactionManager transactionManager = mock(TransactionManager.class);
-    when(muleContext.getTransactionManager()).thenReturn(transactionManager);
 
     final Transaction transaction = transactionFactory.beginTransaction("appName", getNotificationDispatcher(muleContext),
                                                                         new SingleResourceTransactionFactoryManager(),
-                                                                        muleContext.getTransactionManager());
+                                                                        transactionManager);
     assertThat(transaction.getTimeout(), equalTo(timeout));
   }
 }

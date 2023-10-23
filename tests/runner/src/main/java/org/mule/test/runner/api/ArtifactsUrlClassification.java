@@ -47,9 +47,12 @@ public class ArtifactsUrlClassification {
    * @param testRunnerExportedLibUrls define the artifacts that will exported on the test runner plugin in addition to the test
    *                                  classes and resources from the module being tested
    */
-  public ArtifactsUrlClassification(List<URL> containerMuleUrls, List<URL> containerOptUrls,
+  public ArtifactsUrlClassification(List<URL> containerMuleUrls,
+                                    List<URL> containerOptUrls,
                                     List<ServiceUrlClassification> serviceUrlClassifications,
-                                    List<URL> testRunnerLibUrls, List<URL> applicationLibUrls, List<URL> applicationSharedLibUrls,
+                                    List<URL> testRunnerLibUrls,
+                                    List<URL> applicationLibUrls,
+                                    List<URL> applicationSharedLibUrls,
                                     List<PluginUrlClassification> pluginUrlClassifications,
                                     List<URL> testRunnerExportedLibUrls) {
     requireNonNull(containerMuleUrls, "containerMuleUrls cannot be null");

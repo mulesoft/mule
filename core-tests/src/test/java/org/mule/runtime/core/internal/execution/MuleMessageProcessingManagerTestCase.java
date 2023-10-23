@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.lang.Thread.currentThread;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -27,14 +28,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private SystemExceptionHandler exceptionHandler;
@@ -62,8 +67,6 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
     processingManager.setPolicyManager(policyManager);
 
     processingManager.initialise();
-
-    when(spyContext.getTransactionManager()).thenReturn(null);
   }
 
   @Test

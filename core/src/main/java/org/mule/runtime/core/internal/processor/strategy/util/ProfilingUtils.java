@@ -11,9 +11,9 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingEventContext;
 import org.mule.runtime.api.profiling.type.ProfilingEventType;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.processor.HasLocation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.processor.chain.InterceptedReactiveProcessor;
-import org.mule.runtime.core.api.processor.HasLocation;
 
 /**
  * Utility methods for handling profiling of processing strategy.

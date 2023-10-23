@@ -17,6 +17,7 @@ import static org.apache.commons.lang3.SystemUtils.JAVA_VM_VENDOR;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -229,10 +230,25 @@ public class SystemUtils {
    *         <li>The value of the system property 'mule.encoding'</li>
    *         <li>{@code Charset.defaultCharset()}</li>
    *         </ul>
+   * 
+   * @deprecated Use {@link #getDefaultEncoding(MuleConfiguration)} instead.
    */
+  @Deprecated
   public static Charset getDefaultEncoding(MuleContext muleContext) {
-    if (muleContext != null && muleContext.getConfiguration().getDefaultEncoding() != null) {
-      return Charset.forName(muleContext.getConfiguration().getDefaultEncoding());
+    return getDefaultEncoding(muleContext != null ? muleContext.getConfiguration() : null);
+  }
+
+  /**
+   * @return the configured default encoding, checking in the following order until a value is found:
+   *         <ul>
+   *         <li>{@code configuration} -> {@link org.mule.runtime.core.api.config.MuleConfiguration#getDefaultEncoding()}</li>
+   *         <li>The value of the system property 'mule.encoding'</li>
+   *         <li>{@code Charset.defaultCharset()}</li>
+   *         </ul>
+   */
+  public static Charset getDefaultEncoding(MuleConfiguration configuration) {
+    if (configuration != null && configuration.getDefaultEncoding() != null) {
+      return Charset.forName(configuration.getDefaultEncoding());
     } else if (System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY) != null) {
       return Charset.forName(System.getProperty(MULE_ENCODING_SYSTEM_PROPERTY));
     } else {

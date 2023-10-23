@@ -123,6 +123,7 @@ public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleC
     processor.setAnnotations(getAppleFlowComponentLocationAnnotations());
     processor.setComponentLocator(componentLocator);
     processor.setCacheIdGeneratorFactory(of(mock(MetadataCacheIdGeneratorFactory.class)));
+    processor.setMuleConfiguration(muleContext.getConfiguration());
 
     initialiseIfNeeded(processor, muleContext);
     processor.doStart();
