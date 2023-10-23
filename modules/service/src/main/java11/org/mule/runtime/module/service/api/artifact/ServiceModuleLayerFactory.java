@@ -45,10 +45,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
 
-  private static final Set<String> KNOWN_JPMS_INVALID_LIBS =
-      new HashSet<>(asList("parboiled_2.12",
-                           "scala-parser-combinators_2.12"));
-
   private static final Set<String> SERVICE_MODULE_NAME_PREFIXES =
       new HashSet<>(asList("org.mule.service.",
                            "com.mulesoft.mule.service.",
@@ -86,21 +82,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
         return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
                                            lookupPolicy);
       }
-
-      final Map<Boolean, List<URL>> serviceUrlsByJpmsValidity = Stream.of(classLoaderConfigurationUrls)
-          .collect(partitioningBy(url -> {
-            final String fileName;
-            try {
-              fileName = Paths.get(url.toURI()).getFileName().toString();
-            } catch (URISyntaxException e) {
-              throw new MuleRuntimeException(e);
-            }
-
-            return KNOWN_JPMS_INVALID_LIBS.stream().noneMatch(fileName::contains);
-          }));
-
-      parent = new URLClassLoader(serviceUrlsByJpmsValidity.get(false).toArray(URL[]::new), parent);
-      classLoaderConfigurationUrls = serviceUrlsByJpmsValidity.get(true).toArray(URL[]::new);
     }
 
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
