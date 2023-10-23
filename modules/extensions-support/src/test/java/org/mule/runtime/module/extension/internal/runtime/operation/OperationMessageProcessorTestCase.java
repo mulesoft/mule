@@ -142,6 +142,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                           muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
+    operationMessageProcessor.setMuleConfiguration(muleContext.getConfiguration());
 
     return operationMessageProcessor;
   }

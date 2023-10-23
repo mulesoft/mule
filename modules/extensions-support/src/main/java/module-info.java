@@ -61,14 +61,18 @@ module org.mule.runtime.extensions.support {
   requires java.compiler;
   // XML documentation classes
   requires java.xml.bind;
+  requires com.github.benmanes.caffeine;
   requires com.google.common;
+  requires org.apache.commons.lang3;
   // Date Times and formats
   requires org.joda.time;
   requires reactor.core;
+  requires reflections;
   requires spring.core;
   // Usage of java.beans
   requires java.desktop;
   requires net.bytebuddy;
+  requires java.transaction;
 
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;

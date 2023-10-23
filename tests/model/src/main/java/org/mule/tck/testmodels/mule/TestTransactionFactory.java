@@ -43,6 +43,7 @@ public class TestTransactionFactory implements TransactionFactory {
     }
   }
 
+  @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
                                       TransactionManager transactionManager)

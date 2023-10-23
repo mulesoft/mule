@@ -75,7 +75,10 @@ public interface MuleContext extends Lifecycle {
    * Returns the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
    *
    * @return the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
+   * 
+   * @deprecated since 4.6, cannot be used outside the container when running with Java 17+.
    */
+  @Deprecated
   TransactionManager getTransactionManager();
 
   ServerNotificationManager getNotificationManager();

@@ -57,6 +57,13 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-client</artifactId>
             <version>${activemqVersion}</version>
+            <exclusions>
+				<!-- excluded to prevent conflict with jakarta.jms.api -->
+                <exclusion>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jms_1.1_spec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Used by ActiveMQ if persistent=true -->
         <dependency>

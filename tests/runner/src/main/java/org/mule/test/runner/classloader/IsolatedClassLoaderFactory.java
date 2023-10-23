@@ -199,7 +199,8 @@ public class IsolatedClassLoaderFactory {
         regionClassLoader.addClassLoader(filteredPluginsArtifactClassLoaders.get(i), classLoaderFilter);
       }
 
-      return new ArtifactClassLoaderHolder(containerClassLoaderWrapper.getContainerClassLoader(), serviceArtifactClassLoaders,
+      return new ArtifactClassLoaderHolder(containerClassLoaderWrapper.getContainerClassLoader(),
+                                           serviceArtifactClassLoaders,
                                            pluginsArtifactClassLoaders,
                                            appClassLoader);
     } catch (Exception e) {

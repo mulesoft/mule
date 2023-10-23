@@ -24,6 +24,7 @@ module org.mule.runtime.core.components {
   requires org.apache.log4j;
   // javax.activation
   requires jakarta.activation;
+  requires java.transaction;
   // QName
   requires java.xml;
   requires reactor.core;

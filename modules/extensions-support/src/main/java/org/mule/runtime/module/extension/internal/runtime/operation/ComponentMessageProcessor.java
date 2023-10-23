@@ -77,7 +77,9 @@ import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -154,6 +156,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -230,6 +233,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
+
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -1070,6 +1081,10 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                                                               .fromComponent(this, GET_CONNECTION_SPAN_NAME, "")),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
+                                        muleConfiguration,
+                                        notificationDispatcher,
+                                        muleContext.getTransactionFactoryManager(),
+                                        transactionManager.orElse(null),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
                                         componentTracerFactory.fromComponent(this, OPERATION_EXECUTION_SPAN_NAME, ""),
@@ -1207,4 +1222,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return location != null ? location.getLocation() : super.toString();
   }
 
+  @Inject
+  public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
+  }
 }

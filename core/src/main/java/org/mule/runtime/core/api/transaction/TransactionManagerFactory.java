@@ -14,6 +14,7 @@ import javax.transaction.TransactionManager;
 /**
  * <code>TransactionManagerFactory</code> is a factory class for creating a transaction manager for the Mule container.
  * 
+ * Since 4.6, cannot be used outside the container when running with Java 17+.
  */
 @NoImplement
 public interface TransactionManagerFactory {

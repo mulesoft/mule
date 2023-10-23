@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.execution;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_JOIN;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_BEGIN_OR_JOIN;
@@ -15,19 +16,19 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_JOI
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NEVER;
 import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NONE;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
@@ -46,17 +47,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
 public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase {
-
-  protected static MuleContext mockMuleContext = mockContextWithServices();
-  private static NotificationDispatcher notificationDispatcher;
 
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
@@ -64,20 +60,23 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Mock
   protected CoreEvent RETURN_VALUE;
 
-  private final String applicationName = "appName";
-  @Spy
-  protected TestTransaction mockTransaction =
-      new TestTransaction(applicationName, notificationDispatcher);
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private MuleConfiguration configuration;
 
-  @Spy
-  protected TestTransaction mockNewTransaction =
-      new TestTransaction(applicationName, notificationDispatcher);
+  @Mock
+  private NotificationDispatcher notificationDispatcher;
+
+  private final String applicationName = "appName";
+
+  private TestTransaction mockTransaction;
+
+  private TestTransaction mockNewTransaction;
 
   @Mock(lenient = true)
-  protected MessagingException mockMessagingException;
+  private MessagingException mockMessagingException;
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  protected CoreEvent mockEvent;
+  @Mock(answer = RETURNS_DEEP_STUBS)
+  private CoreEvent mockEvent;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -85,7 +84,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   @Before
   public void prepareEvent() throws RegistrationException {
     when(mockEvent.getMessage()).thenReturn(of(""));
-    notificationDispatcher = getNotificationDispatcher(mockMuleContext);
+
+    mockTransaction =
+        spy(new TestTransaction(applicationName, notificationDispatcher));
+    mockNewTransaction =
+        spy(new TestTransaction(applicationName, notificationDispatcher));
   }
 
   @Before
@@ -308,7 +311,11 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
   }
 
   protected ExecutionTemplate createExecutionTemplate(TransactionConfig config) {
-    return TransactionalExecutionTemplate.createTransactionalExecutionTemplate(mockMuleContext, config);
+    return createTransactionalExecutionTemplate(configuration,
+                                                notificationDispatcher,
+                                                null,
+                                                null,
+                                                config);
   }
 
   protected ExecutionCallback getEmptyTransactionCallback() {

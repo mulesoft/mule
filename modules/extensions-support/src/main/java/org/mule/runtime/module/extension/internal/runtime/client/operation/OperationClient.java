@@ -56,6 +56,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
@@ -66,6 +67,8 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.streaming.object.CursorIterator;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -104,6 +107,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
 
@@ -146,7 +151,10 @@ public class OperationClient implements Lifecycle {
                                      StreamingManager streamingManager,
                                      ReflectionCache reflectionCache,
                                      ComponentTracerFactory<CoreEvent> componentTracerFactory,
-                                     MuleContext muleContext) {
+                                     MuleContext muleContext,
+                                     MuleConfiguration muleConfiguration,
+                                     NotificationDispatcher notificationDispatcher,
+                                     TransactionManager transactionManager) {
 
     return new OperationClient(
                                key.getExtensionModel(),
@@ -157,7 +165,11 @@ public class OperationClient implements Lifecycle {
                                                        errorTypeRepository,
                                                        reflectionCache,
                                                        componentTracerFactory,
-                                                       muleContext),
+                                                       muleContext,
+                                                       muleConfiguration,
+                                                       notificationDispatcher,
+                                                       muleContext.getTransactionFactoryManager(),
+                                                       transactionManager),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
                                streamingManager,
@@ -444,7 +456,11 @@ public class OperationClient implements Lifecycle {
                                                                            ErrorTypeRepository errorTypeRepository,
                                                                            ReflectionCache reflectionCache,
                                                                            ComponentTracerFactory<CoreEvent> componentTracerFactory,
-                                                                           MuleContext muleContext) {
+                                                                           MuleContext muleContext,
+                                                                           MuleConfiguration muleConfiguration,
+                                                                           NotificationDispatcher notificationDispatcher,
+                                                                           SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                                                           TransactionManager transactionManager) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
     final OperationModel operationModel = key.getOperationModel();
@@ -458,6 +474,10 @@ public class OperationClient implements Lifecycle {
                                                                                                                   DUMMY_COMPONENT_TRACER_INSTANCE),
                                                                                 errorTypeRepository,
                                                                                 muleContext.getExecutionClassLoader(),
+                                                                                muleConfiguration,
+                                                                                notificationDispatcher,
+                                                                                transactionFactoryManager,
+                                                                                transactionManager,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,
                                                                                                      operationModel,

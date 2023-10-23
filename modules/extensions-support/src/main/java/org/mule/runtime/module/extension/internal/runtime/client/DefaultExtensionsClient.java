@@ -37,6 +37,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -66,6 +67,7 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -74,6 +76,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -124,9 +127,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   @Inject
   private MuleContext muleContext;
 
+  @Inject
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
+
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
-  private Set<SourceClient> sourceClients = new HashSet<>();
+  private final Set<SourceClient> sourceClients = new HashSet<>();
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> execute(String extensionName,
@@ -224,7 +233,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   streamingManager,
                                   reflectionCache,
                                   componentTracerFactory,
-                                  muleContext);
+                                  muleContext,
+                                  muleConfiguration,
+                                  notificationDispatcher,
+                                  transactionManager.orElse(null));
 
     try {
       initialiseIfNeeded(client);

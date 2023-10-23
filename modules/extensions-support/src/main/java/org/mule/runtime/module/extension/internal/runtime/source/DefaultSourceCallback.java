@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -17,6 +15,9 @@ import static org.mule.runtime.module.extension.internal.ExtensionProperties.MIM
 import static org.mule.runtime.module.extension.internal.runtime.source.poll.PollingSourceWrapper.ACCEPTED_POLL_ITEM_INFORMATION;
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -34,9 +35,9 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -106,8 +107,15 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setMuleContext(MuleContext muleContext) {
-      product.muleContext = muleContext;
+    public Builder<T, A> setDefaultEncoding(Charset defaultEncoding) {
+      product.defaultEncoding = defaultEncoding;
+
+      return this;
+    }
+
+    public Builder<T, A> setTransactionManager(TransactionManager transactionManager) {
+      product.transactionManager = transactionManager;
+
       return this;
     }
 
@@ -193,7 +201,9 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private Set<String> notificationModelNames;
   private ConfigurationInstance configurationInstance;
   private Processor listener;
-  private MuleContext muleContext;
+  private Charset defaultEncoding;
+  private TransactionManager transactionManager;
+
   private String applicationName;
   private NotificationDispatcher notificationDispatcher;
   private SingleResourceTransactionFactoryManager transactionFactoryManager;
@@ -209,8 +219,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private TransactionSourceBinder transactionSourceBinder;
   private final ProfilingService profilingService;
 
-  private Charset defaultEncoding;
-
   private MediaType mimeTypeInitParam;
   private Charset encodingParam;
 
@@ -219,8 +227,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   }
 
   private final RunOnce resolveInitializationParams = Once.of(() -> {
-    defaultEncoding = getDefaultEncoding(muleContext);
-
     Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
 
     String encoding = (String) initialisationParameters.get(ENCODING_PARAMETER_NAME);
@@ -256,7 +262,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
     MediaType mediaType = resolveMediaType(result);
-    PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+    PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(defaultEncoding,
                                                                                      defaultMediaType,
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
@@ -398,7 +404,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public TransactionManager getTransactionManager() {
-    return muleContext.getTransactionManager();
+    return transactionManager;
   }
 
   /**

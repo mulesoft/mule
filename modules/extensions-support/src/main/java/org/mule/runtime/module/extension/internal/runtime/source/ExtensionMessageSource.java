@@ -15,6 +15,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.privileged.util.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
@@ -50,6 +51,7 @@ import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -105,9 +107,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -144,6 +148,12 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
 
   @Inject
   private ProfilingService profilingService;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
+
+  @Inject
+  private MuleConfiguration configuration;
 
   // obtained through setter injection
   private MessageProcessingManager messageProcessingManager;
@@ -335,7 +345,8 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setConfigurationInstance(getConfigurationInstance().orElse(null))
         .setTransactionConfig(transactionConfig.get())
         .setSource(this)
-        .setMuleContext(muleContext)
+        .setDefaultEncoding(getDefaultEncoding(configuration))
+        .setTransactionManager(transactionManager.orElse(null))
         .setListener(messageProcessor)
         .setProcessingManager(messageProcessingManager)
         .setProcessContext(messageProcessContext)

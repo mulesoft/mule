@@ -44,9 +44,11 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -64,8 +66,10 @@ import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -85,6 +89,15 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   protected MuleTransactionConfig transactionConfig;
   private FlowExceptionHandler messagingExceptionHandler;
   private List<Processor> processors;
+
+  @Inject
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
 
   @Inject
   private ProfilingService profilingService;
@@ -109,7 +122,12 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           .transform(nestedChain);
     }
 
-    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleConfiguration,
+                                                                                               notificationDispatcher,
+                                                                                               muleContext
+                                                                                                   .getTransactionFactoryManager(),
+                                                                                               transactionManager.orElse(null),
+                                                                                               transactionConfig);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
     return deferContextual(ctx -> from(publisher)
