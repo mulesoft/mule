@@ -79,7 +79,13 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
         throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
       }
 
-      beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
+      try {
+        beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
+      } catch (LinkageError e) {
+        throw new RuntimeConfigurationException(createStaticMessage(format("Exception adding annotations to class '%s'",
+                                                                           classParameter.getName())),
+                                                e);
+      }
       processMuleProperties(component, beanDefinitionBuilder, null);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }

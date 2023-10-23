@@ -6,20 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static javax.lang.model.element.ElementKind.METHOD;
-import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
@@ -35,6 +21,22 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIg
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
+
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static javax.lang.model.element.ElementKind.METHOD;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -106,9 +108,6 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
-import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -165,6 +164,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -1038,7 +1038,15 @@ public final class IntrospectionUtils {
 
   private static Stream<Field> getFieldsStream(Class<?> clazz) {
     try {
-      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()));
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> {
+        Field[] declaredFields;
+        try {
+          declaredFields = type.getDeclaredFields();
+        } catch (LinkageError e) {
+          throw new IllegalStateException("Exception getting declaredFields of type '" + clazz.getName() + "'", e);
+        }
+        return stream(declaredFields);
+      });
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
