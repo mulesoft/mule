@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
@@ -17,6 +18,7 @@ import javax.transaction.TransactionManager;
 /**
  * <code>TransactionFactory</code> creates a transaction.
  */
+@NoImplement
 public interface TransactionFactory {
 
   /**
@@ -26,9 +28,7 @@ public interface TransactionFactory {
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    *
-   * @deprecated since 4.3.0. Use
-   *             {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager)}
-   *             instead
+   * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, TransactionManager)} instead
    */
   @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
@@ -40,9 +40,26 @@ public interface TransactionFactory {
    * @throws TransactionException if the transaction cannot be created or begun
    * @param applicationName        will be part of the notification
    * @param notificationDispatcher allows the Mule container to fire notifications
+   * 
+   * @deprecated since 4.6. Use {@link #beginTransaction(String, NotificationDispatcher, TransactionManager)} instead
    */
+  @Deprecated
   default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
                                        SingleResourceTransactionFactoryManager transactionFactoryManager,
+                                       TransactionManager transactionManager)
+      throws TransactionException {
+    return beginTransaction(applicationName, notificationDispatcher, transactionManager);
+  }
+
+  /**
+   * Create and begins a new transaction
+   *
+   * @return a new Transaction
+   * @throws TransactionException if the transaction cannot be created or begun
+   * @param applicationName        will be part of the notification
+   * @param notificationDispatcher allows the Mule container to fire notifications
+   */
+  default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
                                        TransactionManager transactionManager)
       throws TransactionException {
     Transaction transaction = beginTransaction(((DefaultNotificationDispatcher) notificationDispatcher).getContext());

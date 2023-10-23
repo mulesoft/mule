@@ -80,6 +80,7 @@ import javax.transaction.TransactionManager;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import org.slf4j.Logger;
 
 
@@ -180,7 +181,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                          reflectionCache,
                                                          expressionManager,
                                                          notificationDispatcher,
-                                                         muleContext.getTransactionFactoryManager(),
                                                          muleContext);
 
     try {

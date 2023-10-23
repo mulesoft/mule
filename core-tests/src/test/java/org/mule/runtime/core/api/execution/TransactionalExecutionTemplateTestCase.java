@@ -314,7 +314,6 @@ public class TransactionalExecutionTemplateTestCase extends AbstractMuleTestCase
     return createTransactionalExecutionTemplate(configuration,
                                                 notificationDispatcher,
                                                 null,
-                                                null,
                                                 config);
   }
 

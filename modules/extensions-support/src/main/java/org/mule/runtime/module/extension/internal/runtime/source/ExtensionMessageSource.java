@@ -181,7 +181,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private MessageProcessContext messageProcessContext;
 
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final String applicationName;
 
   private final AtomicBoolean started = new AtomicBoolean(false);
@@ -195,7 +194,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                                 CursorProviderFactory cursorProviderFactory,
                                 BackPressureStrategy backPressureStrategy,
                                 ExtensionManager managerAdapter, NotificationDispatcher notificationDispatcher,
-                                SingleResourceTransactionFactoryManager transactionFactoryManager, String applicationName) {
+                                String applicationName) {
     super(extensionModel, sourceModel, configurationProvider, cursorProviderFactory, managerAdapter);
     this.sourceModel = sourceModel;
     this.sourceAdapterFactory = sourceAdapterFactory;
@@ -203,7 +202,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     this.primaryNodeOnly = primaryNodeOnly;
     this.backPressureStrategy = backPressureStrategy;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.applicationName = applicationName;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, sourceModel);
     this.lifecycleManager = new DefaultLifecycleManager<>(sourceModel.getName(), this);
@@ -352,7 +350,6 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setProcessContext(messageProcessContext)
         .setApplicationName(applicationName)
         .setNotificationDispatcher(notificationDispatcher)
-        .setTransactionFactoryManager(transactionFactoryManager)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .build();

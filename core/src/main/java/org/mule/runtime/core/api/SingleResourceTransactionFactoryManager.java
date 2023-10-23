@@ -14,12 +14,13 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
 import java.util.Map;
 
 /**
- *
+ * @deprecated Transaction factories management is internal to the container, no need to expose it through an API.
  */
+@Deprecated
 public final class SingleResourceTransactionFactoryManager {
 
-  private Map<Class, TransactionFactory> transactionFactories = new SmallMap<>();
-  private Map<Class, TransactionFactory> transactionFactoriesCache = new SmallMap<>();
+  private final Map<Class, TransactionFactory> transactionFactories = new SmallMap<>();
+  private final Map<Class, TransactionFactory> transactionFactoriesCache = new SmallMap<>();
 
   public void registerTransactionFactory(Class supportedType, TransactionFactory transactionFactory) {
     this.transactionFactories.put(supportedType, transactionFactory);

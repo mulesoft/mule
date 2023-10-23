@@ -80,7 +80,6 @@ public class SourceClient<T, A> implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final MuleContext muleContext;
   private final ClassLoader extensionClassloader;
 
@@ -98,7 +97,6 @@ public class SourceClient<T, A> implements Lifecycle {
                       ReflectionCache reflectionCache,
                       ExpressionManager expressionManager,
                       NotificationDispatcher notificationDispatcher,
-                      SingleResourceTransactionFactoryManager transactionFactoryManager,
                       MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -110,7 +108,6 @@ public class SourceClient<T, A> implements Lifecycle {
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.muleContext = muleContext;
 
     extensionClassloader = getClassLoader(extensionModel);
@@ -138,7 +135,6 @@ public class SourceClient<T, A> implements Lifecycle {
                                         backPressureStrategy,
                                         extensionManager,
                                         notificationDispatcher,
-                                        transactionFactoryManager,
                                         "");
 
     source.setAnnotations(SmallMap.of(LOCATION_KEY, DefaultComponentLocation.from(sourceModel.getName())));

@@ -6,14 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.getNearestRegion;
@@ -22,6 +17,12 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -32,7 +33,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarati
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
@@ -49,15 +49,12 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import javax.transaction.TransactionManager;
-
-import org.mule.runtime.tracer.api.component.ComponentTracer;
-import org.mule.runtime.tracer.api.EventTracer;
 
 import org.slf4j.Logger;
 
@@ -84,7 +81,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final ModuleExceptionHandler moduleExceptionHandler;
   private final MuleConfiguration muleConfiguration;
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final TransactionManager transactionManager;
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
@@ -101,7 +97,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   ClassLoader executionClassLoader,
                                   MuleConfiguration muleConfiguration,
                                   NotificationDispatcher notificationDispatcher,
-                                  SingleResourceTransactionFactoryManager transactionFactoryManager,
                                   TransactionManager transactionManager,
                                   ResultTransformer resultTransformer,
                                   ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
@@ -112,7 +107,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
     this.muleConfiguration = requireNonNull(muleConfiguration);
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.transactionManager = transactionManager;
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
@@ -333,7 +327,6 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     if (context.getTransactionConfig().isPresent()) {
       return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(muleConfiguration,
                                                                           notificationDispatcher,
-                                                                          transactionFactoryManager,
                                                                           transactionManager,
                                                                           context.getTransactionConfig().get()))
                                                                               .execute(callback);

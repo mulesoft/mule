@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.core.internal.config.bootstrap;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APPLY_TO_ARTIFACT_TYPE_PARAMETER_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.POLICY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.createFromString;
 
-import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getCause;
@@ -26,7 +23,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.config.bootstrap.BootstrapService;
 import org.mule.runtime.core.api.config.builders.RegistryBootstrap;
-import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.PropertiesUtils;
 
@@ -102,7 +98,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
     List<ObjectBootstrapProperty> bindingProviders = new LinkedList<>();
     List<ObjectBootstrapProperty> namedObjects = new LinkedList<>();
     List<ObjectBootstrapProperty> unnamedObjects = new LinkedList<>();
-    List<TransactionFactoryBootstrapProperty> singleTransactionFactories = new LinkedList<>();
 
     for (BootstrapService bootstrapService : bootstrapServices) {
       Properties bootstrapProperties = bootstrapService.getProperties();
@@ -125,14 +120,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
         } else if (TRANSFORMER_PREDICATE.test(propertyKey)) {
           logger.debug("Transformer registryBootstrap entry: {}", entry.getKey());
           transformers.add(createTransformerBootstrapProperty(bootstrapService, propertyValue));
-        } else if (propertyKey.contains(SINGLE_TX)) {
-          if (!propertyKey.contains(TRANSACTION_RESOURCE_SUFFIX)) {
-            logger.debug("SingleTx Resource registryBootstrap entry: {}", entry.getKey());
-            singleTransactionFactories.add(createTransactionFactoryBootstrapProperty(bootstrapService, bootstrapProperties,
-                                                                                     propertyKey, propertyValue));
-          } else {
-            logger.debug("SingleTx registryBootstrap entry: {}", entry.getKey());
-          }
         } else if (BINDING_PROVIDER_PREDICATE.test(propertyKey)) {
           logger.debug("Binding Provider registryBootstrap entry: {}", entry.getKey());
           bindingProviders.add(createObjectBootstrapProperty(bootstrapService, propertyKey, propertyValue));
@@ -148,7 +135,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
       registerTransformers(transformers);
       registerObjects(bindingProviders);
       registerObjects(namedObjects);
-      registerTransactionFactories(singleTransactionFactories, muleContext);
     } catch (Exception e1) {
       throw new InitialisationException(e1, this);
     }
@@ -187,32 +173,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
 
     return new TransformerBootstrapProperty(bootstrapService, new HashSet<>(asList(APP, POLICY)), optional, name, className,
                                             returnClassName, mime);
-  }
-
-  private TransactionFactoryBootstrapProperty createTransactionFactoryBootstrapProperty(BootstrapService bootstrapService,
-                                                                                        Properties bootstrapProperties,
-                                                                                        String propertyKey, String propertyValue)
-      throws InitialisationException {
-    String transactionResourceKey = propertyKey.replace(".transaction.factory", TRANSACTION_RESOURCE_SUFFIX);
-    String transactionResource = bootstrapProperties.getProperty(transactionResourceKey);
-    if (transactionResource == null) {
-      throw new InitialisationException(createStaticMessage(format("There is no transaction resource specified for transaction factory %s",
-                                                                   propertyKey)),
-                                        this);
-    }
-
-    String transactionResourceClassNameProperties = transactionResource;
-    boolean optional = false;
-    int index = transactionResourceClassNameProperties.indexOf(",");
-    if (index > -1) {
-      Properties p = PropertiesUtils.getPropertiesFromString(transactionResourceClassNameProperties.substring(index + 1), ',');
-      optional = p.containsKey(OPTIONAL_ATTRIBUTE);
-    }
-    final String transactionResourceClassName =
-        (index == -1 ? transactionResourceClassNameProperties : transactionResourceClassNameProperties.substring(0, index));
-
-    return new TransactionFactoryBootstrapProperty(bootstrapService, singleton(APP), optional, propertyValue,
-                                                   transactionResourceClassName);
   }
 
   private ObjectBootstrapProperty createObjectBootstrapProperty(BootstrapService bootstrapService, String propertyKey,
@@ -265,21 +225,6 @@ public abstract class AbstractRegistryBootstrap implements RegistryBootstrap {
                                   bootstrapProperty);
     } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
       throwExceptionIfNotOptional(bootstrapProperty.getOptional(), e, bootstrapProperty);
-    }
-  }
-
-  private void registerTransactionFactories(List<TransactionFactoryBootstrapProperty> singleTransactionFactories,
-                                            MuleContext context)
-      throws Exception {
-    for (TransactionFactoryBootstrapProperty bootstrapProperty : singleTransactionFactories) {
-      try {
-        final Class<?> supportedType =
-            bootstrapProperty.getService().forName(bootstrapProperty.getTransactionResourceClassName());
-        context.getTransactionFactoryManager().registerTransactionFactory(supportedType, (TransactionFactory) bootstrapProperty
-            .getService().instantiateClass(bootstrapProperty.getTransactionFactoryClassName()));
-      } catch (NoClassDefFoundError | ClassNotFoundException ncdfe) {
-        throwExceptionIfNotOptional(bootstrapProperty.getOptional(), ncdfe, bootstrapProperty);
-      }
     }
   }
 

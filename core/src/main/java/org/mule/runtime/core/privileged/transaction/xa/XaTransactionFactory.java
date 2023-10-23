@@ -7,11 +7,11 @@
 package org.mule.runtime.core.privileged.transaction.xa;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
+
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -31,7 +31,6 @@ public class XaTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      SingleResourceTransactionFactoryManager transactionFactoryManager,
                                       TransactionManager transactionManager)
       throws TransactionException {
     try {
@@ -50,7 +49,7 @@ public class XaTransactionFactory implements TransactionFactory {
       return this.beginTransaction(muleContext.getConfiguration().getId(),
                                    ((MuleContextWithRegistry) muleContext).getRegistry()
                                        .lookupObject(NotificationDispatcher.class),
-                                   muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
+                                   muleContext.getTransactionManager());
     } catch (RegistrationException e) {
       throw new TransactionException(cannotStartTransaction("XA"), e);
     }

@@ -2,6 +2,14 @@
   "4.6.0": {
     "revapi": {
       "ignore": [
+		{
+		  "ignore": true,
+		  "code": "java.annotation.added",
+		  "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+		  "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+		  "annotation": "@org.mule.api.annotation.NoImplement",
+		  "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
+		},
         {
           "ignore": true,
           "code": "java.annotation.added",

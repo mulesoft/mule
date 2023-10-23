@@ -17,7 +17,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
@@ -39,17 +38,14 @@ public class TransactionSourceBinder {
   private final ComponentModel componentModel;
   private final String applicationName;
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final TransactionBindingDelegate transactionBindingDelegate;
 
   public TransactionSourceBinder(ExtensionModel extensionModel, ComponentModel componentModel, String applicationName,
-                                 NotificationDispatcher notificationDispatcher,
-                                 SingleResourceTransactionFactoryManager transactionFactoryManager) {
+                                 NotificationDispatcher notificationDispatcher) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
   }
 
@@ -66,7 +62,7 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx =
-        transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
+        transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher,
                                                         transactionManager);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
