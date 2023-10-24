@@ -278,12 +278,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     domainDescriptorFactory = new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                           artifactDescriptorValidatorBuilder);
-    ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                         artifactDescriptorValidatorBuilder);
     DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
         DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory();
-
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,

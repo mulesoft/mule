@@ -15,6 +15,7 @@ import static java.lang.String.format;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -45,6 +46,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 @NoInstantiate
+@NoExtend
 public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleArtifactModel, T extends ArtifactDescriptor>
     implements ArtifactDescriptorFactory<T> {
 
