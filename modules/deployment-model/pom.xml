@@ -16,6 +16,11 @@
 
     <properties>
         <javaModuleName>org.mule.runtime.deployment.model</javaModuleName>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.runtime.deployment.model/org.mule.runtime.deployment.model.internal.domain.test=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
