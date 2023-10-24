@@ -1,4 +1,18 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider",
+          "new": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "justification": "W-14357577: Provide an API for the GW to obtain a PolicyTemplateDescriptorFactory"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [
