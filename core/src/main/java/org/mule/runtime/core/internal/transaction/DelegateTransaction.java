@@ -6,11 +6,17 @@
  */
 package org.mule.runtime.core.internal.transaction;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import static java.lang.String.format;
 import static java.util.Optional.empty;
+import static java.util.ServiceLoader.load;
+import static java.util.stream.StreamSupport.stream;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
@@ -28,16 +34,22 @@ public class DelegateTransaction extends AbstractTransaction {
 
   private static final Integer DEFAULT_TRANSACTION_TIMEOUT = 30000;
 
+  private static final Optional<TransactionFactory> TX_FACTORY;
+
+  static {
+    TX_FACTORY = stream(load(TransactionFactory.class,
+                             DelegateTransaction.class.getClassLoader()).spliterator(),
+                        false)
+                            .findFirst();
+  }
+
   private Transaction delegate = new NullTransaction();
 
-  private SingleResourceTransactionFactoryManager transactionFactoryManager;
-  private TransactionManager transactionManager;
+  private final TransactionManager transactionManager;
 
   public DelegateTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                             SingleResourceTransactionFactoryManager transactionFactoryManager,
                              TransactionManager transactionManager) {
     super(applicationName, notificationFirer);
-    this.transactionFactoryManager = transactionFactoryManager;
     this.transactionManager = transactionManager;
   }
 
@@ -95,10 +107,15 @@ public class DelegateTransaction extends AbstractTransaction {
       throw new TransactionException(CoreMessages
           .createStaticMessage("Single resource transaction has already a resource bound"));
     }
-    TransactionFactory transactionFactory = transactionFactoryManager.getTransactionFactoryFor(key.getClass());
+
     this.unbindTransaction();
-    this.delegate = transactionFactory.beginTransaction(applicationName, notificationFirer, transactionFactoryManager,
-                                                        transactionManager);
+    this.delegate = TX_FACTORY
+        .orElseThrow(() -> new MuleRuntimeException(createStaticMessage(format("No %s for transactional resource %s",
+                                                                               TransactionFactory.class.getName(),
+                                                                               key.getClass().getName()))))
+        .beginTransaction(applicationName,
+                          notificationFirer,
+                          transactionManager);
     this.delegate.setTimeout(timeout);
     this.delegate.bindResource(key, resource);
     ((TransactionAdapter) delegate).setComponentLocation(componentLocation);

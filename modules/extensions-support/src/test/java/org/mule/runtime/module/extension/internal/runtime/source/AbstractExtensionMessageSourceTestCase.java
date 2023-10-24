@@ -291,7 +291,6 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
         .setProcessContext(messageProcessContext)
         .setApplicationName(muleContext.getConfiguration().getId())
         .setNotificationDispatcher(notificationDispatcher)
-        .setTransactionFactoryManager(muleContext.getTransactionFactoryManager())
         .setCompletionHandlerFactory(completionHandlerFactory)
         .setExceptionCallback(exceptionCallback)
         .setCursorStreamProviderFactory(cursorStreamProviderFactory)
@@ -332,7 +331,7 @@ public abstract class AbstractExtensionMessageSourceTestCase extends AbstractMul
     ExtensionMessageSource messageSource =
         new ExtensionMessageSource(extensionModel, sourceModel, sourceAdapterFactory, configurationProvider, primaryNodeOnly,
                                    retryPolicyTemplate, cursorStreamProviderFactory, FAIL, extensionManager,
-                                   notificationDispatcher, muleContext.getTransactionFactoryManager(),
+                                   notificationDispatcher,
                                    muleContext.getConfiguration().getId());
     messageSource.setListener(messageProcessor);
     messageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());

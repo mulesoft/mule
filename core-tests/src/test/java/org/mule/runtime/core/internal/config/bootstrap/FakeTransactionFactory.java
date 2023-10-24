@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.config.bootstrap;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.UniversalTransactionFactory;
 
@@ -23,7 +22,6 @@ public final class FakeTransactionFactory implements UniversalTransactionFactory
 
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      SingleResourceTransactionFactoryManager transactionFactoryManager,
                                       TransactionManager transactionManager) {
     return null;
   }

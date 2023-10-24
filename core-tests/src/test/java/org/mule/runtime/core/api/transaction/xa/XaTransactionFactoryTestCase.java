@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -36,7 +35,6 @@ public class XaTransactionFactoryTestCase extends AbstractMuleTestCase {
     final TransactionManager transactionManager = mock(TransactionManager.class);
 
     final Transaction transaction = transactionFactory.beginTransaction("appName", getNotificationDispatcher(muleContext),
-                                                                        new SingleResourceTransactionFactoryManager(),
                                                                         transactionManager);
     assertThat(transaction.getTimeout(), equalTo(timeout));
   }

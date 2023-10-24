@@ -168,7 +168,6 @@ public class OperationClient implements Lifecycle {
                                                        muleContext,
                                                        muleConfiguration,
                                                        notificationDispatcher,
-                                                       muleContext.getTransactionFactoryManager(),
                                                        transactionManager),
                                ComponentExecutorResolver.from(key, extensionManager, expressionManager, reflectionCache),
                                new ValueReturnDelegate(key.getOperationModel(), muleContext),
@@ -459,7 +458,6 @@ public class OperationClient implements Lifecycle {
                                                                            MuleContext muleContext,
                                                                            MuleConfiguration muleConfiguration,
                                                                            NotificationDispatcher notificationDispatcher,
-                                                                           SingleResourceTransactionFactoryManager transactionFactoryManager,
                                                                            TransactionManager transactionManager) {
 
     final ExtensionModel extensionModel = key.getExtensionModel();
@@ -476,7 +474,6 @@ public class OperationClient implements Lifecycle {
                                                                                 muleContext.getExecutionClassLoader(),
                                                                                 muleConfiguration,
                                                                                 notificationDispatcher,
-                                                                                transactionFactoryManager,
                                                                                 transactionManager,
                                                                                 getResultTransformer(extensionConnectionSupplier,
                                                                                                      extensionModel,

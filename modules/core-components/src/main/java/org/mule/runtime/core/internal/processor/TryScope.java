@@ -124,8 +124,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
 
     ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleConfiguration,
                                                                                                notificationDispatcher,
-                                                                                               muleContext
-                                                                                                   .getTransactionFactoryManager(),
                                                                                                transactionManager.orElse(null),
                                                                                                transactionConfig);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);

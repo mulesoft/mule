@@ -247,7 +247,9 @@ public interface MuleContext extends Lifecycle {
   /**
    * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource
    *         (i.e jdbc DataSource, jms Connection)
+   * @deprecated Transaction factories management is internal to the container, no need to expose it through an API.
    */
+  @Deprecated
   SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
   /**

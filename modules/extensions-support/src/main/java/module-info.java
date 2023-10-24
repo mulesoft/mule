@@ -83,6 +83,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
 
+  exports org.mule.runtime.module.extension.internal.config to
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.loader.java to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.client to
@@ -102,7 +104,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.transaction to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.util to
-      org.mule.runtime.core;
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.spring.support;
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       java.xml.bind;
@@ -113,5 +116,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.api.loader.DefaultExtensionModelLoaderProvider;
   provides org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory with
       org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
+  provides org.mule.runtime.core.api.transaction.TransactionFactory with
+      org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 
 }

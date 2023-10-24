@@ -491,6 +491,11 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   }
 
   protected static void verifyAndStopSchedulers() throws MuleException {
+    if (muleContext == null) {
+      LOGGER.warn("verifyAndStopSchedulers: muleContext is null!");
+      return;
+    }
+
     final SchedulerService serviceImpl = muleContext.getSchedulerService();
 
     if (isProxyClass(serviceImpl.getClass()) &&

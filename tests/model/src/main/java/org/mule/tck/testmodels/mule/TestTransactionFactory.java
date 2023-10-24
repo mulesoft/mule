@@ -9,7 +9,6 @@ package org.mule.tck.testmodels.mule;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -37,7 +36,7 @@ public class TestTransactionFactory implements TransactionFactory {
     try {
       return beginTransaction(muleContext.getConfiguration().getId(),
                               ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(NotificationDispatcher.class),
-                              muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager());
+                              muleContext.getTransactionManager());
     } catch (Exception e) {
       throw new RuntimeException();
     }
@@ -45,7 +44,6 @@ public class TestTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction beginTransaction(String applicationName, NotificationDispatcher notificationFirer,
-                                      SingleResourceTransactionFactoryManager transactionFactoryManager,
                                       TransactionManager transactionManager)
       throws TransactionException {
     Transaction testTransaction;

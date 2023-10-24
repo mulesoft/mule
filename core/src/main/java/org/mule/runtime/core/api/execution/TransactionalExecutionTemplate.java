@@ -9,7 +9,6 @@ package org.mule.runtime.core.api.execution;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -48,13 +47,11 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   private ExecutionInterceptor<T> executionInterceptor;
 
   private TransactionalExecutionTemplate(String applicationName, NotificationDispatcher notificationDispatcher,
-                                         SingleResourceTransactionFactoryManager transactionFactoryManager,
                                          TransactionManager transactionManager, TransactionConfig transactionConfig) {
-    this(applicationName, notificationDispatcher, transactionFactoryManager, transactionManager, transactionConfig, true, false);
+    this(applicationName, notificationDispatcher, transactionManager, transactionConfig, true, false);
   }
 
   private TransactionalExecutionTemplate(String applicationName, NotificationDispatcher notificationDispatcher,
-                                         SingleResourceTransactionFactoryManager transactionFactoryManager,
                                          TransactionManager transactionManager, TransactionConfig transactionConfig,
                                          boolean resolveAnyTransaction, boolean resolvePreviousTx) {
     if (transactionConfig == null) {
@@ -62,11 +59,13 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
     }
     final boolean processTransactionOnException = true;
     ExecutionInterceptor<T> tempExecutionInterceptor = new ExecuteCallbackInterceptor<>();
-    tempExecutionInterceptor =
-        new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, applicationName,
-                                                    notificationDispatcher, transactionFactoryManager,
-                                                    transactionManager,
-                                                    processTransactionOnException, resolveAnyTransaction);
+    tempExecutionInterceptor = new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor,
+                                                                           transactionConfig,
+                                                                           applicationName,
+                                                                           notificationDispatcher,
+                                                                           transactionManager,
+                                                                           processTransactionOnException,
+                                                                           resolveAnyTransaction);
     if (resolvePreviousTx) {
       tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
     }
@@ -83,7 +82,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    * @param muleContext       MuleContext for this application
    * @param transactionConfig transaction config for the execution context
    * @deprecated use
-   *             {@link #createTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, TransactionConfig)}
+   *             {@link #createTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, TransactionManager, TransactionConfig)}
    *             instead.
    */
   @Deprecated
@@ -91,7 +90,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                                                            TransactionConfig transactionConfig) {
     return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionFactoryManager(), muleContext.getTransactionManager(),
+                                                muleContext.getTransactionManager(),
                                                 transactionConfig);
   }
 
@@ -100,12 +99,10 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    */
   public static <T> TransactionalExecutionTemplate<T> createTransactionalExecutionTemplate(MuleConfiguration muleConfiguration,
                                                                                            NotificationDispatcher notificationDispatcher,
-                                                                                           SingleResourceTransactionFactoryManager transactionFactoryManager,
                                                                                            TransactionManager transactionManager,
                                                                                            TransactionConfig transactionConfig) {
     return new TransactionalExecutionTemplate<>(getApplicationName(muleConfiguration),
                                                 notificationDispatcher,
-                                                transactionFactoryManager,
                                                 transactionManager,
                                                 transactionConfig);
   }
@@ -123,7 +120,6 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                                                            TransactionConfig transactionConfig) {
     return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionFactoryManager(),
                                                 muleContext.getTransactionManager(),
                                                 transactionConfig, true, true);
   }
@@ -151,7 +147,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    * @param transactionConfig
    * @return <T>
    * @deprecated Use
-   *             {@link #createScopeTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager, TransactionConfig)}
+   *             {@link #createScopeTransactionalExecutionTemplate(MuleConfiguration, NotificationDispatcher, TransactionManager, TransactionConfig)}
    *             instead.
    */
   @Deprecated
@@ -159,7 +155,6 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                                                                 TransactionConfig transactionConfig) {
     return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionFactoryManager(),
                                                 muleContext.getTransactionManager(),
                                                 transactionConfig, false, false);
   }
@@ -171,12 +166,10 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
    */
   public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleConfiguration muleConfiguration,
                                                                                                 NotificationDispatcher notificationDispatcher,
-                                                                                                SingleResourceTransactionFactoryManager transactionFactoryManager,
                                                                                                 TransactionManager transactionManager,
                                                                                                 TransactionConfig transactionConfig) {
     return new TransactionalExecutionTemplate<>(getApplicationName(muleConfiguration),
                                                 notificationDispatcher,
-                                                transactionFactoryManager,
                                                 transactionManager,
                                                 transactionConfig, false, false);
   }

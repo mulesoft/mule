@@ -103,7 +103,7 @@ public class ExtensionSourceObjectFactory extends AbstractExtensionObjectFactory
                                         muleContext.getExtensionManager(),
                                         ((MuleContextWithRegistry) muleContext).getRegistry()
                                             .lookupObject(NotificationDispatcher.class),
-                                        muleContext.getTransactionFactoryManager(), muleContext.getConfiguration().getId());
+                                        muleContext.getConfiguration().getId());
     });
   }
 

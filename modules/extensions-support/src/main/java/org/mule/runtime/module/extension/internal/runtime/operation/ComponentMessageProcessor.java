@@ -1083,7 +1083,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                         muleContext.getExecutionClassLoader(),
                                         muleConfiguration,
                                         notificationDispatcher,
-                                        muleContext.getTransactionFactoryManager(),
                                         transactionManager.orElse(null),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),

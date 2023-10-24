@@ -129,11 +129,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setTransactionFactoryManager(SingleResourceTransactionFactoryManager transactionFactoryManager) {
-      product.transactionFactoryManager = transactionFactoryManager;
-      return this;
-    }
-
     public Builder<T, A> setSource(ExtensionMessageSource messageSource) {
       product.messageSource = messageSource;
       return this;
@@ -175,11 +170,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       checkArgument(product.messageSource, "messageSource");
       checkArgument(product.applicationName, "applicationName");
       checkArgument(product.notificationDispatcher, "notificationDispatcher");
-      checkArgument(product.transactionFactoryManager, "transactionFactoryManager");
 
       product.transactionSourceBinder =
           new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel, product.applicationName,
-                                      product.notificationDispatcher, product.transactionFactoryManager);
+                                      product.notificationDispatcher);
 
       return product;
     }
@@ -206,7 +200,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
   private String applicationName;
   private NotificationDispatcher notificationDispatcher;
-  private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private ExtensionMessageSource messageSource;
   private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;

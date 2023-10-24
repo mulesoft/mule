@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -26,7 +25,6 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
   private final ExecutionInterceptor<T> next;
   private final TransactionConfig transactionConfig;
   private final String applicationName;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final TransactionManager transactionManager;
   private final NotificationDispatcher notificationDispatcher;
   private final boolean processOnException;
@@ -34,14 +32,12 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
   public BeginAndResolveTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
                                                String applicationName, NotificationDispatcher notificationDispatcher,
-                                               SingleResourceTransactionFactoryManager transactionFactoryManager,
                                                TransactionManager transactionManager,
                                                boolean processOnException, boolean mustResolveAnyTransaction) {
     this.next = next;
     this.transactionConfig = transactionConfig;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.transactionManager = transactionManager;
     this.processOnException = processOnException;
     this.mustResolveAnyTransaction = mustResolveAnyTransaction;
@@ -62,7 +58,8 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
       // Timeout is a traversal attribute of all Transaction implementations.
       // Setting it up here for all of them rather than in every implementation.
-      tx = transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
+      tx = transactionConfig.getFactory().beginTransaction(applicationName,
+                                                           notificationDispatcher,
                                                            transactionManager);
       tx.setTimeout(timeout);
       resolveStartedTransaction = true;

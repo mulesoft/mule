@@ -628,6 +628,7 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.value to
       spring.core;
 
+  uses org.mule.runtime.core.api.transaction.TransactionFactory;
   uses org.mule.runtime.core.api.util.ClassLoaderResourceNotFoundExceptionFactory;
 
 }
