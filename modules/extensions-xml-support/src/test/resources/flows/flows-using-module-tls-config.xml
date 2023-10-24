@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-tls-config="http://www.mulesoft.org/schema/mule/module-tls-config"
+      xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xsi:schemaLocation="
+       http://www.mulesoft.org/schema/mule/module-tls-config http://www.mulesoft.org/schema/mule/module-tls-config/current/mule-module-tls-config.xsd
+       http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <tls:context name="myTlsContext">
+        <tls:key-store keyPassword="changeit"
+                       password="changeit"
+                       path="ssltest-keystore.jks"/>
+
+    </tls:context>
+
+    <module-tls-config:config name="byRef" someUserConfig="john" somePassConfig="doe" tlsContext="myTlsContext"/>
+
+    <module-tls-config:config name="inline" someUserConfig="john" somePassConfig="doe">
+        <tls:context>
+            <tls:key-store keyPassword="changeit"
+                           password="changeit"
+                           path="ssltest-keystore.jks"/>
+        </tls:context>
+    </module-tls-config:config>
+
+</mule>

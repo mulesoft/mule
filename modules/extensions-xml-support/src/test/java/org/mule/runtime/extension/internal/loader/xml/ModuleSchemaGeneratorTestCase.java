@@ -16,16 +16,17 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +45,7 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   private static final String EXPECTED_FILES_DIR = "modules/schema/";
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
+  private static final ExtensionModel PET_STORE_EXTENSION_MODEL = MuleExtensionUtils.loadExtension(PetStoreConnector.class);
 
   private final DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
 
@@ -59,7 +61,8 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
                                            "module-properties-types",
                                            "module-single-op-with-property",
                                            "module-single-operation",
-                                           "module-single-operation-camelized");
+                                           "module-single-operation-camelized",
+                                           "module-tls-config");
 
     return extensions.stream().map(moduleName -> {
       String modulePath = EXPECTED_FILES_DIR + moduleName + ".xml";
@@ -77,7 +80,10 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   }
 
   private static Set<ExtensionModel> getDependencies() {
-    return singleton(getExtensionModel());
+    Set<ExtensionModel> dependencies = new HashSet<>();
+    dependencies.add(getExtensionModel());
+    dependencies.add(PET_STORE_EXTENSION_MODEL);
+    return dependencies;
   }
 
   @Override

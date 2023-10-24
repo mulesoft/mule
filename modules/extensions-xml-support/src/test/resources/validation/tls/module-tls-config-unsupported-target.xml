@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-tls-config"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+
+        xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd ">
+
+    <property name="someUserConfig" type="string"/>
+    <property name="somePassConfig" type="string"/>
+
+    <petstore:config name="petstore-config" cashierName="cashierName">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]" />
+        <petstore:pets>
+            <petstore:pet value="Dog" xmlns:tlsEnabled="true"/>
+        </petstore:pets>
+    </petstore:config>
+</module>
