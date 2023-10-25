@@ -126,10 +126,11 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
     Object connectionFactory = connectionFactoryClass.newInstance();
 
+    createWorkerThread(artifactClassLoader);
+
     beforeClassLoaderDisposal();
 
     artifactClassLoader.dispose();
-
   }
 
   @Test
@@ -144,7 +145,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
      */
     assumeThat(System.getProperty("java.specification.version"), is(equalTo("1.8")));
     assertThat(countJULKnownLevels(artifactClassLoader), is(0));
-
   }
 
   @Test
@@ -185,9 +185,194 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Test
   @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
-  public void threadWorkerTest() throws Exception {
+  public void threadWorkerTestJustOneApplication() throws Exception {
     assertThat(countWorkerThreads(artifactClassLoader), is(0));
   }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  public void threadWorkerTestMultipleApplication() throws Exception {
+    MulePluginClassLoader artifactClassLoaderApplication1 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase1",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication1);
+
+    MulePluginClassLoader artifactClassLoaderApplication2 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase2",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication2);
+
+    MulePluginClassLoader artifactClassLoaderApplication3 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase3",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication3);
+
+    MulePluginClassLoader artifactClassLoaderApplication4 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase4",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication4);
+
+    artifactClassLoaderApplication1.dispose();
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication4), is(1));
+
+    artifactClassLoaderApplication2.dispose();
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication4), is(1));
+
+    artifactClassLoaderApplication3.dispose();
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication4), is(1));
+
+    artifactClassLoaderApplication4.dispose();
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication4), is(0));
+  }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  public void threadWorkerApplicationDriver() throws Exception {
+    MulePluginClassLoader muleDomainClassLoader =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase1",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    MulePluginClassLoader artifactClassLoaderApplication1 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase2",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication1);
+
+    MulePluginClassLoader artifactClassLoaderApplication2 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase3",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+    createWorkerThread(artifactClassLoaderApplication2);
+
+    MulePluginClassLoader artifactClassLoaderApplication3 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase4",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+
+    createWorkerThread(artifactClassLoaderApplication3);
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(1));
+
+    artifactClassLoaderApplication1.dispose();
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(1));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(1));
+
+    artifactClassLoaderApplication2.dispose();
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(1));
+
+    artifactClassLoaderApplication3.dispose();
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
+
+  }
+
+  @Test
+  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  public void threadWorkerDomainDriver() throws Exception {
+    MulePluginClassLoader muleDomainClassLoader =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase1",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
+                                  testLookupPolicy);
+
+    // Creating Worker Thread domain level
+    createWorkerThread(muleDomainClassLoader);
+
+    MulePluginClassLoader artifactClassLoaderApplication1 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase2",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+    MulePluginClassLoader artifactClassLoaderApplication2 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase3",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+    MulePluginClassLoader artifactClassLoaderApplication3 =
+        new MulePluginClassLoader("IBMMQResourceReleaserTestCase4",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  muleDomainClassLoader,
+                                  testLookupPolicy);
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(1));
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
+
+    muleDomainClassLoader.dispose();
+
+
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
+
+    assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
+    assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
+  }
+
 
   protected void beforeClassLoaderDisposal() {
     // Nothing to do
@@ -247,7 +432,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     }
     return counter;
   }
-
 
   private Object getMyInstanceFromJmsTls(ClassLoader artifactClassLoader) throws Exception {
     Class<?> jmsTlsClass = loadClass(IBM_MQ_JMS_TLS_CLASS, artifactClassLoader);
@@ -317,9 +501,30 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   private int countWorkerThreads(ClassLoader artifactClassLoader) {
+    ThreadUtils.getAllThreads().stream().forEach(o -> {
+      System.out.println(o.getName());
+    });
+
     List<Thread> threads = ThreadUtils.getAllThreads().stream()
         .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
+        .filter(thread -> thread.getClass().getClassLoader() == artifactClassLoader)
         .collect(Collectors.toList());
     return threads.size();
+  }
+
+  private void createWorkerThread(MuleArtifactClassLoader artifactClassLoader) throws ClassNotFoundException {
+    // Load all the clases need to create the IBM Worker thread.
+    artifactClassLoader.loadClass(IBM_WORKER_CLASS);
+    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.workqueue.WorkQueueItem");
+    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.workqueue.SimpleWorkQueueItem");
+    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.j2se.workqueue.WorkQueueManagerImplementation");
+    artifactClassLoader
+        .loadClass("com.ibm.msg.client.commonservices.j2se.workqueue.WorkQueueManagerImplementation$WorkQueueManagerThread");
+
+
+    Class.forName(IBM_WORKER_CLASS, true, artifactClassLoader);
+
+    // Verify if the worker thread is alive.
+    assertThat(countWorkerThreads(artifactClassLoader), is(1));
   }
 }
