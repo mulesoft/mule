@@ -204,8 +204,6 @@ public final class JpmsUtils {
                  asList("org.mule.runtime.module.boot.internal"));
     openToModule(childLayer, "kryo.shaded", "java.base",
                  asList("java.lang", "java.lang.reflect", "java.security.cert"));
-    openToModule(childLayer, "kryo.shaded", "jakarta.activation",
-                 asList("javax.activation"));
 
     return childLayer.findLoader(childLayer.modules().iterator().next().getName());
   }
