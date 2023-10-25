@@ -100,7 +100,6 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     LOGGER
         .debug("Releasing IBM MQ resources - Removes the thread local references to instances of classes loaded by the driver classloader.");
     removeThreadLocals();
-
   }
 
   /**
@@ -399,6 +398,7 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private void disposeMQThreads() {
     List<Thread> threads = ThreadUtils.getAllThreads().stream()
         .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
+        .filter(thread -> thread.getClass().getClassLoader() == driverClassLoader)
         .collect(Collectors.toList());
 
     if (!threads.isEmpty()) {
