@@ -20,6 +20,7 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.ThreadUtils.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -42,6 +43,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Map;
@@ -136,9 +138,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     props.remove("avoid.ibm.mq.cleanup");
     props.remove("avoid.ibm.mq.cleanup.mbeans");
 
-    artifactClassLoader = new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase", mock(ArtifactDescriptor.class),
-                                                      new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                                      currentThread().getContextClassLoader(), testLookupPolicy);
+    artifactClassLoader = getArtifactClassLoader("IBMMQResourceReleaserTestCase", currentThread().getContextClassLoader());
 
     // Force to load a Driver class so the resource releaser is flagged to run on dispose
     Class<?> connectionFactoryClass = Class.forName(KNOWN_DRIVER_CLASS_NAME, true, artifactClassLoader);
@@ -146,10 +146,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     createWorkerThread(artifactClassLoader);
 
-    beforeClassLoaderDisposal();
-
     artifactClassLoader.dispose();
-
   }
 
   @Test
@@ -209,40 +206,22 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Test
   @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
   public void threadWorkerTestMultipleApplication() throws Exception {
-    MuleArtifactClassLoader artifactClassLoaderApplication1 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase1",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
 
+
+    MuleArtifactClassLoader artifactClassLoaderApplication1 =
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase1", currentThread().getContextClassLoader());
     createWorkerThread(artifactClassLoaderApplication1);
 
     MuleArtifactClassLoader artifactClassLoaderApplication2 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase2",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase2", currentThread().getContextClassLoader());
     createWorkerThread(artifactClassLoaderApplication2);
 
     MuleArtifactClassLoader artifactClassLoaderApplication3 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase3",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase3", currentThread().getContextClassLoader());
     createWorkerThread(artifactClassLoaderApplication3);
 
     MuleArtifactClassLoader artifactClassLoaderApplication4 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase4",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase4", currentThread().getContextClassLoader());
     createWorkerThread(artifactClassLoaderApplication4);
 
     artifactClassLoaderApplication1.dispose();
@@ -278,37 +257,19 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
   public void threadWorkerApplicationDriver() throws Exception {
     MuleArtifactClassLoader muleDomainClassLoader =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase1",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
+        getArtifactClassLoader("muleDomainClassLoader", currentThread().getContextClassLoader());
 
     MuleArtifactClassLoader artifactClassLoaderApplication1 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase2",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase1", muleDomainClassLoader);
     createWorkerThread(artifactClassLoaderApplication1);
 
     MuleArtifactClassLoader artifactClassLoaderApplication2 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase3",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase2", muleDomainClassLoader);
 
     createWorkerThread(artifactClassLoaderApplication2);
 
     MuleArtifactClassLoader artifactClassLoaderApplication3 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase4",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase3", muleDomainClassLoader);
 
     createWorkerThread(artifactClassLoaderApplication3);
 
@@ -337,42 +298,23 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
     assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
     assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
-
   }
 
   @Test
   @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
   public void threadWorkerDomainDriver() throws Exception {
     MuleArtifactClassLoader muleDomainClassLoader =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase1",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
+        getArtifactClassLoader("muleDomainClassLoader", currentThread().getContextClassLoader());
 
     // Creating Worker Thread domain level
     createWorkerThread(muleDomainClassLoader);
 
     MuleArtifactClassLoader artifactClassLoaderApplication1 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase2",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase1", currentThread().getContextClassLoader());
     MuleArtifactClassLoader artifactClassLoaderApplication2 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase3",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
-
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase2", currentThread().getContextClassLoader());
     MuleArtifactClassLoader artifactClassLoaderApplication3 =
-        new MuleArtifactClassLoader("IBMMQResourceReleaserTestCase4",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getBundleDependency().getBundleUri().toURL()},
-                                    muleDomainClassLoader,
-                                    testLookupPolicy);
+        getArtifactClassLoader("IBMMQResourceReleaserTestCase3", currentThread().getContextClassLoader());
 
     assertThat(countWorkerThreads(muleDomainClassLoader), is(1));
 
@@ -380,19 +322,15 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
     assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
 
+    artifactClassLoaderApplication1.dispose();
+    assertThat(countWorkerThreads(muleDomainClassLoader), is(1));
+
     muleDomainClassLoader.dispose();
-
-
     assertThat(countWorkerThreads(muleDomainClassLoader), is(0));
 
     assertThat(countWorkerThreads(artifactClassLoaderApplication1), is(0));
     assertThat(countWorkerThreads(artifactClassLoaderApplication2), is(0));
     assertThat(countWorkerThreads(artifactClassLoaderApplication3), is(0));
-  }
-
-
-  protected void beforeClassLoaderDisposal() {
-    // Nothing to do
   }
 
   private int countMBeans(MuleArtifactClassLoader artifactClassLoader) throws MalformedObjectNameException {
@@ -479,7 +417,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
     return traceControllerField.get(null);
   }
 
-
   private int countJULKnownLevels(ClassLoader artifactClassLoader) throws Exception {
     int counter = 0;
     Class<?> knownLevelClass = loadClass(JUL_KNOWN_LEVEL_CLASS, artifactClassLoader);
@@ -519,27 +456,16 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   private int countWorkerThreads(ClassLoader artifactClassLoader) {
-    ThreadUtils.getAllThreads().stream().forEach(o -> {
-      System.out.println(o.getName());
-    });
-
-    List<Thread> threads = ThreadUtils.getAllThreads().stream()
+    List<Thread> threads = getAllThreads().stream()
         .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
         .filter(thread -> thread.getClass().getClassLoader() == artifactClassLoader)
         .collect(Collectors.toList());
+
     return threads.size();
   }
 
   private void createWorkerThread(MuleArtifactClassLoader artifactClassLoader) throws ClassNotFoundException {
-    // Load all the clases need to create the IBM Worker thread.
     artifactClassLoader.loadClass(IBM_WORKER_CLASS);
-    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.workqueue.WorkQueueItem");
-    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.workqueue.SimpleWorkQueueItem");
-    artifactClassLoader.loadClass("com.ibm.msg.client.commonservices.j2se.workqueue.WorkQueueManagerImplementation");
-    artifactClassLoader
-        .loadClass("com.ibm.msg.client.commonservices.j2se.workqueue.WorkQueueManagerImplementation$WorkQueueManagerThread");
-
-
     Class.forName(IBM_WORKER_CLASS, true, artifactClassLoader);
 
     // Verify if the worker thread is alive.
@@ -564,5 +490,14 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
     return dependency;
+  }
+
+  private MuleArtifactClassLoader getArtifactClassLoader(String artifactId, ClassLoader classLoader)
+      throws MalformedURLException {
+    return new MuleArtifactClassLoader(artifactId,
+                                       mock(ArtifactDescriptor.class),
+                                       new URL[] {getBundleDependency().getBundleUri().toURL()},
+                                       classLoader,
+                                       testLookupPolicy);
   }
 }
