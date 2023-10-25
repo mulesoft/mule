@@ -15,7 +15,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
-import static org.apache.commons.lang3.ThreadUtils.*;
+import static org.apache.commons.lang3.ThreadUtils.getAllThreads;
 
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.ref.Reference;
