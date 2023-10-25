@@ -18,6 +18,8 @@ import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -25,11 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
+
+import org.apache.commons.lang3.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +61,8 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   private final static String IBM_MQ_ENVIRONMENT_CLASS = "com.ibm.mq.MQEnvironment";
   private final static String IBM_MQ_JMS_TLS_CLASS = "com.ibm.msg.client.jms.internal.JmsTls";
   private final static String IBM_MQ_TRACE_CLASS = "com.ibm.msg.client.commonservices.trace.Trace";
+  private static final String JMSCC_THREAD_POOL_MAIN_NAME = "JMSCCThreadPoolMaster";
+  private final static String IBM_WORKER_CLASS = "com.ibm.msg.client.commonservices.workqueue.WorkQueueManager";
   private final ClassLoader driverClassLoader;
 
 
@@ -86,6 +93,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
 
     LOGGER.debug("Releasing IBM MQ resources - Removes the static references held by the TraceController Class.");
     cleanPrivateStaticFieldForClass(IBM_MQ_TRACE_CLASS, "traceController");
+
+    LOGGER.debug("Releasing IBM MQ resources - Removes JMSCCThreadPoolMaster threads.");
+    disposeMQThreads();
 
     LOGGER
         .debug("Releasing IBM MQ resources - Removes the thread local references to instances of classes loaded by the driver classloader.");
@@ -381,5 +391,51 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
         }
       }
     }
+  }
+
+  /**
+   * Close JMSCCThreadPoolMaster threads pending to close to avoid thread leaks after redeployment
+   */
+  private void disposeMQThreads() {
+    List<Thread> threads = ThreadUtils.getAllThreads().stream()
+        .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
+        .collect(Collectors.toList());
+
+    if (!threads.isEmpty()) {
+      threads.forEach(thread -> killThread(thread));
+      try {
+        killIBMWorker();
+      } catch (Throwable e) {
+        LOGGER.debug("An error occurred trying to close the WorkQueueManager", e);
+      }
+    }
+  }
+
+  /**
+   * Kill any thread alive
+   *
+   * @param thread thread to kill
+   */
+  private void killThread(Thread thread) {
+    try {
+      Class<? extends Thread> threadClass = thread.getClass();
+      Method closeMethod = threadClass.getDeclaredMethod("close");
+      closeMethod.setAccessible(true);
+      closeMethod.invoke(thread);
+      LOGGER.info("Thread name : " + thread.getName());
+      thread.interrupt();
+    } catch (Throwable e) {
+      LOGGER.debug("An error occurred trying to close the '" + JMSCC_THREAD_POOL_MAIN_NAME + "' Thread", e);
+    }
+  }
+
+  /**
+   * Kill IBM mq active queue worker
+   */
+  private void killIBMWorker()
+      throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    Class<?> clazz = loadClass(IBM_WORKER_CLASS, driverClassLoader);
+    Method method = clazz.getMethod("close");
+    method.invoke(null);
   }
 }
