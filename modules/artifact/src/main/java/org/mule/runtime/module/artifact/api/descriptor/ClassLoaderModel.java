@@ -107,14 +107,16 @@ public final class ClassLoaderModel {
   }
 
   /**
-   * @return the artifact IDs that have access to the privileged API defined on the {@link ClassLoader}. Each artifact is defined using Maven's groupId:artifactId. Non null
+   * @return the artifact IDs that have access to the privileged API defined on the {@link ClassLoader}. Each artifact is defined
+   *         using Maven's groupId:artifactId. Non null
    */
   public Set<String> getPrivilegedArtifacts() {
     return privilegedArtifacts;
   }
 
   /**
-   * @return {@code true} if the model should include {@code test} scope dependencies when resolving the class loader {@link URL urls} for the artifact.
+   * @return {@code true} if the model should include {@code test} scope dependencies when resolving the class loader {@link URL
+   *         urls} for the artifact.
    */
   public boolean isIncludeTestDependencies() {
     return includeTestDependencies;
@@ -215,7 +217,7 @@ public final class ClassLoaderModel {
     /**
      * Indicates which Java packages are exported as privileged API on the model.
      *
-     * @param packages Java packages names to export. Non null.
+     * @param packages    Java packages names to export. Non null.
      * @param artifactIds artifact IDs that have access to the privileged API. No null.
      * @return same builder instance.
      */
@@ -276,6 +278,7 @@ public final class ClassLoaderModel {
 
     /**
      * Creates a {@link ClassLoaderModel} with the current configuration.
+     * 
      * @return a non null {@link ClassLoaderModel}
      */
     public ClassLoaderModel build() {

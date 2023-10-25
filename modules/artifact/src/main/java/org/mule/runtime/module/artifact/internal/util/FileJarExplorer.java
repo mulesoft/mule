@@ -11,7 +11,6 @@ import static java.io.File.separator;
 import static java.io.File.separatorChar;
 import static java.util.regex.Pattern.compile;
 import static java.util.regex.Pattern.quote;
-
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
@@ -52,7 +51,7 @@ public class FileJarExplorer implements JarExplorer {
    * @param runtimeModeForServices if {@code false}, services will be considered as resources, otherwise they will be considered
    *                               as {@link ExportedService exported services}.
    *
-   * @since 4.3.1
+   * @since 4.4.1
    */
   public FileJarExplorer(boolean runtimeModeForServices) {
     this.runtimeModeForServices = runtimeModeForServices;

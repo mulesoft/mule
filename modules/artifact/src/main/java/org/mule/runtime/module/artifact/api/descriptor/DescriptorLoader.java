@@ -30,7 +30,7 @@ public interface DescriptorLoader<T> {
    * Loads a described object
    *
    * @param artifactFile {@link File} with the content of the artifact to work with. Non null
-   * @param attributes collection of attributes describing the loader. Non null.
+   * @param attributes   collection of attributes describing the loader. Non null.
    * @param artifactType the type of the artifact of the descriptor to be loaded.
    * 
    * @return a {@link T} loaded with the given attributes from the artifact folder.

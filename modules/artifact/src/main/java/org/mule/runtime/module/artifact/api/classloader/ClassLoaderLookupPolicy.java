@@ -53,8 +53,8 @@ public interface ClassLoaderLookupPolicy {
    * Creates a new instance extending the original policy configuration
    *
    * @param lookupStrategies lookup strategies to use with specific packages. Non null.
-   * @param overwrite if a lookupStrategy for a package provided in {@code lookupStrategies} already exists on this policy, it
-   *        will be overridden or not depending on this value.
+   * @param overwrite        if a lookupStrategy for a package provided in {@code lookupStrategies} already exists on this policy,
+   *                         it will be overridden or not depending on this value.
    * @return a new policy containing the lookup strategies from the original policy and the lookup strategies passed on the
    *         parameter.
    */

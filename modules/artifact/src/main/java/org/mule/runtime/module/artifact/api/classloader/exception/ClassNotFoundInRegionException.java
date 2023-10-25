@@ -30,7 +30,7 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
   /**
    * Builds the exception.
    *
-   * @param className the name of the class that was trying to be loaded.
+   * @param className  the name of the class that was trying to be loaded.
    * @param regionName the name of the region the class was being loaded from.
    */
   public ClassNotFoundInRegionException(String className, String regionName) {
@@ -42,10 +42,10 @@ public final class ClassNotFoundInRegionException extends ClassNotFoundException
   /**
    * Builds the exception.
    *
-   * @param className the name of the class that was trying to be loaded.
-   * @param regionName the name of the region the class was being loaded from.
+   * @param className    the name of the class that was trying to be loaded.
+   * @param regionName   the name of the region the class was being loaded from.
    * @param artifactName the name of the artifact in the region the class was being loaded from.
-   * @param cause the actual exception that was thrown when loading the class form the artifact classLoader.
+   * @param cause        the actual exception that was thrown when loading the class form the artifact classLoader.
    */
   public ClassNotFoundInRegionException(String className, String regionName, String artifactName, ClassNotFoundException cause) {
     super(format("Class '%s' not found in classloader for artifact '%s' in region '%s'.", className, artifactName, regionName),

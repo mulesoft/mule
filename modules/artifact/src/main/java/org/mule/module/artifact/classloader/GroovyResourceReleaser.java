@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 /**
  * A utility class to release all resources associated to Groovy Dependency on un-deployment to prevent classloader leaks.
  *
- * @since 4.3.0
+ * @since 4.4.0
  */
 public class GroovyResourceReleaser implements ResourceReleaser {
 

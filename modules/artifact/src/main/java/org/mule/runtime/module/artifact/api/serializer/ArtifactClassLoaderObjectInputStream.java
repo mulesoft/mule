@@ -32,7 +32,7 @@ public final class ArtifactClassLoaderObjectInputStream extends ObjectInputStrea
    * Creates a new stream instance.
    *
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
-   * @param input input stream to read from. Non null.
+   * @param input                 input stream to read from. Non null.
    * @throws IOException if an I/O error occurs while reading stream header
    */
   public ArtifactClassLoaderObjectInputStream(ClassLoaderRepository classLoaderRepository, InputStream input)

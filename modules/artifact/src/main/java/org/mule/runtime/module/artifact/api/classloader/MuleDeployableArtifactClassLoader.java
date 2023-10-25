@@ -29,11 +29,11 @@ public class MuleDeployableArtifactClassLoader extends MuleArtifactClassLoader {
   /**
    * Creates a {@link MuleDeployableArtifactClassLoader} with the provided configuration.
    *
-   * @param artifactId artifact unique ID. Non empty.
-   * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.
-   * @param urls the URLs from which to load classes and resources
-   * @param parent parent class loader in the hierarchy
-   * @param lookupPolicy policy for resolving classes and resources
+   * @param artifactId                 artifact unique ID. Non empty.
+   * @param artifactDescriptor         descriptor for the artifact owning the created class loader instance.
+   * @param urls                       the URLs from which to load classes and resources
+   * @param parent                     parent class loader in the hierarchy
+   * @param lookupPolicy               policy for resolving classes and resources
    * @param artifactPluginClassLoaders class loaders for the plugin artifacts contained by this artifact. Must be not null.
    */
   public MuleDeployableArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls,

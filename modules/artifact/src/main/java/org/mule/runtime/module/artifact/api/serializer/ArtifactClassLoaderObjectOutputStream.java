@@ -30,7 +30,7 @@ public final class ArtifactClassLoaderObjectOutputStream extends ObjectOutputStr
    * Creates a new output stream.
    *
    * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
-   * @param out output stream to write to
+   * @param out                   output stream to write to
    * @throws IOException if an I/O error occurs while writing stream header
    */
   public ArtifactClassLoaderObjectOutputStream(ClassLoaderRepository classLoaderRepository, OutputStream out) throws IOException {

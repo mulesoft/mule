@@ -96,8 +96,8 @@ public final class MuleArtifactUrlConnection extends URLConnection {
    * that are accessible from that starting point.
    *
    * @throws IOException if the first element is not a ZIP file, or if the protocol is not supported, or if it's impossible to
-   *         create a {@link ZipFile} from the parsed {@code url}, or if there's not at least a {@link #SEPARATOR} in the
-   *         {@code url}.
+   *                     create a {@link ZipFile} from the parsed {@code url}, or if there's not at least a {@link #SEPARATOR} in
+   *                     the {@code url}.
    */
   @Override
   public void connect() throws IOException {
@@ -169,8 +169,8 @@ public final class MuleArtifactUrlConnection extends URLConnection {
    * Recursively iterates the {@code files} queue to lookup for the element, ends successfully when it gets to the bottom of it.
    *
    * @param currentStream position to the current element of the zip file (it moves in the recursion targeting the contents of a
-   *        ZIP file)
-   * @param files the queue with the files that has to be introspected
+   *                      ZIP file)
+   * @param files         the queue with the files that has to be introspected
    * @return the input stream of the file that has been looked for
    * @throws IOException if the file is not present
    */

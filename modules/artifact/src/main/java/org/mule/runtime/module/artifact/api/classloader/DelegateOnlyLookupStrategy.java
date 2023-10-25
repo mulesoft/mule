@@ -15,8 +15,7 @@ import org.mule.api.annotation.NoInstantiate;
 import java.util.List;
 
 /**
- * Defines a {@link LookupStrategy} that will search on a given classloader only, without searching
- * on the current classloader.
+ * Defines a {@link LookupStrategy} that will search on a given classloader only, without searching on the current classloader.
  *
  * @since 4.0
  */

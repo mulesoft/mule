@@ -39,9 +39,9 @@ public final class NotExportedClassException extends ClassNotFoundException {
   /**
    * Builds the exception.
    *
-   * @param className the name of the class that was trying to be loaded.
+   * @param className    the name of the class that was trying to be loaded.
    * @param artifactName the name of the artifact the class was being loaded from.
-   * @param filter the applied filter for the artifact.
+   * @param filter       the applied filter for the artifact.
    */
   public NotExportedClassException(String className, String artifactName, ClassLoaderFilter filter) {
     super(format("Class '%s' not found in classloader for artifact '%s'.", className, artifactName));
