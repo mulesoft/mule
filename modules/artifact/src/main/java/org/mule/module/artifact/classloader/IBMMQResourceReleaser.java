@@ -15,6 +15,8 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
+import static org.apache.commons.lang3.ThreadUtils.*;
+
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
@@ -26,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import javax.management.MBeanRegistrationException;
@@ -34,7 +37,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
-import org.apache.commons.lang3.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -396,36 +398,50 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
    * Close JMSCCThreadPoolMaster threads pending to close to avoid thread leaks after redeployment
    */
   private void disposeMQThreads() {
-    List<Thread> threads = ThreadUtils.getAllThreads().stream()
-        .filter(thread -> thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME))
-        .filter(thread -> thread.getClass().getClassLoader() == driverClassLoader)
+    String shouldAvoid = System.getProperty("avoid.dispose.mq.threads");
+    if (Boolean.valueOf(shouldAvoid)) {
+      return;
+    }
+
+    List<Thread> threads = getAllThreads().stream()
+        .filter(isThreadToBeDisposed())
         .collect(Collectors.toList());
 
     if (!threads.isEmpty()) {
-      threads.forEach(thread -> killThread(thread));
+      threads.forEach(thread -> closeWorkerThread(thread));
       try {
         killIBMWorker();
       } catch (Throwable e) {
-        LOGGER.debug("An error occurred trying to close the WorkQueueManager", e);
+        LOGGER.error("An error occurred trying to close the WorkQueueManager", e);
       }
     }
   }
 
   /**
-   * Kill any thread alive
-   *
-   * @param thread thread to kill
+   * @return Predicate to evaluate if thread is disposable
    */
-  private void killThread(Thread thread) {
+  private Predicate<Thread> isThreadToBeDisposed() {
+    Predicate<Thread> nameThreadPredicate = t -> t.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME);
+    Predicate<Thread> classLoaderPredicate = t -> t.getClass().getClassLoader() == driverClassLoader;
+
+    return nameThreadPredicate.and(classLoaderPredicate);
+  }
+
+  /**
+   * Close worker thread
+   *
+   * @param thread thread to close
+   */
+  private void closeWorkerThread(Thread thread) {
     try {
       Class<? extends Thread> threadClass = thread.getClass();
       Method closeMethod = threadClass.getDeclaredMethod("close");
       closeMethod.setAccessible(true);
       closeMethod.invoke(thread);
-      LOGGER.info("Thread name : " + thread.getName());
+      LOGGER.debug("Thread name : " + thread.getName());
       thread.interrupt();
     } catch (Throwable e) {
-      LOGGER.debug("An error occurred trying to close the '" + JMSCC_THREAD_POOL_MAIN_NAME + "' Thread", e);
+      LOGGER.error("An error occurred trying to close the '" + JMSCC_THREAD_POOL_MAIN_NAME + "' Thread", e);
     }
   }
 
