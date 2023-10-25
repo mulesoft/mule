@@ -14,7 +14,6 @@ import static java.beans.Introspector.flushCaches;
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
-import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.ThreadUtils.getAllThreads;
 
@@ -29,7 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -403,13 +404,13 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
     }
 
     List<Thread> threads = getAllThreads().stream()
-        .filter(this::isThreadToBeDisposed)
-        .collect(toList());
+        .filter(isThreadToBeDisposed())
+        .collect(Collectors.toList());
 
     if (!threads.isEmpty()) {
       threads.forEach(thread -> closeWorkerThread(thread));
       try {
-        closeIBMWorker();
+        killIBMWorker();
       } catch (Throwable e) {
         LOGGER.error("An error occurred trying to close the WorkQueueManager", e);
       }
@@ -417,11 +418,13 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * @return if thread is disposable
+   * @return Predicate to evaluate if thread is disposable
    */
-  private boolean isThreadToBeDisposed(Thread thread) {
-    return thread.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME) &&
-            thread.getClass().getClassLoader() == driverClassLoader;
+  private Predicate<Thread> isThreadToBeDisposed() {
+    Predicate<Thread> nameThreadPredicate = t -> t.getName().equals(JMSCC_THREAD_POOL_MAIN_NAME);
+    Predicate<Thread> classLoaderPredicate = t -> t.getClass().getClassLoader() == driverClassLoader;
+
+    return nameThreadPredicate.and(classLoaderPredicate);
   }
 
   /**
@@ -443,9 +446,9 @@ public class IBMMQResourceReleaser implements ResourceReleaser {
   }
 
   /**
-   * Close IBM mq active queue worker
+   * Kill IBM mq active queue worker
    */
-  private void closeIBMWorker()
+  private void killIBMWorker()
       throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     Class<?> clazz = loadClass(IBM_WORKER_CLASS, driverClassLoader);
     Method method = clazz.getMethod("close");

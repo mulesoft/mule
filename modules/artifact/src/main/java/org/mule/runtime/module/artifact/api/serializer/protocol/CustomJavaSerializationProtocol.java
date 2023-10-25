@@ -27,9 +27,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Custom serialization protocol that uses {@link ArtifactClassLoaderObjectInputStream} and
- * {@link ArtifactClassLoaderObjectOutputStream} to write and read serialized objects to support deserialization of non exported
- * classes.
+ * Custom serialization protocol that uses {@link ArtifactClassLoaderObjectInputStream} and {@link ArtifactClassLoaderObjectOutputStream}
+ * to write and read serialized objects to support deserialization of non exported classes.
  */
 @NoInstantiate
 public class CustomJavaSerializationProtocol extends AbstractSerializationProtocol {
@@ -37,10 +36,9 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
   private final ClassLoaderRepository classLoaderRepository;
 
   /**
-   * Creates a new serialization protocol to serialize/deserialize classes provided by any class loader defined in the provided
-   * class loader repository.
-   * 
-   * @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
+   * Creates a new serialization protocol to serialize/deserialize classes provided by any class loader
+   * defined in the provided class loader repository.
+   *  @param classLoaderRepository contains the registered classloaders that can be used to load serialized classes. Non null.
    *
    */
   public CustomJavaSerializationProtocol(ClassLoaderRepository classLoaderRepository) {
@@ -53,7 +51,7 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
    */
   @Override
   protected byte[] doSerialize(Object object) throws Exception {
-    // TODO: MULE-11939
+    //TODO: MULE-11939
     if (object instanceof CursorStreamProvider) {
       try (CursorStream cursor = ((CursorStreamProvider) object).openCursor()) {
         object = toByteArray(cursor);

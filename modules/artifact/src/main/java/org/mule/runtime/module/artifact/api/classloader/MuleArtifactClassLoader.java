@@ -113,11 +113,11 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
    *
-   * @param artifactId         artifact unique ID. Non empty.
+   * @param artifactId artifact unique ID. Non empty.
    * @param artifactDescriptor descriptor for the artifact owning the created class loader. Non null.
-   * @param urls               the URLs from which to load classes and resources
-   * @param parent             the parent class loader for delegation
-   * @param lookupPolicy       policy used to guide the lookup process. Non null
+   * @param urls the URLs from which to load classes and resources
+   * @param parent the parent class loader for delegation
+   * @param lookupPolicy policy used to guide the lookup process. Non null
    */
   public MuleArtifactClassLoader(String artifactId, ArtifactDescriptor artifactDescriptor, URL[] urls, ClassLoader parent,
                                  ClassLoaderLookupPolicy lookupPolicy) {

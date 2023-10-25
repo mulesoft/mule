@@ -13,28 +13,21 @@ package org.mule.runtime.module.artifact.api.descriptor;
 public final class ArtifactDescriptorCreateException extends RuntimeException {
 
   /**
-   * Thrown to indicate any error related to errors in the structure of a plugin file or folder.
-   *
-   * @param message
+   * {@inheritDoc}
    */
   public ArtifactDescriptorCreateException(String message) {
     super(message);
   }
 
   /**
-   * Thrown to indicate any error related to errors in the structure of a plugin file or folder.
-   *
-   * @param s
-   * @param throwable
+   * {@inheritDoc}
    */
   public ArtifactDescriptorCreateException(String s, Throwable throwable) {
     super(s, throwable);
   }
 
   /**
-   * Thrown to indicate any error related to errors in the structure of a plugin file or folder.
-   *
-   * @param cause
+   * {@inheritDoc}
    */
   public ArtifactDescriptorCreateException(Throwable cause) {
     super(cause);

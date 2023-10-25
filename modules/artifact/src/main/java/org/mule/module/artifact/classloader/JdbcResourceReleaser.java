@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.activeCount;
 import static java.lang.Thread.enumerate;
 import static java.lang.Boolean.getBoolean;
+
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static java.sql.DriverManager.deregisterDriver;
 import static java.sql.DriverManager.getDrivers;
@@ -19,7 +20,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.lang.reflect.Field;
@@ -42,8 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has to use
- * {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
+ * ResourceReleaser implementation used for every artifact created on the container that is loaded dynamically as it has
+ * to use {@link java.sql.DriverManager} to unregister {@link Driver} registered by the artifact class loader.
  * <p>
  * <p/>
  * IMPORTANT: this class is on a different package than the rest of the classes in this module. The reason of that is that this
@@ -52,18 +52,14 @@ import org.slf4j.LoggerFactory;
  */
 public class JdbcResourceReleaser implements ResourceReleaser {
 
-  /*
-   * This system property should be avoid.dispose.timer.threads because there are others drivers that also uses them, but we
-   * cannot change it due to backward compatibility
-   */
-  private static final String AVOID_DISPOSE_TIMER_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
-  private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_TIMER_THREADS =
-      getBoolean(AVOID_DISPOSE_TIMER_THREADS_PROPERTY_NAME);
+  private static final String AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME = "avoid.dispose.oracle.threads";
+  private static final boolean JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS =
+      getBoolean(AVOID_DISPOSE_ORACLE_THREADS_PROPERTY_NAME);
 
   public static final String DIAGNOSABILITY_BEAN_NAME = "diagnosability";
-  public static final String DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
+  public static final String ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";
   public static final String COMPOSITE_CLASS_LOADER_CLASS_NAME = "CompositeClassLoader";
-  public static final Pattern DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
+  public static final Pattern ORACLE_DRIVER_TIMER_THREAD_PATTERN = Pattern.compile("^Timer-\\d+");
   private static final Logger logger = LoggerFactory.getLogger(JdbcResourceReleaser.class);
   private static final List<String> CONNECTION_CLEANUP_THREAD_KNOWN_CLASS_ADDRESES =
       Arrays.asList("com.mysql.jdbc.AbandonedConnectionCleanupThread", "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
@@ -89,19 +85,12 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         }
       }
     }
-    /*
-     * (W-12460123) When we have a DB2 driver in the application: Due to in this class getDrivers() method does not return any
-     * values when we had a DB2 driver, we found the TimerThread that it triggers for canceling it
-     */
-    if (!JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_TIMER_THREADS && detectDB2Uses()) {
-      disposeDriverTimerThreads();
-    }
   }
 
   /**
    * @param driver the JDBC driver to check its {@link ClassLoader} for.
    * @return {@code true} if the {@link ClassLoader} of the driver is a descendant of the {@link ClassLoader} of this releaser,
-   *         {@code false} otherwise.
+   * {@code false} otherwise.
    */
   private boolean isDriverLoadedByThisClassLoader(Driver driver) {
     ClassLoader driverClassLoader = driver.getClass().getClassLoader();
@@ -112,6 +101,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       }
       driverClassLoader = driverClassLoader.getParent();
     }
+
     return false;
   }
 
@@ -124,7 +114,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       if (isOracleDriver(driver)) {
         deregisterOracleDiagnosabilityMBean();
-        disposeDriverTimerThreads();
+        disposeOracleDriverThreads();
       }
       if (isMySqlDriver(driver)) {
         shutdownMySqlAbandonedConnectionCleanupThread();
@@ -133,7 +123,6 @@ public class JdbcResourceReleaser implements ResourceReleaser {
       if (isDerbyEmbeddedDriver(driver)) {
         leakPreventionForDerbyEmbeddedDriver(driver);
       }
-
     } catch (Exception e) {
       logger.warn(format("Can not deregister driver %s. This can cause a memory leak.", driver.getClass()), e);
     }
@@ -150,14 +139,6 @@ public class JdbcResourceReleaser implements ResourceReleaser {
   private boolean isDerbyEmbeddedDriver(Driver driver) {
     // This is the dummy driver which is registered with the DriverManager and which is autoloaded by JDBC4
     return isDriver(driver, "org.apache.derby.jdbc.AutoloadedDriver");
-  }
-
-  private boolean detectDB2Uses() {
-    try {
-      return getClass().getClassLoader().getResources("com/ibm/db2").hasMoreElements();
-    } catch (IOException e) {
-      return false;
-    }
   }
 
   private boolean isDriver(Driver driver, String expectedDriverClass) {
@@ -299,9 +280,9 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     throw new ClassNotFoundException("No MySql's AbandonedConnectionCleanupThread class was found");
   }
 
-  private void disposeDriverTimerThreads() {
+  private void disposeOracleDriverThreads() {
     try {
-      if (JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_TIMER_THREADS) {
+      if (JDBC_RESOURCE_RELEASER_AVOID_DISPOSE_ORACLE_THREADS) {
         return;
       }
 
@@ -316,13 +297,14 @@ public class JdbcResourceReleaser implements ResourceReleaser {
 
       ClassLoader undeployedArtifactClassLoader = this.getClass().getClassLoader();
 
-      /*
-       * IMPORTANT: This is done to avoid metaspace OOM caused by thread leaks from oracle and db2 drivers. This is only meant to
-       * stop TimerThread threads spawned by oracle driver's HAManager class. This timer cannot be fetched by reflection because,
-       * in order to do so, other oracle dependencies would be required.
-       */
+      /* IMPORTANT: this is done to avoid metaspace OOM caused by oracle driver
+      thread leak. This is only meant to stop TimerThread threads spawned
+      by oracle driver's HAManager class. This timer cannot be fetched
+      by reflection because, in order to do so, other oracle dependencies
+      would be required.
+      * */
       for (Thread thread : threads) {
-        if (isTimerThread(undeployedArtifactClassLoader, thread)) {
+        if (isOracleTimerThread(undeployedArtifactClassLoader, thread)) {
           try {
             clearReferencesStopTimerThread(thread);
             thread.interrupt();
@@ -339,15 +321,15 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     }
   }
 
-  private boolean isTimerThread(ClassLoader undeployedArtifactClassLoader, Thread thread) {
+  private boolean isOracleTimerThread(ClassLoader undeployedArtifactClassLoader, Thread thread) {
     if (!(undeployedArtifactClassLoader instanceof ArtifactClassLoader)) {
       return false;
     }
     String artifactId = ((ArtifactClassLoader) undeployedArtifactClassLoader).getArtifactId();
-    Matcher timerThreadNameMatcher = DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
+    Matcher oracleTimerThreadNameMatcher = ORACLE_DRIVER_TIMER_THREAD_PATTERN.matcher(thread.getName());
 
-    return thread.getClass().getSimpleName().equals(DRIVER_TIMER_THREAD_CLASS_NAME)
-        && timerThreadNameMatcher.matches()
+    return thread.getClass().getSimpleName().equals(ORACLE_DRIVER_TIMER_THREAD_CLASS_NAME)
+        && oracleTimerThreadNameMatcher.matches()
         && (isThreadLoadedByDisposedApplication(artifactId, thread.getContextClassLoader())
             || isThreadLoadedByDisposedDomain(artifactId, thread.getContextClassLoader()));
   }
@@ -401,7 +383,7 @@ public class JdbcResourceReleaser implements ResourceReleaser {
     // - newTasksMayBeScheduled field (in java.util.TimerThread)
     // - queue field
     // - queue.clear()
-    // in IBM JDK, Apache Harmony and DB2:
+    // in IBM JDK, Apache Harmony:
     // - cancel() method (in java.util.Timer$TimerImpl)
     try {
       Field newTasksMayBeScheduledField =
@@ -418,16 +400,12 @@ public class JdbcResourceReleaser implements ResourceReleaser {
         // In case queue was already empty. Should only be one
         // thread waiting but use notifyAll() to be safe.
         queue.notifyAll();
-        newTasksMayBeScheduledField.setAccessible(false);
-        queueField.setAccessible(false);
-        clearMethod.setAccessible(false);
       }
     } catch (NoSuchFieldException noSuchFieldEx) {
       logger.warn("Unable to clear timer references using 'clear' method. Attempting to use 'cancel' method.");
       Method cancelMethod = thread.getClass().getDeclaredMethod("cancel");
       cancelMethod.setAccessible(true);
       cancelMethod.invoke(thread);
-      cancelMethod.setAccessible(false);
     }
   }
 }

@@ -9,7 +9,6 @@ package org.mule.runtime.module.artifact.builder;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.SystemUtils.JAVA_IO_TMPDIR;
 import static org.mule.runtime.module.artifact.api.classloader.MuleMavenPlugin.MULE_MAVEN_PLUGIN_ARTIFACT_ID;
@@ -44,7 +43,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public abstract class AbstractDependencyFileBuilder<T extends AbstractDependencyFileBuilder<T>> {
 
   public static final String COMPILE_SCOPE = "compile";
-  public static final String PROVIDED_SCOPE = "provided";
   private static final String MULE_MAVEN_PLUGIN_VERSION = "1.0.0";
   private final String artifactId;
   private final List<AbstractDependencyFileBuilder> dependencies = new ArrayList<>();
@@ -53,7 +51,6 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   private String version = "1.0.0";
   private final String type = "jar";
   private String classifier;
-  private String scope;
   private File artifactPomFile;
   private File artifactPomPropertiesFile;
   private File tempFolder;
@@ -214,15 +211,6 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
   }
 
   /**
-   * @param scope the maven scope
-   * @return the same builder instance
-   */
-  public T withScope(String scope) {
-    this.scope = scope;
-    return getThis();
-  }
-
-  /**
    * @return maven group id
    */
   public String getGroupId() {
@@ -255,13 +243,6 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
    */
   public String getClassifier() {
     return classifier;
-  }
-
-  /**
-   * @return maven scope
-   */
-  public String getScope() {
-    return scope;
   }
 
   /**
@@ -319,7 +300,7 @@ public abstract class AbstractDependencyFileBuilder<T extends AbstractDependency
     dependency.setArtifactId(getArtifactId());
     dependency.setClassifier(getClassifier());
     dependency.setType(getType());
-    dependency.setScope(ofNullable(getScope()).orElse(COMPILE_SCOPE));
+    dependency.setScope(COMPILE_SCOPE);
     return dependency;
   }
 

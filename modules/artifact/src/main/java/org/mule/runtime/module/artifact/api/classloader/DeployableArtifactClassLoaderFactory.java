@@ -22,9 +22,9 @@ public interface DeployableArtifactClassLoaderFactory<T extends ArtifactDescript
   /**
    * Creates a {@link ClassLoader} from a given descriptor
    *
-   * @param artifactId                 artifact unique ID
-   * @param parent                     parent for the new artifact classloader.
-   * @param descriptor                 descriptor of the artifact owner of the created classloader
+   * @param artifactId artifact unique ID
+   * @param parent parent for the new artifact classloader.
+   * @param descriptor descriptor of the artifact owner of the created classloader
    * @param artifactPluginClassLoaders {@link List} with the artifact plugin class loaders
    * @return a new classLoader for described artifact
    */
