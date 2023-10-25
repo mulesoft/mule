@@ -465,7 +465,6 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   private void createWorkerThread(MuleArtifactClassLoader artifactClassLoader) throws ClassNotFoundException {
-    artifactClassLoader.loadClass(IBM_WORKER_CLASS);
     Class.forName(IBM_WORKER_CLASS, true, artifactClassLoader);
 
     // Verify if the worker thread is alive.
