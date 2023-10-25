@@ -20,7 +20,7 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.lang3.ThreadUtils.*;
+import static org.apache.commons.lang3.ThreadUtils.getAllThreads;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
