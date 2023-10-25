@@ -65,7 +65,6 @@ import org.junit.runners.Parameterized;
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.apache.commons.lang3.ThreadUtils;
 
 @Feature(LEAK_PREVENTION)
 @RunWith(Parameterized.class)
