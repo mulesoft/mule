@@ -28,8 +28,8 @@ import org.junit.Test;
 public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
 
   @Override
-  protected String getModulePath() {
-    return "modules/module-tls-config.xml";
+  protected String[] getModulePaths() {
+    return new String[] {"modules/module-tls-config.xml", "modules/module-tls-config-with-default.xml"};
   }
 
   @Override
@@ -43,6 +43,18 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
   }
 
   @Test
+  public void noTlsContextProvided() throws Exception {
+    PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientNoTls").getMessage().getPayload().getValue();
+    assertThat(client.getTlsContext(), is(nullValue()));
+  }
+
+  @Test
+  public void whenInnerConfigDoesNotEnableTlsThenItIsNotMacroExpanded() throws Exception {
+    PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientNoCustomTlsSupport").getMessage().getPayload().getValue();
+    assertThat(client.getTlsContext(), is(nullValue()));
+  }
+
+  @Test
   public void tlsContextByRef() throws Exception {
     PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientByRef").getMessage().getPayload().getValue();
     assertExpectedTlsContext(client.getTlsContext());
@@ -52,6 +64,35 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
   public void tlsContextInline() throws Exception {
     PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientInline").getMessage().getPayload().getValue();
     assertExpectedTlsContext(client.getTlsContext());
+  }
+
+  @Test
+  public void noCustomTlsButDefaultFromModule() throws Exception {
+    PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientWithDefault").getMessage().getPayload().getValue();
+
+    // The given config does not provide a TLS context but the config in the module definition already has one
+    TlsContextFactory actualTlsContextFactory = client.getTlsContext();
+    assertThat(actualTlsContextFactory, is(notNullValue()));
+    assertThat(actualTlsContextFactory.getTrustStoreConfiguration().getPassword(), is("changeit2"));
+  }
+
+  @Test
+  public void whenCustomTlsIsProvidedToTlsEnabledThenItTakesPrecedence() throws Exception {
+    // Even when the module's internal element already had a TLS context, since it was marked as tlsEnabled, it can be overridden
+    // by the TLS config given to the module's config
+    PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientWithDefaultByRef").getMessage().getPayload().getValue();
+    assertExpectedTlsContext(client.getTlsContext());
+  }
+
+  @Test
+  public void whenInnerConfigDoesNotEnableTlsAndHasDefaultThenDefaultTakesPrecedence() throws Exception {
+    PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientFixedTls").getMessage().getPayload().getValue();
+
+    // The given config provides a TLS context but the config in the module definition already has one, and it is not marked as
+    // tlsEnabled
+    TlsContextFactory actualTlsContextFactory = client.getTlsContext();
+    assertThat(actualTlsContextFactory, is(notNullValue()));
+    assertThat(actualTlsContextFactory.getTrustStoreConfiguration().getPassword(), is("changeit2"));
   }
 
   private void assertExpectedTlsContext(TlsContextFactory actualTlsContextFactory) throws IOException {

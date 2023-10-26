@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:module-tls-config="http://www.mulesoft.org/schema/mule/module-tls-config"
+      xmlns:module-tls-config-with-default="http://www.mulesoft.org/schema/mule/module-tls-config-with-default"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/module-tls-config http://www.mulesoft.org/schema/mule/module-tls-config/current/mule-module-tls-config.xsd
+       http://www.mulesoft.org/schema/mule/module-tls-config-with-default http://www.mulesoft.org/schema/mule/module-tls-config-with-default/current/mule-module-tls-config-with-default.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -15,6 +17,8 @@
                        path="ssltest-keystore.jks"/>
 
     </tls:context>
+
+    <module-tls-config:config name="noTls" someUserConfig="john" somePassConfig="doe"/>
 
     <module-tls-config:config name="byRef" someUserConfig="john" somePassConfig="doe" tlsContext="myTlsContext"/>
 
@@ -27,11 +31,36 @@
         </tls:context>
     </module-tls-config:config>
 
+    <module-tls-config-with-default:config name="withDefaultNoTls" someUserConfig="john" somePassConfig="doe"/>
+
+    <module-tls-config-with-default:config name="withDefaultByRef" someUserConfig="john" somePassConfig="doe" tlsContext="myTlsContext"/>
+
+    <flow name="getPetStoreClientNoTls">
+        <module-tls-config:get-pet-store-client config-ref="noTls" />
+    </flow>
+
     <flow name="getPetStoreClientByRef">
         <module-tls-config:get-pet-store-client config-ref="byRef" />
     </flow>
 
     <flow name="getPetStoreClientInline">
         <module-tls-config:get-pet-store-client config-ref="inline" />
+    </flow>
+
+    <flow name="getPetStoreClientNoCustomTlsSupport">
+        <!-- We are providing a config with TLS, but the operation uses an inner config which ignores it -->
+        <module-tls-config:get-pet-store-client-no-tls config-ref="byRef" />
+    </flow>
+
+    <flow name="getPetStoreClientWithDefault">
+        <module-tls-config-with-default:get-pet-store-client config-ref="withDefaultNoTls" />
+    </flow>
+
+    <flow name="getPetStoreClientWithDefaultByRef">
+        <module-tls-config-with-default:get-pet-store-client config-ref="withDefaultByRef" />
+    </flow>
+
+    <flow name="getPetStoreClientFixedTls">
+        <module-tls-config-with-default:get-pet-store-client-fixed-tls config-ref="withDefaultByRef" />
     </flow>
 </mule>
