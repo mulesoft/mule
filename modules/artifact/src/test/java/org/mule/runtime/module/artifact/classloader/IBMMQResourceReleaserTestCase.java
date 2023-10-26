@@ -203,7 +203,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  @Description("When removing an application which contains the IBM MQ Driver in the application class loader, there should not be worker thread references left")
   public void threadWorkerTestMultipleApplication() throws Exception {
 
 
@@ -253,7 +253,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  @Description("When removing an application which contains the IBM MQ Driver in the application class loader in a Domain, there should not be worker thread references left")
   public void threadWorkerApplicationDriver() throws Exception {
     MuleArtifactClassLoader muleDomainClassLoader =
         getArtifactClassLoader("muleDomainClassLoader", currentThread().getContextClassLoader());
@@ -300,7 +300,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  @Description("When removing an application which contains the IBM MQ Driver, there should not be worker thread references left")
+  @Description("When removing an application which contains the IBM MQ Driver in the domain classloader, there should not be worker thread references left")
   public void threadWorkerDomainDriver() throws Exception {
     MuleArtifactClassLoader muleDomainClassLoader =
         getArtifactClassLoader("muleDomainClassLoader", currentThread().getContextClassLoader());
