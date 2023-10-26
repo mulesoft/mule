@@ -195,7 +195,7 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final QName MODULE_CONNECTION_MARKER_ANNOTATION_QNAME =
       new QName("http://www.w3.org/2000/xmlns/", "connection", "xmlns");
-  private static final QName MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME =
+  public static final QName MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME =
       new QName("http://www.w3.org/2000/xmlns/", "tlsEnabled", "xmlns");
   public static final String MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE =
       MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getPrefix() + ":" + MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getLocalPart();

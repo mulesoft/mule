@@ -8,7 +8,8 @@
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
-    <tls:context name="myTlsContext">
+    <tls:context name="myTlsContext" enabledProtocols="TLSv1.2">
+        <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
         <tls:key-store keyPassword="changeit"
                        password="changeit"
                        path="ssltest-keystore.jks"/>
@@ -18,11 +19,19 @@
     <module-tls-config:config name="byRef" someUserConfig="john" somePassConfig="doe" tlsContext="myTlsContext"/>
 
     <module-tls-config:config name="inline" someUserConfig="john" somePassConfig="doe">
-        <tls:context>
+        <tls:context enabledProtocols="TLSv1.2">
+            <tls:trust-store path="ssltest-cacerts.jks" password="changeit"/>
             <tls:key-store keyPassword="changeit"
                            password="changeit"
                            path="ssltest-keystore.jks"/>
         </tls:context>
     </module-tls-config:config>
 
+    <flow name="getPetStoreClientByRef">
+        <module-tls-config:get-pet-store-client config-ref="byRef" />
+    </flow>
+
+    <flow name="getPetStoreClientInline">
+        <module-tls-config:get-pet-store-client config-ref="inline" />
+    </flow>
 </mule>

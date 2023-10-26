@@ -17,4 +17,11 @@
             <petstore:pet value="Dog"/>
         </petstore:pets>
     </petstore:config>
+
+    <operation name="get-pet-store-client">
+        <body>
+            <petstore:get-client config-ref="petstore-config" />
+        </body>
+        <output type="any"/>
+    </operation>
 </module>
