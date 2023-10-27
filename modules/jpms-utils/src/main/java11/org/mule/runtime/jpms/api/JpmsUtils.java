@@ -171,35 +171,36 @@ public final class JpmsUtils {
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
                                                          ClassLoader parent) {
-    return createModuleLayerClassLoader(modulePathEntriesParent, modulePathEntriesChild, childClassLoaderFactory,
-                                        useResolvedClassLoaderIfAvailable(parent), empty());
+    return createModuleLayerClassLoader(modulePathEntriesParent, modulePathEntriesChild, childClassLoaderFactory, parent,
+                                        empty());
   }
 
   /**
    * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, with the layer
-   * from the given {@code clazz} as parent, if any, or the parent class loader obtained from {@code parentClassLoaderResolver}. A
-   * classLoader from which the child modules can be read is returned.
+   * from the given {@code clazz} as parent, if any, and with the given {@code parentClassLoader}. A classLoader from which the
+   * child modules can be read is returned.
    *
-   * @param modulePathEntriesParent   the URLs from which to find the modules of the parent
-   * @param modulePathEntriesChild    the URLs from which to find the modules of the child
-   * @param childClassLoaderFactory   how the classLoader for the child is created, if moduleLayers are not used
-   * @param parentClassLoaderResolver determines the parent class loader for delegation
-   * @param clazz                     the class from which to get the parent layer.
+   * @param modulePathEntriesParent the URLs from which to find the modules of the parent
+   * @param modulePathEntriesChild  the URLs from which to find the modules of the child
+   * @param childClassLoaderFactory how the classLoader for the child is created, if moduleLayers are not used
+   * @param parentClassLoader       the parent class loader for delegation
+   * @param clazz                   the class from which to get the parent layer.
    * @return a new classLoader.
    */
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
-                                                         UnaryOperator<ClassLoader> parentClassLoaderResolver,
+                                                         ClassLoader parentClassLoader,
                                                          Optional<Class> clazz) {
     if (!useModuleLayer()) {
-      return childClassLoaderFactory.create(parentClassLoaderResolver.apply(clazz.map(Class::getClassLoader).orElse(null)),
-                                            modulePathEntriesParent, modulePathEntriesChild);
+      return childClassLoaderFactory.create(parentClassLoader, modulePathEntriesParent, modulePathEntriesChild);
     }
 
     ModuleLayer resolvedParentLayer = clazz.map(cl -> cl.getModule().getLayer()).orElse(null);
     final ModuleLayer parentLayer =
-        createModuleLayer(modulePathEntriesParent, parentClassLoaderResolver, ofNullable(resolvedParentLayer), false, true);
-    final ModuleLayer childLayer = createModuleLayer(modulePathEntriesChild, identity(), of(parentLayer), false, true);
+        createModuleLayer(modulePathEntriesParent, parentClassLoader, ofNullable(resolvedParentLayer), false, true);
+    ClassLoader childParentClassLoader = parentLayer.findLoader(parentLayer.modules().iterator().next().getName());
+    final ModuleLayer childLayer =
+        createModuleLayer(modulePathEntriesChild, childParentClassLoader, of(parentLayer), false, true);
     openToModule(childLayer, "org.mule.runtime.launcher", "org.mule.boot.api",
                  asList("org.mule.runtime.module.boot.internal"));
     openToModule(childLayer, "kryo.shaded", "java.base",
@@ -227,28 +228,6 @@ public final class JpmsUtils {
    * @return a new {@link ModuleLayer}.
    */
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
-                                              boolean isolateDependenciesInTheirOwnLayer,
-                                              boolean filterBootModules) {
-    return createModuleLayer(modulePathEntries, useResolvedClassLoaderIfAvailable(parent), parentLayer,
-                             isolateDependenciesInTheirOwnLayer, filterBootModules);
-  }
-
-  /**
-   * Creates a {@link ModuleLayer} for the given {@code modulePathEntries} and with the given {@code parent}.
-   * <p>
-   * Note: By definition, automatic modules have transitive readability on ALL other modules on the same layer and the parents.
-   * This may cause a situation where a layer that is supposed to be isolated will instead be able to read all the modules in the
-   * parent layers. To prevent this, the {@code isolateDependenciesInTheirOwnLayer} parameter must be passed as {@code true}.
-   *
-   * @param modulePathEntries                  the URLs from which to find the modules
-   * @param parentClassLoaderResolver          determines the parent class loader for delegation
-   * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
-   * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
-   *                                           parent will be created for modules that need to be isolated.
-   * @return a new {@link ModuleLayer}.
-   */
-  public static ModuleLayer createModuleLayer(URL[] modulePathEntries, UnaryOperator<ClassLoader> parentClassLoaderResolver,
-                                              Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
                                               boolean filterBootModules) {
     final Set<String> bootModules;
@@ -279,8 +258,6 @@ public final class JpmsUtils {
         .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
-    ClassLoader resolvedParentClassLoader = parentClassLoaderResolver
-        .apply(parentLayer.map(layer -> layer.findLoader(layer.modules().iterator().next().getName())).orElse(null));
 
     Controller controller;
     if (isolateDependenciesInTheirOwnLayer) {
@@ -300,7 +277,7 @@ public final class JpmsUtils {
               .collect(toList()));
       Controller isolatedModulesController = defineModulesWithOneLoader(isolatedModulesConfiguration,
                                                                         singletonList(boot()),
-                                                                        resolvedParentClassLoader);
+                                                                        parent);
 
       // ... the put the rest of the modules on a new layer with the isolated modules one as parent.
       Path[] notIsolatedModulesPaths = modulesByIsolation.get(false)
@@ -320,7 +297,7 @@ public final class JpmsUtils {
                                                 .collect(toList()));
       controller = defineModulesWithOneLoader(configuration,
                                               asList(isolatedModulesController.layer(), resolvedParentLayer),
-                                              resolvedParentClassLoader);
+                                              parent);
 
     } else {
       Path[] filteredModulesPaths = modulesByIsolation.values().stream()
@@ -339,7 +316,7 @@ public final class JpmsUtils {
               .collect(toList()));
       controller = defineModulesWithOneLoader(configuration,
                                               singletonList(resolvedParentLayer),
-                                              resolvedParentClassLoader);
+                                              parent);
     }
 
 
@@ -394,10 +371,6 @@ public final class JpmsUtils {
                 bootModule.addOpens(pkg, module);
               }
             }));
-  }
-
-  private static UnaryOperator<ClassLoader> useResolvedClassLoaderIfAvailable(ClassLoader parent) {
-    return resolved -> resolved != null ? resolved : parent;
   }
 
 }
