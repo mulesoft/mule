@@ -916,8 +916,8 @@ public final class XmlExtensionLoaderDelegate {
     if (!isTlsConfigurationSupported(componentAst)) {
       throw new MuleRuntimeException(createStaticMessage(format("The annotated element [%s] with [%s:%s] is not valid to be configured for TLS (the component [%s] does not support it)",
                                                                 getComponentIdForErrorMessage(componentAst),
-                                                                MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getPrefix(),
-                                                                MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getLocalPart(),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getPrefix(),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getLocalPart(),
                                                                 componentAst.getIdentifier())));
     }
   }
