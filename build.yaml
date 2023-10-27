@@ -11,7 +11,7 @@ upstreamProjects:
 # Uncomment it after they are copied
 # "mavenSettingsXmlId" : "mule-runtime-maven-settings-MuleSettings",
 mavenAdditionalArgs: -Djava.net.preferIPv4Stack=true -T1C
-mavenCompileGoal: clean install -U -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
+mavenCompileGoal: clean install -DskipTests -DskipITs -Dinvoker.skip=true -Darchetype.test.skip -Dmaven.javadoc.skip
 projectType: runtime
 jdkTool: OPEN-JDK11
 testJdkTool: OPEN-JDK8
