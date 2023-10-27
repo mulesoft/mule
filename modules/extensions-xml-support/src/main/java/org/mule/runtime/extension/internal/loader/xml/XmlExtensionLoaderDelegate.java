@@ -10,7 +10,6 @@ import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
@@ -18,15 +17,15 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyCompone
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getDslConfiguration;
-import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
@@ -47,9 +46,10 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -70,7 +70,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDecl
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.OptionalParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OutputDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
@@ -79,10 +78,7 @@ import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterRole;
-import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
-import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -94,7 +90,6 @@ import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBu
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
-import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -102,8 +97,6 @@ import org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProvider;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
-import org.mule.runtime.extension.api.property.InfrastructureParameterModelProperty;
-import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
@@ -112,8 +105,6 @@ import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelPr
 import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
-import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.InfrastructureType;
 import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
@@ -195,8 +186,6 @@ public final class XmlExtensionLoaderDelegate {
   private static final String XMLNS_TNS = XMLNS_ATTRIBUTE + ":" + TNS_PREFIX;
   private static final QName MODULE_CONNECTION_MARKER_ANNOTATION_QNAME =
       new QName("http://www.w3.org/2000/xmlns/", "connection", "xmlns");
-  public static final QName MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME =
-      new QName("http://www.w3.org/2000/xmlns/", "tlsEnabled", "xmlns");
   public static final String MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE =
       MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getPrefix() + ":" + MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.getLocalPart();
   private static final String GLOBAL_ELEMENT_NAME_ATTRIBUTE = "name";
@@ -749,7 +738,7 @@ public final class XmlExtensionLoaderDelegate {
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || tlsEnabledComponent.isPresent()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
-      tlsEnabledComponent.ifPresent(mp -> addTlsContextParameter(configurationDeclarer));
+      tlsEnabledComponent.ifPresent(mp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup()));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel);
       return of(configurationDeclarer);
@@ -843,24 +832,6 @@ public final class XmlExtensionLoaderDelegate {
 
   }
 
-  private void addTlsContextParameter(ConfigurationDeclarer configurationDeclarer) {
-    InfrastructureType tlsContextInfrastructureType = InfrastructureTypeMapping.getMap().get(TlsContextFactory.class);
-    MetadataType tlsContextType = new DefaultExtensionsTypeLoaderFactory()
-        .createTypeLoader(this.getClass().getClassLoader())
-        .load(TlsContextFactory.class);
-
-    ParameterDeclarer<OptionalParameterDeclarer> parameterDeclarer = configurationDeclarer.onDefaultParameterGroup()
-        .withOptionalParameter(tlsContextInfrastructureType.getName())
-        .ofType(tlsContextType)
-        .withRole(BEHAVIOUR)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .withModelProperty(new SyntheticModelModelProperty())
-        .withModelProperty(new InfrastructureParameterModelProperty(tlsContextInfrastructureType.getSequence()));
-
-    getQName(tlsContextInfrastructureType.getName()).ifPresent(parameterDeclarer::withModelProperty);
-    getDslConfiguration(tlsContextInfrastructureType.getName()).ifPresent(parameterDeclarer::withDsl);
-  }
-
   private String getComponentIdForErrorMessage(ComponentAst componentAst) {
     return componentAst.getComponentId().orElse("unnamed@" + componentAst.getLocation().getLocation());
   }
@@ -894,22 +865,6 @@ public final class XmlExtensionLoaderDelegate {
     }
 
     return annotatedElements.stream().findFirst();
-  }
-
-  private boolean isTlsContextFactoryParameter(ParameterModel parameterModel) {
-    return getType(parameterModel.getType())
-        .map(TlsContextFactory.class::isAssignableFrom)
-        .orElse(false);
-  }
-
-  private boolean hasTlsContextFactoryParameter(ParameterizedModel model) {
-    return model.getAllParameterModels().stream().anyMatch(this::isTlsContextFactoryParameter);
-  }
-
-  private boolean isTlsConfigurationSupported(ComponentAst componentAst) {
-    return componentAst.getModel(ParameterizedModel.class)
-        .map(this::hasTlsContextFactoryParameter)
-        .orElse(false);
   }
 
   private void validateIsTlsConfigurationSupported(ComponentAst componentAst) {

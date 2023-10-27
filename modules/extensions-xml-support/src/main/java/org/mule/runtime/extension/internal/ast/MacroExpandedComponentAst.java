@@ -9,9 +9,9 @@ package org.mule.runtime.extension.internal.ast;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsContextFactoryParameter;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsEnabled;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.UnaryOperator.identity;
@@ -27,7 +27,6 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
 import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 
 import java.util.Collection;
@@ -103,21 +102,6 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         .stream()
         .map(this::mapIdParam)
         .collect(toList());
-  }
-
-  private boolean isTlsEnabled(ComponentAst componentAst) {
-    Object annotation = componentAst.getAnnotations().get(MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.toString());
-    if (annotation == null) {
-      return false;
-    }
-
-    return parseBoolean(annotation.toString());
-  }
-
-  private boolean isTlsContextFactoryParameter(ComponentParameterAst parameter) {
-    return ExtensionMetadataTypeUtils.getType(parameter.getModel().getType())
-        .map(TlsContextFactory.class::isAssignableFrom)
-        .orElse(false);
   }
 
   private boolean mustExpandTlsContextParameter(ComponentParameterAst parameter) {
