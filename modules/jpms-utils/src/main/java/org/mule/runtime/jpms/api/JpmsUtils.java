@@ -51,22 +51,22 @@ public final class JpmsUtils {
   }
 
   /**
-   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, and with the
-   * parent class loader obtained from the given {@code parentClassLoaderResolver}.
+   * Creates two classLoaders for the given {@code modulePathEntriesParent} and {@code modulePathEntriesChild}, with the layer
+   * from the given {@code clazz} as parent, if any, and with the given {@code parentClassLoader}. A classLoader from which the
+   * child modules can be read is returned.
    *
-   * @param modulePathEntriesParent   the URLs from which to find the modules of the parent
-   * @param modulePathEntriesChild    the URLs from which to find the modules of the child
-   * @param childClassLoaderFactory   how the classLoader for the child is created
-   * @param parentClassLoaderResolver the parent class loader for delegation
-   * @param clazz                     the class from which to get the parent layer.
+   * @param modulePathEntriesParent the URLs from which to find the modules of the parent
+   * @param modulePathEntriesChild  the URLs from which to find the modules of the child
+   * @param childClassLoaderFactory how the classLoader for the child is created, if moduleLayers are not used
+   * @param parentClassLoader       the parent class loader for delegation
+   * @param clazz                   the class from which to get the parent layer.
    * @return a new classLoader.
    */
   public static ClassLoader createModuleLayerClassLoader(URL[] modulePathEntriesParent, URL[] modulePathEntriesChild,
                                                          MultiLevelClassLoaderFactory childClassLoaderFactory,
-                                                         UnaryOperator<ClassLoader> parentClassLoaderResolver,
+                                                         ClassLoader parentClassLoader,
                                                          Optional<Class> clazz) {
-    return childClassLoaderFactory.create(parentClassLoaderResolver.apply(clazz.map(Class::getClassLoader).orElse(null)),
-                                          modulePathEntriesParent, modulePathEntriesChild);
+    return childClassLoaderFactory.create(parentClassLoader, modulePathEntriesParent, modulePathEntriesChild);
   }
 
   public static void exploreJdkModules(Set<String> packages) {
