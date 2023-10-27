@@ -245,6 +245,7 @@ module org.mule.runtime.core {
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.config.builders to
+      org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,

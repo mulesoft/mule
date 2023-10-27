@@ -31,9 +31,11 @@ module org.mule.runtime.deployment.model.impl {
   requires org.mule.runtime.policy.api;
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.service;
+  requires org.mule.runtime.artifact.ast;
 
   // For deserialization of patching model:
   requires com.google.gson;
+  requires commons.lang;
 
   exports org.mule.runtime.module.deployment.impl.internal to
       org.mule.runtime.deployment,

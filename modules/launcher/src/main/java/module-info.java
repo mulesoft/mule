@@ -27,6 +27,7 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.service;
   requires org.mule.runtime.tooling.support;
   requires org.mule.runtime.troubleshooting;
+  requires org.mule.runtime.integration.orchestrator;
   requires org.apache.commons.io;
 
   // Embedded uses this
