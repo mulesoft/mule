@@ -352,6 +352,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-osgi</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-common</artifactId>
                 <version>${sshdVersion}</version>
             </dependency>

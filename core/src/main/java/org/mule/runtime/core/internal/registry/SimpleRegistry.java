@@ -215,6 +215,11 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       registryMap.lockForReading();
 
       for (Map.Entry<String, Object> entry : registryMap.entrySet()) {
+        if (entry.getValue() == null) {
+          throw new NullPointerException("SimpleRegistry - null value for entry with key '" + entry.getKey() + "' of type '"
+              + type + "'");
+        }
+
         final Class<?> clazz = entry.getValue().getClass();
         if (type.isAssignableFrom(clazz)) {
           results.put(entry.getKey(), (T) entry.getValue());

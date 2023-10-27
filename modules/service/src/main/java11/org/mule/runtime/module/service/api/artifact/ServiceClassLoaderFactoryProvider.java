@@ -31,7 +31,9 @@ public class ServiceClassLoaderFactoryProvider {
   }
 
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
-    if (classloaderContainerJpmsModuleLayer()) {
+    if (classloaderContainerJpmsModuleLayer()
+        // Only if the container is modularized it makes sense to load services as module layers
+        && ServiceClassLoaderFactoryProvider.class.getModule().isNamed()) {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
       final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
       serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);

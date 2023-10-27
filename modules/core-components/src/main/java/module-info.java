@@ -20,8 +20,6 @@ module org.mule.runtime.core.components {
   requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.customization.api;
 
-  // LoggerMessageProcessor
-  requires org.apache.log4j;
   // javax.activation
   requires jakarta.activation;
   requires java.transaction;

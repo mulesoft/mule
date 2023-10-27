@@ -70,7 +70,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -92,20 +91,33 @@
             </exclusions>
         </dependency>
         <dependency>
+            <!-- merged jar that addresses a split package between sshd-core and sshd-common -->
             <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.sshd</groupId>
-            <artifactId>sshd-core</artifactId>
+            <artifactId>sshd-osgi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-scp</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.sshd</groupId>
+                    <artifactId>sshd-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.sshd</groupId>
+                    <artifactId>sshd-common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-sftp</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.sshd</groupId>
+                    <artifactId>sshd-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -124,6 +136,12 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-invoker</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
