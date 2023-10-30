@@ -31,4 +31,8 @@ public class ServiceClassLoaderFactoryProvider {
     LOGGER.debug("Default 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
     return new ServiceClassLoaderFactory();
   }
+
+  public static void setWithinModularizedContainer(boolean withinModularizedContainer) {
+    // nothing to do
+  }
 }
