@@ -13,7 +13,6 @@ import static org.mule.runtime.jpms.api.JpmsUtils.openToModule;
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.partitioningBy;
 
 import org.mule.api.annotation.jpms.RequiredOpens;
 import org.mule.api.annotation.jpms.ServiceModule;
@@ -26,17 +25,11 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Paths;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +40,11 @@ import org.slf4j.LoggerFactory;
 class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
+
+  // prefixes of services provided by the Mule Runtime team
+  private static final Set<String> MULE_SERVICE_MODULE_NAME_PREFIXES =
+      new HashSet<>(asList("org.mule.service.",
+                           "com.mulesoft.mule.service."));
 
   private static final String CLASSLOADER_SERVICE_JPMS_MODULE_LAYER_DATAWEAVE =
       SYSTEM_PROPERTY_PREFIX + "classloader.service.jpmsModuleLayer.dataWeave";
@@ -94,7 +92,10 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
     String serviceModuleName = serviceModule.getName();
 
-    propagateOpensToService(parent, artifactLayer, serviceModuleAnnotationClass, serviceModule, serviceModuleName);
+    // Only for services owned by the Mule Runtime team
+    if (MULE_SERVICE_MODULE_NAME_PREFIXES.stream().anyMatch(serviceModuleName::startsWith)) {
+      propagateOpensToService(parent, artifactLayer, serviceModuleAnnotationClass, serviceModule, serviceModuleName);
+    }
 
     return new MuleServiceClassLoader(artifactId,
                                       descriptor,
