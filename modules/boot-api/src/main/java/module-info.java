@@ -24,6 +24,9 @@ module org.mule.boot.api {
       com.mulesoft.mule.boot,
       com.mulesoft.mule.runtime.plugin; // container layer!
 
+  exports org.mule.runtime.module.boot.internal.util to
+    org.mule.runtime.launcher;
+
   // Needed by the MuleLog4jConfigurer
   requires org.mule.runtime.boot.log4j;
 

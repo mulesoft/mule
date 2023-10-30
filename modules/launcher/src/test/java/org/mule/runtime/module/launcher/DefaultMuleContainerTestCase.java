@@ -6,11 +6,20 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
+import static org.mule.runtime.module.launcher.DefaultMuleContainer.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.launcher.DefaultMuleContainer.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -28,6 +37,9 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -35,6 +47,7 @@ import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.mockito.InOrder;
 
@@ -47,6 +60,9 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
   // folder with a conf/log4j2.xml
   @Rule
   public SystemProperty simpleLog = new SystemProperty(MULE_SIMPLE_LOG, "true");
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   private DefaultMuleContainer container;
 
@@ -63,6 +79,7 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
   private final TroubleshootingService troubleshootingService = mock(TroubleshootingService.class);
 
   private final ToolingService toolingService = mock(ToolingService.class);
+  private final Map<String, Object> commandLineOptions = new HashMap<>();
 
   @Before
   public void setUp() throws Exception {
@@ -196,4 +213,30 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
     inOrder.verify(serviceManager).stop();
   }
 
+  @Test
+  public void setsMuleDeployApplicationsPropertyWhenAppOptionIsUsed() throws Exception {
+    try {
+      commandLineOptions.put(APP_COMMAND_LINE_OPTION, APP_NAME);
+      container = createMuleContainer();
+
+      container.start(false);
+
+      assertThat(getProperty(DEPLOYMENT_APPLICATION_PROPERTY), equalTo(APP_NAME));
+    } finally {
+      if (getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {
+        clearProperty(DEPLOYMENT_APPLICATION_PROPERTY);
+      }
+    }
+  }
+
+  @Test
+  public void failsToStartWhenMuleDeployApplicationsPropertyAndAppOptionAreUsed() throws Exception {
+    testWithSystemProperty(DEPLOYMENT_APPLICATION_PROPERTY, APP_NAME, () -> {
+      commandLineOptions.put(APP_COMMAND_LINE_OPTION, APP_NAME);
+
+      expectedException.expect(IllegalArgumentException.class);
+      expectedException.expectMessage(INVALID_DEPLOY_APP_CONFIGURATION_ERROR);
+      createMuleContainer();
+    });
+  }
 }

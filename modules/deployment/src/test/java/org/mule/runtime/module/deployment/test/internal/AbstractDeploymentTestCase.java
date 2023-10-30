@@ -30,6 +30,7 @@ import static org.mule.runtime.module.deployment.impl.internal.policy.loader.Pro
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.TYPE;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher.CHANGE_CHECK_INTERVAL_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.JAR_ARTIFACT_FILTER;
@@ -173,7 +174,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -183,10 +188,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import com.github.valfirst.slf4jtest.TestLogger;
-
 import org.apache.logging.log4j.LogManager;
-import org.slf4j.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -196,9 +198,8 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
 import org.mockito.verification.VerificationMode;
-
+import org.slf4j.Logger;
 import uk.org.lidalia.slf4jext.Level;
 
 /**
@@ -1366,7 +1367,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                           this,
                                                           applicationDeploymentListener);
       } else {
-        deploymentTemplate = (DomainDeploymentTemplate) ArtifactDeploymentTemplate.NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
+        deploymentTemplate = (DomainDeploymentTemplate) NOP_ARTIFACT_DEPLOYMENT_TEMPLATE;
       }
       return new TestDomainArchiveDeployer(new DefaultArchiveDeployer<>(domainMuleDeployer, domainFactory, domains,
                                                                         deploymentTemplate,

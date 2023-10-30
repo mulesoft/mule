@@ -41,6 +41,7 @@ module org.mule.runtime.deployment {
   exports org.mule.runtime.module.deployment.api;
   exports org.mule.runtime.module.deployment.internal to
       org.mule.runtime.launcher,
+      org.mule.runtime.integration.orchestrator,
       spring.beans;
   exports org.mule.runtime.module.deployment.internal.processor to
       org.mule.runtime.launcher;

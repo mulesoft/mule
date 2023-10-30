@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
@@ -29,6 +30,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -40,7 +42,6 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.http.api.HttpService;
@@ -50,6 +51,7 @@ import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStrea
 import org.mule.runtime.module.artifact.api.classloader.net.MuleUrlStreamHandlerFactory;
 import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInitializer;
 import org.mule.runtime.module.boot.api.MuleContainer;
+import org.mule.runtime.module.boot.internal.util.SystemUtils;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
@@ -62,6 +64,7 @@ import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
+import org.mule.runtime.module.service.api.manager.ServiceRepository;
 import org.mule.runtime.module.tooling.api.ToolingService;
 import org.mule.runtime.module.tooling.internal.DefaultToolingService;
 import org.mule.runtime.module.troubleshooting.api.TroubleshootingService;
@@ -70,6 +73,7 @@ import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingSe
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -89,6 +93,10 @@ public class DefaultMuleContainer implements MuleContainer {
    * logger used by this class
    */
   private static final Logger logger;
+
+  static final String APP_COMMAND_LINE_OPTION = "app";
+  static final String INVALID_DEPLOY_APP_CONFIGURATION_ERROR =
+      format("Cannot set both '%s' option and '%s' property", APP_COMMAND_LINE_OPTION, DEPLOYMENT_APPLICATION_PROPERTY);
 
   /**
    * The Runtime shutdown thread used to undeploy this server
@@ -123,11 +131,25 @@ public class DefaultMuleContainer implements MuleContainer {
 
   private final ServiceManager serviceManager;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
-  private boolean embeddedMode = false;
   private boolean voltronMode;
 
+  /**
+   * Application entry point (used only for experimentation purposes).
+   *
+   * @param args command-line args
+   */
+  // TODO W-12412027: remove this entry point once we have the alternative without Tanuki
+  public static void main(String[] args) throws Exception {
+    DefaultMuleContainer container = new DefaultMuleContainer(args);
+    container.start(true);
+  }
+
   public DefaultMuleContainer() throws InitialisationException {
-    init();
+    this(new String[0]);
+  }
+
+  public DefaultMuleContainer(String[] args) throws InitialisationException {
+    init(args);
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
 
@@ -156,9 +178,8 @@ public class DefaultMuleContainer implements MuleContainer {
     artifactResourcesRegistry.getContainerClassLoader().dispose();
   }
 
-  /**
-   * Configure the server.
-   */
+
+
   public DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
                               ToolingService toolingService,
                               MuleCoreExtensionManagerServer coreExtensionManager, ServiceManager serviceManager,
@@ -184,7 +205,8 @@ public class DefaultMuleContainer implements MuleContainer {
                               TroubleshootingService troubleshootingService,
                               IntegrationOrchestratorAPI integrationOrchestratorAPI)
       throws IllegalArgumentException, InitialisationException {
-    init();
+    // TODO(pablo.kraan): remove the args argument and use the already existing setters to set everything needed
+    init(args);
 
     this.deploymentService = deploymentService;
     this.coreExtensionManager = coreExtensionManager;
@@ -196,7 +218,10 @@ public class DefaultMuleContainer implements MuleContainer {
     this.integrationOrchestratorAPI = integrationOrchestratorAPI;
   }
 
-  protected void init() throws IllegalArgumentException, InitialisationException {
+  protected void init(String[] args) throws IllegalArgumentException, InitialisationException {
+    // TODO(pablo.kraan): move initialization of others classes outside this method
+    Map<String, Object> commandlineOptions = getCommandLineOptions(args);
+
     // set our own UrlStreamHandlerFactory to become more independent of system
     // properties
     MuleUrlStreamHandlerFactory.installUrlStreamHandlerFactory();
@@ -221,6 +246,18 @@ public class DefaultMuleContainer implements MuleContainer {
     artifactResourcesRegistry.getMemoryManagementService().initialise();
     artifactResourcesRegistry.inject(artifactResourcesRegistry.getContainerProfilingService());
     initialiseIfNeeded(artifactResourcesRegistry.getContainerProfilingService());
+  }
+
+  /**
+   * Allows subclasses to obtain command line options differently.
+   * <p>
+   * Useful for testing purposes
+   *
+   * @param args arguments received from command line
+   * @return map containing each configuration option name and value
+   */
+  Map<String, Object> getCommandLineOptions(String[] args) {
+    return SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
   }
 
   private void createExecutionMuleFolder() {
@@ -386,12 +423,12 @@ public class DefaultMuleContainer implements MuleContainer {
       log4jContextFactory.dispose();
     }
 
-    if (integrationOrchestratorAPI != null) {
-      integrationOrchestratorAPI.stop();
-    }
-
     if (artifactResourcesRegistry.getDescriptorLoaderRepository() != null) {
       disposeIfNeeded(artifactResourcesRegistry.getDescriptorLoaderRepository(), logger);
+    }
+
+    if (integrationOrchestratorAPI != null) {
+      integrationOrchestratorAPI.stop();
     }
 
     if (repositoryService != null) {

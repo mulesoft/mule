@@ -28,6 +28,8 @@ module org.mule.runtime.launcher {
   requires org.mule.runtime.tooling.support;
   requires org.mule.runtime.troubleshooting;
   requires org.mule.runtime.integration.orchestrator;
+  requires org.mule.runtime.http.api;
+  requires org.mule.runtime.profiling.api;
   requires org.apache.commons.io;
 
   // Embedded uses this

@@ -15,12 +15,19 @@ module org.mule.runtime.integration.orchestrator {
   requires transitive org.mule.runtime.api;
   requires org.mule.runtime.core;
   requires org.mule.runtime.artifact;
+  requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.serialization;
+  requires  org.mule.runtime.deployment.model;
   requires org.mule.runtime.deployment.model.impl;
   requires org.mule.runtime.deployment;
+  requires org.mule.runtime.http.api;
+  requires org.mule.sdk.api;
 
   requires semver4j;
+  requires com.google.gson;
 
+  exports org.mule.module.io.internal
+    to org.mule.runtime.launcher;
 
   
 }
