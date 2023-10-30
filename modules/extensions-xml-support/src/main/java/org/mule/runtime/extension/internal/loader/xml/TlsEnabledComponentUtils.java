@@ -15,7 +15,7 @@ import static org.mule.runtime.extension.internal.loader.util.InfrastructureType
 import static java.lang.Boolean.parseBoolean;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.api.meta.model.declaration.fluent.OptionalParameterDeclarer;
+import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
@@ -81,16 +81,25 @@ public class TlsEnabledComponentUtils {
    * Adds a synthetic TLS context infrastructure parameter to the given {@link ParameterGroupDeclarer}.
    *
    * @param parameterGroupDeclarer The parameter group declarer in which the new parameter should be declared.
+   * @param targetComponent        The component that has been marked as a target for the macro-expansion of this synthetic
+   *                               parameter.
    */
-  public static void addTlsContextParameter(ParameterGroupDeclarer<?> parameterGroupDeclarer) {
+  public static void addTlsContextParameter(ParameterGroupDeclarer<?> parameterGroupDeclarer, ComponentAst targetComponent) {
     InfrastructureTypeMapping.InfrastructureType tlsContextInfrastructureType =
         InfrastructureTypeMapping.getMap().get(TlsContextFactory.class);
     MetadataType tlsContextType = new DefaultExtensionsTypeLoaderFactory()
         .createTypeLoader(TlsEnabledComponentUtils.class.getClassLoader())
         .load(TlsContextFactory.class);
 
-    ParameterDeclarer<OptionalParameterDeclarer> parameterDeclarer = parameterGroupDeclarer
-        .withOptionalParameter(tlsContextInfrastructureType.getName())
+    ParameterDeclarer<?> parameterDeclarer;
+
+    if (isTlsConfigurationRequired(targetComponent) && !isTlsConfigurationProvided(targetComponent)) {
+      parameterDeclarer = parameterGroupDeclarer.withRequiredParameter(tlsContextInfrastructureType.getName());
+    } else {
+      parameterDeclarer = parameterGroupDeclarer.withOptionalParameter(tlsContextInfrastructureType.getName());
+    }
+
+    parameterDeclarer = parameterDeclarer
         .ofType(tlsContextType)
         .withRole(BEHAVIOUR)
         .withExpressionSupport(NOT_SUPPORTED)
@@ -109,6 +118,29 @@ public class TlsEnabledComponentUtils {
 
   private static boolean hasTlsContextFactoryParameter(ParameterizedModel model) {
     return model.getAllParameterModels().stream().anyMatch(TlsEnabledComponentUtils::isTlsContextFactoryParameter);
+  }
+
+  private static boolean requiresTlsContextFactoryParameter(ParameterizedModel model) {
+    return model.getAllParameterModels().stream()
+        .filter(ParameterModel::isRequired)
+        .anyMatch(TlsEnabledComponentUtils::isTlsContextFactoryParameter);
+  }
+
+  private static boolean isTlsConfigurationRequired(ComponentAst componentAst) {
+    return componentAst.getModel(ParameterizedModel.class)
+        .map(TlsEnabledComponentUtils::requiresTlsContextFactoryParameter)
+        .orElse(false);
+  }
+
+  private static boolean isTlsConfigurationProvided(ComponentAst componentAst) {
+    return componentAst.getParameters().stream()
+        .filter(TlsEnabledComponentUtils::isTlsContextFactoryParameter)
+        .anyMatch(TlsEnabledComponentUtils::hasValue);
+  }
+
+  private static boolean hasValue(ComponentParameterAst parameterAst) {
+    Either<String, ?> value = parameterAst.getValue();
+    return value.isLeft() || value.isRight();
   }
 
   private TlsEnabledComponentUtils() {

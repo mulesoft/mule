@@ -2,11 +2,15 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:module-tls-config="http://www.mulesoft.org/schema/mule/module-tls-config"
       xmlns:module-tls-config-with-default="http://www.mulesoft.org/schema/mule/module-tls-config-with-default"
+      xmlns:module-tls-config-required="http://www.mulesoft.org/schema/mule/module-tls-config-required"
+      xmlns:module-tls-config-required-with-default="http://www.mulesoft.org/schema/mule/module-tls-config-required-with-default"
       xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="
        http://www.mulesoft.org/schema/mule/module-tls-config http://www.mulesoft.org/schema/mule/module-tls-config/current/mule-module-tls-config.xsd
        http://www.mulesoft.org/schema/mule/module-tls-config-with-default http://www.mulesoft.org/schema/mule/module-tls-config-with-default/current/mule-module-tls-config-with-default.xsd
+       http://www.mulesoft.org/schema/mule/module-tls-config-required http://www.mulesoft.org/schema/mule/module-tls-config-required/current/mule-module-tls-config-required.xsd
+       http://www.mulesoft.org/schema/mule/module-tls-config-required-with-default http://www.mulesoft.org/schema/mule/module-tls-config-required-with-default/current/mule-module-tls-config-required-with-default.xsd
        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
 
@@ -35,6 +39,10 @@
 
     <module-tls-config-with-default:config name="withDefaultByRef" someUserConfig="john" somePassConfig="doe" tlsContext="myTlsContext"/>
 
+    <module-tls-config-required:config name="requiredByRef" tlsContext="myTlsContext"/>
+
+    <module-tls-config-required-with-default:config name="requiredWithDefaultNoTls"/>
+
     <flow name="getPetStoreClientNoTls">
         <module-tls-config:get-pet-store-client config-ref="noTls" />
     </flow>
@@ -62,5 +70,13 @@
 
     <flow name="getPetStoreClientFixedTls">
         <module-tls-config-with-default:get-pet-store-client-fixed-tls config-ref="withDefaultByRef" />
+    </flow>
+
+    <flow name="getHeisenbergConnectionRequiredByRef">
+        <module-tls-config-required:get-heisenberg-connection config-ref="requiredByRef" />
+    </flow>
+
+    <flow name="getHeisenbergConnectionRequiredWithDefaultNoTls">
+        <module-tls-config-required-with-default:get-heisenberg-connection config-ref="requiredWithDefaultNoTls" />
     </flow>
 </mule>

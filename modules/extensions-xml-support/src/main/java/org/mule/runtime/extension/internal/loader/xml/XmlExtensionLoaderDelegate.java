@@ -738,7 +738,7 @@ public final class XmlExtensionLoaderDelegate {
     if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || tlsEnabledComponent.isPresent()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
-      tlsEnabledComponent.ifPresent(mp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup()));
+      tlsEnabledComponent.ifPresent(comp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup(), comp));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel);
       return of(configurationDeclarer);

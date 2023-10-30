@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.tls.TlsContextFactory;
+import org.mule.test.heisenberg.extension.HeisenbergConnection;
 import org.mule.test.petstore.extension.PetStoreClient;
 
 import java.io.IOException;
@@ -29,7 +30,8 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
 
   @Override
   protected String[] getModulePaths() {
-    return new String[] {"modules/module-tls-config.xml", "modules/module-tls-config-with-default.xml"};
+    return new String[] {"modules/module-tls-config.xml", "modules/module-tls-config-with-default.xml",
+        "modules/module-tls-config-required.xml", "modules/module-tls-config-required-with-default.xml"};
   }
 
   @Override
@@ -67,6 +69,14 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
   }
 
   @Test
+  public void tlsContextRequired() throws Exception {
+    HeisenbergConnection connection =
+        (HeisenbergConnection) runFlow("getHeisenbergConnectionRequiredByRef").getMessage().getPayload().getValue();
+
+    assertExpectedTlsContext(connection.getTlsContextFactory());
+  }
+
+  @Test
   public void noCustomTlsButDefaultFromModule() throws Exception {
     PetStoreClient client = (PetStoreClient) runFlow("getPetStoreClientWithDefault").getMessage().getPayload().getValue();
 
@@ -91,6 +101,17 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
     // The given config provides a TLS context but the config in the module definition already has one, and it is not marked as
     // tlsEnabled
     TlsContextFactory actualTlsContextFactory = client.getTlsContext();
+    assertThat(actualTlsContextFactory, is(notNullValue()));
+    assertThat(actualTlsContextFactory.getTrustStoreConfiguration().getPassword(), is("changeit2"));
+  }
+
+  @Test
+  public void whenInnerConfigRequiresTlsButProvidesOneThenBecomesOptional() throws Exception {
+    HeisenbergConnection connection =
+        (HeisenbergConnection) runFlow("getHeisenbergConnectionRequiredWithDefaultNoTls").getMessage().getPayload().getValue();
+
+    // The given config does not provide a TLS context but the config in the module definition already has one
+    TlsContextFactory actualTlsContextFactory = connection.getTlsContextFactory();
     assertThat(actualTlsContextFactory, is(notNullValue()));
     assertThat(actualTlsContextFactory.getTrustStoreConfiguration().getPassword(), is("changeit2"));
   }

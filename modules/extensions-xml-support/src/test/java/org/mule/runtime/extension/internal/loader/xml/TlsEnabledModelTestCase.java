@@ -38,6 +38,7 @@ import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SyntheticModelModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.HashSet;
@@ -53,7 +54,8 @@ import org.junit.rules.ExpectedException;
 @SmallTest
 public class TlsEnabledModelTestCase extends AbstractMuleTestCase {
 
-  private static final ExtensionModel PET_STORE_EXTENSION_MODEL = loadPetstoreExtension();
+  private static final ExtensionModel PET_STORE_EXTENSION_MODEL = loadExtension(PetStoreConnector.class);
+  private static final ExtensionModel HEISENBERG_EXTENSION_MODEL = loadExtension(HeisenbergExtension.class);
   private static final String EXPECTED_TLS_CONTEXT_PARAM_NAME = "tlsContext";
 
   @Rule
@@ -63,28 +65,21 @@ public class TlsEnabledModelTestCase extends AbstractMuleTestCase {
   public void generatedModelHasTlsContextParameter() {
     ExtensionModel extensionModel = loadExtensionModelFrom("modules/module-tls-config.xml",
                                                            singleton(PET_STORE_EXTENSION_MODEL));
-    ConfigurationModel configurationModel = extensionModel.getConfigurationModel("config").get();
-    ParameterGroupModel defaultParameterGroupModel = configurationModel.getParameterGroupModels().stream()
-        .filter(pgm -> pgm.getName().equals(DEFAULT_GROUP_NAME))
-        .findFirst()
-        .get();
+    assertModelHasTlsContextParameter(extensionModel, false);
+  }
 
-    ParameterModel tlsContextParameterModel = defaultParameterGroupModel.getParameter(EXPECTED_TLS_CONTEXT_PARAM_NAME).get();
-    assertThat(getType(tlsContextParameterModel.getType()).get(), is(TlsContextFactory.class));
-    assertThat(isInfrastructure(tlsContextParameterModel.getType()), is(true));
-    assertThat(tlsContextParameterModel.isRequired(), is(false));
-    assertThat(tlsContextParameterModel.getRole(), is(BEHAVIOUR));
-    assertThat(tlsContextParameterModel.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(tlsContextParameterModel.getModelProperty(SyntheticModelModelProperty.class).isPresent(), is(true));
-    assertThat(tlsContextParameterModel.getModelProperty(InfrastructureParameterModelProperty.class).isPresent(), is(true));
-    assertThat(tlsContextParameterModel.getModelProperty(QNameModelProperty.class),
-               is(getQName(EXPECTED_TLS_CONTEXT_PARAM_NAME)));
+  @Test
+  public void whenTargetRequiresTlsContextThenGeneratedModelHasRequiredTlsContextParameter() {
+    ExtensionModel extensionModel = loadExtensionModelFrom("modules/module-tls-config-required.xml",
+                                                           singleton(HEISENBERG_EXTENSION_MODEL));
+    assertModelHasTlsContextParameter(extensionModel, true);
+  }
 
-    ParameterDslConfiguration actualDslConfiguration = tlsContextParameterModel.getDslConfiguration();
-    ParameterDslConfiguration expectedDslConfiguration = getDslConfiguration(EXPECTED_TLS_CONTEXT_PARAM_NAME).get();
-    assertThat(actualDslConfiguration.allowTopLevelDefinition(), is(expectedDslConfiguration.allowTopLevelDefinition()));
-    assertThat(actualDslConfiguration.allowsReferences(), is(expectedDslConfiguration.allowsReferences()));
-    assertThat(actualDslConfiguration.allowsInlineDefinition(), is(expectedDslConfiguration.allowsInlineDefinition()));
+  @Test
+  public void whenTargetRequiresTlsContextAndProvidesOneThenGeneratedModelHasOptionalTlsContextParameter() {
+    ExtensionModel extensionModel = loadExtensionModelFrom("modules/module-tls-config-required-with-default.xml",
+                                                           singleton(HEISENBERG_EXTENSION_MODEL));
+    assertModelHasTlsContextParameter(extensionModel, false);
   }
 
   @Test
@@ -123,10 +118,6 @@ public class TlsEnabledModelTestCase extends AbstractMuleTestCase {
                            singleton(PET_STORE_EXTENSION_MODEL));
   }
 
-  private static ExtensionModel loadPetstoreExtension() {
-    return loadExtension(PetStoreConnector.class);
-  }
-
   private ExtensionModel loadExtensionModelFrom(String modulePath, Set<ExtensionModel> dependencyExtensions) {
     Set<ExtensionModel> allExtensions = new HashSet<>(dependencyExtensions);
     allExtensions.add(getExtensionModel());
@@ -135,5 +126,30 @@ public class TlsEnabledModelTestCase extends AbstractMuleTestCase {
         .build();
 
     return new XmlExtensionModelLoader().loadExtensionModel(request);
+  }
+
+  private void assertModelHasTlsContextParameter(ExtensionModel extensionModel, boolean expectRequired) {
+    ConfigurationModel configurationModel = extensionModel.getConfigurationModel("config").get();
+    ParameterGroupModel defaultParameterGroupModel = configurationModel.getParameterGroupModels().stream()
+        .filter(pgm -> pgm.getName().equals(DEFAULT_GROUP_NAME))
+        .findFirst()
+        .get();
+
+    ParameterModel tlsContextParameterModel = defaultParameterGroupModel.getParameter(EXPECTED_TLS_CONTEXT_PARAM_NAME).get();
+    assertThat(getType(tlsContextParameterModel.getType()).get(), is(TlsContextFactory.class));
+    assertThat(isInfrastructure(tlsContextParameterModel.getType()), is(true));
+    assertThat(tlsContextParameterModel.isRequired(), is(expectRequired));
+    assertThat(tlsContextParameterModel.getRole(), is(BEHAVIOUR));
+    assertThat(tlsContextParameterModel.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(tlsContextParameterModel.getModelProperty(SyntheticModelModelProperty.class).isPresent(), is(true));
+    assertThat(tlsContextParameterModel.getModelProperty(InfrastructureParameterModelProperty.class).isPresent(), is(true));
+    assertThat(tlsContextParameterModel.getModelProperty(QNameModelProperty.class),
+               is(getQName(EXPECTED_TLS_CONTEXT_PARAM_NAME)));
+
+    ParameterDslConfiguration actualDslConfiguration = tlsContextParameterModel.getDslConfiguration();
+    ParameterDslConfiguration expectedDslConfiguration = getDslConfiguration(EXPECTED_TLS_CONTEXT_PARAM_NAME).get();
+    assertThat(actualDslConfiguration.allowTopLevelDefinition(), is(expectedDslConfiguration.allowTopLevelDefinition()));
+    assertThat(actualDslConfiguration.allowsReferences(), is(expectedDslConfiguration.allowsReferences()));
+    assertThat(actualDslConfiguration.allowsInlineDefinition(), is(expectedDslConfiguration.allowsInlineDefinition()));
   }
 }
