@@ -62,6 +62,8 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -521,7 +523,7 @@ public class MacroExpansionModuleModel {
    */
   private Map<String, Object> getLiteralParameters(Map<String, ?> propertiesMap, Map<String, String> parametersMap) {
     final Map<String, Object> literalParameters = propertiesMap.entrySet().stream()
-        .filter(entry -> !isExpression(entry.getValue()))
+        .filter(entry -> !MuleExtensionUtils.isExpression(entry.getValue()))
         .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                        Map.Entry::getValue));
 
@@ -543,10 +545,6 @@ public class MacroExpansionModuleModel {
    */
   private String getReplaceableExpression(String name, String prefix) {
     return "#[" + prefix + "." + name + "]";
-  }
-
-  private boolean isExpression(Object value) {
-    return value instanceof String && isExpression((String) value);
   }
 
   private boolean isExpression(String value) {
