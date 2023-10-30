@@ -49,6 +49,7 @@ import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
 import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactory;
+import org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
 import org.mule.test.runner.api.ArtifactsUrlClassification;
@@ -94,8 +95,6 @@ public class IsolatedClassLoaderFactory {
 
   private final ClassLoaderFilterFactory classLoaderFilterFactory = new ArtifactClassLoaderFilterFactory();
   private final PluginLookPolicyFactory pluginLookupPolicyGenerator = new PluginLookPolicyFactory();
-  private final ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory =
-      serviceClassLoaderFactory();
 
   /**
    * Creates a {@link ArtifactClassLoaderHolder} containing the container, plugins and application {@link ArtifactClassLoader}s
@@ -121,7 +120,6 @@ public class IsolatedClassLoaderFactory {
     final List<ArtifactClassLoader> filteredPluginsArtifactClassLoaders = new ArrayList<>();
     final List<ArtifactClassLoader> pluginsArtifactClassLoaders = new ArrayList<>();
     final List<ArtifactClassLoaderFilter> pluginArtifactClassLoaderFilters = new ArrayList<>();
-    List<ArtifactClassLoader> serviceArtifactClassLoaders;
 
     try {
       final TestContainerClassLoaderAssembler testContainerClassLoaderAssembler =
@@ -138,10 +136,12 @@ public class IsolatedClassLoaderFactory {
       containerClassLoaderWrapper = testContainerClassLoaderAssembler.createContainerClassLoader();
       ModuleRepository moduleRepository = testContainerClassLoaderAssembler.getModuleRepository();
 
+      ServiceClassLoaderFactoryProvider.setWithinModularizedContainer(true);
+      ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory = serviceClassLoaderFactory();
       serviceClassLoaderFactory.setParentLayerFrom(containerClassLoaderWrapper.getContainerClassLoader().getClassLoader()
           .loadClass(ServiceClassLoaderFactory.class.getName()));
-      serviceArtifactClassLoaders =
-          createServiceClassLoaders(containerClassLoaderWrapper, artifactsUrlClassification);
+      List<ArtifactClassLoader> serviceArtifactClassLoaders =
+          createServiceClassLoaders(serviceClassLoaderFactory, containerClassLoaderWrapper, artifactsUrlClassification);
 
       childClassLoaderLookupPolicy = containerClassLoaderWrapper.getContainerClassLoaderLookupPolicy();
 
@@ -337,7 +337,8 @@ public class IsolatedClassLoaderFactory {
    * @param artifactsUrlClassification  the url classifications to get service {@link URL}s
    * @return a list of {@link ArtifactClassLoader} for service class loaders
    */
-  protected List<ArtifactClassLoader> createServiceClassLoaders(MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
+  protected List<ArtifactClassLoader> createServiceClassLoaders(ContainerDependantArtifactClassLoaderFactory<ServiceDescriptor> serviceClassLoaderFactory,
+                                                                MuleContainerClassLoaderWrapper containerClassLoaderWrapper,
                                                                 ArtifactsUrlClassification artifactsUrlClassification) {
     List<ArtifactClassLoader> servicesArtifactClassLoaders = newArrayList();
     for (ServiceUrlClassification serviceUrlClassification : artifactsUrlClassification.getServiceUrlClassifications()) {

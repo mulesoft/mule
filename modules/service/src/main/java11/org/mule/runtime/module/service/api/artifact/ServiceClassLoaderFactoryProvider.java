@@ -30,10 +30,12 @@ public class ServiceClassLoaderFactoryProvider {
     return new LibFolderClassLoaderConfigurationLoader();
   }
 
+  private static boolean withinModularizedContainer = ServiceClassLoaderFactoryProvider.class.getModule().isNamed();
+
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
     if (classloaderContainerJpmsModuleLayer()
         // Only if the container is modularized it makes sense to load services as module layers
-        && ServiceClassLoaderFactoryProvider.class.getModule().isNamed()) {
+        && withinModularizedContainer) {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
       final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
       serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
@@ -44,4 +46,7 @@ public class ServiceClassLoaderFactoryProvider {
     }
   }
 
+  public static void setWithinModularizedContainer(boolean withinModularizedContainer) {
+    ServiceClassLoaderFactoryProvider.withinModularizedContainer = withinModularizedContainer;
+  }
 }
