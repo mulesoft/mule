@@ -119,4 +119,22 @@ public interface ConnectionManager {
    * @throws IllegalArgumentException if the {@code configurationInstance} doesn't have an associated {@link ConnectionProvider}
    */
   ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance) throws IllegalArgumentException;
+
+  /**
+   * Tests connectivity for the given {@code configurationInstance}.
+   * <p>
+   * The {@code connectionProvider} is expected to be fully initialised and functional. It is not required for the config wrapped
+   * by the {@code configurationInstance} to have been registered through the {@link #bind(Object, ConnectionProvider)} method.
+   * However, if it has been, then the test will be performed using the resources allocated by such registration.
+   *
+   * @param configurationInstance a {@link ConfigurationInstance}
+   * @param force                 whether connectivity testing must be done anyway, regardless of the
+   *                              {@link MuleDeploymentPropertiesMULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY} deployment property.
+   * @return a {@link ConnectionValidationResult}
+   * @throws IllegalArgumentException if the {@code configurationInstance} doesn't have an associated {@link ConnectionProvider}
+   * 
+   * @since 4.6
+   */
+  ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException;
 }

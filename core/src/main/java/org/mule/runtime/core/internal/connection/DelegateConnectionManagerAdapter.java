@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.reflect.Proxy.newProxyInstance;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.reflect.Proxy.newProxyInstance;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -37,7 +38,7 @@ import javax.inject.Inject;
 public final class DelegateConnectionManagerAdapter implements ConnectionManagerAdapter {
 
   private final MuleContext muleContext;
-  private ConnectionManagerAdapter delegate;
+  private final ConnectionManagerAdapter delegate;
   private ConnectionManagerAdapter connectionManagerAdapterStrategy;
 
   @Inject
@@ -100,6 +101,12 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
   public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
       throws IllegalArgumentException {
     return connectionManagerAdapterStrategy.testConnectivity(configurationInstance);
+  }
+
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException {
+    return connectionManagerAdapterStrategy.testConnectivity(configurationInstance, force);
   }
 
   @Override
@@ -181,6 +188,12 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
+    public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+        throws IllegalArgumentException {
+      return delegate.testConnectivity(configurationInstance, force);
+    }
+
+    @Override
     public void initialise() throws InitialisationException {
       initialiseIfNeeded(delegate, true, muleContext);
     }
@@ -242,6 +255,16 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
+    public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+        throws IllegalArgumentException {
+      if (force) {
+        return delegate.testConnectivity(configurationInstance, force);
+      } else {
+        return ConnectionValidationResult.success();
+      }
+    }
+
+    @Override
     public boolean hasBinding(Object config) {
       return delegate.hasBinding(config);
     }
@@ -288,7 +311,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   class LazyInvocationHandler implements InvocationHandler {
 
-    private Object config;
+    private final Object config;
     private ConnectionHandler<Object> connection;
 
     public LazyInvocationHandler(Object config) {

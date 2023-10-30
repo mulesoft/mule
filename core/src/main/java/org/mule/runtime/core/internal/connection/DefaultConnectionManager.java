@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStoppi
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -181,6 +182,12 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
       return doTestConnectivity(connectionProvider, connectionHandler);
     });
 
+  }
+
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException {
+    return testConnectivity(configurationInstance);
   }
 
   private ConnectionValidationResult doTestConnectivity(Callable<ConnectionValidationResult> callable) {

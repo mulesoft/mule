@@ -18,6 +18,8 @@ import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TIME_SUPPLIER;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.config.PoolingProfile;
@@ -51,6 +53,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +64,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 @SmallTest
+@Feature(JAVA_SDK)
+@Story(CONNECTIVITY_TEST)
 public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
 
   @Rule
@@ -191,6 +198,12 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
 
     @Override
     public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
+        throws IllegalArgumentException {
+      return success();
+    }
+
+    @Override
+    public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
         throws IllegalArgumentException {
       return success();
     }
