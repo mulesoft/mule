@@ -113,8 +113,7 @@ public class ObjectFactoryClassRepository {
         .defineField(IS_SINGLETON, Boolean.class, PRIVATE)
         .defineField(IS_PROTOTYPE, Boolean.class, PRIVATE)
         .defineField(IS_EAGER_INIT, Supplier.class, PRIVATE)
-        // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields. This interface extends
-        // from SmartFactoryBean.
+        // Implements the SmartFactoryBeanInterceptor interface to add getters and setters for the fields.
         .implement(SmartFactoryBeanInterceptor.class).intercept(ofBeanProperty())
         .implement(SmartFactoryBean.class)
         // Implements the SmartFactoryBean methods and delegates to the fields.

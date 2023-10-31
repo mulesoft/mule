@@ -12,6 +12,10 @@ import org.springframework.beans.factory.SmartFactoryBean;
 
 /**
  * This interface is used to implement the getters and setters of the fields added with Byte Buddy.
+ * <p>
+ * This <b>does NOT</b> extends Spring's SmartFactoryBean because this is exposed as API because it has to be visible by the
+ * generated classes in the extension classloader, and extending Spring stuff would imply visibility on that when we want Spring
+ * to be completely encapsulated.
  *
  * @since 4.6.0
  */
