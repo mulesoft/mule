@@ -9,7 +9,6 @@ package org.mule.runtime.module.tooling.internal;
 import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
@@ -35,7 +34,6 @@ import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.persistence.MuleApplicationModelJsonSerializer;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -140,7 +138,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private void addMavenModelDependency(BundleDependency bundleDependency) {
     org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor = bundleDependency.getDescriptor();
-    if (descriptor.getClassifier().isPresent() && !MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().get())) {
+    if (!MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().orElse(null))) {
       model.addSharedLibraryDependency(descriptor.getGroupId(), descriptor.getArtifactId());
     }
     model.addDependency(bundleDependency);
@@ -232,6 +230,16 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private T getThis() {
     return (T) this;
+  }
+
+  // Used in test cases
+  MavenModelBuilder getModel() {
+    return model;
+  }
+
+  // Used in test cases
+  void setModel(MavenModelBuilder model) {
+    this.model = model;
   }
 
 }

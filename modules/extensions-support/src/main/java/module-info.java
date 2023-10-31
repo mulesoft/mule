@@ -83,12 +83,20 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
 
+  exports org.mule.runtime.module.extension.internal to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.config to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.loader.java to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.metadata to
+      org.mule.runtime.tooling.support;
+  exports org.mule.runtime.module.extension.internal.runtime to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.config to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
@@ -99,13 +107,18 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.resolver to
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.transaction to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.util to
       org.mule.runtime.core,
-      org.mule.runtime.extensions.spring.support;
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.tooling.support;
+  exports org.mule.runtime.module.extension.internal.value to
+      org.mule.runtime.tooling.support;
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       java.xml.bind;
