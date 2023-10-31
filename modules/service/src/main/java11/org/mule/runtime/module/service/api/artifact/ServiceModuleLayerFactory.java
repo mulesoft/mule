@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
+import org.mule.runtime.module.service.internal.artifact.ModuleLayerGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,11 +99,19 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
       propagateOpensToService(parent, artifactLayer, serviceModuleAnnotationClass, serviceModule, serviceModuleName);
     }
 
-    return new MuleServiceClassLoader(artifactId,
-                                      descriptor,
-                                      new URL[0],
-                                      artifactLayer.findLoader(serviceModuleName),
-                                      lookupPolicy);
+    ArtifactClassLoader serviceClassLoader =
+        new MuleServiceClassLoader(artifactId, descriptor, new URL[0], artifactLayer.findLoader(serviceModuleName), lookupPolicy);
+
+    ModuleLayerGraph.setModuleLayerId(artifactLayer, artifactId);
+    artifactLayer.parents().stream().filter(parentLayer -> !parentLayer.equals(ModuleLayer.boot())).findFirst()
+        .ifPresent(parentLayer -> ModuleLayerGraph.setModuleLayerId(parentLayer, "Mule Container Module Layer"));
+
+    ModuleLayerGraph graph = new ModuleLayerGraph(artifactLayer);
+    serviceClassLoader.setModuleLayerInformationSupplier(graph::toString);
+    if (parent instanceof ArtifactClassLoader) {
+      ((ArtifactClassLoader) parent).setModuleLayerInformationSupplier(graph::toString);
+    }
+    return serviceClassLoader;
   }
 
   // this relies on reflection because the annotation in the services is loaded with the container classloader, but this code may

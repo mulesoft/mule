@@ -14,3 +14,17 @@ Couldn't read from file domain-config.yaml: Couldn't find resource: domain-confi
  
  Current classloader in context is (Domain Class Loader) 
  Seems the resource doesn't exist in any classloader. Verify you wrote the right resource name.
+Module Layer Information:
+--------------------------------------
+| service/expressionLanguageService  |
+--------------------------------------
+                   |
+                   |
+                   V
+--------------------------------------
+|    Mule Container Module Layer     |
+--------------------------------------
+
+Modules in each Module Layer:
+service/expressionLanguageService: org.mule.service.el.mock
+Mule Container Module Layer: (Empty Layer)

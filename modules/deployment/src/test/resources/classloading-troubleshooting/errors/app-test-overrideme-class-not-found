@@ -23,3 +23,17 @@ Couldn't find class: test.OverrideMe
  
  Current classloader in context is (App Class Loader) 
  The class exists in the following context (Domain Class Loader) but is not exported. Try exporting the package where the class by modifying the mule-artifact.json file
+Module Layer Information:
+--------------------------------
+|   service/schedulerService   |
+--------------------------------
+                |
+                |
+                V
+--------------------------------
+| Mule Container Module Layer  |
+--------------------------------
+
+Modules in each Module Layer:
+service/schedulerService: org.mule.service.scheduler.mock
+Mule Container Module Layer: (Empty Layer)

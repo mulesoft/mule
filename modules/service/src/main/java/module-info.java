@@ -25,6 +25,7 @@ module org.mule.runtime.service {
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires reflections;
+  requires org.apache.commons.lang3;
 
   exports org.mule.runtime.module.service.api.artifact;
   exports org.mule.runtime.module.service.api.discoverer;

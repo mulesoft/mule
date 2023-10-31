@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,11 +49,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+  private static final String SERVICE_PREFIX = "META-INF/services/";
 
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
   private final List<ExportedService> exportedServices;
-  private static final String SERVICE_PREFIX = "META-INF/services/";
+  private Supplier<String> moduleLayerInformation = () -> null;
 
   private final boolean verboseLogging;
 
@@ -269,5 +271,15 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   public ArtifactClassLoader getArtifactClassLoader() {
     return artifactClassLoader;
+  }
+
+  @Override
+  public void setModuleLayerInformationSupplier(Supplier<String> moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = moduleLayerInformationSupplier;
+  }
+
+  @Override
+  public String getModuleLayerInformation() {
+    return moduleLayerInformation.get();
   }
 }

@@ -23,3 +23,17 @@ Couldn't read from file jms.properties: Couldn't find resource: jms.properties n
  
  Current classloader in context is (App Class Loader) 
  The resource exists in the following context (Domain Class Loader) but is not exported. Try exporting the resource by modifying the mule-artifact.json file
+Module Layer Information:
+--------------------------------
+|   service/schedulerService   |
+--------------------------------
+                |
+                |
+                V
+--------------------------------
+| Mule Container Module Layer  |
+--------------------------------
+
+Modules in each Module Layer:
+service/schedulerService: org.mule.service.scheduler.mock
+Mule Container Module Layer: (Empty Layer)
