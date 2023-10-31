@@ -34,6 +34,8 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.internal.ast.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -62,7 +64,6 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
-import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 
 import org.slf4j.Logger;
 
@@ -523,7 +524,7 @@ public class MacroExpansionModuleModel {
    */
   private Map<String, Object> getLiteralParameters(Map<String, ?> propertiesMap, Map<String, String> parametersMap) {
     final Map<String, Object> literalParameters = propertiesMap.entrySet().stream()
-        .filter(entry -> !MuleExtensionUtils.isExpression(entry.getValue()))
+        .filter(entry -> !isExpression(entry.getValue()))
         .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                        Map.Entry::getValue));
 
@@ -545,10 +546,6 @@ public class MacroExpansionModuleModel {
    */
   private String getReplaceableExpression(String name, String prefix) {
     return "#[" + prefix + "." + name + "]";
-  }
-
-  private boolean isExpression(String value) {
-    return value.startsWith("#[") && value.endsWith("]");
   }
 
   /**

@@ -93,7 +93,7 @@ public class TlsEnabledComponentUtils {
 
     ParameterDeclarer<?> parameterDeclarer;
 
-    if (isTlsConfigurationRequired(targetComponent) && !isTlsConfigurationProvided(targetComponent)) {
+    if (requiresTlsContextFactoryParameter(targetComponent) && !isTlsContextFactoryProvided(targetComponent)) {
       parameterDeclarer = parameterGroupDeclarer.withRequiredParameter(tlsContextInfrastructureType.getName());
     } else {
       parameterDeclarer = parameterGroupDeclarer.withOptionalParameter(tlsContextInfrastructureType.getName());
@@ -126,13 +126,13 @@ public class TlsEnabledComponentUtils {
         .anyMatch(TlsEnabledComponentUtils::isTlsContextFactoryParameter);
   }
 
-  private static boolean isTlsConfigurationRequired(ComponentAst componentAst) {
+  private static boolean requiresTlsContextFactoryParameter(ComponentAst componentAst) {
     return componentAst.getModel(ParameterizedModel.class)
         .map(TlsEnabledComponentUtils::requiresTlsContextFactoryParameter)
         .orElse(false);
   }
 
-  private static boolean isTlsConfigurationProvided(ComponentAst componentAst) {
+  private static boolean isTlsContextFactoryProvided(ComponentAst componentAst) {
     return componentAst.getParameters().stream()
         .filter(TlsEnabledComponentUtils::isTlsContextFactoryParameter)
         .anyMatch(TlsEnabledComponentUtils::hasValue);
