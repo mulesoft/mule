@@ -274,7 +274,7 @@
         <mockitoVersion>4.11.0</mockitoVersion>
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <byteBuddyVersion>1.14.0</byteBuddyVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>9.4.51.v20230217</jettyVersion>
     </properties>
 
     <dependencyManagement>
