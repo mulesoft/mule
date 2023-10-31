@@ -266,10 +266,15 @@
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
+        <junitVersion>4.12</junitVersion>
+        <hamcrestVersion>2.2</hamcrestVersion>
         <allureJunitVersion>2.22.2</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
         <tikaVersion>1.24.1</tikaVersion>
         <mockitoVersion>4.11.0</mockitoVersion>
+        <xmlUnitVersion>1.6</xmlUnitVersion>
+        <byteBuddyVersion>1.14.0</byteBuddyVersion>
+        <jettyVersion>9.0.7.v20131107</jettyVersion>
     </properties>
 
     <dependencyManagement>
@@ -286,6 +291,23 @@
                 <groupId>com.googlecode.multithreadedtc</groupId>
                 <artifactId>multithreadedtc</artifactId>
                 <version>${multithreadedtcVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrestVersion}</version>
             </dependency>
             <dependency>
                 <groupId>io.qameta.allure</groupId>
@@ -307,6 +329,13 @@
                 <artifactId>mockito-inline</artifactId>
                 <version>${mockitoVersion}</version>
             </dependency>
+            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byteBuddyVersion}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
@@ -323,6 +352,18 @@
                 </exclusions>
             </dependency>
             
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlUnitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <!-- Other deps used in testing -->
             <dependency>
                 <groupId>org.apache.derby</groupId>
@@ -349,6 +390,17 @@
                 <groupId>org.apache.ftpserver</groupId>
                 <artifactId>ftpserver-core</artifactId>
                 <version>${ftpServerVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.sshd</groupId>
@@ -379,6 +431,14 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-exec</artifactId>
                 <version>${commonsExecVersion}</version>
+            </dependency>
+
+            <!-- NOT the service (with mule-service classifier) -->
+            <!-- this raw jar is used in unit tests only -->
+            <dependency>
+                <groupId>org.mule.services</groupId>
+                <artifactId>mule-service-weave</artifactId>
+                <version>${weaveVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
