@@ -210,6 +210,7 @@ module org.mule.runtime.core {
       org.mule.runtime.properties.config,
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.privileged.exception;
+  exports org.mule.runtime.core.privileged.interception;
   exports org.mule.runtime.core.privileged.lifecycle to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.privileged.processor;
