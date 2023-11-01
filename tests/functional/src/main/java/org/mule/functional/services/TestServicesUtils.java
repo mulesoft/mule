@@ -6,7 +6,11 @@
  */
 package org.mule.functional.services;
 
+import static java.lang.System.getProperty;
+
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -26,7 +30,11 @@ public class TestServicesUtils {
   }
 
   private static File getResourceFile(String resource, File tempFolder) {
-    final File targetFile = new File(tempFolder, resource);
+    return getResourceFile(resource, tempFolder, resource);
+  }
+
+  private static File getResourceFile(String resource, File tempFolder, String targetFilePath) {
+    final File targetFile = new File(tempFolder, targetFilePath);
     try {
       copyInputStreamToFile(TestServicesUtils.class.getResourceAsStream(resource), targetFile);
     } catch (IOException e) {
@@ -44,11 +52,16 @@ public class TestServicesUtils {
    */
   public static File buildSchedulerServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/org/mule/service/scheduler/MockScheduler.java", tempFolder),
                    getResourceFile("/org/mule/service/scheduler/MockSchedulerService.java", tempFolder),
-                   getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java", tempFolder))
+                   getResourceFile("/org/mule/service/scheduler/MockSchedulerServiceProvider.java", tempFolder),
+                   getResourceFile("/org/mule/service/scheduler/MockSchedulerView.java", tempFolder))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/org/mule/service/scheduler/module-info.java", tempFolder, "module-info.java"))
         .including(getResourceFile("/org/mule/service/scheduler/MANIFEST.MF", tempFolder),
                    "META-INF/MANIFEST.MF")
+        .dependingOn(new File(getProperty("apiAnnotationsLib")))
         .compile("mule-module-service-mock-scheduler-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("schedulerService")
@@ -67,11 +80,15 @@ public class TestServicesUtils {
    */
   public static File buildExpressionLanguageServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/org/mule/service/el/MockExpressionLanguage.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/MockExpressionLanguageFactoryServiceProvider.java", tempFolder))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/org/mule/service/el/module-info.java", tempFolder, "module-info.java"))
         .including(getResourceFile("/org/mule/service/el/MANIFEST.MF", tempFolder),
                    "META-INF/MANIFEST.MF")
+        .dependingOn(new File(getProperty("apiAnnotationsLib")))
         .compile("mule-module-service-mock-expression-language-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageService")
@@ -91,11 +108,15 @@ public class TestServicesUtils {
    */
   public static File buildExpressionLanguageMetadataServiceFile(File tempFolder) {
     final File defaultServiceJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataService.java", tempFolder),
                    getResourceFile("/org/mule/service/el/metadata/MockExpressionLanguageMetadataServiceProvider.java",
                                    tempFolder))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/org/mule/service/el/metadata/module-info.java", tempFolder, "module-info.java"))
         .including(getResourceFile("/org/mule/service/el/metadata/MANIFEST.MF", tempFolder),
                    "META-INF/MANIFEST.MF")
+        .dependingOn(new File(getProperty("apiAnnotationsLib")))
         .compile("mule-module-service-mock-expression-language-metadata-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("expressionLanguageMetadataService")
@@ -114,10 +135,14 @@ public class TestServicesUtils {
    */
   public static File buildHttpServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/org/mule/service/http/MockHttpService.java", tempFolder),
                    getResourceFile("/org/mule/service/http/MockHttpServiceProvider.java", tempFolder))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/org/mule/service/http/module-info.java", tempFolder, "module-info.java"))
         .including(getResourceFile("/org/mule/service/http/MANIFEST.MF", tempFolder),
                    "META-INF/MANIFEST.MF")
+        .dependingOn(new File(getProperty("apiAnnotationsLib")))
         .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("http-service")

@@ -124,8 +124,9 @@ public final class TestArtifactsCatalog {
         new JarCompiler().compiling(getResourceFile("/packagetesting/javax/annotation/BarUtils.java"))
             .compile("bar-javax.jar");
 
-    barUtilsForbiddenJavaClassFile =
-        new SingleClassCompiler().compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
+    barUtilsForbiddenJavaClassFile = new SingleClassCompiler()
+        .targetJavaVersion(8)
+        .compile(getResourceFile("/packagetesting/java/lang/BarUtils.java"));
     barUtilsForbiddenJavaJarFile =
         new JarCompiler().compiling(getResourceFile("/packagetesting/java/lang/BarUtils.java"))
             .compile("bar-javaForbidden.jar");
