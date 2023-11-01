@@ -35,9 +35,8 @@ public class MultiParentClassLoaderUtils {
       .weakKeys()
       .weakValues()
       .build(cl -> new MultipleParentClassLoader.Builder(false)
-          .appendMostSpecific(MultiParentClassLoaderUtils.class)
-          .appendMostSpecific(cl)
-          .build(CONTAINER_CLASS_LOADER));
+          .append(CONTAINER_CLASS_LOADER, cl)
+          .build());
 
   /**
    * Creates a new classloader that has visibility on the Mule Container classloader and {@code deploymentClassLoader}.
