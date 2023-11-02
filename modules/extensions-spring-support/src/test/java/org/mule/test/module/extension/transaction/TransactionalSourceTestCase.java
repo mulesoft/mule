@@ -7,10 +7,10 @@
 package org.mule.test.module.extension.transaction;
 
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
@@ -32,13 +32,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-import javax.transaction.TransactionManager;
-
 @RunnerDelegateTo(Parameterized.class)
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private boolean isSdkApi;
-  private String configFile;
+  private final boolean isSdkApi;
+  private final String configFile;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -63,7 +61,6 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
     SdkTransactionalSource.isSuccess = null;
-    muleContext.setTransactionManager(mock(TransactionManager.class));
   }
 
   @After
