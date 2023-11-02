@@ -23,6 +23,9 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
 import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
@@ -43,9 +46,10 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Sets.newHashSet;
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -117,6 +121,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
@@ -728,9 +733,12 @@ public final class XmlExtensionLoaderDelegate {
     List<ComponentAst> connectionProperties = extractConnectionProperties(moduleAst);
     validateProperties(configurationProperties, connectionProperties);
 
-    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty()) {
+    Optional<ComponentAst> tlsEnabledComponent = getTlsEnabledComponent(moduleAst);
+
+    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || tlsEnabledComponent.isPresent()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
+      tlsEnabledComponent.ifPresent(comp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup(), comp));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
       addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel);
       return of(configurationDeclarer);
@@ -824,32 +832,62 @@ public final class XmlExtensionLoaderDelegate {
 
   }
 
-  private Optional<ComponentAst> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
-                                                                List<ComponentAst> globalElementsComponentModel) {
-    final List<ComponentAst> markedAsTestConnectionGlobalElements =
-        globalElementsComponentModel.stream()
-            .filter(globalElementComponentModel -> {
-              Object connection =
-                  globalElementComponentModel.getAnnotations().get(MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.toString());
-              if (connection == null) {
-                return false;
-              }
+  private String getComponentIdForErrorMessage(ComponentAst componentAst) {
+    return componentAst.getComponentId().orElse("unnamed@" + componentAst.getLocation().getLocation());
+  }
 
-              return parseBoolean(connection.toString());
-            })
-            .collect(toList());
+  private boolean isEnabledBooleanAnnotation(ComponentAst componentAst, QName annotationName) {
+    Object annotation = componentAst.getAnnotations().get(annotationName.toString());
+    if (annotation == null) {
+      return false;
+    }
 
-    if (markedAsTestConnectionGlobalElements.size() > 1) {
-      throw new MuleRuntimeException(createStaticMessage(format("It can only be one global element marked as test connectivity [%s] but found [%d], offended global elements are: [%s]",
-                                                                MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
-                                                                markedAsTestConnectionGlobalElements.size(),
-                                                                markedAsTestConnectionGlobalElements.stream()
-                                                                    .map(ComponentAst::getComponentId)
-                                                                    .filter(Optional::isPresent)
-                                                                    .map(Optional::get)
+    return parseBoolean(annotation.toString());
+  }
+
+  private Predicate<ComponentAst> withEnabledBooleanAnnotation(QName annotationName) {
+    return componentAst -> isEnabledBooleanAnnotation(componentAst, annotationName);
+  }
+
+  private Optional<ComponentAst> findAnnotatedElement(Stream<ComponentAst> elements, QName annotationQName) {
+
+    final List<ComponentAst> annotatedElements = elements
+        .filter(withEnabledBooleanAnnotation(annotationQName))
+        .collect(toList());
+    if (annotatedElements.size() > 1) {
+      throw new MuleRuntimeException(createStaticMessage(format("There can only be one global element marked with [%s:%s] but found [%d], offending global elements are: [%s]",
+                                                                annotationQName.getPrefix(),
+                                                                annotationQName.getLocalPart(),
+                                                                annotatedElements.size(),
+                                                                annotatedElements.stream()
+                                                                    .map(this::getComponentIdForErrorMessage)
                                                                     .collect(joining(", ")))));
     }
-    Optional<ComponentAst> testConnectionGlobalElement = markedAsTestConnectionGlobalElements.stream().findFirst();
+
+    return annotatedElements.stream().findFirst();
+  }
+
+  private void validateIsTlsConfigurationSupported(ComponentAst componentAst) {
+    if (!isTlsConfigurationSupported(componentAst)) {
+      throw new MuleRuntimeException(createStaticMessage(format("The annotated element [%s] with [%s:%s] is not valid to be configured for TLS (the component [%s] does not support it)",
+                                                                getComponentIdForErrorMessage(componentAst),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getPrefix(),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getLocalPart(),
+                                                                componentAst.getIdentifier())));
+    }
+  }
+
+  private Optional<ComponentAst> getTlsEnabledComponent(ComponentAst moduleAst) {
+    Optional<ComponentAst> tlsEnabledElement =
+        findAnnotatedElement(moduleAst.recursiveStream(), MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME);
+    tlsEnabledElement.ifPresent(this::validateIsTlsConfigurationSupported);
+    return tlsEnabledElement;
+  }
+
+  private Optional<ComponentAst> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
+                                                                List<ComponentAst> globalElementsComponentModel) {
+    Optional<ComponentAst> testConnectionGlobalElement = findAnnotatedElement(globalElementsComponentModel.stream(),
+                                                                              MODULE_CONNECTION_MARKER_ANNOTATION_QNAME);
     if (!testConnectionGlobalElement.isPresent()) {
       testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel);
     } else {

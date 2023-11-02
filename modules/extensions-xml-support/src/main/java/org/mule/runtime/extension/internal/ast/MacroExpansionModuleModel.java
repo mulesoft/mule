@@ -34,6 +34,8 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.internal.ast.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -62,6 +64,7 @@ import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.Defaul
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
+
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -363,15 +366,15 @@ public class MacroExpansionModuleModel {
 
   private ComponentAst expandGlobalElement(List<ComponentAst> moduleComponentModels, Set<String> moduleGlobalElementsNames,
                                            ComponentAst comp, ConfigurationModel configurationModel) {
-    Map<String, String> propertiesMap = comp.getParameters()
+    Map<String, Object> propertiesMap = comp.getParameters()
         .stream()
         .filter(paramAst -> paramAst.getValue().isRight())
         .collect(toMap(paramAst -> paramAst.getModel().getName(),
-                       paramAst -> paramAst.getValue().getRight().toString()));
+                       paramAst -> paramAst.getValue().getRight()));
     Map<String, String> connectionPropertiesMap =
         extractConnectionProperties(comp, configurationModel);
     propertiesMap.putAll(connectionPropertiesMap);
-    final Map<String, String> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
+    final Map<String, Object> literalsParameters = getLiteralParameters(propertiesMap, emptyMap());
 
     final String defaultGlobalElementSuffix = comp.getComponentId().orElse("");
 
@@ -467,7 +470,7 @@ public class MacroExpansionModuleModel {
         .filter(paramAst -> paramAst.getResolvedRawValue() != null)
         .collect(toMap(paramAst -> paramAst.getModel().getName(), paramAst -> paramAst.getResolvedRawValue()));
 
-    final Map<String, String> literalParameters = getLiteralParameters(propertiesMap, parametersMap);
+    final Map<String, Object> literalParameters = getLiteralParameters(propertiesMap, parametersMap);
 
     List<ComponentAst> processorChainChildren = operationModuleComponentModel.directChildrenStream()
         .map(bodyProcessor -> copyComponentTreeRecursively(bodyProcessor,
@@ -519,17 +522,17 @@ public class MacroExpansionModuleModel {
    * @param parametersMap <param>s that are feed in the current usage of the <module/>
    * @return a {@link Map} of <property>s and <parameter>s that could be replaced by their literal values
    */
-  private Map<String, String> getLiteralParameters(Map<String, String> propertiesMap, Map<String, String> parametersMap) {
-    final Map<String, String> literalsParameters = propertiesMap.entrySet().stream()
+  private Map<String, Object> getLiteralParameters(Map<String, ?> propertiesMap, Map<String, String> parametersMap) {
+    final Map<String, Object> literalParameters = propertiesMap.entrySet().stream()
         .filter(entry -> !isExpression(entry.getValue()))
         .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                        Map.Entry::getValue));
 
-    literalsParameters.putAll(parametersMap.entrySet().stream()
+    literalParameters.putAll(parametersMap.entrySet().stream()
         .filter(entry -> !isExpression(entry.getValue()))
         .collect(toMap(e -> getReplaceableExpression(e.getKey(), VARS),
                        Map.Entry::getValue)));
-    return literalsParameters;
+    return literalParameters;
   }
 
   /**
@@ -543,10 +546,6 @@ public class MacroExpansionModuleModel {
    */
   private String getReplaceableExpression(String name, String prefix) {
     return "#[" + prefix + "." + name + "]";
-  }
-
-  private boolean isExpression(String value) {
-    return value.startsWith("#[") && value.endsWith("]");
   }
 
   /**

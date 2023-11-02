@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-tls-config"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:mule="http://www.mulesoft.org/schema/mule/core"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <operation name="set-payload-hardcoded-value" xmlns:tlsEnabled="true">
+        <body>
+            <mule:set-payload value="hardcoded value"/>
+        </body>
+        <output type="string"/>
+    </operation>
+</module>

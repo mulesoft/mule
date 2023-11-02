@@ -116,6 +116,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.util to
       org.mule.runtime.core,
       org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.value to
       org.mule.runtime.tooling.support;

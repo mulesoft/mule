@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-tls-config-required-with-default"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
+        xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
+
+    <heisenberg:config name="heisenbergConfig"
+                       myName="wally"
+                       age="50"
+                       cancer="true"
+                       dateOfBirth="1959-09-07T00:00:00"
+                       dateOfDeath="2011-09-07T00:00:00-05:00"
+                       money="100000"
+                       initialHealth="CANCER"
+                       finalHealth="CANCER">
+        <heisenberg:secure-connection saulPhoneNumber="123-12-3" xmlns:tlsEnabled="true">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit2"/>
+            </tls:context>
+        </heisenberg:secure-connection>
+    </heisenberg:config>
+
+    <operation name="get-heisenberg-connection">
+        <body>
+            <heisenberg:get-connection config-ref="heisenbergConfig" />
+        </body>
+        <output type="any"/>
+    </operation>
+</module>

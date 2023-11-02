@@ -9,6 +9,8 @@ package org.mule.runtime.extension.internal.ast;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsContextFactoryParameter;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsEnabled;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -18,12 +20,14 @@ import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
+import org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,12 +44,19 @@ import java.util.stream.Stream;
  */
 class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
+  private static final String TLS_CONTEXT_CONFIG_PARAMETER_KEY = getTlsContextConfigParameterKey();
+
+  private static String getTlsContextConfigParameterKey() {
+    return "#[vars." + InfrastructureTypeMapping.getMap().get(TlsContextFactory.class).getName() + "]";
+  }
+
   private final ComponentLocation location;
   private final Set<String> moduleGlobalElementsNames;
   private final String defaultGlobalElementSuffix;
-  private final Map<String, String> literalsParameters;
+  private final Map<String, Object> literalsParameters;
 
   private final List<ComponentAst> macroExpandedChildren;
+  private final boolean isTlsEnabled;
 
   public MacroExpandedComponentAst(ComponentAst original, ComponentLocation location,
                                    Set<String> moduleGlobalElementsNames, String defaultGlobalElementSuffix,
@@ -55,7 +66,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
 
   public MacroExpandedComponentAst(ComponentAst original, ComponentLocation location,
                                    Set<String> moduleGlobalElementsNames, String defaultGlobalElementSuffix,
-                                   Map<String, String> literalsParameters,
+                                   Map<String, Object> literalsParameters,
                                    List<ComponentAst> macroExpandedChildren) {
     super(original);
     this.location = location;
@@ -63,6 +74,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
     this.defaultGlobalElementSuffix = defaultGlobalElementSuffix;
     this.literalsParameters = literalsParameters;
     this.macroExpandedChildren = macroExpandedChildren;
+    this.isTlsEnabled = isTlsEnabled(original);
   }
 
   @Override
@@ -92,6 +104,10 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         .collect(toList());
   }
 
+  private boolean mustExpandTlsContextParameter(ComponentParameterAst parameter) {
+    return isTlsEnabled && isTlsContextFactoryParameter(parameter);
+  }
+
   private ComponentParameterAst mapIdParam(final ComponentParameterAst originalParameter) {
     requireNonNull(originalParameter);
     return new BaseComponentParameterAstDecorator(originalParameter) {
@@ -99,6 +115,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       @Override
       public <T> Either<String, T> getValue() {
         final Either<String, T> originalValue = getDecorated().getValue();
+
+        // Checks if it is a TLS context parameter that must be expanded from the config parameter
+        if (mustExpandTlsContextParameter(getDecorated()) && literalsParameters.containsKey(TLS_CONTEXT_CONFIG_PARAMETER_KEY)) {
+          return right((T) literalsParameters.get(TLS_CONTEXT_CONFIG_PARAMETER_KEY));
+        }
 
         if (originalValue.isLeft()) {
           final String expression = "#[" + originalValue.getLeft() + "]";
@@ -150,9 +171,11 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         return originalParameter.getValue()
             .mapRight(mappings -> ((List<ErrorMapping>) mappings)
                 .stream()
-                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource()),
+                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource())
+                    .toString(),
                                                  literalsParameters.getOrDefault(mapping.getTarget(),
-                                                                                 mapping.getTarget())))
+                                                                                 mapping.getTarget())
+                                                     .toString()))
                 .collect(toList()))
             .getRight();
       }
@@ -180,7 +203,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
           if (moduleGlobalElementsNames.contains(originalRawValue)) {
             return originalRawValue.concat("-").concat(defaultGlobalElementSuffix);
           } else {
-            return literalsParameters.getOrDefault(originalRawValue, originalRawValue);
+            return literalsParameters.getOrDefault(originalRawValue, originalRawValue).toString();
           }
         } else {
           return null;
@@ -201,7 +224,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       return originalValue.concat("-").concat(defaultGlobalElementSuffix);
     } else {
       // not a global element, returning the original value.
-      return literalsParameters.getOrDefault(originalValue, originalValue);
+      return literalsParameters.getOrDefault(originalValue, originalValue).toString();
     }
   }
 
