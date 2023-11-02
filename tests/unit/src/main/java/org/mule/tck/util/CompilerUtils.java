@@ -19,6 +19,8 @@ import static java.util.stream.Stream.concat;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -514,13 +516,13 @@ public class CompilerUtils {
 
       if (targetJavaVersion <= 8) {
         options.addAll(asList("-classpath", fullClassPath));
-        // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing what
-        // happens when deploying.
-        options.addAll(asList("--release", "8"));
+        if (isJavaVersionAtLeast(JAVA_11)) {
+          // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing
+          // what happens when deploying.
+          options.addAll(asList("--release", "8"));
+        }
       } else {
         options.addAll(asList("--module-path", fullClassPath));
-
-        options.addAll(asList("--source", Integer.toString(targetJavaVersion)));
       }
 
       options.addAll(processProperties);
