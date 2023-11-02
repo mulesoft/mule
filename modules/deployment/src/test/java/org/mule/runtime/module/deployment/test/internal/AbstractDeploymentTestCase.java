@@ -249,10 +249,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String MIN_MULE_VERSION = "4.0.0";
 
   protected static TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  protected static TestArtifactsCatalog testArtifactsCatalog = new TestArtifactsCatalog();
   protected static TestServicesSetup testServicesSetup = new TestServicesSetup(compilerWorkFolder);
 
   @ClassRule
-  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup);
+  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup).around(testArtifactsCatalog);
 
   @ClassRule
   public static SystemProperty duplicateProvidersLax =
@@ -511,7 +512,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void installFooService() throws IOException {
     installService("fooService", "org.mule.runtime.service.test.api.FooService", "org.mule.service.foo.FooServiceProvider",
-                   defaultFooServiceJarFile);
+                   defaultFooServiceJarFile, defaulServiceEchoJarFile, new File(System.getProperty("testServicesLib")));
   }
 
   protected void installEchoService() throws IOException {
@@ -520,13 +521,13 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   }
 
   private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,
-                              File serviceJarFile)
+                              File... serviceJarFiles)
       throws IOException {
     final File echoService =
         new ServiceFileBuilder(serviceName)
             .forContract(satisfiedServiceClassName)
             .withServiceProviderClass(serviceProviderClassName)
-            .usingLibrary(serviceJarFile.getAbsolutePath())
+            .usingLibraries(serviceJarFiles)
             .unpack(true)
             .getArtifactFile();
 

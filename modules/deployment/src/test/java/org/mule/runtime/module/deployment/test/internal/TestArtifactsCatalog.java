@@ -23,6 +23,9 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+
 import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -39,11 +42,16 @@ import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import org.apache.commons.lang3.JavaVersion;
+import org.apache.commons.lang3.SystemUtils;
+
+import org.junit.rules.ExternalResource;
+
 /**
  * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
  * creating them repeatedly for each test.
  */
-public final class TestArtifactsCatalog {
+public final class TestArtifactsCatalog extends ExternalResource {
 
   private static final String MIN_MULE_VERSION = "4.0.0";
 
@@ -154,8 +162,11 @@ public final class TestArtifactsCatalog {
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/packagetesting/org/mule/service/foo/DefaultFooService.java"),
                    getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
         .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
         .including(getResourceFile("/packagetesting/org/mule/service/foo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")

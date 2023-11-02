@@ -15,8 +15,8 @@ import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCata
 import static org.mule.tck.junit4.matcher.EventMatcher.hasMessage;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DOMAIN_DEPLOYMENT;
 
+import static java.lang.System.getProperty;
 import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Paths.get;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -33,13 +33,9 @@ import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
-import org.mule.weave.v2.el.WeaveServiceProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -108,20 +104,20 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
 
   private static File getRealExpressionLanguageServiceFile(File tempFolder) {
     try {
-      final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
-      String weaveSeriveFileName = Paths.get(weaveJarUrl.toURI()).getFileName().toString();
-      String weaveServiceArtifactId = weaveSeriveFileName.substring(0, weaveSeriveFileName.length() - 4);
+      // final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
+      // String weaveSeriveFileName = Paths.get(weaveJarUrl.toURI()).getFileName().toString();
+      // String weaveServiceArtifactId = weaveSeriveFileName.substring(0, weaveSeriveFileName.length() - 4);
 
       // Unpack the service because java doesn't allow to create a classloader with jars within a zip out of the box.
       File serviceExplodedDir;
-      serviceExplodedDir = createTempDirectory(weaveServiceArtifactId).toFile();
+      serviceExplodedDir = createTempDirectory("mule-service-weave").toFile();
 
-      URL serviceBundleUrl = weaveJarUrl;
+      // URL serviceBundleUrl = weaveJarUrl;
 
-      unzip(get(serviceBundleUrl.toURI()).toFile(), serviceExplodedDir);
+      unzip(new File(getProperty("dataWeaveService")), serviceExplodedDir);
       return serviceExplodedDir;
 
-    } catch (IOException | URISyntaxException e) {
+    } catch (IOException e) {
       throw new IllegalStateException("Couldn't prepare RealExpressionLanguageService.", e);
     }
   }

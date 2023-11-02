@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.artifact.builder;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static org.mule.tck.ZipUtils.compress;
+
 import static java.io.File.separator;
 import static java.util.Optional.empty;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.io.FileUtils.write;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getName;
@@ -16,7 +19,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mule.tck.ZipUtils.compress;
 
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.tck.ZipUtils.ZipResource;
@@ -109,6 +111,24 @@ public abstract class AbstractArtifactFileBuilder<T extends AbstractArtifactFile
     checkImmutable();
     checkArgument(!isEmpty(jarFile), "Jar file cannot be empty");
     resources.add(new ZipResource(jarFile, "lib/" + getName(jarFile)));
+
+    return getThis();
+  }
+
+  /**
+   * Adds a jar file to the artifact lib folder.
+   *
+   * @param jarFile jar file from a external file or test resource.
+   * @return the same builder instance
+   */
+  public T usingLibraries(File... jarFiles) {
+    checkImmutable();
+
+    for (File jarFile : jarFiles) {
+      checkArgument(!isEmpty(jarFile.getAbsolutePath()), "Jar file cannot be empty");
+      resources.add(new ZipResource(jarFile.getAbsolutePath(), "lib/" + getName(jarFile.getAbsolutePath())));
+
+    }
 
     return getThis();
   }

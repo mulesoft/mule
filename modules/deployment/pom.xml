@@ -330,7 +330,9 @@
                 <configuration>
                     <systemPropertyVariables>
                         <testComponentPlugin>${org.mule.tests.plugin:mule-tests-component-plugin:jar:mule-plugin}</testComponentPlugin>
+                        <testServicesLib>${org.mule.tests:mule-module-test-services:jar}</testServicesLib>
                         <extensionsApiLib>${org.mule.runtime:mule-extensions-api:jar}</extensionsApiLib>
+                        <dataWeaveService>${org.mule.services:mule-service-weave:jar:mule-service}</dataWeaveService>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

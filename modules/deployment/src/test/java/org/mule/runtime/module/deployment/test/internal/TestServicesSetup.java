@@ -99,8 +99,6 @@ public class TestServicesSetup extends ExternalResource {
    * @throws IOException if some sub-folder of the services folder couldn't be created.
    */
   public void copyServicesToFolder(File servicesFolder) throws IOException {
-    initNotOverriddenServices();
-
     copyDirectory(schedulerService,
                   new File(servicesFolder, SCHEDULER_SERVICE_NAME));
     copyDirectory(expressionLanguageService,
@@ -111,7 +109,8 @@ public class TestServicesSetup extends ExternalResource {
     }
   }
 
-  private void initNotOverriddenServices() throws IOException {
+  @Override
+  protected void before() throws IOException {
     if (schedulerService == null) {
       schedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
     }
