@@ -78,10 +78,5 @@
             <artifactId>mule-dwb-api</artifactId>                
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
