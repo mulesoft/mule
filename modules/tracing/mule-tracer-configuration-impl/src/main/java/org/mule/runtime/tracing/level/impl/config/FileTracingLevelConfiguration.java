@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.OVERVIEW;
 
 import static java.lang.Boolean.parseBoolean;
@@ -19,6 +20,7 @@ import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
 import static java.util.Optional.empty;
 
+import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -70,7 +72,8 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
   private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
   private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
   private static final String OVERRIDES_PROPERTY_NAME = "mule.openTelemetry.tracer.levelOverrides";
-  private static final TracingLevel DEFAULT_LEVEL = OVERVIEW;
+  private static final TracingLevel DEFAULT_LEVEL =
+      TracingLevel.valueOf(getProperty(MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL, OVERVIEW.toString()).toUpperCase());
   private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
   private static final ObjectMapper configFileMapper = new ObjectMapper(new YAMLFactory());
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
