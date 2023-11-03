@@ -78,8 +78,6 @@ public final class JpmsUtils {
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
       "--add-opens=java.base/java.lang.reflect=org.mule.runtime.jpms.utils";
-  private static final String REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT =
-      "--add-opens=java.base/java.security.cert=org.mule.runtime.jpms.utils";
 
   /**
    * Validates that no module tweaking jvm options (i.e: {@code --add-opens}, {@code --add-exports}, ...) have been provided in
@@ -108,8 +106,7 @@ public final class JpmsUtils {
             || arg.startsWith("--patch-module"))
         .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
-            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)
-            || arg.equals(REQUIRED_ADD_OPENS_JAVA_SECURITY_CERT)))
+            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)))
         .collect(toList());
 
     if (!illegalArguments.isEmpty()) {
