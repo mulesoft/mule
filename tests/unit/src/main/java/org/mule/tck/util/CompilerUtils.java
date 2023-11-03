@@ -491,16 +491,16 @@ public class CompilerUtils {
         options.add(target.getAbsolutePath());
       }
 
+      Predicate<String> classpathEntryPredicate;
+      final String xmlApisLib = System.getProperty("xmlApisLib");
+      if (xmlApisLib == null) {
+        classpathEntryPredicate = cpe -> true;
+      } else {
+        classpathEntryPredicate = cpe -> !cpe.equals(xmlApisLib);
+      }
       // Adds same classpath as the one used on the runner
       String fullClassPath;
       if (jarFiles.length > 0) {
-        Predicate<String> classpathEntryPredicate;
-        final String xmlApisLib = System.getProperty("xmlApisLib");
-        if (xmlApisLib == null) {
-          classpathEntryPredicate = cpe -> true;
-        } else {
-          classpathEntryPredicate = cpe -> !cpe.equals(xmlApisLib);
-        }
 
         // Adds extra jars files required to compile the source classes
         fullClassPath = concat(CLASS_PATH_ENTRIES
@@ -511,6 +511,7 @@ public class CompilerUtils {
                                        .collect(joining(PATH_SEPARATOR));
       } else {
         fullClassPath = CLASS_PATH_ENTRIES.stream()
+            .filter(classpathEntryPredicate)
             .collect(joining(PATH_SEPARATOR));
       }
 

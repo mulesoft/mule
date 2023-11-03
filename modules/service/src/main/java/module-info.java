@@ -21,6 +21,9 @@ module org.mule.runtime.service {
   requires org.mule.runtime.metadata.model.java;
 
   requires java.inject;
+  requires com.google.common;
+  requires org.apache.commons.io;
+  requires org.apache.commons.lang3;
   requires reflections;
 
   exports org.mule.runtime.module.service.api.artifact;

@@ -38,7 +38,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.callbackExtensionPlugin;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaulServiceEchoJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultServiceEchoJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.defaultFooServiceJarFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.echoTestClassFile;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.exceptionThrowingPlugin;
@@ -249,11 +249,11 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static final String MIN_MULE_VERSION = "4.0.0";
 
   protected static TemporaryFolder compilerWorkFolder = new TemporaryFolder();
-  protected static TestArtifactsCatalog testArtifactsCatalog = new TestArtifactsCatalog();
+  protected static TestArtifactsCatalog testArtifactsCatalog = new TestArtifactsCatalog(compilerWorkFolder);
   protected static TestServicesSetup testServicesSetup = new TestServicesSetup(compilerWorkFolder);
 
   @ClassRule
-  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testServicesSetup).around(testArtifactsCatalog);
+  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testArtifactsCatalog).around(testServicesSetup);
 
   @ClassRule
   public static SystemProperty duplicateProvidersLax =
@@ -512,12 +512,12 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
   protected void installFooService() throws IOException {
     installService("fooService", "org.mule.runtime.service.test.api.FooService", "org.mule.service.foo.FooServiceProvider",
-                   defaultFooServiceJarFile, defaulServiceEchoJarFile, new File(System.getProperty("testServicesLib")));
+                   defaultFooServiceJarFile, defaultServiceEchoJarFile);
   }
 
   protected void installEchoService() throws IOException {
     installService("echoService", "org.mule.runtime.service.test.api.EchoService", "org.mule.echo.EchoServiceProvider",
-                   defaulServiceEchoJarFile);
+                   defaultServiceEchoJarFile);
   }
 
   private void installService(String serviceName, String satisfiedServiceClassName, String serviceProviderClassName,

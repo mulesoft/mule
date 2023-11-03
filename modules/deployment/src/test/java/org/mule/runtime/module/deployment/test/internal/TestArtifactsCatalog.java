@@ -6,6 +6,9 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
+import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
+import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_CLASS_PACKAGES_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
@@ -15,10 +18,14 @@ import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.test.internal.TestServicesSetup.EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME;
+import static org.mule.runtime.module.deployment.test.internal.TestServicesSetup.EXPRESSION_LANGUAGE_SERVICE_NAME;
+import static org.mule.runtime.module.deployment.test.internal.TestServicesSetup.SCHEDULER_SERVICE_NAME;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.createBundleDescriptorLoader;
 import static org.mule.runtime.module.deployment.test.internal.util.Utils.getResourceFile;
 import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.JAVA_LOADER_ID;
 
+import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -40,12 +47,11 @@ import org.mule.tck.util.CompilerUtils.JarCompiler;
 import org.mule.tck.util.CompilerUtils.SingleClassCompiler;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.apache.commons.lang3.JavaVersion;
-import org.apache.commons.lang3.SystemUtils;
-
 import org.junit.rules.ExternalResource;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
@@ -54,15 +60,6 @@ import org.junit.rules.ExternalResource;
 public final class TestArtifactsCatalog extends ExternalResource {
 
   private static final String MIN_MULE_VERSION = "4.0.0";
-
-  static {
-    try {
-      initFiles();
-      initArtifactPluginFileBuilders();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /*
    * Dynamically compiled classes and jars.
@@ -84,8 +81,13 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File oracleExtensionJarFile;
   public static File classloaderConnectionExtensionJarFile;
   public static File classloaderConfigConnectionExtensionJarFile;
-  public static File defaulServiceEchoJarFile;
+
+  public static File schedulerServiceJarFile;
+  public static File expressionLanguageServiceJarFile;
+  public static File expressionLanguageMetadataServiceJarFile;
+  public static File defaultServiceEchoJarFile;
   public static File defaultFooServiceJarFile;
+
   public static File helloExtensionV1JarFile;
   public static File loadClassExtensionJarFile;
   public static File callbackExtensionJarFile;
@@ -113,7 +115,30 @@ public final class TestArtifactsCatalog extends ExternalResource {
   public static File withLifecycleListenerExtensionJarFile;
   public static File withBrokenLifecycleListenerExtensionJarFile;
 
-  private static void initFiles() throws URISyntaxException {
+  private static TemporaryFolder compilerWorkFolder;
+
+  public TestArtifactsCatalog(TemporaryFolder compilerWorkFolder) {
+    TestArtifactsCatalog.compilerWorkFolder = compilerWorkFolder;
+  }
+
+  @Override
+  protected void before() throws Throwable {
+    super.before();
+
+    if (barUtils1ClassFile != null) {
+      // avoid recompiling everything
+      return;
+    }
+
+    try {
+      initFiles();
+      initArtifactPluginFileBuilders();
+    } catch (URISyntaxException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void initFiles() throws URISyntaxException, IOException {
     barUtils1ClassFile = new SingleClassCompiler().compile(getResourceFile("/org/bar1/BarUtils.java"));
     barUtils1_0JarFile = new JarFileBuilder("barUtils1",
                                             new JarCompiler().compiling(getResourceFile("/org/bar1/BarUtils.java"))
@@ -151,14 +176,24 @@ public final class TestArtifactsCatalog extends ExternalResource {
         new JarCompiler().compiling(getResourceFile("/packagetesting/org/slf4j/BarUtils.java"))
             .compile("bar-muleThirdPartyForbidden.jar");
 
+    schedulerServiceJarFile = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
+    expressionLanguageServiceJarFile =
+        buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
+    expressionLanguageMetadataServiceJarFile =
+        buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+
     echoTestClassFile = new SingleClassCompiler().compile(getResourceFile("/org/foo/EchoTest.java"));
     echoTestJarFile = new JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java")).compile("echo.jar");
 
-    defaulServiceEchoJarFile = new JarCompiler()
+    defaultServiceEchoJarFile = new JarCompiler()
+        .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
         .compiling(getResourceFile("/packagetesting/org/mule/echo/DefaultEchoService.java"),
                    getResourceFile("/packagetesting/org/mule/echo/EchoServiceProvider.java"))
+        .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
+                                getResourceFile("/packagetesting/org/mule/echo/module-info.java"))
         .including(getResourceFile("/packagetesting/org/mule/echo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
+        .dependingOn(new File(getProperty("testServicesLib")))
         .compile("mule-module-service-echo-4.0-SNAPSHOT.jar");
 
     defaultFooServiceJarFile = new JarCompiler()
@@ -167,7 +202,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
                    getResourceFile("/packagetesting/org/mule/service/foo/FooServiceProvider.java"))
         .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
                                 getResourceFile("/packagetesting/org/mule/service/foo/module-info.java"))
-        .dependingOn(defaulServiceEchoJarFile.getAbsoluteFile())
+        .dependingOn(defaultServiceEchoJarFile.getAbsoluteFile(), new File(getProperty("testServicesLib")))
         .including(getResourceFile("/packagetesting/org/mule/service/foo/MANIFEST.MF"),
                    "META-INF/MANIFEST.MF")
         .compile("mule-module-service-foo-4.0-SNAPSHOT.jar");

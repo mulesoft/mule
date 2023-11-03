@@ -104,15 +104,8 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
 
   private static File getRealExpressionLanguageServiceFile(File tempFolder) {
     try {
-      // final URL weaveJarUrl = WeaveServiceProvider.class.getProtectionDomain().getCodeSource().getLocation();
-      // String weaveSeriveFileName = Paths.get(weaveJarUrl.toURI()).getFileName().toString();
-      // String weaveServiceArtifactId = weaveSeriveFileName.substring(0, weaveSeriveFileName.length() - 4);
-
       // Unpack the service because java doesn't allow to create a classloader with jars within a zip out of the box.
-      File serviceExplodedDir;
-      serviceExplodedDir = createTempDirectory("mule-service-weave").toFile();
-
-      // URL serviceBundleUrl = weaveJarUrl;
+      File serviceExplodedDir = createTempDirectory("mule-service-weave").toFile();
 
       unzip(new File(getProperty("dataWeaveService")), serviceExplodedDir);
       return serviceExplodedDir;
