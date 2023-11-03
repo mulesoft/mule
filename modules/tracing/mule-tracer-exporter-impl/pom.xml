@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
-            <version>3.2.0</version>
+            <version>3.6.0</version>
             <scope>runtime</scope>
         </dependency>
         <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
