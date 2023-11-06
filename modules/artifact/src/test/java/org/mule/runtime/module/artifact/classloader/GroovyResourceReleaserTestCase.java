@@ -8,11 +8,12 @@ package org.mule.runtime.module.artifact.classloader;
 
 import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
+import static org.mule.tck.junit4.matcher.Eventually.eventually;
+import static org.mule.tck.util.CollectableReference.collectedByGc;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
 import static java.lang.Class.forName;
-import static java.lang.System.gc;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singletonList;
 
@@ -25,11 +26,8 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.probe.JUnitLambdaProbe;
-import org.mule.tck.probe.PollingProber;
+import org.mule.tck.util.CollectableReference;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
@@ -38,7 +36,6 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.aspectj.weaver.loadtime.Aj;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,7 +68,6 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private final String groovyVersion;
   private final ClassLoaderLookupPolicy testLookupPolicy;
-  private MuleArtifactClassLoader artifactClassLoader = null;
 
   public GroovyResourceReleaserTestCase(String groovyVersion) {
     this.groovyVersion = groovyVersion;
@@ -87,24 +83,24 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     };
   }
 
-  @Before
-  public void setup() throws Exception {
-    artifactClassLoader =
-        new MuleArtifactClassLoader("GroovyResourceReleaserTestCase",
-                                    mock(ArtifactDescriptor.class),
-                                    new URL[] {getDependencyFromMaven(GROOVY_GROUP_ID, GROOVY_ARTIFACT_ID, groovyVersion)},
-                                    currentThread().getContextClassLoader(),
-                                    testLookupPolicy);
-  }
-
   @Test
   public void runGroovyScriptAndDispose() throws ReflectiveOperationException {
-    assertEquals("TEST", runScript());
-    artifactClassLoader.dispose();
-    assertClassLoaderIsEnqueued();
+    CollectableReference<MuleArtifactClassLoader> collectableReference =
+        new CollectableReference<>(new MuleArtifactClassLoader("GroovyResourceReleaserTestCase",
+                                                               mock(ArtifactDescriptor.class),
+                                                               new URL[] {
+                                                                   getDependencyFromMaven(GROOVY_GROUP_ID, GROOVY_ARTIFACT_ID,
+                                                                                          groovyVersion)},
+                                                               currentThread().getContextClassLoader(),
+                                                               testLookupPolicy));
+
+    assertEquals("TEST", runScript(collectableReference.get()));
+    collectableReference.get().dispose();
+
+    assertThat(collectableReference, is(eventually(collectedByGc())));
   }
 
-  private String runScript() throws ReflectiveOperationException {
+  private static String runScript(MuleArtifactClassLoader artifactClassLoader) throws ReflectiveOperationException {
     URL[] roots = new URL[] {artifactClassLoader.getResource("groovy/example.groovy")};
     Class<?> groovyScriptEngineClass = forName(GROOVY_SCRIPT_ENGINE, true, artifactClassLoader);
     Object scriptEngine =
@@ -113,15 +109,5 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
     Method runMethod = groovyScriptEngineClass.getMethod("run", String.class, groovyBinding);
     String scriptBody = "example.groovy";
     return (String) runMethod.invoke(scriptEngine, scriptBody, groovyBinding.getConstructor().newInstance());
-  }
-
-  private void assertClassLoaderIsEnqueued() {
-    PhantomReference<ClassLoader> artifactClassLoaderRef = new PhantomReference<>(artifactClassLoader, new ReferenceQueue<>());
-    artifactClassLoader = null;
-    new PollingProber(PROBER_POLLING_TIMEOUT, PROBER_POLLING_INTERVAL).check(new JUnitLambdaProbe(() -> {
-      gc();
-      assertThat(artifactClassLoaderRef.isEnqueued(), is(true));
-      return true;
-    }));
   }
 }
