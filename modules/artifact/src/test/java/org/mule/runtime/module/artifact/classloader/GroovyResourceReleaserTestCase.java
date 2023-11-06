@@ -32,10 +32,12 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.List;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.aspectj.weaver.loadtime.Aj;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,9 +49,17 @@ import org.junit.runners.Parameterized;
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
+  private static List<String> oldAjLoadersToSkip;
+
   @BeforeClass
   public static void avoidAspectjAgentLeak() {
+    oldAjLoadersToSkip = Aj.loadersToSkip;
     Aj.loadersToSkip = singletonList(MuleArtifactClassLoader.class.getName());
+  }
+
+  @AfterClass
+  public static void restoreAjLoadersToSkip() {
+    Aj.loadersToSkip = oldAjLoadersToSkip;
   }
 
   private static final int PROBER_POLLING_INTERVAL = 150;
