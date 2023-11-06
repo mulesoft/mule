@@ -133,7 +133,7 @@ public class RxUtils {
    * the latter subscription will take place on the same context. For an example of this, look at
    * {@link org.mule.runtime.core.internal.routing.ChoiceRouter}
    * <p>
-   * This serves its purpose in some in which the are two Fluxes, A and B, and are related in that in some part of A's reactor
+   * This serves its purpose in some in which there are two Fluxes, A and B, and are related in that in some part of A's reactor
    * chain, the processed event is published into a sink that belongs to B. Also, suppose that some of A's processors need to be
    * initialized in order to make the whole assembled chain work. In those cases, one may want to do A's subscription after it has
    * initialized, and once B has subscribed.
@@ -159,7 +159,7 @@ public class RxUtils {
                                                                     @Nullable Consumer<? super U> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer,
-                                                                    Scheduler subscriptionScheduler) {
+                                                                    ScheduledExecutorService subscriptionScheduler) {
 
     return triggeringSubscriber
         .transformDeferredContextual((eventPub, ctx) -> eventPub.doOnSubscribe(s -> {
@@ -227,7 +227,8 @@ public class RxUtils {
   public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback) {
+                                                        CheckedConsumer<Throwable> errorCallback,
+                                                        ScheduledExecutorService subscriptionScheduler) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -237,7 +238,7 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0),
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null, null);
+                                 () -> null, subscriptionScheduler);
   }
 
   /**
@@ -316,7 +317,8 @@ public class RxUtils {
                                                         CheckedRunnable completionCallback,
                                                         CheckedConsumer<Throwable> errorCallback,
                                                         long completionTimeoutMillis, ScheduledExecutorService delayedExecutor,
-                                                        final String dslSource) {
+                                                        final String dslSource,
+                                                        final ScheduledExecutorService subscriptionScheduler) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -333,7 +335,7 @@ public class RxUtils {
                                    LOGGER.debug("Propagating completion after {} milliseconds\nDSL Source:\n{}",
                                                 completionTimeoutMillis, dslSource);
                                    completer.runOnce();
-                                 }, completionTimeoutMillis, MILLISECONDS), null);
+                                 }, completionTimeoutMillis, MILLISECONDS), subscriptionScheduler);
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
@@ -341,7 +343,7 @@ public class RxUtils {
                                                            AtomicInteger inflightCounter,
                                                            final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
                                                            final Supplier<ScheduledFuture<?>> scheduleCompletion,
-                                                           final Scheduler subscriptionScheduler) {
+                                                           final ScheduledExecutorService subscriptionScheduler) {
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
 

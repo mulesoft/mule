@@ -408,7 +408,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
       return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
                                       () -> errorSwitchSinkSinkRef.complete(),
-                                      t -> errorSwitchSinkSinkRef.error(t)));
+                                      t -> errorSwitchSinkSinkRef.error(t), null));
     } else {
       // For fluxes, the only way they would complete is when the flow that owns the flux is stopped.
       // In that case we need to enforce the timeout configured in the app so that the stop of the flow doesn't take more than
@@ -418,7 +418,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                       t -> errorSwitchSinkSinkRef.error(t),
                                       outerFluxTerminationTimeout,
                                       outerFluxCompletionScheduler,
-                                      getDslSource()));
+                                      getDslSource(), null));
     }
   }
 
@@ -673,7 +673,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                             pub -> from(pub)
                                                 .doOnNext(innerEventDispatcher(emitter))
                                                 .map(e -> Either.empty()),
-                                            () -> emitter.complete(), e -> emitter.error(e)))
+                                            () -> emitter.complete(), e -> emitter.error(e), null))
                                                 .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
           });
         }

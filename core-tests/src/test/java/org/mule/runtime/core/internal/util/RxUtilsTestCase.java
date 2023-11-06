@@ -66,6 +66,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
 
   private ScheduledExecutorService scheduledExecutor;
   private ScheduledExecutorService publisherExecutor;
+  private ScheduledExecutorService subscriberExecutor;
 
   public RxUtilsTestCase(boolean withAsyncPublisher, boolean withAsyncSubscriber) {
     this.asyncDownstreamPublisher = withAsyncPublisher;
@@ -76,6 +77,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
   public void before() {
     scheduledExecutor = newScheduledThreadPool(1);
     publisherExecutor = newScheduledThreadPool(1);
+    subscriberExecutor = newScheduledThreadPool(1);
   }
 
   @After
@@ -97,11 +99,11 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
+                                     emitter::complete, emitter::error,
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null, null);
         })
-        .subscribe(s -> results.add(s),
-                   e -> e.printStackTrace(),
+        .subscribe(results::add,
+                   Throwable::printStackTrace,
                    () -> complete.set(true));
 
     probe(() -> {
@@ -117,7 +119,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t));
+                                     emitter::complete, emitter::error, asyncSubscriber ? subscriberExecutor : null);
         })
         .block();
 
@@ -138,7 +140,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
         .transform(pub -> {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(), innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> {
+                                     emitter::complete, t -> {
                                        try {
                                          // give time for the item to complete before the flux is cancelled
                                          Thread.sleep(100);
@@ -148,9 +150,9 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
                                        }
                                        emitter.error(t);
                                      },
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
         })
-        .subscribe(s -> results.add(s),
+        .subscribe(results::add,
                    e -> completeWithError.set(true));
 
     probe(() -> {
@@ -170,7 +172,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t));
+                                     emitter::complete, emitter::error, asyncSubscriber ? subscriberExecutor : null);
         })
         .block();
   }
@@ -193,13 +195,13 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
+                                     emitter::complete, emitter::error,
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
         })
         .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
         },
-                   e -> e.printStackTrace(),
+                   Throwable::printStackTrace,
                    () -> complete.set(true));
 
     probe(() -> {
@@ -228,8 +230,8 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     () -> emitter.complete(), t -> emitter.error(t),
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
+                                     emitter::complete, emitter::error,
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
         })
         .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
