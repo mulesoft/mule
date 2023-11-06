@@ -170,19 +170,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.weave</groupId>
-                    <artifactId>jsonschema-module</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
@@ -316,6 +303,9 @@
                     </execution>
                     <execution>
                         <id>base-testCompile</id>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
                         <configuration>
                             <testRelease>${javaReleaseVersion}</testRelease>
                             <!-- recompile everything for target VM except the module-info.java -->
