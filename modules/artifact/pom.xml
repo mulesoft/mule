@@ -15,7 +15,6 @@
         <surefire.args.base>
             -XX:+TieredCompilation
             -Dfile.encoding=UTF-8
-            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec',excludes=mypackage.MyClass
         </surefire.args.base>
         <!-- open internal required stuff from org.mule.runtime.core to the test infrastructure -->

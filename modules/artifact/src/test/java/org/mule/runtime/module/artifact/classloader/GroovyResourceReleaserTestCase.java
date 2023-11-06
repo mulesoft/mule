@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
@@ -18,36 +14,23 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 import static java.lang.Class.forName;
 import static java.lang.System.gc;
 import static java.lang.Thread.currentThread;
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
+
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
-import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import java.io.File;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.function.Supplier;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -88,9 +71,6 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
-    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
-        "The resource releasing responsibility will be delegated to each connector instead.",
-               isJavaVersionAtLeast(JAVA_17), is(false));
     artifactClassLoader =
         new MuleArtifactClassLoader("GroovyResourceReleaserTestCase",
                                     mock(ArtifactDescriptor.class),
