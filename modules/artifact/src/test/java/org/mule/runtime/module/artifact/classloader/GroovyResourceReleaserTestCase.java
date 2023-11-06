@@ -14,6 +14,7 @@ import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPrevention
 import static java.lang.Class.forName;
 import static java.lang.System.gc;
 import static java.lang.Thread.currentThread;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -31,7 +32,6 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -49,8 +49,7 @@ public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @BeforeClass
   public static void avoidAspectjAgentLeak() {
-    Aj.loadersToSkip = new ArrayList<>();
-    Aj.loadersToSkip.add(MuleArtifactClassLoader.class.getName());
+    Aj.loadersToSkip = singletonList(MuleArtifactClassLoader.class.getName());
   }
 
   private static final int PROBER_POLLING_INTERVAL = 150;
