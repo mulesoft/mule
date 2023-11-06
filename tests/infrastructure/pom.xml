@@ -97,10 +97,6 @@
         </dependency>
         
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit4</artifactId>
         </dependency>
