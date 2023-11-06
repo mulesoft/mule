@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.impl.internal.policy;
+package org.mule.runtime.module.deployment.impl.internal.policy.loader;
 
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -25,7 +25,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 public class FileSystemPolicyClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
 
   public static final String FILE_SYSTEM_POLICY_MODEL_LOADER_ID = "FILE_SYSTEM_POLICY_MODEL_LOADER";
-  static final String LIB_DIR = "lib";
+  public static final String LIB_DIR = "lib";
   private static final String JAR_FILE = ".jar";
 
 
@@ -67,8 +67,8 @@ public class FileSystemPolicyClassLoaderConfigurationLoader implements ClassLoad
       final File libDir = new File(artifactFolder, LIB_DIR);
       if (libDir.exists()) {
         final File[] jars = libDir.listFiles((FilenameFilter) new SuffixFileFilter(JAR_FILE));
-        for (int i = 0; i < jars.length; i++) {
-          classLoaderConfigurationBuilder.containing(jars[i].toURI().toURL());
+        for (File jar : jars) {
+          classLoaderConfigurationBuilder.containing(jar.toURI().toURL());
         }
       }
     } catch (MalformedURLException e) {

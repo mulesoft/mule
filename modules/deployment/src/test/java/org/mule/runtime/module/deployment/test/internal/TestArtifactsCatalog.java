@@ -530,7 +530,7 @@ public final class TestArtifactsCatalog {
 
     pluginFileBuilder
         .dependingOnSharedLibrary(new JarFileBuilder("oracle-driver-v1",
-                                                     getResourceFile("/oracle/jdbc/oracle-driver-v1.jar")));
+                                                     getResourceFile("/packagetesting/oracle/jdbc/oracle-driver-v1.jar")));
 
     return pluginFileBuilder;
   }

@@ -19,40 +19,49 @@
 
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
-            --add-opens=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
-            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=ALL-UNNAMED
-            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.function=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.policy=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer.datatype=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.transformer.simple=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.simple=ALL-UNNAMED
-            --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=ALL-UNNAMED
-            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
-            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=ALL-UNNAMED
-            --add-opens=org.mule.runtime.extension.model/org.mule.runtime.core.internal.extension=ALL-UNNAMED
-            --add-opens=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=ALL-UNNAMED
-            --add-opens=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=ALL-UNNAMED
-            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.api=ALL-UNNAMED
-            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=ALL-UNNAMED
-            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.beans
-            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.maven=ALL-UNNAMED
-            --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
-            --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
-            --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
-            --add-reads=org.mule.runtime.deployment=org.mule.runtime.service
+            --add-exports=org.mule.runtime.api/org.mule.runtime.internal.dsl=org.mule.test.policies
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=org.mule.test.unit
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.exception=org.mule.test.unit
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.interception=org.mule.test.unit
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.test.policies
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=org.mule.test.unit
+            --add-exports=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.container/org.mule.runtime.container.internal=org.mule.runtime.deployment.test
+              --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3
+            --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=org.mule.test.unit
+            --add-exports=org.mule.runtime.extension.model/org.mule.runtime.core.internal.extension=org.mule.test.policies
+              --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=org.mule.test.unit
+            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.test.policies
+            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.property=org.mule.test.policies
+            --add-exports=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=org.mule.runtime.deployment.model.impl.test
+            --add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.classloader=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.nativelib=org.mule.runtime.deployment.test
+              --add-opens=org.mule.runtime.artifact/org.mule.runtime.module.artifact.api.classloader=org.apache.commons.lang3
             --add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment
-            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=ALL-UNNAMED
-            --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment
+            --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.internal.context=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.maven=org.mule.runtime.deployment.model.impl.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment
+              --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.model.impl.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.classloader=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.domain=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.plugin=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.policy=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.util=org.mule.runtime.deployment.test
             --add-reads=org.mule.runtime.deployment=org.mule.runtime.license.api
+            --add-reads=org.mule.runtime.deployment=org.mule.runtime.service
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.processor=org.mule.runtime.deployment.test
+            --add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.util=org.mule.runtime.deployment.test
+              --add-opens=org.mule.runtime.deployment/org.mule.runtime.module.deployment.test.internal=spring.core
+            --add-exports=org.mule.test.runner/org.mule.test.runner.classloader.container=org.mule.runtime.deployment.test
             ${surefire.args.base}
         </surefire.args>
 
@@ -91,6 +100,16 @@
             <artifactId>ojdbc8</artifactId>
             <version>12.2.0.1</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>ucp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.oracle.database.security</groupId>
+                    <artifactId>oraclepki</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -155,12 +174,24 @@
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mule.weave</groupId>
+                    <artifactId>jsonschema-module</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
             <scope>test</scope>
+            <exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -245,6 +276,56 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <configuration>
+							<compilerArgs>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.bootstrap=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.container/org.mule.runtime.container.internal=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.classloader=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.nativelib=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.extensions.xml.support/org.mule.runtime.extension.internal.loader.xml=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.internal.context=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.model.impl.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.classloader=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.domain=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.policy=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.plugin=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.util=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.processor=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.util=org.mule.runtime.deployment.test</arg>
+								<arg>--add-exports=org.mule.test.runner/org.mule.test.runner.classloader.container=org.mule.runtime.deployment.test</arg>
+							</compilerArgs>
+                            <testRelease>11</testRelease>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>base-testCompile</id>
+                        <configuration>
+                            <testRelease>${javaReleaseVersion}</testRelease>
+                            <!-- recompile everything for target VM except the module-info.java -->
+                            <testExcludes>
+                                <testExclude>module-info.java</testExclude>
+                            </testExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
@@ -264,7 +345,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.22.2</version>
                         <configuration>
                             <skipTests>true</skipTests>
                         </configuration>
