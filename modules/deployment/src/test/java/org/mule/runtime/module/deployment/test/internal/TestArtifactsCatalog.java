@@ -30,6 +30,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 
+import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.lang3.JavaVersion.JAVA_11;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
@@ -38,9 +39,11 @@ import static org.junit.Assert.fail;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.core.internal.processor.LoggerMessageProcessor;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.util.CompilerUtils;
 import org.mule.tck.util.CompilerUtils.ExtensionCompiler;
 import org.mule.tck.util.CompilerUtils.JarCompiler;
@@ -50,8 +53,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import com.github.valfirst.slf4jtest.TestLogger;
+
+import org.apache.logging.log4j.LogManager;
+
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
+
+import uk.org.lidalia.slf4jext.Level;
 
 /**
  * Utility class that holds most of the artifacts used in the deployment module test cases, in order to avoid compiling or
@@ -131,11 +140,24 @@ public final class TestArtifactsCatalog extends ExternalResource {
     }
 
     try {
+      initLogging();
       initFiles();
       initArtifactPluginFileBuilders();
     } catch (URISyntaxException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static void initLogging() {
+    // Reduces unnecessary logging
+    TestLogger compilerUtilsTestLogger = getTestLogger(CompilerUtils.class);
+    compilerUtilsTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger pollingProberTestLogger = getTestLogger(PollingProber.class);
+    pollingProberTestLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    TestLogger testLogger = getTestLogger(LoggerMessageProcessor.class);
+    testLogger.setEnabledLevelsForAllThreads(Level.ERROR);
+    // Initialises logging plugins with correct classloader
+    LogManager.getContext(false);
   }
 
   private static void initFiles() throws URISyntaxException, IOException {

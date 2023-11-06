@@ -10,11 +10,10 @@ import org.mule.api.annotation.jpms.ServiceModule;
 module org.mule.service.foo {
 
   requires org.mule.runtime.api;
-  requires transitive org.mule.test.services;
+  requires org.mule.test.services;
 
   exports org.mule.service.foo;
   
-  opens org.mule.service.foo to
-    org.mule.runtime.service;
+  opens org.mule.service.foo;
   
 }
