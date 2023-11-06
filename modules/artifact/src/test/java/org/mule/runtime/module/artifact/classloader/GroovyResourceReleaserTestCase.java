@@ -31,10 +31,13 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.aspectj.weaver.loadtime.Aj;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,6 +46,12 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class GroovyResourceReleaserTestCase extends AbstractMuleTestCase {
+
+  @BeforeClass
+  public static void avoidAspectjAgentLeak() {
+    Aj.loadersToSkip = new ArrayList<>();
+    Aj.loadersToSkip.add(MuleArtifactClassLoader.class.getName());
+  }
 
   private static final int PROBER_POLLING_INTERVAL = 150;
   private static final int PROBER_POLLING_TIMEOUT = 6000;
