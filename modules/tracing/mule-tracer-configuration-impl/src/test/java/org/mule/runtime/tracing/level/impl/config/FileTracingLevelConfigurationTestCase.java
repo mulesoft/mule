@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracing.level.impl.config;
 
+import static org.mule.runtime.tracing.level.api.config.TracingLevel.OVERVIEW;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
 
@@ -40,7 +41,7 @@ public class FileTracingLevelConfigurationTestCase {
   private static final String WRONG_LEVEL_CONF = "wrong-level.conf";
   private static final String LOCATION_1 = "location1";
   private static final String LOCATION_2 = "location2";
-  private static final TracingLevel DEFAULT_LEVEL = TracingLevel.MONITORING;
+  private static final TracingLevel DEFAULT_LEVEL = OVERVIEW;
 
   @Test
   public void whenLevelIsSpecifiedInFileItIsReturned() {
