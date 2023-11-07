@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import io.opentelemetry.exporter.internal.retry.RetryPolicy;
+import io.opentelemetry.sdk.common.export.RetryPolicy;
 
 public class SpanExporterConfigurationUtils {
 
