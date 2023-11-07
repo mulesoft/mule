@@ -74,6 +74,11 @@ public final class JpmsUtils {
           + "org.mule.boot.tanuki,"
           + "org.mule.runtime.jpms.utils,"
           + "com.fasterxml.jackson.core";
+  private static final String REQUIRED_ADD_MODULES_WRAPPERLESS =
+      "--add-modules="
+          + "java.se,"
+          + "org.mule.runtime.jpms.utils,"
+          + "com.fasterxml.jackson.core";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
@@ -105,6 +110,7 @@ public final class JpmsUtils {
             || arg.startsWith("--add-reads")
             || arg.startsWith("--patch-module"))
         .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
+            || arg.equals(REQUIRED_ADD_MODULES_WRAPPERLESS)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)))
         .collect(toList());
