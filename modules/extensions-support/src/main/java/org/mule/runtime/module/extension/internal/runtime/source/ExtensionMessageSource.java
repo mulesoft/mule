@@ -50,7 +50,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -637,12 +636,17 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         // warranties that a possible call to connectionProvider.disconnect made on the onStop method of the source, does not
         // affect the connection's invalidation
         extractConnectionException(e).ifPresent(connectionException -> invalidateConnection(connectionException));
-        stopSource();
+        lifecycleManager.fireStopPhase((phase, o) -> {
+          synchronized (started) {
+            started.set(false);
+            stopSource();
+          }
+        });
       } catch (Exception eStop) {
         e.addSuppressed(eStop);
       }
       try {
-        disposeSource();
+        lifecycleManager.fireDisposePhase((phase, o) -> disposeSource());
       } catch (Exception eDispose) {
         e.addSuppressed(eDispose);
       }
