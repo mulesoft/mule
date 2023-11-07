@@ -26,6 +26,7 @@
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.client=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.config=org.mule.runtime.core
+            --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.config=ALL-UNNAMED
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode=org.mule.runtime.core

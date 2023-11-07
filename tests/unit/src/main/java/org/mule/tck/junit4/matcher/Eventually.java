@@ -30,7 +30,7 @@ public class Eventually<T> extends BaseMatcher {
    * @param matcher the matcher that will be executed until the timeout
    */
   public static <T> Eventually<T> eventually(Matcher<T> matcher) {
-    return new Eventually<T>(matcher);
+    return new Eventually<>(matcher);
   }
 
   private Eventually(Matcher<T> matcher) {
@@ -72,6 +72,6 @@ public class Eventually<T> extends BaseMatcher {
 
   @Override
   public void describeTo(Description description) {
-    description.appendText("after " + time + " " + timeUnit.toString() + " s").appendDescriptionOf(matcher);
+    description.appendText("after " + time + " " + timeUnit.toString() + "s ").appendDescriptionOf(matcher);
   }
 }
