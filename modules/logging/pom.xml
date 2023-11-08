@@ -8,6 +8,7 @@
         <artifactId>mule-modules</artifactId>
         <version>4.6.0-SNAPSHOT</version>
     </parent>
+    <groupId>org.mule.runtime.boot</groupId>
     <artifactId>mule-module-logging</artifactId>
     <packaging>jar</packaging>
     <name>Mule Logging</name>

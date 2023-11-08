@@ -9,6 +9,7 @@
         <version>4.6.0-SNAPSHOT</version>
     </parent>
 
+    <groupId>org.mule.runtime.boot</groupId>
     <artifactId>mule-module-boot-api</artifactId>
     <name>Mule Boot API</name>
     <packaging>jar</packaging>
@@ -26,21 +27,21 @@
 
         <!-- Needed by the MuleLog4jConfigurer -->
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-log4j-boot-configurator</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader -->
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-jpms-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <!-- Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer -->
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
