@@ -14,7 +14,8 @@ import org.mule.api.annotation.jpms.ServiceModule;
 module org.mule.service.http.mock {
 
   requires org.mule.runtime.api;
+  requires org.mule.runtime.http.api;
 
-  exports org.mule.service.http;
+  exports org.mule.service.http.mock;
   
 }

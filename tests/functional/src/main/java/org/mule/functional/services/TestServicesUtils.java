@@ -136,17 +136,17 @@ public class TestServicesUtils {
   public static File buildHttpServiceFile(File tempFolder) {
     final File defaulServiceSchedulerJarFile = new CompilerUtils.JarCompiler()
         .targetJavaVersion(isJavaVersionAtLeast(JAVA_11) ? 11 : 8)
-        .compiling(getResourceFile("/org/mule/service/http/MockHttpService.java", tempFolder),
-                   getResourceFile("/org/mule/service/http/MockHttpServiceProvider.java", tempFolder))
+        .compiling(getResourceFile("/org/mule/service/http/mock/MockHttpService.java", tempFolder),
+                   getResourceFile("/org/mule/service/http/mock/MockHttpServiceProvider.java", tempFolder))
         .compilingConditionally(isJavaVersionAtLeast(JAVA_11),
-                                getResourceFile("/org/mule/service/http/module-info.java", tempFolder, "module-info.java"))
-        .including(getResourceFile("/org/mule/service/http/MANIFEST.MF", tempFolder),
+                                getResourceFile("/org/mule/service/http/mock/module-info.java", tempFolder, "module-info.java"))
+        .including(getResourceFile("/org/mule/service/http/mock/MANIFEST.MF", tempFolder),
                    "META-INF/MANIFEST.MF")
         .dependingOn(new File(getProperty("apiAnnotationsLib")))
         .compile("mule-module-service-mock-http-1.0-SNAPSHOT.jar");
 
     return new ServiceFileBuilder("http-service")
-        .withServiceProviderClass("org.mule.service.http.MockHttpServiceProvider")
+        .withServiceProviderClass("org.mule.service.http.mock.MockHttpServiceProvider")
         .forContract("org.mule.runtime.http.api.HttpService")
         .unpack(true)
         .usingLibrary(defaulServiceSchedulerJarFile.getAbsolutePath()).getArtifactFile();

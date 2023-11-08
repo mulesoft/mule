@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.service.http;
+package org.mule.service.http.mock;
 
 import static java.util.Collections.singletonList;
 
