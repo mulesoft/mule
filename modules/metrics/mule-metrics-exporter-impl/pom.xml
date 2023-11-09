@@ -17,7 +17,6 @@
     <properties>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
-        <opentelemetryVersion>1.27.0</opentelemetryVersion>
         <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
     
@@ -55,6 +54,20 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
             <version>${opentelemetryVersion}</version>
+            <exclusions>
+                <!-- excluded to prevent a split-package with okio-jvm -->
+                <exclusion>
+                    <groupId>com.squareup.okio</groupId>
+                    <artifactId>okio</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Added back because this was brought transitively by okio -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio-jvm</artifactId>
+            <version>3.6.0</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
