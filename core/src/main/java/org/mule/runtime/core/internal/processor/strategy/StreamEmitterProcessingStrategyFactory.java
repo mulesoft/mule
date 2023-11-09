@@ -126,7 +126,7 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     private final Supplier<Long> shutdownTimeoutSupplier;
 
     // This counter keeps track of how many sinks are created for fluxes that use this processing strategy.
-    // Using it, an eager stop of the schedulers is implmented in `stopSchedulersIfNeeded`
+    // Using it, an eager stop of the schedulers is implemented in `stopSchedulersIfNeeded`
     private final AtomicInteger activeSinksCount = new AtomicInteger(0);
 
     public StreamEmitterProcessingStrategy(int bufferSize,
@@ -239,8 +239,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         processor.transform(function)
             .subscribe(multiFluxSubscriber);
 
+        // Ver si esto (await y error) no se puede encapsular dentro del MultiFluxSubscriber
         multiFluxSubscriber.awaitAllSubscriptions();
-
         if (!processor.hasDownstreams() || multiFluxSubscriber.getLastSubscriptionError() != null) {
           throw resolveSubscriptionErrorCause(multiFluxSubscriber);
         }
