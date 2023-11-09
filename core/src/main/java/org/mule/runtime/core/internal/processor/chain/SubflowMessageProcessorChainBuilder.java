@@ -90,7 +90,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   @Override
   protected MessageProcessorChain createSimpleChain(List<Processor> processors,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
-    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, componentTracerFactory);
+    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, componentTracerFactory, this);
   }
 
   public void withComponentTracerFactory(ComponentTracerFactory componentTracerFactory) {
@@ -109,11 +109,13 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors,
                                  Optional<ProcessingStrategy> processingStrategyOptional,
-                                 ComponentTracerFactory componentTracerFactory) {
+                                 ComponentTracerFactory componentTracerFactory,
+                                 SubflowMessageProcessorChainBuilder builder) {
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setComponentTracer(componentTracerFactory.fromComponent(this, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
+
+      this.setComponentTracer(componentTracerFactory.fromComponent(builder, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {
