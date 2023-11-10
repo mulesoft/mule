@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
@@ -25,6 +26,7 @@ import static java.util.stream.Collectors.toList;
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
@@ -63,6 +65,8 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
   private static final String CLASSLOADER_MODEL_VERSION = "1.2.0";
+  private static final String EXPECT_LOGGING_DIRECTORY =
+      "classloading-troubleshooting/errors/" + (isJavaVersionAtLeast(JAVA_17) ? "usesModuleLayers/" : "doesntUseModuleLayers/");
 
   @Rule
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
@@ -107,7 +111,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-config-yaml-not-found");
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-config-yaml-not-found");
   }
 
   @Test
@@ -130,7 +134,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog("classloading-troubleshooting/errors/domain-overrideme-class-not-found");
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-overrideme-class-not-found");
   }
 
   @Test
@@ -158,7 +162,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-overrideme2-class-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-overrideme2-class-not-found");
   }
 
   @Test
@@ -187,7 +191,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-test-overrideme-class-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-test-overrideme-class-not-found");
   }
 
   @Test
@@ -213,7 +217,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog("classloading-troubleshooting/errors/app-jms-properties-resource-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-jms-properties-resource-not-found");
   }
 
   private DomainFileBuilder createDomainFileBuilder(boolean useLightWeightPackage) {
