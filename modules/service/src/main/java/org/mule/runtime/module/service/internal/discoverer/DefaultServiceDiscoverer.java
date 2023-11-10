@@ -8,9 +8,10 @@ package org.mule.runtime.module.service.internal.discoverer;
 
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import org.mule.runtime.api.service.Service;
-import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
+import org.mule.runtime.module.service.api.discoverer.ServiceDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceProviderDiscoverer;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
@@ -26,7 +27,10 @@ public class DefaultServiceDiscoverer implements ServiceDiscoverer {
   private final ServiceProviderDiscoverer serviceProviderDiscoverer;
 
   public DefaultServiceDiscoverer(ServiceProviderDiscoverer serviceProviderDiscoverer) {
-    this(serviceProviderDiscoverer, new ReflectionServiceResolver(new DefaultServiceRegistry(), null));
+    this(serviceProviderDiscoverer,
+         new ReflectionServiceResolver(new DefaultServiceRegistry(),
+                                       null,
+                                       (service, assembly) -> service));
   }
 
   /**

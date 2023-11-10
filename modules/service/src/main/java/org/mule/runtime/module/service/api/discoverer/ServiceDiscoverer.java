@@ -8,9 +8,12 @@ package org.mule.runtime.module.service.api.discoverer;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscoverer;
+import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Discovers the available services.
@@ -28,5 +31,14 @@ public interface ServiceDiscoverer {
 
   static ServiceDiscoverer create(ServiceProviderDiscoverer serviceProviderDiscoverer) {
     return new DefaultServiceDiscoverer(serviceProviderDiscoverer);
+  }
+
+  static ServiceDiscoverer create(ServiceProviderDiscoverer serviceProviderDiscoverer,
+                                  ServiceRegistry serviceRegistry,
+                                  BiFunction<Service, ServiceAssembly, Service> serviceWrapper) {
+    return new DefaultServiceDiscoverer(serviceProviderDiscoverer,
+                                        new ReflectionServiceResolver(serviceRegistry,
+                                                                      null,
+                                                                      serviceWrapper));
   }
 }

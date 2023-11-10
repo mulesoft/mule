@@ -8,6 +8,7 @@ package org.mule.runtime.module.service.api.artifact;
 
 import org.mule.runtime.container.api.ContainerDependantArtifactClassLoaderFactory;
 import org.mule.runtime.container.api.MuleContainerClassLoaderWrapper;
+import org.mule.runtime.container.internal.DefaultMuleContainerClassLoaderWrapper;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
@@ -51,6 +52,25 @@ public class ServiceClassLoaderFactory
     return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
                                        containerClassLoader.getContainerClassLoader().getClassLoader(),
                                        containerClassLoader.getContainerClassLoaderLookupPolicy());
+  }
+
+  /**
+   * Creates a {@link ClassLoader} from a given descriptor.
+   *
+   * @param artifactId           artifact unique ID.
+   * @param descriptor           descriptor of the artifact owner of the created class loader.
+   * @param containerClassLoader parent for the new artifact class loader.
+   * @return a new class loader for described artifact.
+   * 
+   * @since 4.6
+   */
+  public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
+                                    ArtifactClassLoader containerClassLoader) {
+    final MuleContainerClassLoaderWrapper containerClassLoaderWrapper =
+        new DefaultMuleContainerClassLoaderWrapper(containerClassLoader);
+    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
+                                       containerClassLoaderWrapper.getContainerClassLoader().getClassLoader(),
+                                       containerClassLoaderWrapper.getContainerClassLoaderLookupPolicy());
   }
 
   @Override
