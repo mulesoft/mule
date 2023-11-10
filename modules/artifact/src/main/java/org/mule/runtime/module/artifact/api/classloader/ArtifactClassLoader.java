@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static java.util.Optional.empty;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -100,10 +102,16 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
    */
   void addShutdownListener(ShutdownListener listener);
 
-  default void setModuleLayerInformationSupplier(Supplier<String> moduleLayerInformationSupplier) {}
+  /**
+   * Sets the {@link ModuleLayerInformationSupplier} for this ClassLoader.
+   */
+  default void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {}
 
-  default String getModuleLayerInformation() {
-    return null;
+  /**
+   * @return the {@link ModuleLayerInformationSupplier} related to this ClassLoader.
+   */
+  default Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return empty();
   }
 
 }

@@ -25,6 +25,7 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ModuleLayerInformationSupplier;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 
@@ -211,8 +212,9 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
     if (classLoader == null) {
       return empty();
     } else if (classLoader instanceof ArtifactClassLoader) {
-      String info = ((ArtifactClassLoader) classLoader).getModuleLayerInformation();
-      return info != null ? of(info) : getModuleLayerInfo(classLoader.getParent());
+      Optional<String> info = ((ArtifactClassLoader) classLoader).getModuleLayerInformation()
+          .map(ModuleLayerInformationSupplier::retrieveInformation);
+      return info.isPresent() ? info : getModuleLayerInfo(classLoader.getParent());
     } else {
       return getModuleLayerInfo(classLoader.getParent());
     }

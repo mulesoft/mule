@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.service.api.artifact;
 
+import static java.lang.ModuleLayer.boot;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayer;
 import static org.mule.runtime.jpms.api.JpmsUtils.openToModule;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceModuleLayerFactory.class);
+  private static final String CONTAINER_LAYER_NAME = "Mule Container Module Layer";
 
   // prefixes of services provided by the Mule Runtime team
   private static final Set<String> MULE_SERVICE_MODULE_NAME_PREFIXES =
@@ -103,13 +105,13 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
         new MuleServiceClassLoader(artifactId, descriptor, new URL[0], artifactLayer.findLoader(serviceModuleName), lookupPolicy);
 
     ModuleLayerGraph.setModuleLayerId(artifactLayer, artifactId);
-    artifactLayer.parents().stream().filter(parentLayer -> !parentLayer.equals(ModuleLayer.boot())).findFirst()
-        .ifPresent(parentLayer -> ModuleLayerGraph.setModuleLayerId(parentLayer, "Mule Container Module Layer"));
+    artifactLayer.parents().stream().filter(parentLayer -> !parentLayer.equals(boot())).findFirst()
+        .ifPresent(parentLayer -> ModuleLayerGraph.setModuleLayerId(parentLayer, CONTAINER_LAYER_NAME));
 
     ModuleLayerGraph graph = new ModuleLayerGraph(artifactLayer);
-    serviceClassLoader.setModuleLayerInformationSupplier(graph::toString);
+    serviceClassLoader.setModuleLayerInformationSupplier(graph);
     if (parent instanceof ArtifactClassLoader) {
-      ((ArtifactClassLoader) parent).setModuleLayerInformationSupplier(graph::toString);
+      ((ArtifactClassLoader) parent).setModuleLayerInformationSupplier(graph);
     }
     return serviceClassLoader;
   }

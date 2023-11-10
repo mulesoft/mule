@@ -16,6 +16,8 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -27,7 +29,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,7 +55,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
   private final List<ExportedService> exportedServices;
-  private Supplier<String> moduleLayerInformation = () -> null;
+  private Optional<ModuleLayerInformationSupplier> moduleLayerInformation = empty();
 
   private final boolean verboseLogging;
 
@@ -274,12 +275,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   @Override
-  public void setModuleLayerInformationSupplier(Supplier<String> moduleLayerInformationSupplier) {
-    this.moduleLayerInformation = moduleLayerInformationSupplier;
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = of(moduleLayerInformationSupplier);
   }
 
   @Override
-  public String getModuleLayerInformation() {
-    return moduleLayerInformation.get();
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return moduleLayerInformation;
   }
 }

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.service.internal.artifact;
 
+import org.mule.runtime.module.artifact.api.classloader.ModuleLayerInformationSupplier;
+
 import static java.lang.Math.max;
 import static java.lang.System.lineSeparator;
 import static java.util.stream.Collectors.joining;
@@ -26,7 +28,7 @@ import java.util.Set;
  * 
  * @since 4.7
  */
-public class ModuleLayerGraph {
+public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
 
   private static final String REPETITION = "*";
   private static final Map<ModuleLayer, String> ids = new HashMap<>();
@@ -66,13 +68,6 @@ public class ModuleLayerGraph {
       }
       parents.add(parent);
     }
-  }
-
-  @Override
-  public String toString() {
-    return graphString() +
-        lineSeparator() +
-        moduleLayerModules();
   }
 
   public String graphString() {
@@ -325,4 +320,10 @@ public class ModuleLayerGraph {
     moduleLayers.addAll(moveToEnd);
   }
 
+  @Override
+  public String retrieveInformation() {
+    return graphString() +
+        lineSeparator() +
+        moduleLayerModules();
+  }
 }
