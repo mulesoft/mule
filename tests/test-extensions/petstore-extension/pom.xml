@@ -20,7 +20,7 @@
         <javaModuleName>org.mule.test.extension.petstore</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
-        <muleSdkCompatibilityApi>0.7.1</muleSdkCompatibilityApi>
+        <muleSdkCompatibilityApi>0.7.2</muleSdkCompatibilityApi>
     </properties>
 
     <dependencies>
