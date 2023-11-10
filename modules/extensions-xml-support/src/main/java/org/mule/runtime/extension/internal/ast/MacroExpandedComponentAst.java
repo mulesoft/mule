@@ -7,12 +7,10 @@
 package org.mule.runtime.extension.internal.ast;
 
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 
@@ -22,7 +20,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.util.BaseComponentParameterAstDecorator;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.error.ErrorMapping;
 
 import java.util.Collection;
@@ -111,39 +108,14 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         }
 
         return (Either<String, T>) originalValue
-            .mapRight(this::mapComponent);
-      }
-
-      private <T> Object mapComponent(T rawValue) {
-        if (mustMacroExpandRawValue(rawValue)) {
-          return macroExpandedRawValue((String) rawValue);
-        } else if (isAnErrorMappings()) {
-          return mapErrorMappings(getDecorated());
-        } else if (supportsChildDeclaration() && !isResolvedByMetadataVisitor(rawValue)) {
-          return copyMacroExpandedComponentTreeRecursively();
-        }
-        return rawValue;
-      }
-
-      private <T> boolean mustMacroExpandRawValue(T rawValue) {
-        // Evaluates if the parameter is not declared as a child and can be an expression so that it is resolved.
-        // In that case, the raw value is always a String.
-        return rawValue instanceof String;
-      }
-
-      private boolean isAnErrorMappings() {
-        return getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME);
-      }
-
-      private <T> boolean isResolvedByMetadataVisitor(T rawValue) {
-        // These cases are resolved by a MetadataTypeVisitor in MuleAstUtils.
-        // See the visitArrayType and visitObject methods.
-        return rawValue instanceof List || rawValue instanceof Map;
-      }
-
-      private boolean supportsChildDeclaration() {
-        Optional<DslElementSyntax> dslElementSyntax = getDecorated().getGenerationInformation().getSyntax();
-        return dslElementSyntax.map(DslElementSyntax::supportsChildDeclaration).orElse(false);
+            .mapRight(v -> {
+              if (v instanceof String) {
+                return macroExpandedRawValue((String) v);
+              } else if (getDecorated().getModel().getName().equals(ERROR_MAPPINGS_PARAMETER_NAME)) {
+                return mapErrorMappings(getDecorated());
+              }
+              return v;
+            });
       }
 
       private Object mapErrorMappings(final ComponentParameterAst originalParameter) {
@@ -155,14 +127,6 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
                                                                                  mapping.getTarget())))
                 .collect(toList()))
             .getRight();
-      }
-
-      private Object copyMacroExpandedComponentTreeRecursively() {
-        ComponentAst component = (ComponentAst) getDecorated().getValue().getRight();
-        MacroExpandedComponentAst macroExpandedComponentAst =
-            new MacroExpandedComponentAst(component, component.getLocation(), moduleGlobalElementsNames,
-                                          defaultGlobalElementSuffix, literalsParameters, macroExpandedChildren);
-        return copyComponentTreeRecursively(macroExpandedComponentAst, identity());
       }
 
       @Override
