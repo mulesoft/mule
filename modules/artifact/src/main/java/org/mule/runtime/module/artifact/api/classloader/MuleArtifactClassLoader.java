@@ -322,7 +322,9 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (IS_JAVA_VERSION_AT_MOST_11) {
       addLegacyExtensionsResourceReleasers();
     }
-
+    if (shouldReleaseGroovyReferences) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new GroovyResourceReleaser(this));
+    }
     resourceReleaserExecutor.executeResourceReleasers();
 
     super.dispose();
@@ -342,9 +344,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     }
     if (shouldReleaseActiveMQReferences) {
       resourceReleaserExecutor.addResourceReleaser(() -> new ActiveMQResourceReleaser(this));
-    }
-    if (shouldReleaseGroovyReferences) {
-      resourceReleaserExecutor.addResourceReleaser(() -> new GroovyResourceReleaser(this));
     }
   }
 
