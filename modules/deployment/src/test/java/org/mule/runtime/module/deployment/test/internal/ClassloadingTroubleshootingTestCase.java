@@ -66,7 +66,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
   private static final String CLASSLOADER_MODEL_VERSION = "1.2.0";
   private static final String EXPECT_LOGGING_DIRECTORY =
-      "classloading-troubleshooting/errors/" + (isJavaVersionAtLeast(JAVA_17) ? "usesModuleLayers/" : "doesntUseModuleLayers/");
+      "classloading-troubleshooting/errors/" + (isJavaVersionAtLeast(JAVA_17) ? "usesModuleLayers/" : "usesClassLoaders/");
 
   @Rule
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
