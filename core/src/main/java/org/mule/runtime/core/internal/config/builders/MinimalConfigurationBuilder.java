@@ -51,6 +51,8 @@ import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNo
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -66,6 +68,7 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationBuilderRegistryFilter;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -113,7 +116,9 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
@@ -124,6 +129,28 @@ import java.util.Map.Entry;
  * @since 4.5.0
  */
 public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
+
+  private final ConfigurationBuilderRegistryFilter filter;
+
+  public MinimalConfigurationBuilder() {
+    this.filter = new ConfigurationBuilderRegistryFilter() {
+
+      @Override
+      public Optional<Object> filterRegisterObject(String serviceId, Object serviceImpl) {
+        return ofNullable(serviceImpl);
+      }
+
+      @Override
+      public Map<String, Object> getAdditionalObjectsToRegister(MuleContext muleContext) {
+        return emptyMap();
+      }
+
+    };
+  }
+
+  public MinimalConfigurationBuilder(ConfigurationBuilderRegistryFilter filter) {
+    this.filter = filter;
+  }
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
@@ -186,6 +213,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       }
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
+
+    Map<String, Object> additionalObjectsToRegister = filter.getAdditionalObjectsToRegister(muleContext);
+    for (Entry<String, Object> entry : additionalObjectsToRegister.entrySet()) {
+      registerObject(entry.getKey(), entry.getValue(), muleContext);
+    }
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
@@ -282,6 +314,13 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
+    Optional<Object> filtered = filter.filterRegisterObject(serviceId, serviceImpl);
+
+    if (!filtered.isPresent()) {
+      return;
+    }
+
+    serviceImpl = filtered.get();
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
     }
