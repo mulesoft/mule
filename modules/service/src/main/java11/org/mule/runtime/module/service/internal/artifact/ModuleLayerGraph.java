@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * Graph that generates a string representation of the {@link ModuleLayer}s' hierarchy.
  * 
- * @since 4.7
+ * @since 4.6
  */
 public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
 
