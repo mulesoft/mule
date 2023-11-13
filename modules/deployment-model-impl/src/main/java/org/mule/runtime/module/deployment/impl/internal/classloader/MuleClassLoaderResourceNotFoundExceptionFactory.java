@@ -15,7 +15,6 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.System.lineSeparator;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
@@ -213,7 +212,7 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
       return empty();
     } else if (classLoader instanceof ArtifactClassLoader) {
       Optional<String> info = ((ArtifactClassLoader) classLoader).getModuleLayerInformation()
-          .map(ModuleLayerInformationSupplier::retrieveInformation);
+          .map(ModuleLayerInformationSupplier::retrieveRepresentation);
       return info.isPresent() ? info : getModuleLayerInfo(classLoader.getParent());
     } else {
       return getModuleLayerInfo(classLoader.getParent());

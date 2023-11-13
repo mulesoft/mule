@@ -321,7 +321,7 @@ public class ModuleLayerGraph implements ModuleLayerInformationSupplier {
   }
 
   @Override
-  public String retrieveInformation() {
+  public String retrieveRepresentation() {
     return graphString() +
         lineSeparator() +
         moduleLayerModules();

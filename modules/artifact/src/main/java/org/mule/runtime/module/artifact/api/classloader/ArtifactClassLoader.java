@@ -102,11 +102,14 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
 
   /**
    * Sets the {@link ModuleLayerInformationSupplier} for this ClassLoader.
+   * 
+   * @since 4.6.
    */
   void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier);
 
   /**
    * @return the {@link ModuleLayerInformationSupplier} related to this ClassLoader.
+   * @since 4.6.
    */
   Optional<ModuleLayerInformationSupplier> getModuleLayerInformation();
 

@@ -6,8 +6,16 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+/**
+ * Supplies information related to the {@link ModuleLayer} it refers.
+ *
+ * @since 4.6.
+ */
 public interface ModuleLayerInformationSupplier {
 
-  String retrieveInformation();
+  /**
+   * @return a {@link String} representing the information of the related {@link ModuleLayer}.
+   */
+  String retrieveRepresentation();
 
 }
