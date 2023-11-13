@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.api.classloader.test;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.ModuleLayerInformationSupplier;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.tck.classlaoder.TestClassLoader;
@@ -15,6 +16,9 @@ import org.mule.tck.classlaoder.TestClassLoader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Optional;
+
+import static java.util.Optional.empty;
 
 public class TestArtifactClassLoader extends TestClassLoader implements ArtifactClassLoader {
 
@@ -40,6 +44,16 @@ public class TestArtifactClassLoader extends TestClassLoader implements Artifact
   @Override
   public void addShutdownListener(ShutdownListener listener) {
 
+  }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return empty();
   }
 
   @Override

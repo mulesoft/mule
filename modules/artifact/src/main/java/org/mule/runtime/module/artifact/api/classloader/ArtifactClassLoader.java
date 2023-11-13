@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static java.util.Optional.empty;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -105,13 +103,11 @@ public interface ArtifactClassLoader extends DisposableClassLoader, LocalResourc
   /**
    * Sets the {@link ModuleLayerInformationSupplier} for this ClassLoader.
    */
-  default void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {}
+  void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier);
 
   /**
    * @return the {@link ModuleLayerInformationSupplier} related to this ClassLoader.
    */
-  default Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
-    return empty();
-  }
+  Optional<ModuleLayerInformationSupplier> getModuleLayerInformation();
 
 }
