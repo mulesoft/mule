@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 
 import org.junit.Before;
 

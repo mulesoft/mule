@@ -34,6 +34,8 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 
+import org.mule.weave.v2.el.provider.WeaveServiceProvider;
+
 import java.io.File;
 import java.io.IOException;
 
