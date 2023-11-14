@@ -44,6 +44,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   private final RunOnce dance;
 
   private ClientCredentialsOAuthDancer dancer;
+  private UpdatingClientCredentialsState updatingClientCredentialsState;
 
   public ClientCredentialsConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                                     ClientCredentialsConfig oauthConfig,
@@ -82,13 +83,13 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   private void updateOAuthState() {
     final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
-    oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
-                                                                      dancer,
-                                                                      context,
-                                                                      updatedContext -> updateOAuthParameters(delegate,
-                                                                                                              callbackValues,
-                                                                                                              updatedContext)));
-
+    updatingClientCredentialsState = new UpdatingClientCredentialsState(
+                                                                        dancer,
+                                                                        context,
+                                                                        updatedContext -> updateOAuthParameters(delegate,
+                                                                                                                callbackValues,
+                                                                                                                updatedContext));
+    oauthStateSetter.set(delegate, updatingClientCredentialsState);
     updateOAuthParameters(delegate, callbackValues, context);
   }
 
@@ -101,5 +102,13 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   public void start() throws MuleException {
     dancer = oauthHandler.register(oauthConfig);
     super.start();
+  }
+
+  @Override
+  public void stop() throws MuleException {
+    if (updatingClientCredentialsState != null) {
+      updatingClientCredentialsState.deRegisterListener();
+    }
+    super.stop();
   }
 }
