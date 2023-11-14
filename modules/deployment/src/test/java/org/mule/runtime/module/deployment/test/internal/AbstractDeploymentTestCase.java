@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getServicesFolder;
@@ -108,6 +109,7 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MulePolicyModel.MulePolicyModelBuilder;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
@@ -411,7 +413,14 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
 
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                      () -> findSchedulerService(serviceManager));
+                                                      () -> {
+                                                        try {
+                                                          return findSchedulerService(serviceManager);
+                                                        } catch (Exception e) {
+                                                          throw new MuleRuntimeException(createStaticMessage("Available services: "
+                                                              + serviceManager.getServices()), e);
+                                                        }
+                                                      });
     configureDeploymentService();
 
     policyManager = new TestPolicyManager(deploymentService,

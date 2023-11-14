@@ -13,6 +13,7 @@ import static java.lang.ModuleLayer.boot;
 import static java.lang.ModuleLayer.defineModulesWithOneLoader;
 import static java.lang.StackWalker.Option.RETAIN_CLASS_REFERENCE;
 import static java.lang.System.getProperty;
+import static java.lang.management.ManagementFactory.getRuntimeMXBean;
 import static java.lang.module.Configuration.resolve;
 import static java.lang.module.ModuleFinder.ofSystem;
 import static java.nio.file.Paths.get;
@@ -22,14 +23,11 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.partitioningBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.lang.ModuleLayer.Controller;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
@@ -43,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 /**
@@ -68,12 +65,11 @@ public final class JpmsUtils {
                            "com.mulesoft.mule.service.",
                            "com.mulesoft.anypoint.gw.service."));
 
-  private static final String REQUIRED_ADD_MODULES =
-      "--add-modules="
-          + "java.se,"
-          + "org.mule.boot.tanuki,"
-          + "org.mule.runtime.jpms.utils,"
-          + "com.fasterxml.jackson.core";
+  private static final Set<String> REQUIRED_ADD_MODULES =
+      new HashSet<>(asList("java.se",
+                           "org.mule.boot.tanuki",
+                           "org.mule.runtime.jpms.utils",
+                           "com.fasterxml.jackson.core"));
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
@@ -94,18 +90,29 @@ public final class JpmsUtils {
       return;
     }
 
-    RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
-    List<String> arguments = runtimeMxBean.getInputArguments();
+    doValidateArguments(getRuntimeMXBean().getInputArguments());
+  }
+
+  static void doValidateArguments(List<String> arguments) {
+    final List<String> illegalAddModules = arguments
+        .stream()
+        .filter(arg -> arg.startsWith("--add-modules="))
+        .flatMap(addModules -> Stream.of(addModules.split("=")[1].split(",")))
+        .filter(moduleName -> REQUIRED_ADD_MODULES.stream().noneMatch(moduleName::equals))
+        .collect(toList());
+
+    if (!illegalAddModules.isEmpty()) {
+      throw new IllegalArgumentException("Invalid module tweaking options passed to the JVM running the Mule Runtime: "
+          + "--add-modules=" + illegalAddModules);
+    }
 
     List<String> illegalArguments = arguments
         .stream()
-        .filter(arg -> arg.startsWith("--add-exports")
-            || arg.startsWith("--add-opens")
-            || arg.startsWith("--add-modules")
-            || arg.startsWith("--add-reads")
-            || arg.startsWith("--patch-module"))
-        .filter(arg -> !(arg.equals(REQUIRED_ADD_MODULES)
-            || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
+        .filter(arg -> arg.startsWith("--add-exports=")
+            || arg.startsWith("--add-opens=")
+            || arg.startsWith("--add-reads=")
+            || arg.startsWith("--patch-module="))
+        .filter(arg -> !(arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG)
             || arg.equals(REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT)))
         .collect(toList());
 
@@ -267,11 +274,13 @@ public final class JpmsUtils {
           .map(uri -> get(uri))
           .toArray(size -> new Path[size]);
       ModuleFinder isolatedModulesFinder = ModuleFinder.of(isolatedModulesPaths);
+
+      final List<String> isolatedRoots = modulesByIsolation.get(true)
+          .stream()
+          .map(moduleRef -> moduleRef.descriptor().name())
+          .collect(toList());
       Configuration isolatedModulesConfiguration = boot().configuration()
-          .resolve(isolatedModulesFinder, ofSystem(), modulesByIsolation.get(true)
-              .stream()
-              .map(moduleRef -> moduleRef.descriptor().name())
-              .collect(toList()));
+          .resolve(isolatedModulesFinder, ofSystem(), isolatedRoots);
       Controller isolatedModulesController = defineModulesWithOneLoader(isolatedModulesConfiguration,
                                                                         singletonList(boot()),
                                                                         parent);
@@ -285,13 +294,15 @@ public final class JpmsUtils {
           .map(uri -> get(uri))
           .toArray(size -> new Path[size]);
       ModuleFinder notIsolatedModulesFinder = ModuleFinder.of(notIsolatedModulesPaths);
+
+      final List<String> notIsolatedRoots = modulesByIsolation.get(false).stream()
+          .map(moduleRef -> moduleRef.descriptor().name())
+          .collect(toList());
       Configuration configuration = resolve(notIsolatedModulesFinder,
                                             asList(isolatedModulesController.layer().configuration(),
                                                    resolvedParentLayer.configuration()),
                                             ofSystem(),
-                                            modulesByIsolation.get(false).stream()
-                                                .map(moduleRef -> moduleRef.descriptor().name())
-                                                .collect(toList()));
+                                            notIsolatedRoots);
       controller = defineModulesWithOneLoader(configuration,
                                               asList(isolatedModulesController.layer(), resolvedParentLayer),
                                               parent);
@@ -306,11 +317,12 @@ public final class JpmsUtils {
           .toArray(size -> new Path[size]);
       ModuleFinder filteredModulesFinder = ModuleFinder.of(filteredModulesPaths);
 
+      final List<String> roots = modulesByIsolation.values().stream()
+          .flatMap(Collection::stream)
+          .map(moduleRef -> moduleRef.descriptor().name())
+          .collect(toList());
       Configuration configuration = resolvedParentLayer.configuration()
-          .resolve(filteredModulesFinder, ofSystem(), modulesByIsolation.values().stream()
-              .flatMap(Collection::stream)
-              .map(modueRef -> modueRef.descriptor().name())
-              .collect(toList()));
+          .resolve(filteredModulesFinder, ofSystem(), roots);
       controller = defineModulesWithOneLoader(configuration,
                                               singletonList(resolvedParentLayer),
                                               parent);
