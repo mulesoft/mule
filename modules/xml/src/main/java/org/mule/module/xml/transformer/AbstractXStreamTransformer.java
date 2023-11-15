@@ -21,6 +21,7 @@ import org.mule.transformer.AbstractMessageTransformer;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.thoughtworks.xstream.security.WildcardTypePermission;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,7 +89,7 @@ public abstract class AbstractXStreamTransformer extends AbstractMessageTransfor
                     String[] allowlistItems = allowlist.split(",");
                     for (String item : allowlistItems) {
                         if (item.endsWith("*")) {
-                            instance.allowTypesByWildcard(new String[]{item});
+                            instance.addPermission(new WildcardTypePermission(true, new String[]{item}));
                         } else {
                             instance.allowTypes(new String[]{item});
                         }
