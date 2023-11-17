@@ -29,7 +29,7 @@ public class SimpleContextSelector implements ContextSelector {
   private LoggerContext context;
 
   public SimpleContextSelector() {
-    this.context = loggerContextFactory.build(getClass().getClassLoader(), this, false);
+    this.context = loggerContextFactory.build(getClass().getClassLoader(), this, false, null);
   }
 
   @Override

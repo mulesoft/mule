@@ -1099,6 +1099,18 @@ public interface AllureConstants {
 
   }
 
+  interface RuntimeEnvironment {
+
+    String RUNTIME_ENVIRONMENT = "Runtime Environment";
+
+    interface RuntimeEnvironmentStory {
+
+      String APPLICATION_SERVER_ENVIRONMENT = "Application Server Environment";
+
+      String SINGLE_APP_ENVIRONMENT = "Single App Environment";
+    }
+  }
+
   interface Profiling {
 
     String PROFILING = "Profiling";

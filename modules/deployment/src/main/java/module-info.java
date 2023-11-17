@@ -24,6 +24,7 @@ module org.mule.runtime.deployment {
   requires org.mule.runtime.core.components;
   requires org.mule.runtime.deployment.model;
   requires org.mule.runtime.deployment.model.impl;
+  requires org.mule.runtime.environment.singleapp.api;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.extensions.spring.support;
@@ -36,14 +37,16 @@ module org.mule.runtime.deployment {
 
   // package java.beans package is used
   requires java.desktop;
+
+  requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires spring.core;
 
   exports org.mule.runtime.module.deployment.api;
   exports org.mule.runtime.module.deployment.internal to
-      org.mule.runtime.launcher,
-      spring.beans;
+      org.mule.runtime.launcher, org.mule.runtime.core,
+      spring.beans, org.mule.runtime.environment.singleapp.impl;
   exports org.mule.runtime.module.deployment.internal.processor to
       org.mule.runtime.launcher;
 

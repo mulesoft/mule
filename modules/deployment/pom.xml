@@ -133,6 +133,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-runtime-environment-single-app-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-service</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
