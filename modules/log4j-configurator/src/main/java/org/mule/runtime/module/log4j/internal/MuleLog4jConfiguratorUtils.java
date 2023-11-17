@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 
 import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SINGLE_APP_MODE;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
@@ -35,7 +37,7 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null, getBoolean(MULE_SINGLE_APP_MODE));
   }
 
   /**
@@ -44,9 +46,13 @@ public final class MuleLog4jConfiguratorUtils {
    * 
    * @param contextFactory       the {@link MuleLog4jContextFactory} where the selector will be set.
    * @param logSeparationEnabled boolean determining which context selector should be used.
+   * @param singleAppMode        boolean determining if the container is in single app mode.
    */
-  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled) {
-    if (logSeparationEnabled) {
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled,
+                                       boolean singleAppMode) {
+    if (singleAppMode) {
+      contextFactory.setContextSelector(new SingleAppModeContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
+    } else if (logSeparationEnabled) {
       contextFactory.setContextSelector(new ArtifactAwareContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
     } else {
       contextFactory.setContextSelector(new SimpleContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);

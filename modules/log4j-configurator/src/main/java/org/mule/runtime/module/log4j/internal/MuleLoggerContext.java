@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
+import org.apache.logging.log4j.core.Appender;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -40,6 +41,7 @@ class MuleLoggerContext extends LoggerContext {
   private final URI configFile;
   private final boolean standalone;
   private final boolean logSeparationEnabled;
+  private final Appender fileAppender;
   private ContextSelector contextSelector;
   private final boolean artifactClassloader;
   private final boolean applicationClassloader;
@@ -49,7 +51,7 @@ class MuleLoggerContext extends LoggerContext {
   private DeployableArtifactDescriptor artifactDescriptor;
 
   MuleLoggerContext(String name, ContextSelector contextSelector, boolean standalone, boolean logSeparationEnabled) {
-    this(name, null, null, contextSelector, standalone, logSeparationEnabled);
+    this(name, null, null, contextSelector, standalone, logSeparationEnabled, null);
   }
 
   MuleLoggerContext(String name,
@@ -57,11 +59,13 @@ class MuleLoggerContext extends LoggerContext {
                     ClassLoader ownerClassLoader,
                     ContextSelector contextSelector,
                     boolean standalone,
-                    boolean logSeparationEnabled) {
+                    boolean logSeparationEnabled,
+                    Appender fileAppender) {
     super(name, null, configLocn);
     configFile = configLocn;
     this.contextSelector = contextSelector;
     this.standalone = standalone;
+    this.fileAppender = fileAppender;
     this.logSeparationEnabled = logSeparationEnabled;
     ownerClassLoaderHash =
         ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
@@ -113,6 +117,10 @@ class MuleLoggerContext extends LoggerContext {
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
     Logger logger = super.newInstance(ctx, name, messageFactory);
+    if (fileAppender != null) {
+      return new LoggerWrapper(ctx, name, messageFactory, fileAppender);
+    }
+
     if (artifactClassloader || applicationClassloader || !logSeparationEnabled) {
       return logger;
     }

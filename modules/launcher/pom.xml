@@ -39,6 +39,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-runtime-environment-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-deployment</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -73,6 +78,12 @@
         </dependency>
 
         <!--Unit Tests-->
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-application-server-environment</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-functional</artifactId>

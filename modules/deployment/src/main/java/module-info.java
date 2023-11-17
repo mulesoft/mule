@@ -37,8 +37,10 @@ module org.mule.runtime.deployment {
   // package java.beans package is used
   requires java.desktop;
   requires spring.core;
+    requires org.mule.runtime.environment.singleapp.api;
+    requires com.google.common;
 
-  exports org.mule.runtime.module.deployment.api;
+    exports org.mule.runtime.module.deployment.api;
   exports org.mule.runtime.module.deployment.internal to
       org.mule.runtime.launcher,
       spring.beans;
