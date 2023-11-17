@@ -91,8 +91,8 @@ public class MuleDeploymentService implements DeploymentService {
   private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
   private final LazyValue<Scheduler> artifactStartExecutor;
 
-  private final ObservableList<Application> applications = new ObservableList<>();
-  private final ObservableList<Domain> domains = new ObservableList<>();
+  private final ObservableList<Application> applications;
+  private final ObservableList<Domain> domains;
   private final List<StartupListener> startupListeners = new CopyOnWriteArrayList<>();
 
   /**
@@ -102,7 +102,7 @@ public class MuleDeploymentService implements DeploymentService {
   private final CompositeDeploymentListener domainDeploymentListener = new CompositeDeploymentListener();
   private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
   private final ArchiveDeployer<DomainDescriptor, Domain> domainDeployer;
-  private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
+  private DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
 
@@ -133,12 +133,15 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
-    artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
-        .customScheduler(config()
-            .withName("ArtifactDeployer.start")
-            .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
-                         MAX_QUEUED_STARTING_ARTIFACTS));
+                               LazyValue<Scheduler> lazyScheduler,
+                               ObservableList<Application> applications,
+                               ObservableList<Domain> domains,
+                               Supplier<SchedulerService> artifactDeploymentWatcherStartExecutorSupplier) {
+
+    artifactStartExecutor = lazyScheduler;
+    this.applications = applications;
+    this.domains = domains;
+
     // TODO MULE-9653 : Migrate domain class loader creation to use ArtifactClassLoaderBuilder which already has support for
     // artifact plugins.
     ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
@@ -156,22 +159,36 @@ public class MuleDeploymentService implements DeploymentService {
                                                                 applicationDeployer, applications, domainDeploymentListener,
                                                                 applicationDeploymentListener, this);
 
-    if (useParallelDeployment()) {
-      if (isDeployingSelectedAppsInOrder()) {
-        throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
-                                                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+    if (artifactDeploymentWatcherStartExecutorSupplier != null) {
+      if (useParallelDeployment()) {
+        if (isDeployingSelectedAppsInOrder()) {
+          throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
+                                                    DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+        }
+        LOGGER.info("Using parallel deployment");
+        this.deploymentDirectoryWatcher =
+            new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                                                   applications,
+                                                   artifactDeploymentWatcherStartExecutorSupplier, deploymentLock);
+      } else {
+        this.deploymentDirectoryWatcher =
+            new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
+                                           artifactDeploymentWatcherStartExecutorSupplier,
+                                           deploymentLock);
       }
-      LOGGER.info("Using parallel deployment");
-      this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
-                                                 applications,
-                                                 artifactStartExecutorSupplier, deploymentLock);
-    } else {
-      this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         artifactStartExecutorSupplier,
-                                         deploymentLock);
     }
+  }
+
+  public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
+                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    this(domainFactory, applicationFactory, new LazyValue<>(() -> artifactStartExecutorSupplier.get()
+        .customScheduler(config()
+            .withName("ArtifactDeployer.start")
+            .withMaxConcurrentTasks(useParallelDeployment() ? MAX_APPS_IN_PARALLEL_DEPLOYMENT : 1),
+                         MAX_QUEUED_STARTING_ARTIFACTS)),
+         new ObservableList<>(),
+         new ObservableList<>(),
+         artifactStartExecutorSupplier);
   }
 
   static boolean useParallelDeployment() {

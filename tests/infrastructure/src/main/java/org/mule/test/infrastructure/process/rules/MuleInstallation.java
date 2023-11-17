@@ -66,7 +66,7 @@ public class MuleInstallation extends ExternalResource {
   }
 
   public MuleInstallation(String distribution) {
-    this(zippedDistributionFromProperty, "");
+    this(distribution, "");
   }
 
   public MuleInstallation(String distribution, String locationSuffix) {
