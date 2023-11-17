@@ -50,7 +50,6 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -251,7 +250,24 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     }
     Supplier<CompletableFuture<Void>> futureSupplier = () -> {
       CompletableFuture<Void> future = new CompletableFuture<>();
-      retryScheduler.execute(() -> doWork(restarting, restartContext, future));
+      retryScheduler.execute(() -> {
+        if (retryPolicyTemplate.isAsync()) {
+          // in theory we only have to lock on started, but for avoiding deadlocks we need to lock on lifecycleManager first.
+          // Otherwise, doWork may internally call `stop`, which would attempt to take both these locks in this order.
+          synchronized (lifecycleManager) {
+            synchronized (started) {
+              if (!started.get()) {
+                // source was stopped before this async work for starting is triggered.
+                future.complete(null);
+                return;
+              }
+              doWork(restarting, restartContext, future);
+            }
+          }
+        } else {
+          doWork(restarting, restartContext, future);
+        }
+      });
       return future;
     };
     CompletableFuture<Void> future = retryPolicyTemplate
@@ -483,8 +499,9 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
                  getLocation().getRootContainerName());
     safeLifecycle(() -> lifecycleManager.fireStopPhase((phase, o) -> {
       synchronized (started) {
-        started.set(false);
-        stopSource();
+        if (started.compareAndSet(true, false)) {
+          stopSource();
+        }
       }
 
       stopSchedulers();
