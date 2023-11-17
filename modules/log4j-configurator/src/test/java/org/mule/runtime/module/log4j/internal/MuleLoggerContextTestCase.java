@@ -128,7 +128,7 @@ public class MuleLoggerContextTestCase extends AbstractMuleTestCase {
 
   private MuleLoggerContext getDefaultContext(boolean logSeparationEnabled) {
     return new MuleLoggerContext(DEFAULT_CONTEXT_NAME, null, Thread.currentThread().getContextClassLoader(), contextSelector,
-                                 true, logSeparationEnabled);
+                                 true, logSeparationEnabled, null);
   }
 
   private void addTestAppender(MuleLoggerContext context, Appender testAppender) {
