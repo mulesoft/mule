@@ -76,4 +76,8 @@ public class UpdatingClientCredentialsState
   public void deRegisterListener() {
     dancer.removeListener(clientCredentialsListener);
   }
+
+  public boolean getListener(ClientCredentialsListener clientCredentialsListener) {
+    return dancer.getListener(clientCredentialsListener);
+  }
 }
