@@ -30,6 +30,7 @@ module org.mule.runtime.launcher {
 
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
+  requires org.mule.runtime.environment;
 
   // Embedded uses this
   exports org.mule.runtime.module.launcher;
@@ -40,5 +41,7 @@ module org.mule.runtime.launcher {
 
   provides org.mule.runtime.module.boot.api.MuleContainerProvider with
       org.mule.runtime.module.launcher.LauncherMuleContainerProvider;
+
+  uses org.mule.runtime.environment.RuntimeEnvironment;
 
 }

@@ -125,6 +125,9 @@
         <module>core-tests</module>
         <module>modules</module>
         <module>tests</module>
+        <module>runtime-environment-api</module>
+        <module>application-server-enviroment</module>
+        <module>single-app-environment</module>
     </modules>
 
     <properties>

@@ -6,10 +6,13 @@
  */
 package org.mule.runtime.module.launcher;
 
+import static java.lang.Boolean.getBoolean;
+import static java.util.ServiceLoader.load;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SINGLE_APP_MODE;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -40,6 +43,8 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.runtime.environment.RuntimeEnvironment;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.net.MuleArtifactUrlStreamHandler;
@@ -48,6 +53,7 @@ import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInit
 import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
+import org.mule.runtime.module.deployment.internal.DisabledDeploymentService;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
@@ -66,9 +72,10 @@ import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingSe
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.concurrent.Future;
 
-import org.apache.logging.log4j.spi.LoggerContextFactory;
+import org.apache.logging.log4j.spi.LoggerContextFactory;f
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,16 +119,16 @@ public class DefaultMuleContainer implements MuleContainer {
   private final ServiceManager serviceManager;
   private final ExtensionModelLoaderRepository extensionModelLoaderRepository;
 
-  public DefaultMuleContainer() throws InitialisationException {
+  public DefaultMuleContainer() throws InitialisationException, RegistrationException {
     init();
 
     this.serviceManager = artifactResourcesRegistry.getServiceManager();
 
     this.extensionModelLoaderRepository = artifactResourcesRegistry.getExtensionModelLoaderRepository();
 
-    this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
-                                                       artifactResourcesRegistry.getApplicationFactory(),
-                                                       () -> findSchedulerService(serviceManager));
+    this.artifactResourcesRegistry.registerObject("register", getMuleDeploymentService());
+
+    this.deploymentService = resolveDeploymentService();
     this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
 
@@ -136,6 +143,20 @@ public class DefaultMuleContainer implements MuleContainer {
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
+  }
+
+  private DeploymentService resolveDeploymentService() {
+    if (getBoolean(MULE_SINGLE_APP_MODE)) {
+      return new DisabledDeploymentService();
+    }
+
+    return getMuleDeploymentService();
+  }
+
+  private DeploymentService getMuleDeploymentService() {
+    return new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
+                                     artifactResourcesRegistry.getApplicationFactory(),
+                                     () -> findSchedulerService(serviceManager));
   }
 
   /**
@@ -223,7 +244,9 @@ public class DefaultMuleContainer implements MuleContainer {
       toolingService.initialise();
 
       startIfNeeded(extensionModelLoaderRepository);
-      deploymentService.start();
+      RuntimeEnvironment runtimeEnvironment = load(RuntimeEnvironment.class).iterator().next();
+      artifactResourcesRegistry.inject(runtimeEnvironment);
+      runtimeEnvironment.start();
     } catch (MuleException e) {
       shutdown(e);
       throw e;
