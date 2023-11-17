@@ -66,11 +66,7 @@ public class ServiceClassLoaderFactory
    */
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor,
                                     ArtifactClassLoader containerClassLoader) {
-    final MuleContainerClassLoaderWrapper containerClassLoaderWrapper =
-        new DefaultMuleContainerClassLoaderWrapper(containerClassLoader);
-    return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
-                                       containerClassLoaderWrapper.getContainerClassLoader().getClassLoader(),
-                                       containerClassLoaderWrapper.getContainerClassLoaderLookupPolicy());
+    return create(artifactId, descriptor, new DefaultMuleContainerClassLoaderWrapper(containerClassLoader));
   }
 
   @Override
