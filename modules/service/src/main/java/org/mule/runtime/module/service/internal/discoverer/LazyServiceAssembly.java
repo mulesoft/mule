@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.discoverer;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.service.ServiceProvider;
@@ -31,7 +32,9 @@ public class LazyServiceAssembly implements ServiceAssembly {
 
   /**
    * @return a new {@link Builder}
+   * @deprecated since 4.6 use {@link ServiceAssembly#lazyBuilder()} instead.
    */
+  @Deprecated
   public static Builder builder() {
     return new Builder();
   }
@@ -41,7 +44,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
    *
    * @since 4.2
    */
-  public static class Builder {
+  public static class Builder implements ServiceAssemblyBuilder {
 
     private String name;
     private Supplier<ClassLoader> artifactClassLoader;
@@ -56,6 +59,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
      * @param name the {@link Service} name
      * @return {@code this} builder
      */
+    @Override
     public Builder withName(String name) {
       this.name = name;
       return this;
@@ -67,6 +71,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
      * @param artifactClassLoader A {@link Supplier} to lazily create the service's {@link ClassLoader}
      * @return {@code this} builder
      */
+    @Override
     public Builder withClassLoader(Supplier<ClassLoader> artifactClassLoader) {
       this.artifactClassLoader = artifactClassLoader;
       return this;
@@ -78,6 +83,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
      * @param serviceProviderSupplier A {@link Supplier} to lazily create the service's {@link ServiceProvider}
      * @return {@code this} builder
      */
+    @Override
     public Builder withServiceProvider(CheckedSupplier<ServiceProvider> serviceProviderSupplier) {
       this.serviceProviderSupplier = serviceProviderSupplier;
       return this;
@@ -89,6 +95,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
      * @param contractClassName the {@link Service} classname
      * @return {@code this} builder
      */
+    @Override
     public Builder forContract(String contractClassName) {
       this.contractClassName = contractClassName;
       return this;
@@ -98,6 +105,7 @@ public class LazyServiceAssembly implements ServiceAssembly {
      * @return a new {@link LazyServiceAssembly} instance
      * @throws ServiceResolutionError if the assembly couldn't be created
      */
+    @Override
     public ServiceAssembly build() throws ServiceResolutionError {
       try {
         return new LazyServiceAssembly(name, artifactClassLoader, serviceProviderSupplier, resolveContract());

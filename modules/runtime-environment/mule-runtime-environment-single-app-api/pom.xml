@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-module-runtime-environment-parent</artifactId>
+        <version>4.7.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>mule-runtime-environment-single-app-api</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule 4 Application Single App Environment Api</name>
+
+    <properties>
+        <!-- xml parser is a test dependency so it is not in the module-path, open its required packages -->
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-exports=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
+            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.spi=ALL-UNNAMED
+            --add-exports=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
+
+        <javaModuleName>org.mule.runtime.environment.singleapp.api</javaModuleName>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
+</project>

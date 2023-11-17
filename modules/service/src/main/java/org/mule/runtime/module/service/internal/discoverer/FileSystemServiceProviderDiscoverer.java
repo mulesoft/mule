@@ -9,6 +9,7 @@ package org.mule.runtime.module.service.internal.discoverer;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.module.service.api.discoverer.MuleServiceModelLoader.instantiateServiceProvider;
+import static org.mule.runtime.module.service.api.discoverer.ServiceAssembly.lazyBuilder;
 
 import static java.security.AccessController.doPrivileged;
 import static java.security.AccessController.getContext;
@@ -152,7 +153,7 @@ public class FileSystemServiceProviderDiscoverer implements ServiceProviderDisco
                                                                                           ACCESS_CONTROL_CTX));
 
       for (MuleServiceContractModel contract : serviceDescriptor.getContractModels()) {
-        ServiceAssembly assembly = LazyServiceAssembly.builder()
+        ServiceAssembly assembly = lazyBuilder()
             .withName(serviceDescriptor.getName())
             .withClassLoader(serviceClassLoader)
             .withServiceProvider(() -> instantiateServiceProvider(contract))

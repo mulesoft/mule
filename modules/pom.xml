@@ -61,6 +61,7 @@
         <module>metrics</module>
         <module>tooling-support</module>
         <module>observability</module>
+        <module>runtime-environment</module>
     </modules>
 
     <build>

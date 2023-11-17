@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
@@ -44,7 +45,8 @@ public class MuleLoggerContextFactory {
    * @param selector    the selector to bew used when building the loggers for the new context.
    * @return
    */
-  public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled) {
+  public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled,
+                             Appender fileAppender) {
     NewContextParameters parameters = resolveContextParameters(classLoader);
     if (parameters == null) {
       return getDefaultContext(selector, logSeparationEnabled);
@@ -56,7 +58,8 @@ public class MuleLoggerContextFactory {
                               classLoader,
                               selector,
                               isStandalone(),
-                              logSeparationEnabled);
+                              logSeparationEnabled,
+                              fileAppender);
 
     if ((classLoader instanceof ArtifactClassLoader) &&
         selector instanceof ArtifactAwareContextSelector) {
