@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_DEPLOYMENT_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -57,6 +58,8 @@ import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.FlowS
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.RedeploymentStory.APPLICATION_REDEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.Thread.currentThread;
@@ -130,6 +133,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 
 /**
  * Contains test for application deployment on the default domain
@@ -149,8 +153,24 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Rule
   public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
-  public ApplicationDeploymentTestCase(boolean parallelDeployment) {
+  @Rule
+  public SystemProperty singleDeploymentProperty;
+
+  @Parameterized.Parameters(
+      name = "Parallel Deployment: {0} - Single Deployment: {1}")
+  public static List<Object[]> parameters() {
+    return asList(new Object[][] {
+        {FALSE, FALSE},
+        {TRUE, FALSE},
+        {FALSE, TRUE},
+    });
+  }
+
+  public ApplicationDeploymentTestCase(boolean parallelDeployment, boolean singleDeployment) {
     super(parallelDeployment);
+    if (singleDeployment) {
+      this.singleDeploymentProperty = new SystemProperty(SINGLE_DEPLOYMENT_PROPERTY, "");
+    }
   }
 
   @Override
@@ -487,6 +507,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void doesNotRetriesBrokenAppWithFunkyName() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     addPackedAppFromBuilder(brokenAppWithFunkyNameAppFileBuilder);
 
     startDeployment();
@@ -584,6 +606,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppOnStartupWhenExplodedAppIsAlsoPresent() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
 
@@ -641,6 +665,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedOnlyOnce() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     startDeployment();
 
     addExplodedAppFromBuilder(emptyAppFileBuilder, "app with spaces");
@@ -1223,6 +1249,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppOnStartup() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
     startDeployment();
@@ -1242,6 +1270,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppAfterStartup() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     startDeployment();
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
@@ -1261,6 +1291,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     startDeployment();
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
@@ -1510,6 +1542,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysMultipleAppsZipOnStartup() throws Exception {
+    assumeThat(singleDeploymentProperty == null, is(TRUE));
+
     final int totalApps = 20;
 
     for (int i = 1; i <= totalApps; i++) {

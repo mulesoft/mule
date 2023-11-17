@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
-import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
@@ -15,9 +14,7 @@ import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemp
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
 
-import static java.lang.String.format;
 import static java.lang.System.getProperties;
-import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -26,7 +23,6 @@ import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -156,30 +152,15 @@ public class MuleDeploymentService implements DeploymentService {
                                                                 applicationDeployer, applications, domainDeploymentListener,
                                                                 applicationDeploymentListener, this);
 
-    if (useParallelDeployment()) {
-      if (isDeployingSelectedAppsInOrder()) {
-        throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
-                                                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
-      }
-      LOGGER.info("Using parallel deployment");
-      this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
-                                                 applications,
-                                                 artifactStartExecutorSupplier, deploymentLock);
-    } else {
-      this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains, applications,
-                                         artifactStartExecutorSupplier,
-                                         deploymentLock);
-    }
+    ManagerDeploymentDirectoryWatcher managerDeploymentDirectoryWatcher =
+        new ManagerDeploymentDirectoryWatcher(deploymentLock, applications, domains, domainDeployer, applicationDeployer,
+                                              domainBundleDeployer, artifactStartExecutorSupplier);
+
+    this.deploymentDirectoryWatcher = managerDeploymentDirectoryWatcher.getDeploymentDirectoryWatcher();
   }
 
   static boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
-  }
-
-  private boolean isDeployingSelectedAppsInOrder() {
-    return !isEmpty(getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
   }
 
   @Override
