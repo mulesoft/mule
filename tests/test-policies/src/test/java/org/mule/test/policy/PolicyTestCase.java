@@ -9,6 +9,7 @@ package org.mule.test.policy;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_PROVIDER;
 import static org.mule.runtime.http.policy.api.SourcePolicyAwareAttributes.noAttributes;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
