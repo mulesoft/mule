@@ -111,4 +111,8 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
     }
     super.stop();
   }
+
+  public UpdatingClientCredentialsState getUpdatingClientCredentialsState() {
+    return this.updatingClientCredentialsState;
+  }
 }
