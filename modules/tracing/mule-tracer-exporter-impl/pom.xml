@@ -22,6 +22,7 @@
     <description>Implementation for the tracer exporter</description>
 
     <properties>
+        <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
@@ -29,9 +30,9 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetryVersion}</version>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>${muleBomVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

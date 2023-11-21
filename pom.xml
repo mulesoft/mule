@@ -157,7 +157,6 @@
 
         <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
         <muleMavenClientBomVersion>2.2.0-SNAPSHOT</muleMavenClientBomVersion>
-        <opentelemetryVersion>1.31.0</opentelemetryVersion>
 
         <activemqVersion>5.15.15</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>

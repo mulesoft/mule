@@ -15,11 +15,24 @@
     <description>Definitions for Mule Metrics Exporter Implementation</description>
     
     <properties>
+        <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
         <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
-    
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mule</groupId>
+                <artifactId>mule-runtime-bom</artifactId>
+                <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -53,7 +66,6 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
-            <version>${opentelemetryVersion}</version>
             <exclusions>
                 <!-- excluded to prevent a split-package with okio-jvm -->
                 <exclusion>
@@ -72,12 +84,10 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-logging</artifactId>
-            <version>${opentelemetryVersion}</version>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk-testing</artifactId>
-            <version>${opentelemetryVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
