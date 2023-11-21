@@ -24,6 +24,9 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH =
       MULE_OPEN_TELEMETRY_EXPORTER + ".configurationFilePath";
 
+  public static final String MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL =
+      MULE_OPEN_TELEMETRY_EXPORTER + ".defaultTracingLevel";
+
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY =
       MULE_OPEN_TELEMETRY_EXPORTER + ".configurationFileWatcherDelay";
 
