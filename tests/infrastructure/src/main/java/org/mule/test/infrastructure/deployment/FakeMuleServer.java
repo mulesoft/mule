@@ -19,6 +19,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 
 import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -271,7 +272,7 @@ public class FakeMuleServer {
     createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
-    URL log4jFile = getClass().getResource("/log4j2-test.xml");
+    URL log4jFile = currentThread().getContextClassLoader().getResource("log4j2-test.xml");
     copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
   }
 
