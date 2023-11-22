@@ -45,5 +45,7 @@ module org.mule.runtime.tooling.support {
   exports org.mule.runtime.module.tooling.internal to
       org.mule.runtime.launcher;
 
+  opens org.mule.runtime.module.tooling.internal.config to
+      spring.core;
 
 }

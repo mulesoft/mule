@@ -6,14 +6,12 @@
  */
 package org.mule.test.infrastructure.deployment;
 
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 
 import static org.apache.logging.log4j.LogManager.shutdown;
+import static org.junit.rules.RuleChain.outerRule;
 
+import org.mule.runtime.config.api.properties.PropertiesResolverUtils;
 import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -28,9 +26,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 
 public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
+
+  @ClassRule
+  public static SystemProperty duplicateProvidersLax =
+      new SystemProperty(PropertiesResolverUtils.class.getName() + ".duplicateProvidersLax", "true");
 
   @Rule
   public SystemProperty jvmVersionExtensionEnforcementLoose =
@@ -45,8 +48,13 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
 
-  @ClassRule
   public static final TemporaryFolder compilerWorkFolder = new TemporaryFolder();
+  protected static TestArtifactsCatalog testArtifactsCatalog = new TestArtifactsCatalog(compilerWorkFolder);
+  protected static TestServicesSetup testServicesSetup = new TestServicesSetup(compilerWorkFolder);
+
+  @ClassRule
+  public static RuleChain ruleChain = outerRule(compilerWorkFolder).around(testArtifactsCatalog).around(testServicesSetup);
+
   private static boolean areServicesInitialised = false;
   private static File cachedSchedulerService = null;
   private static File cachedHttpService = null;
@@ -62,6 +70,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   @Before
   public void setUp() throws Exception {
     muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
+    testServicesSetup.initNotOverriddenServices();
     initialiseServicesIfNeeded();
     muleServer.addZippedService(cachedSchedulerService);
     muleServer.addZippedService(cachedHttpService);
@@ -106,18 +115,18 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   }
 
   protected File getExpressionLanguageService() throws IOException {
-    return buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder("expressionLanguageService"));
+    return testServicesSetup.getExpressionLanguageService();
   }
 
   protected File getExpressionLanguageMetadataService() throws IOException {
-    return buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder("expressionLanguageMetadataService"));
+    return testServicesSetup.getExpressionLanguageMetadataService();
   }
 
   protected File getSchedulerService() throws IOException {
-    return buildSchedulerServiceFile(compilerWorkFolder.newFolder("schedulerService"));
+    return testServicesSetup.getSchedulerService();
   }
 
   protected File getHttpService() throws IOException {
-    return buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
+    return testServicesSetup.getHttpService();
   }
 }
