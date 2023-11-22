@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.api.context;
 
+import static java.util.Optional.empty;
+
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
@@ -80,4 +83,17 @@ public interface MuleContextBuilder {
    * @since 4.5.0
    */
   void setArtifactCoordinates(ArtifactCoordinates artifactCoordinates);
+
+  /**
+   * @return the {@link Registry} of the built {@link MuleContext}.
+   *         <p>
+   *         This method must be called after {@link #buildMuleContext()}, otherwise it will always return
+   *         {@link Optional#empty()}.
+   *
+   * @since 4.6.0
+   */
+  default Optional<Registry> getRegistry() {
+    return empty();
+  }
+
 }

@@ -46,7 +46,8 @@ public interface ConfigurationBuilder {
    * functioning. This instance will configure the elements related to a particular {@link MuleContext} only. It will not
    * configure container related elements such as {@link Service mule services}.
    *
-   * @return a filtered {@link ConfigurationBuilder}
+   * @param filter the {@link ConfigurationBuilderRegistryFilter filter} to configure the {@link MuleContext} {@link Registry}.
+   * @return a filtered {@link ConfigurationBuilder}.
    * @since 4.6.0
    */
   static ConfigurationBuilder getMinimalConfigurationBuilder(ConfigurationBuilderRegistryFilter filter) {
