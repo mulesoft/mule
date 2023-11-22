@@ -446,7 +446,7 @@ public abstract class AbstractMuleContextTestCase extends AbstractMuleTestCase {
   protected void doTearDownAfterMuleContextDispose() throws Exception {}
 
   @AfterClass
-  public static void disposeContext() throws MuleException {
+  public static synchronized void disposeContext() throws MuleException {
     try {
       clearTestFlows();
       if (muleContext != null && !(muleContext.isDisposed() || muleContext.isDisposing())) {
