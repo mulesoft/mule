@@ -34,9 +34,25 @@ public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowT
 {
     private CountDownLatch latch = new CountDownLatch(1);
 
+    private TestBean testBean = new TestBean() {
+        private Date createDate = null;
+
+        @Override
+        public Date getCreateDate()
+        {
+            return createDate;
+        }
+
+        @Override
+        public void setCreateDate(Date createDate)
+        {
+            this.createDate = createDate;
+        }
+    };
+
     @Rule
     public SystemProperty setVariableEnableXstreamDenylist =
-      new SystemProperty(MULE_XSTREAM_ALLOWLIST, "org.mule.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean");
+      new SystemProperty(MULE_XSTREAM_ALLOWLIST, "org.mule.module.xml.functional.**");
 
     @Parameters
     public static Collection<Object[]> parameters()
@@ -94,18 +110,10 @@ public class XStreamAdditionalConvertersTestCase extends AbstractServiceAndFlowT
         }
     }
 
-    public static class TestBean
-    {
-        private Date createDate = null;
+    public static interface TestBean {
 
-        public Date getCreateDate()
-        {
-            return createDate;
-        }
+        public Date getCreateDate();
 
-        public void setCreateDate(Date createDate)
-        {
-            this.createDate = createDate;
-        }
+        public void setCreateDate(Date createDate);
     }
 }

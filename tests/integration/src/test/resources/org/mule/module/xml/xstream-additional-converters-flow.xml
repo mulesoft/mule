@@ -13,7 +13,7 @@
        http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd">
     
     <mxml:xml-to-object-transformer name="XmlToObject">
-        <mxml:alias name="test-bean" class="org.mule.module.xml.functional.XStreamAdditionalConvertersTestCase$TestBean"/>
+        <mxml:alias name="test-bean" class="org.mule.module.xml.functional.XStreamAdditionalConvertersTestCase$1"/>
         <mxml:converter class="com.thoughtworks.xstream.converters.extended.ISO8601DateConverter"/>
     </mxml:xml-to-object-transformer>
 
