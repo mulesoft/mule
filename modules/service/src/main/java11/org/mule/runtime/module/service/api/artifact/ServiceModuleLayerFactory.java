@@ -88,7 +88,8 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
         .stream()
         .filter(module -> module.isAnnotationPresent(serviceModuleAnnotationClass))
         .findAny()
-        .orElseThrow(() -> new NoSuchElementException("No module annotated with 'ServiceModule' for '" + artifactId + "'"));
+        .orElseThrow(() -> new NoSuchElementException("No module annotated with 'ServiceModule' for '" + artifactId + "' in "
+            + descriptor.getBundleDescriptor().getArtifactFileName()));
 
     String serviceModuleName = serviceModule.getName();
 

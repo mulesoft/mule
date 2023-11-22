@@ -69,12 +69,15 @@ public class DefaultServiceRegistry implements ServiceRegistry {
         if (dependency != null) {
           field.set(serviceProvider, dependency);
         } else if (!asOptional) {
-          throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s' of service provider '%s'",
+          throw new ServiceResolutionError(format("Cannot find a service to inject into field '%s#%s' of service provider '%s'",
+                                                  field.getDeclaringClass().getName(),
                                                   field.getName(),
                                                   serviceProvider.getServiceDefinition().getServiceClass().getName()));
         }
       } catch (Exception e) {
-        throw new ServiceResolutionError(format("Could not inject dependency on field %s of type %s", field.getName(),
+        throw new ServiceResolutionError(format("Could not inject dependency on field '%s#%s' of type '%s'",
+                                                field.getDeclaringClass().getName(),
+                                                field.getName(),
                                                 dependencyType.getName()),
                                          e);
       }
