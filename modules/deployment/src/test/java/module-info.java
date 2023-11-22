@@ -5,12 +5,15 @@
  * LICENSE.txt file.
  */
 /**
- * Provides container artifacts deployment functionality
+ * Mule Deployment Model Implementation Module.
  *
  * @moduleGraph
  * @since 4.6
  */
-module org.mule.runtime.deployment {
+open module org.mule.runtime.deployment.test {
+
+  requires org.mule.runtime.deployment;
+  requires org.mule.test.services;
 
   requires org.mule.runtime.api;
   requires org.mule.runtime.artifact;
@@ -33,21 +36,15 @@ module org.mule.runtime.deployment {
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.spring.config;
   requires org.mule.sdk.api;
+  
+  requires org.mule.runtime.service;
+  requires org.mule.runtime.extensions.xml.support;
+  requires org.mule.runtime.license.api;
 
-  // package java.beans package is used
-  requires java.desktop;
-  requires org.apache.commons.io;
-  requires org.apache.commons.lang3;
-  requires spring.core;
-
-  exports org.mule.runtime.module.deployment.api;
-  exports org.mule.runtime.module.deployment.internal to
-      org.mule.runtime.launcher,
-      spring.beans;
-  exports org.mule.runtime.module.deployment.internal.processor to
-      org.mule.runtime.launcher;
-
-  opens org.mule.runtime.module.deployment.internal to
-      spring.core;
+  requires org.mule.test.runner;
+  requires org.mule.runtime.deployment.model.impl.test;
+  requires org.mule.runtime.oauth.api;
+  requires org.mule.oauth.client.api;
+  requires org.apache.logging.log4j;
 
 }

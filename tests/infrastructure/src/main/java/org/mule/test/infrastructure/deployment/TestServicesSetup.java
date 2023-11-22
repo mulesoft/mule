@@ -4,13 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.deployment.test.internal;
+package org.mule.test.infrastructure.deployment;
 
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.expressionLanguageMetadataServiceJarFile;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.expressionLanguageServiceJarFile;
-import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.schedulerServiceJarFile;
-
-import static org.apache.commons.io.FileUtils.copyDirectory;
+import static org.mule.test.infrastructure.deployment.TestArtifactsCatalog.expressionLanguageMetadataServiceJarFile;
+import static org.mule.test.infrastructure.deployment.TestArtifactsCatalog.expressionLanguageServiceJarFile;
+import static org.mule.test.infrastructure.deployment.TestArtifactsCatalog.httpServiceJarFile;
+import static org.mule.test.infrastructure.deployment.TestArtifactsCatalog.schedulerServiceJarFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +43,7 @@ public class TestServicesSetup extends ExternalResource {
   private final TemporaryFolder compilerWorkFolder;
 
   private File schedulerService;
+  private File httpService;
   private File expressionLanguageService;
   private File expressionLanguageMetadataService;
   private boolean expressionLanguageMetadataServiceDisabled;
@@ -91,29 +91,28 @@ public class TestServicesSetup extends ExternalResource {
     this.expressionLanguageMetadataServiceDisabled = true;
   }
 
-  /**
-   * Copies the pre-built services to the services folder being used by the test. The first call to this method actually builds
-   * the services.
-   * 
-   * @param servicesFolder the {@code $MULE_HOME/services} folder.
-   * @throws IOException if some sub-folder of the services folder couldn't be created.
-   */
-  public void copyServicesToFolder(File servicesFolder) throws IOException {
-    initNotOverriddenServices();
-
-    copyDirectory(schedulerService,
-                  new File(servicesFolder, SCHEDULER_SERVICE_NAME));
-    copyDirectory(expressionLanguageService,
-                  new File(servicesFolder, EXPRESSION_LANGUAGE_SERVICE_NAME));
-    if (!expressionLanguageMetadataServiceDisabled) {
-      copyDirectory(expressionLanguageMetadataService,
-                    new File(servicesFolder, EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
-    }
+  public File getSchedulerService() {
+    return schedulerService;
   }
 
-  private void initNotOverriddenServices() throws IOException {
+  public File getHttpService() {
+    return httpService;
+  }
+
+  public File getExpressionLanguageService() {
+    return expressionLanguageService;
+  }
+
+  public File getExpressionLanguageMetadataService() {
+    return expressionLanguageMetadataService;
+  }
+
+  public void initNotOverriddenServices() throws IOException {
     if (schedulerService == null) {
       schedulerService = schedulerServiceJarFile;
+    }
+    if (httpService == null) {
+      httpService = httpServiceJarFile;
     }
     if (expressionLanguageService == null) {
       expressionLanguageService = expressionLanguageServiceJarFile;
@@ -129,6 +128,10 @@ public class TestServicesSetup extends ExternalResource {
       schedulerService.delete();
       schedulerService = null;
     }
+    if (httpService != null && !httpService.equals(httpServiceJarFile)) {
+      httpService.delete();
+      httpService = null;
+    }
     if (expressionLanguageService != null && !expressionLanguageService.equals(expressionLanguageServiceJarFile)) {
       expressionLanguageService.delete();
       expressionLanguageService = null;
@@ -142,6 +145,7 @@ public class TestServicesSetup extends ExternalResource {
 
   public void reset() {
     schedulerService = null;
+    httpService = null;
     expressionLanguageService = null;
     expressionLanguageMetadataService = null;
     expressionLanguageMetadataServiceDisabled = false;
