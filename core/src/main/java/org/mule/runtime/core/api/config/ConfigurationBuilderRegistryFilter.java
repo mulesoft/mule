@@ -11,6 +11,7 @@ import org.mule.runtime.core.api.MuleContext;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Configures the elements of the {@link Registry} of a {@link MuleContext}.
@@ -22,12 +23,12 @@ public interface ConfigurationBuilderRegistryFilter {
   /**
    * Filters every object added to the target {@link MuleContext}'s registry, allowing customization when needed.
    *
-   * @param serviceId   the ID of the object being added to the registry.
-   * @param serviceImpl the object being added to the registry.
+   * @param serviceId           the ID of the object being added to the registry.
+   * @param serviceImplSupplier a {@link Supplier} for the object being added to the registry.
    * @return the object to add to the registry, or {@link Optional#empty()} if no implementation should be added for the given
    *         {@code serviceId}.
    */
-  Optional<Object> filterRegisterObject(String serviceId, Object serviceImpl);
+  Optional<Object> filterRegisterObject(String serviceId, Supplier<Object> serviceImplSupplier);
 
   /**
    * @param muleContext the target {@link MuleContext}.

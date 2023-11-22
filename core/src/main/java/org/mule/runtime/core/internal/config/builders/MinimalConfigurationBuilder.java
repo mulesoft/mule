@@ -119,6 +119,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
@@ -136,8 +137,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     this.filter = new ConfigurationBuilderRegistryFilter() {
 
       @Override
-      public Optional<Object> filterRegisterObject(String serviceId, Object serviceImpl) {
-        return ofNullable(serviceImpl);
+      public Optional<Object> filterRegisterObject(String serviceId, Supplier<Object> serviceImplSupplier) {
+        return ofNullable(serviceImplSupplier.get());
       }
 
       @Override
@@ -173,28 +174,28 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registerConnectivityTester(muleContext);
     registerInterceptionApiObjects(muleContext);
 
-    registerObject(OBJECT_SECURITY_MANAGER, new DefaultMuleSecurityManager(), muleContext);
-    registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE, new DefaultStreamCloserService(), muleContext);
-    registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, new JavaObjectSerializer(), muleContext);
+    registerObject(OBJECT_SECURITY_MANAGER, DefaultMuleSecurityManager::new, muleContext);
+    registerObject(OBJECT_MULE_STREAM_CLOSER_SERVICE, DefaultStreamCloserService::new, muleContext);
+    registerObject(DEFAULT_OBJECT_SERIALIZER_NAME, JavaObjectSerializer::new, muleContext);
 
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
-    registerObject(ErrorTypeRepository.class.getName(), contributedErrorTypeRepository, muleContext);
+    registerObject(ErrorTypeRepository.class.getName(), () -> contributedErrorTypeRepository, muleContext);
     final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
     contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
-    registerObject(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator, muleContext);
+    registerObject(ErrorTypeLocator.class.getName(), () -> contributedErrorTypeLocator, muleContext);
 
     tryRegisterMvel(muleContext);
 
-    registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
+    registerObject(OBJECT_STREAMING_GHOST_BUSTER, StreamingGhostBuster::new, muleContext);
     registerStreamingManager(muleContext);
-    registerObject(OBJECT_TIME_SUPPLIER, new LocalTimeSupplier(), muleContext);
-    registerObject(OBJECT_CLUSTER_SERVICE, new DefaultClusterService(), muleContext);
+    registerObject(OBJECT_TIME_SUPPLIER, LocalTimeSupplier::new, muleContext);
+    registerObject(OBJECT_CLUSTER_SERVICE, DefaultClusterService::new, muleContext);
 
     registerTransactionFactoryLocator(muleContext);
 
     // This is overridden only if no other test configurator has set the profiling service.
     if (((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(MULE_PROFILING_SERVICE_KEY) == null) {
-      registerObject(MULE_PROFILING_SERVICE_KEY, new NoOpProfilingService(), muleContext);
+      registerObject(MULE_PROFILING_SERVICE_KEY, NoOpProfilingService::new, muleContext);
     }
 
     configureCoreTracer(muleContext);
@@ -205,48 +206,54 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
     configureSpanExporterFactory(muleContext);
 
-    registerObject(ComponentInitialStateManager.SERVICE_ID, new ComponentInitialStateManager() {
+    registerObject(ComponentInitialStateManager.SERVICE_ID, () -> new ComponentInitialStateManager() {
 
       @Override
       public boolean mustStartMessageSource(Component component) {
         return true;
       }
     }, muleContext);
-    registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
+    registerObject(OBJECT_RESOURCE_LOCATOR, DefaultResourceLocator::new, muleContext);
 
     Map<String, Object> additionalObjectsToRegister = filter.getAdditionalObjectsToRegister(muleContext);
     for (Entry<String, Object> entry : additionalObjectsToRegister.entrySet()) {
-      registerObject(entry.getKey(), entry.getValue(), muleContext);
+      registerObject(entry.getKey(), entry::getValue, muleContext);
     }
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, new TransactionFactoryLocator(), muleContext);
+    registerObject(OBJECT_TRANSACTION_FACTORY_LOCATOR, TransactionFactoryLocator::new, muleContext);
   }
 
   protected void registerStreamingManager(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_STREAMING_MANAGER, new DefaultStreamingManager(), muleContext);
+    registerObject(OBJECT_STREAMING_MANAGER, DefaultStreamingManager::new, muleContext);
   }
 
   protected void registerInterceptionApiObjects(MuleContext muleContext) throws RegistrationException {
-    registerObject(INTERCEPTOR_MANAGER_REGISTRY_KEY, new DefaultProcessorInterceptorManager(), muleContext);
+    registerObject(INTERCEPTOR_MANAGER_REGISTRY_KEY, DefaultProcessorInterceptorManager::new, muleContext);
   }
 
   protected void registerConnectivityTester(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, new DefaultConnectivityTesterFactory(), muleContext);
+    registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, DefaultConnectivityTesterFactory::new, muleContext);
   }
 
   protected void registerConnectionManager(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_CONNECTION_MANAGER, new DefaultConnectionManager(muleContext), muleContext);
+    registerObject(OBJECT_CONNECTION_MANAGER, () -> new DefaultConnectionManager(muleContext), muleContext);
   }
 
   protected void registerNotificationHandlingObjects(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_NOTIFICATION_DISPATCHER, new DefaultNotificationDispatcher(), muleContext);
-    registerObject(NotificationListenerRegistry.REGISTRY_KEY, new DefaultNotificationListenerRegistry(), muleContext);
+    registerObject(OBJECT_NOTIFICATION_DISPATCHER, DefaultNotificationDispatcher::new, muleContext);
+    registerObject(NotificationListenerRegistry.REGISTRY_KEY, DefaultNotificationListenerRegistry::new, muleContext);
   }
 
   protected void registerExpressionManager(MuleContext muleContext, MuleRegistry registry) throws MuleException {
-    registerObject(OBJECT_EXPRESSION_MANAGER, getExpressionManager(muleContext, registry), muleContext);
+    registerObject(OBJECT_EXPRESSION_MANAGER, () -> {
+      try {
+        return getExpressionManager(muleContext, registry);
+      } catch (MuleException e) {
+        throw new MuleRuntimeException(e);
+      }
+    }, muleContext);
   }
 
   protected ExtendedExpressionManager getExpressionManager(MuleContext muleContext, MuleRegistry registry)
@@ -270,9 +277,9 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     try {
       Class<?> mvelLangCls = Class.forName("org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage");
       mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
-      registerObject(OBJECT_EXPRESSION_LANGUAGE, mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext),
-                     muleContext);
-      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, true, muleContext);
+      Object mvelExpressionLanguage = mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
+      registerObject(OBJECT_EXPRESSION_LANGUAGE, () -> mvelExpressionLanguage, muleContext);
+      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, () -> true, muleContext);
     } catch (ClassNotFoundException cnfe) {
       // no mvel in classpath, move on
     }
@@ -280,21 +287,21 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void registerTransformerRegistry(MuleContext muleContext) throws RegistrationException {
     TransformersRegistry transformersRegistry = new DefaultTransformersRegistry();
-    registerObject(OBJECT_TRANSFORMERS_REGISTRY, transformersRegistry, muleContext);
-    registerObject(OBJECT_CONVERTER_RESOLVER, new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
-    registerObject(OBJECT_TRANSFORMATION_SERVICE, new ExtendedTransformationService(muleContext), muleContext);
-    registerObject(OBJECT_TRANSFORMER_RESOLVER, new TypeBasedTransformerResolver(), muleContext);
+    registerObject(OBJECT_TRANSFORMERS_REGISTRY, () -> transformersRegistry, muleContext);
+    registerObject(OBJECT_CONVERTER_RESOLVER, () -> new DynamicDataTypeConversionResolver(transformersRegistry), muleContext);
+    registerObject(OBJECT_TRANSFORMATION_SERVICE, () -> new ExtendedTransformationService(muleContext), muleContext);
+    registerObject(OBJECT_TRANSFORMER_RESOLVER, TypeBasedTransformerResolver::new, muleContext);
   }
 
   protected void registerLockFactory(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_LOCK_PROVIDER, new SingleServerLockProvider(), muleContext);
-    registerObject(OBJECT_LOCK_FACTORY, new MuleLockFactory(), muleContext);
+    registerObject(OBJECT_LOCK_PROVIDER, SingleServerLockProvider::new, muleContext);
+    registerObject(OBJECT_LOCK_FACTORY, MuleLockFactory::new, muleContext);
   }
 
   protected void registerSchedulerPoolsConfig(MuleContext muleContext) throws RegistrationException {
-    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig.getInstance(), muleContext);
+    registerObject(OBJECT_SCHEDULER_POOLS_CONFIG, SchedulerContainerPoolsConfig::getInstance, muleContext);
     registerObject(OBJECT_SCHEDULER_BASE_CONFIG,
-                   config().withPrefix(muleContext.getConfiguration().getId())
+                   () -> config().withPrefix(muleContext.getConfiguration().getId())
                        .withShutdownTimeout(() -> muleContext.getConfiguration().getShutdownTimeout(), MILLISECONDS),
                    muleContext);
   }
@@ -305,7 +312,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
         .entrySet()) {
       entry.getValue().getServiceImpl().ifPresent(s -> {
         try {
-          registerObject(entry.getKey(), s, muleContext);
+          registerObject(entry.getKey(), () -> s, muleContext);
         } catch (RegistrationException e) {
           throw new MuleRuntimeException(e);
         }
@@ -313,14 +320,15 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
   }
 
-  protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
-    Optional<Object> filtered = filter.filterRegisterObject(serviceId, serviceImpl);
+  protected void registerObject(String serviceId, Supplier<Object> serviceImplSupplier, MuleContext muleContext)
+      throws RegistrationException {
+    Optional<Object> filtered = filter.filterRegisterObject(serviceId, serviceImplSupplier);
 
     if (!filtered.isPresent()) {
       return;
     }
 
-    serviceImpl = filtered.get();
+    Object serviceImpl = filtered.get();
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
     }
@@ -334,12 +342,12 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     osm.setBasePersistentStoreKey(BASE_PERSISTENT_OBJECT_STORE_KEY);
     osm.setBaseTransientStoreKey(BASE_IN_MEMORY_OBJECT_STORE_KEY);
     osm.setMuleContext(muleContext);
-    registerObject(OBJECT_STORE_MANAGER, osm, muleContext);
+    registerObject(OBJECT_STORE_MANAGER, () -> osm, muleContext);
   }
 
   protected void registerObjectStorePartitions(MuleContext muleContext) throws RegistrationException {
-    registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, getDefaultInMemoryObjectStore(), muleContext);
-    registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, getDefaultPersistentObjectStore(), muleContext);
+    registerObject(BASE_IN_MEMORY_OBJECT_STORE_KEY, this::getDefaultInMemoryObjectStore, muleContext);
+    registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, this::getDefaultPersistentObjectStore, muleContext);
   }
 
   protected ObjectStore<Serializable> getDefaultPersistentObjectStore() {
@@ -352,26 +360,26 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void configureQueueManager(MuleContext muleContext) throws RegistrationException {
     QueueManager queueManager = new TransactionalQueueManager();
-    registerObject(OBJECT_QUEUE_MANAGER, queueManager, muleContext);
-    registerObject(LOCAL_QUEUE_MANAGER_KEY, queueManager, muleContext);
+    registerObject(OBJECT_QUEUE_MANAGER, () -> queueManager, muleContext);
+    registerObject(LOCAL_QUEUE_MANAGER_KEY, () -> queueManager, muleContext);
   }
 
   private void configureComponentTracerFactory(MuleContext muleContext) throws RegistrationException {
     ComponentTracerFactory<CoreEvent> componentTracerFactory = getDummyComponentTracerFactory();
-    registerObject(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, componentTracerFactory, muleContext);
+    registerObject(MULE_CORE_COMPONENT_TRACER_FACTORY_KEY, () -> componentTracerFactory, muleContext);
   }
 
   protected void configureCoreTracer(MuleContext muleContext) throws RegistrationException {
     EventTracer<CoreEvent> tracer = getNoopCoreEventTracer();
-    registerObject(MULE_CORE_EVENT_TRACER_KEY, tracer, muleContext);
+    registerObject(MULE_CORE_EVENT_TRACER_KEY, () -> tracer, muleContext);
   }
 
   protected void configureSpanExporterFactory(MuleContext muleContext) throws RegistrationException {
     SpanExporterFactory spanExporterFactory = new NoopSpanExporterFactory();
-    registerObject(MULE_CORE_EXPORTER_FACTORY_KEY, spanExporterFactory, muleContext);
+    registerObject(MULE_CORE_EXPORTER_FACTORY_KEY, () -> spanExporterFactory, muleContext);
   }
 
   protected void configureSpanExporterConfiguration(MuleContext muleContext) throws RegistrationException {
-    registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, new EmptySpanExporterConfiguration(), muleContext);
+    registerObject(MULE_SPAN_EXPORTER_CONFIGURATION_KEY, EmptySpanExporterConfiguration::new, muleContext);
   }
 }
