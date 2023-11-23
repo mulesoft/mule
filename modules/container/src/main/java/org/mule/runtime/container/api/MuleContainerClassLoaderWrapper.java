@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.container.api;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 
@@ -14,6 +15,7 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
  *
  * @since 4.5
  */
+@NoImplement
 public interface MuleContainerClassLoaderWrapper {
 
   /**
