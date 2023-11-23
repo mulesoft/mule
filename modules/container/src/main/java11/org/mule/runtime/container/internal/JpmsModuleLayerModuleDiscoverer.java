@@ -11,6 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContaine
 import static java.lang.ModuleLayer.boot;
 import static java.lang.module.ModuleDescriptor.Requires.Modifier.TRANSITIVE;
 import static java.util.Collections.emptySet;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
@@ -91,29 +92,6 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
     public JpmsMuleContainerModule(Module jpmsModule) {
       this.jpmsModule = jpmsModule;
 
-      this.exportedPackages = concat(
-                                     // direct exports
-                                     jpmsModule.getDescriptor().exports().stream()
-                                         .filter(export -> export.targets().isEmpty())
-                                         .map(Exports::source),
-                                     // transitiveExportedPackages
-                                     jpmsModule.getDescriptor().requires()
-                                         .stream()
-                                         .filter(required -> required.modifiers().contains(TRANSITIVE))
-                                         .flatMap(required -> {
-                                           final Module requiredTransitiveModule =
-                                               this.getClass().getModule().getLayer().findModule(required.name()).get();
-
-                                           if (requiredTransitiveModule.getDescriptor().isAutomatic()) {
-                                             return requiredTransitiveModule.getPackages().stream();
-                                           } else {
-                                             return requiredTransitiveModule.getDescriptor().exports().stream()
-                                                 .filter(export -> export.targets().isEmpty())
-                                                 .map(Exports::source);
-                                           }
-                                         }))
-                                             .collect(toSet());
-
       if (jpmsModule.isAnnotationPresent(PrivilegedApi.class)) {
         final PrivilegedApi privilegedApiAnnotation = jpmsModule.getAnnotation(PrivilegedApi.class);
         this.privilegedExportedPackages = Stream.of(privilegedApiAnnotation.privilegedPackages())
@@ -124,6 +102,36 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
         this.privilegedExportedPackages = emptySet();
         this.privilegedArtifacts = emptySet();
       }
+
+      this.exportedPackages = concat(getDirectExports(jpmsModule),
+                                     resolveTransitiveExportedPackages(jpmsModule))
+                                         .filter(not(privilegedExportedPackages::contains))
+                                         .collect(toSet());
+    }
+
+    private Stream<String> getDirectExports(Module jpmsModule) {
+      return jpmsModule.getDescriptor().exports().stream()
+          .filter(export -> export.targets().isEmpty())
+          .map(Exports::source);
+    }
+
+    private Stream<String> resolveTransitiveExportedPackages(Module jpmsModule) {
+      return jpmsModule.getDescriptor().requires()
+          .stream()
+          .filter(required -> required.modifiers().contains(TRANSITIVE))
+          .flatMap(required -> {
+            final Module requiredTransitiveModule =
+                this.getClass().getModule().getLayer().findModule(required.name()).get();
+
+            if (requiredTransitiveModule.getDescriptor().isAutomatic()) {
+              return requiredTransitiveModule.getPackages().stream();
+            } else {
+              return jpmsModule.getLayer().findModule(required.name())
+                  .map(requiredModule -> concat(getDirectExports(requiredModule),
+                                                resolveTransitiveExportedPackages(requiredModule)))
+                  .orElse(Stream.empty());
+            }
+          });
     }
 
     @Override
