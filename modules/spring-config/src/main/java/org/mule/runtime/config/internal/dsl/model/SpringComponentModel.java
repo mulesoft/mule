@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanReference;
  */
 public class SpringComponentModel {
 
+  private String componentName;
   private ComponentIdentifier componentIdentifier;
   private ComponentAst component;
   private ConfigurableObjectProvider objectInstance;
@@ -30,6 +31,14 @@ public class SpringComponentModel {
   private MapEntryType mapEntryType;
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public String getComponentName() {
+    return componentName;
+  }
 
   public void setComponentIdentifier(ComponentIdentifier componentIdentifier) {
     this.componentIdentifier = componentIdentifier;

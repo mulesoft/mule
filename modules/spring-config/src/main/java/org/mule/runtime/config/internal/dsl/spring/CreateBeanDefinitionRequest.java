@@ -46,6 +46,7 @@ public abstract class CreateBeanDefinitionRequest<T> {
     this.paramsModels = paramsModels;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
+    springComponentModel.setComponentName(componentBuildingDefinition.getRegistrationName());
     springComponentModel.setComponentIdentifier(componentIdentifier);
     springComponentModel.setComponent(component);
 
