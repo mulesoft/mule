@@ -9,6 +9,8 @@ package org.mule.runtime.core.privileged.metadata;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionDataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
@@ -22,12 +24,13 @@ import java.util.Optional;
  *
  * @since 4.0
  */
+@NoExtend
 public class DefaultFunctionDataType extends SimpleDataType implements FunctionDataType {
 
   private static final long serialVersionUID = 5452095230956829108L;
 
-  private List<FunctionParameter> parameters;
-  private Optional<DataType> returnType;
+  private final List<FunctionParameter> parameters;
+  private final Optional<DataType> returnType;
 
   public DefaultFunctionDataType(Class<?> type, DataType returnType, List<FunctionParameter> parameters, MediaType mediaType,
                                  boolean consumable) {

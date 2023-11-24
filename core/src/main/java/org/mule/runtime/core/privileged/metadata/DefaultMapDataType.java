@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.metadata;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -17,14 +18,15 @@ import java.util.Objects;
  *
  * @since 4.0
  */
+@NoExtend
 public class DefaultMapDataType extends SimpleDataType implements MapDataType {
 
   private static final long serialVersionUID = 1052687171949146300L;
 
-  private DataType keyType;
-  private DataType valueType;
+  private final DataType keyType;
+  private final DataType valueType;
 
-  DefaultMapDataType(Class<?> type, DataType keyType, DataType valueType, MediaType mimeType, boolean streamType) {
+  protected DefaultMapDataType(Class<?> type, DataType keyType, DataType valueType, MediaType mimeType, boolean streamType) {
     super(type, mimeType, streamType);
     this.keyType = keyType;
     this.valueType = valueType;

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.metadata;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 
@@ -18,6 +19,7 @@ import java.util.Objects;
  *
  * @since 1.0
  */
+@NoExtend
 public class SimpleDataType implements DataType {
 
   private static final long serialVersionUID = -4590745924720880358L;
@@ -26,7 +28,7 @@ public class SimpleDataType implements DataType {
   protected final MediaType mimeType;
   protected final boolean streamType;
 
-  SimpleDataType(Class<?> type, MediaType mimeType, boolean streamType) {
+  protected SimpleDataType(Class<?> type, MediaType mimeType, boolean streamType) {
     this.type = type;
     this.mimeType = mimeType;
     this.streamType = streamType;

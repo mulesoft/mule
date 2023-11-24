@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.metadata;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
@@ -19,13 +20,14 @@ import java.util.Objects;
  *
  * @since 3.0
  */
+@NoExtend
 public class DefaultCollectionDataType extends SimpleDataType implements CollectionDataType {
 
   private static final long serialVersionUID = 3600944898597616006L;
 
   private final DataType itemsType;
 
-  DefaultCollectionDataType(Class collectionType, DataType type, MediaType mimeType, boolean streamType) {
+  protected DefaultCollectionDataType(Class collectionType, DataType type, MediaType mimeType, boolean streamType) {
     super(collectionType, mimeType, streamType);
     this.itemsType = type;
   }

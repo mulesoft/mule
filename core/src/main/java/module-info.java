@@ -369,6 +369,8 @@ module org.mule.runtime.core {
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
   exports org.mule.runtime.core.internal.message;
+  exports org.mule.runtime.core.internal.metadata to
+      com.mulesoft.mule.runtime.kryo;
   exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
