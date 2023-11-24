@@ -131,7 +131,7 @@ public class LifecycleAwareConfigurationInstanceTestCase extends AbstractMuleCon
       @Override
       protected void doConfigure(MuleContext muleContext) throws Exception {
         super.doConfigure(muleContext);
-        registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
+        registerObject(OBJECT_CONNECTION_MANAGER, () -> connectionManager, muleContext);
       }
     };
   }
