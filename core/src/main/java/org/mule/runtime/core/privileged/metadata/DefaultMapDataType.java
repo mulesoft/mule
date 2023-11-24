@@ -16,7 +16,7 @@ import java.util.Objects;
 /**
  * Implementation of {@link MapDataType}.
  *
- * @since 4.0
+ * @since 4.6, moved from {@link org.mule.runtime.core.internal.metadata.DefaultMapDataType}.
  */
 @NoExtend
 public class DefaultMapDataType extends SimpleDataType implements MapDataType {
@@ -62,7 +62,7 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null || !equalsCheckClass(o)) {
       return false;
     }
 
@@ -72,6 +72,12 @@ public class DefaultMapDataType extends SimpleDataType implements MapDataType {
         Objects.equals(this.getValueDataType(), that.getValueDataType()) &&
         Objects.equals(this.getType(), that.getType()) &&
         Objects.equals(this.getMediaType(), that.getMediaType());
+  }
+
+  @Override
+  protected boolean equalsCheckClass(Object o) {
+    return getClass() == o.getClass()
+        || (DefaultMapDataType.class.isAssignableFrom(o.getClass()));
   }
 
   @Override

@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+/**
+ * This is kept for backwards compatibility with persistent serialized data.
+ * 
+ * @since 3.0
+ */
 public class DefaultCollectionDataType extends org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType {
 
   private static final long serialVersionUID = 3600944898597616006L;

@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * Basic implementation of {@link FunctionDataType}.
  *
- * @since 4.0
+ * @since 4.6, moved from {@link org.mule.runtime.core.internal.metadata.DefaultFunctionDataType}.
  */
 @NoExtend
 public class DefaultFunctionDataType extends SimpleDataType implements FunctionDataType {
@@ -48,4 +48,11 @@ public class DefaultFunctionDataType extends SimpleDataType implements FunctionD
   public Optional<DataType> getReturnType() {
     return returnType;
   }
+
+  @Override
+  protected boolean equalsCheckClass(Object o) {
+    return getClass() == o.getClass()
+        || (DefaultFunctionDataType.class.isAssignableFrom(o.getClass()));
+  }
+
 }

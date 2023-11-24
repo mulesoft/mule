@@ -17,7 +17,7 @@ import java.util.Objects;
  * <p>
  * This type also allows a mime type and encoding to be associated with the Java type.
  *
- * @since 1.0
+ * @since 4.6, moved from {@link org.mule.runtime.core.internal.metadata.SimpleDataType}
  */
 @NoExtend
 public class SimpleDataType implements DataType {
@@ -79,7 +79,7 @@ public class SimpleDataType implements DataType {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null || !equalsCheckClass(o)) {
       return false;
     }
 
@@ -87,6 +87,11 @@ public class SimpleDataType implements DataType {
 
     return Objects.equals(this.getType(), that.getType()) &&
         Objects.equals(this.getMediaType(), that.getMediaType());
+  }
+
+  protected boolean equalsCheckClass(Object o) {
+    return getClass() == o.getClass()
+        || (SimpleDataType.class.isAssignableFrom(o.getClass()));
   }
 
   @Override

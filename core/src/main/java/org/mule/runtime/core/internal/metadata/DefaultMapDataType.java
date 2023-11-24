@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.core.internal.metadata;
 
+/**
+ * This is kept for backwards compatibility with persistent serialized data.
+ * 
+ * @since 4.0
+ */
 public class DefaultMapDataType extends org.mule.runtime.core.privileged.metadata.DefaultMapDataType {
 
   private static final long serialVersionUID = 1052687171949146300L;

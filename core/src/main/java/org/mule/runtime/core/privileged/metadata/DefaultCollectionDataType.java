@@ -18,7 +18,7 @@ import java.util.Objects;
  * <p>
  * When checked for compatibility both the collection type and the generic item type will be compared.
  *
- * @since 3.0
+ * @since 4.6, moved from {@link org.mule.runtime.core.internal.metadata.DefaultCollectionDataType}.
  */
 @NoExtend
 public class DefaultCollectionDataType extends SimpleDataType implements CollectionDataType {
@@ -57,7 +57,7 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (o == null || !equalsCheckClass(o)) {
       return false;
     }
 
@@ -77,6 +77,12 @@ public class DefaultCollectionDataType extends SimpleDataType implements Collect
   public String toString() {
     return "CollectionDataType{" + "type=" + getType().getName() + ", itemType=" + getItemDataType().toString() + ", mimeType='"
         + getMediaType() + '\'' + '}';
+  }
+
+  @Override
+  protected boolean equalsCheckClass(Object o) {
+    return getClass() == o.getClass()
+        || (DefaultCollectionDataType.class.isAssignableFrom(o.getClass()));
   }
 
 }
