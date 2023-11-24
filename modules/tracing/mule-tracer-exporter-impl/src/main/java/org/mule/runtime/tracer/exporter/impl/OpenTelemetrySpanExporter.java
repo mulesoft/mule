@@ -34,9 +34,12 @@ import static io.opentelemetry.api.common.Attributes.of;
 import static io.opentelemetry.api.trace.SpanContext.getInvalid;
 import static io.opentelemetry.api.trace.SpanKind.INTERNAL;
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
+import static io.opentelemetry.api.trace.TraceFlags.getDefault;
+import static io.opentelemetry.api.trace.TraceFlags.getSampled;
 import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
+import static io.opentelemetry.sdk.trace.samplers.SamplingDecision.RECORD_AND_SAMPLE;
 
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.InternalSpan;
@@ -44,6 +47,7 @@ import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,15 +62,18 @@ import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.common.InstrumentationLibraryInfo;
 import io.opentelemetry.sdk.common.InstrumentationScopeInfo;
 import io.opentelemetry.sdk.resources.Resource;
-import io.opentelemetry.sdk.trace.ReadableSpan;
-import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import io.opentelemetry.sdk.trace.ReadableSpan;
+import io.opentelemetry.sdk.trace.SpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
+import io.opentelemetry.sdk.trace.samplers.SamplingResult;
 
 /**
  * A {@link SpanExporter} that exports the spans as Open Telemetry Spans.
@@ -108,6 +115,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   private String endThreadNameValue;
 
   private MutableMuleTraceState muleTraceState;
+  private Sampler sampler;
 
   public OpenTelemetrySpanExporter(InternalSpan internalSpan,
                                    InitialSpanInfo initialSpanInfo,
@@ -115,7 +123,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
                                    String artifactType,
                                    SpanProcessor spanProcessor,
                                    boolean enableMuleAncestorIdManagement,
-                                   Resource resource) {
+                                   Resource resource,
+                                   Sampler sampler) {
     requireNonNull(internalSpan);
     requireNonNull(initialSpanInfo);
     requireNonNull(artifactId);
@@ -134,6 +143,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     this.resource = resource;
     this.muleTraceState = getMutableMuleTraceStateFrom(emptyMap(), enableMuleAncestorIdManagement);
     this.initialExportInfo = initialSpanInfo.getInitialExportInfo();
+    this.sampler = sampler;
     createSpanContext();
   }
 
@@ -175,7 +185,7 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void export() {
-    if (exportable) {
+    if (exportable && spanContext.isSampled()) {
       endThreadNameValue = Thread.currentThread().getName();
       spanProcessor.onEnd(this);
     }
@@ -217,17 +227,34 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   public void updateParentSpanFrom(Map<String, String> serializeAsMap) {
     parentSpanContext = extractContextFromTraceParent(serializeAsMap.get(TRACE_PARENT_KEY));
     muleTraceState = getMutableMuleTraceStateFrom(serializeAsMap, enableMuleAncestorIdManagement);
+
     if (parentSpanContext.isValid()) {
+      String traceId = parentSpanContext.getTraceId();
+
+      TraceFlags traceFlags = getTraceFlags(traceId, parentSpanContext, this);
+
       if (!exportable) {
         // if it not exportable, we set the parent span context so that it is eventually
         // propagated to the next exportable span.
-        spanContext = SpanContext.create(parentSpanContext.getTraceId(), parentSpanContext.getSpanId(),
-                                         TraceFlags.getSampled(), muleTraceState);
+        spanContext = SpanContext.create(traceId, parentSpanContext.getSpanId(),
+                                         traceFlags, muleTraceState);
       } else {
-        spanContext = SpanContext.create(parentSpanContext.getTraceId(), spanContext.getSpanId(),
-                                         TraceFlags.getSampled(), muleTraceState);
+        spanContext = SpanContext.create(traceId, spanContext.getSpanId(),
+                                         traceFlags, muleTraceState);
       }
     }
+  }
+
+  private TraceFlags getTraceFlags(String traceId, SpanContext parentContext,
+                                   OpenTelemetrySpanExporter openTelemetrySpanExporter) {
+    SamplingResult samplingResult = openTelemetrySpanExporter.sampler
+        .shouldSample(
+                      Context.current().with(io.opentelemetry.api.trace.Span.wrap(parentContext)), traceId,
+                      openTelemetrySpanExporter.getName(),
+                      openTelemetrySpanExporter.spanKind, Attributes.empty(),
+                      emptyList());
+
+    return RECORD_AND_SAMPLE.equals(samplingResult.getDecision()) ? getSampled() : getDefault();
   }
 
   @Override
@@ -283,6 +310,14 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
       if (childOpenTelemetrySpanExporter.parentSpanContext == getInvalid()) {
         childOpenTelemetrySpanExporter.parentSpanContext = spanContext;
       }
+      String traceId = childOpenTelemetrySpanExporter.spanContext.getTraceId();
+      String spanId = childOpenTelemetrySpanExporter.spanContext.getSpanId();
+      childOpenTelemetrySpanExporter.spanContext = SpanContext.create(traceId,
+                                                                      spanId,
+                                                                      getTraceFlags(traceId,
+                                                                                    childOpenTelemetrySpanExporter.parentSpanContext,
+                                                                                    childOpenTelemetrySpanExporter),
+                                                                      childOpenTelemetrySpanExporter.spanContext.getTraceState());
     }
   }
 
@@ -297,7 +332,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
     if (this.exportable && !this.spanContext.isValid()) {
       String spanId = OpenTelemetryTraceIdUtils.generateSpanId();
       String traceId = OpenTelemetryTraceIdUtils.generateTraceId(getAsInternalSpan(internalSpan.getParent()));
-      this.spanContext = SpanContext.create(traceId, spanId, TraceFlags.getSampled(), muleTraceState);
+      TraceFlags traceFlags = getTraceFlags(traceId, parentSpanContext, this);
+      this.spanContext = SpanContext.create(traceId, spanId, traceFlags, muleTraceState);
     }
   }
 
