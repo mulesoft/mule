@@ -46,13 +46,13 @@ public abstract class CreateBeanDefinitionRequest<T> {
     this.paramsModels = paramsModels;
     this.componentBuildingDefinition = componentBuildingDefinition;
     this.springComponentModel = new SpringComponentModel();
-    springComponentModel.setComponentName(componentBuildingDefinition.getRegistrationName());
     springComponentModel.setComponentIdentifier(componentIdentifier);
     springComponentModel.setComponent(component);
 
     ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(component);
 
     if (componentBuildingDefinition != null) {
+      springComponentModel.setComponentName(componentBuildingDefinition.getRegistrationName());
       componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     } else {
       objectTypeVisitor.onType(Object.class);
