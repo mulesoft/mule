@@ -9,10 +9,12 @@ package org.mule.runtime.tracer.exporter.impl;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
+import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getSampler;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.System.getenv;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -34,6 +36,7 @@ import javax.inject.Inject;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,9 @@ import org.slf4j.LoggerFactory;
  */
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Disposable, Initialisable {
 
+  public static final String OTEL_TRACES_SAMPLER_ENV = "OTEL_TRACES_SAMPLER";
+  public static final String OTEL_TRACES_SAMPLER_ARG_ENV = "OTEL_TRACES_SAMPLER_ARG";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetrySpanExporterFactory.class);
 
   private SpanExporterConfiguration configuration;
@@ -55,6 +61,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
       new CapturingSpanExporterWrapper(OpenTelemetryResources.NoOpSpanExporter.getInstance());
+
+  private Sampler sampler;
 
   private FeatureFlaggingService featureFlaggingService;
   private MuleContext muleContext;
@@ -88,7 +96,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   public SpanExporter getSpanExporter(Span span, InitialSpanInfo initialSpanInfo) {
     return new OpenTelemetrySpanExporter(span, initialSpanInfo, artifactId, artifactType, spanProcessor,
-                                         addMuleAncestorSpanId, resource);
+                                         addMuleAncestorSpanId, resource, sampler);
   }
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
@@ -134,6 +142,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.spanProcessor = resolveOpenTelemetrySpanProcessor();
     this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
     this.configuration.doOnConfigurationChanged(this::doOnConfigurationChanged);
+    this.sampler = resolveSampler();
   }
 
   private void doOnConfigurationChanged() {
@@ -153,6 +162,10 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Override
   public void dispose() {
     silentlyShutdown(spanProcessor);
+  }
+
+  protected Sampler resolveSampler() {
+    return getSampler(getenv(OTEL_TRACES_SAMPLER_ENV), getenv(OTEL_TRACES_SAMPLER_ARG_ENV));
   }
 
   private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {
