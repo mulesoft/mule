@@ -1,5 +1,5 @@
 {
-  "4.7.0": {
+  "4.6.0": {
     "revapi": {
       "ignore": [
         {
@@ -9,13 +9,7 @@
           "new": "interface org.mule.runtime.container.api.MuleContainerClassLoaderWrapper",
           "annotation": "@org.mule.api.annotation.NoImplement",
           "justification": "W-14464715: Decouple MuleFrameworkServiceDiscoverer from internals of the runtime"
-        }
-      ]
-    }
-  },
-  "4.6.0": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "ignore": true,
           "code": "java.method.returnTypeTypeParametersChanged",
