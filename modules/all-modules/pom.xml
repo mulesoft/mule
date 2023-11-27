@@ -137,6 +137,12 @@
             <artifactId>mule-tracer-exporter-configuration-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-runtime-environment-application-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 </project>
