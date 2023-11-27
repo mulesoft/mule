@@ -18,7 +18,7 @@ import javax.inject.Inject;
  */
 public class SingleAppEnvironment implements RuntimeEnvironment {
 
-  private SingleAppStarter singleAppExecutor;
+  private SingleAppStarter singleAppStarter;
 
   @Override
   public String getName() {
@@ -32,7 +32,7 @@ public class SingleAppEnvironment implements RuntimeEnvironment {
 
   @Override
   public void start() {
-    singleAppExecutor.startApp();
+    singleAppStarter.startApp();
   }
 
   @Override
@@ -41,7 +41,7 @@ public class SingleAppEnvironment implements RuntimeEnvironment {
   }
 
   @Inject
-  public void setSingleAppExecutor(SingleAppStarter singleAppExecutor) {
-    this.singleAppExecutor = singleAppExecutor;
+  public void setSingleAppStarter(SingleAppStarter singleAppStarter) {
+    this.singleAppStarter = singleAppStarter;
   }
 }

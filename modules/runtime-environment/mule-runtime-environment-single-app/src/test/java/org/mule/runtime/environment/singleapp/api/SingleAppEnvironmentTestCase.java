@@ -27,7 +27,7 @@ public class SingleAppEnvironmentTestCase {
   public void whenExecutorStartsDeploymentServiceIsStarted() {
     SingleAppEnvironment applicationServerRuntimeEnvironment = new SingleAppEnvironment();
     SingleAppStarter singleAppExecutor = mock(SingleAppStarter.class);
-    applicationServerRuntimeEnvironment.setSingleAppExecutor(singleAppExecutor);
+    applicationServerRuntimeEnvironment.setSingleAppStarter(singleAppExecutor);
     applicationServerRuntimeEnvironment.start();
     verify(singleAppExecutor).startApp();
   }
