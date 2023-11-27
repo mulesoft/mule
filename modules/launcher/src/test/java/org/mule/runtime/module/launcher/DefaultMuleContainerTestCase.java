@@ -15,7 +15,6 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -71,7 +70,7 @@ public class DefaultMuleContainerTestCase extends AbstractMuleTestCase {
     FileUtils.deleteDirectory(getExecutionFolder());
   }
 
-  private DefaultMuleContainer createMuleContainer() throws InitialisationException {
+  private DefaultMuleContainer createMuleContainer() throws Exception {
     return new DefaultMuleContainer(deploymentService, repositoryService, toolingService, coreExtensionManager, serviceManager,
                                     extensionModelLoaderRepository, troubleshootingService);
   }

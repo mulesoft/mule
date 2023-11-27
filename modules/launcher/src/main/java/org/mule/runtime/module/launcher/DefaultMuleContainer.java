@@ -182,7 +182,7 @@ public class DefaultMuleContainer implements MuleContainer {
                               ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
                               ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
                               TroubleshootingService troubleshootingService)
-      throws IllegalArgumentException, InitialisationException {
+      throws IllegalArgumentException, InitialisationException, RegistrationException {
     init();
 
     this.deploymentService = deploymentService;
@@ -192,6 +192,7 @@ public class DefaultMuleContainer implements MuleContainer {
     this.extensionModelLoaderRepository = extensionModelLoaderRepository;
     this.toolingService = toolingService;
     this.troubleshootingService = troubleshootingService;
+    this.artifactResourcesRegistry.registerObject(MULE_DEPLOYMENT_SERVICE, deploymentService);
   }
 
   protected void init() throws IllegalArgumentException, InitialisationException {
