@@ -34,7 +34,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 

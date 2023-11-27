@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.metadata;
 import org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
-import org.mule.runtime.core.internal.metadata.DefaultDataTypeBuilder;
+import org.mule.runtime.core.privileged.metadata.DefaultDataTypeBuilder;
 
 public final class DefaultDataTypeBuilderFactory extends AbstractDataTypeBuilderFactory {
 
