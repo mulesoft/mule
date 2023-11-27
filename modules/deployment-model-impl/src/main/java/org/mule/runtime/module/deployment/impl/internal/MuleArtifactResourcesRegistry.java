@@ -299,7 +299,9 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
+                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(),
+                                                                                         this,
+                                                                                         (service, assembly) -> service)));
 
     extensionModelLoaderRepository = getExtensionModelLoaderManager();
 
