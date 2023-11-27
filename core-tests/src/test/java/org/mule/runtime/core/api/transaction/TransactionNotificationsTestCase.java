@@ -18,7 +18,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

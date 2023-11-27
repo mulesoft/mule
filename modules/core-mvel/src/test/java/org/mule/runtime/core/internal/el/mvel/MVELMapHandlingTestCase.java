@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

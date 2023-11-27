@@ -27,6 +27,7 @@
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.privileged.context.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED

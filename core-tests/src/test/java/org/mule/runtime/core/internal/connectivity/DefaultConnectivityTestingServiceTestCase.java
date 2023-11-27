@@ -29,7 +29,7 @@ import org.mule.runtime.api.connectivity.ConnectivityTestingStrategy;
 import org.mule.runtime.api.connectivity.UnsupportedConnectivityTestingObjectException;
 import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

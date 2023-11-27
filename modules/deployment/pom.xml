@@ -29,6 +29,7 @@
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.test.policies
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.deployment.test
             --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=org.mule.test.unit
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.privileged.context.registry=ALL-UNNAMED
             --add-exports=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=org.mule.runtime.deployment.test
             --add-exports=org.mule.runtime.container/org.mule.runtime.container.internal=org.mule.runtime.deployment.test
               --add-opens=org.mule.runtime.container/org.mule.runtime.container.internal=org.apache.commons.lang3

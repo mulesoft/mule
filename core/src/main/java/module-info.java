@@ -20,6 +20,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.component",
         "org.mule.runtime.core.privileged.connector",
         "org.mule.runtime.core.privileged.context.notification",
+        "org.mule.runtime.core.privileged.context.registry",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.endpoint",
         "org.mule.runtime.core.privileged.event",
@@ -70,7 +71,8 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.modules:mule-apikit-module",
         "org.mule.modules:mule-tracing-module",
         "org.mule.modules:mule-aggregators-module",
-        "org.mule.modules:mule-streaming-utils-module"
+        "org.mule.modules:mule-streaming-utils-module",
+        "org.mule.fwk:mule-framework"
     })
 module org.mule.runtime.core {
 

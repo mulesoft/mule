@@ -7,9 +7,7 @@
 package org.mule.runtime.core.internal.context;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -112,15 +110,9 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   }
 
   protected void configureRegistry(DefaultMuleContext muleContext) {
-    final SimpleRegistry simpleRegistry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
-    muleContext.setRegistry(simpleRegistry);
-    muleContext.setInjector(simpleRegistry);
-    registry = simpleRegistry.lookupObject(OBJECT_REGISTRY);
-  }
-
-  @Override
-  public Optional<Registry> getRegistry() {
-    return ofNullable(registry);
+    final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
+    muleContext.setRegistry(registry);
+    muleContext.setInjector(registry);
   }
 
   private Properties getDeploymentProperties() {

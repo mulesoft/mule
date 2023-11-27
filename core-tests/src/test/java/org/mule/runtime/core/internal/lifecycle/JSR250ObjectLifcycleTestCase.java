@@ -11,7 +11,7 @@ import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_APPLY_OBJEC
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 

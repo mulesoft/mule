@@ -35,6 +35,7 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.simple=ALL-UNNAMED
+            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.context.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
             ${surefire.test.unit.open.args}
         </surefire.args>

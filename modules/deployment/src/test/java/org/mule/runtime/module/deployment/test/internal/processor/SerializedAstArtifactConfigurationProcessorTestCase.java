@@ -23,7 +23,7 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.AbstractMuleTestCase;

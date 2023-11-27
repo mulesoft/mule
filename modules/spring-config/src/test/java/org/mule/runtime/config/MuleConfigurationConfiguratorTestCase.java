@@ -34,7 +34,7 @@ import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.context.DefaultMuleContextFactory;
 import org.mule.runtime.core.internal.config.ImmutableExpirationPolicy;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToInputStream;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.tck.config.TestServicesConfigurationBuilder;

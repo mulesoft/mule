@@ -37,7 +37,7 @@ import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotSame;
 
 import org.mule.runtime.core.api.object.AbstractObjectFactory;
 import org.mule.runtime.core.api.object.AbstractObjectFactoryTestCase;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 
 public class PrototypeObjectFactoryTestCase extends AbstractObjectFactoryTestCase {
 
