@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
-import static com.google.common.io.Files.createTempDir;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -50,6 +50,7 @@ import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -387,7 +388,12 @@ public abstract class AbstractMavenClassLoaderModelLoader implements ClassLoader
     boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
     Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
-    Optional<File> temporaryDirectory = of(createTempDir());
+    Optional<File> temporaryDirectory;
+    try {
+      temporaryDirectory = of(createTempDirectory(null).toFile());
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to create directory", e);
+    }
     try {
       List<org.mule.maven.client.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
