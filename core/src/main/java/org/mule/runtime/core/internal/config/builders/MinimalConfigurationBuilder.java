@@ -51,8 +51,6 @@ import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNo
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -68,7 +66,6 @@ import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.api.config.ConfigurationBuilderRegistryFilter;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
@@ -80,7 +77,6 @@ import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.CustomServiceRegistry;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
-import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationListenerRegistry;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
@@ -106,6 +102,7 @@ import org.mule.runtime.core.internal.util.DefaultResourceLocator;
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;
+import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
@@ -116,7 +113,6 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -131,28 +127,6 @@ import java.util.function.Supplier;
  */
 public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
-  private final ConfigurationBuilderRegistryFilter filter;
-
-  public MinimalConfigurationBuilder() {
-    this.filter = new ConfigurationBuilderRegistryFilter() {
-
-      @Override
-      public Optional<Object> filterRegisterObject(String serviceId, Supplier<Object> serviceImplSupplier) {
-        return ofNullable(serviceImplSupplier.get());
-      }
-
-      @Override
-      public Map<String, Object> getAdditionalObjectsToRegister(MuleContext muleContext) {
-        return emptyMap();
-      }
-
-    };
-  }
-
-  public MinimalConfigurationBuilder(ConfigurationBuilderRegistryFilter filter) {
-    this.filter = filter;
-  }
-
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
@@ -162,6 +136,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     configureQueueManager(muleContext);
 
     registry.registerObject(OBJECT_MULE_CONTEXT, muleContext);
+
+    serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
 
     registerCustomServices(muleContext);
     registerObjectStoreManager(muleContext);
@@ -214,11 +190,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       }
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, DefaultResourceLocator::new, muleContext);
-
-    Map<String, Object> additionalObjectsToRegister = filter.getAdditionalObjectsToRegister(muleContext);
-    for (Entry<String, Object> entry : additionalObjectsToRegister.entrySet()) {
-      registerObject(entry.getKey(), entry::getValue, muleContext);
-    }
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
@@ -322,13 +293,14 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void registerObject(String serviceId, Supplier<Object> serviceImplSupplier, MuleContext muleContext)
       throws RegistrationException {
-    Optional<Object> filtered = filter.filterRegisterObject(serviceId, serviceImplSupplier);
+    Optional<Object> decorated =
+        ((CustomServiceRegistry) muleContext.getCustomizationService()).decorateDefaultService(serviceId, serviceImplSupplier);
 
-    if (!filtered.isPresent()) {
+    if (!decorated.isPresent()) {
       return;
     }
 
-    Object serviceImpl = filtered.get();
+    Object serviceImpl = decorated.get();
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
     }
