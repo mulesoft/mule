@@ -25,6 +25,7 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -407,7 +408,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
     Optional<File> temporaryDirectory;
     try {
-      temporaryDirectory = of(java.nio.file.Files.createTempDirectory(null).toFile());
+      temporaryDirectory = of(createTempDirectory(null).toFile());
     } catch (IOException e) {
       throw new IllegalStateException("Failed to create directory", e);
     }
