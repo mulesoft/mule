@@ -4,9 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
-
-import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler;
+package org.mule.runtime.core.privileged.component;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;

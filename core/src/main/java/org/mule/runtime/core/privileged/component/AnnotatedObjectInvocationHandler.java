@@ -27,8 +27,6 @@ import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.RemoveDynamicAnnotationsInterceptor;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ToStringInterceptor;
-import org.mule.runtime.core.internal.component.DynamicallyComponent;
-import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;

@@ -387,6 +387,12 @@
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -422,12 +428,6 @@
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
