@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Helper interface to unify both {@link org.mule.runtime.core.internal.value.cache.ValueProviderCacheId} and
- * {@link org.mule.runtime.core.internal.metadata.cache.MetadataCacheId} construction.
+ * {@link org.mule.runtime.core.privileged.metadata.cache.MetadataCacheId} construction.
  *
  * @param <K> the cache id this builder creates.
  */

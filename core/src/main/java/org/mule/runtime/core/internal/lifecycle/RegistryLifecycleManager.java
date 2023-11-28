@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.core.internal.lifecycle;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -31,6 +33,7 @@ import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,17 +41,17 @@ import java.util.TreeMap;
 public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry> {
 
 
-  protected Map<String, LifecyclePhase> phases = new SmallMap<>();
-  protected SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
+  private final Map<String, LifecyclePhase> phases = new SmallMap<>();
+  private final SortedMap<String, LifecycleCallback> callbacks = new TreeMap<>();
 
-  protected MuleContext muleContext;
+  private final MuleContext muleContext;
   private final LifecycleInterceptor lifecycleInterceptor;
 
   public RegistryLifecycleManager(String id, Registry object, MuleContext muleContext,
                                   LifecycleInterceptor lifecycleInterceptor) {
     super(id, object);
     this.muleContext = muleContext;
-    this.lifecycleInterceptor = lifecycleInterceptor;
+    this.lifecycleInterceptor = requireNonNull(lifecycleInterceptor);
 
     registerPhases(object);
   }
@@ -196,5 +199,13 @@ public class RegistryLifecycleManager extends AbstractLifecycleManager<Registry>
 
   protected Map<String, Object> lookupObjectsForLifecycle() {
     return getLifecycleObject().lookupByType(Object.class);
+  }
+
+  protected Optional<MuleContext> getMuleContext() {
+    return ofNullable(muleContext);
+  }
+
+  protected LifecyclePhase getPhase(String phaseName) {
+    return phases.get(phaseName);
   }
 }
