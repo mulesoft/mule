@@ -11,8 +11,8 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 
 import java.util.Optional;
 
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   private final String ownerConfigName;
-  private final DefaultReconnectionConfig reconnectionConfig;
+  private final ReconnectionConfig reconnectionConfig;
 
   /**
    * Creates a new instance
@@ -32,7 +32,7 @@ public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConn
    * @param delegate        The {@link ConnectionProvider} to be wrapped
    * @param ownerConfigName The name of the owning configuration
    */
-  public ConfigNameResolverConnectionProviderWrapper(ConnectionProvider<C> delegate, DefaultReconnectionConfig reconnectionConfig,
+  public ConfigNameResolverConnectionProviderWrapper(ConnectionProvider<C> delegate, ReconnectionConfig reconnectionConfig,
                                                      String ownerConfigName) {
     super(delegate);
     this.reconnectionConfig = reconnectionConfig;
@@ -62,7 +62,7 @@ public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConn
    * {@inheritDoc}
    */
   @Override
-  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper
         ? ((ConnectionProviderWrapper) delegate).getReconnectionConfig()

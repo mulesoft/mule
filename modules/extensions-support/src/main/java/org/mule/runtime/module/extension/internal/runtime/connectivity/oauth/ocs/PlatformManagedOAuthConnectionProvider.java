@@ -47,11 +47,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ConnectionUtils;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
@@ -94,7 +94,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private final PlatformManagedOAuthConfig oauthConfig;
   private final PlatformManagedOAuthHandler oauthHandler;
   private final PoolingProfile poolingProfile;
-  private final DefaultReconnectionConfig reconnectionConfig;
+  private final ReconnectionConfig reconnectionConfig;
   private final Map<Field, String> callbackValues;
   private final RunOnce dance = Once.of(this::updateOAuthState);
 
@@ -117,7 +117,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   public PlatformManagedOAuthConnectionProvider(PlatformManagedOAuthConfig oauthConfig,
                                                 PlatformManagedOAuthHandler oauthHandler,
-                                                DefaultReconnectionConfig reconnectionConfig,
+                                                ReconnectionConfig reconnectionConfig,
                                                 PoolingProfile poolingProfile) {
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
@@ -347,7 +347,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   @Override
-  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
     return ofNullable(reconnectionConfig);
   }
 

@@ -21,8 +21,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.lang.reflect.InvocationHandler;
@@ -58,7 +58,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
   }
 
   @Override
-  public <C> DefaultReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+  public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
     return connectionManagerAdapterStrategy.getReconnectionConfigFor(connectionProvider);
   }
 
@@ -142,7 +142,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
-    public <C> DefaultReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+    public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
       return delegate.getReconnectionConfigFor(connectionProvider);
     }
 
@@ -234,7 +234,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
-    public <C> DefaultReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+    public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
       return delegate.getReconnectionConfigFor(connectionProvider);
     }
 

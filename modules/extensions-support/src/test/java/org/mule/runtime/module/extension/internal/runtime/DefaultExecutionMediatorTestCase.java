@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
@@ -62,12 +63,12 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -247,7 +248,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
-                                                     new DefaultReconnectionConfig(true, retryPolicy));
+                                                     defaultReconnectionConfig(true, retryPolicy));
     initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
     Optional<ConnectionProvider> connectionProvider = of(connectionProviderWrapper);
 

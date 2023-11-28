@@ -28,11 +28,11 @@ import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.RetryCallback;
 import org.mule.runtime.core.api.retry.RetryContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
@@ -101,7 +101,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
 
         Scheduler retryScheduler = schedulerService.ioScheduler();
         RetryPolicyTemplate retryTemplate = connectionManager.getRetryTemplateFor(provider);
-        DefaultReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
+        ReconnectionConfig reconnectionConfig = connectionManager.getReconnectionConfigFor(provider);
         final Latch latch = new Latch();
         RetryCallback retryCallback = new RetryCallback() {
 
@@ -179,7 +179,7 @@ public class DefaultConnectivityTesterFactory implements ConnectivityTesterFacto
     };
   }
 
-  private void handleTestConnectivityFailure(String name, DefaultReconnectionConfig reconnectionConfig, RetryContext context,
+  private void handleTestConnectivityFailure(String name, ReconnectionConfig reconnectionConfig, RetryContext context,
                                              ConnectionValidationResult result)
       throws ConnectionException {
     if ((reconnectionConfig.isFailsDeployment())) {

@@ -38,13 +38,6 @@ public class DefaultReconnectionConfig extends AbstractComponent implements Reco
    */
   private final RetryPolicyTemplate retryPolicyTemplate;
 
-  /**
-   * @return a new instance with default values
-   */
-  public static DefaultReconnectionConfig getDefault() {
-    return new DefaultReconnectionConfig(false, new NoRetryPolicyTemplate());
-  }
-
   public DefaultReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
     this.failsDeployment = failsDeployment;
     this.retryPolicyTemplate = getRetryPolicyTemplate(retryPolicyTemplate);
@@ -60,14 +53,7 @@ public class DefaultReconnectionConfig extends AbstractComponent implements Reco
     return retryPolicyTemplate;
   }
 
-  /**
-   * Generates a {@link RetryPolicyTemplate} that behaves as expected regarding the deployment model defined by {@code this}
-   * {@link DefaultReconnectionConfig}, while maintaining the behaviour expected for the delegating policy.
-   *
-   * @param delegate the {@link RetryPolicyTemplate} with the policy and configuration that should be finally applied
-   * @return a {@link RetryPolicyTemplate} that is configured with the current deployment configuration, while using the
-   *         delegate's RetryPolicy.
-   */
+  @Override
   public RetryPolicyTemplate getRetryPolicyTemplate(RetryPolicyTemplate delegate) {
     if (delegate == null) {
       return this.retryPolicyTemplate;

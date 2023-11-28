@@ -13,10 +13,10 @@ import static org.mule.runtime.module.extension.internal.runtime.connectivity.oa
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
@@ -50,7 +50,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
                                                     AuthorizationCodeConfig oauthConfig,
                                                     Map<Field, String> callbackValues,
                                                     AuthorizationCodeOAuthHandler oauthHandler,
-                                                    DefaultReconnectionConfig reconnectionConfig) {
+                                                    ReconnectionConfig reconnectionConfig) {
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;

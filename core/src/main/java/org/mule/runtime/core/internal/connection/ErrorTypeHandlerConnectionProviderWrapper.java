@@ -18,8 +18,8 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -37,11 +37,11 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
 
   private final ErrorTypeRepository errorTypeRepository;
   private final String prefix;
-  private final DefaultReconnectionConfig reconnectionConfig;
+  private final ReconnectionConfig reconnectionConfig;
 
   public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider,
                                                    ExtensionModel extensionModel,
-                                                   DefaultReconnectionConfig reconnectionConfig,
+                                                   ReconnectionConfig reconnectionConfig,
                                                    ErrorTypeRepository errorTypeRepository) {
     super(connectionProvider);
     this.errorTypeRepository = errorTypeRepository;
@@ -107,7 +107,7 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
    * {@inheritDoc}
    */
   @Override
-  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper
         ? ((ConnectionProviderWrapper) delegate).getReconnectionConfig()

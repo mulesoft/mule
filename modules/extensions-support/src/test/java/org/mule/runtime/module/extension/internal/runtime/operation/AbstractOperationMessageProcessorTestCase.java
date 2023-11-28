@@ -36,6 +36,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -84,7 +85,6 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -352,7 +352,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
-    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(DefaultReconnectionConfig.getDefault()));
+    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(defaultReconnectionConfig()));
     when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
 
     mockSubTypes(extensionModel);
@@ -381,7 +381,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(executionContext.getRetryPolicyTemplate()).thenReturn(empty());
     when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
-    when(connectionManagerAdapter.getReconnectionConfigFor(any())).thenReturn(DefaultReconnectionConfig.getDefault());
+    when(connectionManagerAdapter.getReconnectionConfigFor(any())).thenReturn(defaultReconnectionConfig());
     messageProcessor = setUpOperationMessageProcessor();
   }
 

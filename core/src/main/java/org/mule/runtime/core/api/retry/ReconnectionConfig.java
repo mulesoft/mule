@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.retry;
 
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.source.Source;
@@ -22,12 +23,19 @@ import org.mule.runtime.extension.api.runtime.source.Source;
 public interface ReconnectionConfig {
 
   /**
+   * @return a default {@link ReconnectionConfig} instance with default values.
+   */
+  static ReconnectionConfig defaultReconnectionConfig() {
+    return new DefaultReconnectionConfig(false, new NoRetryPolicyTemplate());
+  }
+
+  /**
    * @param failsDeployment     whether the deployment should fail if the connectivity test that is performed on all connectors
    *                            doesn't pass after exhausting the associated reconnection strategy.
    * @param retryPolicyTemplate the reconnection strategy to use.
-   * @return a {@link ReconnectionConfig} instance with the given configuration.
+   * @return a default {@link ReconnectionConfig} instance with the given configuration.
    */
-  static ReconnectionConfig getReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
+  static ReconnectionConfig defaultReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
     return new DefaultReconnectionConfig(failsDeployment, retryPolicyTemplate);
   }
 
@@ -41,5 +49,15 @@ public interface ReconnectionConfig {
    * @return the configured reconnection strategy.
    */
   RetryPolicyTemplate getRetryPolicyTemplate();
+
+  /**
+   * Generates a {@link RetryPolicyTemplate} that behaves as expected regarding the deployment model defined by {@code this}
+   * {@link ReconnectionConfig}, while maintaining the behaviour expected for the delegating policy.
+   *
+   * @param delegate the {@link RetryPolicyTemplate} with the policy and configuration that should be finally applied
+   * @return a {@link RetryPolicyTemplate} that is configured with the current deployment configuration, while using the
+   *         delegate's RetryPolicy.
+   */
+  RetryPolicyTemplate getRetryPolicyTemplate(RetryPolicyTemplate delegate);
 
 }

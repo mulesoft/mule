@@ -21,7 +21,7 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
@@ -49,7 +49,7 @@ public class PlatformManagedOAuthConnectionProviderObjectBuilder<C> extends Base
   public PlatformManagedOAuthConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                                              ResolverSet resolverSet,
                                                              PoolingProfile poolingProfile,
-                                                             DefaultReconnectionConfig reconnectionConfig,
+                                                             ReconnectionConfig reconnectionConfig,
                                                              PlatformManagedOAuthGrantType grantType,
                                                              PlatformManagedOAuthHandler platformHandler,
                                                              ConfigurationProperties configurationProperties,

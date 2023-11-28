@@ -10,7 +10,7 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 
 import java.util.Optional;
 
@@ -29,11 +29,11 @@ public final class PoolingConnectionProviderWrapper<C> extends ReconnectableConn
    *
    * @param delegate           the {@link ConnectionProvider} to be wrapped
    * @param poolingProfile     a not {@code null} {@link PoolingProfile}
-   * @param reconnectionConfig a {@link DefaultReconnectionConfig}
+   * @param reconnectionConfig a {@link ReconnectionConfig}
    */
   public PoolingConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                           PoolingProfile poolingProfile,
-                                          DefaultReconnectionConfig reconnectionConfig) {
+                                          ReconnectionConfig reconnectionConfig) {
     super(delegate, reconnectionConfig);
     this.poolingProfile = poolingProfile;
   }

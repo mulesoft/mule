@@ -23,11 +23,11 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -47,7 +47,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                                 PoolingProfile poolingProfile,
-                                                DefaultReconnectionConfig reconnectionConfig,
+                                                ReconnectionConfig reconnectionConfig,
                                                 ExtensionModel extensionModel,
                                                 ExpressionManager expressionManager,
                                                 MuleContext muleContext) {
@@ -57,7 +57,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   public DefaultConnectionProviderObjectBuilder(Class<?> prototypeClass, ConnectionProviderModel providerModel,
                                                 ResolverSet resolverSet,
                                                 PoolingProfile poolingProfile,
-                                                DefaultReconnectionConfig reconnectionConfig,
+                                                ReconnectionConfig reconnectionConfig,
                                                 ExtensionModel extensionModel,
                                                 ExpressionManager expressionManager,
                                                 MuleContext muleContext) {

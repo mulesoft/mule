@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -59,7 +59,7 @@ public final class ConnectionProviderDefinitionParser extends ExtensionDefinitio
         .withConstructorParameterDefinition(fromReferenceObject(PlatformManagedOAuthHandler.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withSetterParameterDefinition("reconnectionConfig",
-                                       fromChildConfiguration(DefaultReconnectionConfig.class).build())
+                                       fromChildConfiguration(ReconnectionConfig.class).build())
         .withSetterParameterDefinition("poolingProfile", fromChildConfiguration(PoolingProfile.class).build());
 
     parseParameters(providerModel);

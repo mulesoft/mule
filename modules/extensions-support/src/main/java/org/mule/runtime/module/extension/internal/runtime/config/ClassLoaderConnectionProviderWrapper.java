@@ -15,10 +15,10 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.connection.AbstractConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.retry.HasReconnectionConfig;
-import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 
 import java.util.Optional;
 
@@ -136,7 +136,7 @@ public class ClassLoaderConnectionProviderWrapper<C> extends AbstractConnectionP
   }
 
   @Override
-  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
+  public Optional<ReconnectionConfig> getReconnectionConfig() {
     ConnectionProvider<C> delegate = getDelegate();
     if (delegate instanceof HasReconnectionConfig) {
       return ((HasReconnectionConfig) delegate).getReconnectionConfig();
