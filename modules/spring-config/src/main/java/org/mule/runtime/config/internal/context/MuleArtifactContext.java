@@ -139,6 +139,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+
 import org.slf4j.Logger;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -642,10 +643,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                       Set<String> alwaysEnabledGeneratedTopLevelComponentsName,
                                       List<Pair<String, ComponentAst>> createdComponentModels,
                                       SpringComponentModel resolvedComponentModel) {
-    String nameAttribute = resolvedComponentModel.getComponent().getComponentId().orElse(null);
-    if (resolvedComponentModel.getComponent().getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-      nameAttribute = OBJECT_MULE_CONFIGURATION;
-    } else if (nameAttribute == null) {
+    String nameAttribute = resolvedComponentModel.getComponent().getComponentId()
+        .orElse(resolvedComponentModel.getComponentName());
+    if (nameAttribute == null) {
       // This may be a configuration that does not requires a name.
       nameAttribute = uniqueValue(resolvedComponentModel.getBeanDefinition().getBeanClassName());
 

@@ -52,6 +52,7 @@ public abstract class CreateBeanDefinitionRequest<T> {
     ObjectTypeVisitor objectTypeVisitor = new ObjectTypeVisitor(component);
 
     if (componentBuildingDefinition != null) {
+      springComponentModel.setComponentName(componentBuildingDefinition.getRegistrationName());
       componentBuildingDefinition.getTypeDefinition().visit(objectTypeVisitor);
     } else {
       objectTypeVisitor.onType(Object.class);
