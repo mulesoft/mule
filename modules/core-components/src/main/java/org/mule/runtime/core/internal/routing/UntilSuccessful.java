@@ -20,6 +20,7 @@ import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -27,10 +28,9 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.AbstractMuleObjectOwner;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
-import org.mule.runtime.core.internal.routing.UntilSuccessfulRouter.RetryContextInitializationException;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
@@ -88,7 +88,8 @@ public class UntilSuccessful extends AbstractMuleObjectOwner implements Scope {
 
     super.initialise();
 
-    timer = schedulerService.cpuLightScheduler();
+    timer = schedulerService.cpuLightScheduler(SchedulerConfig.config()
+        .withName(this.getClass().getName() + ".timer - " + getLocation().getLocation()));
     suppressErrors = featureFlaggingService.isEnabled(SUPPRESS_ERRORS);
     shouldRetry = event -> event.getError().isPresent();
 

@@ -25,6 +25,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -118,7 +119,8 @@ public abstract class AbstractForkJoinRouter extends AbstractMuleObjectOwner<Mes
     if (targetValue != null) {
       targetValueExpression = compile(targetValue, expressionManager);
     }
-    timeoutScheduler = schedulerService.cpuLightScheduler();
+    timeoutScheduler = schedulerService.cpuLightScheduler(SchedulerConfig.config()
+        .withName(this.getClass().getName() + ".timeoutScheduler - " + getLocation().getLocation()));
     timeoutErrorType = errorTypeRepository.getErrorType(TIMEOUT).get();
     maxConcurrency = maxConcurrency != null ? maxConcurrency : getDefaultMaxConcurrency();
     forkJoinStrategyFactory = forkJoinStrategyFactory != null ? forkJoinStrategyFactory : getDefaultForkJoinStrategyFactory();
