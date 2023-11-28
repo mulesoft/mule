@@ -115,7 +115,7 @@ public class DefaultMuleContainer implements MuleContainer {
       } else {
         log4jContextFactory = createAndInstall();
       }
-      configureSelector(log4jContextFactory, runtimeEnvironment.isSingleApp());
+      configureSelector(log4jContextFactory, false, runtimeEnvironment.isSingleApp());
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
