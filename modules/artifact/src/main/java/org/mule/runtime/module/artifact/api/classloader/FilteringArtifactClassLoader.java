@@ -16,6 +16,8 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.core.internal.util.EnumerationAdapter;
@@ -48,11 +50,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+  private static final String SERVICE_PREFIX = "META-INF/services/";
 
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
   private final List<ExportedService> exportedServices;
-  private static final String SERVICE_PREFIX = "META-INF/services/";
+  private Optional<ModuleLayerInformationSupplier> moduleLayerInformation = empty();
 
   private final boolean verboseLogging;
 
@@ -269,5 +272,15 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   public ArtifactClassLoader getArtifactClassLoader() {
     return artifactClassLoader;
+  }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = of(moduleLayerInformationSupplier);
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return moduleLayerInformation;
   }
 }
