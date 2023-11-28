@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
+import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
@@ -14,18 +15,18 @@ import static org.mule.runtime.module.deployment.internal.ArtifactDeploymentTemp
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.ParallelDeploymentDirectoryWatcher.MAX_APPS_IN_PARALLEL_DEPLOYMENT;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperties;
+import static java.lang.System.getProperty;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.service.Service;
@@ -35,9 +36,7 @@ import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.deployment.model.api.DeploymentException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
-import org.mule.runtime.module.artifact.api.Artifact;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
@@ -48,11 +47,9 @@ import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFact
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -106,6 +103,8 @@ public class MuleDeploymentService implements DeploymentService {
     setWeakHashCaches();
   }
 
+  private final DeploymentExecutor deploymentExecutor = new DeploymentExecutor(this);
+
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
@@ -152,15 +151,28 @@ public class MuleDeploymentService implements DeploymentService {
                                                                 applicationDeployer, applications, domainDeploymentListener,
                                                                 applicationDeploymentListener, this);
 
-    ManagerDeploymentDirectoryWatcher managerDeploymentDirectoryWatcher =
-        new ManagerDeploymentDirectoryWatcher(deploymentLock, applications, domains, domainDeployer, applicationDeployer,
-                                              domainBundleDeployer, artifactStartExecutorSupplier);
-
-    this.deploymentDirectoryWatcher = managerDeploymentDirectoryWatcher.getDeploymentDirectoryWatcher();
+    if (useParallelDeployment()) {
+      if (isDeployingSelectedAppsInOrder()) {
+        throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
+                                                  DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
+      }
+      LOGGER.info("Using parallel deployment");
+      this.deploymentDirectoryWatcher =
+          new ParallelDeploymentDirectoryWatcher(this, domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                                                 applications, artifactStartExecutorSupplier, deploymentLock);
+    } else {
+      this.deploymentDirectoryWatcher =
+          new DeploymentDirectoryWatcher(this, domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+                                         applications, artifactStartExecutorSupplier, deploymentLock);
+    }
   }
 
   static boolean useParallelDeployment() {
     return getProperties().containsKey(PARALLEL_DEPLOYMENT_PROPERTY);
+  }
+
+  private boolean isDeployingSelectedAppsInOrder() {
+    return !isEmpty(getProperty(DEPLOYMENT_APPLICATION_PROPERTY));
   }
 
   @Override
@@ -277,13 +289,13 @@ public class MuleDeploymentService implements DeploymentService {
     deploy(appArchiveUri, empty());
   }
 
-  private void deploy(final URI appArchiveUri, final Optional<Properties> deploymentProperties) throws IOException {
-    deployTemplateMethod(appArchiveUri, deploymentProperties, getAppsFolder(), applicationDeployer);
-  }
-
   @Override
   public void deploy(URI appArchiveUri, Properties appProperties) throws IOException {
     deploy(appArchiveUri, ofNullable(appProperties));
+  }
+
+  private void deploy(final URI appArchiveUri, final Optional<Properties> deploymentProperties) throws IOException {
+    deploymentExecutor.deploy(appArchiveUri, deploymentProperties, getAppsFolder(), applicationDeployer);
   }
 
   @Override
@@ -298,7 +310,7 @@ public class MuleDeploymentService implements DeploymentService {
 
   @Override
   public void redeploy(URI archiveUri, Properties appProperties) throws IOException {
-    deployTemplateMethod(archiveUri, ofNullable(appProperties), getAppsFolder(), applicationDeployer);
+    deploymentExecutor.deploy(archiveUri, ofNullable(appProperties), getAppsFolder(), applicationDeployer);
   }
 
   @Override
@@ -317,7 +329,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   private void deployDomain(URI domainArchiveUri, Optional<Properties> deploymentProperties) throws IOException {
-    deployTemplateMethod(domainArchiveUri, deploymentProperties, getDomainsFolder(), domainDeployer);
+    deploymentExecutor.deploy(domainArchiveUri, deploymentProperties, getDomainsFolder(), domainDeployer);
   }
 
   @Override
@@ -386,40 +398,13 @@ public class MuleDeploymentService implements DeploymentService {
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 
-  private interface SynchronizedDeploymentAction {
+  protected interface SynchronizedDeploymentAction {
 
     void execute();
 
   }
 
-  private <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deployTemplateMethod(final URI artifactArchiveUri,
-                                                                                                    final Optional<Properties> deploymentProperties,
-                                                                                                    File artifactDeploymentFolder,
-                                                                                                    ArchiveDeployer<D, T> archiveDeployer)
-      throws IOException {
-    executeSynchronized(() -> {
-      try {
-        File artifactLocation = toFile(artifactArchiveUri.toURL());
-        String fileName = artifactLocation.getName();
-        if (fileName.endsWith(".jar")) {
-          archiveDeployer.deployPackagedArtifact(artifactArchiveUri, deploymentProperties);
-        } else {
-          if (!artifactLocation.getParent().equals(artifactDeploymentFolder.getPath())) {
-            try {
-              copyDirectory(artifactLocation, new File(artifactDeploymentFolder, fileName));
-            } catch (IOException e) {
-              throw new MuleRuntimeException(e);
-            }
-          }
-          archiveDeployer.deployExplodedArtifact(fileName, deploymentProperties);
-        }
-      } catch (MalformedURLException e) {
-        throw new MuleRuntimeException(e);
-      }
-    });
-  }
-
-  private void executeSynchronized(SynchronizedDeploymentAction deploymentAction) {
+  protected void executeSynchronized(SynchronizedDeploymentAction deploymentAction) {
     try {
       if (!deploymentLock.tryLock(0, SECONDS)) {
         if (LOGGER.isDebugEnabled()) {

@@ -39,6 +39,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ElementAddedEvent;
 import org.mule.runtime.module.deployment.internal.util.ElementRemovedEvent;
@@ -87,6 +88,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected transient final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final ReentrantLock deploymentLock;
+  private final DeploymentService deploymentService;
   private final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer;
   protected final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer;
   protected final Supplier<SchedulerService> schedulerServiceSupplier;
@@ -101,12 +103,13 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   protected volatile boolean dirty;
 
-  public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+  public DeploymentDirectoryWatcher(DeploymentService deploymentService, DomainBundleArchiveDeployer domainBundleDeployer,
                                     final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
                                     final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
                                     ObservableList<Domain> domains,
                                     ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
                                     final ReentrantLock deploymentLock) {
+    this.deploymentService = deploymentService;
     this.domainBundleDeployer = domainBundleDeployer;
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
@@ -169,10 +172,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
             File applicationFile = new File(appsDir, app + JAR_FILE_SUFFIX);
 
             if (applicationFile.exists() && applicationFile.isFile()) {
-              applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX, empty());
+              this.deploymentService.deploy(applicationFile.toURI());
             } else {
               if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
-                applicationArchiveDeployer.deployExplodedArtifact(app, empty());
+                this.deploymentService.deploy(applicationFile.toURI());
               }
             }
           } catch (Exception e) {
@@ -239,7 +242,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
-        applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
+        File zipFile = new File(appsDir, zip);
+        this.deploymentService.deploy(zipFile.toURI());
       } catch (Exception e) {
         // Ignore and continue
       }
@@ -249,8 +253,9 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
-        applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
-      } catch (DeploymentException e) {
+        File addedAppFile = new File(appsDir, addedApp);
+        this.deploymentService.deploy(addedAppFile.toURI());
+      } catch (Exception e) {
         // Ignore and continue
       }
     }
