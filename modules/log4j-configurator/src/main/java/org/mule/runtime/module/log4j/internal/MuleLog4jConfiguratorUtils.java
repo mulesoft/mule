@@ -8,7 +8,6 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.lifecycle.Disposable;
