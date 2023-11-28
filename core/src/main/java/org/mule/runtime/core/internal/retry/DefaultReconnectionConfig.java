@@ -50,10 +50,12 @@ public class DefaultReconnectionConfig extends AbstractComponent implements Reco
     this.retryPolicyTemplate = getRetryPolicyTemplate(retryPolicyTemplate);
   }
 
+  @Override
   public boolean isFailsDeployment() {
     return failsDeployment;
   }
 
+  @Override
   public RetryPolicyTemplate getRetryPolicyTemplate() {
     return retryPolicyTemplate;
   }
