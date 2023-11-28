@@ -15,7 +15,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
@@ -54,7 +54,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
   private final PlatformManagedOAuthHandler platformManagedOAuthHandler;
 
   private PoolingProfile poolingProfile = null;
-  private ReconnectionConfig reconnectionConfig = ReconnectionConfig.getDefault();
+  private DefaultReconnectionConfig reconnectionConfig = DefaultReconnectionConfig.getDefault();
 
   @Inject
   private ConfigurationProperties properties;
@@ -159,7 +159,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     this.poolingProfile = poolingProfile;
   }
 
-  public void setReconnectionConfig(ReconnectionConfig reconnectionConfig) {
+  public void setReconnectionConfig(DefaultReconnectionConfig reconnectionConfig) {
     this.reconnectionConfig = reconnectionConfig;
   }
 }

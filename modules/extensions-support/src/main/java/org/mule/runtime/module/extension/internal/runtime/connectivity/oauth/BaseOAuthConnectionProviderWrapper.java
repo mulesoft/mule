@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.util.Collections.unmodifiableMap;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.MAX_REFRESH_ATTEMPTS;
+
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.refreshTokenIfNecessary;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
 
@@ -15,7 +15,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.internal.connection.ConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 
 import java.lang.reflect.Field;
@@ -33,7 +33,7 @@ public abstract class BaseOAuthConnectionProviderWrapper<C> extends Reconnectabl
   protected final Map<Field, String> callbackValues;
 
   public BaseOAuthConnectionProviderWrapper(ConnectionProvider<C> delegate,
-                                            ReconnectionConfig reconnectionConfig,
+                                            DefaultReconnectionConfig reconnectionConfig,
                                             Map<Field, String> callbackValues) {
     super(delegate, reconnectionConfig);
     this.callbackValues = unmodifiableMap(callbackValues);

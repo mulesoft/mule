@@ -12,20 +12,18 @@ import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PRE
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.runtime.source.Source;
 
 /**
- * Configures the default reconnection behaviour for a connected component.
- *
- * Whenever a connected {@link Processor} or {@link Source} doesn't specify a specific reconnection strategy, an instance of this
- * class should be used as a fallback.
+ * Default implementation of {@link ReconnectionConfig}.
  *
  * @since 4.0
  */
-public class ReconnectionConfig extends AbstractComponent {
+public class DefaultReconnectionConfig extends AbstractComponent implements ReconnectionConfig {
 
   public static final String DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES = SYSTEM_PROPERTY_PREFIX + "disableAsyncRetryPolicyOnSources";
 
@@ -43,11 +41,11 @@ public class ReconnectionConfig extends AbstractComponent {
   /**
    * @return a new instance with default values
    */
-  public static ReconnectionConfig getDefault() {
-    return new ReconnectionConfig(false, new NoRetryPolicyTemplate());
+  public static DefaultReconnectionConfig getDefault() {
+    return new DefaultReconnectionConfig(false, new NoRetryPolicyTemplate());
   }
 
-  public ReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
+  public DefaultReconnectionConfig(boolean failsDeployment, RetryPolicyTemplate retryPolicyTemplate) {
     this.failsDeployment = failsDeployment;
     this.retryPolicyTemplate = getRetryPolicyTemplate(retryPolicyTemplate);
   }
@@ -62,7 +60,7 @@ public class ReconnectionConfig extends AbstractComponent {
 
   /**
    * Generates a {@link RetryPolicyTemplate} that behaves as expected regarding the deployment model defined by {@code this}
-   * {@link ReconnectionConfig}, while maintaining the behaviour expected for the delegating policy.
+   * {@link DefaultReconnectionConfig}, while maintaining the behaviour expected for the delegating policy.
    *
    * @param delegate the {@link RetryPolicyTemplate} with the policy and configuration that should be finally applied
    * @return a {@link RetryPolicyTemplate} that is configured with the current deployment configuration, while using the

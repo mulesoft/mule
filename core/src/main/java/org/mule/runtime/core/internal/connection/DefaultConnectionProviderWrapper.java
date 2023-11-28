@@ -6,16 +6,15 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import org.mule.runtime.api.config.PoolingProfile;
+
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 
 import java.util.Optional;
 
@@ -70,12 +69,12 @@ public class DefaultConnectionProviderWrapper<C> extends AbstractConnectionProvi
   }
 
   @Override
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     if (delegate instanceof ConnectionProviderWrapper) {
       return ((ConnectionProviderWrapper) delegate).getReconnectionConfig();
     }
 
-    return of(ReconnectionConfig.getDefault());
+    return of(DefaultReconnectionConfig.getDefault());
   }
 }

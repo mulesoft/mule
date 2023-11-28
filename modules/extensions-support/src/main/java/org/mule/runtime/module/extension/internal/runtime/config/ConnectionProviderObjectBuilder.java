@@ -19,7 +19,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -37,7 +37,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
     extends ResolverSetBasedObjectBuilder<Pair<ConnectionProvider<C>, ResolverSetResult>> {
 
   protected final ConnectionProviderModel providerModel;
-  protected final ReconnectionConfig reconnectionConfig;
+  protected final DefaultReconnectionConfig reconnectionConfig;
   protected final PoolingProfile poolingProfile;
   protected final ExtensionModel extensionModel;
   protected final MuleContext muleContext;
@@ -63,7 +63,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
                                          ConnectionProviderModel providerModel,
                                          ResolverSet resolverSet,
                                          PoolingProfile poolingProfile,
-                                         ReconnectionConfig reconnectionConfig,
+                                         DefaultReconnectionConfig reconnectionConfig,
                                          ExtensionModel extensionModel,
                                          ExpressionManager expressionManager,
                                          MuleContext muleContext) {
@@ -78,7 +78,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          ResolverSet resolverSet,
                                          PoolingProfile poolingProfile,
-                                         ReconnectionConfig reconnectionConfig,
+                                         DefaultReconnectionConfig reconnectionConfig,
                                          ExtensionModel extensionModel,
                                          ExpressionManager expressionManager,
                                          MuleContext muleContext) {
@@ -86,15 +86,15 @@ public abstract class ConnectionProviderObjectBuilder<C>
          reconnectionConfig, extensionModel, expressionManager, muleContext);
   }
 
-  private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
-    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
+  private DefaultReconnectionConfig computeReconnectionConfig(DefaultReconnectionConfig reconnectionConfig) {
+    return reconnectionConfig != null ? reconnectionConfig : DefaultReconnectionConfig.getDefault();
   }
 
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                          Class<?> prototypeClass,
                                          ResolverSet resolverSet,
                                          PoolingProfile poolingProfile,
-                                         ReconnectionConfig reconnectionConfig,
+                                         DefaultReconnectionConfig reconnectionConfig,
                                          ExtensionModel extensionModel,
                                          ExpressionManager expressionManager,
                                          MuleContext muleContext) {

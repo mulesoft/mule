@@ -6,15 +6,13 @@
  */
 package org.mule.runtime.core.internal.connection;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 
 import java.util.Optional;
 
@@ -26,7 +24,7 @@ import java.util.Optional;
 public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
   private final String ownerConfigName;
-  private final ReconnectionConfig reconnectionConfig;
+  private final DefaultReconnectionConfig reconnectionConfig;
 
   /**
    * Creates a new instance
@@ -34,7 +32,7 @@ public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConn
    * @param delegate        The {@link ConnectionProvider} to be wrapped
    * @param ownerConfigName The name of the owning configuration
    */
-  public ConfigNameResolverConnectionProviderWrapper(ConnectionProvider<C> delegate, ReconnectionConfig reconnectionConfig,
+  public ConfigNameResolverConnectionProviderWrapper(ConnectionProvider<C> delegate, DefaultReconnectionConfig reconnectionConfig,
                                                      String ownerConfigName) {
     super(delegate);
     this.reconnectionConfig = reconnectionConfig;
@@ -64,7 +62,7 @@ public class ConfigNameResolverConnectionProviderWrapper<C> extends AbstractConn
    * {@inheritDoc}
    */
   @Override
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper
         ? ((ConnectionProviderWrapper) delegate).getReconnectionConfig()

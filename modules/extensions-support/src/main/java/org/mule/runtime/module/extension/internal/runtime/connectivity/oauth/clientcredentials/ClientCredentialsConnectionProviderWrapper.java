@@ -16,7 +16,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.annotation.connectivity.oauth.OAuthCallbackValue;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
@@ -49,7 +49,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
                                                     ClientCredentialsConfig oauthConfig,
                                                     Map<Field, String> callbackValues,
                                                     ClientCredentialsOAuthHandler oauthHandler,
-                                                    ReconnectionConfig reconnectionConfig) {
+                                                    DefaultReconnectionConfig reconnectionConfig) {
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;

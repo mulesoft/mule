@@ -72,7 +72,7 @@ import org.mule.runtime.core.internal.execution.ExceptionCallback;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -307,7 +307,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
     return this.getConfigurationInstance()
         .map(config -> config.getConnectionProvider().orElse(null))
         .map(provider -> connectionManager.getReconnectionConfigFor(provider).getRetryPolicyTemplate(customTemplate))
-        .orElseGet(() -> customTemplate != null ? customTemplate : ReconnectionConfig.getDefault().getRetryPolicyTemplate());
+        .orElseGet(() -> customTemplate != null ? customTemplate : DefaultReconnectionConfig.getDefault().getRetryPolicyTemplate());
   }
 
   private void stopSource() throws MuleException {

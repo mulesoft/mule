@@ -6,19 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,7 +30,7 @@ public class ConnectionProviderSettings {
 
   private final ComponentParameterization<ConnectionProviderModel> componentParameterization;
   private final Optional<PoolingProfile> poolingProfile;
-  private final Optional<ReconnectionConfig> reconnectionConfig;
+  private final Optional<DefaultReconnectionConfig> reconnectionConfig;
   private final AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler;
   private final ClientCredentialsOAuthHandler clientCredentialsOAuthHandler;
   private final PlatformManagedOAuthHandler platformManagedOAuthHandler;
@@ -40,7 +38,7 @@ public class ConnectionProviderSettings {
   public ConnectionProviderSettings(ConnectionProviderModel connectionProviderModel,
                                     ComponentParameterization componentParameterization,
                                     PoolingProfile poolingProfile,
-                                    ReconnectionConfig reconnectionConfig,
+                                    DefaultReconnectionConfig reconnectionConfig,
                                     AuthorizationCodeOAuthHandler authorizationCodeOAuthHandler,
                                     ClientCredentialsOAuthHandler clientCredentialsOAuthHandler,
                                     PlatformManagedOAuthHandler platformManagedOAuthHandler) {
@@ -65,7 +63,7 @@ public class ConnectionProviderSettings {
     return poolingProfile;
   }
 
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     return reconnectionConfig;
   }
 

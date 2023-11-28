@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.retry.async.AsynchronousRetryTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationState;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -226,7 +226,7 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
-    public <C> ReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
+    public <C> DefaultReconnectionConfig getReconnectionConfigFor(ConnectionProvider<C> connectionProvider) {
       return null;
     }
 

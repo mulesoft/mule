@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
@@ -54,7 +54,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
   public BaseOAuthConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                                   ResolverSet resolverSet,
                                                   PoolingProfile poolingProfile,
-                                                  ReconnectionConfig reconnectionConfig,
+                                                  DefaultReconnectionConfig reconnectionConfig,
                                                   ExtensionModel extensionModel,
                                                   ExpressionManager expressionManager,
                                                   MuleContext muleContext) {
@@ -64,7 +64,7 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
   public BaseOAuthConnectionProviderObjectBuilder(Class<?> prototypeClass, ConnectionProviderModel providerModel,
                                                   ResolverSet resolverSet,
                                                   PoolingProfile poolingProfile,
-                                                  ReconnectionConfig reconnectionConfig,
+                                                  DefaultReconnectionConfig reconnectionConfig,
                                                   ExtensionModel extensionModel,
                                                   ExpressionManager expressionManager,
                                                   MuleContext muleContext) {

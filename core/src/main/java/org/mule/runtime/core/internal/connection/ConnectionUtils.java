@@ -13,7 +13,7 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.internal.registry.InjectionTargetDecorator;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.core.internal.util.InjectionUtils;
 
 import java.util.Optional;
@@ -34,12 +34,12 @@ public final class ConnectionUtils {
    * Returns the {@link RetryPolicyTemplate} defined in the {@code reconnectionConfig}. If none was specified or the
    * {@code reconnectionConfig} is empty, then a {@link NoRetryPolicyTemplate} is created and returned
    *
-   * @param reconnectionConfig an optional {@link ReconnectionConfig}
+   * @param reconnectionConfig an optional {@link DefaultReconnectionConfig}
    * @return a {@link RetryPolicyTemplate}
    */
-  public static RetryPolicyTemplate getRetryPolicyTemplate(Optional<ReconnectionConfig> reconnectionConfig) {
+  public static RetryPolicyTemplate getRetryPolicyTemplate(Optional<DefaultReconnectionConfig> reconnectionConfig) {
     return reconnectionConfig
-        .map(ReconnectionConfig::getRetryPolicyTemplate)
+        .map(DefaultReconnectionConfig::getRetryPolicyTemplate)
         .orElseGet(NoRetryPolicyTemplate::new);
   }
 

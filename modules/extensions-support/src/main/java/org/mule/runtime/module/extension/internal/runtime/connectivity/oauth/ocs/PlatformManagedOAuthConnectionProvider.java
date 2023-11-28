@@ -36,7 +36,6 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.api.connection.PoolingListener;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -52,17 +51,13 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.connection.ConnectionUtils;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
-import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
-import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
@@ -99,7 +94,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private final PlatformManagedOAuthConfig oauthConfig;
   private final PlatformManagedOAuthHandler oauthHandler;
   private final PoolingProfile poolingProfile;
-  private final ReconnectionConfig reconnectionConfig;
+  private final DefaultReconnectionConfig reconnectionConfig;
   private final Map<Field, String> callbackValues;
   private final RunOnce dance = Once.of(this::updateOAuthState);
 
@@ -122,7 +117,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
   public PlatformManagedOAuthConnectionProvider(PlatformManagedOAuthConfig oauthConfig,
                                                 PlatformManagedOAuthHandler oauthHandler,
-                                                ReconnectionConfig reconnectionConfig,
+                                                DefaultReconnectionConfig reconnectionConfig,
                                                 PoolingProfile poolingProfile) {
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
@@ -352,7 +347,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   @Override
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     return ofNullable(reconnectionConfig);
   }
 

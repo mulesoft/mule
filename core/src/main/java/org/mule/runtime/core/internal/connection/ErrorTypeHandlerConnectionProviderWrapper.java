@@ -12,7 +12,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
@@ -20,7 +19,7 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.ModuleException;
 
@@ -38,11 +37,11 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
 
   private final ErrorTypeRepository errorTypeRepository;
   private final String prefix;
-  private final ReconnectionConfig reconnectionConfig;
+  private final DefaultReconnectionConfig reconnectionConfig;
 
   public ErrorTypeHandlerConnectionProviderWrapper(ConnectionProvider<C> connectionProvider,
                                                    ExtensionModel extensionModel,
-                                                   ReconnectionConfig reconnectionConfig,
+                                                   DefaultReconnectionConfig reconnectionConfig,
                                                    ErrorTypeRepository errorTypeRepository) {
     super(connectionProvider);
     this.errorTypeRepository = errorTypeRepository;
@@ -108,7 +107,7 @@ public final class ErrorTypeHandlerConnectionProviderWrapper<C> extends Abstract
    * {@inheritDoc}
    */
   @Override
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     final ConnectionProvider<C> delegate = getDelegate();
     return delegate instanceof ConnectionProviderWrapper
         ? ((ConnectionProviderWrapper) delegate).getReconnectionConfig()

@@ -19,7 +19,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.extension.api.soap.MessageDispatcherProvider;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -44,7 +44,7 @@ public final class SoapConnectionProviderObjectBuilder extends ConnectionProvide
   public SoapConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
                                              ResolverSet resolverSet,
                                              PoolingProfile poolingProfile,
-                                             ReconnectionConfig reconnectionConfig,
+                                             DefaultReconnectionConfig reconnectionConfig,
                                              ExtensionModel extensionModel,
                                              ExpressionManager expressionManager,
                                              MuleContext muleContext) {

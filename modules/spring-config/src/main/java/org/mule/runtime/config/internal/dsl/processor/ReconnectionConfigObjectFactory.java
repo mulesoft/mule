@@ -8,23 +8,23 @@ package org.mule.runtime.config.internal.dsl.processor;
 
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ComponentFactory;
 
 /**
- * {@link ComponentFactory} which yields instances of {@link ReconnectionConfig}
+ * {@link ComponentFactory} which yields instances of {@link DefaultReconnectionConfig}
  *
  * @since 4.0
  */
-public class ReconnectionConfigObjectFactory extends AbstractComponentFactory<ReconnectionConfig> {
+public class ReconnectionConfigObjectFactory extends AbstractComponentFactory<DefaultReconnectionConfig> {
 
   private boolean failsDeployment = false;
   private RetryPolicyTemplate retryPolicyTemplate = new NoRetryPolicyTemplate();
 
   @Override
-  public ReconnectionConfig doGetObject() throws Exception {
-    return new ReconnectionConfig(failsDeployment, retryPolicyTemplate);
+  public DefaultReconnectionConfig doGetObject() throws Exception {
+    return new DefaultReconnectionConfig(failsDeployment, retryPolicyTemplate);
   }
 
   public void setFailsDeployment(boolean failsDeployment) {

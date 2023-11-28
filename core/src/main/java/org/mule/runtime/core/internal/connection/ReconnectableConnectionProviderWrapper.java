@@ -11,7 +11,7 @@ import static java.util.Optional.ofNullable;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 
 import java.util.Optional;
 
@@ -26,15 +26,15 @@ import java.util.Optional;
  */
 public class ReconnectableConnectionProviderWrapper<C> extends AbstractConnectionProviderWrapper<C> {
 
-  private final ReconnectionConfig reconnectionConfig;
+  private final DefaultReconnectionConfig reconnectionConfig;
 
   /**
    * Creates a new instance
    *
    * @param delegate           the {@link ConnectionProvider} to be wrapped
-   * @param reconnectionConfig The {@link ReconnectionConfig} for retrying failed connection attempts
+   * @param reconnectionConfig The {@link DefaultReconnectionConfig} for retrying failed connection attempts
    */
-  public ReconnectableConnectionProviderWrapper(ConnectionProvider<C> delegate, ReconnectionConfig reconnectionConfig) {
+  public ReconnectableConnectionProviderWrapper(ConnectionProvider<C> delegate, DefaultReconnectionConfig reconnectionConfig) {
     super(delegate);
     this.reconnectionConfig = reconnectionConfig;
   }
@@ -51,7 +51,7 @@ public class ReconnectableConnectionProviderWrapper<C> extends AbstractConnectio
   }
 
   @Override
-  public Optional<ReconnectionConfig> getReconnectionConfig() {
+  public Optional<DefaultReconnectionConfig> getReconnectionConfig() {
     return ofNullable(reconnectionConfig);
   }
 }

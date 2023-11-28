@@ -27,7 +27,7 @@ import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionPro
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.DefaultReconnectionConfig;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
@@ -47,7 +47,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
 
   public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                                 PoolingProfile poolingProfile,
-                                                ReconnectionConfig reconnectionConfig,
+                                                DefaultReconnectionConfig reconnectionConfig,
                                                 ExtensionModel extensionModel,
                                                 ExpressionManager expressionManager,
                                                 MuleContext muleContext) {
@@ -57,7 +57,7 @@ public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProvide
   public DefaultConnectionProviderObjectBuilder(Class<?> prototypeClass, ConnectionProviderModel providerModel,
                                                 ResolverSet resolverSet,
                                                 PoolingProfile poolingProfile,
-                                                ReconnectionConfig reconnectionConfig,
+                                                DefaultReconnectionConfig reconnectionConfig,
                                                 ExtensionModel extensionModel,
                                                 ExpressionManager expressionManager,
                                                 MuleContext muleContext) {
