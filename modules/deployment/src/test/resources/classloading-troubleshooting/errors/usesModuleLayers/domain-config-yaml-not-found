@@ -1,0 +1,30 @@
+Couldn't read from file domain-config.yaml: Couldn't find resource: domain-config.yaml neither on classpath or in file system 
+ ------------------------
+| Runtime Class Loader |
+------------------------
+           ^            
+           |            
+------------------------
+|   Domain Region CL   |
+------------------------
+           |            
+            ------------> ------------------------
+                          | Domain Class Loader  |
+                          ------------------------
+ 
+ Current classloader in context is (Domain Class Loader) 
+ Seems the resource doesn't exist in any classloader. Verify you wrote the right resource name.
+Module Layer Information:
+--------------------------------------
+| service/expressionLanguageService  |
+--------------------------------------
+                   |
+                   |
+                   V
+--------------------------------------
+|    Mule Container Module Layer     |
+--------------------------------------
+
+Modules in each Module Layer:
+service/expressionLanguageService: org.mule.service.el.mock
+Mule Container Module Layer: (Empty Layer)
