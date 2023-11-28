@@ -6,8 +6,17 @@
  */
 package org.mule.runtime.config.api;
 
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
+import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * {@link ConfigurationBuilder} specialization that can provide a new {@link ArtifactContextFactory}.
@@ -15,6 +24,34 @@ import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
  * @since 4.4
  */
 public interface ArtifactContextFactory extends ConfigurationBuilder {
+
+  /**
+   * Creates a new {@link ArtifactContextFactory} based on the given ArtifactctAst and its creation parameters.
+   * 
+   * @since 4.7
+   */
+  public static ArtifactContextFactory createArtifactContextFactory(ArtifactAst artifactAst,
+                                                                    Map<String, String> artifactProperties,
+                                                                    ArtifactType artifactType,
+                                                                    boolean enableLazyInit,
+                                                                    boolean addToolingObjectsToRegistry,
+                                                                    List<ServiceConfigurator> serviceConfigurators,
+                                                                    Optional<ArtifactContext> parentArtifactContext)
+      throws ConfigurationException {
+    ArtifactAstConfigurationBuilder configurationBuilder =
+        new ArtifactAstConfigurationBuilder(artifactAst,
+                                            artifactProperties,
+                                            artifactType,
+                                            enableLazyInit,
+                                            addToolingObjectsToRegistry);
+
+    parentArtifactContext
+        .ifPresent(parentContext -> configurationBuilder.setParentContext(parentContext.getMuleContext(),
+                                                                          parentContext.getArtifactAst()));
+    serviceConfigurators.stream().forEach(configurationBuilder::addServiceConfigurator);
+
+    return configurationBuilder;
+  }
 
   /**
    *

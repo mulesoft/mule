@@ -13,6 +13,8 @@ import static java.util.Collections.synchronizedMap;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.privileged.component.DynamicallyComponent;
+
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Empty;
 import net.bytebuddy.implementation.bind.annotation.Origin;

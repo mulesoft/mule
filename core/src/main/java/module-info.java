@@ -52,9 +52,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.util.queue",
         "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
-        "org.mule.runtime.core.privileged.profiling.tracing",
-        "org.mule.runtime.tracer.api.sniffer",
-        "org.mule.runtime.tracer.api.context.getter"
+        "org.mule.runtime.core.privileged.profiling.tracing"
     },
     privilegedArtifactIds = {
         "com.mulesoft.mule.modules:mule-compatibility-module",
@@ -202,10 +200,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
   exports org.mule.runtime.core.privileged;
-  exports org.mule.runtime.core.privileged.component to
-      org.mule.runtime.extensions.support,
-      org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.spring.config;
+  exports org.mule.runtime.core.privileged.component;
   exports org.mule.runtime.core.privileged.el;
   exports org.mule.runtime.core.privileged.event;
   exports org.mule.runtime.core.privileged.execution to
@@ -298,8 +293,11 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
-  // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
-  exports org.mule.runtime.core.internal.component;
+  exports org.mule.runtime.core.internal.component to
+      org.mule.runtime.core.components,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.el to
       org.mule.runtime.core.mvel,
       org.mule.runtime.core.components,
