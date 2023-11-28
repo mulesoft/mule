@@ -234,7 +234,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                         ProfiledMemoryManagementService memoryManagementService)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
-    super(null, null);
+    super(null);
 
     // A "container level" notification server is created and registered in order to be injectable
     serverNotificationManager = ServerNotificationManager
@@ -299,7 +299,9 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
+                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(),
+                                                                                         this,
+                                                                                         (service, assembly) -> service)));
 
     extensionModelLoaderRepository = getExtensionModelLoaderManager();
 

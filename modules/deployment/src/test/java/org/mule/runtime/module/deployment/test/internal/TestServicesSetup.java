@@ -6,9 +6,9 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
-import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.expressionLanguageMetadataServiceJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.expressionLanguageServiceJarFile;
+import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.schedulerServiceJarFile;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 
@@ -37,9 +37,9 @@ import org.junit.rules.TemporaryFolder;
  */
 public class TestServicesSetup extends ExternalResource {
 
-  private static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
-  private static final String EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME = "expressionLanguageMetadataService";
-  private static final String SCHEDULER_SERVICE_NAME = "schedulerService";
+  public static final String EXPRESSION_LANGUAGE_SERVICE_NAME = "expressionLanguageService";
+  public static final String EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME = "expressionLanguageMetadataService";
+  public static final String SCHEDULER_SERVICE_NAME = "schedulerService";
 
   private final TemporaryFolder compilerWorkFolder;
 
@@ -59,7 +59,7 @@ public class TestServicesSetup extends ExternalResource {
    * @throws IOException if the temp folder for the service couldn't be created.
    */
   public void overrideSchedulerService(Function<File, File> supplier) throws IOException {
-    this.schedulerService = supplier.apply(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
+    this.schedulerService = supplier.apply(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME + "_override"));
   }
 
   /**
@@ -69,7 +69,7 @@ public class TestServicesSetup extends ExternalResource {
    * @throws IOException if the temp folder for the service couldn't be created.
    */
   public void overrideExpressionLanguageService(Function<File, File> supplier) throws IOException {
-    this.expressionLanguageService = supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
+    this.expressionLanguageService = supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME + "_override"));
   }
 
   /**
@@ -80,7 +80,7 @@ public class TestServicesSetup extends ExternalResource {
    */
   public void overrideExpressionLanguageMetadataService(Function<File, File> supplier) throws IOException {
     this.expressionLanguageMetadataService =
-        supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+        supplier.apply(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME + "_override"));
   }
 
   /**
@@ -113,29 +113,28 @@ public class TestServicesSetup extends ExternalResource {
 
   private void initNotOverriddenServices() throws IOException {
     if (schedulerService == null) {
-      schedulerService = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
+      schedulerService = schedulerServiceJarFile;
     }
     if (expressionLanguageService == null) {
-      expressionLanguageService =
-          buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
+      expressionLanguageService = expressionLanguageServiceJarFile;
     }
     if (!expressionLanguageMetadataServiceDisabled && expressionLanguageMetadataService == null) {
-      expressionLanguageMetadataService =
-          buildExpressionLanguageMetadataServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME));
+      expressionLanguageMetadataService = expressionLanguageMetadataServiceJarFile;
     }
   }
 
   @Override
   protected void after() {
-    if (schedulerService != null) {
+    if (schedulerService != null && !schedulerService.equals(schedulerServiceJarFile)) {
       schedulerService.delete();
       schedulerService = null;
     }
-    if (expressionLanguageService != null) {
+    if (expressionLanguageService != null && !expressionLanguageService.equals(expressionLanguageServiceJarFile)) {
       expressionLanguageService.delete();
       expressionLanguageService = null;
     }
-    if (!expressionLanguageMetadataServiceDisabled && expressionLanguageMetadataService != null) {
+    if (!expressionLanguageMetadataServiceDisabled && expressionLanguageMetadataService != null
+        && !expressionLanguageMetadataService.equals(expressionLanguageMetadataServiceJarFile)) {
       expressionLanguageMetadataService.delete();
       expressionLanguageMetadataService = null;
     }

@@ -24,7 +24,7 @@ public class MessageMatchers {
    * Verifies the {@link Message}'s payload using a String matcher. Only works with String and InputStream payloads.
    */
   public static Matcher<Message> hasPayload(Matcher<String> matcher) {
-    return new IsMessageWithPayload(matcher);
+    return new IsMessageWithPayload<>(matcher);
   }
 
   /**

@@ -29,6 +29,8 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.interception",
         "org.mule.runtime.core.privileged.lifecycle",
         "org.mule.runtime.core.privileged.message",
+        // for DataWeave
+        "org.mule.runtime.core.privileged.metadata",
         "org.mule.runtime.core.privileged.object",
         "org.mule.runtime.core.privileged.processor",
         "org.mule.runtime.core.privileged.processor.simple",
@@ -216,6 +218,8 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support;
   // for MUnit
   exports org.mule.runtime.core.privileged.message;
+  // for DataWeave
+  exports org.mule.runtime.core.privileged.metadata;
   exports org.mule.runtime.core.privileged.processor;
   exports org.mule.runtime.core.privileged.processor.chain;
   exports org.mule.runtime.core.privileged.processor.objectfactory;

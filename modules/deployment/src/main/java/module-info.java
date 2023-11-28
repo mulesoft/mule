@@ -36,6 +36,8 @@ module org.mule.runtime.deployment {
 
   // package java.beans package is used
   requires java.desktop;
+  requires org.apache.commons.io;
+  requires org.apache.commons.lang3;
   requires spring.core;
 
   exports org.mule.runtime.module.deployment.api;

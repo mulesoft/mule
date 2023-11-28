@@ -222,7 +222,7 @@
         <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.6.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.7.0-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
         <muleRevapiExtensionVersion>1.7.0-SNAPSHOT</muleRevapiExtensionVersion>
         <mule.extensions.maven.plugin.version>1.7.0-SNAPSHOT</mule.extensions.maven.plugin.version>
@@ -1156,22 +1156,31 @@
                                     <!-- Add this to the classpath so it is available when running tests with jvm8 -->
                                     <!-- but it does not interfere with the module system --> 
                                     <!-- (it has colliding packages with java.xml module) when running with java11+ -->
-                                    <additionalClasspathElement>${org.mule.apache:xerces2-xsd11:jar:}</additionalClasspathElement>
+                                    <additionalClasspathElement>${settings.localRepository}/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</additionalClasspathElement>
                                 </additionalClasspathElements>
                             </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
+                <plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>get-xml-apis</id>
+								<phase>process-test-resources</phase>
+								<goals>
+									<goal>get</goal>
+								</goals>
+								<configuration>
+									<artifact>xml-apis:xml-apis:1.4.01</artifact>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                    <!-- This is needed only for jdk8, the required classes from here -->
-                    <!-- are already available in the jdk on versions 11+ -->
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>mac</id>
