@@ -59,8 +59,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
 
   private static final boolean USE_LEGACY_SORTER = parseBoolean(getProperty(MULE_USE_LEGACY_LIFECYCLE_OBJECT_SORTER, "false"));
@@ -134,7 +132,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
     @Override
     public void applyLifecycle(Object o) throws LifecycleException {
       try {
-        o = muleContext.getInjector().inject(o);
+        o = getMuleContext().get().getInjector().inject(o);
       } catch (MuleException e) {
         throw new LifecycleException(e, o);
       }

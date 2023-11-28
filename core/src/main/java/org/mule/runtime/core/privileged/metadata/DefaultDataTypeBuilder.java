@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.metadata;
+package org.mule.runtime.core.privileged.metadata;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static com.google.common.collect.Lists.newArrayList;

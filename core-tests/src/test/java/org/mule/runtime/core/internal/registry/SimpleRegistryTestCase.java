@@ -11,6 +11,8 @@ import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGIN
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -36,6 +38,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 import org.junit.Test;
+
+import io.qameta.allure.Issue;
 
 public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
@@ -229,6 +233,26 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     } catch (RegistrationException e) {
       // Expected
     }
+  }
+
+  @Test
+  @Issue("W-14547712")
+  public void lifecycleCallbackOnRegistryWithoutMuleContext() throws Exception {
+    final SimpleRegistry registry = new SimpleRegistry(null);
+
+    final InterfaceBasedTracker lifecycleTracker = new InterfaceBasedTracker();
+    registry.registerObject("_testLifecycle", lifecycleTracker);
+
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("not in lifecycle"));
+    assertThat(lifecycleTracker.getTracker(), emptyIterable());
+
+    registry.initialise();
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("initialise"));
+    assertThat(lifecycleTracker.getTracker(), hasItems("initialise"));
+
+    registry.dispose();
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("dispose"));
+    assertThat(lifecycleTracker.getTracker(), hasItems("initialise", "dispose"));
   }
 
   private MuleRegistry getRegistry() {

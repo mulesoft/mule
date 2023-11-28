@@ -39,6 +39,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.internal.lifecycle.NullLifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
@@ -76,6 +77,10 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
 
   private final boolean disableApplyObjectProcessor;
   private final RegistryMap registryMap = new RegistryMap(logger);
+
+  public SimpleRegistry(MuleContext muleContext) {
+    this(muleContext, new NullLifecycleInterceptor());
+  }
 
   public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     this(muleContext, lifecycleInterceptor, muleContext != null ? of(createFeatureFlaggingService(muleContext)) : empty());

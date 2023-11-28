@@ -48,7 +48,7 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
-import org.mule.runtime.core.internal.metadata.DefaultCollectionDataType;
+import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 

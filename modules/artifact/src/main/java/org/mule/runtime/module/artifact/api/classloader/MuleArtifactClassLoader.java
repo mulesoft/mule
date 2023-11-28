@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
@@ -117,6 +119,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
   private final ResourceReleaserExecutor resourceReleaserExecutor = new ResourceReleaserExecutor(this::reportPossibleLeak);
+  private Optional<ModuleLayerInformationSupplier> moduleLayerInformation = empty();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -425,4 +428,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), getArtifactId(), toHexString(identityHashCode(this)));
   }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = of(moduleLayerInformationSupplier);
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return moduleLayerInformation;
+  }
+
 }
