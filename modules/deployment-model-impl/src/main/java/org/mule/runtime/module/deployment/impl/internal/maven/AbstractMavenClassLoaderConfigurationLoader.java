@@ -25,12 +25,12 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
-import static com.google.common.io.Files.createTempDir;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -58,6 +58,7 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -405,7 +406,12 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
     Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
-    Optional<File> temporaryDirectory = of(createTempDir());
+    Optional<File> temporaryDirectory;
+    try {
+      temporaryDirectory = of(createTempDirectory(null).toFile());
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to create directory", e);
+    }
     try {
       List<org.mule.maven.pom.parser.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
