@@ -6,16 +6,16 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
-import static java.lang.String.format;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.ANY;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.BOOLEAN;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.MULE_INFRASTRUCTURE_FORMAT;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+
+import static java.lang.String.format;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -54,7 +54,7 @@ public final class MuleExtensionModelProvider {
   public static final ClassTypeLoader TYPE_LOADER = ExtensionsTypeLoaderFactory.getDefault()
       .createTypeLoader(MuleExtensionModelProvider.class.getClassLoader());
 
-  public static final BaseTypeBuilder BASE_TYPE_BUILDER = BaseTypeBuilder.create(JAVA);
+  public static final BaseTypeBuilder BASE_TYPE_BUILDER = BaseTypeBuilder.create(MULE_INFRASTRUCTURE_FORMAT);
   public static final MetadataType STRING_TYPE = loadPrimitive(STRING);
   public static final MetadataType INTEGER_TYPE = TYPE_LOADER.load(Integer.class);
   public static final MetadataType NUMBER_TYPE = loadPrimitive(NUMBER);

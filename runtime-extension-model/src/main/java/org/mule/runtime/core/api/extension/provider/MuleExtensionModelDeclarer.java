@@ -67,6 +67,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PAR
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.annotation.param.display.Placement.ADVANCED_TAB;
+import static org.mule.runtime.extension.api.declaration.type.TypeUtils.MULE_INFRASTRUCTURE_FORMAT;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_MATCHER;
@@ -761,7 +762,7 @@ class MuleExtensionModelDeclarer {
         .withOptionalParameter("collectList")
         .withRole(BEHAVIOUR)
         .withExpressionSupport(NOT_SUPPORTED)
-        .ofType(BaseTypeBuilder.create(JAVA).objectType()
+        .ofType(BaseTypeBuilder.create(MULE_INFRASTRUCTURE_FORMAT).objectType()
             .id("CollectList")
             .with(new TypeDslAnnotation(true, false, null, null))
             .build())
