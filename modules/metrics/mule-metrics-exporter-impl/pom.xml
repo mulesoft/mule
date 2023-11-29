@@ -19,7 +19,7 @@
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
         <ioGrpcVersion>1.51.0</ioGrpcVersion>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -53,7 +53,6 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
-            <version>${opentelemetryVersion}</version>
             <exclusions>
                 <!-- excluded to prevent a split-package with okio-jvm -->
                 <exclusion>
@@ -72,12 +71,10 @@
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-logging</artifactId>
-            <version>${opentelemetryVersion}</version>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk-testing</artifactId>
-            <version>${opentelemetryVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
