@@ -1,0 +1,39 @@
+Couldn't find class: OverrideMe2 
+ ------------------------
+| Runtime Class Loader |
+------------------------
+           ^            
+           |            
+------------------------
+|   Domain Region CL   |
+------------------------
+           |            
+            ------------> ------------------------
+           |              | Domain Class Loader  |
+           |              ------------------------
+           ^            
+           |            
+------------------------
+|    App Region CL     |
+------------------------
+           |            
+            ------------> ------------------------
+                          |   App Class Loader   |
+                          ------------------------
+ 
+ Current classloader in context is (App Class Loader) 
+ Seems the class doesn't exist in any classloader. Verify you wrote the right class name.
+Module Layer Information:
+--------------------------------
+|   service/schedulerService   |
+--------------------------------
+                |
+                |
+                V
+--------------------------------
+| Mule Container Module Layer  |
+--------------------------------
+
+Modules in each Module Layer:
+service/schedulerService: org.mule.service.scheduler.mock
+Mule Container Module Layer: (Empty Layer)
