@@ -81,7 +81,7 @@ public class ContainerClassLoaderFilterFactory {
       boolean exported = moduleClassLoaderFilter.exportsClass(name);
 
       if (!exported) {
-        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+        exported = isExportedBootPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
       }
       return exported;
     }
@@ -91,7 +91,7 @@ public class ContainerClassLoaderFilterFactory {
       boolean exported = moduleClassLoaderFilter.exportsPackage(name);
 
       if (!exported) {
-        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+        exported = isExportedBootPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
       }
       return exported;
     }
@@ -104,7 +104,7 @@ public class ContainerClassLoaderFilterFactory {
         final String resourceFolder = getResourceFolder(name);
         exported = moduleClassLoaderFilter.exportsResource(resourceFolder);
         if (!exported) {
-          exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+          exported = isExportedBootPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
         }
       }
 
@@ -121,7 +121,7 @@ public class ContainerClassLoaderFilterFactory {
       return resourceFolder;
     }
 
-    private boolean isExportedBooPackage(String name, String splitRegex) {
+    private boolean isExportedBootPackage(String name, String splitRegex) {
       boolean exported = false;
       final String[] splitName = name.split(splitRegex);
       final String[] packages = Arrays.copyOf(splitName, splitName.length - 1);

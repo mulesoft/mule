@@ -30,6 +30,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -68,7 +69,13 @@ public class TestPreFilteredContainerClassLoaderCreator implements PreFilteredCo
 
   @Override
   public Set<String> getBootPackages() {
-    return bootPackages;
+    if (bootPackages.isEmpty()) {
+      return BOOT_PACKAGES;
+    }
+    Set<String> finalBootPackages = new HashSet<>();
+    finalBootPackages.addAll(BOOT_PACKAGES);
+    finalBootPackages.addAll(bootPackages);
+    return finalBootPackages;
   }
 
   @Override
