@@ -6,6 +6,7 @@
  */
 package org.mule.test.runner.classloader.container;
 
+import static org.mule.runtime.container.internal.PreFilteredContainerClassLoaderCreator.BOOT_PACKAGES;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
 
@@ -65,6 +66,7 @@ public class DefaultTestContainerClassLoaderAssembler implements TestContainerCl
   public MuleContainerClassLoaderWrapper createContainerClassLoader() {
     final Set<String> bootPackages = ImmutableSet.<String>builder()
         .addAll(extraBootPackages)
+        .addAll(BOOT_PACKAGES)
         .addAll(new JreModuleDiscoverer().discover().get(0).getExportedPackages()).build();
     ClassLoader launcherArtifact = createLauncherClassLoader(bootPackages);
 
