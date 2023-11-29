@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.container.api.MuleModule;
 import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
@@ -15,8 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-
-import static java.util.Collections.emptySet;
 
 /**
  * Creates a container class loader without adding a filter to it.
