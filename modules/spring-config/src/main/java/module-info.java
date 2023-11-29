@@ -16,7 +16,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
     privilegedPackages = {
         "org.mule.runtime.config.privileged.dsl",
         "org.mule.runtime.config.privileged.dsl.processor",
-        "org.mule.runtime.config.privileged.dsl.spring",
+        "org.mule.runtime.config.privileged.dsl.spring"
     },
     privilegedArtifactIds = {
         "com.mulesoft.mule.modules:mule-compatibility-module",

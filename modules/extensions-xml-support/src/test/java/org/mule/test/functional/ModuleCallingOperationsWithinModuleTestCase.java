@@ -8,7 +8,6 @@ package org.mule.test.functional;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -197,4 +196,9 @@ public class ModuleCallingOperationsWithinModuleTestCase extends AbstractCeXmlEx
         .run();
   }
 
+  @Override
+  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    // returns true because not same extensions are loaded by all tests.
+    return true;
+  }
 }
