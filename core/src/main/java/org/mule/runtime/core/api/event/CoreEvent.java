@@ -50,14 +50,6 @@ public interface CoreEvent extends Serializable, Event {
   }
 
   /**
-   * @param muleContext context on which the event will be associated.
-   * @return a dummy event associated on the given {@code muleContext} and no values.
-   */
-  static CoreEvent nullEvent(MuleContext muleContext) {
-    return getNullEvent(muleContext);
-  }
-
-  /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using
    * this context
    *
