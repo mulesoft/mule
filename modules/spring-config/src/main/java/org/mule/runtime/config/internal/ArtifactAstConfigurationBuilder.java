@@ -15,6 +15,7 @@ import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRu
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -66,7 +67,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @since 4.5
  */
 public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilder
-    implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory {
+    implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory,
+    ComponentBuildingDefinitionRegistryFactoryAware {
 
   private final boolean enableLazyInit;
   private final boolean addToolingObjectsToRegistry;
@@ -78,8 +80,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
   private final MemoryManagementService memoryManagementService;
-  private final ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
-      new DefaultComponentBuildingDefinitionRegistryFactory();
+  private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
 
   private ArtifactAstConfigurationBuilder(ArtifactAst artifactAst, Map<String, String> artifactProperties,
                                           ArtifactType artifactType, boolean enableLazyInit, boolean addToolingObjectsToRegistry,
@@ -200,6 +201,10 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                                          ContributedErrorTypeLocator errorTypeLocator,
                                                          FeatureFlaggingService featureFlaggingService,
                                                          ExpressionLanguageMetadataService expressionLanguageMetadataService) {
+    ComponentBuildingDefinitionRegistryFactory resolvedComponentBuildingDefinitionRegistryFactory =
+        this.componentBuildingDefinitionRegistryFactory
+            .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
+
     if (enableLazyInit) {
       return new LazyMuleArtifactContext(muleContext, artifactAst,
                                          optionalObjectsController,
@@ -209,7 +214,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                          getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
                                          resolveComponentModelInitializer(),
                                          runtimeLockFactory,
-                                         componentBuildingDefinitionRegistryFactory,
+                                         resolvedComponentBuildingDefinitionRegistryFactory,
                                          new ArtifactMemoryManagementService(memoryManagementService),
                                          featureFlaggingService, expressionLanguageMetadataService);
     } else {
@@ -220,7 +225,7 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
                                         baseConfigurationComponentLocator,
                                         errorTypeRepository, errorTypeLocator,
                                         getArtifactProperties(), addToolingObjectsToRegistry, artifactType,
-                                        componentBuildingDefinitionRegistryFactory,
+                                        resolvedComponentBuildingDefinitionRegistryFactory,
                                         new ArtifactMemoryManagementService(memoryManagementService),
                                         featureFlaggingService, expressionLanguageMetadataService);
       context.initialize();
@@ -292,6 +297,11 @@ public class ArtifactAstConfigurationBuilder extends AbstractConfigurationBuilde
   @Override
   public void setParentContext(MuleContext domainContext, ArtifactAst parentAst) {
     this.parentContext = ((MuleContextWithRegistry) domainContext).getRegistry().get(SPRING_APPLICATION_CONTEXT);
+  }
+
+  @Override
+  public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
+    this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
   }
 
   public Map<String, String> getArtifactProperties() {

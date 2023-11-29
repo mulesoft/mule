@@ -13,7 +13,7 @@
 module org.mule.runtime.oauth.api {
 
   requires transitive org.mule.runtime.api;
-  requires transitive org.mule.oauth.client.api;
+  requires org.mule.oauth.client.api;
   requires org.mule.runtime.http.api;
 
   exports org.mule.runtime.oauth.api;

@@ -20,6 +20,8 @@ import org.mule.functional.services.NullPolicyProvider;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.api.service.Service;
+import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
+import org.mule.runtime.config.internal.DefaultComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
@@ -115,6 +117,9 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   private static IsolatedClassLoaderExtensionsManagerConfigurationBuilder reloadableExtensionsManagerConfigurationBuilder;
 
   private static TestServicesMuleContextConfigurator serviceConfigurator;
+
+  protected static TestComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
+      new TestComponentBuildingDefinitionRegistryFactory();
 
   @BeforeClass
   public static void configureClassLoaderRepository() {
@@ -238,6 +243,16 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
   // TODO W-14161254 review this
   protected void configureSpringConfigurationBuilder(ConfigurationBuilder builder) {
     builder.addServiceConfigurator(serviceConfigurator);
+    if (builder instanceof ComponentBuildingDefinitionRegistryFactoryAware) {
+      if (mustRegenerateComponentBuildingDefinitionRegistryFactory()
+          || mustRegenerateExtensionModels()) {
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
+            .setComponentBuildingDefinitionRegistryFactory(new DefaultComponentBuildingDefinitionRegistryFactory());
+      } else {
+        ((ComponentBuildingDefinitionRegistryFactoryAware) builder)
+            .setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
+      }
+    }
   }
 
   private static void createServiceManager() {
@@ -298,6 +313,17 @@ public abstract class ArtifactFunctionalTestCase extends FunctionalTestCase {
    */
   protected Map<String, Object> getExtensionLoaderContextAdditionalParameters() {
     return emptyMap();
+  }
+
+  /**
+   * if this return {@code true} a new {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory}
+   * instance will be used by tests. It's useful when same test class load different extensions through tests.
+   *
+   * @return whether the tests on this class need for
+   *         {@link org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionRegistryFactory} to be generated again.
+   */
+  protected boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    return false;
   }
 
   /**

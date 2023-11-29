@@ -73,4 +73,9 @@ public class ModuleTestConnectionTestCase extends AbstractCeXmlExtensionMuleArti
     connectionProvider.disconnect(connect);
   }
 
+  @Override
+  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
+    // returns true because not same extensions are loaded by all tests.
+    return true;
+  }
 }
