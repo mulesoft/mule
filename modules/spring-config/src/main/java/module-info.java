@@ -103,7 +103,8 @@ module org.mule.runtime.spring.config {
       org.mule.runtime.tooling.support,
       spring.beans;
   exports org.mule.runtime.config.internal to
-      org.mule.runtime.deployment;
+      org.mule.runtime.deployment,
+      org.mule.runtime.deployment.model.impl;
   exports org.mule.runtime.config.internal.bean to
       spring.beans;
   exports org.mule.runtime.config.internal.context to
