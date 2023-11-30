@@ -24,6 +24,7 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.apache.commons.io.IOUtils.copy;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
@@ -166,6 +167,10 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
                 .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
                                                       createTempBundleDescriptor()),
                       ArtifactType.APP);
+      }
+
+      for (String config : configs) {
+        copy(this.getClass().getClassLoader().getResource(config), new File(applicationFolder, config));
       }
 
       File destinationFolder =
