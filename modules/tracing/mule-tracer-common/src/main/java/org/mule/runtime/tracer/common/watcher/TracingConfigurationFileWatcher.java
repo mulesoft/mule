@@ -7,9 +7,8 @@
 package org.mule.runtime.tracer.common.watcher;
 
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_CONFIGURATION_WATCHER_DEFAULT_DELAY_PROPERTY;
-import static org.slf4j.LoggerFactory.getLogger;
 
-import org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import java.io.File;
 
@@ -28,10 +27,9 @@ public class TracingConfigurationFileWatcher extends Thread {
   private final Runnable doOnChange;
 
   protected long delay = DEFAULT_DELAY;
-  File file;
-  long lastModified;
-  boolean warnedAlready;
-  boolean interrupted;
+  private final File file;
+  private long lastModified;
+  private boolean warnedAlready;
 
   public TracingConfigurationFileWatcher(String filename, Runnable doOnChange) {
     super("FileSpanExporterConfigurationWatcher");
@@ -48,7 +46,7 @@ public class TracingConfigurationFileWatcher extends Thread {
       fileExists = file.exists();
     } catch (SecurityException var4) {
       LOGGER.warn("The tracing config file " + filename + " was possibly removed.");
-      interrupted = true;
+      this.interrupt();
       return;
     }
 
@@ -65,12 +63,14 @@ public class TracingConfigurationFileWatcher extends Thread {
     }
   }
 
+  @Override
   public void run() {
-    while (!this.interrupted) {
+    while (!interrupted()) {
       try {
         checkAndConfigure();
         sleep(delay);
       } catch (InterruptedException var2) {
+        return;
       }
     }
   }
