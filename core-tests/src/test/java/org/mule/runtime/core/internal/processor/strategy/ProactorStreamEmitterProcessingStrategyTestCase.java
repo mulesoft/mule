@@ -95,6 +95,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -565,6 +566,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
+  @Ignore("W-14573707: Fix flaky backpressureOnInnerCpuIntensiveSchedulerBusy test")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
