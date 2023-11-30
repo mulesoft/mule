@@ -53,13 +53,13 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE = MULE_OPEN_TELEMETRY_EXPORTER + ".batch.maxSize";
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE =
-          MULE_OPEN_TELEMETRY_EXPORTER + ".batch.queueSize";
+      MULE_OPEN_TELEMETRY_EXPORTER + ".batch.queueSize";
 
   public static final String MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER =
       MULE_OPEN_TELEMETRY_EXPORTER + ".sampler";
 
   public static final String MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG =
-          MULE_OPEN_TELEMETRY_EXPORTER + ".sampler.arg";
+      MULE_OPEN_TELEMETRY_EXPORTER + ".sampler.arg";
 
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY =
       MULE_OPEN_TELEMETRY_EXPORTER + ".batch.scheduledDelay";
