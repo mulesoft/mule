@@ -17,16 +17,17 @@ import org.mule.runtime.config.internal.model.dsl.config.EnvironmentPropertiesCo
 import org.mule.runtime.config.internal.model.dsl.config.FileConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.dsl.config.GlobalPropertyConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.dsl.config.MapConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
+import org.mule.runtime.config.internal.model.dsl.config.StaticConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -56,7 +57,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   private Optional<ConfigurationPropertiesProvider> environmentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> fileProperties = empty();
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
-  private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
+  private final List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
   private boolean failuresIfNotPresent = true;
 
@@ -111,6 +112,17 @@ public class ConfigurationPropertiesHierarchyBuilder {
    */
   public ConfigurationPropertiesHierarchyBuilder withApplicationProperties(ConfigurationPropertiesProvider provider) {
     this.appProperties.add(provider);
+    return this;
+  }
+
+  /**
+   * Creates and sets a {@link ConfigurationPropertiesProvider} to use as application property.
+   * 
+   * @param artifactProperties the properties to add to the hierarchy as Application Properties.
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withApplicationProperties(Map<String, String> artifactProperties) {
+    this.appProperties.add(new StaticConfigurationPropertiesProvider(artifactProperties));
     return this;
   }
 
