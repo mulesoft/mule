@@ -22,7 +22,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
@@ -41,13 +40,12 @@ import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.artifact.SpringArtifactContext;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.BaseMuleArtifactContext;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
-import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.model.dsl.config.StaticConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.config.internal.model.ComponentModelInitializer;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
@@ -89,8 +87,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @Deprecated
 public class SpringXmlConfigurationBuilder extends AbstractResourceConfigurationBuilder
-    implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory,
-    ComponentBuildingDefinitionRegistryFactoryAware {
+    implements ParentMuleContextAwareConfigurationBuilder, ArtifactContextFactory {
 
   private MemoryManagementService memoryManagementService;
   private ArtifactDeclaration artifactDeclaration;
@@ -102,7 +99,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
   private MuleArtifactContext muleArtifactContext;
   private final ArtifactType artifactType;
   private final LockFactory runtimeLockFactory;
-  private Optional<ComponentBuildingDefinitionRegistryFactory> componentBuildingDefinitionRegistryFactory = empty();
+  private final ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
+      new DefaultComponentBuildingDefinitionRegistryFactory();
 
   private SpringXmlConfigurationBuilder(String[] configResources, Map<String, String> artifactProperties,
                                         ArtifactType artifactType, boolean enableLazyInit, boolean disableXmlValidations,
@@ -273,10 +271,6 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                                          ContributedErrorTypeLocator errorTypeLocator,
                                                          FeatureFlaggingService featureFlaggingService,
                                                          ExpressionLanguageMetadataService expressionLanguageMetadataService) {
-    ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory =
-        this.componentBuildingDefinitionRegistryFactory
-            .orElse(new DefaultComponentBuildingDefinitionRegistryFactory());
-
     final ArtifactAst artifactAst =
         createApplicationModel(getExtensions(muleContext.getExtensionManager()),
                                artifactDeclaration, resolveArtifactConfigResources(), getArtifactProperties(),
@@ -348,7 +342,8 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
                                            Map<String, String> artifactProperties, boolean disableXmlValidations,
                                            FeatureFlaggingService featureFlaggingService) {
     ConfigurationPropertiesResolver propertyResolver = new ConfigurationPropertiesHierarchyBuilder()
-        .withApplicationProperties(new StaticConfigurationPropertiesProvider(artifactProperties)).build();
+        .withApplicationProperties(artifactProperties)
+        .build();
 
     Builder builder = AstXmlParser.builder()
         .withPropertyResolver(propertyKey -> (String) propertyResolver.resolveValue(propertyKey))
@@ -458,8 +453,4 @@ public class SpringXmlConfigurationBuilder extends AbstractResourceConfiguration
     this.parentArtifactAst = parentAst;
   }
 
-  @Override
-  public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
-    this.componentBuildingDefinitionRegistryFactory = ofNullable(componentBuildingDefinitionRegistryFactory);
-  }
 }

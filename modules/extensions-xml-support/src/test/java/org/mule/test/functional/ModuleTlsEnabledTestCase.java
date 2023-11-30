@@ -144,9 +144,4 @@ public class ModuleTlsEnabledTestCase extends AbstractCeXmlExtensionMuleArtifact
                is(TrustManagerFactory.getDefaultAlgorithm()));
   }
 
-  @Override
-  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
-    // returns true because not same extensions are loaded by all tests.
-    return true;
-  }
 }

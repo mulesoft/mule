@@ -17,9 +17,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.config.privileged.dsl",
         "org.mule.runtime.config.privileged.dsl.processor",
         "org.mule.runtime.config.privileged.dsl.spring",
-        // TODO W-14161254 remove this these
-        "org.mule.runtime.config.internal",
-        "org.mule.runtime.config.internal.model"
     },
     privilegedArtifactIds = {
         "com.mulesoft.mule.modules:mule-compatibility-module",
@@ -101,14 +98,12 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.privileged.dsl;
   exports org.mule.runtime.config.privileged.dsl.processor;
   exports org.mule.runtime.config.privileged.dsl.spring;
-  // Required by test infrastructure
-  // TODO W-14161254 remove these
-  exports org.mule.runtime.config.internal;
-  exports org.mule.runtime.config.internal.model;
 
   exports org.mule.runtime.config.api.dsl.model.metadata to
       org.mule.runtime.tooling.support,
       spring.beans;
+  exports org.mule.runtime.config.internal to
+      org.mule.runtime.deployment;
   exports org.mule.runtime.config.internal.bean to
       spring.beans;
   exports org.mule.runtime.config.internal.context to
@@ -138,9 +133,8 @@ module org.mule.runtime.spring.config {
       spring.beans;
   exports org.mule.runtime.config.internal.lazy to
       spring.beans;
-  // TODO W-14161254 uncomment this
-  // exports org.mule.runtime.config.internal.model to
-  // org.mule.runtime.extensions.xml.support;
+  exports org.mule.runtime.config.internal.model to
+      org.mule.runtime.extensions.xml.support;
   exports org.mule.runtime.config.internal.processor to
       spring.beans;
 
