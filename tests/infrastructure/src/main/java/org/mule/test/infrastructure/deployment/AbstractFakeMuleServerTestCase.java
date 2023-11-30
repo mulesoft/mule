@@ -39,11 +39,9 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   public SystemProperty jvmVersionExtensionEnforcementLoose =
       new SystemProperty("mule.jvm.version.extension.enforcement", "LOOSE");
 
-  // These tests just create a container form the test classpath. There are no modules involved in these tests, so code relying on
-  // modules from the container doesn't work (i.e.: class.getModule().getLayer() returns null).
   @Rule
   public SystemProperty classloaderContainerJpmsModuleLayer =
-      new SystemProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false");
+      new SystemProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "" + classloaderContainerJpmsModuleLayer());
 
   @Rule
   public TemporaryFolder muleHome = new TemporaryFolder();
@@ -78,6 +76,12 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     if (addExpressionLanguageMetadataService()) {
       muleServer.addZippedService(cachedELMService);
     }
+  }
+
+  // These tests just create a container form the test classpath. There are no modules involved in these tests, so code relying on
+  // modules from the container doesn't work (i.e.: class.getModule().getLayer() returns null).
+  protected boolean classloaderContainerJpmsModuleLayer() {
+    return false;
   }
 
   protected boolean addExpressionLanguageMetadataService() {
@@ -129,4 +133,5 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   protected File getHttpService() throws IOException {
     return testServicesSetup.getHttpService();
   }
+
 }
