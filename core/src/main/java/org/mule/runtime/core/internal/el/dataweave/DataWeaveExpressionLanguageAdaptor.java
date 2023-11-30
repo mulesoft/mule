@@ -34,6 +34,8 @@ import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -52,26 +54,37 @@ import java.util.function.Function;
 
 import javax.inject.Inject;
 
-public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
 
   public static final String SERVER = "server";
   public static final String MULE = "mule";
   public static final String APP = "app";
 
-  private final ExpressionLanguage expressionExecutor;
+  private ExpressionLanguage expressionExecutor;
   private final MuleContext muleContext;
+  private final Registry registry;
+  private final DefaultExpressionLanguageFactoryService service;
+  private final FeatureFlaggingService featureFlaggingService;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service,
                                             FeatureFlaggingService featureFlaggingService) {
+    this.muleContext = muleContext;
+    this.registry = registry;
+    this.service = service;
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
     this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
         .defaultEncoding(getDefaultEncoding(muleContext))
         .featureFlaggingService(featureFlaggingService)
         .appId(muleContext.getConfiguration().getId())
         .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
         .build());
-    this.muleContext = muleContext;
+
     registerGlobalBindings(registry);
   }
 
