@@ -12,6 +12,10 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties.OTEL_TRACES_SAMPLER_ARG_ENV;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties.OTEL_TRACES_SAMPLER_ENV;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.valueOf;
 
 import static java.lang.Integer.parseInt;
@@ -24,7 +28,10 @@ import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
+import io.opentelemetry.sdk.trace.samplers.Sampler;
+import org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils;
 import org.mule.runtime.tracer.exporter.impl.metrics.OpenTelemetryExportQueueMetrics;
 
 import java.util.Collection;
@@ -122,6 +129,27 @@ public class OpenTelemetryResources {
     } catch (Exception e) {
       throw new SpanExporterConfiguratorException(e);
     }
+  }
+
+  /**
+   * @param spanExporterConfiguration the spanExporterConfiguration.
+   *
+   * @return the sampler for the {@link SpanExporter}.
+   */
+  public static Sampler getSampler(SpanExporterConfiguration spanExporterConfiguration) {
+    String sampler = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER);
+
+    if (sampler == null) {
+      sampler = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ENV)
+    }
+
+    String samplerArg = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG);
+
+    if (samplerArg == null) {
+      samplerArg = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ARG_ENV);;
+    }
+
+    OpenTelemetrySpanExporterUtils.getSampler(sampler, samplerArg);
   }
 
   /**

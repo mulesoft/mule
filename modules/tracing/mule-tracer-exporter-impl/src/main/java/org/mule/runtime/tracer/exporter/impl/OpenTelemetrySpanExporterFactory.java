@@ -9,12 +9,11 @@ package org.mule.runtime.tracer.exporter.impl;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
-import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getSampler;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getResource;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getenv;
+import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getSampler;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -48,9 +47,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.5.0
  */
 public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Disposable, Initialisable {
-
-  public static final String OTEL_TRACES_SAMPLER_ENV = "OTEL_TRACES_SAMPLER";
-  public static final String OTEL_TRACES_SAMPLER_ARG_ENV = "OTEL_TRACES_SAMPLER_ARG";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetrySpanExporterFactory.class);
 
@@ -165,7 +161,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   }
 
   protected Sampler resolveSampler() {
-    return getSampler(getenv(OTEL_TRACES_SAMPLER_ENV), getenv(OTEL_TRACES_SAMPLER_ARG_ENV));
+    return getSampler(configuration);
   }
 
   private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {
