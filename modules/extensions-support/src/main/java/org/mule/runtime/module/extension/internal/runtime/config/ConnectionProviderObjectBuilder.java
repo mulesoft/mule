@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.config;
 
 import static java.util.Collections.emptyList;
+
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
@@ -19,7 +21,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -87,7 +89,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
   }
 
   private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
-    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
+    return reconnectionConfig != null ? reconnectionConfig : defaultReconnectionConfig();
   }
 
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
