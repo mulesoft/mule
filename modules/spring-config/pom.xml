@@ -124,6 +124,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast</artifactId>
         </dependency>
         <dependency>
@@ -151,12 +156,6 @@
             <artifactId>mule-sdk-compatibility-api</artifactId>
         </dependency>
         
-        <!-- Add logging libraries required by spring -->
-        <dependency>
-            <groupId>org.mule.runtime.boot</groupId>
-            <artifactId>mule-module-logging</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
@@ -198,12 +197,6 @@
             <artifactId>mule-api</artifactId>
             <version>${muleApiVersion}</version>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

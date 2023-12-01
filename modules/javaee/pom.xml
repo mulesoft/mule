@@ -22,6 +22,7 @@
         <javaModuleName>org.mule.runtime.javaee</javaModuleName>
 
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
     <build>

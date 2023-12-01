@@ -4,13 +4,19 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+import org.mule.api.annotation.jpms.OptionalPackages;
+
 /**
  * Mule Log4j Configurator Module.
  * 
  * @moduleGraph
  * @since 4.5
  */
+@OptionalPackages({"org.osgi.framework"})
 module org.mule.runtime.boot.log4j {
+
+  requires org.mule.runtime.api.annotations;
+
   // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 

@@ -1,4 +1,34 @@
 {
+  "4.7.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelDeclarer",
+          "justification": "W-13829806: Removed from API, not used/required by external uers"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionExtensionModelProvider",
+          "justification": "W-13829806: Removed from API, not used/required by external uers"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider",
+          "justification": "W-13829806: Removed from API, not used/required by external uers"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.mule.api.loader.MuleSdkExtensionModelLoaderProvider",
+          "justification": "W-13829806: Removed from API, not used/required by external uers"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

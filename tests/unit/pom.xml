@@ -72,12 +72,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-tracer-internal-impl</artifactId>
-            <version>4.7.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-api</artifactId>
             <version>${project.version}</version>
         </dependency>

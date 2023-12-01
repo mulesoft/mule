@@ -18,6 +18,7 @@
         <javaModuleName>org.mule.runtime.logging</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
     <dependencies>

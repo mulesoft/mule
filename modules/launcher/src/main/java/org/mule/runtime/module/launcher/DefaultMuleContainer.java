@@ -141,10 +141,10 @@ public class DefaultMuleContainer implements MuleContainer {
   /**
    * Configure the server.
    */
-  public DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
-                              ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
-                              ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
-                              TroubleshootingService troubleshootingService)
+  DefaultMuleContainer(DeploymentService deploymentService, RepositoryService repositoryService,
+                       ToolingService toolingService, MuleCoreExtensionManagerServer coreExtensionManager,
+                       ServiceManager serviceManager, ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                       TroubleshootingService troubleshootingService)
       throws IllegalArgumentException, InitialisationException {
     init();
 

@@ -29,10 +29,6 @@ module org.mule.runtime.extensions.mule.support {
 
   requires java.inject;
 
-  exports org.mule.runtime.module.extension.mule.api.extension;
-  exports org.mule.runtime.module.extension.mule.api.loader;
-  exports org.mule.runtime.module.extension.mule.api.processor;
-
   provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider
       with org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider;
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider
@@ -41,6 +37,9 @@ module org.mule.runtime.extensions.mule.support {
       with org.mule.runtime.module.extension.mule.internal.dsl.processor.xml.MuleSdkExtensionDslNamespaceInfoProvider;
   provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider
       with org.mule.runtime.module.extension.mule.api.loader.MuleSdkExtensionModelLoaderProvider;
+
+  exports org.mule.runtime.module.extension.mule.api.processor to
+      spring.beans;
 
   exports org.mule.runtime.module.extension.mule.internal.config.factory to
       org.mule.runtime.spring.config,

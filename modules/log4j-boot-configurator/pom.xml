@@ -27,6 +27,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>api-annotations</artifactId>
+            <version>${muleAnnotationsApiVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>

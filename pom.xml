@@ -190,7 +190,7 @@
         <dependency.plugin.version>3.5.0</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
         <assembly.plugin.version>3.6.0</assembly.plugin.version>
-        <jar.plugin.version>3.3.0</jar.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
         <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>
@@ -221,6 +221,7 @@
         <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
+        <muleAnnotationsApiVersion>1.6.0-SNAPSHOT</muleAnnotationsApiVersion>
         <mule.module.maven.plugin.version>1.7.0-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
         <muleRevapiExtensionVersion>1.7.0-SNAPSHOT</muleRevapiExtensionVersion>
@@ -238,6 +239,7 @@
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.6.0-rc1</oldMuleArtifactVersion>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
+        <skipMuleModuleMojos>false</skipMuleModuleMojos>
         
         <surefire.args.base>
             -XX:+TieredCompilation
@@ -577,6 +579,10 @@
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
                         <proc>none</proc>
+                        <source>${javaVersion}</source>
+                        <target>${javaVersion}</target>
+                        <testRelease>${javaReleaseVersion}</testRelease>
+                        <parameters>true</parameters>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -634,7 +640,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${jar.plugin.version}</version>
+                    <version>${maven.jar.plugin.version}</version>
                     <executions>
                         <execution>
                             <id>default-test-jar</id>
@@ -962,6 +968,97 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-module-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>analyze</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${skipMuleModuleMojos}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.revapi</groupId>
+                <artifactId>revapi-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mule.tools.maven</groupId>
+                        <artifactId>mule-revapi-extension</artifactId>
+                        <version>${muleRevapiExtensionVersion}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <skip>${skipMuleModuleMojos}</skip>
+                    <oldVersion>${oldMuleArtifactVersion}</oldVersion>
+                    <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
+                    <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
+                    <analysisConfiguration><![CDATA[
+                        {
+                            "revapi" : {
+                                "java" : {
+                                    "missing-classes" : {
+                                        "behavior" : "report"
+                                    }
+                                },
+                                "semver": {
+                                  "ignore": {
+                                    "enabled": true,
+                                    "versionIncreaseAllows" : {
+                                      "major" : "breaking",
+                                      "minor" : "nonBreaking",
+                                      "patch" : "equivalent"
+                                    }
+                                  }
+                                }
+                            }
+                        }
+                    ]]></analysisConfiguration>
+                    <analysisConfigurationFiles combine.children="append">
+                        <configurationFile>
+                            <path>api-changes.json</path>
+                            <roots>
+                                <root>
+                                    ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+                                </root>
+                            </roots>
+                        </configurationFile>
+                    </analysisConfigurationFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>api-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1109,32 +1206,6 @@
     </reporting>
     <profiles>
         <profile>
-            <id>j11</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <version>${mavenCompilerVersion}</version>
-                            <configuration>
-                                <encoding>ISO-8859-1</encoding>
-                                <source>${javaVersion}</source>
-                                <target>${javaVersion}</target>
-                                <release>${javaReleaseVersion}</release>
-                                <testRelease>${javaReleaseVersion}</testRelease>
-                                <proc>none</proc>
-                                <parameters>true</parameters>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>testJdkWithoutXmlModule</id>
             <activation>
                 <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
@@ -1162,23 +1233,23 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>get-xml-apis</id>
-								<phase>process-test-resources</phase>
-								<goals>
-									<goal>get</goal>
-								</goals>
-								<configuration>
-									<artifact>xml-apis:xml-apis:1.4.01</artifact>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>get-xml-apis</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>get</goal>
+                                </goals>
+                                <configuration>
+                                    <artifact>xml-apis:xml-apis:1.4.01</artifact>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
@@ -1309,98 +1380,6 @@
                                     </rules>
                                     <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>mule-module</id>
-            <activation>
-                <file>
-                    <exists>src/main/resources/META-INF/mule-module.properties</exists>
-                </file>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.mule.tools.maven</groupId>
-                        <artifactId>mule-module-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>analyze</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>analyze</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>parse-version</id>
-                                <goals>
-                                    <goal>parse-version</goal>
-                                </goals>
-                                <phase>validate</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.revapi</groupId>
-                        <artifactId>revapi-maven-plugin</artifactId>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.mule.tools.maven</groupId>
-                                <artifactId>mule-revapi-extension</artifactId>
-                                <version>${muleRevapiExtensionVersion}</version>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <oldVersion>${oldMuleArtifactVersion}</oldVersion>
-                            <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
-                            <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
-                            <analysisConfiguration><![CDATA[
-                                {
-                                    "revapi" : {
-                                        "java" : {
-                                            "missing-classes" : {
-                                                "behavior" : "report"
-                                            }
-                                        },
-                                        "semver": {
-                                          "ignore": {
-                                            "enabled": true,
-                                            "versionIncreaseAllows" : {
-                                              "major" : "breaking",
-                                              "minor" : "nonBreaking",
-                                              "patch" : "equivalent"
-                                            }
-                                          }
-                                        }
-                                    }
-                                }
-                            ]]></analysisConfiguration>
-                            <analysisConfigurationFiles combine.children="append">
-                                <configurationFile>
-                                    <path>api-changes.json</path>
-                                    <roots>
-                                        <root>
-                                            ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-                                        </root>
-                                    </roots>
-                                </configurationFile>
-                            </analysisConfigurationFiles>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>api-check</id>
-                                <goals><goal>check</goal></goals>
                             </execution>
                         </executions>
                     </plugin>
