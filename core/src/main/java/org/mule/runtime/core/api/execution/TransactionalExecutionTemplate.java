@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.execution.BeginAndResolveTransactionInterceptor;
 import org.mule.runtime.core.internal.execution.ExecuteCallbackInterceptor;
 import org.mule.runtime.core.internal.execution.ExecutionContext;

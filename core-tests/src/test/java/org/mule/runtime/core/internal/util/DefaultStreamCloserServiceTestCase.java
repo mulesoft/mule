@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.streaming.iterator.Consumer;
-import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;

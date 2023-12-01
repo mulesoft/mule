@@ -22,6 +22,8 @@ import java.util.Optional;
 
 public interface InterceptorManager {
 
+  String INTERCEPTOR_MANAGER_REGISTRY_KEY = "_muleInterceptorManager";
+
   /**
    * Determines the order in which the {@link ProcessorInterceptorFactory ProcessorInterceptorFactories} products will be applied
    * to the applicable components.

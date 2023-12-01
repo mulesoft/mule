@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 

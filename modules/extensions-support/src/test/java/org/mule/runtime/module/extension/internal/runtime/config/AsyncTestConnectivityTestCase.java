@@ -110,7 +110,7 @@ public class AsyncTestConnectivityTestCase extends AbstractMuleContextTestCase {
         retryPolicyTemplate.setNotifier(mock(RetryNotifier.class));
         connectionManager = spy(new AsyncConnectionManagerAdapter(retryPolicyTemplate));
 
-        registerObject(OBJECT_CONNECTION_MANAGER, () -> connectionManager, muleContext);
+        registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
       }
     };
   }

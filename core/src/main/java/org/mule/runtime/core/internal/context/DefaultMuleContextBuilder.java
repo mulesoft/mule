@@ -7,10 +7,8 @@
 package org.mule.runtime.core.internal.context;
 
 import static java.util.Optional.empty;
-
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -68,7 +66,6 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
   private List<MuleContextListener> listeners = new ArrayList<>();
 
   private ArtifactCoordinates artifactCoordinates;
-  private Registry registry;
 
 
   /**

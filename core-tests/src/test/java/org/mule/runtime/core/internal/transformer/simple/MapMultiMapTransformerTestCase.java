@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.privileged.context.registry.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.HashMap;

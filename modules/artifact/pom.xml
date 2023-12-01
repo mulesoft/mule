@@ -27,7 +27,6 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.datetime=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.context.registry=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
 

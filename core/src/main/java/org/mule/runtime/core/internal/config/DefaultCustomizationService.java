@@ -7,8 +7,6 @@
 package org.mule.runtime.core.internal.config;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -17,16 +15,14 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * {@inheritDoc}
  */
 public class DefaultCustomizationService implements CustomizationService, CustomServiceRegistry {
 
-  private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
-  private final Map<String, ServiceDecorator> muleContextDefaultServicesDecorators = new HashMap<>();
-  private final Map<String, CustomService> customServices = new HashMap<>();
+  private Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
+  private Map<String, CustomService> customServices = new HashMap<>();
 
   /**
    * {@inheritDoc}
@@ -34,14 +30,6 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   @Override
   public <T> void overrideDefaultServiceImpl(String serviceId, T serviceImpl) {
     muleContextDefaultServices.put(serviceId, new CustomService(serviceImpl));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void decorateDefaultServiceImpl(String serviceId, ServiceDecorator serviceDecorator) {
-    muleContextDefaultServicesDecorators.put(serviceId, serviceDecorator);
   }
 
   /**
@@ -82,14 +70,4 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   public Map<String, CustomService> getDefaultServices() {
     return unmodifiableMap(muleContextDefaultServices);
   }
-
-  @Override
-  public Optional<Object> decorateDefaultService(String serviceId, Supplier<Object> serviceImplSupplier) {
-    if (!muleContextDefaultServicesDecorators.containsKey(serviceId)) {
-      return of(serviceImplSupplier.get());
-    }
-
-    return muleContextDefaultServicesDecorators.get(serviceId).decorate(serviceImplSupplier);
-  }
-
 }
