@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.event;
 
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
@@ -38,6 +40,13 @@ import java.util.function.Function;
  */
 @NoImplement
 public interface CoreEvent extends Serializable, Event {
+
+  /**
+   * @return a dummy event with no context and no values.
+   */
+  static CoreEvent nullEvent() {
+    return getNullEvent();
+  }
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using

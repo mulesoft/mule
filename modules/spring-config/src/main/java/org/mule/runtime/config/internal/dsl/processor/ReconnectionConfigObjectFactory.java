@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
+
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ComponentFactory;
 
@@ -24,7 +26,7 @@ public class ReconnectionConfigObjectFactory extends AbstractComponentFactory<Re
 
   @Override
   public ReconnectionConfig doGetObject() throws Exception {
-    return new ReconnectionConfig(failsDeployment, retryPolicyTemplate);
+    return defaultReconnectionConfig(failsDeployment, retryPolicyTemplate);
   }
 
   public void setFailsDeployment(boolean failsDeployment) {
