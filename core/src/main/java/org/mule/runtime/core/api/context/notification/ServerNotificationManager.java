@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.context.notification;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
@@ -51,6 +52,7 @@ import org.mule.runtime.api.notification.SecurityNotificationListener;
 import org.mule.runtime.api.notification.TransactionNotification;
 import org.mule.runtime.api.notification.TransactionNotificationListener;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.util.concurrent.Latch;
@@ -59,8 +61,8 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.context.notification.Configuration;
 import org.mule.runtime.core.internal.context.notification.Policy;
-import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificationListener;
 import org.mule.runtime.core.internal.profiling.notification.ProfilingNotification;
+import org.mule.runtime.core.internal.profiling.notification.ProfilingNotificationListener;
 import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 
 import java.util.Collection;
@@ -135,7 +137,7 @@ public class ServerNotificationManager implements ServerNotificationHandler, Mul
    * object to send notifications.
    */
   public void initialise() throws InitialisationException {
-    notificationsLiteScheduler = schedulerService.get().cpuLightScheduler();
+    notificationsLiteScheduler = schedulerService.get().cpuLightScheduler(SchedulerConfig.config().withName(toString()));
     notificationsIoScheduler = schedulerService.get().ioScheduler();
   }
 
