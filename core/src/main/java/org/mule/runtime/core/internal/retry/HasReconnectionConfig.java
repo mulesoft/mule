@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.retry;
 
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
+
 import java.util.Optional;
 
 /**

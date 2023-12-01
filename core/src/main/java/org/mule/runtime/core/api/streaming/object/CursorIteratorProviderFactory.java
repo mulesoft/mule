@@ -9,6 +9,8 @@ package org.mule.runtime.core.api.streaming.object;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
+import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.streaming.object.factory.NullCursorIteratorProviderFactory;
 
 import java.util.Iterator;
 
@@ -20,5 +22,13 @@ import java.util.Iterator;
  */
 @NoImplement
 public interface CursorIteratorProviderFactory extends CursorProviderFactory<Iterator> {
+
+  /**
+   * @param streamingManager the {@link StreamingManager} to handle the {@link Iterator}s.
+   * @return a {@link CursorIteratorProviderFactory} which always returns the original iterator without creating any provider.
+   */
+  static CursorIteratorProviderFactory nullCursorIteratorProviderFactory(StreamingManager streamingManager) {
+    return new NullCursorIteratorProviderFactory(streamingManager);
+  }
 
 }

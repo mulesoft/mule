@@ -9,6 +9,7 @@ package org.mule.runtime.core.api.streaming;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.core.internal.streaming.NullStreamingStatistics;
 
 /**
  * Statistics about current streaming assets
@@ -17,6 +18,13 @@ import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
  */
 @NoImplement
 public interface StreamingStatistics {
+
+  /**
+   * @return a null implementation of {@link StreamingStatistics} where all methods simply return zero.
+   */
+  static StreamingStatistics nullStreamingStatistics() {
+    return new NullStreamingStatistics();
+  }
 
   /**
    * @return How many {@link CursorStreamProvider} instances are currently open

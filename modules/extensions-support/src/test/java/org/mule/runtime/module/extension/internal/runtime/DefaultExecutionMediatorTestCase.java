@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
@@ -62,12 +63,12 @@ import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -84,7 +85,6 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
-import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -92,7 +92,6 @@ import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -249,7 +248,7 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
-                                                     new ReconnectionConfig(true, retryPolicy));
+                                                     defaultReconnectionConfig(true, retryPolicy));
     initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
     Optional<ConnectionProvider> connectionProvider = of(connectionProviderWrapper);
 

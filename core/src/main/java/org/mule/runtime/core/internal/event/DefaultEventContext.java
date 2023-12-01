@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
 import static org.mule.runtime.core.privileged.event.DefaultFlowCallStack.newDefaultFlowCallStack;
 
@@ -188,6 +189,9 @@ public final class DefaultEventContext extends AbstractEventContext implements S
   public DefaultEventContext(FlowConstruct flow, ComponentLocation location, String correlationId,
                              Optional<CompletableFuture<Void>> externalCompletion) {
     super(NullExceptionHandler.getInstance(), 0, externalCompletion);
+
+    checkArgument(flow != null, "'flow' can't be null");
+
     this.id = flow.getUniqueIdString();
     this.serverId = flow.getServerId();
     this.location = location;
