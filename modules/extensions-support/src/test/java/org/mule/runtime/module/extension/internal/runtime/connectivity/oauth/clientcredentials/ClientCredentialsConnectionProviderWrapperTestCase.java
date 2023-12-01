@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
+import static org.mule.runtime.extension.api.security.CredentialsPlacement.BODY;
+
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
@@ -34,11 +36,15 @@ public class ClientCredentialsConnectionProviderWrapperTestCase {
   public void getUpdatingClientCredentialsState() throws MuleException {
     ConnectionProvider delegate = mock(ConnectionProvider.class);
     ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
+    ClientCredentialsGrantType type = new ClientCredentialsGrantType("http://accessToken",
+                                                                     "#[accessToken]",
+                                                                     ".*",
+                                                                     null,
+                                                                     BODY);
+    when(oauthConfig.getGrantType()).thenReturn(type);
     Map<Field, String> callbackValues = new HashMap<>();
     ClientCredentialsOAuthHandler oauthHandler = mock(ClientCredentialsOAuthHandler.class);
     ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
-    // ClientCredentialsGrantType type = mock(ClientCredentialsGrantType.class);
-    // when(oauthConfig.getGrantType()).thenReturn(type);
     ClientCredentialsConnectionProviderWrapper wrapper =
         new ClientCredentialsConnectionProviderWrapper(delegate, oauthConfig, callbackValues, oauthHandler, reconnectionConfig);
     ClientCredentialsOAuthDancer dancer = mock(ClientCredentialsOAuthDancer.class);
