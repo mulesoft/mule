@@ -28,8 +28,6 @@ import static io.opentelemetry.context.propagation.ContextPropagators.create;
 import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
-import io.opentelemetry.sdk.trace.samplers.Sampler;
-import org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils;
 import org.mule.runtime.tracer.exporter.impl.metrics.OpenTelemetryExportQueueMetrics;
@@ -45,6 +43,7 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.MetricReader;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
