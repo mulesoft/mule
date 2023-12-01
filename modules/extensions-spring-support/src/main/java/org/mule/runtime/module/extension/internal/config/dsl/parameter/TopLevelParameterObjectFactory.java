@@ -22,9 +22,6 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultO
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-
-import javax.inject.Inject;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be
