@@ -5,7 +5,7 @@
  * LICENSE.txt file.
  */
 /**
- * Core components implementatios for the Mule Runtime.
+ * Core components implementations for the Mule Runtime.
  *
  * @moduleGraph
  * @since 4.6
