@@ -299,7 +299,8 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.component to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.el to
       org.mule.runtime.core.mvel,
       org.mule.runtime.core.components,
