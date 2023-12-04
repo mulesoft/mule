@@ -6,13 +6,15 @@
  */
 package org.mule.runtime.core.internal.source.scheduler;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToScheduleWork;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.component.ComponentUtils.getFromAnnotatedObject;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -24,6 +26,8 @@ import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.source.SchedulerConfiguration;
 import org.mule.runtime.api.source.SchedulerMessageSource;
 import org.mule.runtime.core.api.MuleContext;
@@ -69,7 +73,12 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   private ScheduledFuture<?> schedulingJob;
   private Processor listener;
   private FlowConstruct flowConstruct;
+
+  @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private SchedulerService schedulerService;
 
   @Inject
   private ConfigurationComponentLocator componentLocator;
@@ -92,9 +101,8 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
    * @param muleContext application's context
    * @param scheduler   the scheduler
    */
-  public DefaultSchedulerMessageSource(MuleContext muleContext, PeriodicScheduler scheduler,
+  public DefaultSchedulerMessageSource(PeriodicScheduler scheduler,
                                        boolean disallowConcurrentExecution) {
-    this.muleContext = muleContext;
     this.scheduler = scheduler;
     this.disallowConcurrentExecution = disallowConcurrentExecution;
   }
@@ -220,7 +228,9 @@ public class DefaultSchedulerMessageSource extends AbstractComponent
   }
 
   private void createScheduler() throws InitialisationException {
-    pollingExecutor = muleContext.getSchedulerService().cpuLightScheduler();
+    pollingExecutor = schedulerService
+        .cpuLightScheduler(SchedulerConfig.config()
+            .withName(this.getClass().getName() + ".pollingExecutor - " + getLocation().getLocation()));
   }
 
   private void disposeScheduler() {

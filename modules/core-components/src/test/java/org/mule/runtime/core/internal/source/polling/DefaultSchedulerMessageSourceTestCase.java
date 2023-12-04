@@ -6,8 +6,21 @@
  */
 package org.mule.runtime.core.internal.source.polling;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
+import static org.mule.tck.MuleTestUtils.createFlowWithSource;
+import static org.mule.test.allure.AllureConstants.SchedulerFeature.SCHEDULER;
+import static org.mule.test.allure.AllureConstants.SchedulerFeature.SchedulerStories.SCHEDULED_FLOW_EXECUTION;
+
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.of;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
@@ -17,19 +30,12 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
-import static org.mule.tck.MuleTestUtils.createFlowWithSource;
-import static org.mule.test.allure.AllureConstants.SchedulerFeature.SCHEDULER;
-import static org.mule.test.allure.AllureConstants.SchedulerFeature.SchedulerStories.SCHEDULED_FLOW_EXECUTION;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -52,6 +58,8 @@ import org.slf4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -132,10 +140,13 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
         pollScheduler.set(spiedScheduler);
       }
       return pollScheduler.get();
-    }).when(schedulerService).cpuLightScheduler();
+    }).when(schedulerService).cpuLightScheduler(any(SchedulerConfig.class));
 
     DefaultSchedulerMessageSource schedulerMessageSource = createMessageSource();
-    verify(schedulerService, atLeastOnce()).cpuLightScheduler();
+    final ArgumentCaptor<SchedulerConfig> schedulerConfigCaptor = forClass(SchedulerConfig.class);
+    verify(schedulerService, atLeastOnce()).cpuLightScheduler(schedulerConfigCaptor.capture());
+    assertThat(schedulerConfigCaptor.getValue().getSchedulerName(),
+               is("DefaultMessageProcessorChain '(chain) of 'appleFlow' processor chain' .switchOnErrorScheduler"));
 
     schedulerMessageSource.start();
 
@@ -156,8 +167,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   }
 
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
-    schedulerMessageSource =
-        new DefaultSchedulerMessageSource(muleContext, scheduler(), false);
+    schedulerMessageSource = new DefaultSchedulerMessageSource(scheduler(), false);
     schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
 
     // Manually create and register flow

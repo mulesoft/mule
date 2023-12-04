@@ -6,9 +6,12 @@
  */
 package org.mule.runtime.module.deployment.internal.processor;
 
+import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactContextFactory;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -36,18 +39,20 @@ abstract class AbstractAstConfigurationProcessor implements ArtifactConfiguratio
 
     ArtifactAst artifactAst = obtainArtifactAst(artifactContextConfiguration);
 
-    ArtifactAstConfigurationBuilder configurationBuilder =
-        new ArtifactAstConfigurationBuilder(artifactAst,
-                                            artifactContextConfiguration.getArtifactProperties(),
-                                            artifactContextConfiguration.getArtifactType(),
-                                            artifactContextConfiguration.isEnableLazyInitialization(),
-                                            artifactContextConfiguration.isAddToolingObjectsToRegistry());
+    ArtifactContextFactory configurationBuilder = createArtifactContextFactory(artifactAst,
+                                                                               artifactContextConfiguration
+                                                                                   .getArtifactProperties(),
+                                                                               artifactContextConfiguration
+                                                                                   .getArtifactType(),
+                                                                               artifactContextConfiguration
+                                                                                   .isEnableLazyInitialization(),
+                                                                               artifactContextConfiguration
+                                                                                   .isAddToolingObjectsToRegistry(),
+                                                                               artifactContextConfiguration
+                                                                                   .getServiceConfigurators(),
+                                                                               artifactContextConfiguration
+                                                                                   .getParentArtifactContext());
 
-    artifactContextConfiguration.getParentArtifactContext()
-        .ifPresent(parentContext -> configurationBuilder.setParentContext(parentContext.getMuleContext(),
-                                                                          parentContext.getArtifactAst()));
-    artifactContextConfiguration.getServiceConfigurators().stream()
-        .forEach(configurationBuilder::addServiceConfigurator);
     configurationBuilder.configure(artifactContextConfiguration.getMuleContext());
     return configurationBuilder.createArtifactContext();
   }
