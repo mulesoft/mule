@@ -67,8 +67,8 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   private final Registry registry;
   private final DefaultExpressionLanguageFactoryService service;
   private final FeatureFlaggingService featureFlaggingService;
-    private List<BindingContext> globalBindings = new LinkedList<>();
-    private volatile boolean initialised = false;
+  private List<BindingContext> globalBindings = new LinkedList<>();
+  private volatile boolean initialised = false;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,

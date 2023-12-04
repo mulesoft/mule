@@ -51,6 +51,7 @@ import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNo
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -284,19 +285,21 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
   }
 
-  protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
-    Optional<Object> overridden =
-        ((CustomServiceRegistry) muleContext.getCustomizationService()).overrideDefaultService(serviceId, serviceImpl);
+  protected void registerObject(String serviceId, Object defaultServiceImpl, MuleContext muleContext)
+      throws RegistrationException {
+    Optional<Object> serviceImpl =
+        ((CustomServiceRegistry) muleContext.getCustomizationService()).getOverriddenService(serviceId)
+            .map(customService -> customService.getServiceImpl(defaultServiceImpl))
+            .orElse(of(defaultServiceImpl));
 
-    if (!overridden.isPresent()) {
+    if (!serviceImpl.isPresent()) {
       return;
     }
 
-    serviceImpl = overridden.get();
-    if (serviceImpl instanceof MuleContextAware) {
-      ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
+    if (serviceImpl.get() instanceof MuleContextAware) {
+      ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl);
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {

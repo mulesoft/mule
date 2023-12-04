@@ -26,7 +26,6 @@ import java.util.function.Function;
 public class DefaultCustomizationService implements CustomizationService, CustomServiceRegistry {
 
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
-  private final Map<String, Consumer<ServiceOverrider>> muleContextDefaultServicesOverrider = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();
 
   /**
@@ -42,7 +41,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public void overrideDefaultServiceImpl(String serviceId, Consumer<ServiceOverrider> serviceOverrider) {
-    muleContextDefaultServicesOverrider.put(serviceId, serviceOverrider);
+    muleContextDefaultServices.put(serviceId, new CustomService(serviceOverrider));
   }
 
   /**
@@ -78,61 +77,6 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   @Override
   public Map<String, CustomService> getCustomServices() {
     return unmodifiableMap(customServices);
-  }
-
-  @Override
-  public Optional<Object> overrideDefaultService(String serviceId, Object serviceImpl) {
-    if (!muleContextDefaultServicesOverrider.containsKey(serviceId)) {
-      return of(serviceImpl);
-    }
-
-    DefaultServiceOverrider serviceOverrider = new DefaultServiceOverrider(serviceImpl);
-    muleContextDefaultServicesOverrider.get(serviceId).accept(serviceOverrider);
-
-    return serviceOverrider.isRemove() ? empty() : of(serviceOverrider.getOverrider());
-  }
-
-  private static class DefaultServiceOverrider implements ServiceOverrider {
-
-    private final Object serviceImpl;
-    private Object overrider;
-    private boolean remove;
-
-    public DefaultServiceOverrider(Object serviceImpl) {
-      this.serviceImpl = serviceImpl;
-    }
-
-    @Override
-    public Object getOverridee() {
-      return serviceImpl;
-    }
-
-    @Override
-    public void override(Object overrider) {
-      this.overrider = overrider;
-    }
-
-    @Override
-    public void remove() {
-      if (overrider != null) {
-        throw new IllegalStateException("An 'overrider' service is already present");
-      }
-
-      remove = true;
-    }
-
-    public Object getOverrider() {
-      if (remove) {
-        throw new IllegalStateException("Service set to be removed, can't be overridden");
-      }
-
-      return overrider;
-    }
-
-    public boolean isRemove() {
-      return remove;
-    }
-
   }
 
   public Map<String, CustomService> getDefaultServices() {
