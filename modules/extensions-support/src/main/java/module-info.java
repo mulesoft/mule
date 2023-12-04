@@ -108,7 +108,10 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.execution.executor to
       org.mule.runtime.core;
+  exports org.mule.runtime.module.extension.internal.runtime.objectbuilder to
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver to
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to
