@@ -36,45 +36,45 @@ import org.junit.Test;
 @Feature(SDK_OAUTH_SUPPORT)
 public class ClientCredentialsConnectionProviderWrapperTestCase {
 
-    @Test
-    public void listenerIsUnRegisteredOnStop() throws MuleException {
-        ConnectionProvider delegate = mock(ConnectionProvider.class);
-        ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
-        ClientCredentialsGrantType type = new ClientCredentialsGrantType("http://accessToken",
-                "#[accessToken]",
-                ".*",
-                null,
-                BODY);
-        when(oauthConfig.getGrantType()).thenReturn(type);
-        Map<Field, String> callbackValues = new HashMap<>();
-        ClientCredentialsOAuthHandler oauthHandler = mock(ClientCredentialsOAuthHandler.class);
-        when(oauthHandler.getOAuthContext(any())).thenReturn(mock(ResourceOwnerOAuthContext.class));
-        ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
-        ClientCredentialsConnectionProviderWrapper wrapper =
-                new TestClientCredentialsConnectionProviderWrapper(delegate, oauthConfig, callbackValues, oauthHandler,
-                        reconnectionConfig);
-        ClientCredentialsOAuthDancer dancer = mock(ClientCredentialsOAuthDancer.class);
-        when(oauthHandler.register(any())).thenReturn(dancer);
+  @Test
+  public void listenerIsUnRegisteredOnStop() throws MuleException {
+    ConnectionProvider delegate = mock(ConnectionProvider.class);
+    ClientCredentialsConfig oauthConfig = mock(ClientCredentialsConfig.class);
+    ClientCredentialsGrantType type = new ClientCredentialsGrantType("http://accessToken",
+                                                                     "#[accessToken]",
+                                                                     ".*",
+                                                                     null,
+                                                                     BODY);
+    when(oauthConfig.getGrantType()).thenReturn(type);
+    Map<Field, String> callbackValues = new HashMap<>();
+    ClientCredentialsOAuthHandler oauthHandler = mock(ClientCredentialsOAuthHandler.class);
+    when(oauthHandler.getOAuthContext(any())).thenReturn(mock(ResourceOwnerOAuthContext.class));
+    ReconnectionConfig reconnectionConfig = mock(ReconnectionConfig.class);
+    ClientCredentialsConnectionProviderWrapper wrapper =
+        new TestClientCredentialsConnectionProviderWrapper(delegate, oauthConfig, callbackValues, oauthHandler,
+                                                           reconnectionConfig);
+    ClientCredentialsOAuthDancer dancer = mock(ClientCredentialsOAuthDancer.class);
+    when(oauthHandler.register(any())).thenReturn(dancer);
 
-        wrapper.start();
-        wrapper.connect();
-        verify(dancer, times(1)).addListener(any());
-        wrapper.stop();
-        verify(dancer, times(1)).removeListener(any());
+    wrapper.start();
+    wrapper.connect();
+    verify(dancer, times(1)).addListener(any());
+    wrapper.stop();
+    verify(dancer, times(1)).removeListener(any());
+  }
+
+  private class TestClientCredentialsConnectionProviderWrapper extends ClientCredentialsConnectionProviderWrapper {
+
+    public TestClientCredentialsConnectionProviderWrapper(ConnectionProvider delegate, ClientCredentialsConfig oauthConfig,
+                                                          Map<Field, String> callbackValues,
+                                                          ClientCredentialsOAuthHandler oauthHandler,
+                                                          ReconnectionConfig reconnectionConfig) {
+      super(delegate, oauthConfig, callbackValues, oauthHandler, reconnectionConfig);
     }
 
-    private class TestClientCredentialsConnectionProviderWrapper extends ClientCredentialsConnectionProviderWrapper {
-
-        public TestClientCredentialsConnectionProviderWrapper(ConnectionProvider delegate, ClientCredentialsConfig oauthConfig,
-                                                              Map<Field, String> callbackValues,
-                                                              ClientCredentialsOAuthHandler oauthHandler,
-                                                              ReconnectionConfig reconnectionConfig) {
-            super(delegate, oauthConfig, callbackValues, oauthHandler, reconnectionConfig);
-        }
-
-        @Override
-        protected FieldSetter<Object, Object> resolveOauthStateSetter(ClientCredentialsConfig oauthConfig) {
-            return mock(FieldSetter.class);
-        }
+    @Override
+    protected FieldSetter<Object, Object> resolveOauthStateSetter(ClientCredentialsConfig oauthConfig) {
+      return mock(FieldSetter.class);
     }
+  }
 }
