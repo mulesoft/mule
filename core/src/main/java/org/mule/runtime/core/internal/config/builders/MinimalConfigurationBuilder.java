@@ -114,6 +114,7 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
@@ -127,6 +128,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
+    serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
+
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
     defaultRegistryBoostrap(APP, muleContext).initialise();
@@ -282,6 +285,14 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
+    Optional<Object> decorated =
+        ((CustomServiceRegistry) muleContext.getCustomizationService()).decorateDefaultService(serviceId, serviceImpl);
+
+    if (!decorated.isPresent()) {
+      return;
+    }
+
+    serviceImpl = decorated.get();
     if (serviceImpl instanceof MuleContextAware) {
       ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
     }
