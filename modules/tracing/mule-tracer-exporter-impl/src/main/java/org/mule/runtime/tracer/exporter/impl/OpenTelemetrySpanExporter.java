@@ -47,7 +47,6 @@ import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.List;
