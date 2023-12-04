@@ -254,6 +254,7 @@ public class MuleProperties {
   public static final String MULE_CORE_EXPORTER_FACTORY_KEY = "_muleCoreExporterFactory";
   public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";
   public static final String OBJECT_ARTIFACT_TYPE_LOADER = "_artifactTypeLoader";
+  public static final String INTERCEPTOR_MANAGER_REGISTRY_KEY = "_muleInterceptorManager";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";

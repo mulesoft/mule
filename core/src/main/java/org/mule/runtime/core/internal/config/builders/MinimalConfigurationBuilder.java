@@ -45,7 +45,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaultRegistryBoostrap;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.getDummyComponentTracerFactory;
 import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
@@ -286,7 +286,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
     Optional<Object> decorated =
-        ((CustomServiceRegistry) muleContext.getCustomizationService()).decorateDefaultService(serviceId, serviceImpl);
+        ((CustomServiceRegistry) muleContext.getCustomizationService()).overrideDefaultService(serviceId, serviceImpl);
 
     if (!decorated.isPresent()) {
       return;

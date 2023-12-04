@@ -30,13 +30,13 @@ public interface CustomServiceRegistry extends CustomizationService {
   Map<String, CustomService> getCustomServices();
 
   /**
-   * Decorates the supplied service implementation if a decorator has been registered for the given {@code serviceId}.
+   * Decorates the given service implementation if a decorator has been registered for the given {@code serviceId}.
    *
    * @param serviceId   identifier of the service.
    * @param serviceImpl the service implementation to be decorated.
    * @return the decorated service implementation, or {@link Optional#empty()} if it should be ignored.
    * @since 4.6
    */
-  Optional<Object> decorateDefaultService(String serviceId, Object serviceImpl);
+  Optional<Object> overrideDefaultService(String serviceId, Object serviceImpl);
 
 }

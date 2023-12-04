@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.config;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -16,6 +17,7 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -24,7 +26,7 @@ import java.util.function.Function;
 public class DefaultCustomizationService implements CustomizationService, CustomServiceRegistry {
 
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
-  private final Map<String, Function<Object, Optional<Object>>> muleContextDefaultServicesDecorators = new HashMap<>();
+  private final Map<String, Consumer<ServiceOverrider>> muleContextDefaultServicesOverrider = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();
 
   /**
@@ -39,8 +41,8 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    * {@inheritDoc}
    */
   @Override
-  public void decorateDefaultServiceImpl(String serviceId, Function<Object, Optional<Object>> serviceDecorator) {
-    muleContextDefaultServicesDecorators.put(serviceId, serviceDecorator);
+  public void overrideDefaultServiceImpl(String serviceId, Consumer<ServiceOverrider> serviceOverrider) {
+    muleContextDefaultServicesOverrider.put(serviceId, serviceOverrider);
   }
 
   /**
@@ -79,12 +81,58 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   }
 
   @Override
-  public Optional<Object> decorateDefaultService(String serviceId, Object serviceImpl) {
-    if (!muleContextDefaultServicesDecorators.containsKey(serviceId)) {
+  public Optional<Object> overrideDefaultService(String serviceId, Object serviceImpl) {
+    if (!muleContextDefaultServicesOverrider.containsKey(serviceId)) {
       return of(serviceImpl);
     }
 
-    return muleContextDefaultServicesDecorators.get(serviceId).apply(serviceImpl);
+    DefaultServiceOverrider serviceOverrider = new DefaultServiceOverrider(serviceImpl);
+    muleContextDefaultServicesOverrider.get(serviceId).accept(serviceOverrider);
+
+    return serviceOverrider.isRemove() ? empty() : of(serviceOverrider.getOverrider());
+  }
+
+  private static class DefaultServiceOverrider implements ServiceOverrider {
+
+    private final Object serviceImpl;
+    private Object overrider;
+    private boolean remove;
+
+    public DefaultServiceOverrider(Object serviceImpl) {
+      this.serviceImpl = serviceImpl;
+    }
+
+    @Override
+    public Object getOverridee() {
+      return serviceImpl;
+    }
+
+    @Override
+    public void override(Object overrider) {
+      this.overrider = overrider;
+    }
+
+    @Override
+    public void remove() {
+      if (overrider != null) {
+        throw new IllegalStateException("An 'overrider' service is already present");
+      }
+
+      remove = true;
+    }
+
+    public Object getOverrider() {
+      if (remove) {
+        throw new IllegalStateException("Service set to be removed, can't be overridden");
+      }
+
+      return overrider;
+    }
+
+    public boolean isRemove() {
+      return remove;
+    }
+
   }
 
   public Map<String, CustomService> getDefaultServices() {
