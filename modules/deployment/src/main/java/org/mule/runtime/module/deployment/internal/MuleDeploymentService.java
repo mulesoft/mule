@@ -98,12 +98,11 @@ public class MuleDeploymentService implements DeploymentService {
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
+  private final DeploymentExecutor deploymentExecutor;
 
   static {
     setWeakHashCaches();
   }
-
-  private final DeploymentExecutor deploymentExecutor = new DeploymentExecutor(this);
 
   /**
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
@@ -128,7 +127,7 @@ public class MuleDeploymentService implements DeploymentService {
   }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                               Supplier<SchedulerService> artifactStartExecutorSupplier) {
+                               Supplier<SchedulerService> artifactStartExecutorSupplier, DeploymentExecutor deploymentExecutor) {
     artifactStartExecutor = new LazyValue<>(() -> artifactStartExecutorSupplier.get()
         .customScheduler(config()
             .withName("ArtifactDeployer.start")
@@ -165,6 +164,9 @@ public class MuleDeploymentService implements DeploymentService {
           new DeploymentDirectoryWatcher(this, domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                          applications, artifactStartExecutorSupplier, deploymentLock);
     }
+
+    this.deploymentExecutor = deploymentExecutor;
+    this.deploymentExecutor.setDeploymentService(this);
   }
 
   static boolean useParallelDeployment() {
