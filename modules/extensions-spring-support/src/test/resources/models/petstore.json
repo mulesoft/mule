@@ -277,7 +277,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -1496,7 +1500,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -1627,7 +1635,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -2032,7 +2044,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -2163,7 +2179,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -2568,7 +2588,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -2699,7 +2723,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -3125,7 +3153,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -3256,7 +3288,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -3643,7 +3679,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -3977,7 +4017,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -4108,7 +4152,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -4592,7 +4640,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -4723,7 +4775,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -5110,7 +5166,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -5459,7 +5519,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -5590,7 +5654,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -6105,7 +6173,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -6236,7 +6308,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -6751,7 +6827,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -6882,7 +6962,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -7498,7 +7582,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -7629,7 +7717,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -8245,7 +8337,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -8376,7 +8472,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -8891,7 +8991,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -9022,7 +9126,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -9638,7 +9746,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -9769,7 +9881,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -10385,7 +10501,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -10516,7 +10636,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -11031,7 +11155,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -11162,7 +11290,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -11504,7 +11636,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ByteStreamingStrategy",
@@ -11802,7 +11938,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Array",
                     "annotations": {
                       "infrastructureType": {},
@@ -11933,7 +12073,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -12383,7 +12527,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -12984,7 +13132,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
@@ -13468,7 +13620,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -14069,7 +14225,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
@@ -14590,7 +14750,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -15191,7 +15355,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
@@ -15890,7 +16058,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -16491,7 +16663,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
@@ -16975,7 +17151,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -17576,7 +17756,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "Reconnection",
@@ -18073,7 +18257,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy",
@@ -18170,6 +18358,7 @@
                           "name": "objectStore"
                         },
                         "model": {
+                          "format": "java",
                           "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
@@ -18241,7 +18430,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -18708,7 +18901,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy",
@@ -18805,6 +19002,7 @@
                           "name": "objectStore"
                         },
                         "model": {
+                          "format": "java",
                           "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
@@ -18876,7 +19074,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -19287,7 +19489,11 @@
                 },
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "RedeliveryPolicy",
@@ -19384,6 +19590,7 @@
                           "name": "objectStore"
                         },
                         "model": {
+                          "format": "java",
                           "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                         },
                         "annotations": {
@@ -19455,7 +19662,11 @@
               "parameters": [
                 {
                   "type": {
-                    "format": "java",
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Union",
                     "annotations": {
                       "typeId": "ReconnectionStrategy",
@@ -19865,7 +20076,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -20177,7 +20392,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -20510,7 +20729,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -20822,7 +21045,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -21134,7 +21361,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -21440,7 +21671,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -21783,7 +22018,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -22245,7 +22484,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -22595,7 +22838,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -22965,7 +23212,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -23355,7 +23606,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -23714,7 +23969,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -23997,7 +24256,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -24313,7 +24576,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -24596,7 +24863,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -24889,7 +25160,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -25182,7 +25457,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -25476,7 +25755,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -25812,7 +26095,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -26041,7 +26328,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Union",
                 "annotations": {
                   "typeId": "ByteStreamingStrategy",
@@ -26339,7 +26630,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -26604,7 +26899,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -26833,7 +27132,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -27013,7 +27316,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -27306,7 +27613,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -27607,7 +27918,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -27955,7 +28270,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -28295,7 +28614,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -28643,7 +28966,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -29039,7 +29366,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -29640,7 +29971,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "Reconnection",
@@ -30124,7 +30459,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -30725,7 +31064,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "Reconnection",
@@ -31246,7 +31589,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -31847,7 +32194,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "Reconnection",
@@ -32546,7 +32897,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -33147,7 +33502,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "Reconnection",
@@ -33631,7 +33990,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -34232,7 +34595,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "Reconnection",
@@ -34675,7 +35042,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -34772,6 +35143,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -35063,7 +35435,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -35160,6 +35536,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -35493,7 +35870,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -35590,6 +35971,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -35804,7 +36186,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -35901,6 +36287,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -36192,7 +36579,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -36289,6 +36680,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -36469,7 +36861,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -36566,6 +36962,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -37006,7 +37403,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -37103,6 +37504,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -37339,7 +37741,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -37436,6 +37842,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -37611,7 +38018,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -37708,6 +38119,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -38065,7 +38477,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -38162,6 +38578,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -38519,7 +38936,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -38616,6 +39037,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -38946,7 +39368,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Union",
                 "annotations": {
                   "typeId": "ByteStreamingStrategy",
@@ -39147,7 +39573,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -39244,6 +39674,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -39494,7 +39925,11 @@
             },
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Object",
                 "annotations": {
                   "typeId": "RedeliveryPolicy",
@@ -39591,6 +40026,7 @@
                       "name": "objectStore"
                     },
                     "model": {
+                      "format": "java",
                       "type": "@ref:org.mule.runtime.api.store.ObjectStore"
                     },
                     "annotations": {
@@ -40182,6 +40618,11 @@
             "name": "tls"
           },
           "model": {
+            "format": {
+              "id": "muleInfra",
+              "label": "Mule Infrastructure",
+              "validMimeTypes": []
+            },
             "type": "Object",
             "annotations": {
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -41058,6 +41499,11 @@
             "name": "tlsContext"
           },
           "model": {
+            "format": {
+              "id": "muleInfra",
+              "label": "Mule Infrastructure",
+              "validMimeTypes": []
+            },
             "type": "Object",
             "annotations": {
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -41739,6 +42185,11 @@
             "name": "tls"
           },
           "model": {
+            "format": {
+              "id": "muleInfra",
+              "label": "Mule Infrastructure",
+              "validMimeTypes": []
+            },
             "type": "Object",
             "annotations": {
               "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -42399,6 +42850,11 @@
                   "name": "tls"
                 },
                 "model": {
+                  "format": {
+                    "id": "muleInfra",
+                    "label": "Mule Infrastructure",
+                    "validMimeTypes": []
+                  },
                   "type": "Object",
                   "annotations": {
                     "typeId": "org.mule.runtime.api.tls.TlsContextFactory",
@@ -43085,6 +43541,11 @@
                     "name": "tls"
                   },
                   "model": {
+                    "format": {
+                      "id": "muleInfra",
+                      "label": "Mule Infrastructure",
+                      "validMimeTypes": []
+                    },
                     "type": "Object",
                     "annotations": {
                       "typeId": "org.mule.runtime.api.tls.TlsContextFactory",

@@ -199,7 +199,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -508,7 +512,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -770,7 +778,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -1032,7 +1044,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -1340,7 +1356,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -1711,7 +1731,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -2019,7 +2043,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -2327,7 +2355,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -2635,7 +2667,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -2943,7 +2979,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -3251,7 +3291,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
@@ -3513,7 +3557,11 @@
           "parameters": [
             {
               "type": {
-                "format": "java",
+                "format": {
+                  "id": "muleInfra",
+                  "label": "Mule Infrastructure",
+                  "validMimeTypes": []
+                },
                 "type": "Array",
                 "annotations": {
                   "infrastructureType": {},
