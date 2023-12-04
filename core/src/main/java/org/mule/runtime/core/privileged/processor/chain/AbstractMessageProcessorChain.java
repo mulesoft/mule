@@ -22,9 +22,14 @@ import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateEventForStreaming;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
+import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -32,13 +37,6 @@ import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlin
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveException;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.resolveMessagingException;
 import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
-
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.runtime.core.internal.processor.interceptor.ReactiveInterceptorAdapter.createInterceptors;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
-import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
-import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -62,6 +60,7 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
@@ -73,13 +72,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-
-import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
-import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
-import org.mule.runtime.core.privileged.exception.EventProcessingException;
-
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -93,10 +85,14 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadin
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
-
+import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
+import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
+import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-import org.mule.runtime.tracer.api.EventTracer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -113,11 +109,11 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
+
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -747,7 +743,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     endOperationExecutionDataProducer = profilingService.getProfilingDataProducer(OPERATION_EXECUTED);
 
     if (switchOnErrorScheduler == null) {
-      switchOnErrorScheduler = schedulerService.cpuLightScheduler();
+      switchOnErrorScheduler =
+          schedulerService.cpuLightScheduler(SchedulerConfig.config().withName(toString() + ".switchOnErrorScheduler"));
     }
 
     muleEventTracer = profilingService.getCoreEventTracer();

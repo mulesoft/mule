@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>org.mule.runtime.boot</groupId>
     <artifactId>mule-module-jpms-utils</artifactId>
     <name>Mule Java JPMS utilities</name>
     <description>This module provides JMPS utilities for use within the Mule Runtime.</description>

@@ -6,8 +6,6 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
@@ -16,8 +14,6 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.base.Joiner.on;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
 
-import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.model.MavenConfiguration;
 import org.mule.maven.client.internal.MuleMavenRepositoryState;
 import org.mule.maven.client.internal.MuleMavenRepositoryStateFactory;
@@ -385,11 +381,13 @@ public class DependencyResolver implements AutoCloseable {
   // Implementation note: this must be kept consistent with the equivalent logic in embedded-api and the distro assemblies
   private boolean isMuleContainerGroupId(final String groupId) {
     return groupId.equals("org.mule.runtime")
+        || groupId.equals("org.mule.runtime.boot")
         || groupId.equals("org.mule.sdk")
         || groupId.equals("org.mule.weave")
         || groupId.equals("org.mule.mvel")
         || groupId.equals("org.mule.commons")
         || groupId.equals("com.mulesoft.mule.runtime")
+        || groupId.equals("com.mulesoft.mule.runtime.boot")
         || groupId.equals("com.mulesoft.mule.runtime.modules")
         || groupId.equals("com.mulesoft.anypoint");
   }

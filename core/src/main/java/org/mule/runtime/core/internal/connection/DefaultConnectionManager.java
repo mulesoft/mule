@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStoppi
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -25,9 +26,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.HashMap;
@@ -58,7 +59,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile defaultPoolingProfile;
   private final ConnectionManagementStrategyFactory managementStrategyFactory;
-  private final ReconnectionConfig defaultReconnectionConfig = ReconnectionConfig.getDefault();
+  private final ReconnectionConfig defaultReconnectionConfig = defaultReconnectionConfig();
 
   @Inject
   protected FeatureFlaggingService featureFlaggingService;

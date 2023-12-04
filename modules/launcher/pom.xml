@@ -33,7 +33,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -68,7 +68,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-boot-api</artifactId>
             <version>${project.version}</version>
         </dependency>
