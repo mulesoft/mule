@@ -145,7 +145,7 @@ public class OpenTelemetryResources {
     String samplerArg = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG);
 
     if (samplerArg == null) {
-      samplerArg = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ARG_ENV);;
+      samplerArg = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ARG_ENV);
     }
 
     return OpenTelemetrySpanExporterUtils.getSampler(sampler, samplerArg);

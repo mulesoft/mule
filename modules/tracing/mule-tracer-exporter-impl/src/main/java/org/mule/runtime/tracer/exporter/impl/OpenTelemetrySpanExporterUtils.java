@@ -90,7 +90,7 @@ public class OpenTelemetrySpanExporterUtils {
         return parentBased(traceIdRatioBased(sampleRatio));
       }
       default:
-        LOGGER.error("Unrecognized value for sampler: " + sampler + ". Default sampler will be used.");
+        LOGGER.error("Unrecognized value for sampler: " + sampler + ". Always on sampler will be used.");
         return alwaysOn();
     }
   }
