@@ -7,6 +7,7 @@
         <groupId>org.mule.runtime</groupId>
         <version>4.7.0-SNAPSHOT</version>
     </parent>
+    <groupId>org.mule.runtime.boot</groupId>
     <artifactId>mule-module-tanuki-boot</artifactId>
     <packaging>jar</packaging>
     <name>Mule 4 Container Wrapper based on Tanuki</name>
@@ -18,12 +19,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-boot-api</artifactId>
             <version>${project.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.mule.runtime</groupId>
+                    <groupId>org.mule.runtime.boot</groupId>
                     <artifactId>mule-module-log4j-boot-configurator</artifactId>
                 </exclusion>
             </exclusions>

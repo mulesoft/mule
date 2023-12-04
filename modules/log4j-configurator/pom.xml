@@ -39,12 +39,12 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-log4j-boot-configurator</artifactId>
             <version>${project.version}</version>
         </dependency>
