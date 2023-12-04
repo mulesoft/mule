@@ -106,7 +106,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   @Override
   public void stop() throws MuleException {
     if (updatingClientCredentialsState != null) {
-      updatingClientCredentialsState.deRegisterListener();
+      updatingClientCredentialsState.deregisterListener();
     }
     super.stop();
   }

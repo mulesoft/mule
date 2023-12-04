@@ -73,7 +73,7 @@ public class UpdatingClientCredentialsState
     return delegate.getExpiresIn();
   }
 
-  public void deRegisterListener() {
+  public void deregisterListener() {
     dancer.removeListener(clientCredentialsListener);
   }
 }
