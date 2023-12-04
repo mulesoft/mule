@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.tracer.exporter.config.api;
 
+import static java.lang.System.getenv;
+
 /**
  * A configuration for the export of spans.
  *
@@ -35,4 +37,13 @@ public interface SpanExporterConfiguration {
    * @param doOnConfigurationChanged to execute when a change in the configuration is detected.
    */
   default void doOnConfigurationChanged(Runnable doOnConfigurationChanged) {}
+
+  /**
+   * @param envProperty the env property to retrieve.
+   *
+   * @return the env property.
+   */
+  default String getEnvProperty(String envProperty) {
+    return getenv(envProperty);
+  }
 }
