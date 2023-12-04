@@ -13,6 +13,7 @@ import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetr
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.Boolean.parseBoolean;
+import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.getSampler;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 
 import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,8 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   private static final CapturingSpanExporterWrapper SNIFFED_EXPORTER =
       new CapturingSpanExporterWrapper(OpenTelemetryResources.NoOpSpanExporter.getInstance());
+
+  private Sampler sampler;
 
   private FeatureFlaggingService featureFlaggingService;
   private MuleContext muleContext;
@@ -88,7 +92,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
 
   public SpanExporter getSpanExporter(Span span, InitialSpanInfo initialSpanInfo) {
     return new OpenTelemetrySpanExporter(span, initialSpanInfo, artifactId, artifactType, spanProcessor,
-                                         addMuleAncestorSpanId, resource);
+                                         addMuleAncestorSpanId, resource, sampler);
   }
 
   protected SpanProcessor resolveOpenTelemetrySpanProcessor() {
@@ -134,6 +138,7 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
     this.spanProcessor = resolveOpenTelemetrySpanProcessor();
     this.addMuleAncestorSpanId = featureFlaggingService.isEnabled(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE);
     this.configuration.doOnConfigurationChanged(this::doOnConfigurationChanged);
+    this.sampler = resolveSampler();
   }
 
   private void doOnConfigurationChanged() {
@@ -153,6 +158,10 @@ public class OpenTelemetrySpanExporterFactory implements SpanExporterFactory, Di
   @Override
   public void dispose() {
     silentlyShutdown(spanProcessor);
+  }
+
+  protected Sampler resolveSampler() {
+    return getSampler(configuration);
   }
 
   private static class OpenTelemetrySpanSnifferManager implements SpanSnifferManager {
