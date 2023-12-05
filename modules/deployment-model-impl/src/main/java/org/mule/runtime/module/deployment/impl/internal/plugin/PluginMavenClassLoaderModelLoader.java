@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
-import static com.google.common.io.Files.createTempDir;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -38,6 +38,7 @@ import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLo
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderModelBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -228,7 +229,7 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
 
   private class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
 
-    private final File temporaryFolder = createTempDir();
+    private final File temporaryFolder;
 
     private final Model effectiveModel;
 
@@ -236,10 +237,19 @@ public class PluginMavenClassLoaderModelLoader extends AbstractMavenClassLoaderM
     private final File artifactFile;
 
     public MuleSystemPluginMavenReactorResolver(File artifactFile) {
+      this.temporaryFolder = getTempDir();
       this.effectiveModel = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
 
       this.pomFile = effectiveModel.getPomFile();
       this.artifactFile = artifactFile;
+    }
+
+    private File getTempDir() {
+      try {
+        return createTempDirectory(null).toFile();
+      } catch (IOException e) {
+        throw new IllegalStateException("Failed to create directory", e);
+      }
     }
 
     public Model getEffectiveModel() {
