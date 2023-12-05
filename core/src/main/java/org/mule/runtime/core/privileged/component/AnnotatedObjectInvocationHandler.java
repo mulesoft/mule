@@ -13,8 +13,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableSet;
 
 import static net.bytebuddy.dynamic.scaffold.subclass.ConstructorStrategy.Default.IMITATE_SUPER_CLASS;
+import static net.bytebuddy.implementation.MethodCall.invoke;
 import static net.bytebuddy.implementation.MethodDelegation.to;
-import static net.bytebuddy.matcher.ElementMatchers.is;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.isToString;
 import static net.bytebuddy.matcher.ElementMatchers.named;
@@ -22,13 +22,8 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.RemoveDynamicAnnotationsInterceptor;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ToStringInterceptor;
-import org.mule.runtime.core.internal.component.DynamicallyComponent;
-import org.mule.runtime.core.internal.component.DynamicallySerializableComponent;
+import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentAdditionalInterceptor;
+import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -39,6 +34,9 @@ import org.slf4j.Logger;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.SuperMethodCall;
+import net.bytebuddy.matcher.ElementMatchers;
 
 /**
  * Provides {@code annotations} handling logic for Byte Buddy enhanced classes that implement {@link Component} dynamically.
@@ -52,6 +50,15 @@ public final class AnnotatedObjectInvocationHandler {
 
   private static final Set<Method> MANAGED_METHODS =
       unmodifiableSet(new HashSet<>(asList(Component.class.getDeclaredMethods())));
+  private static final Method COMPONENT_ADDITIONAL_INTERCEPTOR_SET_OBJ;
+
+  static {
+    try {
+      COMPONENT_ADDITIONAL_INTERCEPTOR_SET_OBJ = ComponentAdditionalInterceptor.class.getMethod("setObj", Component.class);
+    } catch (NoSuchMethodException | SecurityException e) {
+      throw new IllegalStateException(e);
+    }
+  }
 
   /**
    * Enhances the given {@code nonAnnotatedClass} to be an implementation of {@link Component}.
@@ -88,22 +95,28 @@ public final class AnnotatedObjectInvocationHandler {
       dynamicInterface = DynamicallyComponent.class;
     }
 
-    ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor(MANAGED_METHODS);
+    ComponentInterceptor annotatedObjectInvocationHandler = new ComponentInterceptor();
+    final MethodDelegation implementation = to(annotatedObjectInvocationHandler);
 
-    Reference<DynamicType.Builder> builder =
-        new Reference<>(byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface));
-    MANAGED_METHODS
-        .forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
-    annotatedObjectInvocationHandler.getOverridingMethods()
-        .forEach(method -> builder.set(builder.get().method(is(method)).intercept(to(annotatedObjectInvocationHandler))));
-    builder.set(builder.get().method(named("writeReplace")).intercept(to(new RemoveDynamicAnnotationsInterceptor())));
-    MANAGED_METHODS.forEach(method -> builder
-        .set(builder.get().method(named(method.getName()).and(takesArguments(method.getParameterTypes())))
-            .intercept(to(annotatedObjectInvocationHandler))));
-    builder.set(builder.get().method(isToString().and(isDeclaredBy(Object.class))).intercept(to(new ToStringInterceptor())));
+    DynamicType.Builder builder =
+        byteBuddy.subclass(clazz, IMITATE_SUPER_CLASS).implement(dynamicInterface);
+    for (Method method : MANAGED_METHODS) {
+      builder = builder
+          .method(named(method.getName()).and(takesArguments(method.getParameterTypes())))
+          .intercept(implementation);
+    }
+
+    final ComponentAdditionalInterceptor annotatedObjectAdditionalInvocationHandler = new ComponentAdditionalInterceptor();
+    builder = builder
+        .method(named("writeReplace").or(isToString().and(isDeclaredBy(Object.class))))
+        .intercept(to(annotatedObjectAdditionalInvocationHandler));
+
+    builder = builder.constructor(ElementMatchers.any())
+        .intercept(SuperMethodCall.INSTANCE
+            .andThen(invoke(COMPONENT_ADDITIONAL_INTERCEPTOR_SET_OBJ).on(annotatedObjectAdditionalInvocationHandler).withThis()));
 
     ClassLoader classLoader = multiParentClassLoaderFor(clazz.getClassLoader());
-    return builder.get().make().load(classLoader).getLoaded();
+    return builder.make().load(classLoader).getLoaded();
   }
 
   /**

@@ -14,6 +14,7 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 
 import static java.util.Collections.singletonMap;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -63,6 +64,14 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
     assertThat(removeDynamicAnnotations(annotated), instanceOf(NotAnnotated.class));
     assertThat(removeDynamicAnnotations(annotated), not(instanceOf(Component.class)));
+  }
+
+  @Test
+  public void notAnnotatedWithConstructor() throws Exception {
+    NotAnnotatedWithConstructor annotated =
+        (NotAnnotatedWithConstructor) addAnnotationsToClass(NotAnnotatedWithConstructor.class).newInstance();
+
+    assertThat(annotated.getSomething(), equalTo("something"));
   }
 
   @Test
@@ -181,6 +190,20 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     @Inject
     public void setSomething(Object something) {
       this.something = something;
+    }
+
+    public Object getSomething() {
+      return something;
+    }
+
+  }
+
+  public static class NotAnnotatedWithConstructor {
+
+    private final Object something;
+
+    public NotAnnotatedWithConstructor() {
+      this.something = "something";
     }
 
     public Object getSomething() {
