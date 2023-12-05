@@ -317,7 +317,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>${mockitoVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -335,7 +334,29 @@
                 <directory>${basedir}/src/test/resources</directory>
             </testResource>
         </testResources>
+
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/mule/runtime/module/extension/internal/resources/test/**</include>
+                                <include>org/mule/runtime/module/extension/internal/loader/parser/java/test/**</include>
+                                <include>org/mule/runtime/module/extension/internal/util/test/**</include>
+                                <include>org/mule/test/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>                
+            </plugin>
+
             <!-- Required by mule-extension-ast-loader -->
             <!-- Force creation of the test-jar before the shade-plugin runs -->
             <plugin>

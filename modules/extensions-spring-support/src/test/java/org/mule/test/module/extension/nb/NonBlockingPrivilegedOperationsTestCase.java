@@ -6,11 +6,13 @@
  */
 package org.mule.test.module.extension.nb;
 
+import static org.mule.test.module.extension.internal.util.extension.privileged.PrivilegedNonBlockingComponentExecutor.OUTPUT;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.module.extension.internal.loader.privileged.extension.PrivilegedNonBlockingComponentExecutor.OUTPUT;
+
 import org.mule.functional.junit4.ExtensionFunctionalTestCase;
-import org.mule.runtime.module.extension.internal.loader.privileged.extension.PrivilegedExtension;
+import org.mule.test.module.extension.internal.util.extension.privileged.PrivilegedExtension;
 
 import org.junit.Test;
 

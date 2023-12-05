@@ -49,7 +49,7 @@
                         <configuration>
                             <includes>
                                 <include>org/mule/runtime/module/artifact/api/classloader/test/**</include>
-                                <include>org/mule/runtime/module/artifact/internal/util/**</include>
+                                <include>org/mule/runtime/module/artifact/internal/util/test/**</include>
                             </includes>
                         </configuration>
                     </execution>
@@ -126,7 +126,6 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>${aspectjVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

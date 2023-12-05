@@ -15,7 +15,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-default">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:inner-pojo="http://www.mulesoft.org/schema/mule/inner-pojo" base="inner-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Account"></xs:extension>
+                  <xs:extension xmlns:inner-pojo="http://www.mulesoft.org/schema/mule/inner-pojo" base="inner-pojo:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Account"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
@@ -31,7 +31,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Account">
+  <xs:complexType name="org.mule.test.module.extension.internal.util.extension.connectivity.basic.Account">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="xs:string" use="required" name="requiredInnerPojoWithExpressionRequired"></xs:attribute>

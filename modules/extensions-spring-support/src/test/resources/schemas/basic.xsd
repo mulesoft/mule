@@ -16,42 +16,42 @@
             <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-default">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-no-expression">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="required-pojo-expression-supported">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-default">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-no-expression">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
             <xs:element minOccurs="0" maxOccurs="1" name="optional-pojo-expression-supported">
               <xs:complexType>
                 <xs:complexContent>
-                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner"></xs:extension>
+                  <xs:extension xmlns:basic="http://www.mulesoft.org/schema/mule/basic" base="basic:org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner"></xs:extension>
                 </xs:complexContent>
               </xs:complexType>
             </xs:element>
@@ -73,7 +73,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="org.mule.runtime.module.extension.internal.runtime.connectivity.basic.Owner">
+  <xs:complexType name="org.mule.test.module.extension.internal.util.extension.connectivity.basic.Owner">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="mule:expressionString" use="required" name="requiredFieldDefault"></xs:attribute>

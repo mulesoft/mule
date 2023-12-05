@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.data.sample;
 
-import static org.mule.runtime.module.extension.internal.data.sample.SampleDataTestUtils.exceptionMatcher;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;
 import static org.mule.sdk.api.data.sample.SampleDataException.UNKNOWN;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SampleDataStory.SAMPLE_DATA_SERVICE;
+import static org.mule.test.module.extension.internal.util.extension.data.sample.SampleDataTestUtils.exceptionMatcher;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;

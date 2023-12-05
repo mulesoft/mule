@@ -78,4 +78,25 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test-jar</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/mule/runtime/deployment/model/internal/domain/test/**</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>                
+            </plugin>
+        </plugins>
+    </build>
 </project>
