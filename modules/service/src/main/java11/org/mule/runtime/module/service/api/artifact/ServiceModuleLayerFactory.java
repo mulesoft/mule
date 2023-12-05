@@ -73,14 +73,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
                                     ClassLoaderLookupPolicy lookupPolicy) {
     URL[] classLoaderConfigurationUrls = descriptor.getClassLoaderConfiguration().getUrls();
 
-    if (artifactId.equals("service/DataWeave service")) {
-      // TODO TD-0144818 remove this special case
-      if (!getBoolean(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER_DATAWEAVE)) {
-        return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
-                                           lookupPolicy);
-      }
-    }
-
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
     ModuleLayer artifactLayer = createModuleLayer(classLoaderConfigurationUrls, parent,
                                                   parentLayer, true, true);
