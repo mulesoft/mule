@@ -4,27 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
+package org.mule.runtime.core.privileged.component;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Collections.synchronizedMap;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Empty;
-import net.bytebuddy.implementation.bind.annotation.Origin;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.implementation.bind.annotation.SuperMethod;
-import net.bytebuddy.implementation.bind.annotation.This;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 public class AnnotatedObjectInvocationHandlerInterceptors {
 
@@ -69,53 +65,69 @@ public class AnnotatedObjectInvocationHandlerInterceptors {
 
   public static class ComponentInterceptor extends AbstractComponent {
 
-    private final Map<Method, Method> overridingMethods = synchronizedMap(new HashMap<>());
-
-    public ComponentInterceptor(Set<Method> managedMethods) {
-      for (Method method : managedMethods) {
-        overridingMethods.put(method, method);
-      }
+    @Override
+    public Object getAnnotation(QName qName) {
+      return super.getAnnotation(qName);
     }
 
-    @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
-                            @SuperMethod(nullIfImpossible = true) Method superMethod, @Empty Object defaultValue)
-        throws Throwable {
-      if (overridingMethods.containsKey(method)) {
-        return overridingMethods.get(method).invoke(this, args);
-      } else {
-        return defaultValue;
-      }
+    @Override
+    public Map<QName, Object> getAnnotations() {
+      return super.getAnnotations();
     }
 
-    public Set<Method> getOverridingMethods() {
-      return overridingMethods.keySet();
+    @Override
+    public void setAnnotations(Map<QName, Object> newAnnotations) {
+      super.setAnnotations(newAnnotations);
+    }
+
+    @Override
+    public ComponentLocation getLocation() {
+      return super.getLocation();
+    }
+
+    @Override
+    public Location getRootContainerLocation() {
+      return super.getRootContainerLocation();
+    }
+
+    @Override
+    public ComponentIdentifier getIdentifier() {
+      return super.getIdentifier();
+    }
+
+    @Override
+    public String getRepresentation() {
+      return super.getRepresentation();
+    }
+
+    @Override
+    public String getDslSource() {
+      return super.getDslSource();
     }
   }
 
-  public static class RemoveDynamicAnnotationsInterceptor {
+  public static class ComponentAdditionalInterceptor {
 
-    @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args,
-                            @SuperMethod(nullIfImpossible = true) Method superMethod, @Empty Object defaultValue)
+    private Component obj;
+
+    public Object writeReplace()
         throws Throwable {
       return removeDynamicAnnotations(obj);
     }
-  }
 
-  public static class ToStringInterceptor {
-
-    @RuntimeType
-    public Object intercept(@This Object obj, @Origin Method method, @AllArguments Object[] args, @SuperMethod Method superMethod)
-        throws Throwable {
+    @Override
+    public String toString() {
       String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
-      if (((Component) obj).getLocation() != null) {
-        return base + ((Component) obj).getLocation().getLocation();
+      if (obj.getLocation() != null) {
+        return base + obj.getLocation().getLocation();
       } else {
         return base + "(null)";
       }
     }
 
+    public void setObj(Component obj) {
+      this.obj = obj;
+    }
   }
 
 }
