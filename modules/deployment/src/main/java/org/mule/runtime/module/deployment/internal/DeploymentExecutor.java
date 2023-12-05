@@ -16,10 +16,24 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Properties;
 
+/**
+ * Provides customization of the DeploymentService deploy action.
+ *
+ * @since 4.7.0
+ */
 public interface DeploymentExecutor {
 
   void setDeploymentService(DeploymentService deploymentService);
 
+  /**
+   * Deploys an application bundled as a zip from the given URL to the mule container.
+   *
+   * @param artifactArchiveUri       location of the zip application file.
+   * @param deploymentProperties     the properties of the deployment.
+   * @param artifactDeploymentFolder deployment folder of the artifact.
+   * @param archiveDeployer          deployer of the artifact.
+   * @throws IOException
+   */
   <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deploy(URI artifactArchiveUri,
                                                                               Optional<Properties> deploymentProperties,
                                                                               File artifactDeploymentFolder,
