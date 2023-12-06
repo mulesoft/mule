@@ -10,7 +10,7 @@ import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
-import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorInShutdown;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.fatalErrorWhileRunning;
@@ -51,8 +51,8 @@ import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
 import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutorMultiApp;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutorSingleApp;
+import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
+import org.mule.runtime.module.deployment.internal.SingleAppDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
@@ -125,10 +125,10 @@ public class DefaultMuleContainer implements MuleContainer {
     this.extensionModelLoaderRepository = artifactResourcesRegistry.getExtensionModelLoaderRepository();
 
     DeploymentExecutor deploymentExecutor;
-    if (getProperties().containsKey(SINGLE_DEPLOYMENT_PROPERTY)) {
-      deploymentExecutor = new DeploymentExecutorSingleApp();
+    if (getProperties().containsKey(SINGLE_APP_MODE_PROPERTY)) {
+      deploymentExecutor = new SingleAppDeploymentExecutor();
     } else {
-      deploymentExecutor = new DeploymentExecutorMultiApp();
+      deploymentExecutor = new ApplicationServerDeploymentExecutor();
     }
 
     this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),

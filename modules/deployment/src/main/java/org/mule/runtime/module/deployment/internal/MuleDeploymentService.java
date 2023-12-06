@@ -157,11 +157,11 @@ public class MuleDeploymentService implements DeploymentService {
       }
       LOGGER.info("Using parallel deployment");
       this.deploymentDirectoryWatcher =
-          new ParallelDeploymentDirectoryWatcher(this, domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+          new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                                  applications, artifactStartExecutorSupplier, deploymentLock);
     } else {
       this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(this, domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
+          new DeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                          applications, artifactStartExecutorSupplier, deploymentLock);
     }
 

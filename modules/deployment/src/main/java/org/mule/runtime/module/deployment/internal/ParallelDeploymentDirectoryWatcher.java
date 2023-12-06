@@ -17,7 +17,6 @@ import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
-import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.util.ArrayList;
@@ -39,13 +38,12 @@ public class ParallelDeploymentDirectoryWatcher extends DeploymentDirectoryWatch
 
   private Scheduler threadPoolExecutor;
 
-  public ParallelDeploymentDirectoryWatcher(DeploymentService deploymentService,
-                                            DomainBundleArchiveDeployer domainBundleDeployer,
+  public ParallelDeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
                                             ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
                                             ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
                                             ObservableList<Domain> domains, ObservableList<Application> applications,
                                             Supplier<SchedulerService> schedulerServiceSupplier, ReentrantLock deploymentLock) {
-    super(deploymentService, domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications,
+    super(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications,
           schedulerServiceSupplier, deploymentLock);
   }
 

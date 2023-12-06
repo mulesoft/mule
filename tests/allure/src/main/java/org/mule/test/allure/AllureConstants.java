@@ -96,6 +96,12 @@ public interface AllureConstants {
 
     }
 
+    interface SingleAppDeploymentStory {
+
+      String SINGLE_APP_DEPLOYMENT = "Single App Deployment";
+
+    }
+
     interface SupportedJavaVersions {
 
       String JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT =

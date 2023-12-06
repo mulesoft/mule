@@ -16,24 +16,27 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Properties;
 
-public class DeploymentExecutorSingleApp extends DeploymentExecutorUtils implements DeploymentExecutor {
+/**
+ * Is the default deploy action of a DeploymentService.
+ *
+ * @since 4.7.0
+ */
+public class ApplicationServerDeploymentExecutor extends DeploymentExecutorUtils implements DeploymentExecutor {
 
   private DeploymentService deploymentService;
 
   @Override
-  public final void setDeploymentService(DeploymentService deploymentService) {
+  public void setDeploymentService(DeploymentService deploymentService) {
     this.deploymentService = deploymentService;
   }
 
   @Override
-  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deploy(final URI artifactArchiveUri,
-                                                                                     final Optional<Properties> deploymentProperties,
+  public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> void deploy(URI artifactArchiveUri,
+                                                                                     Optional<Properties> deploymentProperties,
                                                                                      File artifactDeploymentFolder,
                                                                                      ArchiveDeployer<D, T> archiveDeployer)
       throws IOException {
-    if (this.deploymentService.getApplications().isEmpty()) {
-      deployTemplateMethod(this.deploymentService, artifactArchiveUri, deploymentProperties, artifactDeploymentFolder,
-                           archiveDeployer);
-    }
+    deployTemplateMethod(this.deploymentService, artifactArchiveUri, deploymentProperties, artifactDeploymentFolder,
+                         archiveDeployer);
   }
 }

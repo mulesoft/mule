@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.DeploymentSuccessfulStory.DEPLOYMENT_SUCCESS;
+import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SingleAppDeploymentStory.SINGLE_APP_DEPLOYMENT;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -19,28 +20,27 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import java.util.List;
 
 import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
-@Issue("W-12356140")
 @Feature(APP_DEPLOYMENT)
-public class SingleDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
+@Story(SINGLE_APP_DEPLOYMENT)
+public class SingleAppDeploymentTestCase extends AbstractApplicationDeploymentTestCase {
 
   @Rule
-  public SystemProperty singleDeploymentProperty;
+  public SystemProperty singleAppModeProperty;
 
   @Parameterized.Parameters(name = "Parallel Deployment: {0} - Single Deployment: {1}")
   public static List<Object[]> parameters() {
     return singletonList(new Object[] {FALSE, TRUE});
   }
 
-  public SingleDeploymentTestCase(boolean parallelDeployment, boolean singleDeployment) {
+  public SingleAppDeploymentTestCase(boolean parallelDeployment, boolean singleDeployment) {
     super(parallelDeployment);
     if (singleDeployment) {
-      this.singleDeploymentProperty = new SystemProperty(SINGLE_DEPLOYMENT_PROPERTY, "");
+      this.singleAppModeProperty = new SystemProperty(SINGLE_APP_MODE_PROPERTY, "");
     }
   }
 

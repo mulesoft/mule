@@ -8,7 +8,7 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.EXPORTED_RESOURCE_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXTENSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
@@ -111,7 +111,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutorMultiApp;
+import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
 import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -155,7 +155,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public SystemProperty otherSystemProperty = new SystemProperty("oneProperty", "someValue");
 
   @Rule
-  public SystemProperty singleDeploymentProperty;
+  public SystemProperty singleAppModeProperty;
 
   @Parameterized.Parameters(
       name = "Parallel Deployment: {0} - Single Deployment: {1}")
@@ -170,7 +170,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   public ApplicationDeploymentTestCase(boolean parallelDeployment, boolean singleDeployment) {
     super(parallelDeployment);
     if (singleDeployment) {
-      this.singleDeploymentProperty = new SystemProperty(SINGLE_DEPLOYMENT_PROPERTY, "");
+      this.singleAppModeProperty = new SystemProperty(SINGLE_APP_MODE_PROPERTY, "");
     }
   }
 
@@ -508,7 +508,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void doesNotRetriesBrokenAppWithFunkyName() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     addPackedAppFromBuilder(brokenAppWithFunkyNameAppFileBuilder);
 
@@ -607,7 +607,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysPackagedAppOnStartupWhenExplodedAppIsAlsoPresent() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     addExplodedAppFromBuilder(dummyAppDescriptorFileBuilder);
     addPackedAppFromBuilder(dummyAppDescriptorFileBuilder);
@@ -666,7 +666,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysInvalidExplodedOnlyOnce() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     startDeployment();
 
@@ -1250,7 +1250,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppOnStartup() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     addPackedAppFromBuilder(incompleteAppFileBuilder);
 
@@ -1271,7 +1271,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void deploysIncompleteZipAppAfterStartup() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     startDeployment();
 
@@ -1292,7 +1292,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_FAILURE)
   public void mantainsAppFolderOnExplodedAppDeploymentError() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     startDeployment();
 
@@ -1543,7 +1543,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
   @Test
   @Story(DEPLOYMENT_SUCCESS)
   public void deploysMultipleAppsZipOnStartup() throws Exception {
-    assumeThat(singleDeploymentProperty == null, is(TRUE));
+    assumeThat(singleAppModeProperty == null, is(TRUE));
 
     final int totalApps = 20;
 
@@ -1899,7 +1899,7 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
                                                       () -> findSchedulerService(serviceManager),
-                                                      new DeploymentExecutorMultiApp());
+                                                      new ApplicationServerDeploymentExecutor());
     configureDeploymentService();
     deploymentService.start(false);
   }

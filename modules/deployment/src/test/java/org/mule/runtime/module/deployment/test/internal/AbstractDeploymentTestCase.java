@@ -152,7 +152,7 @@ import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
 import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
 import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutorMultiApp;
+import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
@@ -424,7 +424,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                               + serviceManager.getServices()), e);
                                                         }
                                                       },
-                                                      new DeploymentExecutorMultiApp());
+                                                      new ApplicationServerDeploymentExecutor());
     configureDeploymentService();
 
     policyManager = new TestPolicyManager(deploymentService,
