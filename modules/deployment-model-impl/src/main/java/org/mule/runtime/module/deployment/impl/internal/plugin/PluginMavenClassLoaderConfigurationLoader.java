@@ -16,7 +16,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import static java.lang.String.format;
-import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -39,7 +38,6 @@ import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLo
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderConfigurationBuilder;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,14 +241,15 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       File baseDir = new File(System.getProperty("java.io.tmpdir"));
       String baseName = System.currentTimeMillis() + "-";
 
-      for(int counter = 0; counter < 10000; ++counter) {
+      for (int counter = 0; counter < 10000; ++counter) {
         File tempDir = new File(baseDir, baseName + counter);
         if (tempDir.mkdir()) {
           return tempDir;
         }
       }
 
-      throw new IllegalStateException("Failed to create directory within 10000 attempts (tried " + baseName + "0 to " + baseName + 9999 + ')');
+      throw new IllegalStateException("Failed to create directory within 10000 attempts (tried " + baseName + "0 to " + baseName
+          + 9999 + ')');
     }
 
     public MavenPomModel getEffectiveModel() {
