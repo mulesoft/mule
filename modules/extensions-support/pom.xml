@@ -36,7 +36,7 @@
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.resolver=ALL-UNNAMED
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.source=org.mule.runtime.core
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.runtime.operation=org.mule.runtime.core
-            --add-exports=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.privileged.extension=org.mule.runtime.core
+            --add-exports=org.mule.runtime.extensions.support/org.mule.test.module.extension.internal.util.extension.privileged=org.mule.runtime.core
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
@@ -347,6 +347,7 @@
                         </goals>
                         <configuration>
                             <includes>
+                                <include>*</include>
                                 <include>org/mule/runtime/module/extension/internal/resources/test/**</include>
                                 <include>org/mule/runtime/module/extension/internal/loader/parser/java/test/**</include>
                                 <include>org/mule/runtime/module/extension/internal/util/test/**</include>
