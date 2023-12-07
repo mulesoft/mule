@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
-import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.ArrayList;
@@ -43,12 +42,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Issue("MULE-19984")
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
@@ -68,7 +68,6 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     sorter = new DependencyGraphLifecycleObjectSorter(resolver, new Class<?>[] {
         LockFactory.class,
         ObjectStoreManager.class,
-        ExpressionLanguageExtension.class,
         ExpressionLanguage.class,
         QueueManager.class,
         StreamingManager.class,

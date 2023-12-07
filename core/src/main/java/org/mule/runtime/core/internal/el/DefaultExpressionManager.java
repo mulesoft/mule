@@ -57,10 +57,6 @@ import org.slf4j.Logger;
 
 public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
-  public static final String DW_PREFIX = "dw";
-  public static final String MEL_PREFIX = "mel";
-  public static final String PREFIX_EXPR_SEPARATOR = ":";
-  public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
@@ -72,7 +68,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
-  private boolean melDefault;
 
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
@@ -223,10 +218,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       throws ExpressionRuntimeException {
     Builder eventBuilder = CoreEvent.builder(event);
 
-    if ((!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault) || hasMelExpression(expression)) {
-      parseWarning.warn();
-      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), expression);
-    } else if (isExpression(expression)) {
+    if (isExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
@@ -261,36 +253,22 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
                                  BindingContext bindingContext)
       throws ExpressionRuntimeException {
 
-    if ((!hasDwExpression(template) && !hasMelExpression(template) && melDefault) || hasMelExpression(template)) {
-      Builder eventBuilder = CoreEvent.builder(event);
-      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), template);
-    } else {
-      return parser.parse(token -> {
-        TypedValue<?> evaluation = expressionLanguage.evaluateLogExpression(token, event, componentLocation, bindingContext);
-        if (evaluation.getValue() instanceof Message) {
-          // Do not apply transformation to Message since payload will be considered then
-          return evaluation.getValue();
-        }
-        try {
-          return transform(evaluation, evaluation.getDataType(), STRING).getValue();
-        } catch (TransformerException e) {
-          throw new ExpressionRuntimeException(
-                                               createStaticMessage(format("Failed to transform %s to %s.",
-                                                                          evaluation.getDataType(),
-                                                                          STRING)),
-                                               e);
-        }
-      }, template);
-    }
-  }
-
-  private Object melParseEvaluation(CoreEvent event, ComponentLocation componentLocation, Builder eventBuilder, String token) {
-    Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
-    if (result instanceof Message) {
-      return ((Message) result).getPayload().getValue();
-    } else {
-      return result;
-    }
+    return parser.parse(token -> {
+      TypedValue<?> evaluation = expressionLanguage.evaluateLogExpression(token, event, componentLocation, bindingContext);
+      if (evaluation.getValue() instanceof Message) {
+        // Do not apply transformation to Message since payload will be considered then
+        return evaluation.getValue();
+      }
+      try {
+        return transform(evaluation, evaluation.getDataType(), STRING).getValue();
+      } catch (TransformerException e) {
+        throw new ExpressionRuntimeException(
+                                             createStaticMessage(format("Failed to transform %s to %s.",
+                                                                        evaluation.getDataType(),
+                                                                        STRING)),
+                                             e);
+      }
+    }, template);
   }
 
   @Override
@@ -344,26 +322,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     return expressionLanguage.split(expression, null, context);
   }
 
-  /**
-   * Checks if an expression has MEL prefix.
-   *
-   * @param expression the expression to check to see if is a MEL expression.
-   * @return true if the expression is a MEL expression
-   */
-  public static boolean hasMelExpression(String expression) {
-    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
-  }
-
-  /**
-   * Checks if an expression has DW prefix.
-   *
-   * @param expression the expression to check to see if is a DW expression.
-   * @return true if the expression is a MEL expression
-   */
-  public static boolean hasDwExpression(String expression) {
-    return expression.contains(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX + PREFIX_EXPR_SEPARATOR);
-  }
-
   @Override
   public ExpressionManagerSession openSession(BindingContext context) {
     return new DefaultExpressionManagerSession(new LazyValue<>(() -> expressionLanguage.openSession(null, null, context)),
@@ -393,10 +351,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   public void setExpressionLanguage(ExtendedExpressionLanguageAdaptor expressionLanguage) {
     this.expressionLanguage = expressionLanguage;
-  }
-
-  public void setMelDefault(boolean melDefault) {
-    this.melDefault = melDefault;
   }
 
   @Override

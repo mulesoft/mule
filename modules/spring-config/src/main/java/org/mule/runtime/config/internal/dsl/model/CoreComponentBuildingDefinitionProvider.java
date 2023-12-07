@@ -25,8 +25,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
-import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
@@ -91,7 +89,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
 import org.mule.runtime.core.api.config.MuleConfiguration;
-import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.ResourceIdentifierSelector;
@@ -113,11 +110,6 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
-import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
-import org.mule.runtime.core.internal.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
-import org.mule.runtime.core.internal.el.mvel.configuration.MVELGlobalFunctionsConfig;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -585,8 +577,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                        .build())
         .build());
 
-    componentBuildingDefinitions.addAll(getMvelBuildingDefinitions());
-
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
     componentBuildingDefinitions
@@ -645,40 +635,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     return definitions;
   }
-
-  private List<ComponentBuildingDefinition> getMvelBuildingDefinitions() {
-    List<ComponentBuildingDefinition> mvelComponentBuildingDefinitions = new ArrayList<>();
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
-        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
-        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
-        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
-        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
-        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
-        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
-        .withTypeDefinition(fromType(ImportEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
-        .withTypeDefinition(fromType(AliasEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
-        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
-        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
-        .build());
-
-    return mvelComponentBuildingDefinitions;
-  }
-
 
   @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {
