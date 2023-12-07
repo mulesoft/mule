@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.classloader.model.utils;
 
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_DOMAIN;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.Classifier.MULE_PLUGIN;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
@@ -125,19 +122,6 @@ public class ArtifactUtils {
     artifacts.stream().filter(artifact -> artifact.getArtifactCoordinates().getGroupId().equals(sharedLibraryGroupId) &&
         artifact.getArtifactCoordinates().getArtifactId().equals(sharedLibraryArtifactId))
         .forEach(artifact -> artifact.setShared(true));
-  }
-
-
-  protected static String getAttribute(org.codehaus.plexus.util.xml.Xpp3Dom tag, String attributeName) {
-    org.codehaus.plexus.util.xml.Xpp3Dom attributeDom = tag.getChild(attributeName);
-    checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file",
-                                            attributeName, tag));
-    String attributeValue = attributeDom.getValue().trim();
-    checkState(!isEmpty(attributeValue),
-               format("'%s' was defined but has an empty value at '%s' declared in the pom file",
-                      attributeName, tag));
-    return attributeValue;
-
   }
 
   public static void updateScopeIfDomain(Artifact artifact) {
