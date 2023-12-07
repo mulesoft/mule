@@ -18,6 +18,7 @@ import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.functional.Either;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -44,8 +46,8 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   private final Set<String> moduleGlobalElementsNames;
   private final String defaultGlobalElementSuffix;
   private final Map<String, String> literalsParameters;
-
   private final List<ComponentAst> macroExpandedChildren;
+  private final Map<String, ComponentParameterAst> mappedParameters = new ConcurrentHashMap<>();
 
   public MacroExpandedComponentAst(ComponentAst original, ComponentLocation location,
                                    Set<String> moduleGlobalElementsNames, String defaultGlobalElementSuffix,
@@ -79,16 +81,23 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
   }
 
   @Override
-  public ComponentParameterAst getParameter(String groupName, String paramName) {
-    final ComponentParameterAst parameter = super.getParameter(groupName, paramName);
-    return parameter != null ? mapIdParam(parameter) : null;
+  public ComponentParameterAst getParameter(String parameterGroup, String parameterName) {
+    final ComponentParameterAst parameter = super.getParameter(parameterGroup, parameterName);
+    return parameter != null ? resolveParameter(parameter) : null;
+  }
+
+  private ComponentParameterAst resolveParameter(ComponentParameterAst parameter) {
+    String resolvedParameterKey = parameter.getGroupModel() == null ? parameter.getModel().getName()
+        : parameter.getGroupModel().getName() + "-" + parameter.getModel().getName();
+    mappedParameters.putIfAbsent(resolvedParameterKey, mapIdParam(parameter));
+    return mappedParameters.get(resolvedParameterKey);
   }
 
   @Override
   public Collection<ComponentParameterAst> getParameters() {
     return super.getParameters()
         .stream()
-        .map(this::mapIdParam)
+        .map(this::resolveParameter)
         .collect(toList());
   }
 
@@ -96,31 +105,38 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
     requireNonNull(originalParameter);
     return new BaseComponentParameterAstDecorator(originalParameter) {
 
+      private final LazyValue<Either<String, ?>> expandedParameter = new LazyValue<>(this::expandParameter);
+
       @Override
       public <T> Either<String, T> getValue() {
-        final Either<String, T> originalValue = getDecorated().getValue();
+        return (Either<String, T>) expandedParameter.get();
+      }
 
+      private <T> Either<String, T> expandParameter() {
+
+        // Simple parameters are expanded if necessary.
+        final Either<String, T> originalValue = getDecorated().getValue();
         if (originalValue.isLeft()) {
           final String expression = "#[" + originalValue.getLeft() + "]";
           if (literalsParameters.containsKey(expression)) {
-            // Do the Gorvachev
             return right((T) literalsParameters.get(expression));
           } else {
             return originalValue;
           }
         }
 
+        // Complex parameters are expanded by this call.
         return (Either<String, T>) originalValue
-            .mapRight(this::mapComponent);
+            .mapRight(this::mapParameter);
       }
 
-      private <T> Object mapComponent(T rawValue) {
+      private <T> Object mapParameter(T rawValue) {
         if (mustMacroExpandRawValue(rawValue)) {
           return macroExpandedRawValue((String) rawValue);
         } else if (isAnErrorMappings()) {
           return mapErrorMappings(getDecorated());
         } else if (supportsChildDeclaration() && !isResolvedByMetadataVisitor(rawValue)) {
-          return copyMacroExpandedComponentTreeRecursively();
+          return macroExpandComplexParameter();
         }
         return rawValue;
       }
@@ -150,14 +166,16 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
         return originalParameter.getValue()
             .mapRight(mappings -> ((List<ErrorMapping>) mappings)
                 .stream()
-                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource()),
+                .map(mapping -> new ErrorMapping(literalsParameters.getOrDefault(mapping.getSource(), mapping.getSource())
+                    .toString(),
                                                  literalsParameters.getOrDefault(mapping.getTarget(),
-                                                                                 mapping.getTarget())))
+                                                                                 mapping.getTarget())
+                                                     .toString()))
                 .collect(toList()))
             .getRight();
       }
 
-      private Object copyMacroExpandedComponentTreeRecursively() {
+      private Object macroExpandComplexParameter() {
         ComponentAst component = (ComponentAst) getDecorated().getValue().getRight();
         MacroExpandedComponentAst macroExpandedComponentAst =
             new MacroExpandedComponentAst(component, component.getLocation(), moduleGlobalElementsNames,
@@ -180,7 +198,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
           if (moduleGlobalElementsNames.contains(originalRawValue)) {
             return originalRawValue.concat("-").concat(defaultGlobalElementSuffix);
           } else {
-            return literalsParameters.getOrDefault(originalRawValue, originalRawValue);
+            return literalsParameters.getOrDefault(originalRawValue, originalRawValue).toString();
           }
         } else {
           return null;
@@ -201,7 +219,7 @@ class MacroExpandedComponentAst extends BaseComponentAstDecorator {
       return originalValue.concat("-").concat(defaultGlobalElementSuffix);
     } else {
       // not a global element, returning the original value.
-      return literalsParameters.getOrDefault(originalValue, originalValue);
+      return literalsParameters.getOrDefault(originalValue, originalValue).toString();
     }
   }
 
