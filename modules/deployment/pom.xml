@@ -173,17 +173,6 @@
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.erosb</groupId>
-                    <artifactId>everit-json-schema</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.services</groupId>
-            <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
             <scope>test</scope>
             <exclusions>
