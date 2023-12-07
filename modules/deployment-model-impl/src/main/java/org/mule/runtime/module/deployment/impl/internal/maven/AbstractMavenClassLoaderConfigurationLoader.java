@@ -25,7 +25,6 @@ import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.dese
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
-import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -58,7 +57,6 @@ import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -406,12 +404,7 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
     Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
-    Optional<File> temporaryDirectory;
-    try {
-      temporaryDirectory = of(createTempDirectory(null).toFile());
-    } catch (IOException e) {
-      throw new IllegalStateException("Failed to create directory", e);
-    }
+    Optional<File> temporaryDirectory = of(getTempDir());
     try {
       List<org.mule.maven.pom.parser.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),
@@ -423,6 +416,21 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     } finally {
       deleteQuietly(temporaryDirectory.get());
     }
+  }
+
+  protected File getTempDir() {
+    File baseDir = new File(System.getProperty("java.io.tmpdir"));
+    String baseName = System.currentTimeMillis() + "-";
+
+    for (int counter = 0; counter < 10000; ++counter) {
+      File tempDir = new File(baseDir, baseName + counter);
+      if (tempDir.mkdir()) {
+        return tempDir;
+      }
+    }
+
+    throw new IllegalStateException("Failed to create directory within 10000 attempts (tried " + baseName + "0 to " + baseName
+        + 9999 + ')');
   }
 
   protected final Optional<File> getLocalMavenRepo(File artifactFile, MavenClient mavenClient) {

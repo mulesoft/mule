@@ -237,21 +237,6 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
       this.artifactFile = artifactFile;
     }
 
-    private File getTempDir() {
-      File baseDir = new File(System.getProperty("java.io.tmpdir"));
-      String baseName = System.currentTimeMillis() + "-";
-
-      for (int counter = 0; counter < 10000; ++counter) {
-        File tempDir = new File(baseDir, baseName + counter);
-        if (tempDir.mkdir()) {
-          return tempDir;
-        }
-      }
-
-      throw new IllegalStateException("Failed to create directory within 10000 attempts (tried " + baseName + "0 to " + baseName
-          + 9999 + ')');
-    }
-
     public MavenPomModel getEffectiveModel() {
       return effectiveModel;
     }
