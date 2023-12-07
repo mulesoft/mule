@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.resources.test;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
@@ -21,19 +22,23 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public abstract class ResourcesGeneratorContractTestCase extends AbstractMuleTestCase {
 
   protected static final String RESOURCE_PATH = "path";
   protected static final byte[] RESOURCE_CONTENT = "hello world!".getBytes();
 
   protected ResourcesGenerator generator;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   protected GeneratedResourceFactory resourceFactory;
