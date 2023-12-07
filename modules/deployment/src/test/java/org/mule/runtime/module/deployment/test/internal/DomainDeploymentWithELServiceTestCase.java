@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.test.internal;
 
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
+import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
 import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.deployment.test.internal.TestArtifactsCatalog.classloaderConfigConnectExtensionPlugin;
@@ -34,8 +35,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.DomainFileBuilder;
 import org.mule.tck.junit4.rule.SystemProperty;
 
-import org.mule.weave.v2.el.provider.WeaveServiceProvider;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -57,6 +56,11 @@ public class DomainDeploymentWithELServiceTestCase extends AbstractDeploymentTes
 
   @ClassRule
   public static SystemProperty enableDynamicConfigRef = new SystemProperty(ENABLE_DYNAMIC_CONFIG_REF_PROPERTY, "true");
+
+  // These tests have all dependencies in the boot layer, and they conflict with the libs of the DW service
+  @ClassRule
+  public static SystemProperty dontLoadservicesAsModuleLayers =
+      new SystemProperty(CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER, "false");
 
   @BeforeClass
   public static void setUpELService() throws IOException {
