@@ -19,7 +19,7 @@ import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
 import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
