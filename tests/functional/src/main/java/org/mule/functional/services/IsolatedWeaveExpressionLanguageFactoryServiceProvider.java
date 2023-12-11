@@ -24,7 +24,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.service.api.artifact.ServiceDescriptor;
 import org.mule.tck.config.WeaveExpressionLanguageFactoryServiceProvider;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.io.File;
@@ -138,7 +138,7 @@ public class IsolatedWeaveExpressionLanguageFactoryServiceProvider implements We
   private DefaultExpressionLanguageFactoryService instantiateExpressionLanguageService(ClassLoader serviceClassLoader) {
     try {
       Class<DefaultExpressionLanguageFactoryService> weaveServiceClass =
-          (Class<DefaultExpressionLanguageFactoryService>) forName("org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService",
+          (Class<DefaultExpressionLanguageFactoryService>) forName("org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService",
                                                                    false, serviceClassLoader);
 
       final Constructor<DefaultExpressionLanguageFactoryService> constructor =
