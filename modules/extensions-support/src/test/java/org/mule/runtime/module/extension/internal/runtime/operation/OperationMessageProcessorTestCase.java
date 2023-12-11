@@ -96,7 +96,7 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;

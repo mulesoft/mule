@@ -38,7 +38,7 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 
 import io.qameta.allure.Issue;

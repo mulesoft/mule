@@ -14,6 +14,7 @@ open module org.mule.runtime.deployment.test {
 
   requires org.mule.runtime.deployment;
   requires org.mule.test.services;
+  requires org.mule.weave.mule.dwb.api;
 
   requires org.mule.runtime.api;
   requires org.mule.runtime.artifact;

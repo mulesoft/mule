@@ -10,7 +10,7 @@ import static java.util.ServiceLoader.load;
 
 import org.mule.runtime.api.el.DefaultExpressionLanguageFactoryService;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 import org.mule.weave.v2.el.metadata.WeaveExpressionLanguageMetadataServiceImpl;
 
 import java.util.Iterator;
