@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.extension.internal.ast;
+package org.mule.runtime.config.internal.dsl.model.extension.xml;
 
 import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.functional.Either.left;
@@ -13,18 +13,18 @@ import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation
 import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
-import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAnnotation;
@@ -44,16 +44,17 @@ import org.mule.runtime.ast.api.ComponentGenerationInformation;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.util.BaseArtifactAst;
 import org.mule.runtime.ast.api.util.BaseComponentAst;
+import org.mule.runtime.config.internal.dsl.model.extension.xml.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.qameta.allure.Issue;
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 @Feature(XML_SDK)
