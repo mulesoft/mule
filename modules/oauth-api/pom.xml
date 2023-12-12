@@ -13,6 +13,8 @@
         <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <muleOAuthClientVersion>2.2.0-SNAPSHOT</muleOAuthClientVersion>
+        <!-- because this module requires transitive org.mule.oauth.client.api -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>
 
     <dependencies>
