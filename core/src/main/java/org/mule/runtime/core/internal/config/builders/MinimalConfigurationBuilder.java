@@ -51,7 +51,7 @@ import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNo
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -196,10 +196,9 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
 
-    for (Map.Entry<String, CustomService> entry : ((CustomServiceRegistry) muleContext.getCustomizationService())
-        .getDefaultServices().entrySet()) {
-      if (!registeredServices.contains(entry.getKey())) {
-        registerObject(entry.getKey(), entry.getValue().getServiceImpl(), muleContext);
+    for (String serviceId : ((CustomServiceRegistry) muleContext.getCustomizationService()).getDefaultServices().keySet()) {
+      if (!registeredServices.contains(serviceId)) {
+        registerObject(serviceId, null, muleContext);
       }
     }
   }
@@ -299,10 +298,12 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
   protected void registerObject(String serviceId, Object defaultServiceImpl, MuleContext muleContext)
       throws RegistrationException {
+    registeredServices.add(serviceId);
+
     Optional<Object> serviceImpl =
         ((CustomServiceRegistry) muleContext.getCustomizationService()).getOverriddenService(serviceId)
             .map(customService -> customService.getServiceImpl(defaultServiceImpl))
-            .orElse(of(defaultServiceImpl));
+            .orElse(ofNullable(defaultServiceImpl));
 
     if (!serviceImpl.isPresent()) {
       return;
@@ -312,7 +313,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
     }
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
-    registeredServices.add(serviceId);
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {
