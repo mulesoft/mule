@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
+import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.AUTHORIZATION_CODE_STATE_INTERFACES;
+
 
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -40,7 +42,7 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
 
   private final AuthorizationCodeConfig oauthConfig;
   private final AuthorizationCodeOAuthHandler oauthHandler;
-  private final FieldSetter<ConnectionProvider<C>, AuthorizationCodeState> authCodeStateSetter;
+  private final FieldSetter<Object, Object> authCodeStateSetter;
   private final RunOnce dance;
 
   private AuthorizationCodeOAuthDancer dancer;
@@ -53,7 +55,8 @@ public class AuthorizationCodeConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    authCodeStateSetter = getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType());
+    authCodeStateSetter =
+        getOAuthStateSetter(getDelegateForInjection(), AUTHORIZATION_CODE_STATE_INTERFACES, oauthConfig.getGrantType());
     dance = Once.of(this::updateAuthState);
   }
 

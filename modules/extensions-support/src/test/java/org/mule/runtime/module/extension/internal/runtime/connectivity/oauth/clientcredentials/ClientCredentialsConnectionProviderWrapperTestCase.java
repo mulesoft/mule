@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,13 +13,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.test.allure.AllureConstants.OauthFeature.SDK_OAUTH_SUPPORT;
 
-import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
-import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
+import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.api.retry.ReconnectionConfig;
+import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 
@@ -27,13 +26,18 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @Issue("W-14391247")
-@Feature(SDK_OAUTH_SUPPORT)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(FieldSetter.class)
+@PowerMockIgnore({"javax.management.*"})
 public class ClientCredentialsConnectionProviderWrapperTestCase {
 
   @Test
