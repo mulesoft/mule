@@ -166,7 +166,7 @@ public class CompositeOperationPolicy
         .doOnNext(new OperationDispatcher(sinkRecorder, getParametersTransformer(), this.operation))
         .map(e -> Either.empty()), sinkRecorder::complete, sinkRecorder::error,
                                     shutdownTimeout, completionCallbackScheduler,
-                                    operation.getDslSource(), null))
+                                    operation.getDslSource()))
                                         .map(result -> {
                                           result.applyLeft(t -> {
                                             throw propagate(t);

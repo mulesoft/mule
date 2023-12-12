@@ -96,7 +96,7 @@ public class RxUtils {
    */
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber) {
-    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null, null);
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null);
   }
 
   /**
@@ -125,7 +125,7 @@ public class RxUtils {
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber,
                                                                     Scheduler subscribeOnScheduler) {
-    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null, subscribeOnScheduler);
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null);
   }
 
   /**
@@ -158,19 +158,27 @@ public class RxUtils {
                                                                     Flux<U> deferredSubscriber,
                                                                     @Nullable Consumer<? super U> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
-                                                                    @Nullable Runnable completeConsumer,
-                                                                    ScheduledExecutorService subscriptionScheduler) {
+                                                                    @Nullable Runnable completeConsumer) {
 
     return triggeringSubscriber
         .transformDeferredContextual((eventPub, ctx) -> eventPub.doOnSubscribe(s -> {
           startPendingSubscription(ctx);
           just(ctx)
-              .publishOn(subscriptionScheduler != null ? fromExecutorService(subscriptionScheduler) : immediate())
+              .publishOn(getSubscriptionScheduler(ctx))
               .doOnNext(c -> deferredSubscriber
                   .contextWrite(ctx)
                   .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer))
               .subscribe(RxUtils::completePendingSubscription, throwable -> failPendingSubscription(throwable, ctx));
         }));
+  }
+
+  private static reactor.core.scheduler.Scheduler getSubscriptionScheduler(ContextView ctx) {
+    MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
+    if (multiFluxSubscriber != null && multiFluxSubscriber.subscriptionScheduler != null) {
+      return fromExecutorService(multiFluxSubscriber.subscriptionScheduler);
+    } else {
+      return immediate();
+    }
   }
 
   private static void handleSubscriptionError(Throwable throwable, Consumer<? super Throwable> errorConsumer, ContextView ctx) {
@@ -227,8 +235,7 @@ public class RxUtils {
   public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback,
-                                                        ScheduledExecutorService subscriptionScheduler) {
+                                                        CheckedConsumer<Throwable> errorCallback) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -238,7 +245,7 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  new AtomicInteger(0),
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null, subscriptionScheduler);
+                                 () -> null);
   }
 
   /**
@@ -270,8 +277,7 @@ public class RxUtils {
                                                         Function<Publisher<U>, Publisher<T>> transformer,
                                                         AtomicInteger inflightCounter,
                                                         CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback,
-                                                        Scheduler subscriptionScheduler) {
+                                                        CheckedConsumer<Throwable> errorCallback) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -281,7 +287,7 @@ public class RxUtils {
     return doPropagateCompletion(upstream, downstream, transformer,
                                  inflightCounter,
                                  Once.of(completionCallback), Once.of(errorCallback),
-                                 () -> null, subscriptionScheduler);
+                                 () -> null);
   }
 
   /**
@@ -317,8 +323,7 @@ public class RxUtils {
                                                         CheckedRunnable completionCallback,
                                                         CheckedConsumer<Throwable> errorCallback,
                                                         long completionTimeoutMillis, ScheduledExecutorService delayedExecutor,
-                                                        final String dslSource,
-                                                        final ScheduledExecutorService subscriptionScheduler) {
+                                                        final String dslSource) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
     requireNonNull(transformer, "'transformer' must not be null");
@@ -335,15 +340,14 @@ public class RxUtils {
                                    LOGGER.debug("Propagating completion after {} milliseconds\nDSL Source:\n{}",
                                                 completionTimeoutMillis, dslSource);
                                    completer.runOnce();
-                                 }, completionTimeoutMillis, MILLISECONDS), subscriptionScheduler);
+                                 }, completionTimeoutMillis, MILLISECONDS));
   }
 
   private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
                                                            Function<Publisher<U>, Publisher<T>> transformer,
                                                            AtomicInteger inflightCounter,
                                                            final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
-                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion,
-                                                           final ScheduledExecutorService subscriptionScheduler) {
+                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion) {
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
     AtomicReference<Throwable> upstreamError = new AtomicReference<>();
 
@@ -377,7 +381,7 @@ public class RxUtils {
                                                   } else {
                                                     scheduledCompletion.set(scheduleCompletion.get());
                                                   }
-                                                }, subscriptionScheduler);
+                                                });
   }
 
   /**
@@ -490,15 +494,15 @@ public class RxUtils {
   public static class MultiFluxSubscriber<T> implements CoreSubscriber<T> {
 
     public static String MULTI_FLUX_SUBSCRIBER = "MULTI_FLUX_SUBSCRIBER";
-
     private Throwable lastSubscriptionError;
-
     private final Latch completionLatch;
     private final Phaser subscriptionPhaser = new Phaser(1);
+    private Scheduler subscriptionScheduler;
     private boolean subscribed = false;
 
-    public MultiFluxSubscriber(Latch completionLatch) {
+    public MultiFluxSubscriber(Latch completionLatch, Scheduler subscriptionScheduler) {
       this.completionLatch = completionLatch;
+      this.subscriptionScheduler = subscriptionScheduler;
     }
 
     @Override
@@ -508,8 +512,8 @@ public class RxUtils {
 
     @Override
     public void onSubscribe(Subscription s) {
-      // Protect the subscriptionPhaser from potential extra calls.
       synchronized (this) {
+        // Protect the subscriptionPhaser from potential extra calls.
         if (!subscribed) {
           subscribed = true;
           s.request(Long.MAX_VALUE);

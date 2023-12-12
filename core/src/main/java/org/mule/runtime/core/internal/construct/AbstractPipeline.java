@@ -350,7 +350,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
                                                                                             pipelineInlet, true),
                                                             pipelineOutlet::complete,
-                                                            pipelineOutlet::error, null)));
+                                                            pipelineOutlet::error)));
       } else {
         return handlePipelineError(from(propagateCompletion(pipelineUpstream, pipelineOutlet.flux(),
                                                             pipelineInlet -> splicePipeline(pipelineOutlet,
@@ -358,7 +358,7 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
                                                             pipelineOutlet::complete,
                                                             pipelineOutlet::error,
                                                             muleContext.getConfiguration().getShutdownTimeout(),
-                                                            completionCallbackScheduler, getDslSource(), null)));
+                                                            completionCallbackScheduler, getDslSource())));
       }
     });
   }

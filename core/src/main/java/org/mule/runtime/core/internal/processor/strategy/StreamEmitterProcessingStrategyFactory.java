@@ -234,7 +234,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferQueueSize);
 
-        MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = getCoreEventMultiFluxSubscriber(flowConstruct, completionLatch);
+        MultiFluxSubscriber<CoreEvent> multiFluxSubscriber =
+            getCoreEventMultiFluxSubscriber(flowConstruct, completionLatch, getCpuLightScheduler());
 
         processor.transform(function)
             .subscribe(multiFluxSubscriber);
@@ -260,8 +261,9 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return new RoundRobinReactorSink<>(sinks);
     }
 
-    private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(FlowConstruct flowConstruct, Latch completionLatch) {
-      return new MultiFluxSubscriber<CoreEvent>(completionLatch) {
+    private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(FlowConstruct flowConstruct, Latch completionLatch,
+                                                                           Scheduler subscriptionScheduler) {
+      return new MultiFluxSubscriber<CoreEvent>(completionLatch, subscriptionScheduler) {
 
         @Override
         public void onError(Throwable throwable) {

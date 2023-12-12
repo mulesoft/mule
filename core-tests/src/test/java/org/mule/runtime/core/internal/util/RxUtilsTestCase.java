@@ -100,7 +100,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      emitter::complete, emitter::error,
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null, null);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscribe(results::add,
                    Throwable::printStackTrace,
@@ -119,7 +119,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     emitter::complete, emitter::error, asyncSubscriber ? subscriberExecutor : null);
+                                     emitter::complete, emitter::error);
         })
         .block();
 
@@ -150,7 +150,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
                                        }
                                        emitter.error(t);
                                      },
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .subscribe(results::add,
                    e -> completeWithError.set(true));
@@ -172,7 +172,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           final FluxSinkRecorder<String> emitter = new FluxSinkRecorder<>();
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
-                                     emitter::complete, emitter::error, asyncSubscriber ? subscriberExecutor : null);
+                                     emitter::complete, emitter::error);
         })
         .block();
   }
@@ -196,7 +196,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      emitter::complete, emitter::error,
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
@@ -231,7 +231,7 @@ public class RxUtilsTestCase extends AbstractMuleTestCase {
           return propagateCompletion(pub, emitter.flux(),
                                      innerPub -> transformer(emitter, innerPub),
                                      emitter::complete, emitter::error,
-                                     RECEIVE_TIMEOUT, scheduledExecutor, null, asyncSubscriber ? subscriberExecutor : null);
+                                     RECEIVE_TIMEOUT, scheduledExecutor, null);
         })
         .contextWrite(ctx -> ctx.put("key", "value"))
         .subscribe(s -> {
