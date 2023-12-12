@@ -46,8 +46,12 @@ public class ClassLoaderDisposeErrorTestCase extends AbstractMuleTestCase {
 
     artifactClassLoader.loadClass(TestDriver.class.getName());
 
-    ShutdownListener shutdownListener = () -> {
-      // Nothing to do
+    ShutdownListener shutdownListener = new ShutdownListener() {
+
+      @Override
+      public void execute() {
+        // Nothing to do
+      }
     };
 
     artifactClassLoader.addShutdownListener(shutdownListener);
