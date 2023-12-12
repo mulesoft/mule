@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config;
 
+import static org.mule.test.allure.AllureConstants.CustomizationServiceFeature.CUSTOMIZATION_SERVICE;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -15,8 +17,10 @@ import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
+import io.qameta.allure.Feature;
 import org.junit.Test;
 
+@Feature(CUSTOMIZATION_SERVICE)
 public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
 
   public static final String SERVICE_ID = "foo";

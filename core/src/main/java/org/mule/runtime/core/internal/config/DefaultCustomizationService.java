@@ -30,7 +30,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public <T> void overrideDefaultServiceImpl(String serviceId, T serviceImpl) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceImpl));
+    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceImpl));
   }
 
   /**
@@ -38,7 +38,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor> serviceInterceptor) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceInterceptor));
+    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceInterceptor));
   }
 
   /**
@@ -46,7 +46,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public <T> void overrideDefaultServiceClass(String serviceId, Class<T> serviceClass) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceClass));
+    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceClass));
   }
 
   /**
@@ -61,14 +61,14 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceImpl != null, "serviceImpl cannot be null");
-    customServices.put(serviceId, new CustomService(serviceImpl));
+    customServices.put(serviceId, new CustomService(serviceId, serviceImpl));
   }
 
   @Override
   public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceClass != null, "serviceClass cannot be null");
-    customServices.put(serviceId, new CustomService(serviceClass));
+    customServices.put(serviceId, new CustomService(serviceId, serviceClass));
   }
 
   @Override

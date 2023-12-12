@@ -13,6 +13,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAG
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleContextFeature.MULE_CONTEXT;
+import static org.mule.test.allure.AllureConstants.MuleContextFeature.MuleContextCreationStory.MULE_CONTEXT_CREATION;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -60,12 +62,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.function.Consumer;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+@Feature(MULE_CONTEXT)
+@Story(MULE_CONTEXT_CREATION)
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Rule

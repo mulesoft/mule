@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.config;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
  */
 public class CustomService {
 
+  private final String serviceId;
   private final Optional<Class> serviceClass;
   private final Optional<Consumer<ServiceInterceptor>> serviceImplInterceptorConsumer;
 
@@ -32,7 +34,8 @@ public class CustomService {
    *
    * @param serviceClass the service class.
    */
-  public CustomService(Class serviceClass) {
+  public CustomService(String serviceId, Class serviceClass) {
+    this.serviceId = serviceId;
     this.serviceClass = of(serviceClass);
     this.serviceImplInterceptorConsumer = empty();
   }
@@ -42,7 +45,8 @@ public class CustomService {
    *
    * @param serviceImpl the service implementation.
    */
-  public CustomService(Object serviceImpl) {
+  public CustomService(String serviceId, Object serviceImpl) {
+    this.serviceId = serviceId;
     this.serviceImplInterceptorConsumer = of(serviceInterceptor -> serviceInterceptor.newServiceImpl(serviceImpl));
     this.serviceClass = empty();
   }
@@ -52,7 +56,8 @@ public class CustomService {
    *
    * @param serviceImplInterceptorConsumer the {@link Consumer} for the {@link ServiceInterceptor}.
    */
-  public CustomService(Consumer<ServiceInterceptor> serviceImplInterceptorConsumer) {
+  public CustomService(String serviceId, Consumer<ServiceInterceptor> serviceImplInterceptorConsumer) {
+    this.serviceId = serviceId;
     this.serviceImplInterceptorConsumer = of(serviceImplInterceptorConsumer);
     this.serviceClass = empty();
   }
@@ -76,7 +81,7 @@ public class CustomService {
       return empty();
     }
 
-    DefaultServiceInterceptor serviceInterceptor = new DefaultServiceInterceptor(defaultService);
+    DefaultServiceInterceptor serviceInterceptor = new DefaultServiceInterceptor(serviceId, defaultService);
     serviceImplInterceptorConsumer.get().accept(serviceInterceptor);
 
     return serviceInterceptor.isRemove() ? empty() : ofNullable(serviceInterceptor.getNewServiceImpl());
@@ -84,11 +89,13 @@ public class CustomService {
 
   private static class DefaultServiceInterceptor implements ServiceInterceptor {
 
+    private final String serviceId;
     private final Object serviceImpl;
     private Object newServiceImpl;
     private boolean remove;
 
-    public DefaultServiceInterceptor(Object serviceImpl) {
+    public DefaultServiceInterceptor(String serviceId, Object serviceImpl) {
+      this.serviceId = serviceId;
       this.serviceImpl = serviceImpl;
     }
 
@@ -105,7 +112,8 @@ public class CustomService {
     @Override
     public void skip() {
       if (newServiceImpl != null) {
-        throw new IllegalStateException("A 'newServiceImpl' is already present");
+        throw new IllegalStateException(format("A 'newServiceImpl' is already present '%s' for service '%s' with default '%s'",
+                                               newServiceImpl, serviceId, serviceImpl));
       }
 
       remove = true;
@@ -113,7 +121,8 @@ public class CustomService {
 
     public Object getNewServiceImpl() {
       if (remove) {
-        throw new IllegalStateException("Service set to be removed, can't be overridden");
+        throw new IllegalStateException(format("Service '%s' with default '%s' set to be removed, can't be overridden", serviceId,
+                                               serviceImpl));
       }
 
       return newServiceImpl;
