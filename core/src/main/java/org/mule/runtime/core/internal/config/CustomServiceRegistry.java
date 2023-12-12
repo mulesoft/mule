@@ -29,4 +29,11 @@ public interface CustomServiceRegistry extends CustomizationService {
    */
   Map<String, CustomService> getCustomServices();
 
+  /**
+   * Provides access to the default services defined for the corresponding mule context.
+   *
+   * @return the registered default services. Non null.
+   */
+  Map<String, CustomService> getDefaultServices();
+
 }

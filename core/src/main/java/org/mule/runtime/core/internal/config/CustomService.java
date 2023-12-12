@@ -10,7 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
-import org.mule.runtime.api.config.custom.CustomizationService.ServiceOverrider;
+import org.mule.runtime.api.config.custom.CustomizationService.ServiceInterceptor;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -24,8 +24,8 @@ import java.util.function.Consumer;
  */
 public class CustomService {
 
-  private Optional<Class> serviceClass;
-  private Optional<Consumer<ServiceOverrider>> serviceImplOverriderConsumer;
+  private final Optional<Class> serviceClass;
+  private final Optional<Consumer<ServiceInterceptor>> serviceImplInterceptorConsumer;
 
   /**
    * Creates a custom service from a class.
@@ -34,7 +34,7 @@ public class CustomService {
    */
   public CustomService(Class serviceClass) {
     this.serviceClass = of(serviceClass);
-    this.serviceImplOverriderConsumer = empty();
+    this.serviceImplInterceptorConsumer = empty();
   }
 
   /**
@@ -43,7 +43,17 @@ public class CustomService {
    * @param serviceImpl the service implementation.
    */
   public CustomService(Object serviceImpl) {
-    this.serviceImplOverriderConsumer = of(serviceOverrider -> serviceOverrider.override(serviceImpl));
+    this.serviceImplInterceptorConsumer = of(serviceInterceptor -> serviceInterceptor.newServiceImpl(serviceImpl));
+    this.serviceClass = empty();
+  }
+
+  /**
+   * Creates a custom service from a {@link ServiceInterceptor} {@link Consumer}.
+   *
+   * @param serviceImplInterceptorConsumer the {@link Consumer} for the {@link ServiceInterceptor}.
+   */
+  public CustomService(Consumer<ServiceInterceptor> serviceImplInterceptorConsumer) {
+    this.serviceImplInterceptorConsumer = of(serviceImplInterceptorConsumer);
     this.serviceClass = empty();
   }
 
@@ -62,51 +72,51 @@ public class CustomService {
   }
 
   public Optional<Object> getServiceImpl(Object defaultService) {
-    if (!serviceImplOverriderConsumer.isPresent()) {
+    if (!serviceImplInterceptorConsumer.isPresent()) {
       return empty();
     }
 
-    DefaultServiceOverrider serviceOverrider = new DefaultServiceOverrider(defaultService);
-    serviceImplOverriderConsumer.get().accept(serviceOverrider);
+    DefaultServiceInterceptor serviceInterceptor = new DefaultServiceInterceptor(defaultService);
+    serviceImplInterceptorConsumer.get().accept(serviceInterceptor);
 
-    return serviceOverrider.isRemove() ? empty() : ofNullable(serviceOverrider.getOverrider());
+    return serviceInterceptor.isRemove() ? empty() : ofNullable(serviceInterceptor.getNewServiceImpl());
   }
 
-  private static class DefaultServiceOverrider implements ServiceOverrider {
+  private static class DefaultServiceInterceptor implements ServiceInterceptor {
 
     private final Object serviceImpl;
-    private Object overrider;
+    private Object newServiceImpl;
     private boolean remove;
 
-    public DefaultServiceOverrider(Object serviceImpl) {
+    public DefaultServiceInterceptor(Object serviceImpl) {
       this.serviceImpl = serviceImpl;
     }
 
     @Override
-    public Object getOverridee() {
-      return serviceImpl;
+    public Optional<Object> getDefaultServiceImpl() {
+      return ofNullable(serviceImpl);
     }
 
     @Override
-    public void override(Object overrider) {
-      this.overrider = overrider;
+    public void newServiceImpl(Object newServiceImpl) {
+      this.newServiceImpl = newServiceImpl;
     }
 
     @Override
-    public void remove() {
-      if (overrider != null) {
-        throw new IllegalStateException("An 'overrider' service is already present");
+    public void skip() {
+      if (newServiceImpl != null) {
+        throw new IllegalStateException("A 'newServiceImpl' is already present");
       }
 
       remove = true;
     }
 
-    public Object getOverrider() {
+    public Object getNewServiceImpl() {
       if (remove) {
         throw new IllegalStateException("Service set to be removed, can't be overridden");
       }
 
-      return overrider;
+      return newServiceImpl;
     }
 
     public boolean isRemove() {

@@ -7,8 +7,6 @@
 package org.mule.runtime.core.internal.config;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -18,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * {@inheritDoc}
@@ -40,8 +37,8 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    * {@inheritDoc}
    */
   @Override
-  public void overrideDefaultServiceImpl(String serviceId, Consumer<ServiceOverrider> serviceOverrider) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceOverrider));
+  public void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor> serviceInterceptor) {
+    muleContextDefaultServices.put(serviceId, new CustomService(serviceInterceptor));
   }
 
   /**
@@ -79,7 +76,9 @@ public class DefaultCustomizationService implements CustomizationService, Custom
     return unmodifiableMap(customServices);
   }
 
+  @Override
   public Map<String, CustomService> getDefaultServices() {
     return unmodifiableMap(muleContextDefaultServices);
   }
+
 }

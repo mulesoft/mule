@@ -114,8 +114,11 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
@@ -126,6 +129,8 @@ import java.util.Optional;
  * @since 4.5.0
  */
 public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
+
+  private final Set<String> registeredServices = new HashSet<>();
 
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
@@ -190,6 +195,13 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       }
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
+
+    for (Map.Entry<String, CustomService> entry : ((CustomServiceRegistry) muleContext.getCustomizationService())
+        .getDefaultServices().entrySet()) {
+      if (!registeredServices.contains(entry.getKey())) {
+        registerObject(entry.getKey(), entry.getValue().getServiceImpl(), muleContext);
+      }
+    }
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
@@ -300,6 +312,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
     }
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
+    registeredServices.add(serviceId);
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {
