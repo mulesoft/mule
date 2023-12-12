@@ -971,7 +971,7 @@
             <plugin>
                 <groupId>org.mule.tools.maven</groupId>
                 <artifactId>mule-module-maven-plugin</artifactId>
-                <extensions>true</extensions>
+                <inherited>true</inherited>
                 <executions>
                     <execution>
                         <goals>
