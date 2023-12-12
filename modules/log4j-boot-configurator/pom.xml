@@ -17,6 +17,8 @@
     <properties>
         <javaModuleName>org.mule.runtime.boot.log4j</javaModuleName>
         <skipExportTests>false</skipExportTests>
+        <!-- because this module requires transitive org.apache.logging.log4j -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

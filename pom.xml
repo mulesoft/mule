@@ -238,6 +238,7 @@
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
         <oldMuleArtifactVersion>4.6.0-rc1</oldMuleArtifactVersion>
+        <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
         
@@ -1016,6 +1017,7 @@
                 <configuration>
                     <skip>${skipMuleModuleMojos}</skip>
                     <oldVersion>${oldMuleArtifactVersion}</oldVersion>
+                    <checkDependencies>${revapi.checkDependencies}</checkDependencies>
                     <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
                     <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
                     <analysisConfiguration><![CDATA[
