@@ -25,6 +25,7 @@ import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.Exp
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionFunction;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.FunctionParameter;
@@ -59,7 +60,7 @@ public class ExtendedExpressionDwLanguageAdapterTestCase extends AbstractWeaveEx
 
   @Override
   @Before
-  public void setUp() {
+  public void setUp() throws InitialisationException {
     super.setUp();
     expressionLanguageAdapter = expressionLanguage;
   }

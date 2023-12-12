@@ -92,6 +92,7 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
   protected Map<String, Class<?>> imports = new HashMap<>();
   private boolean autoResolveVariables = true;
   private MvelDataTypeResolver dataTypeResolver = new MvelDataTypeResolver();
+  private volatile boolean initialised = false;
 
   @Inject
   public MVELExpressionLanguage(MuleContext muleContext) {
@@ -102,6 +103,18 @@ public class MVELExpressionLanguage extends AbstractComponent implements Extende
 
   @Override
   public void initialise() throws InitialisationException {
+    if (!initialised) {
+      synchronized (this) {
+        if (!initialised) {
+          this.doInitialise();
+
+          initialised = true;
+        }
+      }
+    }
+  }
+
+  public void doInitialise() throws InitialisationException {
     parserConfiguration = createParserConfiguration(imports);
     expressionExecutor = new MVELExpressionExecutor(parserConfiguration);
     loadGlobalFunctions();
