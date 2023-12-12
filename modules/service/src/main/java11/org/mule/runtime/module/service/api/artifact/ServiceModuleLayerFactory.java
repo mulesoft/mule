@@ -6,12 +6,10 @@
  */
 package org.mule.runtime.module.service.api.artifact;
 
-import static java.lang.ModuleLayer.boot;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayer;
 import static org.mule.runtime.jpms.api.JpmsUtils.openToModule;
 
-import static java.lang.Boolean.getBoolean;
+import static java.lang.ModuleLayer.boot;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 
@@ -23,6 +21,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.service.internal.artifact.ModuleLayerGraph;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
-import org.mule.runtime.module.service.internal.artifact.ModuleLayerGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +46,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
   private static final Set<String> MULE_SERVICE_MODULE_NAME_PREFIXES =
       new HashSet<>(asList("org.mule.service.",
                            "com.mulesoft.mule.service."));
-
-  private static final String CLASSLOADER_SERVICE_JPMS_MODULE_LAYER_DATAWEAVE =
-      SYSTEM_PROPERTY_PREFIX + "classloader.service.jpmsModuleLayer.dataWeave";
 
   private static final class MuleServiceClassLoader extends MuleArtifactClassLoader {
 
@@ -72,14 +67,6 @@ class ServiceModuleLayerFactory extends ServiceClassLoaderFactory {
   public ArtifactClassLoader create(String artifactId, ServiceDescriptor descriptor, ClassLoader parent,
                                     ClassLoaderLookupPolicy lookupPolicy) {
     URL[] classLoaderConfigurationUrls = descriptor.getClassLoaderConfiguration().getUrls();
-
-    if (artifactId.equals("service/DataWeave service")) {
-      // TODO TD-0144818 remove this special case
-      if (!getBoolean(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER_DATAWEAVE)) {
-        return new MuleArtifactClassLoader(artifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(), parent,
-                                           lookupPolicy);
-      }
-    }
 
     LOGGER.debug(" >> Creating ModuleLayer for service: '" + artifactId + "'...");
     ModuleLayer artifactLayer = createModuleLayer(classLoaderConfigurationUrls, parent,
