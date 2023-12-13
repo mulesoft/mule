@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor;
 
+import static java.util.Optional.empty;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
@@ -294,5 +295,25 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else {
       return ProcessingType.CPU_LITE;
     }
+  }
+
+  void setComponentTracerFactory(ComponentTracerFactory componentTracerFactory) {
+    this.componentTracerFactory = componentTracerFactory;
+  }
+
+  void setProfilingService(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+  }
+
+  void setMuleConfiguration(MuleConfiguration configuration) {
+    this.muleConfiguration = configuration;
+  }
+
+  void setTransactionManager(TransactionManager transactionManager) {
+    this.transactionManager = of(transactionManager);
+  }
+
+  void setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {
+    this.notificationDispatcher = notificationDispatcher;
   }
 }
