@@ -30,6 +30,7 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUt
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
+import static org.mule.runtime.core.internal.util.rx.SubscribedProcessors.subscribedProcessors;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;
@@ -363,7 +364,9 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     for (Processor processor : getProcessorsToExecute()) {
       // Perform assembly for processor chain by transforming the existing publisher with a publisher function for each processor
       // along with the interceptors that decorate it.
-      stream = stream.transform(applyInterceptors(interceptors, processor))
+      stream = stream
+          .contextWrite(context -> subscribedProcessors(context).addSubscribedProcessor(processor))
+          .transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
           .contextWrite(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
                                                getLocalOperatorErrorHook(processor, errorTypeLocator,
