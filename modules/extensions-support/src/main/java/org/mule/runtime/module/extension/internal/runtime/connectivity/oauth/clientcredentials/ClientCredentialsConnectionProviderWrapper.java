@@ -39,10 +39,11 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   private final ClientCredentialsConfig oauthConfig;
 
   private final ClientCredentialsOAuthHandler oauthHandler;
-  private final FieldSetter<ConnectionProvider<C>, ClientCredentialsState> oauthStateSetter;
+  private final FieldSetter<Object, Object> oauthStateSetter;
   private final RunOnce dance;
 
   private ClientCredentialsOAuthDancer dancer;
+  private UpdatingClientCredentialsState updatingClientCredentialsState;
 
   public ClientCredentialsConnectionProviderWrapper(ConnectionProvider<C> delegate,
                                                     ClientCredentialsConfig oauthConfig,
@@ -52,7 +53,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
     super(delegate, reconnectionConfig, callbackValues);
     this.oauthConfig = oauthConfig;
     this.oauthHandler = oauthHandler;
-    oauthStateSetter = getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType());
+    oauthStateSetter = resolveOauthStateSetter(oauthConfig);
     dance = Once.of(this::updateOAuthState);
   }
 
@@ -78,15 +79,15 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   }
 
   private void updateOAuthState() {
-    final ConnectionProvider<C> delegate = getDelegate();
+    final Object delegate = getDelegateForInjection();
     ResourceOwnerOAuthContext context = getContext();
-    oauthStateSetter.set(delegate, new UpdatingClientCredentialsState(
-                                                                      dancer,
-                                                                      context,
-                                                                      updatedContext -> updateOAuthParameters(delegate,
-                                                                                                              callbackValues,
-                                                                                                              updatedContext)));
-
+    updatingClientCredentialsState = new UpdatingClientCredentialsState(
+                                                                        dancer,
+                                                                        context,
+                                                                        updatedContext -> updateOAuthParameters(delegate,
+                                                                                                                callbackValues,
+                                                                                                                updatedContext));
+    oauthStateSetter.set(delegate, updatingClientCredentialsState);
     updateOAuthParameters(delegate, callbackValues, context);
   }
 
@@ -100,4 +101,17 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
     dancer = oauthHandler.register(oauthConfig);
     super.start();
   }
+
+  @Override
+  public void stop() throws MuleException {
+    if (updatingClientCredentialsState != null) {
+      updatingClientCredentialsState.deregisterListener();
+    }
+    super.stop();
+  }
+
+  protected FieldSetter<Object, Object> resolveOauthStateSetter(ClientCredentialsConfig oauthConfig) {
+    return getOAuthStateSetter(getDelegateForInjection(), ClientCredentialsState.class, oauthConfig.getGrantType());
+  }
+
 }

@@ -26,13 +26,14 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
   private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;
   private boolean invalidated = false;
+  private ClientCredentialsListener clientCredentialsListener;
 
   public UpdatingClientCredentialsState(ClientCredentialsOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     this.dancer = dancer;
     updateDelegate(initialContext);
-    dancer.addListener(new ClientCredentialsListener() {
+    clientCredentialsListener = new ClientCredentialsListener() {
 
       @Override
       public void onTokenRefreshed(ResourceOwnerOAuthContext context) {
@@ -44,7 +45,8 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
       public void onTokenInvalidated() {
         invalidated = true;
       }
-    });
+    };
+    dancer.addListener(clientCredentialsListener);
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
@@ -68,5 +70,9 @@ public class UpdatingClientCredentialsState implements ClientCredentialsState {
   @Override
   public Optional<String> getExpiresIn() {
     return delegate.getExpiresIn();
+  }
+
+  public void deregisterListener() {
+    dancer.removeListener(clientCredentialsListener);
   }
 }

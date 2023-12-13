@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
@@ -57,7 +58,6 @@ import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantT
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
-import org.mule.runtime.extension.api.connectivity.oauth.OAuthState;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
@@ -113,7 +113,8 @@ public class PlatformManagedOAuthConnectionProvider<C>
   private PlatformManagedOAuthDancer dancer;
   private ConnectionProvider<C> delegate;
   private ConnectionProvider<C> unwrappedDelegate;
-  private FieldSetter<ConnectionProvider<C>, OAuthState> oauthStateFieldSetter;
+  private Object delegateForInjection;
+  private FieldSetter<Object, Object> oauthStateFieldSetter;
   private PlatformManagedConnectionDescriptor descriptor;
   private PoolingListener<C> delegatePoolingListener;
   private DslSyntaxResolver dslSyntaxResolver;
@@ -159,6 +160,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       descriptor = fetchConnectionDescriptor();
       delegate = createDelegate(descriptor);
       unwrappedDelegate = unwrapConnectionProvider(delegate);
+      delegateForInjection = getInjectionTarget(unwrappedDelegate);
       delegatePoolingListener = getDelegatePoolingListener();
       initialiseDelegate();
       startIfNeeded(getRetryPolicyTemplate());
@@ -203,7 +205,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       throw e;
     }
 
-    oauthStateFieldSetter = getOAuthStateSetter(unwrappedDelegate);
+    oauthStateFieldSetter = getOAuthStateSetter(delegateForInjection);
   }
 
   private ConnectionProvider<C> createDelegate(PlatformManagedConnectionDescriptor descriptor) throws MuleException {
@@ -281,18 +283,20 @@ public class PlatformManagedOAuthConnectionProvider<C>
                                     e);
   }
 
-  private FieldSetter<ConnectionProvider<C>, OAuthState> getOAuthStateSetter(ConnectionProvider<C> delegate) {
-    Reference<FieldSetter<ConnectionProvider<C>, ? extends OAuthState>> setter = new Reference<>();
+  private FieldSetter<Object, Object> getOAuthStateSetter(Object target) {
+    Reference<FieldSetter<Object, Object>> setter = new Reference<>();
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(delegate, AuthorizationCodeState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AuthorizationCodeState.class,
+                                                            oauthConfig.getGrantType()));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(delegate, ClientCredentialsState.class, oauthConfig.getGrantType()));
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, ClientCredentialsState.class,
+                                                            oauthConfig.getGrantType()));
       }
 
       @Override
@@ -301,7 +305,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
       }
     });
 
-    return (FieldSetter<ConnectionProvider<C>, OAuthState>) setter.get();
+    return (FieldSetter<Object, Object>) setter.get();
   }
 
   private IllegalConnectionProviderModelDefinitionException illegalDelegateException() {
@@ -326,19 +330,20 @@ public class PlatformManagedOAuthConnectionProvider<C>
   }
 
   private void updateOAuthState() {
-    Consumer<ResourceOwnerOAuthContext> onUpdate = context -> updateOAuthParameters(unwrappedDelegate, callbackValues, context);
+    Consumer<ResourceOwnerOAuthContext> onUpdate =
+        context -> updateOAuthParameters(delegateForInjection, callbackValues, context);
     oauthConfig.getDelegateGrantType().accept(new OAuthGrantTypeVisitor() {
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        oauthStateFieldSetter.set(unwrappedDelegate, new PlatformAuthorizationCodeStateAdapter(dancer,
-                                                                                               descriptor,
-                                                                                               onUpdate));
+        oauthStateFieldSetter.set(delegateForInjection, new PlatformAuthorizationCodeStateAdapter(dancer,
+                                                                                                  descriptor,
+                                                                                                  onUpdate));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        oauthStateFieldSetter.set(unwrappedDelegate, new PlatformClientCredentialsOAuthStateAdapter(dancer, onUpdate));
+        oauthStateFieldSetter.set(delegateForInjection, new PlatformClientCredentialsOAuthStateAdapter(dancer, onUpdate));
       }
 
       @Override
