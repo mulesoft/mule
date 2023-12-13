@@ -16,23 +16,32 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
+import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.*;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -41,6 +50,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
+import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
@@ -51,6 +61,8 @@ import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.testmodels.mule.TestTransaction;
+import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import javax.transaction.TransactionManager;
 import javax.xml.namespace.QName;
@@ -62,13 +74,12 @@ import java.util.Map;
 public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
 
   private static List<Transaction> transactions;
-  private static List<javax.transaction.Transaction> innerTransactions;
-
   private FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
   private ProfilingService profilingService = mock(ProfilingService.class);
   private TransactionManager manager = mock(TransactionManager.class);
 
   private MuleConfiguration configuration = mock(MuleConfiguration.class);
+  private NotificationDispatcher notificationDispatcher = mock(NotificationDispatcher.class);
 
   private Flow flow;
 
@@ -81,7 +92,7 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setup() throws Exception {
     transactions = new ArrayList<>();
-    innerTransactions = new ArrayList<>();
+    //innerTransactions = new ArrayList<>();
     when(profilingService.getProfilingDataProducer(TX_CONTINUE)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_START)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_COMMIT)).thenReturn(mock(ProfilingDataProducer.class));
@@ -104,7 +115,7 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
     scope.setMuleConfiguration(configuration);
     scope.setTransactionManager(manager);
     scope.setMuleContext(muleContext);
-    scope.setNotificationDispatcher(mock(NotificationDispatcher.class));
+    scope.setNotificationDispatcher(notificationDispatcher);
     return scope;
   }
 
@@ -126,18 +137,11 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
     }
   }
 
-  private MuleTransactionConfig createTransactionConfig(String action) {
-    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
-    transactionConfig.setActionAsString(action);
-    transactionConfig.setFactory(new XaTransactionFactory());
-    return transactionConfig;
-  }
-
   @Test
   public void xaErrorInNestedTx() throws Exception {
     TryScope inner = createTryScope(true);
     inner.setMessageProcessors(asList(new TxCaptor(), new ErrorProcessor()));
-    TemplateOnErrorHandler handler = new OnErrorPropagateHandler();
+    TemplateOnErrorHandler handler = createPropagateErrorHandler();
     handler.setMessageProcessors(singletonList(new TxCaptor()));
     inner.setExceptionListener(handler);
 
@@ -152,11 +156,11 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
 
     try {
       outer.process(getNullEvent());
-      assertThat(innerTransactions, hasSize(4));
-      assertThat(innerTransactions.get(0).getStatus(), is(Transaction.STATUS_COMMITTED));
-      assertThat(innerTransactions.get(1).getStatus(), is(Transaction.STATUS_ROLLEDBACK));
-      assertThat(innerTransactions.get(2), is(nullValue()));
-      assertThat(innerTransactions.get(3).getStatus(), is(Transaction.STATUS_COMMITTED));
+      assertThat(transactions, hasSize(4));
+      assertThat(transactions.get(0).getStatus(), is(Transaction.STATUS_COMMITTED));
+      assertThat(transactions.get(1).getStatus(), is(Transaction.STATUS_ROLLEDBACK));
+      assertThat(transactions.get(2), is(nullValue()));
+      assertThat(transactions.get(3).getStatus(), is(Transaction.STATUS_COMMITTED));
     } finally {
       outer.dispose();
     }
@@ -169,6 +173,7 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
 
     TryScope outer = createTryScope(true);
     outer.setMessageProcessors(asList(new TxCaptor(), inner, new ErrorProcessor()));
+    outer.setExceptionListener(createPropagateErrorHandler());
 
     TryScope surrounding = createTryScope(false);
     surrounding.setMessageProcessors(singletonList(outer));
@@ -178,11 +183,34 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
     try {
       surrounding.process(getNullEvent());
       assertThat(transactions, hasSize(2));
-      assertThat(innerTransactions.get(0).getStatus(), is(Transaction.STATUS_ROLLEDBACK));
-      assertThat(innerTransactions.get(1).getStatus(), is(Transaction.STATUS_COMMITTED));
+      assertThat(transactions.get(0).getStatus(), is(Transaction.STATUS_ROLLEDBACK));
+      assertThat(transactions.get(1).getStatus(), is(Transaction.STATUS_COMMITTED));
     } finally {
       surrounding.dispose();
     }
+  }
+
+  private MuleTransactionConfig createTransactionConfig(String action) {
+    MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
+    transactionConfig.setActionAsString(action);
+    transactionConfig.setFactory(new TestTransactionFactory(true));
+    return transactionConfig;
+  }
+
+  private static ComponentLocation mockComponentLocation() {
+    ComponentLocation cl = mock(ComponentLocation.class);
+    when(cl.getLocation()).thenReturn("test/error-handler/0");
+    when(cl.getRootContainerName()).thenReturn(TEST_CONNECTOR_LOCATION.getRootContainerName());
+    when(cl.getParts()).thenReturn(TEST_CONNECTOR_LOCATION.getParts());
+    return cl;
+  }
+
+  private static TemplateOnErrorHandler createPropagateErrorHandler() {
+    TemplateOnErrorHandler handler = new OnErrorPropagateHandler();
+    Map<QName, Object> annotations = new HashMap<>();
+    annotations.put(LOCATION_KEY, mockComponentLocation());
+    handler.setAnnotations(annotations);
+    return handler;
   }
 
   public static class TxCaptor implements Processor {
@@ -191,7 +219,6 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
     public CoreEvent process(CoreEvent event) throws MuleException {
       Transaction tx = TransactionCoordination.getInstance().getTransaction();
       transactions.add(tx);
-      innerTransactions.add(tx != null ? ((XaTransaction) tx).getTransaction() : null);
       return event;
     }
   }
