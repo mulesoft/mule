@@ -19,8 +19,6 @@ import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.AUTHORIZATION_CODE_STATE_INTERFACES;
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.validateOAuthConnection;
@@ -55,7 +53,9 @@ import org.mule.runtime.core.internal.connection.ConnectionUtils;
 import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeState;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
+import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
@@ -289,13 +289,13 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
       @Override
       public void visit(AuthorizationCodeGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AUTHORIZATION_CODE_STATE_INTERFACES,
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, AuthorizationCodeState.class,
                                                             oauthConfig.getGrantType()));
       }
 
       @Override
       public void visit(ClientCredentialsGrantType grantType) {
-        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, CLIENT_CREDENTIALS_STATE_INTERFACES,
+        setter.set(ExtensionsOAuthUtils.getOAuthStateSetter(target, ClientCredentialsState.class,
                                                             oauthConfig.getGrantType()));
       }
 

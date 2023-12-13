@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
-import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.CLIENT_CREDENTIALS_STATE_INTERFACES;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getOAuthStateSetter;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.updateOAuthParameters;
 
@@ -112,7 +111,7 @@ public class ClientCredentialsConnectionProviderWrapper<C> extends BaseOAuthConn
   }
 
   protected FieldSetter<Object, Object> resolveOauthStateSetter(ClientCredentialsConfig oauthConfig) {
-    return getOAuthStateSetter(getDelegateForInjection(), CLIENT_CREDENTIALS_STATE_INTERFACES, oauthConfig.getGrantType());
+    return getOAuthStateSetter(getDelegateForInjection(), ClientCredentialsState.class, oauthConfig.getGrantType());
   }
 
 }
