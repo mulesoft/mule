@@ -79,7 +79,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
       assertThat(serviceInterceptor.getDefaultServiceImpl().get(), is(defaultService));
-      serviceInterceptor.newServiceImpl(service);
+      serviceInterceptor.overrideServiceImpl(service);
     });
 
     assertThat(customizationService.getDefaultServices().size(), equalTo(1));
@@ -94,7 +94,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
 
     customizationService.interceptDefaultServiceImpl(SERVICE_ID, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(false));
-      serviceInterceptor.newServiceImpl(service);
+      serviceInterceptor.overrideServiceImpl(service);
     });
 
     assertThat(customizationService.getDefaultServices().size(), equalTo(1));

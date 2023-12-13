@@ -246,7 +246,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     // replace the default Security Manager
     interceptors.put(OBJECT_SECURITY_MANAGER, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
-      serviceInterceptor.newServiceImpl(customSecurityManagerImpl);
+      serviceInterceptor.overrideServiceImpl(customSecurityManagerImpl);
     });
     // avoid registering the Cluster service
     interceptors.put(OBJECT_CLUSTER_SERVICE, serviceInterceptor -> {

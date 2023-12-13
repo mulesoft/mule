@@ -47,7 +47,7 @@ public class CustomService {
    */
   public CustomService(String serviceId, Object serviceImpl) {
     this.serviceId = serviceId;
-    this.serviceImplInterceptorConsumer = of(serviceInterceptor -> serviceInterceptor.newServiceImpl(serviceImpl));
+    this.serviceImplInterceptorConsumer = of(serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl));
     this.serviceClass = empty();
   }
 
@@ -76,36 +76,36 @@ public class CustomService {
     return getServiceImpl(null);
   }
 
-  public Optional<Object> getServiceImpl(Object defaultService) {
+  public <T> Optional<T> getServiceImpl(T defaultService) {
     if (!serviceImplInterceptorConsumer.isPresent()) {
       return empty();
     }
 
-    DefaultServiceInterceptor serviceInterceptor = new DefaultServiceInterceptor(serviceId, defaultService);
+    DefaultServiceInterceptor<T> serviceInterceptor = new DefaultServiceInterceptor<>(serviceId, defaultService);
     serviceImplInterceptorConsumer.get().accept(serviceInterceptor);
 
     return serviceInterceptor.isRemove() ? empty() : ofNullable(serviceInterceptor.getNewServiceImpl());
   }
 
-  private static class DefaultServiceInterceptor implements ServiceInterceptor {
+  private static class DefaultServiceInterceptor<T> implements ServiceInterceptor<T> {
 
     private final String serviceId;
-    private final Object serviceImpl;
-    private Object newServiceImpl;
+    private final T serviceImpl;
+    private T newServiceImpl;
     private boolean remove;
 
-    public DefaultServiceInterceptor(String serviceId, Object serviceImpl) {
+    public DefaultServiceInterceptor(String serviceId, T serviceImpl) {
       this.serviceId = serviceId;
       this.serviceImpl = serviceImpl;
     }
 
     @Override
-    public Optional<Object> getDefaultServiceImpl() {
+    public Optional<T> getDefaultServiceImpl() {
       return ofNullable(serviceImpl);
     }
 
     @Override
-    public void newServiceImpl(Object newServiceImpl) {
+    public void overrideServiceImpl(T newServiceImpl) {
       this.newServiceImpl = newServiceImpl;
     }
 
@@ -119,7 +119,7 @@ public class CustomService {
       remove = true;
     }
 
-    public Object getNewServiceImpl() {
+    public T getNewServiceImpl() {
       if (remove) {
         throw new IllegalStateException(format("Service '%s' with default '%s' set to be removed, can't be overridden", serviceId,
                                                serviceImpl));

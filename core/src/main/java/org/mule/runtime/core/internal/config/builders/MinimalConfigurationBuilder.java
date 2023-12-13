@@ -296,11 +296,11 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
   }
 
-  protected void registerObject(String serviceId, Object defaultServiceImpl, MuleContext muleContext)
+  protected <T> void registerObject(String serviceId, T defaultServiceImpl, MuleContext muleContext)
       throws RegistrationException {
     registeredServices.add(serviceId);
 
-    Optional<Object> serviceImpl =
+    Optional<T> serviceImpl =
         ((CustomServiceRegistry) muleContext.getCustomizationService()).getOverriddenService(serviceId)
             .map(customService -> customService.getServiceImpl(defaultServiceImpl))
             .orElse(ofNullable(defaultServiceImpl));
