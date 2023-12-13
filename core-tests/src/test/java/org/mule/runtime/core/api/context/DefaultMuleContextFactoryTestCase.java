@@ -242,7 +242,7 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     Object testCustomServiceImpl = new Object();
     Object customQueueManagerImpl = new Object();
     Object customSecurityManagerImpl = new Object();
-    Map<String, Consumer<ServiceInterceptor>> interceptors = new HashMap<>();
+    Map<String, Consumer<ServiceInterceptor<Object>>> interceptors = new HashMap<>();
     // replace the default Security Manager
     interceptors.put(OBJECT_SECURITY_MANAGER, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
@@ -352,11 +352,11 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
     private final Map<String, Object> customServices;
     private final Map<String, Object> defaultServices;
-    private final Map<String, Consumer<ServiceInterceptor>> interceptedServices;
+    private final Map<String, Consumer<ServiceInterceptor<Object>>> interceptedServices;
 
     public TestServiceConfigurator(Map<String, Object> customServices,
                                    Map<String, Object> defaultServices,
-                                   Map<String, Consumer<ServiceInterceptor>> interceptedServices) {
+                                   Map<String, Consumer<ServiceInterceptor<Object>>> interceptedServices) {
       this.customServices = customServices;
       this.defaultServices = defaultServices;
       this.interceptedServices = interceptedServices;

@@ -30,15 +30,17 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public <T> void overrideDefaultServiceImpl(String serviceId, T serviceImpl) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceImpl));
+    muleContextDefaultServices
+        .put(serviceId,
+             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor> serviceInterceptor) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceInterceptor));
+  public <T> void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor<T>> serviceInterceptor) {
+    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor));
   }
 
   /**
@@ -46,7 +48,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public <T> void overrideDefaultServiceClass(String serviceId, Class<T> serviceClass) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceId, serviceClass));
+    muleContextDefaultServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
   }
 
   /**
@@ -61,14 +63,16 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceImpl != null, "serviceImpl cannot be null");
-    customServices.put(serviceId, new CustomService(serviceId, serviceImpl));
+    customServices
+        .put(serviceId,
+             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
   }
 
   @Override
   public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceClass != null, "serviceClass cannot be null");
-    customServices.put(serviceId, new CustomService(serviceId, serviceClass));
+    customServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
   }
 
   @Override

@@ -23,11 +23,11 @@ import java.util.function.Consumer;
  *
  * @since 4.0
  */
-public class CustomService {
+public class CustomService<T> {
 
   private final String serviceId;
   private final Optional<Class> serviceClass;
-  private final Optional<Consumer<ServiceInterceptor>> serviceImplInterceptorConsumer;
+  private final Optional<Consumer<ServiceInterceptor<T>>> serviceImplInterceptorConsumer;
 
   /**
    * Creates a custom service from a class.
@@ -41,22 +41,11 @@ public class CustomService {
   }
 
   /**
-   * Creates a custom service from an implementation.
-   *
-   * @param serviceImpl the service implementation.
-   */
-  public CustomService(String serviceId, Object serviceImpl) {
-    this.serviceId = serviceId;
-    this.serviceImplInterceptorConsumer = of(serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl));
-    this.serviceClass = empty();
-  }
-
-  /**
    * Creates a custom service from a {@link ServiceInterceptor} {@link Consumer}.
    *
    * @param serviceImplInterceptorConsumer the {@link Consumer} for the {@link ServiceInterceptor}.
    */
-  public CustomService(String serviceId, Consumer<ServiceInterceptor> serviceImplInterceptorConsumer) {
+  public CustomService(String serviceId, Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer) {
     this.serviceId = serviceId;
     this.serviceImplInterceptorConsumer = of(serviceImplInterceptorConsumer);
     this.serviceClass = empty();
@@ -72,11 +61,11 @@ public class CustomService {
   /**
    * @return the service implementation.
    */
-  public Optional<Object> getServiceImpl() {
+  public Optional<T> getServiceImpl() {
     return getServiceImpl(null);
   }
 
-  public <T> Optional<T> getServiceImpl(T defaultService) {
+  public Optional<T> getServiceImpl(T defaultService) {
     if (!serviceImplInterceptorConsumer.isPresent()) {
       return empty();
     }
