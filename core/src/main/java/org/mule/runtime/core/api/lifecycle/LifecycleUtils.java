@@ -124,7 +124,9 @@ public class LifecycleUtils {
    * @throws InitialisationException
    */
   public static void initialiseIfNeeded(Collection<? extends Object> objects) throws InitialisationException {
-    initialiseIfNeeded(objects, null);
+    for (Object object : objects) {
+      initialiseIfNeeded(object);
+    }
   }
 
   /**
