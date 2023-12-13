@@ -174,6 +174,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
                                                new WeaveDefaultExpressionLanguageFactoryService(null),
                                                getFeatureFlaggingService());
+    initialiseIfNeeded(expressionLanguageAdaptor);
     TypedValue<?> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     initialiseIfNeeded(idempotent, true, muleContext);
@@ -213,6 +214,7 @@ public class IdempotentMessageValidatorTestCase extends AbstractMuleContextTestC
         new DataWeaveExpressionLanguageAdaptor(muleContext, mock(Registry.class),
                                                new WeaveDefaultExpressionLanguageFactoryService(null),
                                                getFeatureFlaggingService());
+    initialiseIfNeeded(expressionLanguageAdaptor);
     TypedValue<Object> hashedValue = expressionLanguageAdaptor.evaluate(dwHashExpression, event, NULL_BINDING_CONTEXT);
 
     initialiseIfNeeded(idempotent, true, muleContext);

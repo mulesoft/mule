@@ -11,6 +11,8 @@ import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
@@ -28,6 +30,8 @@ import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -51,7 +55,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExtendedExpressionManager {
+public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
   public static final String DW_PREFIX = "dw";
   public static final String MEL_PREFIX = "mel";
@@ -400,4 +404,15 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   public String toString() {
     return this.getClass().getName() + "[" + (expressionLanguage != null ? expressionLanguage.toString() : "null") + "]";
   }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(expressionLanguage);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(expressionLanguage, LOGGER);
+  }
+
 }
