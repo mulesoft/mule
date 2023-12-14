@@ -6,13 +6,18 @@
  */
 package org.mule.runtime.config.internal.lazy;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -37,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.2.0
  */
-public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LazyExpressionLanguageAdaptor.class);
 
@@ -45,6 +50,7 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
   private volatile boolean initialised = false;
   private CheckedSupplier<ExtendedExpressionLanguageAdaptor> delegateSupplier;
   private ExtendedExpressionLanguageAdaptor delegate;
+  private boolean shouldInitialise;
 
   /**
    * Creates a new instance
@@ -75,6 +81,9 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
       synchronized (this) {
         if (!initialised) {
           delegate = delegateSupplier.get();
+          if (shouldInitialise) {
+            doInitialise();
+          }
           globalBindings.forEach(delegate::addGlobalBindings);
           globalBindings = null;
           initialised = true;
@@ -160,4 +169,22 @@ public class LazyExpressionLanguageAdaptor implements ExtendedExpressionLanguage
       disposeIfNeeded(delegate, LOGGER);
     }
   }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (initialised) {
+      doInitialise();
+    } else {
+      shouldInitialise = true;
+    }
+  }
+
+  private void doInitialise() {
+    try {
+      initialiseIfNeeded(delegate);
+    } catch (InitialisationException e) {
+      throw new MuleRuntimeException(createStaticMessage("Failed to initialise the ExpressionLanguageAdaptor"), e);
+    }
+  }
+
 }

@@ -80,6 +80,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
@@ -125,14 +126,27 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Before
   public void setupMVEL() throws InitialisationException {
-    mvel = new MVELExpressionLanguage(muleContext);
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage();
 
     flowConstruct = mock(FlowConstruct.class, withSettings().extraInterfaces(Component.class));
     when(flowConstruct.getName()).thenReturn("myFlow");
     final DefaultComponentLocation location = fromSingleComponent("myFlow");
-    when(((Component) flowConstruct).getAnnotation(LOCATION_KEY)).thenReturn(location);
-    when(((Component) flowConstruct).getLocation()).thenReturn(location);
+    when(flowConstruct.getAnnotation(LOCATION_KEY)).thenReturn(location);
+    when(flowConstruct.getLocation()).thenReturn(location);
+  }
+
+  private MVELExpressionLanguage createMVELExpressionLanguage() throws InitialisationException {
+    return createMVELExpressionLanguage(mvel -> {
+    });
+  }
+
+  private MVELExpressionLanguage createMVELExpressionLanguage(Consumer<MVELExpressionLanguage> configurer)
+      throws InitialisationException {
+    MVELExpressionLanguage mvel = new MVELExpressionLanguage(muleContext);
+    configurer.accept(mvel);
+    mvel.initialise();
+
+    return mvel;
   }
 
   @Test
@@ -227,25 +241,23 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
 
   @Test
   public void appTakesPrecedenceOverEverything() throws Exception {
-    mvel.setAliases(singletonMap("app", "'other1'"));
     PrivilegedEvent event =
         this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("app", "otherb").build();
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("foo",
                                                                          (ExpressionLanguageExtension) context -> context
                                                                              .addVariable("app", "otherc"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setAliases(singletonMap("app", "'other1'")));
     assertEquals(MVELArtifactContext.class, evaluate("app", event).getClass());
   }
 
   @Test
   public void messageTakesPrecedenceOverEverything() throws Exception {
-    mvel.setAliases(singletonMap("message", "'other1'"));
     PrivilegedEvent event =
         this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("message", "other2").build();
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject("foo",
                                                                          (ExpressionLanguageExtension) context -> context
                                                                              .addVariable("message", "other3"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setAliases(singletonMap("message", "'other1'")));
     assertEquals(MessageContext.class, evaluate("message", event).getClass());
   }
 
@@ -255,44 +267,40 @@ public class MVELExpressionLanguageTestCase extends AbstractMuleContextTestCase 
         this.<PrivilegedEvent.Builder>getEventBuilder().message(Message.of("")).addVariable("foo", "other").build();
     ((MuleContextWithRegistry) muleContext).getRegistry()
         .registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "bar"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage();
     assertEquals("bar", evaluate("foo", event));
   }
 
   @Test
   public void aliasTakesPrecedenceOverAutoResolved() throws RegistrationException, InitialisationException {
-    mvel.setAliases(singletonMap("foo", "'bar'"));
     ((MuleContextWithRegistry) muleContext).getRegistry()
         .registerObject("key", (ExpressionLanguageExtension) context -> context.addVariable("foo", "other"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setAliases(singletonMap("foo", "'bar'")));
     assertEquals("bar", evaluate("foo"));
   }
 
   @Test
   public void aliasTakesPrecedenceOverExtension() throws Exception {
-    mvel.setAliases(singletonMap("foo", "'bar'"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setAliases(singletonMap("foo", "'bar'")));
     assertEquals("bar", evaluate("foo"));
   }
 
   @Test
   public void addImport() throws InitialisationException {
-    mvel.setImports(singletonMap("loc", Locale.class));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setImports(singletonMap("loc", Locale.class)));
     assertEquals(Locale.class, evaluate("loc"));
   }
 
   @Test
   public void addAlias() throws InitialisationException {
-    mvel.setAliases(singletonMap("appName", "app.name"));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel.setAliases(singletonMap("appName", "app.name")));
     assertEquals(muleContext.getConfiguration().getId(), evaluate("appName"));
   }
 
   @Test
   public void addGlobalFunction() throws InitialisationException {
-    mvel.addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration)));
-    mvel.initialise();
+    mvel = createMVELExpressionLanguage(mvel -> mvel
+        .addGlobalFunction("hello", new HelloWorldFunction(new ParserContext(mvel.parserConfiguration))));
     assertEquals("Hello World!", evaluate("hello()"));
   }
 

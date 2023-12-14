@@ -34,6 +34,8 @@ import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -48,31 +50,54 @@ import org.mule.runtime.core.privileged.el.MuleInstanceContext;
 import org.mule.runtime.core.privileged.el.ServerContext;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
-public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
 
   public static final String SERVER = "server";
   public static final String MULE = "mule";
   public static final String APP = "app";
 
-  private final ExpressionLanguage expressionExecutor;
+  private ExpressionLanguage expressionExecutor;
   private final MuleContext muleContext;
+  private final Registry registry;
+  private final DefaultExpressionLanguageFactoryService service;
+  private final FeatureFlaggingService featureFlaggingService;
+  private List<BindingContext> globalBindings = new LinkedList<>();
+  private volatile boolean initialised = false;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service,
                                             FeatureFlaggingService featureFlaggingService) {
-    this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
-        .defaultEncoding(getDefaultEncoding(muleContext))
-        .featureFlaggingService(featureFlaggingService)
-        .appId(muleContext.getConfiguration().getId())
-        .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
-        .build());
     this.muleContext = muleContext;
-    registerGlobalBindings(registry);
+    this.registry = registry;
+    this.service = service;
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (!initialised) {
+      synchronized (this) {
+        if (!initialised) {
+          this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
+              .defaultEncoding(getDefaultEncoding(muleContext))
+              .featureFlaggingService(featureFlaggingService)
+              .appId(muleContext.getConfiguration().getId())
+              .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
+              .build());
+
+          initialised = true;
+
+          registerGlobalBindings(registry);
+        }
+      }
+    }
   }
 
   private void registerGlobalBindings(Registry registry) {
@@ -89,6 +114,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
         ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
         : contextBuilder.build());
+
+    globalBindings.forEach(this::addGlobalBindings);
+    globalBindings = null;
   }
 
 
@@ -99,7 +127,17 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    */
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
-    expressionExecutor.addGlobalBindings(bindingContext);
+    if (initialised) {
+      expressionExecutor.addGlobalBindings(bindingContext);
+    } else {
+      synchronized (this) {
+        if (initialised) {
+          expressionExecutor.addGlobalBindings(bindingContext);
+        } else {
+          globalBindings.add(bindingContext);
+        }
+      }
+    }
   }
 
   @Override
