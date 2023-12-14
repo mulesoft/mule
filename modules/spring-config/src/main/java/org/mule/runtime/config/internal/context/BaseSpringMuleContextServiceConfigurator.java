@@ -37,7 +37,7 @@ import org.mule.runtime.config.internal.registry.SpringRegistryBootstrap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.internal.config.CustomService;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
@@ -86,7 +86,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
                                                   Registry serviceLocator,
                                                   org.mule.runtime.core.internal.registry.Registry originalRegistry,
                                                   boolean enableLazyInit) {
-    super((CustomServiceRegistry) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
+    super((InternalCustomizationService) muleContext.getCustomizationService(), beanDefinitionRegistry, serviceLocator);
     this.muleContext = muleContext;
     this.configurationProperties = configurationProperties;
     this.artifactType = artifactType;
@@ -156,7 +156,7 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   }
 
   private void createRuntimeServices() {
-    final Map<String, CustomService> customServices = getCustomServiceRegistry().getCustomServices();
+    final Map<String, CustomService> customServices = getCustomizationService().getCustomServices();
     for (String serviceName : customServices.keySet()) {
 
       if (containsBeanDefinition(serviceName)) {
