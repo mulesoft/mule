@@ -37,6 +37,7 @@ public class OpenTelemetrySpanExporterUtils {
   public static final String TRACEIDRATIO_SAMPLER = "traceidratio";
   public static final String PARENTBASED_ALWAYS_OFF_SAMPLER = "parentbased_always_off";
   public static final String PARENTBASED_TRACEIDRATIO_SAMPLER = "parentbased_traceidratio";
+  public static final Sampler DEFAULT_SAMPLER = parentBased(traceIdRatioBased(0.1d));
 
   private OpenTelemetrySpanExporterUtils() {}
 
@@ -71,7 +72,7 @@ public class OpenTelemetrySpanExporterUtils {
     }
 
     if (sampler == null) {
-      return alwaysOn();
+      return DEFAULT_SAMPLER;
     }
 
     switch (sampler) {
@@ -91,7 +92,7 @@ public class OpenTelemetrySpanExporterUtils {
       }
       default:
         LOGGER.error("Unrecognized value for sampler: " + sampler + ". Always on sampler will be used.");
-        return alwaysOn();
+        return DEFAULT_SAMPLER;
     }
   }
 }
