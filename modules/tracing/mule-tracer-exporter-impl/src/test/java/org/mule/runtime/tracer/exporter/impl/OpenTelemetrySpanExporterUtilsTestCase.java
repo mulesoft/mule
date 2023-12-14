@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
+import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.DEFAULT_SAMPLER;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getSampler;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
@@ -40,7 +41,7 @@ public class OpenTelemetrySpanExporterUtilsTestCase {
 
   @Test
   public void defaultSampler() {
-    assertThat(getSampler(null, null), equalTo(alwaysOn()));
+    assertThat(getSampler(null, null), equalTo(DEFAULT_SAMPLER));
   }
 
   @Test
