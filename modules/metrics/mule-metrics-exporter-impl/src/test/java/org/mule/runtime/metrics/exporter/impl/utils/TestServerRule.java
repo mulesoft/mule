@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.metrics.exporter.impl.utils;
 
-import static io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.parseFrom;
 import static java.util.concurrent.CompletableFuture.completedFuture;
+
+import static io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.parseFrom;
 
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -19,9 +20,10 @@ import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.server.ServiceRequestContext;
 import com.linecorp.armeria.server.grpc.protocol.AbstractUnaryGrpcService;
 import com.linecorp.armeria.testing.junit4.server.ServerRule;
-import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest;
-import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse;
+
 import org.jetbrains.annotations.NotNull;
+
+import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse;
 
 public class TestServerRule extends ServerRule {
 

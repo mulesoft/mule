@@ -159,6 +159,9 @@
         <muleMavenClientBomVersion>2.2.0-SNAPSHOT</muleMavenClientBomVersion>
 
         <activemqVersion>5.15.15</activemqVersion>
+        <hawtbufVersion>1.1</hawtbufVersion>
+        <activemqProtobuf>1.1</activemqProtobuf>
+        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
         <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
@@ -167,6 +170,7 @@
         <sshdVersion>2.10.0</sshdVersion>
         <ftpServerVersion>1.2.0</ftpServerVersion>
         <commonsExecVersion>1.3</commonsExecVersion>
+        <testcontainersVersion>1.17.6</testcontainersVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.3.0-SNAPSHOT</mulePropertiesApiVersion>

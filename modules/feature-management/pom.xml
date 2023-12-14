@@ -9,9 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-feature-management</artifactId>
-    <version>4.7.0-SNAPSHOT</version>
     <name>Mule Global Configuration Module</name>
     <description>This module performs feature management for the runtime</description>
 

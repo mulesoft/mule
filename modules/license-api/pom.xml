@@ -9,7 +9,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-license-api</artifactId>
     <packaging>jar</packaging>
     <name>Mule Runtime License API</name>
