@@ -15,33 +15,22 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.ERROR_HANDLER;
-import static org.mule.runtime.api.component.location.Location.builderFromStringRepresentation;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.*;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.mule.runtime.api.component.Component;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.TypedComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -50,18 +39,12 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.transaction.XaTransaction;
-import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
-import org.mule.runtime.tracer.api.component.ComponentTracer;
-import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
-import org.mule.tck.testmodels.mule.TestTransaction;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 
 import javax.transaction.TransactionManager;
@@ -71,7 +54,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
+public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   private static List<Transaction> transactions;
   private FlowExceptionHandler exceptionHandler = mock(FlowExceptionHandler.class);
@@ -92,7 +75,7 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setup() throws Exception {
     transactions = new ArrayList<>();
-    //innerTransactions = new ArrayList<>();
+    // innerTransactions = new ArrayList<>();
     when(profilingService.getProfilingDataProducer(TX_CONTINUE)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_START)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_COMMIT)).thenReturn(mock(ProfilingDataProducer.class));
@@ -224,6 +207,7 @@ public class XaNestedTransactionTestCase extends AbstractMuleContextTestCase {
   }
 
   public static class ErrorProcessor implements Processor {
+
     @Override
     public CoreEvent process(CoreEvent event) throws MuleException {
       throw new ConnectionException("I tried to connect and I couldn't. Boo hoo.");
