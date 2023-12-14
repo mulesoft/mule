@@ -75,7 +75,6 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
   @Before
   public void setup() throws Exception {
     transactions = new ArrayList<>();
-    // innerTransactions = new ArrayList<>();
     when(profilingService.getProfilingDataProducer(TX_CONTINUE)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_START)).thenReturn(mock(ProfilingDataProducer.class));
     when(profilingService.getProfilingDataProducer(TX_COMMIT)).thenReturn(mock(ProfilingDataProducer.class));
