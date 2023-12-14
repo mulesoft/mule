@@ -6,7 +6,15 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_ALWAYS_ON_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_ON_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_OFF_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.TRACEIDRATIO_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_ALWAYS_OFF_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_TRACEIDRATIO_SAMPLER;
+
 import static java.lang.Double.parseDouble;
+import static java.lang.String.format;
 
 import static io.opentelemetry.api.common.AttributeKey.booleanKey;
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
@@ -18,8 +26,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
-import org.slf4j.Logger;
 
+import org.slf4j.Logger;
 
 /**
  * Utils for exporting Open Telemetry Spans.
@@ -28,16 +36,7 @@ import org.slf4j.Logger;
  */
 public class OpenTelemetrySpanExporterUtils {
 
-  private static final double DEFAULT_TRACEIDRATIO_SAMPLE_RATIO = 1.0d;
-  private static final String PARENTBASED_ALWAYS_ON = "parentbased_always_on";
-
   private static final Logger LOGGER = getLogger(OpenTelemetrySpanExporterUtils.class);
-  public static final String ALWAYS_ON_SAMPLER = "always_on";
-  public static final String ALWAYS_OFF_SAMPLER = "always_off";
-  public static final String TRACEIDRATIO_SAMPLER = "traceidratio";
-  public static final String PARENTBASED_ALWAYS_OFF_SAMPLER = "parentbased_always_off";
-  public static final String PARENTBASED_TRACEIDRATIO_SAMPLER = "parentbased_traceidratio";
-  public static final Sampler DEFAULT_SAMPLER = parentBased(traceIdRatioBased(0.1d));
 
   private OpenTelemetrySpanExporterUtils() {}
 
@@ -65,14 +64,8 @@ public class OpenTelemetrySpanExporterUtils {
   }
 
   public static Sampler getSampler(String sampler, String samplerArg) {
-    double sampleRatio = DEFAULT_TRACEIDRATIO_SAMPLE_RATIO;
-
-    if (samplerArg != null) {
-      sampleRatio = parseDouble(samplerArg);
-    }
-
     if (sampler == null) {
-      return DEFAULT_SAMPLER;
+      throw new IllegalArgumentException("The sampler arg retrieved by configuration cannot be null.");
     }
 
     switch (sampler) {
@@ -81,18 +74,25 @@ public class OpenTelemetrySpanExporterUtils {
       case ALWAYS_OFF_SAMPLER:
         return alwaysOff();
       case TRACEIDRATIO_SAMPLER: {
-        return traceIdRatioBased(sampleRatio);
+        return traceIdRatioBased(resolveRatio(samplerArg));
       }
-      case PARENTBASED_ALWAYS_ON:
+      case PARENTBASED_ALWAYS_ON_SAMPLER:
         return parentBased(alwaysOn());
       case PARENTBASED_ALWAYS_OFF_SAMPLER:
         return parentBased(alwaysOff());
       case PARENTBASED_TRACEIDRATIO_SAMPLER: {
-        return parentBased(traceIdRatioBased(sampleRatio));
+        return parentBased(traceIdRatioBased(resolveRatio(samplerArg)));
       }
       default:
-        LOGGER.error("Unrecognized value for sampler: " + sampler + ". Always on sampler will be used.");
-        return DEFAULT_SAMPLER;
+        throw new IllegalArgumentException(format("Sampler not valid. Sampler: %s Arg: %s", sampler, samplerArg));
+    }
+  }
+
+  private static double resolveRatio(String samplerArg) {
+    try {
+      return parseDouble(samplerArg);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(format("The ratio is invalid: %s", samplerArg));
     }
   }
 }

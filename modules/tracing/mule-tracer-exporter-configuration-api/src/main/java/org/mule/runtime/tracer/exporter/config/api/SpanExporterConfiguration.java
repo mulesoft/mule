@@ -38,12 +38,4 @@ public interface SpanExporterConfiguration {
    */
   default void doOnConfigurationChanged(Runnable doOnConfigurationChanged) {}
 
-  /**
-   * @param envProperty the env property to retrieve.
-   *
-   * @return the env property.
-   */
-  default String getEnvProperty(String envProperty) {
-    return getenv(envProperty);
-  }
 }

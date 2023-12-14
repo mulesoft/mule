@@ -78,4 +78,18 @@ public class OpenTelemetrySpanExporterConfigurationProperties {
   public static final String MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY =
       MULE_OPEN_TELEMETRY_EXPORTER + ".metricsLogFrequency";
 
+  // Sampling
+
+  public static final String PARENTBASED_ALWAYS_ON_SAMPLER = "parentbased_always_on";
+
+  public static final String ALWAYS_ON_SAMPLER = "always_on";
+
+  public static final String ALWAYS_OFF_SAMPLER = "always_off";
+
+  public static final String TRACEIDRATIO_SAMPLER = "traceidratio";
+
+  public static final String PARENTBASED_ALWAYS_OFF_SAMPLER = "parentbased_always_off";
+
+  public static final String PARENTBASED_TRACEIDRATIO_SAMPLER = "parentbased_traceidratio";
+
 }
