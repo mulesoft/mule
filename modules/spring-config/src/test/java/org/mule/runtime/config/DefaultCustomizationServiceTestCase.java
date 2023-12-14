@@ -105,7 +105,7 @@ public class DefaultCustomizationServiceTestCase extends AbstractMuleTestCase {
 
   @Test
   public void skipsDefaultService() {
-    customizationService.interceptDefaultServiceImpl(SERVICE_ID, ServiceInterceptor::skip);
+    customizationService.interceptDefaultServiceImpl(SERVICE_ID, ServiceInterceptor::remove);
 
     assertThat(customizationService.getDefaultServices().size(), equalTo(1));
 

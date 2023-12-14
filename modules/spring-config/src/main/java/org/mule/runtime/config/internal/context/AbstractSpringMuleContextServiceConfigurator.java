@@ -20,7 +20,7 @@ import org.mule.runtime.config.internal.context.service.InjectParamsFromContextS
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.core.internal.config.CustomService;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
@@ -38,14 +38,14 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 abstract class AbstractSpringMuleContextServiceConfigurator {
 
-  private final CustomServiceRegistry customServiceRegistry;
+  private final InternalCustomizationService customizationService;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
   private final Registry serviceLocator;
 
-  protected AbstractSpringMuleContextServiceConfigurator(CustomServiceRegistry customServiceRegistry,
+  protected AbstractSpringMuleContextServiceConfigurator(InternalCustomizationService customizationService,
                                                          BeanDefinitionRegistry beanDefinitionRegistry,
                                                          Registry serviceLocator) {
-    this.customServiceRegistry = customServiceRegistry;
+    this.customizationService = customizationService;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.serviceLocator = serviceLocator;
   }
@@ -59,7 +59,7 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
-    beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
+    beanDefinition = customizationService.getOverriddenService(serviceId)
         .map(customService -> getCustomServiceBeanDefinition(customService, serviceId))
         .orElse(beanDefinition);
 
@@ -138,8 +138,8 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     return beanDefinitionRegistry.containsBeanDefinition(beanName);
   }
 
-  protected CustomServiceRegistry getCustomServiceRegistry() {
-    return customServiceRegistry;
+  protected InternalCustomizationService getCustomizationService() {
+    return customizationService;
   }
 
   protected BeanDefinitionRegistry getBeanDefinitionRegistry() {

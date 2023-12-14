@@ -75,7 +75,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -115,7 +115,6 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -196,7 +195,8 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
 
-    for (String serviceId : ((CustomServiceRegistry) muleContext.getCustomizationService()).getDefaultServices().keySet()) {
+    for (String serviceId : ((InternalCustomizationService) muleContext.getCustomizationService()).getDefaultServices()
+        .keySet()) {
       if (!registeredServices.contains(serviceId)) {
         registerObject(serviceId, null, muleContext);
       }
@@ -283,7 +283,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void registerCustomServices(MuleContext muleContext) {
-    for (Entry<String, CustomService> entry : ((CustomServiceRegistry) (muleContext.getCustomizationService()))
+    for (Entry<String, CustomService> entry : ((InternalCustomizationService) (muleContext.getCustomizationService()))
         .getCustomServices()
         .entrySet()) {
       entry.getValue().getServiceImpl().ifPresent(s -> {
@@ -301,7 +301,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     registeredServices.add(serviceId);
 
     Optional<T> serviceImpl =
-        ((CustomServiceRegistry) muleContext.getCustomizationService()).getOverriddenService(serviceId)
+        ((InternalCustomizationService) muleContext.getCustomizationService()).getOverriddenService(serviceId)
             .map(customService -> customService.getServiceImpl(defaultServiceImpl))
             .orElse(ofNullable(defaultServiceImpl));
 

@@ -8,6 +8,8 @@ package org.mule.runtime.core.api.context;
 
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
@@ -46,11 +48,14 @@ import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
+import org.mule.runtime.core.internal.connection.ConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -237,21 +242,26 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testCreateMuleContextWithCustomServices() throws InitialisationException, ConfigurationException {
-    MinimalConfigurationBuilder minimalConfigurationBuilder = new MinimalConfigurationBuilder();
+    ConnectivityTesterFactory defaultConnectivityTesterFactory = mock(ConnectivityTesterFactory.class);
+    ConnectionManager defaultConnectionManager = mock(ConnectionManager.class);
+    MinimalConfigurationBuilder minimalConfigurationBuilder =
+        new TestMinimalConfigurationBuilder(defaultConnectivityTesterFactory, defaultConnectionManager);
 
     Object testCustomServiceImpl = new Object();
     Object customQueueManagerImpl = new Object();
-    Object customSecurityManagerImpl = new Object();
+    Object customConnectivityTesterFactoryImpl = new Object();
     Map<String, Consumer<ServiceInterceptor<Object>>> interceptors = new HashMap<>();
-    // replace the default Security Manager
-    interceptors.put(OBJECT_SECURITY_MANAGER, serviceInterceptor -> {
+    // replace the default Connectivity Tester Factory
+    interceptors.put(OBJECT_CONNECTIVITY_TESTER_FACTORY, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
-      serviceInterceptor.overrideServiceImpl(customSecurityManagerImpl);
+      assertThat(serviceInterceptor.getDefaultServiceImpl().get(), is(defaultConnectivityTesterFactory));
+      serviceInterceptor.overrideServiceImpl(customConnectivityTesterFactoryImpl);
     });
-    // avoid registering the Cluster service
-    interceptors.put(OBJECT_CLUSTER_SERVICE, serviceInterceptor -> {
+    // avoid registering the Connection Manager
+    interceptors.put(OBJECT_CONNECTION_MANAGER, serviceInterceptor -> {
       assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
-      serviceInterceptor.skip();
+      assertThat(serviceInterceptor.getDefaultServiceImpl().get(), is(defaultConnectionManager));
+      serviceInterceptor.remove();
     });
     // attempt intercepting a non-existent service
     interceptors.put(NON_EXISTENT_SERVICE_KEY,
@@ -269,9 +279,9 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_CUSTOM_SERVICE_KEY),
                is(testCustomServiceImpl));
     assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER), is(customQueueManagerImpl));
-    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_SECURITY_MANAGER),
-               is(customSecurityManagerImpl));
-    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_CLUSTER_SERVICE), is(nullValue()));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_CONNECTIVITY_TESTER_FACTORY),
+               is(customConnectivityTesterFactoryImpl));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER), is(nullValue()));
     assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(NON_EXISTENT_SERVICE_KEY), is(nullValue()));
   }
 
@@ -367,6 +377,29 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
       customServices.forEach(customizationService::registerCustomServiceImpl);
       defaultServices.forEach(customizationService::overrideDefaultServiceImpl);
       interceptedServices.forEach(customizationService::interceptDefaultServiceImpl);
+    }
+
+  }
+
+  private static class TestMinimalConfigurationBuilder extends MinimalConfigurationBuilder {
+
+    private final ConnectivityTesterFactory connectivityTesterFactory;
+    private final ConnectionManager connectionManager;
+
+    public TestMinimalConfigurationBuilder(ConnectivityTesterFactory connectivityTesterFactory,
+                                           ConnectionManager connectionManager) {
+      this.connectivityTesterFactory = connectivityTesterFactory;
+      this.connectionManager = connectionManager;
+    }
+
+    @Override
+    protected void registerConnectivityTester(MuleContext muleContext) throws RegistrationException {
+      registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, connectivityTesterFactory, muleContext);
+    }
+
+    @Override
+    protected void registerConnectionManager(MuleContext muleContext) throws RegistrationException {
+      registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
     }
 
   }

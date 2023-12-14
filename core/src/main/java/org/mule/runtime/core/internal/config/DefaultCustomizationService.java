@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 /**
  * {@inheritDoc}
  */
-public class DefaultCustomizationService implements CustomizationService, CustomServiceRegistry {
+public class DefaultCustomizationService implements InternalCustomizationService {
 
   private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
   private final Map<String, CustomService> customServices = new HashMap<>();

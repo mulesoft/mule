@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public interface CustomServiceRegistry extends CustomizationService {
+/**
+ * Extended {@link CustomizationService} contract with additional non-API behavior.
+ */
+public interface InternalCustomizationService extends CustomizationService {
 
   /**
    * Provides the configuration of a particular service.

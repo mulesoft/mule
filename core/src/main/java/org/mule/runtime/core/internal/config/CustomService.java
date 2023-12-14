@@ -26,8 +26,8 @@ import java.util.function.Consumer;
 public class CustomService<T> {
 
   private final String serviceId;
-  private final Optional<Class> serviceClass;
-  private final Optional<Consumer<ServiceInterceptor<T>>> serviceImplInterceptorConsumer;
+  private final Class serviceClass;
+  private final Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer;
 
   /**
    * Creates a custom service from a class.
@@ -36,8 +36,8 @@ public class CustomService<T> {
    */
   public CustomService(String serviceId, Class serviceClass) {
     this.serviceId = serviceId;
-    this.serviceClass = of(serviceClass);
-    this.serviceImplInterceptorConsumer = empty();
+    this.serviceClass = serviceClass;
+    this.serviceImplInterceptorConsumer = null;
   }
 
   /**
@@ -47,15 +47,15 @@ public class CustomService<T> {
    */
   public CustomService(String serviceId, Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer) {
     this.serviceId = serviceId;
-    this.serviceImplInterceptorConsumer = of(serviceImplInterceptorConsumer);
-    this.serviceClass = empty();
+    this.serviceImplInterceptorConsumer = serviceImplInterceptorConsumer;
+    this.serviceClass = null;
   }
 
   /**
    * @return the service class.
    */
   public Optional<Class> getServiceClass() {
-    return serviceClass;
+    return ofNullable(serviceClass);
   }
 
   /**
@@ -66,12 +66,12 @@ public class CustomService<T> {
   }
 
   public Optional<T> getServiceImpl(T defaultService) {
-    if (!serviceImplInterceptorConsumer.isPresent()) {
+    if (serviceImplInterceptorConsumer == null) {
       return empty();
     }
 
     DefaultServiceInterceptor<T> serviceInterceptor = new DefaultServiceInterceptor<>(serviceId, defaultService);
-    serviceImplInterceptorConsumer.get().accept(serviceInterceptor);
+    serviceImplInterceptorConsumer.accept(serviceInterceptor);
 
     return serviceInterceptor.isRemove() ? empty() : ofNullable(serviceInterceptor.getNewServiceImpl());
   }
@@ -99,7 +99,7 @@ public class CustomService<T> {
     }
 
     @Override
-    public void skip() {
+    public void remove() {
       if (newServiceImpl != null) {
         throw new IllegalStateException(format("A 'newServiceImpl' is already present '%s' for service '%s' with default '%s'",
                                                newServiceImpl, serviceId, serviceImpl));
