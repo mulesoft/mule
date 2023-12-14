@@ -40,10 +40,5 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.mockito</groupId>-->
-<!--            <artifactId>mockito-all</artifactId>-->
-<!--            <version> 1.10.19</version>-->
-<!--        </dependency>-->
     </dependencies>
 </project>
