@@ -10,8 +10,12 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
-public interface CustomServiceRegistry extends CustomizationService {
+/**
+ * Extended {@link CustomizationService} contract with additional non-API behavior.
+ */
+public interface InternalCustomizationService extends CustomizationService {
 
   /**
    * Provides the configuration of a particular service.
@@ -27,4 +31,12 @@ public interface CustomServiceRegistry extends CustomizationService {
    * @return the registered custom services. Non null.
    */
   Map<String, CustomService> getCustomServices();
+
+  /**
+   * Provides access to the default services defined for the corresponding mule context.
+   *
+   * @return the registered default services. Non null.
+   */
+  Map<String, CustomService> getDefaultServices();
+
 }
