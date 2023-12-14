@@ -10,8 +10,12 @@ import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.DW_PREFIX;
 import static org.mule.runtime.core.internal.el.DefaultExpressionManager.MEL_PREFIX;
 
@@ -20,6 +24,9 @@ import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
@@ -34,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.slf4j.Logger;
 
 /**
  * Implementation of an {@link ExtendedExpressionLanguageAdaptor} which adapts MVEL and DW together, deciding via a prefix whether
@@ -41,7 +49,9 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  *
  * @since 4.0
  */
-public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLanguageAdaptor {
+public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
+
+  private static final Logger LOGGER = getLogger(ExpressionLanguageAdaptorHandler.class);
 
   private static final String EXPR_PREFIX_LANGS_TOKEN = "LANGS";
   private static final String EXPR_PREFIX_PATTERN_TEMPLATE =
@@ -271,4 +281,15 @@ public class ExpressionLanguageAdaptorHandler implements ExtendedExpressionLangu
   public String toString() {
     return this.getClass().getName() + "[" + expressionLanguages.toString() + "]";
   }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(expressionLanguages.values());
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(expressionLanguages.values(), LOGGER);
+  }
+
 }
