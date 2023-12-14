@@ -6,6 +6,12 @@
  */
 package org.mule.runtime.tracer.exporter.impl;
 
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_OFF_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_ON_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_ALWAYS_OFF_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_ALWAYS_ON_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_TRACEIDRATIO_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.TRACEIDRATIO_SAMPLER;
 import static org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils.getSampler;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
@@ -22,61 +28,85 @@ import static org.junit.Assert.assertThat;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
 public class OpenTelemetrySpanExporterUtilsTestCase {
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   @Test
   public void alwaysOnSampler() {
-    assertThat(getSampler("always_on", null), equalTo(alwaysOn()));
+    assertThat(getSampler(ALWAYS_ON_SAMPLER, ""), equalTo(alwaysOn()));
   }
 
   @Test
   public void alwaysOffSampler() {
-    assertThat(getSampler("always_off", null), equalTo(alwaysOff()));
+    assertThat(getSampler(ALWAYS_OFF_SAMPLER, ""), equalTo(alwaysOff()));
   }
 
   @Test
-  public void defaultSampler() {
-    assertThat(getSampler(null, null), equalTo(alwaysOn()));
+  public void nullSampler() {
+    expectedException.expectMessage("The sampler arg retrieved by configuration cannot be null");
+    getSampler(null, null);
   }
 
   @Test
-  public void traceIddRatioSampler() {
-    Sampler sampler = getSampler("traceidratio", null);
-    assertThat(sampler, equalTo(traceIdRatioBased(1.0d)));
+  public void invalidSampler() {
+    expectedException.expectMessage("Sampler not valid. Sampler: zaraza Arg: arg");
+    getSampler("zaraza", "arg");
+  }
+
+  @Test
+  public void invalidRatioTraceId() {
+    expectedException.expectMessage("The ratio is invalid: zaraza");
+    getSampler(TRACEIDRATIO_SAMPLER, "zaraza");
+  }
+
+  @Test
+  public void invalidRatioParentBased() {
+    expectedException.expectMessage("The ratio is invalid: zaraza");
+    getSampler(PARENTBASED_TRACEIDRATIO_SAMPLER, "zaraza");
+  }
+
+  @Test
+  public void traceIdRatioSampler() {
+    Sampler sampler = getSampler(TRACEIDRATIO_SAMPLER, "0.1");
+    assertThat(sampler, equalTo(traceIdRatioBased(0.1d)));
   }
 
   @Test
   public void traceIddRatioSamplerWithRatioDifferentThanDefault() {
-    Sampler sampler = getSampler("traceidratio", "0.5d");
+    Sampler sampler = getSampler(TRACEIDRATIO_SAMPLER, "0.5");
     assertThat(sampler, equalTo(traceIdRatioBased(0.5d)));
   }
 
   @Test
   public void parentBasedIdAlwaysOn() {
-    Sampler sampler = getSampler("parentbased_always_on", null);
+    Sampler sampler = getSampler(PARENTBASED_ALWAYS_ON_SAMPLER, "0.1");
     assertThat(sampler, equalTo(parentBased(alwaysOn())));
   }
 
   @Test
   public void parentBasedIdAlwaysOff() {
-    Sampler sampler = getSampler("parentbased_always_off", null);
+    Sampler sampler = getSampler(PARENTBASED_ALWAYS_OFF_SAMPLER, "0.1");
     assertThat(sampler, equalTo(parentBased(alwaysOff())));
   }
 
   @Test
   public void parentBasedTraceIdRatioWithRatioDifferentThanDefault() {
-    Sampler sampler = getSampler("parentbased_traceidratio", "0.5d");
+    Sampler sampler = getSampler(PARENTBASED_TRACEIDRATIO_SAMPLER, "0.5");
     assertThat(sampler, equalTo(parentBasedBuilder(traceIdRatioBased(0.5d)).build()));
   }
 
   @Test
   public void parentBasedTraceIdRatio() {
-    Sampler sampler = getSampler("parentbased_traceidratio", null);
-    assertThat(sampler, equalTo(parentBasedBuilder(traceIdRatioBased(1.0d)).build()));
+    Sampler sampler = getSampler(PARENTBASED_TRACEIDRATIO_SAMPLER, "0.1");
+    assertThat(sampler, equalTo(parentBasedBuilder(traceIdRatioBased(0.1d)).build()));
   }
 
 }
