@@ -78,6 +78,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -489,54 +490,71 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#[payload]", testEvent(), bindingContext);
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#[payload]", testEvent(), bindingContext);
     verify(genericExpressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", null, bindingContext);
+  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event or DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", OBJECT, null, bindingContext);
+  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", OBJECT, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, with DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", OBJECT, null, null, bindingContext, false);
+  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", OBJECT, null, null, bindingContext, false);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location, no DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", null, null, null, bindingContext);
+  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", null, null, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluateLogExpression("#['Hello World']", null, null, bindingContext);
+  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluateLogExpression("#['Hello World']", null, null, bindingContext);
     verify(genericExpressionLanguage).evaluateLogExpression(anyString(), eq(bindingContext));
   }
 
