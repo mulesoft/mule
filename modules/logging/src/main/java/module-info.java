@@ -17,7 +17,7 @@ module org.mule.runtime.logging {
 
   // Logging framework
   requires org.slf4j;
-  requires transitive org.apache.logging.log4j;
+  requires org.apache.logging.log4j;
 
   // These logging implementations have to be exported so any artifact code using those libs is hooked to Mule's logging
   // mechanism.

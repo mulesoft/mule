@@ -22,16 +22,16 @@
             <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-boot-api</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mule.runtime.boot</groupId>
-                    <artifactId>mule-module-log4j-boot-configurator</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>tanukisoft</groupId>
             <artifactId>wrapper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>api-annotations</artifactId>
+            <version>${muleAnnotationsApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 /**
  * Mule Log4j Configurator Module.
  * 
@@ -11,6 +12,7 @@
  * @since 4.5
  */
 module org.mule.runtime.boot.log4j {
+
   // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 

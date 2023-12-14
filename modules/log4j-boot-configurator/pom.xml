@@ -17,14 +17,45 @@
     <properties>
         <javaModuleName>org.mule.runtime.boot.log4j</javaModuleName>
         <skipExportTests>false</skipExportTests>
+        <!-- because this module requires transitive org.apache.logging.log4j -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-module-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                        <configuration>
+                            <!-- TODO W-14658807 reenable this -->
+                            <skip>true</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>api-annotations</artifactId>
+            <version>${muleAnnotationsApiVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->

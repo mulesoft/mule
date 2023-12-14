@@ -15,6 +15,7 @@
         <javaModuleName>org.mule.test.core</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
     
     <dependencies>

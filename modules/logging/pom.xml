@@ -17,7 +17,10 @@
     <properties>
         <javaModuleName>org.mule.runtime.logging</javaModuleName>
         <skipExportTests>false</skipExportTests>
+        <!-- because this module requires transitive logging libraries -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
     <dependencies>

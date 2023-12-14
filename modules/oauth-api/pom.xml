@@ -13,12 +13,20 @@
         <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <muleOAuthClientVersion>2.2.0-SNAPSHOT</muleOAuthClientVersion>
+        <!-- because this module requires transitive org.mule.oauth.client.api -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

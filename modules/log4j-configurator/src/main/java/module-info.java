@@ -29,7 +29,7 @@ module org.mule.runtime.log4j {
   requires org.apache.logging.log4j.core;
   requires reflections;
 
-  requires transitive org.apache.logging.log4j;
+  requires org.apache.logging.log4j;
 
   exports org.mule.runtime.module.log4j.internal to
       org.mule.runtime.launcher;

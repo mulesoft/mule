@@ -52,9 +52,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.util.queue",
         "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
-        "org.mule.runtime.core.privileged.profiling.tracing",
-        "org.mule.runtime.tracer.api.sniffer",
-        "org.mule.runtime.tracer.api.context.getter"
+        "org.mule.runtime.core.privileged.profiling.tracing"
     },
     privilegedArtifactIds = {
         "com.mulesoft.mule.modules:mule-compatibility-module",
