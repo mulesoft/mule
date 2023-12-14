@@ -69,6 +69,7 @@ module org.mule.runtime.spring.config {
   requires org.apache.commons.lang3;
   requires com.google.common;
 
+  requires org.jgrapht.core;
   requires net.bytebuddy;
 
   // Still needed for the deprecated properties support

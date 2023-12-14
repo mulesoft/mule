@@ -16,7 +16,7 @@ module org.mule.runtime.global.config {
   requires org.mule.runtime.api.annotations;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
-  requires org.mule.runtime.maven.client.api;
+  requires transitive org.mule.runtime.maven.client.api;
 
   // com.typesafe:config dependency:
   requires config;
