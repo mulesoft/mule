@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.config;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.config.custom.CustomizationService.ServiceInterceptor;
@@ -26,7 +25,7 @@ import java.util.function.Consumer;
 public class CustomService<T> {
 
   private final String serviceId;
-  private final Class serviceClass;
+  private final Class<T> serviceClass;
   private final Consumer<ServiceInterceptor<T>> serviceImplInterceptorConsumer;
 
   /**
@@ -34,7 +33,7 @@ public class CustomService<T> {
    *
    * @param serviceClass the service class.
    */
-  public CustomService(String serviceId, Class serviceClass) {
+  public CustomService(String serviceId, Class<T> serviceClass) {
     this.serviceId = serviceId;
     this.serviceClass = serviceClass;
     this.serviceImplInterceptorConsumer = null;
@@ -54,7 +53,7 @@ public class CustomService<T> {
   /**
    * @return the service class.
    */
-  public Optional<Class> getServiceClass() {
+  public Optional<Class<T>> getServiceClass() {
     return ofNullable(serviceClass);
   }
 

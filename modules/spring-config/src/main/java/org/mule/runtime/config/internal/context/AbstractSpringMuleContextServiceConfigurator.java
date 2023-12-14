@@ -66,9 +66,9 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
   }
 
-  protected boolean isServiceRuntimeProvided(final CustomService customService) {
+  protected boolean isServiceRuntimeProvided(final CustomService<?> customService) {
     return customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
-        || customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false);
+        || customService.getServiceClass().map(Service.class::isAssignableFrom).orElse(false);
   }
 
   /**
