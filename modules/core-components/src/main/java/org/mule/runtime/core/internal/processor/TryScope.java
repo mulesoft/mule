@@ -295,4 +295,24 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
       return ProcessingType.CPU_LITE;
     }
   }
+
+  void setComponentTracerFactory(ComponentTracerFactory componentTracerFactory) {
+    this.componentTracerFactory = componentTracerFactory;
+  }
+
+  void setProfilingService(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+  }
+
+  void setMuleConfiguration(MuleConfiguration configuration) {
+    this.muleConfiguration = configuration;
+  }
+
+  void setTransactionManager(TransactionManager transactionManager) {
+    this.transactionManager = of(transactionManager);
+  }
+
+  void setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {
+    this.notificationDispatcher = notificationDispatcher;
+  }
 }
