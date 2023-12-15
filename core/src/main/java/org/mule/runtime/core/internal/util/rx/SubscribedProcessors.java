@@ -18,7 +18,7 @@ import reactor.util.context.Context;
 public class SubscribedProcessors {
 
   private Context context;
-  private boolean trackSubscribedComponents = false;
+  private boolean trackSubscribedComponents = true;
   private List<String> subscribedComponents = Collections.emptyList();
   private int subscribedProcessors = 0;
 

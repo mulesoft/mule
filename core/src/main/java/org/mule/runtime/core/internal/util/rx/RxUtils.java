@@ -36,6 +36,8 @@ import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.ScheduledExecutorService;
@@ -201,14 +203,14 @@ public class RxUtils {
   private static void completePendingSubscription(ContextView ctx) {
     MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
     if (multiFluxSubscriber != null) {
-      multiFluxSubscriber.completePendingSubscription();
+      multiFluxSubscriber.completePendingSubscription(ctx);
     }
   }
 
   private static ContextView startPendingSubscription(ContextView ctx) {
     MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
     if (multiFluxSubscriber != null) {
-      multiFluxSubscriber.startPendingSubscription();
+      multiFluxSubscriber.startPendingSubscription(ctx);
     }
     return ctx;
   }
@@ -497,8 +499,10 @@ public class RxUtils {
     private Throwable lastSubscriptionError;
     private final Latch completionLatch;
     private final Phaser subscriptionPhaser = new Phaser(1);
-    private Scheduler subscriptionScheduler;
+    private final Scheduler subscriptionScheduler;
     private boolean subscribed = false;
+
+    private final List<ContextView> pendingContexts = new ArrayList<>();
 
     public MultiFluxSubscriber(Latch completionLatch, Scheduler subscriptionScheduler) {
       this.completionLatch = completionLatch;
@@ -540,12 +544,18 @@ public class RxUtils {
       subscriptionPhaser.forceTermination();
     }
 
-    public void startPendingSubscription() {
+    public void startPendingSubscription(ContextView context) {
       subscriptionPhaser.register();
+      synchronized (pendingContexts) {
+        pendingContexts.add(context);
+      }
     }
 
-    public void completePendingSubscription() {
+    public void completePendingSubscription(ContextView context) {
       subscriptionPhaser.arrive();
+      synchronized (pendingContexts) {
+        pendingContexts.remove(context);
+      }
     }
 
     public void awaitAllSubscriptions() {
