@@ -6,13 +6,28 @@
  */
 package org.mule.runtime.core.api.context;
 
+import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SERVICE;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleContextFeature.MULE_CONTEXT;
+import static org.mule.test.allure.AllureConstants.MuleContextFeature.MuleContextCreationStory.MULE_CONTEXT_CREATION;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -22,25 +37,25 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_SIMPLE_REGISTRY_BOOTSTRAP;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_QUEUE_MANAGER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_SECURITY_MANAGER;
-import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.config.custom.CustomizationService;
+import org.mule.runtime.api.config.custom.CustomizationService.ServiceInterceptor;
+import org.mule.runtime.api.config.custom.ServiceConfigurator;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.DefaultMuleConfiguration;
 import org.mule.runtime.core.api.config.builders.SimpleConfigurationBuilder;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
+import org.mule.runtime.core.internal.connection.ConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.DefaultMuleContextBuilder;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Banana;
@@ -50,24 +65,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
+@Feature(MULE_CONTEXT)
+@Story(MULE_CONTEXT_CREATION)
 public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
 
   @Rule
   public TestServicesConfigurationBuilder testServicesConfigurationBuilder = new TestServicesConfigurationBuilder();
 
   private final DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-  private static String TEST_STRING_KEY = "test";
-  private static String TEST_STRING_VALUE = "test_value";
-  private static String TEST_STRING_KEY2 = "test2";
-  private static String TEST_STRING_VALUE2 = "test_value2";
-  private static String TEST_OBJECT_NAME = "testObject";
+  private static final String TEST_STRING_KEY = "test";
+  private static final String TEST_STRING_VALUE = "test_value";
+  private static final String TEST_STRING_KEY2 = "test2";
+  private static final String TEST_STRING_VALUE2 = "test_value2";
+  private static final String TEST_OBJECT_NAME = "testObject";
+  private static final String TEST_CUSTOM_SERVICE_KEY = "testCustomServiceImpl";
+  private static final String NON_EXISTENT_SERVICE_KEY = "nonExistentService";
 
   private MuleContext context;
 
@@ -218,6 +240,51 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
     inOrder.verify(listener).onInitialization(eq(context), any(Registry.class));
   }
 
+  @Test
+  public void testCreateMuleContextWithCustomServices() throws InitialisationException, ConfigurationException {
+    ConnectivityTesterFactory defaultConnectivityTesterFactory = mock(ConnectivityTesterFactory.class);
+    ConnectionManager defaultConnectionManager = mock(ConnectionManager.class);
+    MinimalConfigurationBuilder minimalConfigurationBuilder =
+        new TestMinimalConfigurationBuilder(defaultConnectivityTesterFactory, defaultConnectionManager);
+
+    Object testCustomServiceImpl = new Object();
+    Object customQueueManagerImpl = new Object();
+    Object customConnectivityTesterFactoryImpl = new Object();
+    Map<String, Consumer<ServiceInterceptor<Object>>> interceptors = new HashMap<>();
+    // replace the default Connectivity Tester Factory
+    interceptors.put(OBJECT_CONNECTIVITY_TESTER_FACTORY, serviceInterceptor -> {
+      assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
+      assertThat(serviceInterceptor.getDefaultServiceImpl().get(), is(defaultConnectivityTesterFactory));
+      serviceInterceptor.overrideServiceImpl(customConnectivityTesterFactoryImpl);
+    });
+    // avoid registering the Connection Manager
+    interceptors.put(OBJECT_CONNECTION_MANAGER, serviceInterceptor -> {
+      assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(true));
+      assertThat(serviceInterceptor.getDefaultServiceImpl().get(), is(defaultConnectionManager));
+      serviceInterceptor.remove();
+    });
+    // attempt intercepting a non-existent service
+    interceptors.put(NON_EXISTENT_SERVICE_KEY,
+                     serviceInterceptor -> assertThat(serviceInterceptor.getDefaultServiceImpl().isPresent(), is(false)));
+    // replace the default Queue Manager and register a custom service
+    minimalConfigurationBuilder.addServiceConfigurator(new TestServiceConfigurator(
+                                                                                   singletonMap(TEST_CUSTOM_SERVICE_KEY,
+                                                                                                testCustomServiceImpl),
+                                                                                   singletonMap(OBJECT_QUEUE_MANAGER,
+                                                                                                customQueueManagerImpl),
+                                                                                   interceptors));
+    context = muleContextFactory.createMuleContext(testServicesConfigurationBuilder, minimalConfigurationBuilder);
+
+    assertMuleContextConfiguration(context);
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(TEST_CUSTOM_SERVICE_KEY),
+               is(testCustomServiceImpl));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER), is(customQueueManagerImpl));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_CONNECTIVITY_TESTER_FACTORY),
+               is(customConnectivityTesterFactoryImpl));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_CONNECTION_MANAGER), is(nullValue()));
+    assertThat(((MuleContextWithRegistry) context).getRegistry().lookupObject(NON_EXISTENT_SERVICE_KEY), is(nullValue()));
+  }
+
   private void assertDefaults(MuleContext context) {
     // Assert existance of defaults in registry
     assertNotNull(((MuleContextWithRegistry) context).getRegistry().lookupObject(OBJECT_QUEUE_MANAGER));
@@ -290,4 +357,51 @@ public class DefaultMuleContextFactoryTestCase extends AbstractMuleTestCase {
   static class TestMuleConfiguration extends DefaultMuleConfiguration {
     // just a skeleton
   }
+
+  private static class TestServiceConfigurator implements ServiceConfigurator {
+
+    private final Map<String, Object> customServices;
+    private final Map<String, Object> defaultServices;
+    private final Map<String, Consumer<ServiceInterceptor<Object>>> interceptedServices;
+
+    public TestServiceConfigurator(Map<String, Object> customServices,
+                                   Map<String, Object> defaultServices,
+                                   Map<String, Consumer<ServiceInterceptor<Object>>> interceptedServices) {
+      this.customServices = customServices;
+      this.defaultServices = defaultServices;
+      this.interceptedServices = interceptedServices;
+    }
+
+    @Override
+    public void configure(CustomizationService customizationService) {
+      customServices.forEach(customizationService::registerCustomServiceImpl);
+      defaultServices.forEach(customizationService::overrideDefaultServiceImpl);
+      interceptedServices.forEach(customizationService::interceptDefaultServiceImpl);
+    }
+
+  }
+
+  private static class TestMinimalConfigurationBuilder extends MinimalConfigurationBuilder {
+
+    private final ConnectivityTesterFactory connectivityTesterFactory;
+    private final ConnectionManager connectionManager;
+
+    public TestMinimalConfigurationBuilder(ConnectivityTesterFactory connectivityTesterFactory,
+                                           ConnectionManager connectionManager) {
+      this.connectivityTesterFactory = connectivityTesterFactory;
+      this.connectionManager = connectionManager;
+    }
+
+    @Override
+    protected void registerConnectivityTester(MuleContext muleContext) throws RegistrationException {
+      registerObject(OBJECT_CONNECTIVITY_TESTER_FACTORY, connectivityTesterFactory, muleContext);
+    }
+
+    @Override
+    protected void registerConnectionManager(MuleContext muleContext) throws RegistrationException {
+      registerObject(OBJECT_CONNECTION_MANAGER, connectionManager, muleContext);
+    }
+
+  }
+
 }
