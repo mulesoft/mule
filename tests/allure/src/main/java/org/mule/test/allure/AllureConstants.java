@@ -1271,4 +1271,19 @@ public interface AllureConstants {
       String SERVER_LOCK_FACTORY = "Container level lock factory";
     }
   }
+
+  interface MuleContextFeature {
+
+    String MULE_CONTEXT = "Mule Context";
+
+    interface MuleContextCreationStory {
+
+      String MULE_CONTEXT_CREATION = "Mule Context creation";
+    }
+  }
+
+  interface CustomizationServiceFeature {
+
+    String CUSTOMIZATION_SERVICE = "Customization Service";
+  }
 }

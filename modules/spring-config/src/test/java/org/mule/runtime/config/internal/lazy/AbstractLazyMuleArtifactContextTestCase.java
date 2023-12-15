@@ -53,7 +53,7 @@ import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -95,7 +95,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
   private ExtensionManager extensionManager;
 
   @Mock
-  private CustomServiceRegistry customizationService;
+  private InternalCustomizationService customizationService;
 
   @Mock
   private OptionalObjectsController optionalObjectsController;

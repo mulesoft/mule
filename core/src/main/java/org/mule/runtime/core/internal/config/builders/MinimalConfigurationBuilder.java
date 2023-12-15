@@ -45,12 +45,13 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaultRegistryBoostrap;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.internal.interception.InterceptorManager.INTERCEPTOR_MANAGER_REGISTRY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.getDummyComponentTracerFactory;
 import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultPersistentObjectStore;
 
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.artifact.Registry;
@@ -74,7 +75,7 @@ import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.cluster.DefaultClusterService;
 import org.mule.runtime.core.internal.config.CustomService;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectivityTesterFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -113,7 +114,10 @@ import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Configures a {@link MuleContext} {@link Registry} with the bare minimum elements needed for functioning. This instance will
@@ -125,8 +129,12 @@ import java.util.Map.Entry;
  */
 public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
 
+  private final Set<String> registeredServices = new HashSet<>();
+
   @Override
   protected void doConfigure(MuleContext muleContext) throws Exception {
+    serviceConfigurators.forEach(serviceConfigurator -> serviceConfigurator.configure(muleContext.getCustomizationService()));
+
     MuleRegistry registry = ((MuleContextWithRegistry) muleContext).getRegistry();
 
     defaultRegistryBoostrap(APP, muleContext).initialise();
@@ -186,6 +194,13 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
       }
     }, muleContext);
     registerObject(OBJECT_RESOURCE_LOCATOR, new DefaultResourceLocator(), muleContext);
+
+    for (String serviceId : ((InternalCustomizationService) muleContext.getCustomizationService()).getDefaultServices()
+        .keySet()) {
+      if (!registeredServices.contains(serviceId)) {
+        registerObject(serviceId, null, muleContext);
+      }
+    }
   }
 
   protected void registerTransactionFactoryLocator(MuleContext muleContext) throws RegistrationException {
@@ -268,7 +283,7 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   }
 
   protected void registerCustomServices(MuleContext muleContext) {
-    for (Entry<String, CustomService> entry : ((CustomServiceRegistry) (muleContext.getCustomizationService()))
+    for (Entry<String, CustomService> entry : ((InternalCustomizationService) (muleContext.getCustomizationService()))
         .getCustomServices()
         .entrySet()) {
       entry.getValue().getServiceImpl().ifPresent(s -> {
@@ -281,11 +296,23 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     }
   }
 
-  protected void registerObject(String serviceId, Object serviceImpl, MuleContext muleContext) throws RegistrationException {
-    if (serviceImpl instanceof MuleContextAware) {
-      ((MuleContextAware) serviceImpl).setMuleContext(muleContext);
+  protected <T> void registerObject(String serviceId, T defaultServiceImpl, MuleContext muleContext)
+      throws RegistrationException {
+    registeredServices.add(serviceId);
+
+    Optional<T> serviceImpl =
+        ((InternalCustomizationService) muleContext.getCustomizationService()).getOverriddenService(serviceId)
+            .map(customService -> customService.getServiceImpl(defaultServiceImpl))
+            .orElse(ofNullable(defaultServiceImpl));
+
+    if (!serviceImpl.isPresent()) {
+      return;
     }
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl);
+
+    if (serviceImpl.get() instanceof MuleContextAware) {
+      ((MuleContextAware) serviceImpl.get()).setMuleContext(muleContext);
+    }
+    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(serviceId, serviceImpl.get());
   }
 
   protected void registerObjectStoreManager(MuleContext muleContext) throws RegistrationException {
