@@ -290,7 +290,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public void dispose() {
-    expressionExecutor.dispose();
+    if (expressionExecutor != null) {
+      expressionExecutor.dispose();
+    }
   }
 
   @Override
