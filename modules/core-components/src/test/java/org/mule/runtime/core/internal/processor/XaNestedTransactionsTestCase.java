@@ -15,14 +15,19 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.*;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
+import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.XaStory.XA_TRANSACTION;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -54,6 +59,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Feature(TRANSACTION)
+@Story(XA_TRANSACTION)
 public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
 
   private static List<Transaction> transactions;
