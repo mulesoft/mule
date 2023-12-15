@@ -15,21 +15,32 @@ import org.mule.runtime.api.config.custom.CustomizationService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * {@inheritDoc}
  */
-public class DefaultCustomizationService implements CustomizationService, CustomServiceRegistry {
+public class DefaultCustomizationService implements InternalCustomizationService {
 
-  private Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
-  private Map<String, CustomService> customServices = new HashMap<>();
+  private final Map<String, CustomService> muleContextDefaultServices = new HashMap<>();
+  private final Map<String, CustomService> customServices = new HashMap<>();
 
   /**
    * {@inheritDoc}
    */
   @Override
   public <T> void overrideDefaultServiceImpl(String serviceId, T serviceImpl) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceImpl));
+    muleContextDefaultServices
+        .put(serviceId,
+             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public <T> void interceptDefaultServiceImpl(String serviceId, Consumer<ServiceInterceptor<T>> serviceInterceptor) {
+    muleContextDefaultServices.put(serviceId, new CustomService<>(serviceId, serviceInterceptor));
   }
 
   /**
@@ -37,7 +48,7 @@ public class DefaultCustomizationService implements CustomizationService, Custom
    */
   @Override
   public <T> void overrideDefaultServiceClass(String serviceId, Class<T> serviceClass) {
-    muleContextDefaultServices.put(serviceId, new CustomService(serviceClass));
+    muleContextDefaultServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
   }
 
   /**
@@ -52,14 +63,16 @@ public class DefaultCustomizationService implements CustomizationService, Custom
   public <T> void registerCustomServiceImpl(String serviceId, T serviceImpl) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceImpl != null, "serviceImpl cannot be null");
-    customServices.put(serviceId, new CustomService(serviceImpl));
+    customServices
+        .put(serviceId,
+             new CustomService<T>(serviceId, serviceInterceptor -> serviceInterceptor.overrideServiceImpl(serviceImpl)));
   }
 
   @Override
   public <T> void registerCustomServiceClass(String serviceId, Class<T> serviceClass) {
     checkArgument(!isEmpty(serviceId), "serviceId cannot be empty");
     checkArgument(serviceClass != null, "serviceClass cannot be null");
-    customServices.put(serviceId, new CustomService(serviceClass));
+    customServices.put(serviceId, new CustomService<T>(serviceId, serviceClass));
   }
 
   @Override
@@ -67,7 +80,9 @@ public class DefaultCustomizationService implements CustomizationService, Custom
     return unmodifiableMap(customServices);
   }
 
+  @Override
   public Map<String, CustomService> getDefaultServices() {
     return unmodifiableMap(muleContextDefaultServices);
   }
+
 }

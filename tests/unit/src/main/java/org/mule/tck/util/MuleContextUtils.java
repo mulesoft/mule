@@ -61,7 +61,7 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -80,7 +80,6 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 
@@ -241,7 +240,7 @@ public class MuleContextUtils {
     when(extensionManager.getExtensions()).thenReturn(emptySet());
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
 
-    CustomServiceRegistry customServices = new DefaultCustomizationService();
+    InternalCustomizationService customServices = new DefaultCustomizationService();
     new TestServicesConfigurationBuilder().configure(customServices);
     when(muleContext.getCustomizationService()).thenReturn(customServices);
 
