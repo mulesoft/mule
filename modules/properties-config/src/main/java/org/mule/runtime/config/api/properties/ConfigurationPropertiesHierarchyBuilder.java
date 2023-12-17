@@ -208,6 +208,8 @@ public class ConfigurationPropertiesHierarchyBuilder {
     environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    return hierarchy.peek();
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
+    lastResolver.setAsRootResolver();
+    return lastResolver;
   }
 }
