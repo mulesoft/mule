@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>test-empty-plugin</artifactId>
-            <version>4.7.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>

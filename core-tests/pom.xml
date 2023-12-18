@@ -31,6 +31,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -92,11 +97,6 @@
             <artifactId>mule-module-memory-management</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-tracer-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
     

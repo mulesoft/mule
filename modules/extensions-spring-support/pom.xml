@@ -24,7 +24,6 @@
         <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsoup.version>1.15.3</jsoup.version>
         <mule.runtime.version>${project.version}</mule.runtime.version>
     </properties>
 
@@ -80,7 +79,6 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
         </dependency>
 
         <!-- Mule Dependencies -->
