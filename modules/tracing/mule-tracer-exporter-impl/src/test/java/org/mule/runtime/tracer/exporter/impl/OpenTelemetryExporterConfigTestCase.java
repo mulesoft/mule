@@ -19,6 +19,7 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_KEY_FILE_LOCATION;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TLS_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.GRPC;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.HTTP;
 import static org.mule.runtime.tracer.exporter.impl.optel.resources.OpenTelemetryResources.resolveOpenTelemetrySpanExporter;
@@ -148,6 +149,7 @@ public class OpenTelemetryExporterConfigTestCase {
   public void defaultGrpcExporter() {
     Map<String, String> properties = new HashMap<>();
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
+    properties.put(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER, "always_on");
     properties.put(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT,
                    "http://" + collector.getHost() + ":" + collector.getMappedPort(COLLECTOR_OTLP_GRPC_PORT));
 

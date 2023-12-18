@@ -7,6 +7,7 @@
 package org.mule.runtime.tracer.exporter.impl.optel.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_ON_SAMPLER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
@@ -19,6 +20,8 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TIMEOUT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG;
 
 import static java.util.Collections.synchronizedList;
 
@@ -32,6 +35,8 @@ import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +64,9 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   private static final String DEFAULT_MAX_BATCH_SIZE = "512";
   private static final String DEFAULT_SCHEDULED_DELAY = "5000";
 
+  private static final String DEFAULT_SAMPLER = ALWAYS_ON_SAMPLER;
+  private static final String DEFAULT_SAMPLER_ARG = "0.1";
+
   private SpanExporterConfiguration delegate;
   private final Map<String, String> defaultConfigurationValues = new HashMap<>();
   private final List<Runnable> runnablesOnChange = synchronizedList(new ArrayList<>());
@@ -77,7 +85,8 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   public String getStringValue(String key) {
     try {
       if (delegate == null) {
-        this.delegate = new FileSpanExporterConfiguration(muleContext);
+        this.delegate = new CompositeSpanExporterConfiguration(Arrays.asList(new FileSpanExporterConfiguration(muleContext),
+                                                                             new EnvironmentPropertiesConfiguration()));
         this.delegate.doOnConfigurationChanged(() -> runnablesOnChange.forEach(Runnable::run));
         initialiseDefaultConfigurationValues();
       }
@@ -104,6 +113,8 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE, DEFAULT_MAX_BATCH_SIZE);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE, DEFAULT_BATCH_QUEUE_SIZE);
     defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY, DEFAULT_SCHEDULED_DELAY);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER, DEFAULT_SAMPLER);
+    defaultConfigurationValues.put(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG, DEFAULT_SAMPLER_ARG);
   }
 
   @Override

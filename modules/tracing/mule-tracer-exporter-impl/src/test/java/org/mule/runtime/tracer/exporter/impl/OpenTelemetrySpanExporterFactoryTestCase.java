@@ -7,6 +7,8 @@
 package org.mule.runtime.tracer.exporter.impl;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_ON_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.OPEN_TELEMETRY_EXPORTER;
 
@@ -24,6 +26,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.junit.Test;
+import org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 
 @Feature(PROFILING)
@@ -38,6 +41,7 @@ public class OpenTelemetrySpanExporterFactoryTestCase {
     SpanProcessor mockedSpanProcessor = mock(SpanProcessor.class);
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
 
+    when(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER)).thenReturn(ALWAYS_ON_SAMPLER);
     when(muleConfiguration.getId()).thenReturn(randomNumeric(3));
     when(muleContext.getConfiguration()).thenReturn(muleConfiguration);
     when(muleContext.getArtifactType()).thenReturn(APP);

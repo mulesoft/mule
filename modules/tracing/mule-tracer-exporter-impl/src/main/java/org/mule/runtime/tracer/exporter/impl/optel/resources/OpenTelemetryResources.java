@@ -136,19 +136,9 @@ public class OpenTelemetryResources {
    * @return the sampler for the {@link SpanExporter}.
    */
   public static Sampler getSampler(SpanExporterConfiguration spanExporterConfiguration) {
-    String sampler = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER);
-
-    if (sampler == null) {
-      sampler = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ENV);
-    }
-
-    String samplerArg = spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG);
-
-    if (samplerArg == null) {
-      samplerArg = spanExporterConfiguration.getEnvProperty(OTEL_TRACES_SAMPLER_ARG_ENV);
-    }
-
-    return OpenTelemetrySpanExporterUtils.getSampler(sampler, samplerArg);
+    return OpenTelemetrySpanExporterUtils
+        .getSampler(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER),
+                    spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG));
   }
 
   /**
