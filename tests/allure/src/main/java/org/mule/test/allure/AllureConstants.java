@@ -595,6 +595,7 @@ public interface AllureConstants {
 
       String BACKPRESSURE = "Backpressure";
       String REACTOR = "Reactor";
+      String MAX_CONCURRENCY = "Max concurrency";
     }
 
   }
