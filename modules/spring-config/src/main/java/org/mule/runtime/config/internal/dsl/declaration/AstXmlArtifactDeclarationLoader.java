@@ -33,8 +33,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.sort;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -42,6 +40,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Predicates.alwaysTrue;
 
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
+import org.mule.metadata.api.model.AnyType;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.BooleanType;
 import org.mule.metadata.api.model.DateTimeType;
@@ -725,7 +724,8 @@ public class AstXmlArtifactDeclarationLoader implements XmlArtifactDeclarationLo
     if (fieldByName.isPresent()) {
       ObjectFieldType objectFieldType = fieldByName.get();
 
-      if (objectFieldType.getValue() instanceof ObjectType) {
+      if (objectFieldType.getValue() instanceof ObjectType
+          || objectFieldType.getValue() instanceof AnyType) {
         childMetadataType = objectFieldType;
       } else if (objectFieldType.getValue() instanceof org.mule.metadata.api.model.SimpleType) {
         childMetadataType = objectFieldType.getValue();
