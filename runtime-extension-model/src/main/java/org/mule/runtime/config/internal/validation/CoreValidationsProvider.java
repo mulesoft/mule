@@ -92,6 +92,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
 
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
+                                                          new NumberParameterWithinRange(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
                                                           new ExpressionsInRequiredExpressionsParamsNonPropertyValue(ignoreParamsWithProperties),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService,

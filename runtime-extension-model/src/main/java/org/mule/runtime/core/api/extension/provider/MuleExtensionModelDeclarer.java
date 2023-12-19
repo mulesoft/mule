@@ -386,7 +386,8 @@ class MuleExtensionModelDeclarer {
     async.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize its performance when processing messages.")
-        .ofType(INTEGER_TYPE);
+        .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
+        .withExpressionSupport(NOT_SUPPORTED);
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer) {
@@ -684,9 +685,11 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE);
     flow.onDefaultParameterGroup().withOptionalParameter("initialState").defaultingTo("started")
         .ofType(BASE_TYPE_BUILDER.stringType().enumOf("started", "stopped").build());
-    flow.onDefaultParameterGroup().withOptionalParameter("maxConcurrency")
+    flow.onDefaultParameterGroup()
+        .withOptionalParameter("maxConcurrency")
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize its performance when processing messages.")
-        .ofType(INTEGER_TYPE);
+        .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
+        .withExpressionSupport(NOT_SUPPORTED);
 
     flow.withOptionalComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
@@ -752,7 +755,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
-        .ofType(INTEGER_TYPE)
+        .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
@@ -819,7 +822,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sets a timeout in milliseconds for each route. Values lower or equals than zero means no timeout.");
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("maxConcurrency")
-        .ofType(INTEGER_TYPE)
+        .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
         .defaultingTo(Integer.MAX_VALUE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("This value determines the maximum level of parallelism that will be used by this router.");
