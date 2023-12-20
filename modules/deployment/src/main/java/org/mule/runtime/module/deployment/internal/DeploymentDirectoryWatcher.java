@@ -169,9 +169,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
             File applicationFile = new File(appsDir, app + JAR_FILE_SUFFIX);
 
             if (applicationFile.exists() && applicationFile.isFile()) {
+              // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
               applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX, empty());
             } else {
               if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
+                // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
                 applicationArchiveDeployer.deployExplodedArtifact(app, empty());
               }
             }
@@ -239,6 +241,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
+        // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
         applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
       } catch (Exception e) {
         // Ignore and continue
@@ -249,6 +252,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
+        // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
         applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
       } catch (DeploymentException e) {
         // Ignore and continue

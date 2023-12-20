@@ -9,6 +9,7 @@ package org.mule.runtime.module.deployment.test.internal;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -38,10 +39,13 @@ public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
   @Mock
   Supplier<SchedulerService> schedulerServiceSupplier;
 
+  @Mock
+  DeploymentExecutor deploymentExecutor;
+
   @Test
   public void startupListenersAddDoesNotResultInConcurrentException() throws Exception {
     MuleDeploymentService deploymentService =
-        new MuleDeploymentService(domainFactory, applicationFactory, schedulerServiceSupplier);
+        new MuleDeploymentService(domainFactory, applicationFactory, schedulerServiceSupplier, deploymentExecutor);
     List<Thread> listenersSubscribers = new ArrayList<>();
 
     for (int i = 0; i < NUMBER_OF_LISTENER_SUBSCRIBERS; i++) {

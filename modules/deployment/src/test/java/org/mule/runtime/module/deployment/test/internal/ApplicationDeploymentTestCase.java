@@ -108,6 +108,7 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
+import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.DeploymentStatusTracker;
 import org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -1863,7 +1864,8 @@ public class ApplicationDeploymentTestCase extends AbstractApplicationDeployment
 
     deploymentService = new TestMuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                       muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                      () -> findSchedulerService(serviceManager));
+                                                      () -> findSchedulerService(serviceManager),
+                                                      new ApplicationServerDeploymentExecutor());
     configureDeploymentService();
     deploymentService.start(false);
   }
