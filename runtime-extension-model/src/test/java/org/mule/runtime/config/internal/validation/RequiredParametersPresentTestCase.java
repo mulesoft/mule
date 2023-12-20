@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTestCase;
 
 import java.util.List;
 import java.util.Optional;
