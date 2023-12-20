@@ -43,7 +43,7 @@ public abstract class AbstractMuleContainerWrapper implements MuleContainerWrapp
       for (BootstrapConfigurer bootstrapConfigurer : bootstrapConfigurers) {
         if (!bootstrapConfigurer.configure()) {
           // This call is important to communicate the exit code to the native code
-          stop(0);
+          haltAndCatchFire(0, null);
           return false;
         }
       }
