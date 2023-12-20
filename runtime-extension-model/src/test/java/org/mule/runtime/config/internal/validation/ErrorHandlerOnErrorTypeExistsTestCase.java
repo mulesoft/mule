@@ -17,6 +17,7 @@ import static org.mockito.Mockito.mock;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTestCase;
 
 import java.util.Optional;
 

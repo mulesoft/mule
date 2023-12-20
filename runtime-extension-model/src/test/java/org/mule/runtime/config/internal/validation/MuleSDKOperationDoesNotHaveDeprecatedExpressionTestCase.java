@@ -31,6 +31,8 @@ import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.el.validation.*;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
+import org.mule.runtime.config.internal.validation.test.AbstractCoreValidationTestCase;
+
 import io.qameta.allure.Features;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Stories;

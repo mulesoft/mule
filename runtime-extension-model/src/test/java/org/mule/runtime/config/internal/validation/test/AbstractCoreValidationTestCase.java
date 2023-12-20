@@ -4,17 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.internal.validation;
+package org.mule.runtime.config.internal.validation.test;
 
-import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -39,13 +42,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.io.input.ReaderInputStream;
+
+import org.junit.Before;
 
 public abstract class AbstractCoreValidationTestCase {
 
   protected static AstXmlParser parser;
 
-  static {
+  @Before
+  public void createAstXmlParser() {
+    // Avoid recreating the same parser
+    if (parser != null) {
+      return;
+    }
+
     final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault()
         .createTypeLoader(AbstractCoreValidationTestCase.class.getClassLoader());
 
@@ -74,13 +86,17 @@ public abstract class AbstractCoreValidationTestCase {
     operation.withOutputAttributes().ofType(typeLoader.load(void.class));
 
     parser = AstXmlParser.builder()
-        .withExtensionModel(MuleExtensionModelProvider.getExtensionModel())
+        .withExtensionModels(resolveRuntimeExtensionModels())
         .withExtensionModel(new ExtensionModelFactory()
             .create(new DefaultExtensionLoadingContext(extensionDeclarer,
                                                        builder(AbstractCoreValidationTestCase.class.getClassLoader(),
                                                                new NullDslResolvingContext()).build())))
         .withSchemaValidationsDisabled()
         .build();
+  }
+
+  protected List<ExtensionModel> resolveRuntimeExtensionModels() {
+    return asList(MuleExtensionModelProvider.getExtensionModel());
   }
 
   protected List<ValidationResultItem> runValidation(final String... xmlConfigs) {

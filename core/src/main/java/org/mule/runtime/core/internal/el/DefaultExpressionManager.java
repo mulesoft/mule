@@ -312,26 +312,25 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
       return new DefaultValidationResult(true, null);
     }
     final StringBuilder message = new StringBuilder();
-    try {
-      parser.validate(expression);
-      final AtomicBoolean valid = new AtomicBoolean(true);
-      if (expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
-        parser.parse(token -> {
-          if (valid.get()) {
-            ValidationResult result = expressionLanguage.validate(token);
-            if (!result.isSuccess()) {
-              valid.compareAndSet(true, false);
-              message.append(token).append(" is invalid\n");
-              message.append(result.errorMessage().orElse(""));
-            }
+    if (!parser.isValid(expression)) {
+      return failure("Invalid Expression", expression);
+    }
+
+    final AtomicBoolean valid = new AtomicBoolean(true);
+    if (expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
+      parser.parse(token -> {
+        if (valid.get()) {
+          ValidationResult result = expressionLanguage.validate(token);
+          if (!result.isSuccess()) {
+            valid.compareAndSet(true, false);
+            message.append(token).append(" is invalid\n");
+            message.append(result.errorMessage().orElse(""));
           }
-          return null;
-        }, expression);
-      } else {
-        return expressionLanguage.validate(expression);
-      }
-    } catch (IllegalArgumentException e) {
-      return failure(e.getMessage(), expression);
+        }
+        return null;
+      }, expression);
+    } else {
+      return expressionLanguage.validate(expression);
     }
 
     if (message.length() > 0) {
