@@ -19,7 +19,7 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
 
         <!-- remove once this artifact is released -->
-        <revapi.skip>true</revapi.skip>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
         <muleModule.analyze.skip>true</muleModule.analyze.skip>
     </properties>
 
