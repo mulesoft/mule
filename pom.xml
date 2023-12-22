@@ -245,6 +245,7 @@
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
+        <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
         <surefire.args.base>
             -XX:+TieredCompilation
@@ -992,6 +993,7 @@
                 </executions>
                 <configuration>
                     <skip>${skipMuleModuleMojos}</skip>
+                    <fillOptionalPackages>${mule.module.maven.plugin.fillOptionalPackages}</fillOptionalPackages>
                 </configuration>
             </plugin>
             <plugin>
