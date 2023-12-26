@@ -14,13 +14,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -43,9 +41,6 @@ public class MuleDeploymentServiceTestCase extends AbstractMuleTestCase {
 
   @Mock
   SchedulerService schedulerService;
-
-  @Mock
-  DeploymentExecutor deploymentExecutor;
 
   Supplier<SchedulerService> schedulerServiceSupplier = () -> schedulerService;
 

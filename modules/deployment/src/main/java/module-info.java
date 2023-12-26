@@ -36,19 +36,21 @@ module org.mule.runtime.deployment {
 
   // package java.beans package is used
   requires java.desktop;
+  requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires spring.core;
-    requires com.google.common;
 
-    exports org.mule.runtime.module.deployment.api;
-    exports org.mule.runtime.module.deployment.internal.processor to
+  exports org.mule.runtime.module.deployment.api;
+  exports org.mule.runtime.module.deployment.internal.processor to
       org.mule.runtime.launcher;
 
   exports org.mule.runtime.module.deployment.internal.singleapp to org.mule.runtime.launcher, spring.beans, org.mule.runtime.deployment.test;
+  exports org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, org.mule.runtime.launcher, spring.beans;
 
-    opens org.mule.runtime.module.deployment.internal.singleapp to spring.core, org.mule.runtime.deployment.test;
-    exports org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, org.mule.runtime.launcher, spring.beans;
-    opens org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, spring.core;
+  opens org.mule.runtime.module.deployment.internal.singleapp to spring.core, org.mule.runtime.deployment.test;
+  opens org.mule.runtime.module.deployment.internal to org.mule.runtime.deployment.test, spring.core;
+
+
 
 }

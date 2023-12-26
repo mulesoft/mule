@@ -270,8 +270,8 @@ public class DefaultMuleContainer implements MuleContainer {
       shutdown(e);
     } catch (Throwable t) {
       LOGGER.error("Error on attempting to shutdown the container", t);
-      exit(-1);
     }
+    exit(1);
   }
 
   private void doResourceInitialization() {
