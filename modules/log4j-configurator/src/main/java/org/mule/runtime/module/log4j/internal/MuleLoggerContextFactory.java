@@ -14,6 +14,7 @@ import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelecto
 
 import static java.lang.System.getProperty;
 
+import org.apache.logging.log4j.core.Appender;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DirectoryResourceLocator;
@@ -44,7 +45,8 @@ public class MuleLoggerContextFactory {
    * @param selector    the selector to bew used when building the loggers for the new context.
    * @return
    */
-  public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled) {
+  public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled,
+                             Appender fileAppender) {
     NewContextParameters parameters = resolveContextParameters(classLoader);
     if (parameters == null) {
       return getDefaultContext(selector, logSeparationEnabled);
@@ -56,7 +58,8 @@ public class MuleLoggerContextFactory {
                               classLoader,
                               selector,
                               isStandalone(),
-                              logSeparationEnabled);
+                              logSeparationEnabled,
+                              fileAppender);
 
     if ((classLoader instanceof ArtifactClassLoader) &&
         selector instanceof ArtifactAwareContextSelector) {

@@ -35,18 +35,23 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null, false);
   }
 
   /**
+   *
    * Depending on the given {@code logSeparationEnabled} parameter, it sets an {@link ArtifactAwareContextSelector} or a
    * {@link SimpleContextSelector} to the given {@code contextFactory}.
    * 
    * @param contextFactory       the {@link MuleLog4jContextFactory} where the selector will be set.
    * @param logSeparationEnabled boolean determining which context selector should be used.
+   * @param singleAppMode        boolean determining if the container is in single app mode.
    */
-  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled) {
-    if (logSeparationEnabled) {
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled,
+                                       boolean singleAppMode) {
+    if (singleAppMode) {
+      contextFactory.setContextSelector(new SingleAppModeContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
+    } else if (logSeparationEnabled) {
       contextFactory.setContextSelector(new ArtifactAwareContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
     } else {
       contextFactory.setContextSelector(new SimpleContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);

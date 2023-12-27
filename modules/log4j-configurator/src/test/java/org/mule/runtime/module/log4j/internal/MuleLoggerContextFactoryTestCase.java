@@ -67,7 +67,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     artifactDescriptor.setLogConfigFile(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
 
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true, null);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
@@ -78,7 +78,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     artifactDescriptor.setLogConfigFile(customLogConfig);
     final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
 
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true, null);
     assertThat(ctx.getConfigLocation(), equalTo(CONFIG_LOCATION.toURI()));
   }
 
@@ -90,7 +90,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     artifactDescriptorDomain.setLogConfigFile(customLogConfig);
 
     final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, mock(ArtifactAwareContextSelector.class), true, null);
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
   }
 
@@ -102,7 +102,7 @@ public class MuleLoggerContextFactoryTestCase extends AbstractMuleTestCase {
     artifactDescriptorDomain.setLogConfigFile(customLogConfig);
 
     final MuleLoggerContextFactory loggerCtxFactory = spyLoggerContextFactory();
-    final LoggerContext ctx = loggerCtxFactory.build(classLoader, new SimpleContextSelector(), false);
+    final LoggerContext ctx = loggerCtxFactory.build(classLoader, new SimpleContextSelector(), false, null);
 
     assertThat(ctx.getLogger(getClass().getName()), is(not(instanceOf(DispatchingLogger.class))));
     assertThat(ctx.getConfigLocation(), equalTo(customLogConfig.toURI()));
