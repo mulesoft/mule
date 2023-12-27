@@ -46,8 +46,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
@@ -142,13 +140,9 @@ public class FakeMuleServer {
                                                muleArtifactResourcesRegistry.getDomainFactory(),
                                                muleArtifactResourcesRegistry.getApplicationFactory(),
                                                muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
-
-    DeploymentExecutor deploymentExecutor = new ApplicationServerDeploymentExecutor();
     deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
                                                   muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                  () -> findSchedulerService(serviceManager),
-                                                  deploymentExecutor);
-
+                                                  () -> findSchedulerService(serviceManager));
     deploymentListener = mock(DeploymentListener.class);
     doAnswer(inv -> {
       final String artifactName = inv.getArgument(0);
@@ -296,7 +290,7 @@ public class FakeMuleServer {
 
   /**
    * Copies a given app archive to the apps folder for deployment.
-   * 
+   *
    * @throws URISyntaxException
    */
   public void addAppArchive(URL url) throws IOException, URISyntaxException {
@@ -337,7 +331,7 @@ public class FakeMuleServer {
 
   /**
    * Copies a given app archive with a given target name to the apps folder for deployment
-   * 
+   *
    * @throws URISyntaxException
    */
   private void addAppArchive(URL url, String targetFile) throws IOException, URISyntaxException {

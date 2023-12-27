@@ -20,17 +20,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+import static org.mule.runtime.core.internal.logging.LogUtil.LOGGER;
 import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.deployment.internal.singleapp.SingleAppApplicationDeployerBuilder.getSingleAppApplicationDeployerBuilder;
+import static org.mule.runtime.module.deployment.internal.singleapp.SingleAppDomainDeployerBuilder.getSingleAppDomainDeployerBuilder;
 import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.lang.System.getProperties;
 import static java.lang.System.getProperty;
+import static java.lang.System.exit;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -50,10 +54,11 @@ import org.mule.runtime.module.artifact.internal.classloader.DefaultResourceInit
 import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.SingleAppDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.singleapp.SingleAppApplicationDeployerBuilder;
+import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentFileResolver;
+import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentService;
+import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDomainDeployerBuilder;
 import org.mule.runtime.module.launcher.coreextension.ClasspathMuleCoreExtensionDiscoverer;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerServer;
@@ -124,17 +129,7 @@ public class DefaultMuleContainer implements MuleContainer {
 
     this.extensionModelLoaderRepository = artifactResourcesRegistry.getExtensionModelLoaderRepository();
 
-    DeploymentExecutor deploymentExecutor;
-    if (getProperties().containsKey(SINGLE_APP_MODE_PROPERTY)) {
-      deploymentExecutor = new SingleAppDeploymentExecutor();
-    } else {
-      deploymentExecutor = new ApplicationServerDeploymentExecutor();
-    }
-
-    this.deploymentService = new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
-                                                       artifactResourcesRegistry.getApplicationFactory(),
-                                                       () -> findSchedulerService(serviceManager),
-                                                       deploymentExecutor);
+    this.deploymentService = resolveDeploymentService();
 
     this.troubleshootingService = new DefaultTroubleshootingService(deploymentService);
     this.repositoryService = new RepositoryServiceFactory().createRepositoryService();
@@ -150,6 +145,28 @@ public class DefaultMuleContainer implements MuleContainer {
     this.muleLockFactory = artifactResourcesRegistry.getRuntimeLockFactory();
 
     artifactResourcesRegistry.getContainerClassLoader().dispose();
+  }
+
+  private DeploymentService resolveDeploymentService() {
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder = getSingleAppDomainDeployerBuilder();
+      singleAppDomainDeployerBuilder
+          .withDomainFactory(artifactResourcesRegistry.getDomainFactory())
+          .withApplicationFactory(artifactResourcesRegistry.getApplicationFactory());
+
+      SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = getSingleAppApplicationDeployerBuilder();
+      singleAppApplicationDeployerBuilder.withApplicationFactory(artifactResourcesRegistry.getApplicationFactory());
+
+      return new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
+                                            singleAppApplicationDeployerBuilder,
+                                            new SingleAppDeploymentFileResolver(),
+                                            new ArrayList<>(),
+                                            new ArrayList<>());
+    } else {
+      return new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
+                                       artifactResourcesRegistry.getApplicationFactory(),
+                                       () -> findSchedulerService(serviceManager));
+    }
   }
 
   /**
@@ -238,6 +255,7 @@ public class DefaultMuleContainer implements MuleContainer {
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
+      deploymentService.onDeploymentError(e -> attemptContainerShutdown(e));
     } catch (MuleException e) {
       shutdown(e);
       throw e;
@@ -245,6 +263,15 @@ public class DefaultMuleContainer implements MuleContainer {
       shutdown(t);
       throw new MuleRuntimeException(t);
     }
+  }
+
+  private void attemptContainerShutdown(Throwable e) {
+    try {
+      shutdown(e);
+    } catch (Throwable t) {
+      LOGGER.error("Error on attempting to shutdown the container", t);
+    }
+    exit(1);
   }
 
   private void doResourceInitialization() {
