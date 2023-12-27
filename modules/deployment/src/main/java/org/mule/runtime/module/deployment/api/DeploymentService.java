@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 /**
  * Manages deploy of mule applications
@@ -173,4 +174,11 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   void start();
 
   void stop();
+
+  /**
+   * @param deploymentErrorConsumer the {@link Throwable} that is considered fatal for the container.
+   */
+  default void onDeploymentError(Consumer<Throwable> deploymentErrorConsumer) {
+    // Nothing to do by default.
+  }
 }

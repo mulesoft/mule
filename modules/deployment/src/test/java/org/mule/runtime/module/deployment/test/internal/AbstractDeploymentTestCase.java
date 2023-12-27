@@ -151,8 +151,6 @@ import org.mule.runtime.module.deployment.internal.ArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
 import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
 import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
-import org.mule.runtime.module.deployment.internal.DeploymentExecutor;
-import org.mule.runtime.module.deployment.internal.ApplicationServerDeploymentExecutor;
 import org.mule.runtime.module.deployment.internal.DeploymentMuleContextListenerFactory;
 import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.DomainDeploymentTemplate;
@@ -423,8 +421,7 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
                                                           throw new MuleRuntimeException(createStaticMessage("Available services: "
                                                               + serviceManager.getServices()), e);
                                                         }
-                                                      },
-                                                      new ApplicationServerDeploymentExecutor());
+                                                      });
     configureDeploymentService();
 
     policyManager = new TestPolicyManager(deploymentService,
@@ -1365,8 +1362,8 @@ public abstract class AbstractDeploymentTestCase extends AbstractMuleTestCase {
   protected static class TestMuleDeploymentService extends MuleDeploymentService {
 
     public TestMuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
-                                     Supplier<SchedulerService> schedulerServiceSupplier, DeploymentExecutor deploymentExecutor) {
-      super(domainFactory, applicationFactory, schedulerServiceSupplier, deploymentExecutor);
+                                     Supplier<SchedulerService> schedulerServiceSupplier) {
+      super(domainFactory, applicationFactory, schedulerServiceSupplier);
     }
 
     @Override
