@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
-import static org.mule.runtime.tracing.level.api.config.TracingLevel.OVERVIEW;
+import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -89,7 +89,7 @@ public class FileTracingLevelConfiguration implements TracingLevelConfiguration,
   public FileTracingLevelConfiguration(MuleContext muleContext) {
     this.muleContext = muleContext;
     this.defaultLevel =
-        valueOf(getProperty(MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL, OVERVIEW.toString()).toUpperCase());
+        valueOf(getProperty(MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL, MONITORING.toString()).toUpperCase());
   }
 
   @Inject
