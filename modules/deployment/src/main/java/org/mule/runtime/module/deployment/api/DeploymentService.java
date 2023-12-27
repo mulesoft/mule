@@ -176,9 +176,9 @@ public interface DeploymentService extends DeploymentListenerManager, DomainDepl
   void stop();
 
   /**
-   * @param onFatalErrorForContainerConsumer the {@link Throwable} that is considered fatal for the container.
+   * @param deploymentErrorConsumer the {@link Throwable} that is considered fatal for the container.
    */
-  default void onFatalErrorForContainer(Consumer<Throwable> onFatalErrorForContainerConsumer) {
+  default void onDeploymentError(Consumer<Throwable> deploymentErrorConsumer) {
     // Nothing to do by default.
   }
 }

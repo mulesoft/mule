@@ -138,7 +138,7 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
 
     Consumer<Throwable> failConsumer = mock(Consumer.class);
     when(archiveDeployer.deployPackagedArtifact(eq(ARCHIVE_URI), any())).thenThrow(RuntimeException.class);
-    singleAppDeploymentService.onFatalErrorForContainer(failConsumer);
+    singleAppDeploymentService.onDeploymentError(failConsumer);
     singleAppDeploymentService.deploy(ARCHIVE_URI);
     verify(archiveDeployer).deployPackagedArtifact(eq(ARCHIVE_URI), any());
     verify(failConsumer).accept(any(RuntimeException.class));

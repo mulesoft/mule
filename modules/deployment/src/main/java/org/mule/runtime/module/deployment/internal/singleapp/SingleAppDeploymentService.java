@@ -80,7 +80,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   private final DeploymentFileResolver fileResolver;
 
   private DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
-  private Consumer<Throwable> onFatalErrorForContainerConsumer = t -> {
+  private Consumer<Throwable> deploymentErrorConsumer = t -> {
   };
 
   public SingleAppDeploymentService(SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder,
@@ -209,7 +209,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
         applicationDeployer.deployExplodedArtifact(fileName, deploymentProperties);
       }
     } catch (Throwable t) {
-      onFatalErrorForContainerConsumer.accept(t);
+      deploymentErrorConsumer.accept(t);
     }
   }
 
@@ -311,8 +311,8 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   }
 
   @Override
-  public void onFatalErrorForContainer(Consumer<Throwable> onFatalErrorForContainerConsumer) {
-    this.onFatalErrorForContainerConsumer = onFatalErrorForContainerConsumer;
+  public void onDeploymentError(Consumer<Throwable> deploymentErrorConsumer) {
+    this.deploymentErrorConsumer = deploymentErrorConsumer;
   }
 
   public DeploymentListener getApplicationDeploymentListener() {
