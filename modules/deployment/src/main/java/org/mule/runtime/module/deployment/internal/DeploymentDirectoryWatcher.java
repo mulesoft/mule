@@ -15,11 +15,11 @@ import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.Thread.MIN_PRIORITY;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
@@ -29,6 +29,8 @@ import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -55,7 +57,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -97,7 +98,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
-  private ScheduledExecutorService artifactDirMonitorTimer;
+  private Scheduler artifactDirMonitorScheduler;
 
   protected volatile boolean dirty;
 
@@ -228,10 +229,13 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void scheduleChangeMonitor() {
     final int reloadIntervalMs = getChangesCheckIntervalMs();
-    // TODO MULE-12337 migrate this to an scheduler
-    artifactDirMonitorTimer = newSingleThreadScheduledExecutor(new ArtifactDeployerMonitorThreadFactory());
+    SchedulerConfig schedulerConfig = SchedulerConfig.config()
+        .withName("Mule.app.deployer.monitor")
+        .withPriority(MIN_PRIORITY)
+        .withMaxConcurrentTasks(1);
 
-    artifactDirMonitorTimer.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
+    artifactDirMonitorScheduler = schedulerServiceSupplier.get().customScheduler(schedulerConfig);
+    artifactDirMonitorScheduler.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
     log(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
@@ -509,10 +513,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void stopAppDirMonitorTimer() {
-    if (artifactDirMonitorTimer != null) {
-      artifactDirMonitorTimer.shutdown();
+    if (artifactDirMonitorScheduler != null) {
+      artifactDirMonitorScheduler.shutdown();
       try {
-        artifactDirMonitorTimer.awaitTermination(getChangesCheckIntervalMs(), MILLISECONDS);
+        artifactDirMonitorScheduler.awaitTermination(getChangesCheckIntervalMs(), MILLISECONDS);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
