@@ -514,7 +514,12 @@ public final class MinMuleVersionUtils {
     if (belongsToSdkPackages(methodParameter.getType().getTypeName())) {
       parameterTypeMMV = getEnforcedMinMuleVersion(methodParameter.getType());
     } else { // The parameter is of custom type
-      parameterTypeMMV = calculateParameterTypeMinMuleVersion(methodParameter.getType(), new HashSet<>());
+      if (methodParameter.getAnnotations()
+          .noneMatch(a -> a.isSameType(Connection.class) || a.isSameType(org.mule.sdk.api.annotation.param.Connection.class))) {
+        parameterTypeMMV = calculateParameterTypeMinMuleVersion(methodParameter.getType(), new HashSet<>());
+      } else {
+        parameterTypeMMV = resolveToDefaultMMV("Type", methodParameter.getType().getName());
+      }
     }
     methodParameterMMV.updateIfHigherMMV(parameterTypeMMV,
                                          getReasonType("Parameter", methodParameter.getName(), parameterTypeMMV));
