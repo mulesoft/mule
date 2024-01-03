@@ -181,11 +181,11 @@
             <classifier>mule-service</classifier>
             <scope>test</scope>
             <exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -275,34 +275,34 @@
                     <execution>
                         <id>default-testCompile</id>
                         <configuration>
-							<compilerArgs>
-								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.bootstrap=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.container/org.mule.runtime.container.internal=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.classloader=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.nativelib=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.extensions.xml.support/org.mule.runtime.extension.internal.loader.xml=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.internal.context=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.model.impl.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.classloader=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.domain=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.policy=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.plugin=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.util=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.processor=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.util=org.mule.runtime.deployment.test</arg>
-								<arg>--add-exports=org.mule.test.runner/org.mule.test.runner.classloader.container=org.mule.runtime.deployment.test</arg>
-							</compilerArgs>
+                            <compilerArgs>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.bootstrap=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.policy=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.container/org.mule.runtime.container.internal=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.artifact/org.mule.runtime.module.artifact.internal.util=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.classloader=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.artifact.activation/org.mule.runtime.module.artifact.activation.internal.nativelib=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.service/org.mule.runtime.module.service.api.manager=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.extensions.xml.support/org.mule.runtime.extension.internal.loader.xml=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.internal.context=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.deployment.model.impl.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.classloader=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.domain=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.policy=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.plugin=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.util=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.processor=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.runtime.deployment/org.mule.runtime.module.deployment.internal.util=org.mule.runtime.deployment.test</arg>
+                                <arg>--add-exports=org.mule.test.runner/org.mule.test.runner.classloader.container=org.mule.runtime.deployment.test</arg>
+                            </compilerArgs>
                             <testRelease>11</testRelease>
                         </configuration>
                     </execution>
