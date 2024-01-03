@@ -8,6 +8,7 @@ package org.mule.test.infrastructure.deployment;
 
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageMetadataServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildExpressionLanguageServiceFile;
+import static org.mule.functional.services.TestServicesUtils.buildHttpServiceFile;
 import static org.mule.functional.services.TestServicesUtils.buildSchedulerServiceFile;
 import static org.mule.test.infrastructure.deployment.TestServicesSetup.EXPRESSION_LANGUAGE_METADATA_SERVICE_NAME;
 import static org.mule.test.infrastructure.deployment.TestServicesSetup.EXPRESSION_LANGUAGE_SERVICE_NAME;
@@ -50,7 +51,7 @@ public final class TestArtifactsCatalog extends ExternalResource {
   }
 
   private static void initFiles() throws URISyntaxException, IOException {
-    httpServiceJarFile = buildSchedulerServiceFile(compilerWorkFolder.newFolder("httpService"));
+    httpServiceJarFile = buildHttpServiceFile(compilerWorkFolder.newFolder("httpService"));
     schedulerServiceJarFile = buildSchedulerServiceFile(compilerWorkFolder.newFolder(SCHEDULER_SERVICE_NAME));
     expressionLanguageServiceJarFile =
         buildExpressionLanguageServiceFile(compilerWorkFolder.newFolder(EXPRESSION_LANGUAGE_SERVICE_NAME));
