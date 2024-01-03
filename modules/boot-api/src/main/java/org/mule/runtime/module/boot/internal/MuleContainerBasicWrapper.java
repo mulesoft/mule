@@ -42,7 +42,9 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
 
   @Override
   public void haltAndCatchFire(int exitCode, String message) {
-    throw new RuntimeException(message);
+    if (exitCode != 0) {
+      throw new RuntimeException(message);
+    }
   }
 
   @Override
