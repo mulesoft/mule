@@ -7,7 +7,6 @@
 package org.mule.runtime.tracer.exporter.impl.optel.config;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.ALWAYS_ON_SAMPLER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MAX_ATTEMPTS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BACKOFF_MULTIPLIER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
@@ -22,6 +21,7 @@ import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExpor
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.PARENTBASED_TRACEIDRATIO_SAMPLER;
 
 import static java.util.Collections.synchronizedList;
 
@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class OpenTelemetryAutoConfigurableSpanExporterConfiguration implements S
   private static final String DEFAULT_MAX_BATCH_SIZE = "512";
   private static final String DEFAULT_SCHEDULED_DELAY = "5000";
 
-  private static final String DEFAULT_SAMPLER = ALWAYS_ON_SAMPLER;
+  private static final String DEFAULT_SAMPLER = PARENTBASED_TRACEIDRATIO_SAMPLER;
   private static final String DEFAULT_SAMPLER_ARG = "0.1";
 
   private SpanExporterConfiguration delegate;
