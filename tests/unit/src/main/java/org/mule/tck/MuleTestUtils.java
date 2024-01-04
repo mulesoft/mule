@@ -6,22 +6,24 @@
  */
 package org.mule.tck;
 
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -44,6 +46,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
+import org.mule.tck.MuleTestUtils.TestDirectProcessingStrategy;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -172,22 +175,22 @@ public final class MuleTestUtils {
    * @param callback      Callback implementing the the test code and assertions to be run with system property set.
    * @throws Exception any exception thrown by the execution of callback
    */
-  public static void testWithSystemProperty(String propertyName, String propertyValue, TestCallback callback)
+  public static void testWithSystemProperty(String propertyName, Object propertyValue, TestCallback callback)
       throws Exception {
     assert propertyName != null && callback != null;
-    String originalPropertyValue = null;
+    Object originalPropertyValue = null;
     try {
       if (propertyValue == null) {
-        originalPropertyValue = System.clearProperty(propertyName);
+        originalPropertyValue = System.getProperties().remove(propertyName);
       } else {
-        originalPropertyValue = System.setProperty(propertyName, propertyValue);
+        originalPropertyValue = System.getProperties().put(propertyName, propertyValue);
       }
       callback.run();
     } finally {
       if (originalPropertyValue == null) {
-        System.clearProperty(propertyName);
+        System.getProperties().remove(propertyName);
       } else {
-        System.setProperty(propertyName, originalPropertyValue);
+        System.getProperties().put(propertyName, originalPropertyValue);
       }
     }
   }
