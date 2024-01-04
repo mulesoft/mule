@@ -29,7 +29,11 @@ public class SystemPropertiesConfigurationProvider implements ConfigurationPrope
   private final Map<String, String> properties;
 
   public SystemPropertiesConfigurationProvider() {
-    properties = getProperties().entrySet().stream().collect(toMap(p -> (String) p.getKey(), p -> (String) p.getValue()));
+    properties = getProperties()
+        .entrySet()
+        .stream()
+        .collect(toMap(p -> p.getKey().toString(),
+                       p -> p.getValue().toString()));
   }
 
   @Override
