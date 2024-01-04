@@ -10,7 +10,6 @@ import static java.lang.String.format;
 
 import org.mule.runtime.extension.api.declaration.type.DefaultExtensionsTypeLoaderFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.api.resources.BaseExtensionResourcesGeneratorAnnotationProcessor;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.ExtensionTypeWrapper;
 
 import javax.annotation.processing.ProcessingEnvironment;
