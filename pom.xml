@@ -175,7 +175,7 @@
         <muleHttpPolicyApiVersion>1.6.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.6.0-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.6.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.6.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.6.1-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
@@ -221,9 +221,9 @@
         <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.5.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.5.1-SNAPSHOT</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.6.0-SNAPSHOT</muleRevapiExtensionVersion>
+        <muleRevapiExtensionVersion>1.6.1-SNAPSHOT</muleRevapiExtensionVersion>
         <mule.extensions.maven.plugin.version>1.6.0-SNAPSHOT</mule.extensions.maven.plugin.version>
         <mule.app.plugins.maven.plugin.version>1.6.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
