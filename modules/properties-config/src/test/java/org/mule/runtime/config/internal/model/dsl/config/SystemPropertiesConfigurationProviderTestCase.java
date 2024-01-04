@@ -15,6 +15,8 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
 
+import io.qameta.allure.Issue;
+
 public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleTestCase {
 
   private SystemPropertiesConfigurationProvider systemPropertiesConfigurationProvider;
@@ -40,6 +42,19 @@ public class SystemPropertiesConfigurationProviderTestCase extends AbstractMuleT
 
     assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
                is(propertyValue));
+  }
+
+  @Test
+  @Issue("W-14747448")
+  public void systemPropertyNotString() throws Exception {
+    String propertyKey = "propertyA";
+    Object propertyValue = SystemPropertiesConfigurationProviderTestCase.class;
+    testWithSystemProperty(propertyKey, propertyValue, () -> {
+      systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
+    });
+
+    assertThat(systemPropertiesConfigurationProvider.provide(propertyKey).get().getValue(),
+               is(propertyValue.toString()));
   }
 
 }
