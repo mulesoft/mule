@@ -28,6 +28,7 @@ import static org.mockito.Mockito.withSettings;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
