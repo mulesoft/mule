@@ -115,6 +115,26 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="org.mule.test.subtypes.extension.StatelessType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType"></xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.StatelessType" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-stateless-type"></xs:element>
+  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.StatelessType" abstract="true" name="abstract-stateless-type"></xs:element>
+  <xs:complexType name="org.mule.test.subtypes.extension.TopLevelStatelessType">
+    <xs:complexContent>
+      <xs:extension xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" base="subtypes:org.mule.test.subtypes.extension.StatelessType"></xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" type="subtypes:org.mule.test.subtypes.extension.TopLevelStatelessType" substitutionGroup="subtypes:abstract-stateless-type" abstract="true" name="abstract-top-level-stateless-type"></xs:element>
+  <xs:element xmlns:subtypes="http://www.mulesoft.org/schema/mule/subtypes" substitutionGroup="subtypes:abstract-top-level-stateless-type" name="top-level-stateless-type">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="subtypes:org.mule.test.subtypes.extension.TopLevelStatelessType"></xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="config">
     <xs:complexType>
       <xs:complexContent>

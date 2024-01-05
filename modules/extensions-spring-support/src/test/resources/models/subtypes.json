@@ -66,6 +66,18 @@
           "type": "@ref:org.mule.test.heisenberg.extension.model.Ricin"
         }
       ]
+    },
+    {
+      "baseType": {
+        "format": "java",
+        "type": "@ref:org.mule.test.subtypes.extension.StatelessType"
+      },
+      "subTypes": [
+        {
+          "format": "java",
+          "type": "@ref:org.mule.test.subtypes.extension.TopLevelStatelessType"
+        }
+      ]
     }
   ],
   "privilegedPackages": [],
@@ -6530,6 +6542,37 @@
       "format": "java",
       "type": "Object",
       "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.StatelessType",
+        "classInformation": {
+          "classname": "org.mule.test.subtypes.extension.StatelessType",
+          "hasDefaultConstructor": false,
+          "isInterface": true,
+          "isInstantiable": false,
+          "isAbstract": true,
+          "isFinal": false,
+          "implementedInterfaces": [],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeAlias": {
+          "value": "StatelessType"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "STATELESS_TYPE",
+              "namespace": "SUBTYPES"
+            }
+          ]
+        }
+      },
+      "fields": []
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
         "typeId": "org.mule.test.subtypes.extension.SubTypesConnectorConnection",
         "classInformation": {
           "classname": "org.mule.test.subtypes.extension.SubTypesConnectorConnection",
@@ -7503,6 +7546,47 @@
           }
         }
       ]
+    },
+    {
+      "format": "java",
+      "type": "Object",
+      "annotations": {
+        "typeId": "org.mule.test.subtypes.extension.TopLevelStatelessType",
+        "classInformation": {
+          "classname": "org.mule.test.subtypes.extension.TopLevelStatelessType",
+          "hasDefaultConstructor": true,
+          "isInterface": false,
+          "isInstantiable": true,
+          "isAbstract": false,
+          "isFinal": false,
+          "implementedInterfaces": [
+            "org.mule.test.subtypes.extension.StatelessType"
+          ],
+          "parent": "",
+          "genericTypes": [],
+          "isMap": false
+        },
+        "typeDsl": {
+          "allowInlineDefinition": true,
+          "allowTopLevelDefinition": true
+        },
+        "typeAlias": {
+          "value": "TopLevelStatelessType"
+        },
+        "stereotype": {
+          "allowedStereotypes": [
+            {
+              "type": "TOP_LEVEL_STATELESS_TYPE",
+              "namespace": "SUBTYPES",
+              "parent": {
+                "type": "STATELESS_TYPE",
+                "namespace": "SUBTYPES"
+              }
+            }
+          ]
+        }
+      },
+      "fields": []
     },
     {
       "format": "java",
