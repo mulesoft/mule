@@ -9,6 +9,7 @@ package org.mule.test.module.extension.dsl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
+import static org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver.getDefault;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
@@ -27,6 +28,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,7 +42,6 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
 
   private ExtensionModel heisenbergExtensionModel;
   private ExtensionModel subTypesExtensionModel;
-  private DslSyntaxResolver dslSyntaxResolver;
 
   @Override
   protected String getConfigFile() {
@@ -51,11 +53,11 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
   public void setup() {
     heisenbergExtensionModel = extensionManager.getExtension(HeisenbergExtension.HEISENBERG).get();
     subTypesExtensionModel = extensionManager.getExtension(SubTypesMappingConnector.NAME).get();
-    dslSyntaxResolver = DslSyntaxResolver.getDefault(heisenbergExtensionModel, new SingleExtensionImportTypesStrategy());
   }
 
   @Test
   public void innerWrapperPojoIsShownAsChild() {
+    DslSyntaxResolver dslSyntaxResolver = getDefault(heisenbergExtensionModel, new SingleExtensionImportTypesStrategy());
     MetadataType carWashType = getSubType(heisenbergExtensionModel, CarWash.class).get();
     DslElementSyntax carWashDslElementSyntax = dslSyntaxResolver.resolve(carWashType).get();
     assertThat(carWashDslElementSyntax.getChild(INVESTMENT_PLAN_B_NAME).isPresent(), is(true));
@@ -67,7 +69,10 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
   }
 
   @Test
-  public void rodri() {
+  @Issue("W-14645134")
+  @Description("Tests that a stateless subtype can be defined as a child element")
+  public void statelessSubType() {
+    DslSyntaxResolver dslSyntaxResolver = getDefault(subTypesExtensionModel, new SingleExtensionImportTypesStrategy());
     MetadataType type = getSubType(subTypesExtensionModel, TopLevelStatelessType.class).get();
     DslElementSyntax syntax = dslSyntaxResolver.resolve(type).get();
     assertThat(syntax.supportsChildDeclaration(), is(true));
