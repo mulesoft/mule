@@ -10,12 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>provided-dependency</artifactId>
+    <packaging>jar</packaging>
 
     <name>Mule Extension with Provided Dependency</name>
     <description>A Mule extension that relies on a provided dependency</description>
 
     <properties>
         <javaModuleName>org.mule.test.extension.provided.dependency</javaModuleName>
+        <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 

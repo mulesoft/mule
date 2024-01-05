@@ -561,14 +561,16 @@ public final class MinMuleVersionUtils {
   }
 
   private static boolean isLinkageError(Throwable t) {
-    t = t.getCause();
-    while (t.getCause() != null) {
+    Set<Throwable> throwables = new HashSet<>();
+    while (t != null && !throwables.contains(t)) {
       if (t instanceof LinkageError) {
         return true;
       }
 
+      throwables.add(t);
       t = t.getCause();
     }
+
     return false;
   }
 
