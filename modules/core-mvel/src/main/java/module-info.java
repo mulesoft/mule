@@ -4,10 +4,20 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.api.annotation.jpms.PrivilegedApi;
+
 /**
  * @moduleGraph
- * @since 4.6
+ * @since 4.7
  */
+@PrivilegedApi(
+    privilegedPackages = "org.mule.runtime.core.privileged.el.context",
+    privilegedArtifactIds = {
+        "com.mulesoft.mule.modules:mule-compatibility-module",
+        "org.mule.modules:mule-scripting-module"
+    }
+)
 module org.mule.runtime.core.mvel {
 
   requires org.mule.runtime.core;
