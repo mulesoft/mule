@@ -547,6 +547,8 @@ public final class MinMuleVersionUtils {
         LOGGER
             .warn(format("Skipping MMV calculation for fields of type '%s', at least one of the fields' types couldn't be loaded",
                          parameterType.getName()));
+      } else {
+        throw t;
       }
     }
 
@@ -561,13 +563,12 @@ public final class MinMuleVersionUtils {
   }
 
   private static boolean isLinkageError(Throwable t) {
-    Set<Throwable> throwables = new HashSet<>();
-    while (t != null && !throwables.contains(t)) {
+    Set<Throwable> seen = new HashSet<>();
+    while (t != null && seen.add(t)) {
       if (t instanceof LinkageError) {
         return true;
       }
 
-      throwables.add(t);
       t = t.getCause();
     }
 

@@ -30,9 +30,8 @@ import org.junit.Test;
 public class ExtensionWithProvidedDependencyTestCase {
 
   @Test
-  @Description("Tests that the model of an extension that has a custom type that relies on types from a dependency" +
-      "declared as provided, and has that custom type used as a parameter in an operation, is correctly loaded and" +
-      "the Min Mule Version of the component has the right value")
+  @Description("Tests that a component that internally relies on a class from a provided dependency doesn't break MMV " +
+      "resolution due to the dependency not being available at design time")
   public void extensionWithParametersRelyingOnProvidedDependencyTypesIsLoaded() {
     ExtensionModel extension = loadExtension(ProvidedDependencyExtension.class);
 
