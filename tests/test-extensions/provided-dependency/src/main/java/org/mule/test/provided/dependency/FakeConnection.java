@@ -8,7 +8,7 @@ package org.mule.test.provided.dependency;
 
 import org.mule.munit.common.event.EventBuilder;
 
-public class FakeEventBuilder {
+public class FakeConnection {
 
   private EventBuilder eventBuilder;
 

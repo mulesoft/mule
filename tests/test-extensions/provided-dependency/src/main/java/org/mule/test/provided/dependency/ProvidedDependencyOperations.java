@@ -10,6 +10,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 
 public class ProvidedDependencyOperations {
 
-  public void dummyOperation(@Connection FakeEventBuilder eventBuilder) {}
+  public void dummyOperation(@Connection FakeConnection connection) {}
 
 }

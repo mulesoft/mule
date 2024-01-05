@@ -12,13 +12,15 @@ import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Operations;
+import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
 import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
 @Extension(name = ProvidedDependencyExtension.NAME)
 @JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Xml(prefix = "provided-dependency")
-@Operations({ProvidedDependencyOperations.class})
+@ConnectionProviders(ProvidedDependencyConnectionProvider.class)
+@Operations(ProvidedDependencyOperations.class)
 public class ProvidedDependencyExtension {
 
   public static final String NAME = "Provided Dependency";
