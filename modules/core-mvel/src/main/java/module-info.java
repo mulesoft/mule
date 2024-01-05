@@ -30,8 +30,10 @@ module org.mule.runtime.core.mvel {
   requires java.xml;
 
   exports org.mule.runtime.core.internal.el.mvel to
-      org.mule.runtime.spring.config;
+      org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.batch;
 
   exports org.mule.runtime.core.internal.el.mvel.configuration to
       org.mule.runtime.spring.config;
+
 }
