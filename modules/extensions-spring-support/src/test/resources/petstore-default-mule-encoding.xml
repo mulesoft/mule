@@ -9,7 +9,7 @@
 
     <object name="testProcessor" class="org.mule.test.module.extension.connector.PetStoreDefaultEncodingTestCase$TestProcessor"/>
 
-    <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
+    <petstore:config name="config" cashierName="jim" pets="#[[]]">
         <petstore:connection username="john" password="doe"/>
         <petstore:cage>
             <petstore:birds>
@@ -27,7 +27,7 @@
         <petstore:get-config config-ref="config"/>
     </flow>
 
-    <petstore:phone-number name="topLevelPhoneNumber" mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
+    <petstore:phone-number name="topLevelPhoneNumber" mobile="13123" home="1231" areaCodes="#[[]]"/>
 
     <flow name="topLevelEncoding">
         <petstore:get-default-encoding usePhoneNumber="true" phoneNumber="topLevelPhoneNumber"/>
@@ -40,7 +40,7 @@
 
     <flow name="inlinePojoEncoding">
         <petstore:get-default-encoding usePhoneNumber="true">
-            <petstore:phone-number mobile="13123" home="1231" areaCodes="#[mel:[]]"/>
+            <petstore:phone-number mobile="13123" home="1231" areaCodes="#[[]]"/>
         </petstore:get-default-encoding>
     </flow>
 

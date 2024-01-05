@@ -17,13 +17,13 @@
                        finalHealth="CANCER"
                        monthlyIncomes="monthlyIncomes"
                        candidateDoors="candidateDoors"
-                       enemies="#[mel:[]]">
+                       enemies="#[[]]">
     </heisenberg:config>
 
     <flow name="source" initialState="stopped">
-        <heisenberg:listen-payments initialBatchNumber="0" config-ref="#[mel:dynamic]" />
+        <heisenberg:listen-payments initialBatchNumber="0" config-ref="#[dynamic]" />
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
 </mule>

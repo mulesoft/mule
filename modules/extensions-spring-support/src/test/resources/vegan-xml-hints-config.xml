@@ -24,7 +24,7 @@
     </flow>
 
     <flow name="eatPealedBanana">
-        <vegan:eat-pealed attributeOnlyBanana="#[mel:new org.mule.tck.testmodels.fruit.Banana()]" />
+        <vegan:eat-pealed attributeOnlyBanana="#[java!org::mule::tck::testmodels::fruit::Banana::new()]" />
     </flow>
 
 </mule>
