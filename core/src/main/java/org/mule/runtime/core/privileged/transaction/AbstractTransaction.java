@@ -8,7 +8,10 @@ package org.mule.runtime.core.privileged.transaction;
 
 import static java.lang.System.identityHashCode;
 import static java.text.MessageFormat.format;
+import static java.time.Duration.between;
+import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
@@ -28,7 +31,9 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
+import java.time.Instant;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 
@@ -42,11 +47,13 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected String id = UUID.getUUID();
 
   protected int timeout;
+  private Instant beginTime;
   protected ComponentLocation componentLocation;
 
   protected String applicationName;
   protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
+  private boolean rollbackAfterTimeout = true;
 
   @Deprecated
   protected AbstractTransaction(MuleContext muleContext) {
@@ -94,6 +101,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
     fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
+    beginTime = now();
   }
 
   @Override
@@ -105,12 +113,21 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       if (isRollbackOnly()) {
         throw new IllegalTransactionStateException(transactionMarkedForRollback());
       }
-
+      if (rollbackAfterTimeout && timeoutReached()) {
+        rollback();
+        throw new TransactionException(createStaticMessage("Couldn't commit transaction. Transaction rolled back."),
+                                       new TimeoutException(format("Execution time for transaction exceeded timeout ({0} ms)",
+                                                                   timeout)));
+      }
       doCommit();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
     } finally {
-      TransactionCoordination.getInstance().unbindTransaction(this);
+      unbindTransaction();
     }
+  }
+
+  private boolean timeoutReached() {
+    return timeout > 0 && between(beginTime, now()).toMillis() > timeout;
   }
 
   @Override

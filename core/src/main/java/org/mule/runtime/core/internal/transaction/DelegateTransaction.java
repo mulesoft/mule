@@ -162,6 +162,7 @@ public class DelegateTransaction extends AbstractTransaction {
 
   @Override
   public void setTimeout(int timeout) {
+    this.timeout = timeout;
     delegate.setTimeout(timeout);
   }
 
