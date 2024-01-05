@@ -20,6 +20,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -61,8 +62,8 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.management.stats.AllStatistics;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.config.DefaultCustomizationService;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -135,7 +136,7 @@ public class MuleContextUtils {
           field.setAccessible(true);
           // Avoid overriding state already set by the test
           if (field.get(object) == null) {
-            field.set(object, nullToOptional ? of(toInject) : toInject);
+            field.set(object, nullToOptional ? ofNullable(toInject) : toInject);
           }
         } catch (Exception e) {
           throw new RuntimeException(format("Could not inject dependency on field %s of type %s", field.getName(),
@@ -178,6 +179,8 @@ public class MuleContextUtils {
         return objects.get(dependencyType);
       } else if (Collection.class.isAssignableFrom(dependencyType)) {
         return emptySet();
+      } else if (Object.class.equals(dependencyType)) {
+        return null;
       } else {
         return mock(dependencyType);
       }
