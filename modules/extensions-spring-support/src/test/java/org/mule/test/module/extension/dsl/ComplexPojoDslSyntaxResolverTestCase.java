@@ -11,6 +11,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.util.NameUtils.hyphenize;
 
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -19,8 +20,13 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.SingleExtensionImportT
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.heisenberg.extension.model.CarWash;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
+import org.mule.test.subtypes.extension.SubTypesMappingConnector;
+import org.mule.test.subtypes.extension.TopLevelStatelessType;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,6 +38,7 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
   private ExtensionManager extensionManager;
 
   private ExtensionModel heisenbergExtensionModel;
+  private ExtensionModel subTypesExtensionModel;
   private DslSyntaxResolver dslSyntaxResolver;
 
   @Override
@@ -43,13 +50,13 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
   @Before
   public void setup() {
     heisenbergExtensionModel = extensionManager.getExtension(HeisenbergExtension.HEISENBERG).get();
+    subTypesExtensionModel = extensionManager.getExtension(SubTypesMappingConnector.NAME).get();
     dslSyntaxResolver = DslSyntaxResolver.getDefault(heisenbergExtensionModel, new SingleExtensionImportTypesStrategy());
   }
 
   @Test
   public void innerWrapperPojoIsShownAsChild() {
-    MetadataType carWashType = heisenbergExtensionModel.getTypes().stream()
-        .filter(metadataType -> metadataType.toString().contains(CarWash.class.getName())).findFirst().get();
+    MetadataType carWashType = getSubType(heisenbergExtensionModel, CarWash.class).get();
     DslElementSyntax carWashDslElementSyntax = dslSyntaxResolver.resolve(carWashType).get();
     assertThat(carWashDslElementSyntax.getChild(INVESTMENT_PLAN_B_NAME).isPresent(), is(true));
 
@@ -57,6 +64,20 @@ public class ComplexPojoDslSyntaxResolverTestCase extends AbstractExtensionFunct
 
     assertThat(investmentPlanBElementSyntax.supportsChildDeclaration(), is(true));
     assertThat(investmentPlanBElementSyntax.getElementName(), is(hyphenize(INVESTMENT_PLAN_B_NAME)));
+  }
+
+  @Test
+  public void rodri() {
+    MetadataType type = getSubType(subTypesExtensionModel, TopLevelStatelessType.class).get();
+    DslElementSyntax syntax = dslSyntaxResolver.resolve(type).get();
+    assertThat(syntax.supportsChildDeclaration(), is(true));
+  }
+
+  private Optional<ObjectType> getSubType(ExtensionModel model, Class<?> clazz) {
+    return model.getSubTypes().stream()
+        .flatMap(subTypesModel -> subTypesModel.getSubTypes().stream())
+        .filter(t -> t.toString().contains(clazz.getName()))
+        .findFirst();
   }
 
 }
