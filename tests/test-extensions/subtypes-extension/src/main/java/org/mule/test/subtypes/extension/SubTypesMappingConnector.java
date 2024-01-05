@@ -23,7 +23,8 @@ import org.mule.test.vegan.extension.VeganCookBook;
 import java.util.List;
 import java.util.Map;
 
-@Extension(name = "SubtypesConnector")
+@Extension(name = SubTypesMappingConnector.NAME)
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations(SubTypesTestOperations.class)
 @Sources(SubtypesSource.class)
 @ConnectionProviders(SubTypesConnectionProvider.class)
@@ -31,10 +32,13 @@ import java.util.Map;
 @SubTypeMapping(baseType = ParentShape.class, subTypes = {Square.class, Triangle.class})
 @SubTypeMapping(baseType = Door.class, subTypes = {HouseDoor.class, CarDoor.class})
 @SubTypeMapping(baseType = Weapon.class, subTypes = {Revolver.class, Ricin.class})
+@SubTypeMapping(baseType = StatelessType.class, subTypes = TopLevelStatelessType.class)
 @Export(classes = {Revolver.class})
 @Xml(prefix = "subtypes", namespace = "http://www.mulesoft.org/schema/mule/subtypes")
 @Import(type = StringAttributes.class)
 public class SubTypesMappingConnector {
+
+  public static final String NAME = "SubtypesConnector";
 
   @Parameter
   private ParentShape abstractShape;
