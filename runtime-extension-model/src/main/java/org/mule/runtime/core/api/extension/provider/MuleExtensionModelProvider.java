@@ -6,18 +6,16 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static java.lang.String.format;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.ANY;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.BOOLEAN;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
-import static org.mule.runtime.core.api.extension.provider.enricher.RuntimeExtensionModelEnrichersProvider.discoverRuntimeExtensionModelEnrichersProvider;
+import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
-
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
@@ -29,7 +27,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
-import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
@@ -38,7 +35,6 @@ import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for Mule's Runtime
@@ -94,13 +90,7 @@ public final class MuleExtensionModelProvider {
       .create(contextFor(new MuleOperationExtensionModelDeclarer().declareExtensionModel())));
 
   private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
-    final Set<DeclarationEnricher> runtimeExtensionModelEnrichers = discoverRuntimeExtensionModelEnrichersProvider()
-        .stream()
-        .flatMap(ep -> ep.getEnrichers().stream())
-        .collect(toSet());
-
-    return new DefaultExtensionLoadingContext(declarer, loadingRequest())
-        .addCustomDeclarationEnrichers(runtimeExtensionModelEnrichers);
+    return new DefaultExtensionLoadingContext(declarer, loadingRequest());
   }
 
   private static ExtensionModelLoadingRequest loadingRequest() {

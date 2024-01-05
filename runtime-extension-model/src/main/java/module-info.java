@@ -44,7 +44,6 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.core.api.extension.provider;
 
   uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
-  uses org.mule.runtime.core.api.extension.provider.enricher.RuntimeExtensionModelEnrichersProvider;
 
   provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
       org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
@@ -83,9 +82,6 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.core.api.source.scheduler;
 
   exports org.mule.runtime.core.privileged.extension;
-
-  exports org.mule.runtime.core.api.extension.provider.enricher to
-      com.mulesoft.mule.runtime.ee.extension.model;
 
   // Beans created using Spring
   opens org.mule.runtime.core.api.source.scheduler to
