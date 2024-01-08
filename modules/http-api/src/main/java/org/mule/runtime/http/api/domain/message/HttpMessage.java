@@ -21,4 +21,7 @@ public interface HttpMessage extends MessageWithHeaders {
    */
   HttpEntity getEntity();
 
+  default boolean isOnlyHeaders() {
+    return false;
+  }
 }

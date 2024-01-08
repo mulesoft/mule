@@ -8,6 +8,8 @@ package org.mule.runtime.http.api.server;
 
 import org.mule.api.annotation.NoImplement;
 
+import java.util.function.Supplier;
+
 /**
  * Factory object for {@link HttpServer}.
  *
@@ -34,4 +36,7 @@ public interface HttpServerFactory {
    * @throws ServerNotFoundException when the desired server was not found
    */
   HttpServer lookup(String name) throws ServerNotFoundException;
+
+  HttpServer getOrCreateServer(String name, Supplier<? extends HttpServerConfiguration> configuration)
+      throws ServerCreationException;
 }

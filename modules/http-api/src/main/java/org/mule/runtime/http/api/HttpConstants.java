@@ -22,7 +22,7 @@ public class HttpConstants {
 
   public enum Protocol {
 
-    HTTP("http", 80), HTTPS("https", 443);
+    HTTP("http", 80), HTTPS("https", 443), HTTP_2("https", 443);
 
     private final String scheme;
     private final int defaultPort;

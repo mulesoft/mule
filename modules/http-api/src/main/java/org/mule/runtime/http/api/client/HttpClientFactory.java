@@ -8,6 +8,8 @@ package org.mule.runtime.http.api.client;
 
 import org.mule.api.annotation.NoImplement;
 
+import java.util.function.Supplier;
+
 /**
  * Factory object for {@link HttpClient}.
  *
@@ -21,4 +23,8 @@ public interface HttpClientFactory {
    * @return a newly built {@link HttpClient} based on the {@code configuration}.
    */
   HttpClient create(HttpClientConfiguration configuration);
+
+  default HttpClient getOrCreateClient(String name, Supplier<? extends HttpClientConfiguration> configuration) {
+    return create(configuration.get());
+  }
 }
