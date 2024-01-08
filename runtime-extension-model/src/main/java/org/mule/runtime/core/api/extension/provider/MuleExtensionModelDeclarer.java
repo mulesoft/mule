@@ -679,7 +679,7 @@ class MuleExtensionModelDeclarer {
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         .describedAs("The expression to evaluate.");
 
-    addBusinessEventParameters(choice, "Enabling this option will activate event tracking for this element and its children.");
+    addTrackingModuleParameters(choice, "Enabling this option will activate event tracking for this element and its children.");
 
     choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
@@ -701,7 +701,7 @@ class MuleExtensionModelDeclarer {
         .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
         .withExpressionSupport(NOT_SUPPORTED);
 
-    addBusinessEventParameters(flow,
+    addTrackingModuleParameters(flow,
                                "Enabling this option will activate event tracking for all the elements within the flow.");
 
     flow.withOptionalComponent("source")
@@ -734,7 +734,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
-    addBusinessEventParameters(firstSuccessful,
+    addTrackingModuleParameters(firstSuccessful,
                                "Enabling this option will activate event tracking for this element and its children.");
 
     firstSuccessful.withRoute("route")
@@ -746,7 +746,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
-    addBusinessEventParameters(roundRobin,
+    addTrackingModuleParameters(roundRobin,
                                "Enabling this option will activate event tracking for this element and its children.");
 
     roundRobin.withRoute("route")
@@ -1443,7 +1443,8 @@ class MuleExtensionModelDeclarer {
             + "'password-encryption-strategy' element, inside a 'security-manager' element at the top level.");
   }
 
-  private void addBusinessEventParameters(ConstructDeclarer componentDeclarer, String description) {
+  // Tracking is an EE module that uses parameters defined in Core components. This method adds those parameters.
+  private void addTrackingModuleParameters(ConstructDeclarer componentDeclarer, String description) {
     componentDeclarer.onParameterGroup(BUSINESS_EVENTS)
         .withOptionalParameter("enableDefaultEvents")
         .describedAs(description)
