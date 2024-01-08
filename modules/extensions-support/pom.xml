@@ -219,6 +219,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>provided-dependency</artifactId>
+            <version>${project.version}</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>

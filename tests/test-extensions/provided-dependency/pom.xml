@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mule-test-extensions-parent</artifactId>
+        <groupId>org.mule.tests</groupId>
+        <version>4.7.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>provided-dependency</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Mule Extension with Provided Dependency</name>
+    <description>A Mule extension that relies on a provided dependency</description>
+
+    <properties>
+        <javaModuleName>org.mule.test.extension.provided.dependency</javaModuleName>
+        <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
+        <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <dependencies>
+        <!-- This dependency shouldn't be in the context of the tests for this extension -->
+        <dependency>
+            <groupId>com.mulesoft.munit</groupId>
+            <artifactId>munit-common</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
