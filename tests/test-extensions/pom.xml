@@ -51,6 +51,7 @@
         <module>custom-object-store-extension</module>
         <module>semantic-terms-extension</module>
         <module>reusable-app</module>
+        <module>provided-dependency</module>
     </modules>
 
     <build>

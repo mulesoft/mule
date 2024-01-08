@@ -1004,6 +1004,12 @@ public interface AllureConstants {
           "Validate that all registered extensions support the Java version Mule is running on";
     }
 
+    interface MinMuleVersion {
+
+      String MIN_MULE_VERSION = "Min Mule Version calculation";
+
+    }
+
   }
 
   interface JavaSdk {
