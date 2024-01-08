@@ -139,9 +139,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.mule.tests.extensions</groupId>
+            <groupId>org.mule.tests</groupId>
             <artifactId>mule-tx-extension</artifactId>
-            <version>${muleTxExtVersion}</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
             <exclusions>
