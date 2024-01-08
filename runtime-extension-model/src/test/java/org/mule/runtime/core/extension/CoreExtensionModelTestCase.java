@@ -6,17 +6,6 @@
  */
 package org.mule.runtime.core.extension;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -43,6 +32,19 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertThat;
 
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -168,7 +170,7 @@ public class CoreExtensionModelTestCase {
     assertThat(flow.allowsTopLevelDeclaration(), is(true));
 
     final List<ParameterModel> paramModels = flow.getAllParameterModels();
-    assertThat(paramModels, hasSize(3));
+    assertThat(paramModels, hasSize(4));
 
     ParameterModel nameParam = paramModels.get(0);
     assertThat(nameParam.getName(), is("name"));
@@ -181,6 +183,9 @@ public class CoreExtensionModelTestCase {
 
     ParameterModel maxConcurrency = paramModels.get(2);
     assertThat(maxConcurrency.getName(), is("maxConcurrency"));
+
+    ParameterModel trackingEnableDefaultEvents = paramModels.get(3);
+    assertThat(trackingEnableDefaultEvents.getName(), is("enableDefaultEvents"));
 
     List<? extends NestableElementModel> nestedComponents = flow.getNestedComponents();
     assertThat(nestedComponents, hasSize(3));
@@ -451,7 +456,13 @@ public class CoreExtensionModelTestCase {
     final ConstructModel choiceModel = coreExtensionModel.getConstructModel("choice").get();
 
     assertThat(choiceModel.allowsTopLevelDeclaration(), is(false));
-    assertThat(choiceModel.getAllParameterModels(), empty());
+
+    final List<ParameterModel> parameterModels = choiceModel.getAllParameterModels();
+    assertThat(parameterModels, hasSize(1));
+
+    ParameterModel trackingEnableDefaultEvents = parameterModels.get(0);
+    assertThat(trackingEnableDefaultEvents.getName(), is("enableDefaultEvents"));
+
     assertThat(choiceModel.getNestedComponents(), hasSize(2));
 
     final NestedRouteModel whenRouteModel = (NestedRouteModel) choiceModel.getNestedComponents().get(0);
@@ -650,7 +661,10 @@ public class CoreExtensionModelTestCase {
     final ConstructModel firstSuccessful = coreExtensionModel.getConstructModel("firstSuccessful").get();
 
     List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(0));
+    assertThat(allParameterModels, hasSize(1));
+
+    ParameterModel trackingEnableDefaultEvents = allParameterModels.get(0);
+    assertThat(trackingEnableDefaultEvents.getName(), is("enableDefaultEvents"));
   }
 
   @Test

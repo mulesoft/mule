@@ -125,12 +125,15 @@ import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotat
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
+import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -150,6 +153,10 @@ class MuleExtensionModelDeclarer {
   final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
+
+  private static final String BUSINESS_EVENTS = "Business Events";
+  private static final String TRACKING_NAMESPACE = "tracking";
+  private static final String TRACKING_NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/ee/tracking";
 
   ExtensionDeclarer createExtensionModel() {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
@@ -671,6 +678,9 @@ class MuleExtensionModelDeclarer {
         .ofType(BOOLEAN_TYPE)
         .withModelProperty(new AllowsExpressionWithoutMarkersModelProperty())
         .describedAs("The expression to evaluate.");
+
+    addTrackingModuleParameters(choice, "Enabling this option will activate event tracking for this element and its children.");
+
     choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
   }
 
@@ -690,6 +700,9 @@ class MuleExtensionModelDeclarer {
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that the Flow can use to optimize its performance when processing messages.")
         .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
         .withExpressionSupport(NOT_SUPPORTED);
+
+    addTrackingModuleParameters(flow,
+                                "Enabling this option will activate event tracking for all the elements within the flow.");
 
     flow.withOptionalComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
@@ -721,6 +734,9 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
+    addTrackingModuleParameters(firstSuccessful,
+                                "Enabling this option will activate event tracking for this element and its children.");
+
     firstSuccessful.withRoute("route")
         .withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE);
@@ -729,6 +745,9 @@ class MuleExtensionModelDeclarer {
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
+
+    addTrackingModuleParameters(roundRobin,
+                                "Enabling this option will activate event tracking for this element and its children.");
 
     roundRobin.withRoute("route")
         // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
@@ -1422,5 +1441,20 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The name of the encryption strategy to use. This should be configured using the "
             + "'password-encryption-strategy' element, inside a 'security-manager' element at the top level.");
+  }
+
+  // Tracking is an EE module that uses parameters defined in Core components. This method adds those parameters.
+  private void addTrackingModuleParameters(ConstructDeclarer componentDeclarer, String description) {
+    componentDeclarer.onParameterGroup(BUSINESS_EVENTS)
+        .withOptionalParameter("enableDefaultEvents")
+        .describedAs(description)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .defaultingTo(false)
+        .withRole(BEHAVIOUR)
+        .ofType(BOOLEAN_TYPE)
+        .withDisplayModel(DisplayModel.builder().displayName("Enable default events tracking").build())
+        .withModelProperty(new QNameModelProperty(new QName(TRACKING_NAMESPACE_URI,
+                                                            "enable-default-events",
+                                                            TRACKING_NAMESPACE)));
   }
 }
