@@ -702,7 +702,7 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED);
 
     addTrackingModuleParameters(flow,
-                               "Enabling this option will activate event tracking for all the elements within the flow.");
+                                "Enabling this option will activate event tracking for all the elements within the flow.");
 
     flow.withOptionalComponent("source")
         .withAllowedStereotypes(MuleStereotypes.SOURCE);
@@ -735,7 +735,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
     addTrackingModuleParameters(firstSuccessful,
-                               "Enabling this option will activate event tracking for this element and its children.");
+                                "Enabling this option will activate event tracking for this element and its children.");
 
     firstSuccessful.withRoute("route")
         .withChain()
@@ -747,7 +747,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
     addTrackingModuleParameters(roundRobin,
-                               "Enabling this option will activate event tracking for this element and its children.");
+                                "Enabling this option will activate event tracking for this element and its children.");
 
     roundRobin.withRoute("route")
         // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
