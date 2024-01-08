@@ -155,7 +155,7 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.5.3-rc1</muleBomVersion>
+        <muleBomVersion>4.5.3</muleBomVersion>
         <muleMavenClientBomVersion>2.0.3</muleMavenClientBomVersion>
         <opentelemetryVersion>1.31.0</opentelemetryVersion>
 
