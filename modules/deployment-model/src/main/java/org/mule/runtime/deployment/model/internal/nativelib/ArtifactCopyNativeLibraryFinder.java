@@ -9,10 +9,10 @@ package org.mule.runtime.deployment.model.internal.nativelib;
 
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.Charset.defaultCharset;
-import static java.util.Arrays.stream;
 
 import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 
@@ -25,9 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,26 +112,38 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
     }
   }
 
-  private String findLibraryLocally(String name) {
-    String nativeLibName = System.mapLibraryName(name);
-    String extension = FilenameUtils.getExtension(nativeLibName);
-    Optional<URL> nativeLib =
-        stream(urls).filter((URL url) -> {
-          String fullPath;
-          try {
-            fullPath = url.toURI().toString();
-          } catch (URISyntaxException e) {
-            return false;
-          }
-          String baseName = getBaseName(fullPath);
-          return baseName.contains(name) && (fullPath.endsWith(extension) || IS_OS_MAC && fullPath.endsWith(JNILIB_EXTENSION));
-        }).findFirst();
+  private String findLibraryLocally(String libraryName) {
+    String localLibraryNameWeakMatch = null;
 
-    if (nativeLib.isPresent()) {
-      return nativeLib.get().getFile();
-    } else {
-      return null;
+    for (URL url : this.urls) {
+      try {
+        String localLibraryNameFullPath = url.toURI().toString();
+        String extension = getExtension(System.mapLibraryName(libraryName));
+        if (endsWithExtension(localLibraryNameFullPath, extension)) {
+          if (isAStrictMatch(libraryName, localLibraryNameFullPath)) {
+            return url.getFile();
+          } else if (localLibraryNameWeakMatch == null && isAWeakMatch(libraryName, localLibraryNameFullPath)) {
+            // The purpose of this if branch is to maintain backwards compatibility with the previous behaviour.
+            localLibraryNameWeakMatch = url.getFile();
+          }
+        }
+      } catch (URISyntaxException ignored) {
+        // Next url.
+      }
     }
+    return localLibraryNameWeakMatch;
+  }
+
+  private static boolean endsWithExtension(String localLibraryNameFullPath, String extension) {
+    return localLibraryNameFullPath.endsWith(extension) || IS_OS_MAC && localLibraryNameFullPath.endsWith(JNILIB_EXTENSION);
+  }
+
+  private static boolean isAStrictMatch(String libraryName, String localLibraryNameFullPath) {
+    return getLibraryBaseName(localLibraryNameFullPath).equals(libraryName);
+  }
+
+  private static boolean isAWeakMatch(String libraryName, String localLibraryNameFullPath) {
+    return getBaseName(localLibraryNameFullPath).contains(libraryName);
   }
 
   public List<String> findLibraryNames() {
@@ -168,6 +178,10 @@ public class ArtifactCopyNativeLibraryFinder implements NativeLibraryFinder {
   }
 
   private static String getLibraryBaseName(String libraryName) {
-    return getBaseName(libraryName).replaceFirst(LIB_PREFIX, EMPTY_STRING).split(HYPHEN_SEPARATOR)[0];
+    String libraryBaseName = getBaseName(libraryName);
+    if (libraryBaseName.startsWith(LIB_PREFIX)) {
+      libraryBaseName = libraryBaseName.replaceFirst(LIB_PREFIX, EMPTY_STRING);
+    }
+    return libraryBaseName.split("-.*[0-9].*")[0];
   }
 }
