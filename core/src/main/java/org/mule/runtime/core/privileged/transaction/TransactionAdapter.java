@@ -29,4 +29,6 @@ public interface TransactionAdapter extends Transaction {
    * @param componentLocation
    */
   void setComponentLocation(ComponentLocation componentLocation);
+
+  void setRollbackIfTimeout(boolean rollbackIfTimeout);
 }

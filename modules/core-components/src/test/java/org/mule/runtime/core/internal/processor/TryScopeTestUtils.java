@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
@@ -30,12 +31,14 @@ public class TryScopeTestUtils {
 
   }
 
-  public static TryScope createTryScope(boolean begintx, MuleContext muleContext, ProfilingService profilingService) {
+  public static TryScope createTryScope(boolean begintx, MuleContext muleContext, ProfilingService profilingService)
+      throws MuleException {
     return createTryScope(begintx, muleContext, profilingService, true, 0);
   }
 
   public static TryScope createTryScope(boolean begintx, MuleContext muleContext, ProfilingService profilingService,
-                                        boolean isXa, int timeout) {
+                                        boolean isXa, int timeout)
+      throws MuleException {
     TryScope scope = new TryScope();
     Map<QName, Object> annotations = new HashMap<>();
     annotations.put(LOCATION_KEY, TEST_CONNECTOR_LOCATION);
@@ -52,6 +55,7 @@ public class TryScopeTestUtils {
     scope.setTransactionManager(muleContext.getTransactionManager());
     scope.setMuleContext(muleContext);
     scope.setNotificationDispatcher(mock(NotificationDispatcher.class));
+    muleContext.getInjector().inject(scope);
     return scope;
   }
 

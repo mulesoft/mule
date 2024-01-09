@@ -266,5 +266,10 @@ public class DelegateTransaction extends AbstractTransaction {
     public void setComponentLocation(ComponentLocation componentLocation) {
 
     }
+
+    @Override
+    public void setRollbackIfTimeout(boolean errorIfTimeout) {
+
+    }
   }
 }

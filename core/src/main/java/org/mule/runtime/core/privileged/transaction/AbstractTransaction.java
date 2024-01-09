@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
+import static java.lang.System.err;
 import static java.lang.System.identityHashCode;
 import static java.text.MessageFormat.format;
 import static java.time.Duration.between;
@@ -229,6 +230,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void setComponentLocation(ComponentLocation componentLocation) {
     this.componentLocation = componentLocation;
+  }
+
+  @Override
+  public void setRollbackIfTimeout(boolean rollbackAfterTimeout) {
+    this.rollbackAfterTimeout = rollbackAfterTimeout;
   }
 
   @Override
