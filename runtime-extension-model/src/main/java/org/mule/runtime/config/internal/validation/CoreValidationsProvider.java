@@ -44,7 +44,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
   private Optional<ArtifactAstDependencyGraphProvider> artifactAstDependencyGraphProvider = empty();
 
   @Inject
-  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
+  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Inject
   private ExpressionLanguage expressionLanguage;
@@ -70,7 +70,6 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
-                                                          new ErrorHandlerRefOrOnErrorExclusiveness(),
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
