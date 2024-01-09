@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 @Extension(name = SubTypesMappingConnector.NAME)
-@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 @Operations(SubTypesTestOperations.class)
 @Sources(SubtypesSource.class)
 @ConnectionProviders(SubTypesConnectionProvider.class)
