@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static java.util.Arrays.asList;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
@@ -16,8 +15,11 @@ import static org.mule.runtime.core.api.transaction.Transaction.STATUS_ROLLEDBAC
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createTryScope;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -85,7 +87,7 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
 
   @Test
   public void transactionIsRolledBackAfterTimeout() throws Exception {
-    TryScope scope = createTryScope(true, muleContext, profilingService, isXa, TIMEOUT);
+    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor()));
     scope.initialise();
     try {
@@ -106,10 +108,10 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
     // tx is being attempted to be committed after the execution of its potential error handling
     // (i.e. no failure, or its on-error-continue). Therefore, a tx timeout error has to be handled in the
     // next level (a surrounding try, flow, etc...).
-    TryScope scope = createTryScope(true, muleContext, profilingService, isXa, TIMEOUT);
+    TryScope scope = createTryScope(muleContext, profilingService, of(isXa), of(TIMEOUT));
     scope.setMessageProcessors(singletonList(new SleepyProcesssor()));
 
-    TryScope outer = createTryScope(false, muleContext, profilingService);
+    TryScope outer = createTryScope(muleContext, profilingService, empty());
     outer.setMessageProcessors(singletonList(scope));
     outer.setExceptionListener(new OnErrorContinueHandler());
     outer.initialise();

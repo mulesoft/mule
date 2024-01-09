@@ -6,19 +6,19 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
-import static java.lang.System.err;
-import static java.lang.System.identityHashCode;
-import static java.text.MessageFormat.format;
-import static java.time.Duration.between;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
+import static java.lang.System.identityHashCode;
+import static java.text.MessageFormat.format;
+import static java.time.Duration.between;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;

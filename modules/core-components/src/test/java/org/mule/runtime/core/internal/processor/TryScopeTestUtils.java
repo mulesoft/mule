@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.tck.junit4.AbstractMuleTestCase.TEST_CONNECTOR_LOCATION;
+import static java.util.Optional.empty;
+import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -23,30 +24,39 @@ import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-
+/**
+ * Utils to create a {@link TryScope} fully configured.
+ */
 public class TryScopeTestUtils {
 
   private TryScopeTestUtils() {
 
   }
 
-  public static TryScope createTryScope(boolean begintx, MuleContext muleContext, ProfilingService profilingService)
+  /**
+   * Creates a {@link TryScope} that could be transactional (with local or xa transaction), without timeout.
+   */
+  public static TryScope createTryScope(MuleContext muleContext, ProfilingService profilingService, Optional<Boolean> txType)
       throws MuleException {
-    return createTryScope(begintx, muleContext, profilingService, true, 0);
+    return createTryScope(muleContext, profilingService, txType, empty());
   }
 
-  public static TryScope createTryScope(boolean begintx, MuleContext muleContext, ProfilingService profilingService,
-                                        boolean isXa, int timeout)
+  /**
+   * Creates a {@link TryScope} that could be transactional (with local or xa transaction), with a given timeout.
+   */
+  public static TryScope createTryScope(MuleContext muleContext, ProfilingService profilingService, Optional<Boolean> txType,
+                                        Optional<Integer> timeout)
       throws MuleException {
     TryScope scope = new TryScope();
     Map<QName, Object> annotations = new HashMap<>();
     annotations.put(LOCATION_KEY, TEST_CONNECTOR_LOCATION);
     scope.setAnnotations(annotations);
-    if (begintx) {
-      scope.setTransactionConfig(createTransactionConfig("ALWAYS_BEGIN", timeout, isXa));
+    if (txType.isPresent()) {
+      scope.setTransactionConfig(createTransactionConfig("ALWAYS_BEGIN", txType.get(), timeout));
     } else {
-      scope.setTransactionConfig(createTransactionConfig("INDIFFERENT", timeout, isXa));
+      scope.setTransactionConfig(createTransactionConfig("INDIFFERENT", false, timeout));
     }
     scope.setComponentTracerFactory(new DummyComponentTracerFactory());
     scope.setExceptionListener(mock(FlowExceptionHandler.class));
@@ -59,11 +69,11 @@ public class TryScopeTestUtils {
     return scope;
   }
 
-  private static MuleTransactionConfig createTransactionConfig(String action, int timeout, boolean isXa) {
+  private static MuleTransactionConfig createTransactionConfig(String action, boolean isXa, Optional<Integer> timeout) {
     MuleTransactionConfig transactionConfig = new MuleTransactionConfig();
     transactionConfig.setActionAsString(action);
     transactionConfig.setFactory(new TestTransactionFactory(isXa));
-    transactionConfig.setTimeout(timeout);
+    transactionConfig.setTimeout(timeout.orElse(0));
     return transactionConfig;
   }
 
