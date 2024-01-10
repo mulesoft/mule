@@ -19,7 +19,7 @@ import org.mule.test.marvel.OddMissileProvider;
 import org.mule.test.marvel.model.Missile;
 
 @Configuration(name = CONFIG_NAME)
-@Operations(IronManOperations.class)
+@Operations({IronManOperations.class, JarvisOperations.class})
 @ConnectionProviders({MissileProvider.class, OddMissileProvider.class})
 public class IronMan {
 

@@ -998,8 +998,8 @@
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [
-        "TEST-COMPONENTS:INTEGER_NOTIFICATION",
-        "TEST-COMPONENTS:STRING_NOTIFICATION"
+        "HEISENBERG:KNOCKING_DOOR",
+        "HEISENBERG:KNOCKED_DOOR"
       ],
       "nestedComponents": [],
       "errors": [],
