@@ -145,6 +145,11 @@ public abstract class Errors {
     public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 
     /**
+     * Indicates that an error occurred related to transactions commit or rollback (e.g. transaction timeout).
+     */
+    public static final String TRANSACTION_ERROR_IDENTIFIER = "TRANSACTION";
+
+    /**
      * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
      */
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
@@ -170,11 +175,6 @@ public abstract class Errors {
      * Indicates that a fatal error occurred (such as stack overflow). Cannot be handled.
      */
     public static final String FATAL_ERROR_IDENTIFIER = "FATAL_JVM_ERROR";
-
-    /**
-     * Indicates that an error occurred related to transactions commit or rollback (e.g. transaction timeout).
-     */
-    public static final String TRANSACTION_ERROR_IDENTIFIER = "TRANSACTION_ERROR";
   }
 
   public static final class ComponentIdentifiers {
