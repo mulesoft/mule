@@ -29,11 +29,11 @@ module org.mule.runtime.core.mvel {
   requires org.apache.commons.lang3;
   requires java.xml;
 
-  exports org.mule.runtime.core.internal.el.mvel to
+  exports org.mule.runtime.core.internal.mvel to
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
 
-  exports org.mule.runtime.core.internal.el.mvel.configuration to
+  exports org.mule.runtime.core.internal.mvel.configuration to
       org.mule.runtime.spring.config;
 
 }
