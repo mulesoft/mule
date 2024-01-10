@@ -12,6 +12,7 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
+import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createPropagateErrorHandler;
 import static org.mule.runtime.core.internal.processor.TryScopeTestUtils.createTryScope;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
@@ -149,22 +150,6 @@ public class XaNestedTransactionsTestCase extends AbstractMuleContextTestCase {
     } finally {
       surrounding.dispose();
     }
-  }
-
-  private static ComponentLocation mockComponentLocation() {
-    ComponentLocation cl = mock(ComponentLocation.class);
-    when(cl.getLocation()).thenReturn("test/error-handler/0");
-    when(cl.getRootContainerName()).thenReturn(TEST_CONNECTOR_LOCATION.getRootContainerName());
-    when(cl.getParts()).thenReturn(TEST_CONNECTOR_LOCATION.getParts());
-    return cl;
-  }
-
-  private static TemplateOnErrorHandler createPropagateErrorHandler() {
-    TemplateOnErrorHandler handler = new OnErrorPropagateHandler();
-    Map<QName, Object> annotations = new HashMap<>();
-    annotations.put(LOCATION_KEY, mockComponentLocation());
-    handler.setAnnotations(annotations);
-    return handler;
   }
 
   public static class TxCaptor implements Processor {

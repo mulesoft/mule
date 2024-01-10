@@ -116,9 +116,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       }
       if (rollbackAfterTimeout && timeoutReached()) {
         rollback();
-        throw new TransactionException(createStaticMessage("Couldn't commit transaction. Transaction rolled back."),
-                                       new TimeoutException(format("Execution time for transaction exceeded timeout ({0} ms)",
-                                                                   timeout)));
       }
       doCommit();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
@@ -140,6 +137,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
+      if (rollbackAfterTimeout && timeoutReached()) {
+        throw new TransactionException(createStaticMessage("Timeout Reached. Transaction rolled back."),
+                                       new TimeoutException(format("Execution time for transaction exceeded timeout ({0} ms)",
+                                                                   timeout)));
+      }
     } finally {
       unbindTransaction();
     }
