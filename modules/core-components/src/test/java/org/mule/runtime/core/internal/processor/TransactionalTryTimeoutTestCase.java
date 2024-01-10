@@ -30,8 +30,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static java.lang.Thread.sleep;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
+import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
 
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -47,6 +48,8 @@ import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import javax.transaction.TransactionManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +60,8 @@ import java.util.Collection;
 import java.util.concurrent.TimeoutException;
 
 @RunWith(Parameterized.class)
+@Feature(TRANSACTION)
+@Story(TRANSACTION_TIMEOUT)
 public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase {
 
   private static final int TIMEOUT = 1000;
