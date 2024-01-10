@@ -107,15 +107,16 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public void commit() throws TransactionException {
+    boolean timeoutReached = timeoutReached();
     try {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
-      }
       if (isRollbackOnly()) {
         throw new IllegalTransactionStateException(transactionMarkedForRollback());
       }
-      if (rollbackAfterTimeout && timeoutReached()) {
+      if (rollbackAfterTimeout && timeoutReached) {
         rollback();
+      }
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
       }
       doCommit();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
@@ -130,6 +131,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
 
   @Override
   public void rollback() throws TransactionException {
+    boolean timeoutReached = timeoutReached();
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
@@ -137,7 +139,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
-      if (rollbackAfterTimeout && timeoutReached()) {
+      if (rollbackAfterTimeout && timeoutReached) {
         throw new TransactionException(createStaticMessage("Timeout Reached. Transaction rolled back."),
                                        new TimeoutException(format("Execution time for transaction exceeded timeout ({0} ms)",
                                                                    timeout)));

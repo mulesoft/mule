@@ -1579,7 +1579,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private static void configureErrorAndRollbackTxWhenTimeout() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.0"));
+    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

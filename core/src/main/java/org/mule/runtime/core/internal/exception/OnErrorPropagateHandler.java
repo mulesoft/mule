@@ -109,10 +109,9 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     try {
       tx.rollback();
     } catch (TransactionException e) {
-      if (e.getCause() instanceof TimeoutException) {
-        ex.addSuppressed(e.getCause());
-      } else {
-        logger.error("Cannot rollback current transaction", e);
+      Throwable cause = e.getCause();
+      if (cause != null) {
+        ex.addSuppressed(cause);
       }
     }
   }
