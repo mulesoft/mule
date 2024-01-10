@@ -278,7 +278,7 @@
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <byteBuddyVersion>1.14.0</byteBuddyVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>9.4.53.v20231009</jettyVersion>
     </properties>
 
     <dependencyManagement>

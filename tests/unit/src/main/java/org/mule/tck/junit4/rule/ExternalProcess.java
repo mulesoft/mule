@@ -7,6 +7,7 @@
 package org.mule.tck.junit4.rule;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.Executors.defaultThreadFactory;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -20,9 +21,10 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.junit.rules.ExternalResource;
 
 /**
  * Executes a process that starts a server required by the test.
@@ -33,6 +35,7 @@ public final class ExternalProcess extends ExternalResource {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExternalProcess.class);
 
+  private final String threadName;
   private final Predicate<String> daemonStartedPredicate;
   private final String[] processCommand;
 
@@ -41,6 +44,11 @@ public final class ExternalProcess extends ExternalResource {
   private Future<?> daemonFuture;
 
   public ExternalProcess(Predicate<String> daemonStartedPredicate, String... processCommand) {
+    this(null, daemonStartedPredicate, processCommand);
+  }
+
+  public ExternalProcess(String threadName, Predicate<String> daemonStartedPredicate, String... processCommand) {
+    this.threadName = threadName;
     this.daemonStartedPredicate = daemonStartedPredicate;
     this.processCommand = processCommand;
   }
@@ -56,7 +64,13 @@ public final class ExternalProcess extends ExternalResource {
 
     AtomicBoolean started = new AtomicBoolean();
 
-    daemonExecutor = newSingleThreadExecutor();
+    daemonExecutor = newSingleThreadExecutor(r -> {
+      final Thread thread = defaultThreadFactory().newThread(r);
+      if (threadName != null) {
+        thread.setName(threadName);
+      }
+      return thread;
+    });
     daemonFuture = daemonExecutor.submit(() -> {
       try {
         p = pb.start();
