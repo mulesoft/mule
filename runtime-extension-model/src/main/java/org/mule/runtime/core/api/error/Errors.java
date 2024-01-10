@@ -7,7 +7,34 @@
 package org.mule.runtime.core.api.error;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.core.api.error.Errors.Identifiers.*;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CLIENT_SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.COMPOSITE_ROUTING_ERROR;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.CRITICAL_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.DUPLICATE_MESSAGE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.EXPRESSION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.FATAL_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.FLOW_BACK_PRESSURE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.NOT_PERMITTED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.OVERLOAD_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.RETRY_EXHAUSTED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.ROUTING_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SERVER_SECURITY_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_RESPONSE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TIMEOUT_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSACTION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.api.annotation.NoExtend;
