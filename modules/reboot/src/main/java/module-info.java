@@ -14,5 +14,5 @@ module org.mule.boot {
 
   requires org.mule.boot.api;
 
-  requires commons.cli;
+  requires org.apache.commons.cli;
 }

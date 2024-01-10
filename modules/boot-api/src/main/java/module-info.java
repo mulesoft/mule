@@ -33,7 +33,7 @@ module org.mule.boot.api {
   // Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer
   requires org.mule.runtime.logging;
 
-  requires commons.cli;
+  requires org.apache.commons.cli;
 
   uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 
