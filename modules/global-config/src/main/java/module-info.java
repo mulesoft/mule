@@ -18,8 +18,7 @@ module org.mule.runtime.global.config {
   requires org.mule.runtime.core;
   requires transitive org.mule.runtime.maven.client.api;
 
-  // com.typesafe:config dependency:
-  requires config;
+  requires typesafe.config;
   requires org.everit.json.schema;
   requires org.json;
 
