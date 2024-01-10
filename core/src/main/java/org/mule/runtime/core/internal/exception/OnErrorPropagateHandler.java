@@ -109,10 +109,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
     try {
       tx.rollback();
     } catch (TransactionException e) {
-      Throwable cause = e.getCause();
-      if (cause != null) {
-        ex.addSuppressed(cause);
-      }
+      ex.addSuppressed(e);
     }
   }
 

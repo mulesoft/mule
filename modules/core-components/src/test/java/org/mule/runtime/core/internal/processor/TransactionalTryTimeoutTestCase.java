@@ -170,7 +170,9 @@ public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase
       fail("Should have finished with a Tx Exception");
     } catch (MuleException ex) {
       assertThat(ex.getSuppressed().length, is(1));
-      assertThat(ex.getSuppressed()[0], instanceOf(TimeoutException.class));
+      Throwable suppressed = ex.getSuppressed()[0];
+      assertThat(suppressed, instanceOf(TransactionException.class));
+      assertThat(suppressed.getCause(), instanceOf(TimeoutException.class));
       assertThat(transaction, is(notNullValue()));;
       assertThat(transaction.getStatus(), is(STATUS_ROLLEDBACK));
       assertThat(processor.executed(), is(true));
