@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.sort;
 
+import static org.apache.commons.collections4.comparators.ComparableComparator.comparableComparator;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -43,8 +44,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import org.apache.commons.collections.comparators.ComparableComparator;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -158,7 +157,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
         Comparable exceptionComparable = o -> {
           throw new RuntimeException(new DefaultMuleException(createStaticMessage("foo")));
         };
-        sort(asList(exceptionComparable, exceptionComparable), ComparableComparator.getInstance());
+        sort(asList(exceptionComparable, exceptionComparable), comparableComparator());
       });
       fail("Expected exception");
     } catch (Exception e) {
