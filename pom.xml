@@ -1323,11 +1323,6 @@
                                     <rules>
                                         <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
-                                            <excludes>
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
-                                            </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
                                             <message>No Snapshots Allowed in Project Version!</message>
@@ -1376,10 +1371,6 @@
 
                                                 <exclude>org.raml:raml-parser-2</exclude>
                                                 <exclude>org.raml:yagi</exclude>
-
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
