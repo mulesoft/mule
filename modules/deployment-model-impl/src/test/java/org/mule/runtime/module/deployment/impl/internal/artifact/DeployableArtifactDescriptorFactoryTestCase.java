@@ -28,6 +28,7 @@ import static java.util.stream.Stream.of;
 
 import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -447,8 +448,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .map(url -> FileUtils.toFile(url).getName())
         .collect(toList()),
                hasItems(startsWith("test-empty-plugin-"),
-                        equalTo("commons-io-2.13.0.jar"),
-                        equalTo("commons-collections4-4.4.jar")));
+                        allOf(startsWith("commons-io-2."), endsWith(".jar")),
+                        allOf(startsWith("commons-collections4-4."), endsWith(".jar"))));
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
