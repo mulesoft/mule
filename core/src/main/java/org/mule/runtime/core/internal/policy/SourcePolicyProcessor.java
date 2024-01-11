@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -68,7 +69,7 @@ public class SourcePolicyProcessor implements ReactiveProcessor {
     return from(publisher)
         .map(policyEventMapper::onSourcePolicyBegin)
         .transform(policy.getPolicyChain())
-        .subscriberContext(ctx -> ctx
+        .contextWrite(ctx -> ctx
             .put(POLICY_NEXT_OPERATION, nextProcessorRef)
             .put(POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS, policy.getPolicyChain().isPropagateMessageTransformations()));
   }

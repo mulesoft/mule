@@ -284,7 +284,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final CoreEvent result = from(MessageProcessors.process(input,
                                                             pub -> Flux
                                                                 .from(applyWithChildContext(pub, eventPub -> Flux.from(eventPub)
-                                                                    .subscriberContext(ctx -> subscriberContextRecognizesChildContext(ctx)),
+                                                                    .contextWrite(ctx -> subscriberContextRecognizesChildContext(ctx)),
                                                                                             Optional.empty()))))
                                                                                                 .block();
 

@@ -501,12 +501,12 @@ public class MessageProcessors {
 
       sink.success(eventChildCtx);
     })
-        .toProcessor()
+        .share()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
         .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
-            .toProcessor())
+            .share())
         .map(MessageProcessors::toParentContext)
         .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
             .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
