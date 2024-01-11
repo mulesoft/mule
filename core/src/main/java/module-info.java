@@ -95,7 +95,7 @@ module org.mule.runtime.core {
 
   // reactor and friends
   requires org.reactivestreams;
-  requires failsafe;
+  requires net.jodah.failsafe;
   requires reactor.core;
   requires reactor.extra;
 
