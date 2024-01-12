@@ -11,6 +11,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
+import static org.mule.runtime.api.util.MuleSystemProperties.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT_PROPERTY;
 import static org.mule.runtime.core.api.construct.Flow.builder;
 import static org.mule.runtime.core.api.transaction.Transaction.STATUS_ROLLEDBACK;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -33,6 +34,7 @@ import static java.lang.Thread.sleep;
 import static org.mule.test.allure.AllureConstants.TransactionFeature.TRANSACTION;
 import static org.mule.test.allure.AllureConstants.TransactionFeature.TimeoutStory.TRANSACTION_TIMEOUT;
 
+import org.junit.Rule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -55,6 +57,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Collection;
 import java.util.concurrent.TimeoutException;
@@ -64,6 +67,8 @@ import java.util.concurrent.TimeoutException;
 @Story(TRANSACTION_TIMEOUT)
 public class TransactionalTryTimeoutTestCase extends AbstractMuleContextTestCase {
 
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT_PROPERTY, "true");
   private static final int TIMEOUT = 1000;
   private static final int EXECUTION_TIME = 2 * TIMEOUT;
 
