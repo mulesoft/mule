@@ -165,7 +165,8 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.apache.commons.collections.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
+                                                       "  org.apache.commons.collections4.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
+                                                       "  org.apache.commons.collections4.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
@@ -211,6 +212,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
   private static final class StringByLineMatcher extends TypeSafeMatcher<String> {
 
     private final String[] expectedEntries;
+    private boolean sameLength = false;
     private int i = 0;
 
     private StringByLineMatcher(String... expectedEntries) {
@@ -219,7 +221,11 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
     @Override
     public void describeTo(Description description) {
-      description.appendText(format("line %d matches \"%s\"", i, expectedEntries[i]));
+      if (sameLength) {
+        description.appendText(format("line %d matches \"%s\"", i, expectedEntries[i]));
+      } else {
+        description.appendText(format("stack with %d entries", expectedEntries.length));
+      }
     }
 
     @Override
@@ -229,6 +235,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
       if (stackEntries.length != expectedEntries.length) {
         return false;
       }
+      sameLength = true;
 
       for (String expectedEntry : expectedEntries) {
         if (!stackEntries[i].matches(expectedEntry)) {
