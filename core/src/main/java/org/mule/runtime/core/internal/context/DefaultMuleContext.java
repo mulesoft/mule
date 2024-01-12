@@ -14,6 +14,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
@@ -331,6 +332,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureUseTransactionSinkIndex();
       configureCreateChildPolicyContextForParallelScopes();
       configureDisableSchedulerLogging();
+      configureErrorAndRollbackTxWhenTimeout();
     }
   }
 
@@ -1436,6 +1438,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableSchedulerLogging() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_SCHEDULER_LOGGING, minMuleVersion("4.6.0"));
+  }
+
+  private static void configureErrorAndRollbackTxWhenTimeout() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
