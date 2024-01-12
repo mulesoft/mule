@@ -40,6 +40,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSACTION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.VALIDATION;
@@ -150,6 +151,7 @@ class MuleExtensionModelDeclarer {
   final ErrorModel compositeRoutingError = newError(COMPOSITE_ROUTING).withParent(routingError).build();
   final ErrorModel validationError = newError(VALIDATION).withParent(anyError).build();
   final ErrorModel duplicateMessageError = newError(DUPLICATE_MESSAGE).withParent(validationError).build();
+  final ErrorModel transactionError = newError(TRANSACTION).withParent(anyError).build();
 
   ExtensionDeclarer createExtensionModel() {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
@@ -845,7 +847,8 @@ class MuleExtensionModelDeclarer {
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer tryScope = extensionDeclarer.withConstruct("try")
         .describedAs("Processes the nested list of message processors, "
-            + "within a transaction and with it's own error handler if required.");
+            + "within a transaction and with it's own error handler if required.")
+        .withErrorModel(transactionError);
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionalAction")
@@ -992,6 +995,7 @@ class MuleExtensionModelDeclarer {
 
     extensionDeclarer.withErrorModel(validationError);
     extensionDeclarer.withErrorModel(duplicateMessageError);
+    extensionDeclarer.withErrorModel(transactionError);
 
     extensionDeclarer.withErrorModel(securityError);
     extensionDeclarer.withErrorModel(serverSecurityError);
