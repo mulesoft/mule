@@ -30,6 +30,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SOURCE_RESPONSE_SEND;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.STREAM_MAXIMUM_SIZE_EXCEEDED;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSACTION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.VALIDATION;
@@ -117,6 +118,7 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
     doAddErrorType(SERVER_SECURITY, getErrorType(SECURITY).get());
     doAddErrorType(NOT_PERMITTED, getErrorType(SERVER_SECURITY).get());
     doAddErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED, getAnyErrorType());
+    doAddErrorType(TRANSACTION, getAnyErrorType());
 
     doAddInternalErrorType(OVERLOAD, getCriticalErrorType());
     doAddInternalErrorType(FLOW_BACK_PRESSURE, getErrorType(OVERLOAD).get());
