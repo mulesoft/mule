@@ -34,6 +34,7 @@ module org.mule.runtime.deployment.model.impl {
 
   // For deserialization of patching model:
   requires com.google.gson;
+  requires org.apache.commons.io;
 
   exports org.mule.runtime.module.deployment.impl.internal to
       org.mule.runtime.deployment,
