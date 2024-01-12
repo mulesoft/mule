@@ -9,6 +9,7 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
@@ -113,7 +114,8 @@ public class DefaultMuleContainer implements MuleContainer {
       } else {
         log4jContextFactory = createAndInstall();
       }
-      configureSelector(log4jContextFactory);
+      configureSelector(log4jContextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null,
+                        true);
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
