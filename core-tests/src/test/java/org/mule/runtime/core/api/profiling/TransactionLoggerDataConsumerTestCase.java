@@ -64,8 +64,7 @@ public class TransactionLoggerDataConsumerTestCase extends AbstractMuleContextTe
   @Rule
   public MockitoRule mockitorule = MockitoJUnit.rule();
 
-  @Rule
-  public SystemProperty enableProfilingServiceProperty = new SystemProperty(ENABLE_PROFILING_SERVICE_PROPERTY, "true");
+
 
   @Rule
   public EnableInternalRuntimeProfilers enableInternalRuntimeProfilers =

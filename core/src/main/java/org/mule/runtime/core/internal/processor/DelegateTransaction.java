@@ -145,6 +145,7 @@ public class DelegateTransaction extends AbstractTransaction {
 
   @Override
   public void setTimeout(int timeout) {
+    super.setTimeout(timeout);
     delegate.setTimeout(timeout);
   }
 
@@ -246,6 +247,11 @@ public class DelegateTransaction extends AbstractTransaction {
 
     @Override
     public void setComponentLocation(ComponentLocation componentLocation) {
+
+    }
+
+    @Override
+    public void setRollbackIfTimeout(boolean errorIfTimeout) {
 
     }
   }
