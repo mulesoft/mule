@@ -1,10 +1,10 @@
 {
-  "id": "http://example.com/persons.json",
+  "$id": "http://example.com/persons.json",
   "type": "array",
   "definitions": {},
   "$schema": "http://json-schema.org/draft-07/schema#",
   "items": {
-    "id": "http://example.com/example.json",
+    "$id": "http://example.com/example.json",
     "title": "Person",
     "type": "object",
     "properties": {

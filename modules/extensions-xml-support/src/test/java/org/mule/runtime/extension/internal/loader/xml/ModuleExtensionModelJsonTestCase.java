@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.extension.internal.loader.xml;
 
-import static java.io.File.separator;
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
@@ -21,6 +14,16 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.io.File.separator;
+import static java.lang.Boolean.getBoolean;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -34,21 +37,20 @@ import org.mule.test.petstore.extension.PetStoreConnector;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.skyscreamer.jsonassert.JSONAssert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.skyscreamer.jsonassert.JSONAssert;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Tests to ensure XSD generation coming from an XML using the {@link ExtensionModel} mechanism.
@@ -75,20 +77,15 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
 
   @Parameterized.Parameters(name = "{2}.json")
   public static Collection<Object[]> data() {
-    final List<String> extensions = new ArrayList<String>() {
-
-      {
-        add("module-calling-operations-within-module");
-        add("module-capitalized-name");
-        add("module-documentation");
-        add("module-global-element");
-        add("module-global-element-default");
-        add("module-json-custom-types");
-        add("module-properties");
-        add("module-stereotypes");
-        add("module-xsd-custom-types");
-      }
-    };
+    final List<String> extensions = asList("module-calling-operations-within-module",
+                                           "module-capitalized-name",
+                                           "module-documentation",
+                                           "module-global-element",
+                                           "module-global-element-default",
+                                           "module-json-custom-types",
+                                           "module-properties",
+                                           "module-stereotypes",
+                                           "module-xsd-custom-types");
 
     Function<String, Object[]> stringFunction = moduleName -> {
       String moduleModelPath = "modules" + separator + "model" + separator + moduleName + ".json";
@@ -159,7 +156,7 @@ public class ModuleExtensionModelJsonTestCase extends AbstractMuleTestCase {
     ExtensionModel petstore = loadExtension(PetStoreConnector.class, emptySet());
     ExtensionModel marvel = loadExtension(MarvelExtension.class, emptySet());
     ExtensionModel ce = MuleExtensionModelProvider.getExtensionModel();
-    return ImmutableSet.<ExtensionModel>builder().add(petstore).add(marvel).add(ce).build();
+    return new HashSet<>(asList(petstore, marvel, ce));
   }
 
   private static ExtensionModel loadExtension(Class extension, Set<ExtensionModel> deps) {

@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static org.apache.commons.collections.MapUtils.getBooleanValue;
-import static org.apache.commons.collections.MapUtils.getDoubleValue;
-import static org.apache.commons.collections.MapUtils.getIntValue;
-import static org.apache.commons.collections.MapUtils.getLongValue;
-import static org.apache.commons.collections.MapUtils.getString;
+import static org.apache.commons.collections4.MapUtils.getBooleanValue;
+import static org.apache.commons.collections4.MapUtils.getDoubleValue;
+import static org.apache.commons.collections4.MapUtils.getIntValue;
+import static org.apache.commons.collections4.MapUtils.getLongValue;
+import static org.apache.commons.collections4.MapUtils.getString;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -26,8 +27,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.collections4.keyvalue.DefaultMapEntry;
-import org.hamcrest.core.IsNull;
+
 import org.junit.Test;
+
+import org.hamcrest.core.IsNull;
 
 @SmallTest
 public class PropertiesUtilsTestCase extends AbstractMuleTestCase {

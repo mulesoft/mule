@@ -19,7 +19,7 @@ module org.mule.runtime.global.config {
   requires transitive org.mule.runtime.maven.client.api;
 
   requires typesafe.config;
-  requires org.everit.json.schema;
+  requires everit.json.schema;
   requires org.json;
 
   exports org.mule.runtime.globalconfig.api;
