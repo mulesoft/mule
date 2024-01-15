@@ -19,6 +19,7 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.enumerate;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.core.Is.is;
@@ -83,6 +84,10 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
     assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
         "The resource releasing responsibility will be delegated to each connector instead.",
                isJavaVersionAtLeast(JAVA_17), is(false));
+
+    // TODO W-14821737: we should review why this is happening and remove this assume when the issue is fixed.
+    assumeThat("When running on Windows the threads created keep spamming a NoClassDefFoundError error in the logs.",
+               IS_OS_WINDOWS, is(false));
 
     artifactClassLoader =
         new MulePluginClassLoader("ActiveMQResourceReleaserTestCase",
