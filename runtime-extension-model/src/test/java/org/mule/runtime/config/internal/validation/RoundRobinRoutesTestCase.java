@@ -35,7 +35,7 @@ public class RoundRobinRoutesTestCase extends AbstractCoreValidationTestCase {
   }
 
   @Test
-  public void scatterGatherRoutes() {
+  public void roundRobinRoutes() {
     final Optional<ValidationResultItem> msg = runValidation("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
         "<mule xmlns=\"http://www.mulesoft.org/schema/mule/core\"\n" +
         "      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +

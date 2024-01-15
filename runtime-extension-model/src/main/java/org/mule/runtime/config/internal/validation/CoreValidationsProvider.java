@@ -70,7 +70,6 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
-                                                          new ErrorHandlerRefOrOnErrorExclusiveness(),
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),

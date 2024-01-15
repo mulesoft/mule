@@ -152,7 +152,7 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
     assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(22));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(21));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -668,26 +668,18 @@ public class CoreExtensionModelTestCase {
   }
 
   @Test
-  public void errorHandler() {
+  public void globalErrorHandler() {
     final ConstructModel errorHandlerModel = coreExtensionModel.getConstructModel("errorHandler").get();
 
     assertThat(errorHandlerModel.allowsTopLevelDeclaration(), is(true));
     assertThat(errorHandlerModel.getStereotype().getType(), is(ERROR_HANDLER.getType()));
 
-    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(2));
+    assertThat(errorHandlerModel.getAllParameterModels(), hasSize(1));
 
     ParameterModel nameParam = errorHandlerModel.getAllParameterModels().get(0);
     assertThat(nameParam.getName(), is("name"));
     assertThat(nameParam.getDefaultValue(), is(nullValue()));
     assertThat(nameParam.isComponentId(), is(true));
-
-    ParameterModel ref = errorHandlerModel.getAllParameterModels().get(1);
-    assertThat(ref.getName(), is("ref"));
-    assertThat(ref.getType(), is(instanceOf(StringType.class)));
-    assertThat(ref.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(ref.isRequired(), is(false));
-    assertThat(ref.getAllowedStereotypes(), hasSize(1));
-    assertThat(ref.getAllowedStereotypes().iterator().next().getType(), is(ERROR_HANDLER.getType()));
 
     assertThat(errorHandlerModel.getNestedComponents(), hasSize(3));
     NestedRouteModel onErrorContinue = (NestedRouteModel) errorHandlerModel.getNestedComponents().get(0);
@@ -697,21 +689,17 @@ public class CoreExtensionModelTestCase {
     verifyOnError(onErrorPropagate);
 
     NestedComponentModel onErrorDelegate = (NestedComponentModel) errorHandlerModel.getNestedComponents().get(2);
+    assertThat(onErrorDelegate.getName(), is("onError"));
     assertThat(onErrorDelegate.isRequired(), is(false));
-    assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
-    assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
 
-    final ConstructModel onError = coreExtensionModel.getConstructModel("onError").get();
-    List<ParameterModel> allParameterModels = onError.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(1));
-
-    ParameterModel onErrorRef = allParameterModels.get(0);
+    final ParameterModel onErrorRef =
+        onErrorDelegate.getAllParameterModels().stream().filter(pm -> pm.getName().equals("ref")).findFirst().get();
     assertThat(onErrorRef.getName(), is("ref"));
     assertThat(onErrorRef.getType(), is(instanceOf(DefaultStringType.class)));
     assertThat(onErrorRef.isRequired(), is(true));
     assertThat(onErrorRef.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(onErrorDelegate.getAllowedStereotypes(), hasSize(1));
-    assertThat(onErrorDelegate.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
+    assertThat(onErrorRef.getAllowedStereotypes(), hasSize(1));
+    assertThat(onErrorRef.getAllowedStereotypes().iterator().next().getType(), is(ON_ERROR.getType()));
   }
 
   @Test

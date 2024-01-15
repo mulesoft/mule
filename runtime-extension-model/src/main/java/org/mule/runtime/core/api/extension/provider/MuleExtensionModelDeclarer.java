@@ -100,6 +100,7 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
@@ -184,7 +185,7 @@ class MuleExtensionModelDeclarer {
     declareFlow(extensionDeclarer);
     declareSubflow(extensionDeclarer);
     declareChoice(extensionDeclarer);
-    declareErrorHandler(extensionDeclarer);
+    declareGlobalErrorHandler(extensionDeclarer);
     declareTry(extensionDeclarer);
     declareScatterGather(extensionDeclarer, TYPE_LOADER);
     declareParallelForEach(extensionDeclarer, TYPE_LOADER);
@@ -712,9 +713,8 @@ class MuleExtensionModelDeclarer {
         .setRequired(true)
         .withAllowedStereotypes(PROCESSOR)
         .withModelProperty(NoWrapperModelProperty.INSTANCE);
-    flow.withComponent("errorHandler")
-        .withAllowedStereotypes(ERROR_HANDLER);
 
+    addErrorHandling(flow);
   }
 
   private void declareSubflow(ExtensionDeclarer extensionDeclarer) {
@@ -889,11 +889,25 @@ class MuleExtensionModelDeclarer {
             + "though LOCAL is always available.");
 
     tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
-    tryScope.withOptionalComponent("errorHandler")
-        .withAllowedStereotypes(ERROR_HANDLER);
+
+    addErrorHandling(tryScope);
   }
 
-  private void declareErrorHandler(ExtensionDeclarer extensionDeclarer) {
+  private void addErrorHandling(ConstructDeclarer chain) {
+    final NestedComponentDeclarer errorHandler = chain.withOptionalComponent("errorHandler");
+    errorHandler
+        .withAllowedStereotypes(ERROR_HANDLER)
+        .onDefaultParameterGroup()
+        .withOptionalParameter("ref")
+        .withAllowedStereotypes(singletonList(ERROR_HANDLER))
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the error handler to reuse.");
+
+    addErrorHandlingRoutes(errorHandler);
+  }
+
+  private void declareGlobalErrorHandler(ExtensionDeclarer extensionDeclarer) {
     ConstructDeclarer errorHandler = extensionDeclarer.withConstruct("errorHandler")
         .withStereotype(ERROR_HANDLER)
         .allowingTopLevelDefinition()
@@ -905,35 +919,7 @@ class MuleExtensionModelDeclarer {
         .asComponentId()
         .ofType(STRING_TYPE);
 
-    errorHandler.onDefaultParameterGroup()
-        .withOptionalParameter("ref")
-        .withAllowedStereotypes(singletonList(ERROR_HANDLER))
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The name of the error handler to reuse.");
-
-    NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
-        .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
-    declareOnErrorRoute(onErrorContinue);
-
-    NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
-        .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
-    declareOnErrorRoute(onErrorPropagate);
-
-    errorHandler.withOptionalComponent("onError")
-        .withAllowedStereotypes(ON_ERROR)
-        .describedAs("Error handler used to reference others.");
-
-    ConstructDeclarer onError = extensionDeclarer.withConstruct("onError")
-        .withStereotype(ON_ERROR)
-        .describedAs("Error handler used to reference others.");
-
-    onError.onDefaultParameterGroup()
-        .withRequiredParameter("ref")
-        .withAllowedStereotypes(asList(ON_ERROR))
-        .ofType(STRING_TYPE)
-        .withExpressionSupport(NOT_SUPPORTED)
-        .describedAs("The name of the error handler to reuse.");
+    addErrorHandlingRoutes(errorHandler);
 
     // TODO MULE-13277 errorHandler.isOneRouteRequired(true);
 
@@ -944,8 +930,30 @@ class MuleExtensionModelDeclarer {
         .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages."));
   }
 
+  private void addErrorHandlingRoutes(ComponentDeclarer errorHandler) {
+    NestedRouteDeclarer onErrorContinue = errorHandler.withRoute("onErrorContinue")
+        .describedAs("Error handler used to handle errors. It will commit any transaction as if the message was consumed successfully.");
+    declareOnErrorRoute(onErrorContinue);
+
+    NestedRouteDeclarer onErrorPropagate = errorHandler.withRoute("onErrorPropagate")
+        .describedAs("Error handler used to propagate errors. It will rollback any transaction and not consume messages.");
+    declareOnErrorRoute(onErrorPropagate);
+
+    final NestedComponentDeclarer onError = errorHandler.withOptionalComponent("onError")
+        .describedAs("Error handler used to reference others.");
+
+    onError.onDefaultParameterGroup()
+        .withRequiredParameter("ref")
+        .withAllowedStereotypes(asList(ON_ERROR))
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the error handler to reuse.");
+  }
+
   private void declareOnErrorRoute(NestedRouteDeclarer onError) {
-    onError.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    onError.withStereotype(ON_ERROR)
+        .withChain()
+        .withModelProperty(NoWrapperModelProperty.INSTANCE);
     declareOnErrorRouteParams(onError);
   }
 
