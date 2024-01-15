@@ -265,7 +265,7 @@
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
-        <junitVersion>4.12</junitVersion>
+        <junitVersion>4.13.2</junitVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <allureJunitVersion>2.22.2</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
