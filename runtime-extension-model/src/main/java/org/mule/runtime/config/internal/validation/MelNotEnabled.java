@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_MEL_AS_DEFAULT;
-import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
+import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 
 import static java.lang.Boolean.valueOf;
@@ -49,7 +49,8 @@ public class MelNotEnabled implements ArtifactValidation {
 
   @Override
   public Level getLevel() {
-    return ERROR;
+    // WARN for now because the rest of the usages of the compatibility features (not just MEL) will be disabled in the future.
+    return WARN;
   }
 
   @Override
