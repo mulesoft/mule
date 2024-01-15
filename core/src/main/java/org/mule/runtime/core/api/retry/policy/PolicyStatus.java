@@ -17,7 +17,7 @@ package org.mule.runtime.core.api.retry.policy;
  * For example, a RetryPolicy may have a RetryCount - how many times the policy can be invoked. Once the retryCount has been
  * reached, the policy is exhausted and cannot be used again.
  */
-public final class PolicyStatus {
+public final class PolicyStatus implements org.mule.runtime.retry.api.policy.PolicyStatus {
 
   private boolean exhausted = false;
   private boolean ok = false;

@@ -4,21 +4,23 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api.retry;
+package org.mule.runtime.retry.api;
+
+import org.mule.runtime.retry.api.policy.RetryPolicy;
 
 /**
  * This is the main Retry SPI. The code inside the {@link #doWork} method is what will actually get <u>retried</u> according to
  * the {@link RetryPolicy} that has been configured. Note that retries can be wrapped in a transaction to ensure the work is
  * atomic.
  */
-@Deprecated
-public interface RetryCallback extends org.mule.runtime.retry.api.RetryCallback {
-
-  @Override
-  default void doWork(org.mule.runtime.retry.api.RetryContext context) throws Exception {
-    // Nothing to do
-  }
+public interface RetryCallback {
 
   void doWork(RetryContext context) throws Exception;
 
+  String getWorkDescription();
+
+  /**
+   * @return the object for which the retry of the work is being done.
+   */
+  Object getWorkOwner();
 }
