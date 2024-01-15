@@ -28,6 +28,11 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Validates that no stale {@code mel} usages exist in expressions.
+ * 
+ * @since 4.7
+ */
 public class ExpressionParametersNotUsingMel implements Validation {
 
   @Override

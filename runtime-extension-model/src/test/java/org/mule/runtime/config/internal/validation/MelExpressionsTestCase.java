@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
@@ -51,7 +51,7 @@ public class MelExpressionsTestCase extends AbstractCoreValidationTestCase {
         "      xsi:schemaLocation=\"\n" +
         "       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd\">\n" +
         "    <flow name=\"flow\">\n" +
-        "        <foreach collection=\"#[mwl:[1, 2, 3]]\">\n" +
+        "        <foreach collection=\"#[mel:[1, 2, 3]]\">\n" +
         "            <logger message=\"hello\"/>\n" +
         "        </foreach>\n" +
         "    </flow>\n" +
@@ -59,6 +59,7 @@ public class MelExpressionsTestCase extends AbstractCoreValidationTestCase {
         "</mule>")
             .stream().findFirst();
 
-    assertThat(msg.isPresent(), is(false));
+    assertThat(msg.isPresent(), is(true));
+    assertThat(msg.get().getMessage(), is("MEL expressions are no longer supported."));
   }
 }
