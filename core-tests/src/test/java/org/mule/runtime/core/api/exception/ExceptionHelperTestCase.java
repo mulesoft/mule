@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.sort;
 
+import static org.apache.commons.collections4.comparators.ComparableComparator.comparableComparator;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -43,8 +44,6 @@ import org.mule.tck.size.SmallTest;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import org.apache.commons.collections.comparators.ComparableComparator;
 
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -158,7 +157,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
         Comparable exceptionComparable = o -> {
           throw new RuntimeException(new DefaultMuleException(createStaticMessage("foo")));
         };
-        sort(asList(exceptionComparable, exceptionComparable), ComparableComparator.getInstance());
+        sort(asList(exceptionComparable, exceptionComparable), comparableComparator());
       });
       fail("Expected exception");
     } catch (Exception e) {
@@ -166,7 +165,8 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
                  StringByLineMatcher.matchesLineByLine("foo \\(org.mule.runtime.api.exception.DefaultMuleException\\)",
                                                        "  " + ExceptionHelperTestCase.class.getName()
                                                            + ".lambda\\$[^\\(]*\\(ExceptionHelperTestCase.java:[0-9]+\\)",
-                                                       "  org.apache.commons.collections.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
+                                                       "  org.apache.commons.collections4.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
+                                                       "  org.apache.commons.collections4.comparators.ComparableComparator.compare\\(ComparableComparator.java:[0-9]+\\)",
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
                                                        "  java.util.*", // Collections.sort
@@ -212,6 +212,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
   private static final class StringByLineMatcher extends TypeSafeMatcher<String> {
 
     private final String[] expectedEntries;
+    private boolean sameLength = false;
     private int i = 0;
 
     private StringByLineMatcher(String... expectedEntries) {
@@ -220,7 +221,11 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
 
     @Override
     public void describeTo(Description description) {
-      description.appendText(format("line %d matches \"%s\"", i, expectedEntries[i]));
+      if (sameLength) {
+        description.appendText(format("line %d matches \"%s\"", i, expectedEntries[i]));
+      } else {
+        description.appendText(format("stack with %d entries", expectedEntries.length));
+      }
     }
 
     @Override
@@ -230,6 +235,7 @@ public class ExceptionHelperTestCase extends AbstractMuleTestCase {
       if (stackEntries.length != expectedEntries.length) {
         return false;
       }
+      sameLength = true;
 
       for (String expectedEntry : expectedEntries) {
         if (!stackEntries[i].matches(expectedEntry)) {

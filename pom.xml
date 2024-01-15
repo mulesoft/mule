@@ -182,10 +182,6 @@
         <muleMetadataModelVersion>1.7.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
-         its version is not changed by the versions:set plugin -->
-        <muleTestComponentsVersion>4.7.0-SNAPSHOT</muleTestComponentsVersion>
-
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.5.0</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
@@ -1327,11 +1323,6 @@
                                     <rules>
                                         <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
-                                            <excludes>
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
-                                            </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
                                             <message>No Snapshots Allowed in Project Version!</message>
@@ -1380,10 +1371,6 @@
 
                                                 <exclude>org.raml:raml-parser-2</exclude>
                                                 <exclude>org.raml:yagi</exclude>
-
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
