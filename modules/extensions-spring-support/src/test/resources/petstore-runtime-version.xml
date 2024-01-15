@@ -9,7 +9,7 @@
 
     <object name="testProcessor" class="org.mule.test.module.extension.connector.PetStoreRuntimeVersionTestCase$TestProcessor"/>
 
-    <petstore:config name="config" cashierName="jim" pets="#[mel:[]]">
+    <petstore:config name="config" cashierName="jim" pets="#[[]]">
         <petstore:connection username="john" password="doe"/>
         <petstore:cage>
             <petstore:birds>

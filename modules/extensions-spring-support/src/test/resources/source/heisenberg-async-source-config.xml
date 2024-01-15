@@ -43,7 +43,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
     <flow name="sourceFailed" initialState="stopped">
@@ -59,8 +59,7 @@
             </heisenberg:error-info>
         </heisenberg:async-listen-payments>
 
-        <!--invalid expression results in exception-->
-        <set-payload value="#[mel:new java.lang.Long.valueOf('100')]"/>
+        <raise-error type="SOURCE_TEST:EXPECTED"/>
     </flow>
 
     <flow name="sourceFailedOnRuntime" initialState="stopped">
@@ -96,7 +95,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
 
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_GENERATE">
@@ -119,7 +118,7 @@
             <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
     </flow>
 
     <flow name="sourceFailsInsideOnError" initialState="stopped">
@@ -135,7 +134,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[null.a!]"/>
+        <raise-error type="SOURCE_TEST:EXPECTED"/>
     </flow>
 
     <flow name="sourceFailsOnSuccessBodyCallsOnErrorAndOnTerminate" initialState="stopped">
@@ -151,7 +150,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[mel:java.lang.Long.valueOf('100')]"/>
+        <set-payload value="#[100]"/>
 
         <error-handler>
             <on-error-propagate type="SOURCE_RESPONSE_SEND">
@@ -177,7 +176,7 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[null.a!]"/>
+        <raise-error type="SOURCE_TEST:EXPECTED"/>
     </flow>
 
     <flow name="failureInFlowErrorHandlerCallsOnErrorDirectly" initialState="stopped">
@@ -193,11 +192,11 @@
             <heisenberg:error-info knownAddresses="#[[]]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[null.a!]"/>
+        <raise-error type="SOURCE_TEST:PROPAGATE"/>
 
         <error-handler>
             <on-error-propagate>
-                <set-payload value="#[null.a!]"/>
+                <raise-error type="SOURCE_TEST:EXPECTED"/>
             </on-error-propagate>
         </error-handler>
     </flow>
@@ -215,7 +214,7 @@
             <heisenberg:error-info knownAddresses="#[null.a!]"/>
         </heisenberg:async-listen-payments>
 
-        <set-payload value="#[null.a!]"/>
+        <raise-error type="SOURCE_TEST:EXPECTED"/>
     </flow>
 
     <flow name="sameChildInBothCallbacks" initialState="stopped">

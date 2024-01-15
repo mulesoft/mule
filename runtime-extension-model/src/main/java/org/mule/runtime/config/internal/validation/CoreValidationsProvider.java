@@ -114,6 +114,7 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                           new OperationDoesNotHaveApikitConsole(),
                                                           new InsecureTLSValidation()));
 
+    validations.add(new ExpressionParametersNotUsingMel());
     // Do not fail if the expressionLanguage was not provided, skip these validations.
     if (expressionLanguage != null) {
       validations.add(new ExpressionParametersSyntacticallyValid(expressionLanguage,
@@ -156,7 +157,8 @@ public class CoreValidationsProvider implements ValidationsProvider, ArtifactAst
                                                                            artifactAstDependencyGraphProviderForValidator),
                   new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
                                                                       artifactAstDependencyGraphProviderForValidator),
-                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator));
+                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),
+                  new MelNotEnabled(isCompatibilityInstalled()));
   }
 
   @Override

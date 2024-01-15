@@ -18,7 +18,7 @@
         <petstore:pets>
             <petstore:pet value="Dog"/>
         </petstore:pets>
-        <petstore:cage ammenities="#[mel:['spinning wheel', 'food can']]" birds="#[mel:['mockingjay':15, 'mockingbird': 10]]"/>
+        <petstore:cage ammenities="#[['spinning wheel', 'food can']]" birds="#[{'mockingjay':15, 'mockingbird': 10}]"/>
     </petstore:config>
 
     <petstore:config name="configWithChildElements" cashierName="jim" >
