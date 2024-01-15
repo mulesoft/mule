@@ -18,6 +18,7 @@
         <javaModuleName>org.mule.runtime.deployment.model</javaModuleName>
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
+            --add-reads=org.mule.runtime.deployment.model=org.apache.commons.io
             --add-opens=org.mule.runtime.deployment.model/org.mule.runtime.deployment.model.internal.domain.test=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
