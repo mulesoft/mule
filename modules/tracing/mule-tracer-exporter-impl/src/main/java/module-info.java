@@ -30,6 +30,7 @@ module org.mule.runtime.tracer.exporter.impl {
   requires io.opentelemetry.sdk.trace;
 
   requires com.google.gson;
+  requires org.apache.commons.lang3;
 
   requires java.inject;
 

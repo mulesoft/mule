@@ -31,6 +31,7 @@ module org.mule.runtime.extensions.xml.support {
 
   requires com.google.gson;
   requires org.apache.commons.io;
+  requires org.apache.commons.lang3;
   requires java.inject;
 
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
