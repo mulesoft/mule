@@ -17,6 +17,7 @@
     <properties>
         <javaModuleName>org.mule.runtime.retry.api</javaModuleName>
         <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
+        <revapi.checkDependencies>true</revapi.checkDependencies>
 
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>

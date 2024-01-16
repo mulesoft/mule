@@ -83,7 +83,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
-  requires org.mule.runtime.retry.api;
+  requires transitive org.mule.runtime.retry.api;
 
   requires org.mule.runtime.metrics.api;
   requires org.mule.runtime.tracer.api;
