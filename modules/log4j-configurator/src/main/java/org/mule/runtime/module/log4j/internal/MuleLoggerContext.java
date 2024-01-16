@@ -126,7 +126,7 @@ class MuleLoggerContext extends LoggerContext {
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
     if (onLoggingAction != null) {
-      return new ReconfigurableOnApplicationLogger(ctx, name, messageFactory, onLoggingAction);
+      return new LoggerWithOnLoggingAction(ctx, name, messageFactory, onLoggingAction);
     }
 
     Logger logger = super.newInstance(ctx, name, messageFactory);

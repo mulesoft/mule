@@ -10,18 +10,22 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.util.MessageSupplier;
 import org.apache.logging.log4j.util.Supplier;
 
-public class ReconfigurableOnApplicationLogger extends Logger {
+/**
+ * A {@link Logger} that performs an extra action everytime it logs.
+ *
+ * @since 4.7.0
+ */
+public class LoggerWithOnLoggingAction extends Logger {
 
   private final Runnable onLoggingAction;
 
-  public ReconfigurableOnApplicationLogger(LoggerContext ctx, String name, MessageFactory messageFactory,
-                                           Runnable onLoggingAction) {
+  public LoggerWithOnLoggingAction(LoggerContext ctx, String name, MessageFactory messageFactory,
+                                   Runnable onLoggingAction) {
     super(ctx, name, messageFactory);
     this.onLoggingAction = onLoggingAction;
   }

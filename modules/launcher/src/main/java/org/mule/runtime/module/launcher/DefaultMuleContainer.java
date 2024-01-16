@@ -115,7 +115,7 @@ public class DefaultMuleContainer implements MuleContainer {
         log4jContextFactory = createAndInstall();
       }
       configureSelector(log4jContextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null,
-                        true);
+                        getBoolean(SINGLE_APP_MODE_PROPERTY));
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
