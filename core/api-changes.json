@@ -1,15 +1,33 @@
 {
+  "4.7.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT",
+          "justification": "W-14572221: MVEL is removed"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method boolean org.mule.runtime.core.api.config.MuleProperties::isMelDefault()",
+          "justification": "W-14572221: MVEL is removed"
+        }
+      ]
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [
-		{
-		  "ignore": true,
-		  "code": "java.annotation.added",
-		  "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
-		  "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
-		  "annotation": "@org.mule.api.annotation.NoImplement",
-		  "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
-		},
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
+        },
         {
           "ignore": true,
           "code": "java.annotation.added",

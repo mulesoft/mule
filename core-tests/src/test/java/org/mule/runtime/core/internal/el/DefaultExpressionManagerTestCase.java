@@ -17,20 +17,17 @@ import static org.mule.runtime.api.metadata.MediaType.XML;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
-import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_MVEL_DW;
+import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -69,7 +66,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
 @Feature(EXPRESSION_LANGUAGE)
-@Story(SUPPORT_MVEL_DW)
+@Story(SUPPORT_DW)
 public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCase {
 
   private static final String MY_VAR = "myVar";
@@ -278,16 +275,13 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that streams are logged in DW but not in MVEL.")
+  @Description("Verifies that streams are logged in DW.")
   public void parseLogStream() throws MuleException {
     ByteArrayInputStream stream = new ByteArrayInputStream("hello".getBytes());
     CoreEvent event = getEventBuilder().message(Message.of(stream)).build();
     assertThat(expressionManager.parseLogTemplate("this is #[payload]", event, TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
                is("this is hello"));
-    assertThat(expressionManager.parseLogTemplate("this is #[mel:payload]", event, TEST_CONNECTOR_LOCATION,
-                                                  NULL_BINDING_CONTEXT),
-               both(startsWith("this is ")).and(containsString(stream.getClass().getSimpleName())));
   }
 
   @Test

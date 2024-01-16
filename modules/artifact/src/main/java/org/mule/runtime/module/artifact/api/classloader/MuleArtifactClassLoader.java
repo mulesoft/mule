@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.artifact.api.classloader;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
@@ -16,6 +14,8 @@ import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.lang.reflect.Modifier.isAbstract;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
 import static org.apache.commons.lang3.JavaVersion.JAVA_11;
@@ -26,9 +26,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.module.artifact.classloader.AwsIdleConnectionReaperResourceReleaser;
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
-import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
-import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
 import org.mule.module.artifact.classloader.GroovyResourceReleaser;
+import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -138,7 +137,6 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
     this.resourceReleaserExecutor.addResourceReleaser(() -> new ClassLoaderResourceReleaser(this));
-    this.resourceReleaserExecutor.addResourceReleaser(() -> new MvelClassLoaderReleaser(this));
   }
 
   @Override

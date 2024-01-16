@@ -34,7 +34,6 @@ import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.DefaultStreamingManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.queue.QueueManager;
-import org.mule.runtime.core.internal.el.mvel.ExpressionLanguageExtension;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.ArrayList;
@@ -43,12 +42,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
 
 @Issue("MULE-19984")
 @Feature(LIFECYCLE_AND_DEPENDENCY_INJECTION)
@@ -57,6 +57,7 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
 
   private DependencyGraphLifecycleObjectSorter sorter;
   private DependencyGraphBeanDependencyResolver resolver;
+  private int streamingManagerGraphIndex;
   private DefaultStreamingManager objectA;
   private DefaultStreamingManager objectB;
   private DefaultStreamingManager objectC;
@@ -68,7 +69,6 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     sorter = new DependencyGraphLifecycleObjectSorter(resolver, new Class<?>[] {
         LockFactory.class,
         ObjectStoreManager.class,
-        ExpressionLanguageExtension.class,
         ExpressionLanguage.class,
         QueueManager.class,
         StreamingManager.class,
@@ -79,10 +79,29 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
         MuleConfiguration.class,
         Initialisable.class
     });
+    streamingManagerGraphIndex = 4;
     lookupObjects = new ArrayList<>();
-    objectA = new DefaultStreamingManager();
-    objectB = new DefaultStreamingManager();
-    objectC = new DefaultStreamingManager();
+    objectA = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "objectA";
+      }
+    };
+    objectB = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "objectB";
+      }
+    };
+    objectC = new DefaultStreamingManager() {
+
+      @Override
+      public String toString() {
+        return "objectC";
+      }
+    };
     lookupObjects.add("objectA");
     lookupObjects.add("objectB");
     lookupObjects.add("objectC");
@@ -147,15 +166,17 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     Map<BeanWrapper, List<BeanWrapper>> transitiveDependenciesOfC = new LinkedHashMap<>();
     transitiveDependenciesOfC.put(componentC, emptyList()); // already processed for this bucket
 
-    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
-    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
-    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+    when(resolver.getTransitiveDependencies("objectA", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfC);
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
     sorter.addObject("objectC", objectC);
 
-    assertThat(sorter.getSortedObjects(), containsInRelativeOrder(objectB, objectC, objectA));
+    final List<Object> sortedObjects = sorter.getSortedObjects();
+    assertThat(sortedObjects.toString(), sortedObjects,
+               containsInRelativeOrder(objectB, objectC, objectA));
   }
 
 
@@ -177,9 +198,9 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     transitiveDependenciesOfB.put(componentB, dependenciesOfB);
     transitiveDependenciesOfB.put(componentC, emptyList());
 
-    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
-    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
-    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(emptyMap());
+    when(resolver.getTransitiveDependencies("objectA", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", streamingManagerGraphIndex)).thenReturn(emptyMap());
     sorter.setLifeCycleObjectNameOrder(lookupObjects);
 
     sorter.addObject("objectA", objectA);
@@ -202,8 +223,8 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     BeanWrapper componentA = new BeanWrapper("objectA", objectA);
     BeanWrapper componentB = new BeanWrapper("objectB", objectB);
 
-    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(asList(componentB));
-    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(asList());
+    when(resolver.getDirectBeanDependencies(componentA, streamingManagerGraphIndex)).thenReturn(asList(componentB));
+    when(resolver.getDirectBeanDependencies(componentB, streamingManagerGraphIndex)).thenReturn(asList());
 
     sorter.addObject("objectA", objectA);
     sorter.addObject("objectB", objectB);
@@ -240,13 +261,13 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     // components that were already processed won't be added to the map.
 
 
-    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(dependenciesOfA);
-    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(dependenciesOfB);
-    when(resolver.getDirectBeanDependencies(componentC, 5)).thenReturn(dependenciesOfC);
+    when(resolver.getDirectBeanDependencies(componentA, streamingManagerGraphIndex)).thenReturn(dependenciesOfA);
+    when(resolver.getDirectBeanDependencies(componentB, streamingManagerGraphIndex)).thenReturn(dependenciesOfB);
+    when(resolver.getDirectBeanDependencies(componentC, streamingManagerGraphIndex)).thenReturn(dependenciesOfC);
 
-    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
-    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
-    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+    when(resolver.getTransitiveDependencies("objectA", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfC);
 
     sorter.setLifeCycleObjectNameOrder(lookupObjects);
 
@@ -285,13 +306,13 @@ public class DependencyGraphLifecycleObjectSorterTestCase {
     transitiveDependenciesOfC.put(componentB, emptyList()); // already processed in the same bucket
 
 
-    when(resolver.getDirectBeanDependencies(componentA, 5)).thenReturn(dependenciesOfA);
-    when(resolver.getDirectBeanDependencies(componentB, 5)).thenReturn(emptyList());
-    when(resolver.getDirectBeanDependencies(componentC, 5)).thenReturn(dependenciesOfC);
-    when(resolver.getDirectBeanDependencies(componentD, 5)).thenReturn(dependenciesOfD);
-    when(resolver.getTransitiveDependencies("objectA", 5)).thenReturn(transitiveDependenciesOfA);
-    when(resolver.getTransitiveDependencies("objectB", 5)).thenReturn(transitiveDependenciesOfB);
-    when(resolver.getTransitiveDependencies("objectC", 5)).thenReturn(transitiveDependenciesOfC);
+    when(resolver.getDirectBeanDependencies(componentA, streamingManagerGraphIndex)).thenReturn(dependenciesOfA);
+    when(resolver.getDirectBeanDependencies(componentB, streamingManagerGraphIndex)).thenReturn(emptyList());
+    when(resolver.getDirectBeanDependencies(componentC, streamingManagerGraphIndex)).thenReturn(dependenciesOfC);
+    when(resolver.getDirectBeanDependencies(componentD, streamingManagerGraphIndex)).thenReturn(dependenciesOfD);
+    when(resolver.getTransitiveDependencies("objectA", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfA);
+    when(resolver.getTransitiveDependencies("objectB", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfB);
+    when(resolver.getTransitiveDependencies("objectC", streamingManagerGraphIndex)).thenReturn(transitiveDependenciesOfC);
     sorter.setLifeCycleObjectNameOrder(lookupObjects);
 
     sorter.addObject("objectA", objectA);

@@ -77,14 +77,16 @@
       "artifactCoordinates": {
         "groupId": "commons-io",
         "artifactId": "commons-io",
-        "version": "2.13.0",
+        "version": "2.15.1",
         "type": "jar"
       },
-      "uri": "repository/commons-io/commons-io/2.13.0/commons-io-2.13.0.jar",
+      "uri": "repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar",
       "isShared":true,
       "packages": [
+        "",
         "org.apache.commons.io",
         "org.apache.commons.io.build",
+        "org.apache.commons.io.channels",
         "org.apache.commons.io.charset",
         "org.apache.commons.io.comparator",
         "org.apache.commons.io.file",
