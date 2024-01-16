@@ -7,13 +7,12 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import org.mule.runtime.api.artifact.Registry;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.privileged.util.AttributeEvaluator;
@@ -44,15 +43,7 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private Registry registry;
-
-  private DataType expectedDataType;
-  private Boolean melDefault;
-  private Boolean melAvailable;
+  private final DataType expectedDataType;
 
   public TypeSafeExpressionValueResolver(String expression, Class<T> expectedType, DataType expectedDataType) {
     checkArgument(expectedType != null, "expected type cannot be null");
@@ -76,14 +67,12 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
 
   @Override
   public void initialise() throws InitialisationException {
-    ExpressionValueResolver resolver = new ExpressionValueResolver(expression, expectedDataType, melDefault, melAvailable);
+    ExpressionValueResolver resolver = new ExpressionValueResolver(expression, expectedDataType);
     resolver.setExtendedExpressionManager(extendedExpressionManager);
-    resolver.setRegistry(registry);
     resolver.initialise();
 
     delegate = new TypeSafeValueResolverWrapper<>(resolver, expectedType);
     delegate.setTransformationService(transformationService);
-    delegate.setMuleContext(muleContext);
 
     delegate.initialise();
   }
@@ -96,15 +85,4 @@ public class TypeSafeExpressionValueResolver<T> implements ValueResolver<T>, Ini
     this.extendedExpressionManager = extendedExpressionManager;
   }
 
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
-  }
-
-  public void setMelDefault(Boolean melDefault) {
-    this.melDefault = melDefault;
-  }
-
-  public void setMelAvailable(Boolean melAvailable) {
-    this.melAvailable = melAvailable;
-  }
 }

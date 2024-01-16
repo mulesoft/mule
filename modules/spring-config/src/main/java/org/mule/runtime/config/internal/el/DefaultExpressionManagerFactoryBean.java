@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.config.internal.el;
 
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
-import static org.mule.runtime.core.api.config.MuleProperties.isMelDefault;
 import static org.mule.runtime.core.internal.execution.ClassLoaderInjectorInvocationHandler.createClassLoaderInjectorInvocationHandler;
 
 import static java.util.Collections.emptyList;
@@ -21,12 +18,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.DefaultExpressionManager;
-import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptorHandler;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,14 +50,6 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
   private ExtendedExpressionLanguageAdaptor dwExpressionLanguage;
 
   @Inject
-  @Named(COMPATIBILITY_PLUGIN_INSTALLED)
-  private Optional<Object> compatibilityPluginInstalled;
-
-  @Inject
-  @Named(OBJECT_EXPRESSION_LANGUAGE)
-  private ExtendedExpressionLanguageAdaptor mvelExpressionLanguage;
-
-  @Inject
   // Avoid this to fail on unit tests with an incomplete repository
   @Autowired(required = false)
   private final List<GlobalBindingContextProvider> globalBindingContextProviders = emptyList();
@@ -73,12 +60,6 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
     ExtendedExpressionLanguageAdaptor expressionLanguage = createExpressionLanguage();
     populateBindings(expressionLanguage);
     delegate.setExpressionLanguage(expressionLanguage);
-
-    boolean melDefault = isMelDefault() || (dwExpressionLanguage == null && compatibilityPluginInstalled.isPresent());
-    delegate.setMelDefault(melDefault);
-    if (melDefault) {
-      LOGGER.warn("Using MEL as the default expression language.");
-    }
 
     muleContext.getInjector().inject(delegate);
     return (ExtendedExpressionManager) createClassLoaderInjectorInvocationHandler(delegate,
@@ -102,18 +83,10 @@ public class DefaultExpressionManagerFactoryBean implements FactoryBean<Extended
   }
 
   private ExtendedExpressionLanguageAdaptor createExpressionLanguage() {
-    if (isMelDefault() || compatibilityPluginInstalled.isPresent()) {
-      ExtendedExpressionLanguageAdaptor exprLangAdaptorHandler = dwExpressionLanguage != null
-          ? new ExpressionLanguageAdaptorHandler(dwExpressionLanguage, mvelExpressionLanguage)
-          : mvelExpressionLanguage;
-
-      return exprLangAdaptorHandler;
-    } else {
-      if (dwExpressionLanguage == null) {
-        throw new IllegalStateException("No expression language installed");
-      }
-      return dwExpressionLanguage;
+    if (dwExpressionLanguage == null) {
+      throw new IllegalStateException("No expression language installed");
     }
+    return dwExpressionLanguage;
   }
 
   @Override

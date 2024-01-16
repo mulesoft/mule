@@ -6,18 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.lang.Boolean.valueOf;
-import static java.lang.System.getProperty;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_MEL_AS_DEFAULT;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
-
-import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.extension.api.runtime.parameter.ParameterResolver;
 
@@ -40,15 +33,7 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
   @Inject
   private ExtendedExpressionManager extendedExpressionManager;
 
-  @Inject
-  private MuleContext muleContext;
-
-  @Inject
-  private Registry registry;
-
-  private Class<T> type;
-  private boolean melDefault;
-  private boolean melAvailable;
+  private final Class<T> type;
   private TypeSafeExpressionValueResolver<T> delegateResolver;
 
   public ExpressionBasedParameterResolverValueResolver(String expression, Class<T> type, DataType expectedDataType) {
@@ -59,15 +44,9 @@ public class ExpressionBasedParameterResolverValueResolver<T> implements Express
 
   @Override
   public void initialise() throws InitialisationException {
-    melDefault = valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
-    melAvailable = registry.lookupByName(COMPATIBILITY_PLUGIN_INSTALLED).isPresent();
-
     delegateResolver = new TypeSafeExpressionValueResolver<>(expression, type, expectedDataType);
     delegateResolver.setExtendedExpressionManager(extendedExpressionManager);
     delegateResolver.setTransformationService(transformationService);
-    delegateResolver.setMuleContext(muleContext);
-    delegateResolver.setMelDefault(melDefault);
-    delegateResolver.setMelAvailable(melAvailable);
 
     delegateResolver.initialise();
   }

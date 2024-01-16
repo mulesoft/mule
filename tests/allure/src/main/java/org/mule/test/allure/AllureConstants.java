@@ -259,8 +259,6 @@ public interface AllureConstants {
 
       String SUPPORT_DW = "Support DW";
       String SUPPORT_FUNCTIONS = "Support Functions";
-      String SUPPORT_MVEL_DW = "Support both MVEL and DW";
-      String SUPPORT_MVEL_COMPATIBILITY = "Support MVEL compatibility mode";
       String SUPPORT_EXPRESSION_BINDINGS = "Support expression bindings";
     }
   }

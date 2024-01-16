@@ -6,36 +6,6 @@
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.ATTRIBUTES;
@@ -66,6 +36,38 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
+import static java.io.File.separator;
+import static java.lang.String.format;
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -111,14 +113,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
-import org.hamcrest.BaseMatcher;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import org.hamcrest.BaseMatcher;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -147,13 +150,6 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void stringExpression() throws Exception {
     TypedValue<?> result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
-    assertThat(result.getValue(), is("hey"));
-    assertThat(result.getDataType(), is(assignableTo(STRING)));
-  }
-
-  @Test
-  public void withPrefixExpression() throws Exception {
-    TypedValue<?> result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
     assertThat(result.getDataType(), is(assignableTo(STRING)));
   }
