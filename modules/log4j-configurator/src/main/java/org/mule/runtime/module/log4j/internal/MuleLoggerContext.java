@@ -40,6 +40,8 @@ class MuleLoggerContext extends LoggerContext {
   private final boolean standalone;
   private final boolean logSeparationEnabled;
   private ContextSelector contextSelector;
+
+  private Runnable onLoggingAction;
   private final boolean artifactClassloader;
   private final boolean applicationClassloader;
   private final String artifactName;
@@ -57,8 +59,19 @@ class MuleLoggerContext extends LoggerContext {
                     ContextSelector contextSelector,
                     boolean standalone,
                     boolean logSeparationEnabled) {
+    this(name, configLocn, ownerClassLoader, contextSelector, standalone, logSeparationEnabled, null);
+  }
+
+  MuleLoggerContext(String name,
+                    URI configLocn,
+                    ClassLoader ownerClassLoader,
+                    ContextSelector contextSelector,
+                    boolean standalone,
+                    boolean logSeparationEnabled,
+                    Runnable onLoggingAction) {
     super(name, null, configLocn);
     configFile = configLocn;
+    this.onLoggingAction = onLoggingAction;
     this.contextSelector = contextSelector;
     this.standalone = standalone;
     this.logSeparationEnabled = logSeparationEnabled;
@@ -110,7 +123,12 @@ class MuleLoggerContext extends LoggerContext {
    */
   @Override
   protected Logger newInstance(LoggerContext ctx, final String name, final MessageFactory messageFactory) {
+    if (onLoggingAction != null) {
+      return new ReconfigurableOnApplicationLogger(ctx, name, messageFactory, onLoggingAction);
+    }
+
     Logger logger = super.newInstance(ctx, name, messageFactory);
+
     if (artifactClassloader || applicationClassloader || !logSeparationEnabled) {
       return logger;
     }
