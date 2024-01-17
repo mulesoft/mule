@@ -68,7 +68,7 @@ module org.mule.runtime.extensions.support {
   // Date Times and formats
   requires org.joda.time;
   requires reactor.core;
-  requires reflections;
+  requires org.reflections;
   requires spring.core;
   // Usage of java.beans
   requires java.desktop;

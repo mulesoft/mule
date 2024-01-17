@@ -39,7 +39,7 @@ module org.mule.test.runner {
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
   requires semver4j;
-  requires reflections;
+  requires org.reflections;
   // TODO: MULE-19762 remove once forward compatibility is finished
   requires org.apache.maven.resolver;
   requires org.apache.maven.resolver.util;

@@ -110,7 +110,7 @@ module org.mule.runtime.core {
   requires org.apache.commons.pool2;
   requires org.jgrapht.core;
   requires net.bytebuddy;
-  requires reflections;
+  requires org.reflections;
   requires uuid;
   requires vibur.object.pool;
 
