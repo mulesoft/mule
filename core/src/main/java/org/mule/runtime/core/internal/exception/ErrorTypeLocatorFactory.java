@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
 import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
