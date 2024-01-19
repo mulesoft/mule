@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.fromFuture;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
@@ -495,11 +496,10 @@ public class MessageProcessors {
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent eventChildCtx,
                                                                       ReactiveProcessor processor,
                                                                       boolean completeParentIfEmpty, boolean propagateErrors) {
+    // Prepare the error propagation...
     MonoSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
-
     childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
                                 completeParentIfEmpty, propagateErrors);
-
     final Mono<? extends CoreEvent> errorPropagateMono =
         Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
             .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
@@ -508,10 +508,13 @@ public class MessageProcessors {
     final Mono<CoreEvent> oneMono = oneSink.asMono()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(errorPropagateMono.toProcessor())
+        // use a Future to force the subscription to errorPropagateMono
+        .switchIfEmpty(fromFuture(errorPropagateMono.toFuture()))
         .map(MessageProcessors::toParentContext)
-        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
-            .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
+        .contextWrite(ctx -> ctx
+            .put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+            .put(WITHIN_PROCESS_TO_APPLY, true)
+            .put(REACTOR_RECREATE_ROUTER, true));
 
     oneSink.tryEmitValue(eventChildCtx);
     return oneMono;
