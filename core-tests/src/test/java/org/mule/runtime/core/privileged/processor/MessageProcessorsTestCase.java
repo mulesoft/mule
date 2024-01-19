@@ -40,7 +40,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.Matchers.isA;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -665,19 +665,20 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                  BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
 
+    Mono<CoreEvent> eventMono = from(processWithChildContext(input,
+                                                             pub -> Flux.from(pub)
+                                                                 .flatMap(event -> processWithChildContextDontComplete(event,
+                                                                                                                       innerChain(innerErrorConsumer,
+                                                                                                                                  expected),
+                                                                                                                       Optional
+                                                                                                                           .empty()))
+                                                                 .onErrorContinue(outerErrorConsumer),
+                                                             newChildContext(input, Optional.empty())));
+
     if (exceptionExpected) {
       thrown.expect(hasRootCause(sameInstance(expected)));
     }
-
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .flatMap(event -> processWithChildContextDontComplete(event,
-                                                                                           innerChain(innerErrorConsumer,
-                                                                                                      expected),
-                                                                                           Optional.empty()))
-                                     .onErrorContinue(outerErrorConsumer),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    eventMono.block();
   }
 
   private ReactiveProcessor innerChain(BiConsumer<Throwable, Object> innerErrorConsumer, final NullPointerException expected) {

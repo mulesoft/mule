@@ -71,6 +71,8 @@ import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import reactor.core.publisher.Sinks.One;
 
 /**
  * Some convenience methods for message processors.
@@ -495,21 +497,24 @@ public class MessageProcessors {
                                                                       boolean completeParentIfEmpty, boolean propagateErrors) {
     MonoSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
 
-    return Mono.<CoreEvent>create(sink -> {
-      childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                  completeParentIfEmpty, propagateErrors);
+    childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                completeParentIfEmpty, propagateErrors);
 
-      sink.success(eventChildCtx);
-    })
-        .share()
+    final Mono<? extends CoreEvent> errorPropagateMono =
+        Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
+            .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
+
+    final One<CoreEvent> oneSink = Sinks.one();
+    final Mono<CoreEvent> oneMono = oneSink.asMono()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
-            .share())
+        .switchIfEmpty(errorPropagateMono.toProcessor())
         .map(MessageProcessors::toParentContext)
         .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
             .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
+
+    oneSink.tryEmitValue(eventChildCtx);
+    return oneMono;
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,
