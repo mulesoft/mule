@@ -52,14 +52,14 @@ public class MuleLoggerContextFactory {
   /**
    * Builds a new {@link LoggerContext} for the given {@code classLoader} and {@code selector}
    *
-   * @param classLoader     the classloader of the artifact this logger context is for.
-   * @param selector        the selector to bew used when building the loggers for the new context.
-   * @param onLoggingAction an application to execute on logging action.
+   * @param classLoader           the classloader of the artifact this logger context is for.
+   * @param selector              the selector to bew used when building the loggers for the new context.
+   * @param reconfigurationAction a reconfiguration action.
    *
    * @return the {@link LoggerContext} built.
    */
   public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled,
-                             final LoggerReconfigurationAction onLoggingAction) {
+                             final LoggerReconfigurationAction reconfigurationAction) {
     NewContextParameters parameters = resolveContextParameters(classLoader);
     if (parameters == null) {
       return getDefaultContext(selector, logSeparationEnabled);
@@ -72,7 +72,7 @@ public class MuleLoggerContextFactory {
                               selector,
                               isStandalone(),
                               logSeparationEnabled,
-                              onLoggingAction);
+                              reconfigurationAction);
 
     if ((classLoader instanceof ArtifactClassLoader) &&
         selector instanceof ArtifactAwareContextSelector) {
