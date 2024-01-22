@@ -197,7 +197,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     }
 
     /**
-     * An action to perform once the classloader for the artifact is created.
+     * An action to perform on the classloader of the artifact that is created.
      *
      * @since 4.7.0
      *

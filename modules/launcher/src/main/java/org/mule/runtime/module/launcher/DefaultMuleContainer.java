@@ -70,6 +70,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
@@ -98,8 +99,7 @@ public class DefaultMuleContainer implements MuleContainer {
       new ApplicationReconfigurableLoggerContextSelector();
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
-      .withActionOnMuleArtifactClassloader(classloader -> SINGLE_APP_CONTEXT_SELECTOR
-          .reconfigureAccordingToAppClassloader(classloader))
+      .withActionOnMuleArtifactClassloader(getActionOnMuleArtifactClassloader())
       .build();
 
   private static MuleLog4jContextFactory log4jContextFactory;
@@ -422,6 +422,16 @@ public class DefaultMuleContainer implements MuleContainer {
    */
   public ArtifactClassLoader getContainerClassLoader() {
     return artifactResourcesRegistry.getContainerClassLoader();
+  }
+
+  private Consumer<ClassLoader> getActionOnMuleArtifactClassloader() {
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      return classloader -> SINGLE_APP_CONTEXT_SELECTOR
+          .reconfigureAccordingToAppClassloader(classloader);
+    }
+
+    return cl -> {
+    };
   }
 }
 
