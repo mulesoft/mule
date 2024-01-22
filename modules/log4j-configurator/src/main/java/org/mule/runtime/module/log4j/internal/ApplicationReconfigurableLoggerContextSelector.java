@@ -6,16 +6,8 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
-import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
-
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.util.Arrays.asList;
-
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
-import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 
 import java.net.URI;
 import java.util.List;
@@ -33,19 +25,19 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
 
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
-  private LoggerContext containerLoggerContext;
+  private LoggerContext loggerContext;
 
   private boolean reconfigured;
 
   public ApplicationReconfigurableLoggerContextSelector() {
-    // The container logger context is created with no logging separation.
+    // The logger context is created with no logging separation.
     // This will guarantee that by default this will work as no separation in logs.
-    this.containerLoggerContext =
+    this.loggerContext =
         this.loggerContextFactory.build(SYSTEM_CLASSLOADER, this, false);
   }
 
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext) {
-    return containerLoggerContext;
+    return loggerContext;
   }
 
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext, URI configLocation) {
@@ -53,40 +45,11 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
   }
 
   public List<LoggerContext> getLoggerContexts() {
-    return asList(containerLoggerContext);
+    return asList(loggerContext);
   }
 
-  public void removeContext(LoggerContext context) {}
-
-  private static ClassLoader getLoggerClassLoader(ClassLoader loggerClassLoader) {
-    if (loggerClassLoader instanceof CompositeClassLoader) {
-      return getLoggerClassLoader(findClassLoader((CompositeClassLoader) loggerClassLoader));
-    }
-
-    // Obtains the first artifact class loader in the hierarchy
-    while (!(loggerClassLoader instanceof ArtifactClassLoader) && loggerClassLoader != null) {
-      loggerClassLoader = loggerClassLoader.getParent();
-    }
-
-    if (loggerClassLoader == null) {
-      loggerClassLoader = SYSTEM_CLASSLOADER;
-    } else if (isRegionClassLoaderMember(loggerClassLoader)) {
-      loggerClassLoader =
-          isPolicyClassLoader(loggerClassLoader.getParent()) ? loggerClassLoader.getParent().getParent()
-              : loggerClassLoader.getParent();
-    } else if (!(loggerClassLoader instanceof RegionClassLoader)
-        && !(loggerClassLoader instanceof MuleSharedDomainClassLoader)) {
-      loggerClassLoader = SYSTEM_CLASSLOADER;
-    }
-    return loggerClassLoader;
-  }
-
-  private static boolean isPolicyClassLoader(ClassLoader loggerClassLoader) {
-    return ((ArtifactClassLoader) loggerClassLoader).getArtifactDescriptor() instanceof PolicyTemplateDescriptor;
-  }
-
-  private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
-    return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
+  public void removeContext(LoggerContext context) {
+    throw new UnsupportedOperationException("It is not allowed to remove contexts in a selector that depends on a single app.");
   }
 
   public void reconfigureAccordingToAppClassloader(ClassLoader classloader) {
@@ -96,14 +59,14 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
     applicationClassLoaderLoggerContext.reconfigure();
 
     // We reconfigure the loggers that were already provided to get the app log4j configuration.
-    containerLoggerContext.updateLoggers(applicationClassLoaderLoggerContext.getConfiguration());
+    loggerContext.updateLoggers(applicationClassLoaderLoggerContext.getConfiguration());
 
     // We change the configuration for the logger context. This only sets the configuration.
-    containerLoggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
+    loggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
 
     // This is needed so that the configuration set is reconfigured.
-    containerLoggerContext.reconfigure();
+    loggerContext.reconfigure();
 
-    containerLoggerContext = applicationClassLoaderLoggerContext;
+    loggerContext = applicationClassLoaderLoggerContext;
   }
 }

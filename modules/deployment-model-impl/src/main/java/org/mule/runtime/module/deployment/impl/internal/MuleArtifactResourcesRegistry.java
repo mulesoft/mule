@@ -143,7 +143,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ProfiledMemoryManagementService memoryManagementService;
     private final Set<String> bootPackages = new HashSet<>();
     private final Set<String> additionalResourceDirectories = new HashSet<>();
-    private Consumer<ClassLoader> actionOnMuleArtifactClassloader;
+    private Consumer<ClassLoader> actionOnMuleArtifactDeployment;
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -201,12 +201,12 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
      *
      * @since 4.7.0
      *
-     * @param actionOnMuleArtifactClassloader the action to be performed.
+     * @param actionOnMuleArtifactDeployment the action to be performed.
      *
      * @return the current builder.
      */
-    public Builder withActionOnMuleArtifactClassloader(Consumer<ClassLoader> actionOnMuleArtifactClassloader) {
-      this.actionOnMuleArtifactClassloader = actionOnMuleArtifactClassloader;
+    public Builder withActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+      this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
       return this;
     }
 
@@ -228,7 +228,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
       try {
         return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor,
-                                                 memoryManagementService, actionOnMuleArtifactClassloader);
+                                                 memoryManagementService, actionOnMuleArtifactDeployment);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
@@ -248,7 +248,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                         ModuleRepository moduleRepository,
                                         ArtifactConfigurationProcessor artifactConfigurationProcessor,
                                         ProfiledMemoryManagementService memoryManagementService,
-                                        Consumer<ClassLoader> actionOnMuleArtifactClassloader)
+                                        Consumer<ClassLoader> actionOnMuleArtifactDeployment)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
     super(null);
@@ -347,7 +347,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,
                                                        artifactConfigurationProcessor,
-                                                       actionOnMuleArtifactClassloader);
+                                                       actionOnMuleArtifactDeployment);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
