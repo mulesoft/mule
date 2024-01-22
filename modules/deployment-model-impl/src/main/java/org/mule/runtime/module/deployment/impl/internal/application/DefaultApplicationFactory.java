@@ -122,6 +122,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(memoryManagementService != null, "memoryManagementService cannot be null");
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
+    checkArgument(actionOnMuleArtifactDeployment != null, "actionOnMuleArtifactDeployment cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
