@@ -17,8 +17,10 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
@@ -26,7 +28,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
@@ -61,6 +62,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
   private ApplicationContext applicationContext;
   private RegistrationDelegate registrationDelegate;
   private boolean readOnly;
+
+  private final Object stopOrDisposeLock = new Object();
 
   // This is used to track the Spring context lifecycle since there is no way to confirm the
   // lifecycle phase from the application context
@@ -302,6 +305,16 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     getLifecycleManager().applyPhase(object, startPhase, toPhase);
   }
 
+  @Override
+  public synchronized void fireLifecycle(String phase) throws LifecycleException {
+    if (Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase)) {
+      // Avoid trying to register objects while the registry is being shut down.
+      synchronized (stopOrDisposeLock) {
+        super.fireLifecycle(phase);
+      }
+    }
+  }
+
   protected final <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
       throws LifecycleException {
     applicationContext.getBeanFactory().autowireBean(object);
@@ -418,7 +431,10 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
-        getMuleContext().withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+        // Avoid trying to register objects while the registry is being shut down.
+        synchronized (stopOrDisposeLock) {
+          doRegisterObject(key, value);
+        }
       } catch (RuntimeException e) {
         Throwable cause = e.getCause();
         if (cause instanceof RegistrationException) {
