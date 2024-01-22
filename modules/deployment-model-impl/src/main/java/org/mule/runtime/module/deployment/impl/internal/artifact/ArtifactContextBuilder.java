@@ -24,6 +24,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -587,10 +588,12 @@ public class ArtifactContextBuilder {
    *
    * @param actionOnMuleArtifactDeployment the {@link ClassLoader} used in the deployment process.
    *
+   * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
+   *
    * @return this builder.
    */
   public ArtifactContextBuilder setActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
-    checkArgument(actionOnMuleArtifactDeployment != null, ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
+    requireNonNull(actionOnMuleArtifactDeployment, ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
     this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
     return this;
   }
