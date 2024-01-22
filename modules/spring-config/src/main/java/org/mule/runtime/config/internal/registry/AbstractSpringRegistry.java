@@ -312,6 +312,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
       synchronized (stopOrDisposeLock) {
         super.fireLifecycle(phase);
       }
+    } else {
+      super.fireLifecycle(phase);
     }
   }
 
