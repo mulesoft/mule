@@ -76,7 +76,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final LicenseValidator licenseValidator;
-  private final Consumer<ClassLoader> applicationClassloaderConsumer;
+  private final Consumer<ClassLoader> actionOnMuleArtifactClassloader;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
@@ -109,7 +109,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    LockFactory runtimeLockFactory,
                                    MemoryManagementService memoryManagementService,
                                    ArtifactConfigurationProcessor artifactConfigurationProcessor,
-                                   Consumer<ClassLoader> applicationClassloaderConsumer) {
+                                   Consumer<ClassLoader> actionOnMuleArtifactClassloader) {
     super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
@@ -131,7 +131,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.licenseValidator = licenseValidator;
-    this.applicationClassloaderConsumer = applicationClassloaderConsumer;
+    this.actionOnMuleArtifactClassloader = actionOnMuleArtifactClassloader;
   }
 
   @Override
@@ -211,7 +211,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
                                    new ArtifactMemoryManagementService(getMemoryManagementService()),
                                    getArtifactConfigurationProcessor(),
-                                   applicationClassloaderConsumer);
+                                   actionOnMuleArtifactClassloader);
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);

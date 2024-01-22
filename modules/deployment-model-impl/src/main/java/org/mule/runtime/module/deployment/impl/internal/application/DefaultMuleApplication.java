@@ -101,7 +101,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final MemoryManagementService memoryManagementService;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
-  private final Consumer<ClassLoader> applicationClassloaderConsumer;
+  private final Consumer<ClassLoader> actionOnMuleArtifactClassloader;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
@@ -138,7 +138,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 LockFactory runtimeLockFactory,
                                 MemoryManagementService memoryManagementService,
                                 ArtifactConfigurationProcessor artifactConfigurationProcessor,
-                                Consumer<ClassLoader> applicationClassloaderConsumer) {
+                                Consumer<ClassLoader> actionOnMuleArtifactClassloader) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -152,7 +152,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.memoryManagementService = memoryManagementService;
     this.expressionLanguageMetadataService = getExpressionLanguageMetadataService(serviceRepository);
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
-    this.applicationClassloaderConsumer = applicationClassloaderConsumer;
+    this.actionOnMuleArtifactClassloader = actionOnMuleArtifactClassloader;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -273,7 +273,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins)
               .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setApplicationClassloaderConsumer(applicationClassloaderConsumer)
+              .setActionOnMuleArtifactClassloader(actionOnMuleArtifactClassloader)
               .setEnableLazyInit(lazy)
               .setDisableXmlValidations(disableXmlValidations)
               .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
