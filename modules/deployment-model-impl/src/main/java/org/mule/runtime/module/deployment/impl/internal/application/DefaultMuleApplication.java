@@ -124,7 +124,8 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 ArtifactConfigurationProcessor artifactConfigurationProcessor) {
     this(descriptor, deploymentClassLoader, artifactPlugins, domainRepository, serviceRepository, extensionModelLoaderRepository,
          location, classLoaderRepository, applicationPolicyProvider, runtimeLockFactory, memoryManagementService,
-         artifactConfigurationProcessor, null);
+         artifactConfigurationProcessor, cl -> {
+         });
 
   }
 
@@ -273,7 +274,6 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins)
               .setExecutionClassloader(deploymentClassLoader.getClassLoader())
-              .setActionOnMuleArtifactDeployment(actionOnMuleArtifactDeployment)
               .setEnableLazyInit(lazy)
               .setDisableXmlValidations(disableXmlValidations)
               .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)

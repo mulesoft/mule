@@ -27,8 +27,6 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
   private LoggerContext loggerContext;
 
-  private boolean reconfigured;
-
   public ApplicationReconfigurableLoggerContextSelector() {
     // The logger context is created with no logging separation.
     // This will guarantee that by default this will work as no separation in logs.

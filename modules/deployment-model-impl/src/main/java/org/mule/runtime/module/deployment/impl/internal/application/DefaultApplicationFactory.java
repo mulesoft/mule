@@ -93,7 +93,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this(applicationClassLoaderBuilderFactory, deployableArtifactDescriptorFactory, domainRepository, serviceRepository,
          extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
          pluginDependenciesResolver, licenseValidator, runtimeLockFactory, memoryManagementService,
-         artifactConfigurationProcessor, null);
+         artifactConfigurationProcessor, cl -> {
+         });
 
   }
 
