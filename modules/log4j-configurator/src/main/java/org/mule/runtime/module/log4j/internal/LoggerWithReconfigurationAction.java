@@ -22,13 +22,13 @@ import org.apache.logging.log4j.util.Supplier;
  */
 class LoggerWithReconfigurationAction extends Logger {
 
-  private final LoggerReconfigurationAction onLoggingAction;
+  private final LoggerReconfigurationAction reconfigurationAction;
   private boolean reconfigured;
 
   public LoggerWithReconfigurationAction(LoggerContext ctx, String name, MessageFactory messageFactory,
-                                         LoggerReconfigurationAction onLoggingAction) {
+                                         LoggerReconfigurationAction reconfigurationAction) {
     super(ctx, name, messageFactory);
-    this.onLoggingAction = onLoggingAction;
+    this.reconfigurationAction = reconfigurationAction;
   }
 
   @Override
@@ -152,8 +152,8 @@ class LoggerWithReconfigurationAction extends Logger {
   }
 
   private void reconfigureIfNeeded() {
-    if (reconfigured) {
-      reconfigured = onLoggingAction.reconfigure();
+    if (!reconfigured) {
+      reconfigured = reconfigurationAction.reconfigure();
     }
   }
 }
