@@ -63,10 +63,9 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
       // We change the configuration for the logger context.
       containerLoggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
 
+      // This is needed so that the configuration set is reconfigured.
       containerLoggerContext.reconfigure();
 
-      // This is needed so that the configuration set is reconfigured.
-      containerLoggerContext = applicationClassLoaderLoggerContext;
       reconfigured = true;
     }
   }
