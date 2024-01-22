@@ -175,7 +175,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
 
-    initialize();
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
     this.graph = generateFor(getApplicationModel());
@@ -510,6 +509,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
       initializationRequest.validateRequestedAst(this::validateModel);
       ArtifactAst minimalAst = initializationRequest.getFilteredAstToInitialize();
+
+      initialize();
 
       initializationRequest.getLocation()
           .ifPresent(location -> validateRequestedComponentExists(location, minimalAst));
