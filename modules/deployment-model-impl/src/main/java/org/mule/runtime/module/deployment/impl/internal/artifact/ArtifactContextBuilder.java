@@ -98,6 +98,8 @@ public class ArtifactContextBuilder {
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
   protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
 
+  protected static final String ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL = "actionOnMuleArtifactDeployment cannot be null";
+
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
   private ArtifactConfigurationProcessor artifactConfigurationProcessor;
@@ -127,7 +129,7 @@ public class ArtifactContextBuilder {
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
-  private Consumer<ClassLoader> actionOnMuleArtifactClassloader = cl -> {
+  private Consumer<ClassLoader> actionOnMuleArtifactDeployment = cl -> {
   };
 
   private ArtifactContextBuilder() {}
@@ -438,7 +440,7 @@ public class ArtifactContextBuilder {
                ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
-        actionOnMuleArtifactClassloader.accept(executionClassLoader);
+        actionOnMuleArtifactDeployment.accept(executionClassLoader);
         List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
@@ -580,8 +582,16 @@ public class ArtifactContextBuilder {
     return this;
   }
 
-  public ArtifactContextBuilder setActionOnMuleArtifactClassloader(Consumer<ClassLoader> actionOnMuleArtifactClassloader) {
-    this.actionOnMuleArtifactClassloader = actionOnMuleArtifactClassloader;
+  /**
+   * An action to be performed on the artifact deployment.
+   *
+   * @param actionOnMuleArtifactDeployment the {@link ClassLoader} used in the deployment process.
+   *
+   * @return this builder.
+   */
+  public ArtifactContextBuilder setActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+    checkArgument(actionOnMuleArtifactDeployment != null, ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
+    this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
     return this;
   }
 }

@@ -107,7 +107,7 @@ public class DefaultMuleContainer implements MuleContainer {
       new ApplicationReconfigurableLoggerContextSelector();
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
-      .withActionOnMuleArtifactClassloader(getActionOnMuleArtifactClassloader())
+      .withActionOnMuleArtifactDeployment(getActionOnMuleArtifactClassloader())
       .build();
 
   private static MuleLog4jContextFactory log4jContextFactory;
@@ -120,13 +120,13 @@ public class DefaultMuleContainer implements MuleContainer {
       } else {
         log4jContextFactory = createAndInstall();
       }
-
-      if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
-        configureSelector(log4jContextFactory, SINGLE_APP_CONTEXT_SELECTOR);
-      }
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
+
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      configureSelector(log4jContextFactory, SINGLE_APP_CONTEXT_SELECTOR);
+    }
   }
 
   private final ServiceManager serviceManager;
