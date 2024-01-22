@@ -35,7 +35,7 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null, false);
+    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
   }
 
   /**
@@ -46,24 +46,7 @@ public final class MuleLog4jConfiguratorUtils {
    * @param logSeparationEnabled boolean determining which context selector should be used.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled) {
-    configureSelector(contextFactory, logSeparationEnabled, false);
-  }
-
-  /**
-   * Depending on the given {@code logSeparationEnabled} parameter, it sets an {@link ArtifactAwareContextSelector} or a
-   * {@link SimpleContextSelector} to the given {@code contextFactory}.
-   *
-   * @param contextFactory                      the {@link MuleLog4jContextFactory} where the selector will be set.
-   * @param logSeparationEnabled                boolean determining which context selector should be used.
-   * @param reconfigureAccordingToAppDeployment boolean determining if the context will be reconfigured once an application is
-   *                                            deployed.
-   */
-  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean logSeparationEnabled,
-                                       boolean reconfigureAccordingToAppDeployment) {
-    if (reconfigureAccordingToAppDeployment) {
-      contextFactory.setContextSelector(new ApplicationReconfigurableLoggerContextSelector(),
-                                        MuleLog4jConfiguratorUtils::disposeIfDisposable);
-    } else if (logSeparationEnabled) {
+    if (logSeparationEnabled) {
       contextFactory.setContextSelector(new ArtifactAwareContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
     } else {
       contextFactory.setContextSelector(new SimpleContextSelector(), MuleLog4jConfiguratorUtils::disposeIfDisposable);
