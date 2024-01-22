@@ -9,12 +9,10 @@ package org.mule.runtime.module.log4j.internal;
 import static org.mule.runtime.deployment.model.internal.artifact.CompositeClassLoaderArtifactFinder.findClassLoader;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
-import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
-import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -43,32 +41,7 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
     // The container logger context is created with no logging separation.
     // This will guarantee that by default this will work as no separation in logs.
     this.containerLoggerContext =
-        this.loggerContextFactory.build(SYSTEM_CLASSLOADER, this, false, this::applicationLoggerReconfigure);
-  }
-
-  private boolean applicationLoggerReconfigure() {
-    if (!reconfigured && currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
-      ClassLoader classloader = getLoggerClassLoader(currentThread().getContextClassLoader());
-
-      LoggerContext applicationClassLoaderLoggerContext = this.loggerContextFactory
-          .build(classloader, this, true);
-
-      applicationClassLoaderLoggerContext.reconfigure();
-
-      // We reconfigure the loggers that were already provided to get the app log4j configuration.
-      containerLoggerContext.updateLoggers(applicationClassLoaderLoggerContext.getConfiguration());
-
-      // We change the configuration for the logger context. This only sets the configuration.
-      containerLoggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
-
-      // This is needed so that the configuration set is reconfigured.
-      containerLoggerContext.reconfigure();
-
-      containerLoggerContext = applicationClassLoaderLoggerContext;
-
-      reconfigured = true;
-    }
-    return reconfigured;
+        this.loggerContextFactory.build(SYSTEM_CLASSLOADER, this, false);
   }
 
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext) {
@@ -114,5 +87,23 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
 
   private static boolean isRegionClassLoaderMember(ClassLoader classLoader) {
     return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
+  }
+
+  public void reconfigureAccordingToClassloader(ClassLoader classloader) {
+    LoggerContext applicationClassLoaderLoggerContext = this.loggerContextFactory
+        .build(classloader, this, true);
+
+    applicationClassLoaderLoggerContext.reconfigure();
+
+    // We reconfigure the loggers that were already provided to get the app log4j configuration.
+    containerLoggerContext.updateLoggers(applicationClassLoaderLoggerContext.getConfiguration());
+
+    // We change the configuration for the logger context. This only sets the configuration.
+    containerLoggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
+
+    // This is needed so that the configuration set is reconfigured.
+    containerLoggerContext.reconfigure();
+
+    containerLoggerContext = applicationClassLoaderLoggerContext;
   }
 }

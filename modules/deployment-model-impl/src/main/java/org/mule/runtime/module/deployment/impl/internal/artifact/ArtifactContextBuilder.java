@@ -75,6 +75,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
@@ -126,6 +127,8 @@ public class ArtifactContextBuilder {
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
+  private Consumer<ClassLoader> applicationClassloaderConsumer = cl -> {
+  };
 
   private ArtifactContextBuilder() {}
 
@@ -435,6 +438,7 @@ public class ArtifactContextBuilder {
                ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
+        applicationClassloaderConsumer.accept(executionClassLoader);
         List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
@@ -573,6 +577,11 @@ public class ArtifactContextBuilder {
 
   public ArtifactContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+    return this;
+  }
+
+  public ArtifactContextBuilder setApplicationClassloaderConsumer(Consumer<ClassLoader> applicationClassloaderConsumer) {
+    this.applicationClassloaderConsumer = applicationClassloaderConsumer;
     return this;
   }
 }

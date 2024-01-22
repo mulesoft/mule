@@ -9,7 +9,6 @@ package org.mule.runtime.module.launcher;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SIMPLE_LOG;
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
@@ -66,6 +65,7 @@ import org.mule.runtime.module.launcher.coreextension.MuleCoreExtensionManagerSe
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.launcher.splash.MuleContainerStartupSplashScreen;
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
+import org.mule.runtime.module.log4j.internal.ApplicationReconfigurableLoggerContextSelector;
 import org.mule.runtime.module.repository.api.RepositoryService;
 import org.mule.runtime.module.repository.internal.RepositoryServiceFactory;
 import org.mule.runtime.module.service.api.manager.ServiceManager;
@@ -101,9 +101,14 @@ public class DefaultMuleContainer implements MuleContainer {
   private final MuleCoreExtensionManagerServer coreExtensionManager;
   private final TroubleshootingService troubleshootingService;
   private ServerLockFactory muleLockFactory;
+
+  private static ApplicationReconfigurableLoggerContextSelector SINGLE_APP_CONTEXT_SELECTOR =
+      new ApplicationReconfigurableLoggerContextSelector();
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
+      .withOnApplicationRegisterAction(classloader -> SINGLE_APP_CONTEXT_SELECTOR.reconfigureAccordingToClassloader(classloader))
       .build();
+
   private static MuleLog4jContextFactory log4jContextFactory;
 
   static {
@@ -114,8 +119,10 @@ public class DefaultMuleContainer implements MuleContainer {
       } else {
         log4jContextFactory = createAndInstall();
       }
-      configureSelector(log4jContextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null,
-                        getBoolean(SINGLE_APP_MODE_PROPERTY));
+
+      if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+        configureSelector(log4jContextFactory, SINGLE_APP_CONTEXT_SELECTOR);
+      }
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);

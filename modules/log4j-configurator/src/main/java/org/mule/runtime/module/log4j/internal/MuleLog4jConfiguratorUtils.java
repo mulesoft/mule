@@ -70,6 +70,10 @@ public final class MuleLog4jConfiguratorUtils {
     }
   }
 
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
+    contextFactory.setContextSelector(contextSelector, MuleLog4jConfiguratorUtils::disposeIfDisposable);
+  }
+
   private static void disposeIfDisposable(ContextSelector selector) {
     if (selector instanceof Disposable) {
       ((Disposable) selector).dispose();
