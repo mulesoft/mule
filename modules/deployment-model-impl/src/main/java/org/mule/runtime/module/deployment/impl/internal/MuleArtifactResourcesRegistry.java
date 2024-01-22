@@ -24,8 +24,8 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.A
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
-import static java.util.Objects.requireNonNull;
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
