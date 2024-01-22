@@ -228,7 +228,7 @@
 
         <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.12.0</allure.maven.plugin.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.11</jacoco.version>
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
