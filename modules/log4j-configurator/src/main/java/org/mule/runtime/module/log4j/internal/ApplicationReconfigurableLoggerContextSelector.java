@@ -89,7 +89,7 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
     return !(classLoader instanceof RegionClassLoader) && classLoader.getParent() instanceof RegionClassLoader;
   }
 
-  public void reconfigureAccordingToClassloader(ClassLoader classloader) {
+  public void reconfigureAccordingToAppClassloader(ClassLoader classloader) {
     LoggerContext applicationClassLoaderLoggerContext = this.loggerContextFactory
         .build(classloader, this, true);
 

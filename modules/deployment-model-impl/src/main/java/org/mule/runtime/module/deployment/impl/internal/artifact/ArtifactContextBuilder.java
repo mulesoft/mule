@@ -127,7 +127,7 @@ public class ArtifactContextBuilder {
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
-  private Consumer<ClassLoader> applicationClassloaderConsumer = cl -> {
+  private Consumer<ClassLoader> actionOnMuleArtifactClassloader = cl -> {
   };
 
   private ArtifactContextBuilder() {}
@@ -438,7 +438,7 @@ public class ArtifactContextBuilder {
                ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
-        applicationClassloaderConsumer.accept(executionClassLoader);
+        actionOnMuleArtifactClassloader.accept(executionClassLoader);
         List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
@@ -580,8 +580,8 @@ public class ArtifactContextBuilder {
     return this;
   }
 
-  public ArtifactContextBuilder setApplicationClassloaderConsumer(Consumer<ClassLoader> applicationClassloaderConsumer) {
-    this.applicationClassloaderConsumer = applicationClassloaderConsumer;
+  public ArtifactContextBuilder setActionOnMuleArtifactClassloader(Consumer<ClassLoader> actionOnMuleArtifactClassloader) {
+    this.actionOnMuleArtifactClassloader = actionOnMuleArtifactClassloader;
     return this;
   }
 }

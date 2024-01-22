@@ -106,7 +106,8 @@ public class DefaultMuleContainer implements MuleContainer {
       new ApplicationReconfigurableLoggerContextSelector();
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
-      .withOnApplicationRegisterAction(classloader -> SINGLE_APP_CONTEXT_SELECTOR.reconfigureAccordingToClassloader(classloader))
+      .withActionOnMuleArtifactClassloader(classloader -> SINGLE_APP_CONTEXT_SELECTOR
+          .reconfigureAccordingToAppClassloader(classloader))
       .build();
 
   private static MuleLog4jContextFactory log4jContextFactory;
