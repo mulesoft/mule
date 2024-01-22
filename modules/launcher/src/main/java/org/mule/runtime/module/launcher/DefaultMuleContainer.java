@@ -126,11 +126,11 @@ public class DefaultMuleContainer implements MuleContainer {
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
   }
 
-  private static void configureContextFactory(MuleLog4jContextFactory log4jContextFactory) {
+  public static void configureContextFactory(MuleLog4jContextFactory log4jContextFactory) {
     if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
       configureSelector(log4jContextFactory, SINGLE_APP_CONTEXT_SELECTOR);
     } else {
-      configureContextFactory(log4jContextFactory);
+      configureSelector(log4jContextFactory);
     }
   }
 
