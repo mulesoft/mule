@@ -59,7 +59,7 @@ public class MuleLoggerContextFactory {
    * @return the {@link LoggerContext} built.
    */
   public LoggerContext build(final ClassLoader classLoader, final ContextSelector selector, boolean logSeparationEnabled,
-                             final Runnable onLoggingAction) {
+                             final LoggerReconfigurationAction onLoggingAction) {
     NewContextParameters parameters = resolveContextParameters(classLoader);
     if (parameters == null) {
       return getDefaultContext(selector, logSeparationEnabled);

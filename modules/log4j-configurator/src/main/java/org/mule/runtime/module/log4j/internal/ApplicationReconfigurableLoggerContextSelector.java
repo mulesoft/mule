@@ -37,8 +37,6 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();
   private LoggerContext containerLoggerContext;
 
-
-  private LoggerContext applicationClassLoaderLoggerContext;
   private boolean reconfigured;
 
   public ApplicationReconfigurableLoggerContextSelector() {
@@ -48,11 +46,11 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
         this.loggerContextFactory.build(SYSTEM_CLASSLOADER, this, false, this::applicationLoggerReconfigure);
   }
 
-  private void applicationLoggerReconfigure() {
+  private boolean applicationLoggerReconfigure() {
     if (!reconfigured && currentThread().getContextClassLoader() instanceof MuleApplicationClassLoader) {
       ClassLoader classloader = getLoggerClassLoader(currentThread().getContextClassLoader());
 
-      applicationClassLoaderLoggerContext = this.loggerContextFactory
+      LoggerContext applicationClassLoaderLoggerContext = this.loggerContextFactory
           .build(classloader, this, true);
 
       applicationClassLoaderLoggerContext.reconfigure();
@@ -60,31 +58,21 @@ public class ApplicationReconfigurableLoggerContextSelector implements ContextSe
       // We reconfigure the loggers that were already provided to get the app log4j configuration.
       containerLoggerContext.updateLoggers(applicationClassLoaderLoggerContext.getConfiguration());
 
-      // We change the configuration for the logger context.
+      // We change the configuration for the logger context. This only sets the configuration.
       containerLoggerContext.reconfigure(applicationClassLoaderLoggerContext.getConfiguration());
 
       // This is needed so that the configuration set is reconfigured.
       containerLoggerContext.reconfigure();
 
+      containerLoggerContext = applicationClassLoaderLoggerContext;
+
       reconfigured = true;
     }
+    return reconfigured;
   }
 
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext) {
-    if (applicationClassLoaderLoggerContext != null) {
-      return applicationClassLoaderLoggerContext;
-    }
-
-    ClassLoader classloader = getLoggerClassLoader(loader);
-
-    if (classloader == SYSTEM_CLASSLOADER) {
-      return containerLoggerContext;
-    }
-
-    applicationClassLoaderLoggerContext = this.loggerContextFactory
-        .build(classloader, this, true);
-
-    return applicationClassLoaderLoggerContext;
+    return containerLoggerContext;
   }
 
   public LoggerContext getContext(String fqcn, ClassLoader loader, boolean currentContext, URI configLocation) {
