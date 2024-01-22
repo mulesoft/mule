@@ -140,8 +140,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   @Test
   public void buildWithActionOnMuleArtifactDeployment() throws Exception {
     expectedException.expectMessage(ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
-    newBuilder().setActionOnMuleArtifactDeployment(cl -> {
-    }).build();
+    newBuilder().setActionOnMuleArtifactDeployment(null).build();
   }
 
   @Test
