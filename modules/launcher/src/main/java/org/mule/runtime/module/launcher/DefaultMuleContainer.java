@@ -451,7 +451,7 @@ public class DefaultMuleContainer implements MuleContainer {
     return artifactResourcesRegistry.getContainerClassLoader();
   }
 
-  private Consumer<ClassLoader> getActionOnMuleArtifactClassloader() {
+  public static Consumer<ClassLoader> getActionOnMuleArtifactClassloader() {
     if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
       return classloader -> SINGLE_APP_CONTEXT_SELECTOR
           .reconfigureAccordingToAppClassloader(classloader);

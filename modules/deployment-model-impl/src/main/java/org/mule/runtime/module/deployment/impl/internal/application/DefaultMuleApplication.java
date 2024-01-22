@@ -274,6 +274,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins)
               .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+              .setActionOnMuleArtifactDeployment(actionOnMuleArtifactDeployment)
               .setEnableLazyInit(lazy)
               .setDisableXmlValidations(disableXmlValidations)
               .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)

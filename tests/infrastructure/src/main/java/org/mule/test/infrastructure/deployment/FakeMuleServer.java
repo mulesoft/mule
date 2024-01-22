@@ -11,6 +11,7 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.newDefaultMemoryManagementService;
@@ -65,6 +66,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 public class FakeMuleServer {
 
@@ -103,19 +105,26 @@ public class FakeMuleServer {
     this(muleHomePath, new LinkedList<>());
   }
 
-  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
+  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions) {
+    this(muleHomePath, initialCoreExtensions, cl -> {
+    });
+  }
+
+  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions,
+                        Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
+        .withActionOnMuleArtifactDeployment(actionOnMuleArtifactDeployment)
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     extensionModelLoaderRepository = muleArtifactResourcesRegistry.getExtensionModelLoaderRepository();
 
-    this.coreExtensions = intialCoreExtensions;
+    this.coreExtensions = initialCoreExtensions;
     for (MuleCoreExtension extension : coreExtensions) {
       extension.setContainerClassLoader(containerClassLoader);
     }

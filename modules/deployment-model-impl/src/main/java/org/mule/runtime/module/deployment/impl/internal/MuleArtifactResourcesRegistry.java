@@ -24,6 +24,7 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.A
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
+import static java.util.Objects.requireNonNull;
 import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -143,7 +144,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ProfiledMemoryManagementService memoryManagementService;
     private final Set<String> bootPackages = new HashSet<>();
     private final Set<String> additionalResourceDirectories = new HashSet<>();
-    private Consumer<ClassLoader> actionOnMuleArtifactDeployment;
+    private Consumer<ClassLoader> actionOnMuleArtifactDeployment = cl -> {
+    };
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -206,6 +208,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
      * @return the current builder.
      */
     public Builder withActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+      requireNonNull(actionOnMuleArtifactDeployment);
       this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
       return this;
     }
