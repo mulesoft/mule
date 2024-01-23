@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.jetbrains.annotations.NotNull;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -40,6 +39,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -69,22 +69,24 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     singleAppDeploymentService.deploy(ARCHIVE_URI);
   }
 
-  @NotNull
   private static SingleAppDeploymentService getSingleAppDeploymentService() {
     DomainArchiveDeployer appDomainDeployer = mock(DomainArchiveDeployer.class);
     SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder = mockSingleAppDomainDeployerBuilder(appDomainDeployer);
     SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = mockSingleAppApplicationDeployerBuilder();
     DefaultArchiveDeployer archiveDeployer = mock(DefaultArchiveDeployer.class);
     when(singleAppApplicationDeployerBuilder.build()).thenReturn(archiveDeployer);
-    List<Domain> domains = mock(List.class);
-    List<Application> applications = mock(List.class);
-    when(applications.isEmpty()).thenReturn(false);
+    List<Domain> domains = new ArrayList<>();
+    List<Application> applications = new ArrayList<>();
+    Application application = mock(Application.class);
+    applications.add(application);
     DeploymentFileResolver fileResolver = mock(DeploymentFileResolver.class);
     SchedulerService schedulerService = mock(SchedulerService.class);
     SingleAppDeploymentService singleAppDeploymentService =
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
+                                       applications,
+                                       domains,
                                        () -> schedulerService);
     return singleAppDeploymentService;
   }
@@ -96,9 +98,8 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = mockSingleAppApplicationDeployerBuilder();
     DefaultArchiveDeployer archiveDeployer = mock(DefaultArchiveDeployer.class);
     when(singleAppApplicationDeployerBuilder.build()).thenReturn(archiveDeployer);
-    List<Domain> domains = mock(List.class);
-    List<Application> applications = mock(List.class);
-    when(applications.isEmpty()).thenReturn(true);
+    List<Domain> domains = new ArrayList<>();
+    List<Application> applications = new ArrayList<>();
     DeploymentFileResolver fileResolver = mock(DeploymentFileResolver.class);
     File file = mock(File.class);
     when(file.getName()).thenReturn("test.jar");
@@ -109,6 +110,8 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
+                                       applications,
+                                       domains,
                                        () -> schedulerService);
 
     singleAppDeploymentService.deploy(ARCHIVE_URI);
@@ -122,9 +125,8 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = mockSingleAppApplicationDeployerBuilder();
     DefaultArchiveDeployer archiveDeployer = mock(DefaultArchiveDeployer.class);
     when(singleAppApplicationDeployerBuilder.build()).thenReturn(archiveDeployer);
-    List<Domain> domains = mock(List.class);
-    List<Application> applications = mock(List.class);
-    when(applications.isEmpty()).thenReturn(true);
+    List<Domain> domains = new ArrayList<>();
+    List<Application> applications = new ArrayList<>();
     DeploymentFileResolver fileResolver = mock(DeploymentFileResolver.class);
     File file = mock(File.class);
     when(file.getName()).thenReturn("test.jar");
@@ -136,6 +138,8 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
+                                       applications,
+                                       domains,
                                        () -> schedulerService);
 
     Consumer<Throwable> failConsumer = mock(Consumer.class);

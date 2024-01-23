@@ -75,6 +75,7 @@ import org.mule.runtime.module.troubleshooting.internal.DefaultTroubleshootingSe
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -160,6 +161,8 @@ public class DefaultMuleContainer implements MuleContainer {
       return new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                             singleAppApplicationDeployerBuilder,
                                             new SingleAppDeploymentFileResolver(),
+              Collections.emptyList(),
+                                            Collections.emptyList(),
                                             () -> findSchedulerService(serviceManager));
     } else {
       return new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),

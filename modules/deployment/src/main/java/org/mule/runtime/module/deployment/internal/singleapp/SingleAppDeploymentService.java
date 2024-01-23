@@ -95,7 +95,11 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   public SingleAppDeploymentService(SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder,
                                     SingleAppApplicationDeployerBuilder applicationDeployerBuilder,
                                     DeploymentFileResolver fileResolver,
+                                    List<Application> applications,
+                                    List<Domain> domains,
                                     Supplier<SchedulerService> artifactStartExecutorSupplier) {
+    this.applications.addAll(applications);
+    this.domains.addAll(domains);
     this.fileResolver = fileResolver;
     this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
 
@@ -295,6 +299,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
       });
 
       this.deploymentDirectoryWatcher.start();
+      notifyStartupListeners();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error on starting single app mode"), e);
     }
