@@ -245,6 +245,8 @@
             -Dfile.encoding=UTF-8
             -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'${surefire.additional.jacoco.args}
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=net.bytebuddy.agent
         </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
         <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
