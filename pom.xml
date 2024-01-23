@@ -257,7 +257,7 @@
             -XX:+IgnoreUnrecognizedVMOptions
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
