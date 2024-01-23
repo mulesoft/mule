@@ -204,8 +204,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
      * @since 4.7.0
      *
      * @param actionOnMuleArtifactDeployment the action to be performed.
-     *
      * @return the current builder.
+     * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
      */
     public Builder withActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
       requireNonNull(actionOnMuleArtifactDeployment);

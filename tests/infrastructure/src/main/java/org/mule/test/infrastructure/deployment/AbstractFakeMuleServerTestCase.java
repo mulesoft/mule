@@ -137,7 +137,8 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
   }
 
   protected Consumer<ClassLoader> getActionOnMuleArtifactDeployment() {
-    return cl -> {};
+    return cl -> {
+    };
   }
 
 }
