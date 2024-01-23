@@ -273,10 +273,6 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   @Override
   public void start() {
     try {
-      // We only start the default domain
-      domainDeployer.deployExplodedArtifact("default", empty());
-      notifyStartupListeners();
-
       this.deploymentDirectoryWatcher =
           new DeploymentDirectoryWatcher(new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
                                                                          applicationDeployer, applications,
@@ -287,7 +283,8 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
                                          domains,
                                          applications,
                                          artifactStartExecutorSupplier,
-                                         deploymentLock);
+                                         deploymentLock,
+                                         false);
 
       applicationDeploymentListener.addDeploymentListener(new DeploymentListener() {
 

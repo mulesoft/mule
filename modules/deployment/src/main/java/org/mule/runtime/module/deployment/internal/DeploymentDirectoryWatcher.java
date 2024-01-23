@@ -98,6 +98,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
+  private final boolean disposeArtifactsOnStop;
   private Scheduler artifactDirMonitorScheduler;
 
   protected volatile boolean dirty;
@@ -108,6 +109,18 @@ public class DeploymentDirectoryWatcher implements Runnable {
                                     ObservableList<Domain> domains,
                                     ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
                                     final ReentrantLock deploymentLock) {
+    this(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications, schedulerServiceSupplier,
+         deploymentLock, true);
+  }
+
+  public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                    final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                    final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
+                                    ObservableList<Domain> domains,
+                                    ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
+                                    final ReentrantLock deploymentLock,
+                                    boolean disposeArtifactsOnStop) {
+    this.disposeArtifactsOnStop = disposeArtifactsOnStop;
     this.domainBundleDeployer = domainBundleDeployer;
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
@@ -198,12 +211,14 @@ public class DeploymentDirectoryWatcher implements Runnable {
     stopAppDirMonitorTimer();
 
     deploymentLock.lock();
-    try {
-      notifyStopListeners();
-      stopArtifacts(applications);
-      stopArtifacts(domains);
-    } finally {
-      deploymentLock.unlock();
+    if (disposeArtifactsOnStop) {
+      try {
+        notifyStopListeners();
+        stopArtifacts(applications);
+        stopArtifacts(domains);
+      } finally {
+        deploymentLock.unlock();
+      }
     }
   }
 
