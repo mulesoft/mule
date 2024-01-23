@@ -190,7 +190,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
     AtomicReference<CoreEvent> resultRef = new AtomicReference<>();
     final Consumer<Exception> router = onErrorContinueHandler
-        .router(pub -> Flux.from(pub).subscriberContext(contextPropagationChecker.contextPropagationFlag()),
+        .router(pub -> Flux.from(pub)
+            .contextWrite(contextPropagationChecker.contextPropagationFlag()),
                 e -> resultRef.set(e),
                 t -> {
                   throw new MuleRuntimeException(t);

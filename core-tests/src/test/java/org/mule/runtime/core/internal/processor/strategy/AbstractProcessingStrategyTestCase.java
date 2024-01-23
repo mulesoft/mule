@@ -1031,7 +1031,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       Flux<CoreEvent> schedulerTrackingPublisher = from(publisher)
-          .doOnEach(signal -> signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+          .doOnEach(signal -> signal.getContextView().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
               .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName())));
 
       if (getProcessingType() == CPU_LITE_ASYNC) {

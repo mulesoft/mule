@@ -894,12 +894,12 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> p) {
           return Flux.from(p)
-              .subscriberContext(ctx -> {
+              .contextWrite(ctx -> {
                 ctx.get("key");
                 return ctx;
               })
               .transform(finalInnerChain)
-              .subscriberContext(ctx -> {
+              .contextWrite(ctx -> {
                 ctx.get("key");
                 return ctx;
               });
@@ -928,7 +928,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
         public org.reactivestreams.Publisher<CoreEvent> apply(org.reactivestreams.Publisher<CoreEvent> p) {
           return Flux.from(p)
               .transform(finalOuterChain)
-              .subscriberContext(ctx -> ctx.put("key", "value"));
+              .contextWrite(ctx -> ctx.put("key", "value"));
         };
       };
 

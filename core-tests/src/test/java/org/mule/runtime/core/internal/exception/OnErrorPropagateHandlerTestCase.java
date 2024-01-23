@@ -65,6 +65,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,7 +75,6 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
@@ -268,7 +268,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     AtomicReference<Throwable> thownRef = new AtomicReference<>();
     final Consumer<Exception> router = onErrorPropagateHandler
         .router(pub -> Flux.from(pub)
-            .subscriberContext(contextPropagationChecker.contextPropagationFlag()),
+            .contextWrite(contextPropagationChecker.contextPropagationFlag()),
                 e -> {
                 },
                 thownRef::set);

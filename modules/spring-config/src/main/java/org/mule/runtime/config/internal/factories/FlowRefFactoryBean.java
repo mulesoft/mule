@@ -73,6 +73,11 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
@@ -84,11 +89,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -322,7 +322,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       final ReactiveProcessor resolvedReferencedProcessor = resolvedReferencedProcessorSupplier.get();
 
       Flux<CoreEvent> pub = from(publisher)
-          .subscriberContext(clearCurrentFlowRefFromCycleDetection());
+          .contextWrite(clearCurrentFlowRefFromCycleDetection());
 
       if (target != null) {
         pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
@@ -386,7 +386,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Publisher<CoreEvent> decoratePublisher(Flux<CoreEvent> pub) {
       pub = pub
-          .subscriberContext(checkAndMarkCurrentFlowRefForCycleDetection());
+          .contextWrite(checkAndMarkCurrentFlowRefForCycleDetection());
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
@@ -539,7 +539,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         // If the resolved target is not a flow, it should be a subflow
         return Mono.just(event).transform(resolvedTarget)
             // This is needed for all cases because of the way that flow-ref invokes flows dynamically
-            .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true));
+            .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true));
       }
     }
 

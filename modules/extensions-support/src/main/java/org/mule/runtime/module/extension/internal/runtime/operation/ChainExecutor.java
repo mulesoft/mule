@@ -57,7 +57,7 @@ class ChainExecutor {
             this.handleError(error, event, errorHandler);
           }
         })
-        .subscriberContext(innerChainCtxMapping)
+        .contextWrite(innerChainCtxMapping)
         .subscribe();
   }
 
