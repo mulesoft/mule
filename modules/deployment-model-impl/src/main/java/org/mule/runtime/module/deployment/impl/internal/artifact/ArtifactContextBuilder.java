@@ -587,10 +587,8 @@ public class ArtifactContextBuilder {
    * An action to be performed on the artifact deployment.
    *
    * @param actionOnMuleArtifactDeployment the {@link ClassLoader} used in the deployment process.
-   *
-   * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
-   *
    * @return this builder.
+   * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
    */
   public ArtifactContextBuilder setActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
     requireNonNull(actionOnMuleArtifactDeployment, ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
