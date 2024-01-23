@@ -160,8 +160,7 @@ public class DefaultMuleContainer implements MuleContainer {
       return new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                             singleAppApplicationDeployerBuilder,
                                             new SingleAppDeploymentFileResolver(),
-                                            new ArrayList<>(),
-                                            new ArrayList<>());
+                                            () -> findSchedulerService(serviceManager));
     } else {
       return new MuleDeploymentService(artifactResourcesRegistry.getDomainFactory(),
                                        artifactResourcesRegistry.getApplicationFactory(),

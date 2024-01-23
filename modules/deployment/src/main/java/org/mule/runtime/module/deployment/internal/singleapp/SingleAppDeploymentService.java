@@ -7,6 +7,7 @@
 package org.mule.runtime.module.deployment.internal.singleapp;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 
@@ -22,6 +23,7 @@ import static com.google.common.util.concurrent.Futures.immediateFuture;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
@@ -33,9 +35,12 @@ import org.mule.runtime.module.deployment.internal.ArtifactDeployer;
 import org.mule.runtime.module.deployment.internal.CompositeDeploymentListener;
 import org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.DefaultArtifactDeployer;
+import org.mule.runtime.module.deployment.internal.DeploymentDirectoryWatcher;
 import org.mule.runtime.module.deployment.internal.DeploymentFileResolver;
 import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
+import org.mule.runtime.module.deployment.internal.DomainBundleArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
+import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +60,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A {@link DeploymentService} that allows only the deployment of one application.
@@ -75,22 +81,23 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   private final List<StartupListener> startupListeners = new CopyOnWriteArrayList<>();
   private final DomainArchiveDeployer domainDeployer;
 
-  private final List<Domain> domains;
-  private final List<Application> applications;
+  private final ObservableList<Domain> domains = new ObservableList<>();
+  private final ObservableList<Application> applications = new ObservableList<>();
   private final DeploymentFileResolver fileResolver;
+  private final Supplier<SchedulerService> artifactStartExecutorSupplier;
 
   private DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private Consumer<Throwable> deploymentErrorConsumer = t -> {
   };
+  private DeploymentDirectoryWatcher deploymentDirectoryWatcher;
+  private final CompositeDeploymentListener domainBundleDeploymentListener = new CompositeDeploymentListener();
 
   public SingleAppDeploymentService(SingleAppDomainDeployerBuilder singleAppDomainDeployerBuilder,
                                     SingleAppApplicationDeployerBuilder applicationDeployerBuilder,
                                     DeploymentFileResolver fileResolver,
-                                    List<Domain> domains,
-                                    List<Application> applications) {
-    this.domains = domains;
-    this.applications = applications;
+                                    Supplier<SchedulerService> artifactStartExecutorSupplier) {
     this.fileResolver = fileResolver;
+    this.artifactStartExecutorSupplier = artifactStartExecutorSupplier;
 
     LazyValue<Scheduler> artifactStartExecutor = new LazyValue<>(SINGLE_SCHEDULER);
     ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
@@ -269,6 +276,28 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
       // We only start the default domain
       domainDeployer.deployExplodedArtifact("default", empty());
       notifyStartupListeners();
+
+      this.deploymentDirectoryWatcher =
+          new DeploymentDirectoryWatcher(new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
+                                                                         applicationDeployer, applications,
+                                                                         domainDeploymentListener,
+                                                                         applicationDeploymentListener, this),
+                                         this.domainDeployer,
+                                         applicationDeployer,
+                                         domains,
+                                         applications,
+                                         artifactStartExecutorSupplier,
+                                         deploymentLock);
+
+      applicationDeploymentListener.addDeploymentListener(new DeploymentListener() {
+
+        @Override
+        public void onDeploymentSuccess(String artifactName) {
+          deploymentDirectoryWatcher.stop();
+        }
+      });
+
+      this.deploymentDirectoryWatcher.start();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error on starting single app mode"), e);
     }

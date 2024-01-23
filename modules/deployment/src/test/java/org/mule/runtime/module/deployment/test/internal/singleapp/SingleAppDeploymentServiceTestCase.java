@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.module.deployment.test.internal.singleapp;
 
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SingleAppDeploymentStory.SINGLE_APP_DEPLOYMENT;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import static java.net.URI.create;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.jetbrains.annotations.NotNull;
+import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.domain.Domain;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -79,12 +80,12 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     List<Application> applications = mock(List.class);
     when(applications.isEmpty()).thenReturn(false);
     DeploymentFileResolver fileResolver = mock(DeploymentFileResolver.class);
+    SchedulerService schedulerService = mock(SchedulerService.class);
     SingleAppDeploymentService singleAppDeploymentService =
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
-                                       domains,
-                                       applications);
+                                       () -> schedulerService);
     return singleAppDeploymentService;
   }
 
@@ -103,12 +104,12 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     when(file.getName()).thenReturn("test.jar");
     when(fileResolver.resolve(any())).thenReturn(file);
 
+    SchedulerService schedulerService = mock(SchedulerService.class);
     SingleAppDeploymentService singleAppDeploymentService =
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
-                                       domains,
-                                       applications);
+                                       () -> schedulerService);
 
     singleAppDeploymentService.deploy(ARCHIVE_URI);
     verify(archiveDeployer).deployPackagedArtifact(eq(ARCHIVE_URI), any());
@@ -129,12 +130,13 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
     when(file.getName()).thenReturn("test.jar");
     when(fileResolver.resolve(any())).thenReturn(file);
 
+    SchedulerService schedulerService = mock(SchedulerService.class);
+
     SingleAppDeploymentService singleAppDeploymentService =
         new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
                                        singleAppApplicationDeployerBuilder,
                                        fileResolver,
-                                       domains,
-                                       applications);
+                                       () -> schedulerService);
 
     Consumer<Throwable> failConsumer = mock(Consumer.class);
     when(archiveDeployer.deployPackagedArtifact(eq(ARCHIVE_URI), any())).thenThrow(RuntimeException.class);
