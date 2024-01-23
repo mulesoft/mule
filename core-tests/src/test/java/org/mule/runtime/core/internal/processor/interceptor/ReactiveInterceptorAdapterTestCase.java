@@ -2209,7 +2209,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .handle(nullSafeMap(checkedFunction(this::process)))
-          .subscriberContext(ctx -> {
+          .contextWrite(ctx -> {
             if (useMockInterceptor) {
               assertThat(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false), is(true));
             }

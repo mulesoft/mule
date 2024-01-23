@@ -369,7 +369,7 @@ public class RxUtils {
       final Flux<T> upstream;
       if (isTransactionActive()) {
         upstream = sinkRef.flux()
-            .subscriberContext(popTxFromSubscriberContext());
+            .contextWrite(popTxFromSubscriberContext());
       } else {
         upstream = sinkRef.flux();
       }
@@ -377,7 +377,7 @@ public class RxUtils {
       Flux<?> flux = configurer.apply(upstream);
 
       if (isTransactionActive()) {
-        flux = flux.subscriberContext(pushTxToSubscriberContext(configurer.toString()));
+        flux = flux.contextWrite(pushTxToSubscriberContext(configurer.toString()));
       }
 
       flux.subscribe(null, e -> LOGGER.error("Exception reached subscriber for " + configurer.toString(), e));

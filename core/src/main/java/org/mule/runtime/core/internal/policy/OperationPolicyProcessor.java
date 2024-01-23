@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -62,7 +63,7 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
         .map(policyEventMapper::onOperationPolicyBegin)
         .doOnNext(event -> policyTraceLogger.logOperationPolicyStart(policy, event))
         .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))
-        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessorRef))
+        .contextWrite(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessorRef))
         .doOnNext(event -> policyTraceLogger.logOperationPolicyEnd(policy, event))
         .map(policyChainResult -> policyEventMapper
             .onOperationPolicyFinish(policyChainResult, policy.getPolicyChain().isPropagateMessageTransformations()));
