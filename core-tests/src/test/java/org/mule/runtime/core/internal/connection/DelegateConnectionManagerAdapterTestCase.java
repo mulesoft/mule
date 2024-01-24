@@ -8,9 +8,12 @@ package org.mule.runtime.core.internal.connection;
 
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
 
+import static java.lang.String.format;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.fail;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -52,7 +55,13 @@ public class DelegateConnectionManagerAdapterTestCase extends AbstractMuleContex
     managerAdapter.bind(config, new FailingConnectionProvider());
     ConnectionHandler<Object> connection = managerAdapter.getConnection(config);
 
-    assertThrows("Expected", ConnectionException.class, () -> connection.getConnection());
+    try {
+      connection.getConnection();
+      fail(format("expected %s to be thrown, but nothing was thrown",
+                  ConnectionException.class.getName()));
+    } catch (ConnectionException e) {
+      assertThat(e.getMessage(), is("Expected"));
+    }
 
     // Just verify these calls do not throw an exception
     connection.release();
