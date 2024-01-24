@@ -7,6 +7,7 @@
 package org.mule.runtime.module.log4j.boot.api;
 
 import com.lmax.disruptor.ExceptionHandler;
+
 import org.apache.logging.log4j.status.StatusLogger;
 
 /**
@@ -15,12 +16,12 @@ import org.apache.logging.log4j.status.StatusLogger;
  *
  * @since 4.5
  */
-public class AsyncLoggerExceptionHandler implements ExceptionHandler {
+public class AsyncLoggerExceptionHandler<T> implements ExceptionHandler<T> {
 
   private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
   @Override
-  public void handleEventException(Throwable ex, long sequence, Object event) {
+  public void handleEventException(Throwable ex, long sequence, T event) {
     LOGGER.error("Failed to asynchronously log message: {}", event, ex);
   }
 
