@@ -36,7 +36,7 @@
             --add-reads=org.mule.runtime.deployment.model.impl=org.mule.runtime.spring.config
             --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.application=org.mule.runtime.core
             --add-opens=org.mule.runtime.deployment.model.impl/org.mule.runtime.module.deployment.impl.internal.artifact=org.mule.runtime.core
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.args>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
