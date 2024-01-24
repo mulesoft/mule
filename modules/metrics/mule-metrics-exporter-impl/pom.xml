@@ -14,6 +14,12 @@
     <description>Definitions for Mule Metrics Exporter Implementation</description>
     
     <properties>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=org.apache.commons.compress
+            ${surefire.args.base}
+        </surefire.args>
+        
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
         <javaModuleName>org.mule.runtime.metrics.exporter.impl</javaModuleName>
     </properties>
