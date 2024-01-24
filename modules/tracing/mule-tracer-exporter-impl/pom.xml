@@ -21,6 +21,12 @@
     <description>Implementation for the tracer exporter</description>
 
     <properties>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-modules=org.apache.commons.compress
+            ${surefire.args.base}
+        </surefire.args>
+
         <javaModuleName>org.mule.runtime.tracer.exporter.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
