@@ -12,12 +12,9 @@ import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_PO
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MAX;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_DEFAULT_STRATEGY_MIN;
 import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY;
-import static org.mule.runtime.core.api.util.ClassUtils.setFieldValue;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleBase;
 import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleConfDir;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.CORRELATION_ID_MDC_KEY;
-import static org.mule.runtime.module.log4j.internal.Utils.getFieldValue;
-import static org.mule.runtime.module.log4j.internal.Utils.isFile;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.getInteger;
@@ -27,7 +24,6 @@ import static java.util.zip.Deflater.NO_COMPRESSION;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import java.io.File;
@@ -35,11 +31,9 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
 import java.util.Properties;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
@@ -52,12 +46,8 @@ import org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy;
 import org.apache.logging.log4j.core.appender.rolling.TimeBasedTriggeringPolicy;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.ConfigurationFileWatcher;
-import org.apache.logging.log4j.core.config.ConfigurationListener;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.config.Reconfigurable;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.apache.logging.log4j.core.util.FileWatcher;
 
 /**
  * This component grabs a {link MuleLoggerContext} which has just been created reading a configuration file and applies
@@ -65,8 +55,6 @@ import org.apache.logging.log4j.core.util.FileWatcher;
  * <p/>
  * Its basic functions are:
  * <ul>
- * <li>Disable log4j's shutdown hook so that it doesn't collide with mule's {@link ShutdownListener}, which would result in a
- * classloader leak.</li>
  * <li>When using a default configuration (one which doesn't come from a config file), the console appender is removed</li>
  * <li>if the classloader is an {@link ArtifactClassLoader}, then it adds a rolling file appender to collect the artifact's
  * logs</li>
@@ -83,7 +71,6 @@ final class LoggerContextConfigurer {
   private static final String MULE_DOMAIN_LOG_FILE_TEMPLATE = "mule-domain-%s.log";
   private static final String PATTERN_LAYOUT =
       "%-5p %d [%t] [processor: %X{processorPath}; event: %X{" + CORRELATION_ID_MDC_KEY + "}] %c: %m%n";
-  private static final int DEFAULT_MONITOR_INTERVAL_SECS = 60;
   private static final Function<Appender, Boolean> containerConsoleAppenderMatcher =
       (appender) -> appender instanceof ConsoleAppender && appender.getName().equals("Console");
   private static final Function<Appender, Boolean> defaultConsoleAppenderMatcher =
@@ -91,11 +78,6 @@ final class LoggerContextConfigurer {
 
   static final String FORCED_CONSOLE_APPENDER_NAME = "Forced-Console";
   static final String PER_APP_FILE_APPENDER_NAME = "defaultFileAppender";
-
-  protected void configure(MuleLoggerContext context) {
-    disableShutdownHook(context);
-    configureMonitor(context);
-  }
 
   protected void update(MuleLoggerContext context) {
     if (!shouldConfigureContext(context)) {
@@ -131,40 +113,6 @@ final class LoggerContextConfigurer {
     return !parseBoolean(properties.getProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "false"));
   }
 
-  private void disableShutdownHook(LoggerContext context) {
-    try {
-      setFieldValue(context.getConfiguration(), "isShutdownHookEnabled", false, true);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not configure shutdown hook. Unexpected configuration type"), e);
-    }
-  }
-
-  private void configureMonitor(MuleLoggerContext context) {
-    Configuration configuration = context.getConfiguration();
-    File configFile = null;
-    if (context.getConfigFile() != null) {
-      configFile = new File(context.getConfigFile().getPath());
-    } else if (!StringUtils.isEmpty(configuration.getName())) {
-      configFile = new File(configuration.getName());
-    }
-
-    if (configFile != null && configuration instanceof Reconfigurable) {
-      configuration.getWatchManager().setIntervalSeconds(DEFAULT_MONITOR_INTERVAL_SECS);
-      FileWatcher watcher = new ConfigurationFileWatcher(configuration, (Reconfigurable) configuration,
-                                                         getListeners(configuration), configFile.lastModified());
-      configuration.getWatchManager().watchFile(configFile, watcher);
-    }
-  }
-
-  private List<ConfigurationListener> getListeners(Configuration configuration) {
-    try {
-      return getFieldValue(configuration, "listeners", true);
-    } catch (Exception e) {
-      throw new MuleRuntimeException(createStaticMessage("Could not get listeners. Unexpected configuration type"),
-                                     e);
-    }
-  }
-
   private void addDefaultAppender(MuleLoggerContext context, String logFilePath) {
     RollingFileAppender appender =
         createRollingFileAppender(logFilePath, ".%d{yyyy-MM-dd}", PER_APP_FILE_APPENDER_NAME, context.getConfiguration());
@@ -173,8 +121,8 @@ final class LoggerContextConfigurer {
 
   private void forceConsoleAppender(MuleLoggerContext context) {
     doAddAppender(context, ConsoleAppender.newBuilder()
-        .withLayout(createLayout(context.getConfiguration()))
-        .withName(FORCED_CONSOLE_APPENDER_NAME)
+        .setLayout(createLayout(context.getConfiguration()))
+        .setName(FORCED_CONSOLE_APPENDER_NAME)
         .build());
   }
 
@@ -190,7 +138,8 @@ final class LoggerContextConfigurer {
         .withFileName(logFilePath)
         .withFilePattern(logFilePath + filePattern)
         .withAppend(true)
-        .withName(appenderName).withBufferedIo(true)
+        .setName(appenderName)
+        .setBufferedIo(true)
         .withPolicy(TimeBasedTriggeringPolicy.newBuilder()
             .withInterval(getInteger(MULE_LOG_DEFAULT_POLICY_INTERVAL, 1))
             .withModulate(true)
@@ -202,7 +151,7 @@ final class LoggerContextConfigurer {
             .withStopCustomActionsOnError(true)
             .withConfig(configuration)
             .build())
-        .withLayout(createLayout(configuration))
+        .setLayout(createLayout(configuration))
         .setConfiguration(configuration)
         .build();
   }
@@ -295,6 +244,16 @@ final class LoggerContextConfigurer {
     }
 
     return false;
+  }
+
+  /**
+   * Checks whether the protocol of an {@link URL} is {@code "file"} or not.
+   * 
+   * @param url the {@link URL}.
+   * @return {@code true} if the protocol is {@code "file"}, or {@code false} otherwise.
+   */
+  private static boolean isFile(URL url) {
+    return "file".equals(url.getProtocol());
   }
 
   private String getFilenamePattern(MuleLoggerContext context) {
