@@ -12,6 +12,8 @@
     <description>Mule Core Unit Tests</description>
 
     <properties>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+		
         <javaModuleName>org.mule.test.core</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
