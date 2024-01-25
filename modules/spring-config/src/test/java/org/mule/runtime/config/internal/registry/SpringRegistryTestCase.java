@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.internal.registry;
 
-import static java.util.Collections.singletonMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION;
+
+import static java.util.Collections.singletonMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -19,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.After;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -37,6 +37,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,7 +69,6 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
 
   @After
   public void tearDown() {
-
     executor.shutdownNow();
   }
 
@@ -88,34 +88,14 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void registryIsReadOnlyWhileStoppingOrDisposing() throws MuleException {
+  public void registryIsReadOnlyWhileStopping() throws MuleException {
     LifecycleInterceptor lifecycleInterceptor = mock(LifecycleInterceptor.class);
     when(lifecycleInterceptor.beforePhaseExecution(any(), any())).thenReturn(true);
-
-    final BeanWithLifeCycle beanWithLifeCycle = new BeanWithLifeCycle(executor);
-
-    SpringRegistry registry = new SpringRegistry(appContext, appContext,
-                                                 null, mock(ConfigurationDependencyResolver.class),
-                                                 lifecycleInterceptor) {
-
-      final Map<String, Object> registeredBeans = singletonMap("beanWithLifeCycle", beanWithLifeCycle);
-
-      @Override
-      <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
-        return (Map<String, T>) registeredBeans;
-      }
-
-      @Override
-      protected <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
-        return (Map<String, T>) registeredBeans;
-      }
-
-    };
-
-    beanWithLifeCycle.setRegistry(registry);
-
-    when(appContext.getBean("beanWithLifeCycle")).thenReturn(beanWithLifeCycle);
-    when(beanFactory.getDependenciesForBean("beanWithLifeCycle")).thenReturn(new String[0]);
+    final BeanWithLifeCycle beanWithLifeCycle = new BeanWithLifeCycle(executor, Stoppable.PHASE_NAME);
+    SpringRegistry registry =
+        buildLifeCycleTesteableSpringRegistry(lifecycleInterceptor, singletonMap("beanWithLifeCycle", beanWithLifeCycle));
+    beanWithLifeCycle.setRegistryUnderTest(registry);
+    // Previous phases are run for consistency of the Registry and the LifeCycleManager
     registry.fireLifecycle(Initialisable.PHASE_NAME);
     registry.fireLifecycle(Startable.PHASE_NAME);
     executor.submit(() -> {
@@ -128,31 +108,93 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     probe(registry::hasPendingRegistrations, () -> "Registry should be read read only while stopping");
   }
 
+  @Test
+  public void registryIsReadOnlyWhileDisposing() throws MuleException {
+    LifecycleInterceptor lifecycleInterceptor = mock(LifecycleInterceptor.class);
+    when(lifecycleInterceptor.beforePhaseExecution(any(), any())).thenReturn(true);
+    final BeanWithLifeCycle beanWithLifeCycle = new BeanWithLifeCycle(executor, Disposable.PHASE_NAME);
+    SpringRegistry registry =
+        buildLifeCycleTesteableSpringRegistry(lifecycleInterceptor, singletonMap("beanWithLifeCycle", beanWithLifeCycle));
+    beanWithLifeCycle.setRegistryUnderTest(registry);
+    // Previous phases are run for consistency of the Registry and the LifeCycleManager
+    registry.fireLifecycle(Initialisable.PHASE_NAME);
+    registry.fireLifecycle(Startable.PHASE_NAME);
+    registry.fireLifecycle(Stoppable.PHASE_NAME);
+    executor.submit(() -> {
+      try {
+        registry.fireLifecycle(Disposable.PHASE_NAME);
+      } catch (LifecycleException e) {
+        throw new RuntimeException(e);
+      }
+    });
+    probe(registry::hasPendingRegistrations, () -> "Registry should be read read only while disposing");
+  }
+
+  /**
+   * This builds a SpringRegistry whose lifecycle can be invoked and tested.
+   * 
+   * @param lifecycleInterceptor     The {@link LifecycleInterceptor} to be used.
+   * @param singletonBeansToRegister key/value map of singleton beans that will be already registered in the returned
+   *                                 {@link SpringRegistry}
+   * @return {@link SpringRegistry} that can be tested via invoking its lifecycle phases.
+   */
+  private SpringRegistry buildLifeCycleTesteableSpringRegistry(LifecycleInterceptor lifecycleInterceptor,
+                                                               Map<String, ?> singletonBeansToRegister) {
+    // This makes the bean look like a registered bean (The ApplicationContext is mocked).
+    singletonBeansToRegister.forEach((key, value) -> {
+      when(appContext.getBean(key)).thenReturn(value);
+      when(appContext.isSingleton(key)).thenReturn(true);
+      // No dependencies for any of the beans.
+      when(beanFactory.getDependenciesForBean(key)).thenReturn(new String[0]);
+    });
+    // The registry is created and will return all the previously registered beans as lifecycle objects.
+    return new SpringRegistry(appContext, appContext,
+                              null, mock(ConfigurationDependencyResolver.class),
+                              lifecycleInterceptor) {
+
+      @Override
+      <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
+        return (Map<String, T>) singletonBeansToRegister;
+      }
+
+      @Override
+      protected <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
+        return (Map<String, T>) singletonBeansToRegister;
+      }
+
+    };
+  }
+
   public static class BeanWithLifeCycle implements Stoppable, Disposable {
 
-    private SpringRegistry registry;
+    private SpringRegistry registryUnderTest;
     private final ExecutorService registrationExecutor;
+    private final String phaseUnderTest;
 
-    public BeanWithLifeCycle(ExecutorService registrationExecutor) {
+    public BeanWithLifeCycle(ExecutorService registrationExecutor, String phaseUnderTest) {
       this.registrationExecutor = registrationExecutor;
+      this.phaseUnderTest = phaseUnderTest;
     }
 
     @Override
     public void stop() {
-      // This registration should be put on hold buy the registry if it is being stopped / disposed.
-      addObjectToRegistry("stopObject");
+      if (phaseUnderTest.equals(Stoppable.PHASE_NAME)) {
+        addObjectToRegistryAndFreezeCurrentThread("stopObject", new Object());
+      }
     }
 
     @Override
     public void dispose() {
-      addObjectToRegistry("disposeObject");
+      if (phaseUnderTest.equals(Disposable.PHASE_NAME)) {
+        addObjectToRegistryAndFreezeCurrentThread("disposeObject", new Object());
+      }
     }
 
-    private void addObjectToRegistry(String disposeObject) {
-      // This registration should be put on hold buy the registry if it is being stopped / disposed
+    private void addObjectToRegistryAndFreezeCurrentThread(String registryKey, Object objectToAdd) {
+      // This registration will be put on hold buy the registry if it is being stopped / disposed
       registrationExecutor.submit(() -> {
         try {
-          registry.registerObject(disposeObject, new Object());
+          registryUnderTest.registerObject(registryKey, objectToAdd);
         } catch (RegistrationException e) {
           // Log the exception instead of throwing it (the test assertion is the one that should fail)
           throw new RuntimeException(e);
@@ -166,8 +208,8 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
       }
     }
 
-    public void setRegistry(SpringRegistry registry) {
-      this.registry = registry;
+    public void setRegistryUnderTest(SpringRegistry registryUnderTest) {
+      this.registryUnderTest = registryUnderTest;
     }
   }
 
