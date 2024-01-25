@@ -7,7 +7,6 @@
 package org.mule.runtime.module.deployment.internal.singleapp;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
 
@@ -107,7 +106,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
     ArtifactDeployer<Application> applicationMuleDeployer = new DefaultArtifactDeployer<>(artifactStartExecutor);
 
     this.domainDeployer = singleAppDomainDeployerBuilder
-        .withDomains(domains)
+        .withDomains(this.domains)
         .withDeploymentService(this)
         .withDomainArtifactDeployer(new DefaultArtifactDeployer<>(artifactStartExecutor))
         .withDomainDeploymentListener(domainDeploymentListener)
@@ -119,7 +118,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
     this.applicationDeployer = applicationDeployerBuilder
         .withApplicationDeployer(new DefaultArtifactDeployer<>(artifactStartExecutor))
         .withApplicationDeploymentListener(applicationDeploymentListener)
-        .withApplications(applications)
+        .withApplications(this.applications)
         .build();
 
     this.applicationDeployer.setDeploymentListener(applicationDeploymentListener);
@@ -278,17 +277,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   public void start() {
     try {
       this.deploymentDirectoryWatcher =
-          new DeploymentDirectoryWatcher(new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
-                                                                         applicationDeployer, applications,
-                                                                         domainDeploymentListener,
-                                                                         applicationDeploymentListener, this),
-                                         this.domainDeployer,
-                                         applicationDeployer,
-                                         domains,
-                                         applications,
-                                         artifactStartExecutorSupplier,
-                                         deploymentLock,
-                                         false);
+          resolveDeploymentDirectoryWatcher();
 
       applicationDeploymentListener.addDeploymentListener(new DeploymentListener() {
 
@@ -303,6 +292,20 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error on starting single app mode"), e);
     }
+  }
+
+  private DeploymentDirectoryWatcher resolveDeploymentDirectoryWatcher() {
+    return new DeploymentDirectoryWatcher(new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
+                                                                          applicationDeployer, applications,
+                                                                          domainDeploymentListener,
+                                                                          applicationDeploymentListener, this),
+                                          this.domainDeployer,
+                                          applicationDeployer,
+                                          domains,
+                                          applications,
+                                          artifactStartExecutorSupplier,
+                                          deploymentLock,
+                                          false);
   }
 
   public void notifyStartupListeners() {

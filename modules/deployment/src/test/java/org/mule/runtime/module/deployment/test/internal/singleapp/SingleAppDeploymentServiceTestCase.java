@@ -9,18 +9,17 @@ package org.mule.runtime.module.deployment.test.internal.singleapp;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.SingleAppDeploymentStory.SINGLE_APP_DEPLOYMENT;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import static java.net.URI.create;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.scheduler.SchedulerService;
@@ -159,7 +158,7 @@ public class SingleAppDeploymentServiceTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void redeployNotsupported() {
+  public void redeployNotSupported() {
     expectedException.expectMessage("Application redeploy operation not supported");
     expectedException.expect(UnsupportedOperationException.class);
     getSingleAppDeploymentService().redeploy(APP);
