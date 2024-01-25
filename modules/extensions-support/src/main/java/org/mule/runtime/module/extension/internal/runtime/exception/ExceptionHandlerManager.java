@@ -6,8 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_EXTENSION_ERROR_NAMESPACE;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
+import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -35,6 +37,7 @@ import java.util.function.Predicate;
 public final class ExceptionHandlerManager {
 
   private static final ExceptionHandler DEFAULT_EXCEPTION_ENRICHER = new NullExceptionHandler();
+  private static final boolean HONOURS_EXTENSION_NAMESPACE = getBoolean(HONOUR_EXTENSION_ERROR_NAMESPACE);
   private final ExceptionHandler exceptionHandler;
   private final ErrorType connectionErrorType;
 
@@ -51,9 +54,11 @@ public final class ExceptionHandlerManager {
 
   private ErrorType resolveConnectionErrorType(ExtensionModel extensionModel, ErrorTypeRepository errorTypeRepository) {
     String extensionNamespace = (extensionModel.getName() != null ? extensionModel.getName().toUpperCase() : null);
+    String namespaceFromXmlDsl = extensionModel.getXmlDslModel().getPrefix().toUpperCase();
     Predicate<ErrorModel> connectivityErrorCondition = errorModel -> errorModel.getType().equals(CONNECTIVITY_ERROR_IDENTIFIER);
     Predicate<ErrorModel> extensionConnectivityErrorCondition =
-        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace));
+        connectivityErrorCondition.and(errorModel -> errorModel.getNamespace().equals(extensionNamespace)
+            || errorHasNamespaceFromDsl(errorModel, namespaceFromXmlDsl));
 
     return extensionModel.getErrorModels().stream()
         .filter(extensionConnectivityErrorCondition).findFirst().map(Optional::of)
@@ -64,6 +69,10 @@ public final class ExceptionHandlerManager {
             .build())
             .orElse(null))
         .orElse(null);
+  }
+
+  private boolean errorHasNamespaceFromDsl(ErrorModel errorModel, String namespaceFromDsl) {
+    return HONOURS_EXTENSION_NAMESPACE ? errorModel.getNamespace().equals(namespaceFromDsl) : false;
   }
 
   /**
