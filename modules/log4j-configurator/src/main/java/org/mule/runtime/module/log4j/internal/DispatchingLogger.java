@@ -12,25 +12,20 @@ import static org.mule.runtime.module.log4j.internal.ArtifactAwareContextSelecto
 import static java.lang.Thread.currentThread;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
-import static org.reflections.ReflectionUtils.getAllMethods;
-import static org.reflections.ReflectionUtils.withName;
-import static org.reflections.ReflectionUtils.withParameters;
 
 import org.mule.runtime.api.util.Reference;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.MessageFactory;
@@ -62,8 +57,6 @@ abstract class DispatchingLogger extends Logger {
       .weakKeys()
       .weakValues()
       .build(key -> new Reference<>());
-
-  private Method updateConfigurationMethod = null;
 
   DispatchingLogger(Logger originalLogger, int ownerClassLoaderHash, LoggerContext loggerContext, ContextSelector contextSelector,
                     MessageFactory messageFactory) {
@@ -147,39 +140,6 @@ abstract class DispatchingLogger extends Logger {
    */
   private boolean useThisLoggerContextClassLoader(ClassLoader currentClassLoader) {
     return currentClassLoader.hashCode() == ownerClassLoaderHash;
-  }
-
-  /**
-   * This is workaround for the low visibility of the {@link Logger#updateConfiguration(Configuration)} method, which invokes it
-   * on the {@code originalLogger}.
-   * <p>
-   * Using a wrapper in the log4j package causes an {@link IllegalAccessError}.
-   *
-   * @param config
-   */
-  @Override
-  protected void updateConfiguration(final Configuration config) {
-    if (lookupUpdateConfigurationMethod()) {
-      try {
-        updateConfigurationMethod.invoke(originalLogger, config);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
-    super.updateConfiguration(config);
-  }
-
-  private boolean lookupUpdateConfigurationMethod() {
-    if (updateConfigurationMethod == null) {
-      Collection<Method> candidateMethods =
-          getAllMethods(originalLogger.getClass(), withName("updateConfiguration"), withParameters(Configuration.class));
-      if (candidateMethods.size() == 1) {
-        updateConfigurationMethod = candidateMethods.iterator().next();
-        updateConfigurationMethod.setAccessible(true);
-      }
-    }
-
-    return updateConfigurationMethod != null;
   }
 
   @Override
