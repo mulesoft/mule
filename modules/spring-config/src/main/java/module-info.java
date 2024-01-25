@@ -65,6 +65,8 @@ module org.mule.runtime.spring.config {
   requires spring.context;
   requires spring.core;
 
+  requires reactor.core;
+
   requires org.apache.commons.lang3;
   requires com.google.common;
 

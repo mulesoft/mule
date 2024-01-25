@@ -134,7 +134,7 @@ public class SourcePolicyProcessorTestCase extends AbstractPolicyProcessorTestCa
     expected.expectCause(hasCause(sameInstance(expectedException)));
 
     just(event).transform(nextProcessor)
-        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, new SoftReference<>(flowProcessor)))
+        .contextWrite(ctx -> ctx.put(POLICY_NEXT_OPERATION, new SoftReference<>(flowProcessor)))
         .block();
   }
 }
