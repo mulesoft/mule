@@ -210,10 +210,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
   public void stop() {
     stopAppDirMonitorTimer();
 
-    deploymentLock.lock();
     if (disposeArtifactsOnStop) {
+      deploymentLock.lock();
       try {
-        notifyStopListeners();
+        setDoNotPersistStopStatusOfArtifacts();
         stopArtifacts(applications);
         stopArtifacts(domains);
       } finally {
@@ -598,7 +598,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  private void notifyStopListeners() {
+  /**
+   * Makes the artifacts not persist the stop status.
+   */
+  private void setDoNotPersistStopStatusOfArtifacts() {
     for (Application application : applications) {
       applicationArchiveDeployer.doNotPersistArtifactStop(application);
     }
