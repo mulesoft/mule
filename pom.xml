@@ -228,7 +228,7 @@
 
         <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.12.0</allure.maven.plugin.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.11</jacoco.version>
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -239,11 +239,12 @@
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
+        <surefire.additional.jacoco.args></surefire.additional.jacoco.args>
         <surefire.args.base>
             -XX:+TieredCompilation
             -Dfile.encoding=UTF-8
             -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
-            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
+            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'${surefire.additional.jacoco.args}
         </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
         <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
@@ -257,7 +258,7 @@
             -XX:+IgnoreUnrecognizedVMOptions
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>

@@ -47,8 +47,10 @@ open module org.mule.runtime.deployment.test {
   requires org.mule.runtime.deployment.model.impl.test;
   requires org.mule.runtime.oauth.api;
   requires org.mule.oauth.client.api;
+
   requires org.apache.logging.log4j;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
+  requires org.jetbrains.annotations;
 
 }

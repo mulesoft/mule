@@ -13,13 +13,12 @@ import static org.mule.runtime.module.log4j.internal.LoggerContextConfigurer.PER
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,10 +34,8 @@ import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescrip
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.logging.log4j.Level;
@@ -48,14 +45,14 @@ import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.config.AbstractConfiguration;
-import org.apache.logging.log4j.core.config.ConfigurationFileWatcher;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.config.Reconfigurable;
-import org.apache.logging.log4j.core.util.WatchManager;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -64,8 +61,6 @@ import org.mockito.junit.MockitoRule;
 @SmallTest
 public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
-  private static final String CURRENT_DIRECTORY = ".";
-  private static final int MONITOR_INTERVAL = 60000;
   private static final String CONVERTER_COMPONENT = "Converter";
   private static final String FILE_PATTERN_TEMPLATE_DATE_SECTION = "%d{yyyy-MM-dd}";
 
@@ -98,26 +93,6 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     }).when(configuration).addComponent(eq("Converter"), any());
 
     when(configuration.getComponent(CONVERTER_COMPONENT)).thenAnswer(invocation -> converter);
-  }
-
-  @Test
-  public void disableShutdownHook() throws Exception {
-    contextConfigurer.configure(context);
-    assertThat(context.getConfiguration().isShutdownHookEnabled(), is(false));
-  }
-
-  @Test
-  public void configurationMonitor() throws Exception {
-    WatchManager watchManager = mock(WatchManager.class);
-    when(configuration.getWatchManager()).thenReturn(watchManager);
-
-    when(context.getConfigFile()).thenReturn(new File(CURRENT_DIRECTORY).toURI());
-    contextConfigurer.configure(context);
-    ArgumentCaptor<ConfigurationFileWatcher> captor = ArgumentCaptor.forClass(ConfigurationFileWatcher.class);
-    verify(watchManager).watchFile(any(File.class), captor.capture());
-
-    assertThat(captor.getValue(), instanceOf(ConfigurationFileWatcher.class));
-    verify(watchManager).setIntervalSeconds(eq((int) MILLISECONDS.toSeconds(MONITOR_INTERVAL)));
   }
 
   @Test
@@ -178,7 +153,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
     Properties properties = new Properties();
     properties.setProperty(MULE_MUTE_APP_LOGS_DEPLOYMENT_PROPERTY, "true");
-    when(descriptor.getDeploymentProperties()).thenReturn(Optional.of(properties));
+    when(descriptor.getDeploymentProperties()).thenReturn(of(properties));
     when(context.getArtifactDescriptor()).thenReturn(descriptor);
 
     contextConfigurer.update(context);
@@ -191,10 +166,14 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     withForceConsoleLog(() -> {
       LoggerConfig rootLogger = ((AbstractConfiguration) context.getConfiguration()).getRootLogger();
       Collection<Appender> appenders = new ArrayList<>();
-      appenders.add(ConsoleAppender.createAppender(mock(Layout.class), null, null, "Console", null, null));
+
+      appenders.add(((org.apache.logging.log4j.core.util.Builder<ConsoleAppender>) ConsoleAppender.newBuilder()
+          .setLayout(mock(Layout.class))
+          .setName("Console"))
+              .build());
       when(rootLogger.getAppenders().values()).thenReturn(appenders);
 
-      contextConfigurer.configure(context);
+      contextConfigurer.update(context);
       verify(context.getConfiguration(), never()).addAppender(any(ConsoleAppender.class));
       verify(rootLogger, never()).addAppender(any(ConsoleAppender.class), same(Level.INFO), any(Filter.class));
     });

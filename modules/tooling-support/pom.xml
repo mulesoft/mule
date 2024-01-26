@@ -23,7 +23,7 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
             --add-opens=org.mule.runtime.tooling.support/org.mule.runtime.module.tooling.internal=ALL-UNNAMED
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.args>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>

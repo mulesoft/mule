@@ -84,6 +84,12 @@ public interface AllureConstants {
 
     }
 
+    interface DeploymentServiceBuilderStory {
+
+      String DEPLOYMENT_SERVICE_BUILDER = "Deployment Service Builder";
+
+    }
+
     interface DeploymentFailureStory {
 
       String DEPLOYMENT_FAILURE = "Deployment Failure";

@@ -326,7 +326,14 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
         }
         return connection.getConnection();
       }
-      return method.invoke(connection, args);
+
+      // Avoid NPE when doing release or invalidate if connection wasn't obtained (for instance, because of an exception on
+      // delegate.getConnection())
+      if (connection != null) {
+        return method.invoke(connection, args);
+      } else {
+        return null;
+      }
     }
   }
 

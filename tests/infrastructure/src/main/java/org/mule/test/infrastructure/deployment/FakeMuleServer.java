@@ -47,7 +47,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -149,9 +149,11 @@ public class FakeMuleServer {
                                                muleArtifactResourcesRegistry.getDomainFactory(),
                                                muleArtifactResourcesRegistry.getApplicationFactory(),
                                                muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
-    deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                  muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                  () -> findSchedulerService(serviceManager));
+    deploymentService = DeploymentServiceBuilder.deploymentServiceBuilder()
+        .withArtifactStartExecutorSupplier(() -> findSchedulerService(serviceManager))
+        .withDomainFactory(muleArtifactResourcesRegistry.getDomainFactory())
+        .withApplicationFactory(muleArtifactResourcesRegistry.getApplicationFactory())
+        .build();
     deploymentListener = mock(DeploymentListener.class);
     doAnswer(inv -> {
       final String artifactName = inv.getArgument(0);
