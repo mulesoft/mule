@@ -21,7 +21,7 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
  *
  * @since 4.7.0
  */
-public class ApplicationReconfigurableLoggerContextSelector implements ContextSelector {
+class ApplicationReconfigurableLoggerContextSelector implements ContextSelector {
 
   private final MuleLoggerContextFactory loggerContextFactory = new MuleLoggerContextFactory();
   private static final ClassLoader SYSTEM_CLASSLOADER = getSystemClassLoader();

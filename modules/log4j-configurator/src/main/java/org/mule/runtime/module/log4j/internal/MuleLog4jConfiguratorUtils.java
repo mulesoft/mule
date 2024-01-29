@@ -6,18 +6,18 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
-import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
-
-import static java.lang.System.getProperty;
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 
-import org.apache.logging.log4j.core.selector.ContextSelector;
-
 import java.util.function.Consumer;
+
+import org.apache.logging.log4j.core.selector.ContextSelector;
 
 /**
  * Utility class used to set the corresponding {@link ContextSelector} to a {@link MuleLog4jContextFactory}, depending on the
@@ -75,11 +75,11 @@ public final class MuleLog4jConfiguratorUtils {
   }
 
   /**
-   * @return the action to perform to rconfigure the loggers.
+   * @return the default reconfiguration for the loggers according to the selector.
    *
    * @since 4.7.0
    */
-  public static Consumer<ClassLoader> getReconfigurationAction() {
+  public static Consumer<ClassLoader> getDefaultReconfigurationAction() {
     if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
       return classloader -> SINGLE_APP_CONTEXT_SELECTOR
           .reconfigureAccordingToAppClassloader(classloader);
