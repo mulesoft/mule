@@ -20,6 +20,8 @@ import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -28,6 +30,7 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
@@ -47,6 +50,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import com.github.valfirst.slf4jtest.LoggingEvent;
@@ -65,8 +69,11 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
   private static final int EXPECTED_CONTENT_IN_LOG_SECS = 10 * 1000;
   private static final String CLASSLOADER_MODEL_VERSION = "1.2.0";
+
+  private static final boolean USES_MODULE_LAYER = isJavaVersionAtLeast(JAVA_17);
   private static final String EXPECT_LOGGING_DIRECTORY =
-      "classloading-troubleshooting/errors/" + (isJavaVersionAtLeast(JAVA_17) ? "usesModuleLayers/" : "usesClassLoaders/");
+      "classloading-troubleshooting/errors/" + (USES_MODULE_LAYER ? "usesModuleLayers/" : "usesClassLoaders/");
+  private static final Optional<String> OP2_MODIFIER = USES_MODULE_LAYER ? of("-op2") : empty();
 
   @Rule
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
@@ -111,7 +118,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-config-yaml-not-found");
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-config-yaml-not-found", empty());
   }
 
   @Test
@@ -134,7 +141,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-overrideme-class-not-found");
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-overrideme-class-not-found", empty());
   }
 
   @Test
@@ -162,7 +169,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-overrideme2-class-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-overrideme2-class-not-found", OP2_MODIFIER);
   }
 
   @Test
@@ -191,7 +198,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
 
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-test-overrideme-class-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-test-overrideme-class-not-found", OP2_MODIFIER);
   }
 
   @Test
@@ -217,7 +224,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(applicationDeploymentListener, applicationFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [app-classloading-troubleshooting-1.0.0-mule-application]"));
-    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-jms-properties-resource-not-found");
+    assertExpectedContentInAppLog(EXPECT_LOGGING_DIRECTORY + "app-jms-properties-resource-not-found", OP2_MODIFIER);
   }
 
   private DomainFileBuilder createDomainFileBuilder(boolean useLightWeightPackage) {
@@ -317,27 +324,39 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     startDeployment();
   }
 
-  private void assertExpectedContentInAppLog(String fileLocation) throws Exception {
-    assertExpectedContentInLog(fileLocation, loggerDefaultMuleApplication);
+  private void assertExpectedContentInAppLog(String fileLocation, Optional<String> modifier) throws Exception {
+    assertExpectedContentInLog(fileLocation, loggerDefaultMuleApplication, modifier.map(modif -> fileLocation + modif));
   }
 
-  private void assertExpectedContentInDomainLog(String fileLocation) throws Exception {
-    assertExpectedContentInLog(fileLocation, loggerDefaultMuleDomain);
+  private void assertExpectedContentInDomainLog(String fileLocation, Optional<String> modifier) throws Exception {
+    assertExpectedContentInLog(fileLocation, loggerDefaultMuleDomain, modifier.map(modif -> fileLocation + modif));
   }
 
-  private void assertExpectedContentInLog(String fileLocation, TestLogger logger) throws Exception {
+  private void assertExpectedContentInLog(String fileLocation, TestLogger logger, Optional<String> secondOptionLog)
+      throws Exception {
     File logContent =
         new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class)
             .toURI());
     final String expectedErrorLog = readFileToString(logContent);
+    final Optional<String> secondOptionExpectedErrorLog = secondOptionLog.map(path -> {
+      try {
+        return readFileToString(new File(getResourceAsUrl(fileLocation, ClassloadingTroubleshootingTestCase.class).toURI()));
+      } catch (URISyntaxException | IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
     new PollingProber(EXPECTED_CONTENT_IN_LOG_SECS, DEFAULT_POLLING_INTERVAL)
         .check(new Probe() {
 
           @Override
           public boolean isSatisfied() {
+            List<String> logMessage = toMessages(logger.getAllLoggingEvents());
             try {
-              assertThat(toMessages(logger.getAllLoggingEvents()),
-                         hasItem(expectedErrorLog));
+              if (secondOptionExpectedErrorLog.isPresent()) {
+                assertThat(logMessage, anyOf(hasItem(expectedErrorLog), hasItem(secondOptionExpectedErrorLog.get())));
+              } else {
+                assertThat(logMessage, hasItem(expectedErrorLog));
+              }
               return true;
             } catch (Exception e) {
               return false;
@@ -349,7 +368,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
             final StringJoiner joiner = new StringJoiner(lineSeparator());
             logger.getAllLoggingEvents().forEach(e -> joiner.add(e.getMessage()));
 
-            return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner.toString();
+            return "expected content ('" + expectedErrorLog + "') not found. Full log is:" + lineSeparator() + joiner;
           }
         });
   }
