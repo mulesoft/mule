@@ -108,14 +108,10 @@ public class DefaultMuleContainer implements MuleContainer {
       } else {
         log4jContextFactory = createAndInstall();
       }
-      configureContextFactory(log4jContextFactory);
+      configureSelector(log4jContextFactory);
     }
 
     logger = LoggerFactory.getLogger(DefaultMuleContainer.class);
-  }
-
-  public static void configureContextFactory(MuleLog4jContextFactory log4jContextFactory) {
-    configureSelector(log4jContextFactory);
   }
 
   private final ServiceManager serviceManager;
