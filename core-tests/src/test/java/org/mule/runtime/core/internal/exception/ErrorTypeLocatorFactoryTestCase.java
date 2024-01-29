@@ -28,6 +28,8 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSACTION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.EXCEPTION_MAPPINGS;
@@ -88,8 +90,8 @@ public class ErrorTypeLocatorFactoryTestCase {
     ErrorType anyError = builder().namespace(ANY.getNamespace()).identifier(ANY.getName()).build();
     ErrorTypeLocator locator = createDefaultErrorTypeLocator(repository);
     ErrorType txError = locator.lookupErrorType(TransactionException.class);
-    assertThat(txError.getNamespace(), is("MULE"));
-    assertThat(txError.getIdentifier(), is("TRANSACTION"));
+    assertThat(txError.getNamespace(), is(CORE_NAMESPACE_NAME));
+    assertThat(txError.getIdentifier(), is(TRANSACTION_ERROR_IDENTIFIER));
     assertThat(txError.getParentErrorType(), is(anyError));
   }
 
