@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -68,8 +67,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    muleServer =
-        new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions(), getActionOnMuleArtifactDeployment());
+    muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
     testServicesSetup.initNotOverriddenServices();
     initialiseServicesIfNeeded();
     muleServer.addZippedService(cachedSchedulerService);
@@ -134,11 +132,6 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   protected File getHttpService() throws IOException {
     return testServicesSetup.getHttpService();
-  }
-
-  protected Consumer<ClassLoader> getActionOnMuleArtifactDeployment() {
-    return cl -> {
-    };
   }
 
 }
