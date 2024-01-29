@@ -122,11 +122,7 @@ public class DefaultMuleContainer implements MuleContainer {
   }
 
   public static void configureContextFactory(MuleLog4jContextFactory log4jContextFactory) {
-    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
-      configureSelector(log4jContextFactory, SINGLE_APP_CONTEXT_SELECTOR);
-    } else {
-      configureSelector(log4jContextFactory);
-    }
+    configureSelector(log4jContextFactory);
   }
 
   private final ServiceManager serviceManager;
