@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanCreationException;
@@ -64,7 +63,7 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
   private RegistrationDelegate registrationDelegate;
   private boolean readOnly;
 
-  private final ReentrantLock stopOrDisposeLock = new ReentrantLock();
+  private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
 
   // This is used to track the Spring context lifecycle since there is no way to confirm the
   // lifecycle phase from the application context
@@ -308,17 +307,11 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
 
   @Override
   public synchronized void fireLifecycle(String phase) throws LifecycleException {
-    if (Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase)) {
-      // Avoid trying to register objects while the registry is being shut down.
-      try {
-        stopOrDisposeLock.lock();
-        super.fireLifecycle(phase);
-      } finally {
-        stopOrDisposeLock.unlock();
-      }
-    } else {
-      super.fireLifecycle(phase);
+    // Avoid trying to register objects while the registry is being shut down.
+    synchronized (isShuttingDown) {
+      isShuttingDown.set(Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase));
     }
+    super.fireLifecycle(phase);
   }
 
   protected final <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
@@ -438,11 +431,18 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
         // Avoid trying to register objects while the registry is being shut down.
-        try {
-          stopOrDisposeLock.lock();
-          doRegisterObject(key, value);
-        } finally {
-          stopOrDisposeLock.unlock();
+        if (isShuttingDown.get()) {
+          throw new RegistrationException(createStaticMessage(String
+              .format("Could not add entry with key '%s': Registry was shutting down.", key)));
+        } else {
+          synchronized (isShuttingDown) {
+            if (isShuttingDown.get()) {
+              throw new RegistrationException(createStaticMessage(String
+                  .format("Could not add entry with key '%s': Registry was shutting down.", key)));
+            } else {
+              doRegisterObject(key, value);
+            }
+          }
         }
       } catch (RuntimeException e) {
         Throwable cause = e.getCause();
@@ -516,12 +516,4 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     }
   }
 
-  /**
-   * This method is meant for testing purposes only.
-   * 
-   * @return True if there are entries waiting to be added to the registry.
-   */
-  protected boolean hasPendingRegistrations() {
-    return stopOrDisposeLock.hasQueuedThreads();
-  }
 }
