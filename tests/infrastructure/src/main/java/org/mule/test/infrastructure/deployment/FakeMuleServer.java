@@ -36,7 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getReconfigurationAction;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -66,7 +66,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 public class FakeMuleServer {
 
@@ -111,7 +110,7 @@ public class FakeMuleServer {
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
-        .withActionOnMuleArtifactDeployment(getReconfigurationAction())
+        .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();

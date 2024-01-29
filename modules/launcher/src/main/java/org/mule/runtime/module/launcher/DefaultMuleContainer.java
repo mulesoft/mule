@@ -26,7 +26,7 @@ import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
 import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.configureSelector;
-import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getReconfigurationAction;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
@@ -95,7 +95,7 @@ public class DefaultMuleContainer implements MuleContainer {
   private ServerLockFactory muleLockFactory;
   private final MuleArtifactResourcesRegistry artifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
       .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
-      .withActionOnMuleArtifactDeployment(getReconfigurationAction())
+      .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
       .build();
 
   private static MuleLog4jContextFactory log4jContextFactory;
