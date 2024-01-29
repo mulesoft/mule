@@ -43,6 +43,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import io.qameta.allure.Issue;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
@@ -80,12 +81,14 @@ public class ErrorTypeLocatorFactoryTestCase {
 
   @Test
   @Description("If a new Error Mapping is added, and it doesn't contemplate a case of old Extension Model (without the error in the repository) the creating would fail. This is just a backwards-check test")
+  @Issue("W-14608096")
   public void canCreateLocatorWithOriginalErrors() {
     createDefaultErrorTypeLocator(repository);
   }
 
   @Test
   @Description("Check that the newly error mapping for TransactionException is available even if the error type is not in the repository")
+  @Issue("W-14608096")
   public void transactionErrorIsAddedIfNotAvailable() {
     ErrorType anyError = builder().namespace(ANY.getNamespace()).identifier(ANY.getName()).build();
     ErrorTypeLocator locator = createDefaultErrorTypeLocator(repository);
