@@ -6,9 +6,11 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
+import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 
 import static java.lang.System.getProperty;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
@@ -35,7 +37,11 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      configureSelector(contextFactory, new ApplicationReconfigurableLoggerContextSelector());
+    } else {
+      configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    }
   }
 
   /**
@@ -53,7 +59,7 @@ public final class MuleLog4jConfiguratorUtils {
     }
   }
 
-  public static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
+  private static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
     contextFactory.setContextSelector(contextSelector, MuleLog4jConfiguratorUtils::disposeIfDisposable);
   }
 
