@@ -11,7 +11,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.APPS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.DOMAINS_FOLDER;
 import static org.mule.runtime.container.api.MuleFoldersUtil.SERVICES_FOLDER;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_HOME_DIRECTORY_PROPERTY;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.internal.memory.management.DefaultMemoryManagementService.newDefaultMemoryManagementService;
@@ -37,6 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getReconfigurationAction;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -106,18 +106,12 @@ public class FakeMuleServer {
   }
 
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions) {
-    this(muleHomePath, initialCoreExtensions, cl -> {
-    });
-  }
-
-  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions,
-                        Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
-        .withActionOnMuleArtifactDeployment(actionOnMuleArtifactDeployment)
+        .withActionOnMuleArtifactDeployment(getReconfigurationAction())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();

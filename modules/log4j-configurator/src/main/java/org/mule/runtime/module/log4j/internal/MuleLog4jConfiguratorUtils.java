@@ -17,6 +17,8 @@ import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
 
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
+import java.util.function.Consumer;
+
 /**
  * Utility class used to set the corresponding {@link ContextSelector} to a {@link MuleLog4jContextFactory}, depending on the
  * value of the system property {@code mule.disableLogSeparation}. It's here instead of be part of {@link MuleLog4jContextFactory}
@@ -25,6 +27,9 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
  * @since 4.5.0
  */
 public final class MuleLog4jConfiguratorUtils {
+
+  private static ApplicationReconfigurableLoggerContextSelector SINGLE_APP_CONTEXT_SELECTOR =
+      new ApplicationReconfigurableLoggerContextSelector();
 
   private MuleLog4jConfiguratorUtils() {
     // private constructor to avoid wrong instantiations
@@ -67,5 +72,20 @@ public final class MuleLog4jConfiguratorUtils {
     if (selector instanceof Disposable) {
       ((Disposable) selector).dispose();
     }
+  }
+
+  /**
+   * @return the action to perform to rconfigure the loggers.
+   *
+   * @since 4.7.0
+   */
+  public static Consumer<ClassLoader> getReconfigurationAction() {
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      return classloader -> SINGLE_APP_CONTEXT_SELECTOR
+          .reconfigureAccordingToAppClassloader(classloader);
+    }
+
+    return cl -> {
+    };
   }
 }
