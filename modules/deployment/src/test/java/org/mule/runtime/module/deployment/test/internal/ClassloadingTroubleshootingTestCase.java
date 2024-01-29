@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.deployment.test.internal;
 
-import static java.util.Optional.*;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-import static org.hamcrest.Matchers.*;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleBaseFolder;
 import static org.mule.runtime.core.api.util.ClassUtils.MULE_DESIGN_MODE;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
@@ -22,6 +20,9 @@ import static org.mule.test.allure.AllureConstants.Logging.LOGGING;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import static com.github.valfirst.slf4jtest.TestLoggerFactory.getTestLogger;
@@ -29,6 +30,9 @@ import static org.apache.commons.io.FileUtils.copyFile;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultMuleApplication;
 import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileBuilder;
@@ -69,7 +73,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
   private static final boolean USES_MODULE_LAYER = isJavaVersionAtLeast(JAVA_17);
   private static final String EXPECT_LOGGING_DIRECTORY =
       "classloading-troubleshooting/errors/" + (USES_MODULE_LAYER ? "usesModuleLayers/" : "usesClassLoaders/");
-  private static final Optional<String> OP2_MODIFIER = USES_MODULE_LAYER ? of("-op2") : Optional.empty();
+  private static final Optional<String> OP2_MODIFIER = USES_MODULE_LAYER ? of("-op2") : empty();
 
   @Rule
   public SystemProperty muleDesignModeSystemProperty = new SystemProperty(MULE_DESIGN_MODE, "true");
@@ -114,7 +118,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-config-yaml-not-found", Optional.empty());
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-config-yaml-not-found", empty());
   }
 
   @Test
@@ -137,7 +141,7 @@ public class ClassloadingTroubleshootingTestCase extends AbstractDeploymentTestC
     assertDeploymentFailure(domainDeploymentListener, domainFileBuilder.getId());
     assertThat(toMessages(loggerDefaultArchiveDeployer.getAllLoggingEvents()),
                hasItem("Failed to deploy artifact [domain-classloading-troubleshooting-1.0.0-mule-domain]"));
-    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-overrideme-class-not-found", Optional.empty());
+    assertExpectedContentInDomainLog(EXPECT_LOGGING_DIRECTORY + "domain-overrideme-class-not-found", empty());
   }
 
   @Test
