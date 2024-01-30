@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.util.Arrays.asList;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
@@ -21,11 +14,20 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.transaction.MuleTransactionConfig.ACTION_INDIFFERENT_STRING;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
+import static java.util.Arrays.asList;
+import static java.util.Optional.of;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.TypedComponentIdentifier;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.processor.TryScope;
 import org.mule.runtime.core.internal.registry.SimpleRegistry;
@@ -45,6 +47,7 @@ import javax.xml.namespace.QName;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -53,7 +56,7 @@ public class TryProcessorFactoryBeanTestCase extends AbstractMuleTestCase {
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
-  private final MuleContextWithRegistry muleContextMock = mockContextWithServices();
+  private final MuleContext muleContextMock = mockContextWithServices();
 
   private SimpleRegistry registry;
 
