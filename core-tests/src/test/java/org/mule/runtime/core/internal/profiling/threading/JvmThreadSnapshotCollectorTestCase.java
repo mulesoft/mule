@@ -36,7 +36,7 @@ import org.junit.Test;
 @Story(DEFAULT_PROFILING_SERVICE)
 public class JvmThreadSnapshotCollectorTestCase {
 
-  private static ExecutorService executor;
+  private ExecutorService executor;
   private static final long TEST_TIME = 10L;
 
   private final Object theSharedLock = new Object();
