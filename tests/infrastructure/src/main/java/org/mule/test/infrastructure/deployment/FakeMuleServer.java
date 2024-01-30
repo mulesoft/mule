@@ -73,6 +73,7 @@ public class FakeMuleServer {
   private final RepositoryService repositoryService;
 
   private final File muleHome;
+  private final String muleLoggingFile;
   private File appsDir;
   private File domainsDir;
   private File logsDir;
@@ -105,6 +106,11 @@ public class FakeMuleServer {
   }
 
   public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions) {
+    this(muleHomePath, initialCoreExtensions, "log4j2-test.xml");
+  }
+
+  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions, String muleLoggingFile) {
+    this.muleLoggingFile = muleLoggingFile;
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
         // This is done to guarantee that different fake servers (containers)
@@ -276,7 +282,7 @@ public class FakeMuleServer {
     createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
-    URL log4jFile = currentThread().getContextClassLoader().getResource("log4j2-test.xml");
+    URL log4jFile = currentThread().getContextClassLoader().getResource(muleLoggingFile);
     copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
   }
 
