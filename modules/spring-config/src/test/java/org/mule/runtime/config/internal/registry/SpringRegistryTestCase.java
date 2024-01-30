@@ -106,7 +106,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     // Previous phases are run for consistency of the Registry and the LifeCycleManager
     registry.fireLifecycle(Initialisable.PHASE_NAME);
     registry.fireLifecycle(Startable.PHASE_NAME);
-    // The stop phase will trigger a registry update intent via BeanWithLifeCycle.stop()
+    // The stop phase will trigger a registry update intent via
     Future<?> stopPhaseResult = executor.submit(() -> {
       try {
         registry.fireLifecycle(Stoppable.PHASE_NAME);
@@ -156,29 +156,30 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
    * @param lifecycleInterceptor     The {@link LifecycleInterceptor} to be used.
    * @param singletonBeansToRegister key/value map of singleton beans that will be already registered in the returned
    *                                 {@link SpringRegistry}
-   * @return {@link SpringRegistry} that can be tested via invoking its lifecycle phases.
+   * @return A {@link SpringRegistry} that can be tested via invoking its lifecycle phases.
    */
   private SpringRegistry buildLifeCycleTesteableSpringRegistry(LifecycleInterceptor lifecycleInterceptor,
                                                                Map<String, ?> singletonBeansToRegister) {
-    // This makes the bean look like a registered bean (The ApplicationContext is mocked).
+    // This makes the beans look like a registered Spring beans (Spring's ApplicationContext is mocked).
     singletonBeansToRegister.forEach((key, value) -> {
       when(appContext.getBean(key)).thenReturn(value);
       when(appContext.isSingleton(key)).thenReturn(true);
-      // No dependencies for any of the beans.
+      // No dependencies for any of the registered beans.
       when(beanFactory.getDependenciesForBean(key)).thenReturn(new String[0]);
     });
-    // The registry is created and will return all the previously registered beans as lifecycle objects.
     return new SpringRegistry(appContext, appContext,
                               null, mock(ConfigurationDependencyResolver.class),
                               lifecycleInterceptor) {
 
       @Override
       <T> Map<String, T> lookupEntriesForLifecycle(Class<T> type) {
+        // The will return all the previously registered beans as lifecycle objects.
         return (Map<String, T>) singletonBeansToRegister;
       }
 
       @Override
       protected <T> Map<String, T> lookupEntriesForLifecycleIncludingAncestors(Class<T> type) {
+        // The will return all the previously registered beans as lifecycle objects.
         return (Map<String, T>) singletonBeansToRegister;
       }
 
@@ -191,6 +192,13 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     private final ExecutorService registrationExecutor;
     private final String phaseUnderTest;
 
+    /**
+     * A bean that implements {@link Stoppable} and {@link Disposable} lifecycle phases and can try to register a bean as part of
+     * each of them.
+     * 
+     * @param registrationExecutor Executor that will be used to register the beans (registrations happen on a different thread).
+     * @param phaseUnderTest       The lifecycle phase where the bean registration should be attempted.
+     */
     public BeanWithLifeCycle(ExecutorService registrationExecutor, String phaseUnderTest) {
       this.registrationExecutor = registrationExecutor;
       this.phaseUnderTest = phaseUnderTest;
@@ -219,12 +227,13 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     }
 
     private void addObjectToRegistry(String registryKey, Object objectToAdd) throws ExecutionException, InterruptedException {
-      // This registration will be put on hold buy the registry if it is being stopped / disposed
+      // This registration will fail if the registry is being shut down (starting to stop, stopped, starting to dispose or
+      // disposed)
       registrationExecutor.submit(() -> {
         try {
           registryUnderTest.registerObject(registryKey, objectToAdd);
         } catch (RegistrationException e) {
-          // Log the exception instead of throwing it (the test assertion is the one that should fail)
+          // We throw the exception so the test can assert it.
           throw new RuntimeException(e);
         }
       }).get();
