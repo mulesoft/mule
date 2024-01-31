@@ -67,7 +67,7 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setUp() throws Exception {
-    muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions(), getMuleLoggingFile());
+    muleServer = new FakeMuleServer(muleHome.getRoot().getAbsolutePath(), getCoreExtensions());
     testServicesSetup.initNotOverriddenServices();
     initialiseServicesIfNeeded();
     muleServer.addZippedService(cachedSchedulerService);
@@ -76,10 +76,6 @@ public class AbstractFakeMuleServerTestCase extends AbstractMuleTestCase {
     if (addExpressionLanguageMetadataService()) {
       muleServer.addZippedService(cachedELMService);
     }
-  }
-
-  protected String getMuleLoggingFile() {
-    return "log4j-test.xml";
   }
 
   // These tests just create a container form the test classpath. There are no modules involved in these tests, so code relying on

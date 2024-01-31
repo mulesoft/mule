@@ -43,10 +43,24 @@ public final class MuleLog4jConfiguratorUtils {
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
     if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
-      configureSelector(contextFactory, new ApplicationReconfigurableLoggerContextSelector());
+      configureSelector(contextFactory, SINGLE_APP_CONTEXT_SELECTOR);
     } else {
       configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
     }
+  }
+
+
+
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean singleAppMode, boolean logSeparation) {
+    if (singleAppMode) {
+      configureSelector(contextFactory, SINGLE_APP_CONTEXT_SELECTOR);
+    } else {
+      configureSelector(contextFactory, logSeparation);
+    }
+  }
+
+  public static ContextSelector resolveSelector() {
+    return new ApplicationReconfigurableLoggerContextSelector();
   }
 
   /**
@@ -64,7 +78,7 @@ public final class MuleLog4jConfiguratorUtils {
     }
   }
 
-  private static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
     contextFactory.setContextSelector(contextSelector, MuleLog4jConfiguratorUtils::disposeIfDisposable);
   }
 

@@ -17,6 +17,7 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
+
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -73,7 +74,6 @@ public class FakeMuleServer {
   private final RepositoryService repositoryService;
 
   private final File muleHome;
-  private final String muleLoggingFile;
   private File appsDir;
   private File domainsDir;
   private File logsDir;
@@ -105,12 +105,7 @@ public class FakeMuleServer {
     this(muleHomePath, new LinkedList<>());
   }
 
-  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions) {
-    this(muleHomePath, initialCoreExtensions, "log4j2-test.xml");
-  }
-
-  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> initialCoreExtensions, String muleLoggingFile) {
-    this.muleLoggingFile = muleLoggingFile;
+  public FakeMuleServer(String muleHomePath, List<MuleCoreExtension> intialCoreExtensions) {
     MuleArtifactResourcesRegistry muleArtifactResourcesRegistry = new MuleArtifactResourcesRegistry.Builder()
         .artifactConfigurationProcessor(serializedAstWithFallbackArtifactConfigurationProcessor())
         // This is done to guarantee that different fake servers (containers)
@@ -123,7 +118,7 @@ public class FakeMuleServer {
     serviceManager = muleArtifactResourcesRegistry.getServiceManager();
     extensionModelLoaderRepository = muleArtifactResourcesRegistry.getExtensionModelLoaderRepository();
 
-    this.coreExtensions = initialCoreExtensions;
+    this.coreExtensions = intialCoreExtensions;
     for (MuleCoreExtension extension : coreExtensions) {
       extension.setContainerClassLoader(containerClassLoader);
     }
@@ -282,7 +277,7 @@ public class FakeMuleServer {
     createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
-    URL log4jFile = currentThread().getContextClassLoader().getResource(muleLoggingFile);
+    URL log4jFile = currentThread().getContextClassLoader().getResource("log4j2-test.xml");
     copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
   }
 
