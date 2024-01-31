@@ -49,20 +49,6 @@ public final class MuleLog4jConfiguratorUtils {
     }
   }
 
-
-
-  public static void configureSelector(MuleLog4jContextFactory contextFactory, boolean singleAppMode, boolean logSeparation) {
-    if (singleAppMode) {
-      configureSelector(contextFactory, SINGLE_APP_CONTEXT_SELECTOR);
-    } else {
-      configureSelector(contextFactory, logSeparation);
-    }
-  }
-
-  public static ContextSelector resolveSelector() {
-    return new ApplicationReconfigurableLoggerContextSelector();
-  }
-
   /**
    * Depending on the given {@code logSeparationEnabled} parameter, it sets an {@link ArtifactAwareContextSelector} or a
    * {@link SimpleContextSelector} to the given {@code contextFactory}.
