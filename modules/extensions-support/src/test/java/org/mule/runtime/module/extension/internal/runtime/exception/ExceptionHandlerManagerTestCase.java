@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.HONOUR_EXTENSION_ERROR_NAMESPACE;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -13,7 +15,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -26,8 +27,12 @@ import org.mule.runtime.api.meta.model.error.ErrorModelBuilder;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandler;
 import org.mule.runtime.extension.api.runtime.exception.ExceptionHandlerFactory;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
+import org.junit.Rule;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -51,6 +56,11 @@ public class ExceptionHandlerManagerTestCase {
   private static final String MULE_NAMESPACE = "MULE";
   private static final String CONNECTIVITY_ERROR_TYPE = "CONNECTIVITY";
   private static final String ERROR_MESSAGE = "ERROR MESSAGE";
+  private static final String EXTENSION_NAME_WITH_SPACES = "extension With Spaces";
+
+  @Rule
+  public SystemProperty HONOURS_ERROR_NAMESPACE = new SystemProperty(HONOUR_EXTENSION_ERROR_NAMESPACE, "true");
+
   @Mock(lenient = true)
   private ExtensionModel extensionModel;
 
@@ -141,6 +151,31 @@ public class ExceptionHandlerManagerTestCase {
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE).build());
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
     when(extensionModel.getErrorModels()).thenReturn(errorModels);
+
+    ExceptionHandlerManager exceptionHandlerManager =
+        new ExceptionHandlerManager(extensionModel, sourceModel, errorTypeRepository);
+    ConnectionException connectionException = new ConnectionException(ERROR_MESSAGE, new Exception());
+
+    Throwable throwable = exceptionHandlerManager.handleThrowable(new Throwable(connectionException));
+    assertThat(throwable, is(instanceOf(ConnectionException.class)));
+    assertThat(throwable.getMessage(), is(ERROR_MESSAGE));
+    assertThat(((ConnectionException) throwable).getErrorType().isPresent(), is(true));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getIdentifier(), is(CONNECTIVITY_ERROR_TYPE));
+    assertThat(((ConnectionException) throwable).getErrorType().get().getNamespace(), is(EXTENSION_NAMESPACE));
+  }
+
+  @Test
+  @Issue("W-10617943")
+  @Description("This test checks for extension names with spaces and verifies that correct error type is picked based on namespace")
+  public void handleConnectionExceptionExtensionWithSpacesAndCustomConnectivityError() {
+    ExceptionHandlerManager.resetProperties();
+    Set<ErrorModel> errorModels = new HashSet<>();
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE).build());
+    errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
+
+    when(extensionModel.getName()).thenReturn(EXTENSION_NAME_WITH_SPACES);
+    when(extensionModel.getErrorModels()).thenReturn(errorModels);
+    when(extensionModel.getXmlDslModel()).thenReturn(XmlDslModel.builder().setPrefix(EXTENSION_NAMESPACE).build());
 
     ExceptionHandlerManager exceptionHandlerManager =
         new ExceptionHandlerManager(extensionModel, sourceModel, errorTypeRepository);
