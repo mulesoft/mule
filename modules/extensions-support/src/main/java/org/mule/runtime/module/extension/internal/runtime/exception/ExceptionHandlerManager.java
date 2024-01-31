@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 public final class ExceptionHandlerManager {
 
   private static final ExceptionHandler DEFAULT_EXCEPTION_ENRICHER = new NullExceptionHandler();
-  private static final boolean HONOURS_EXTENSION_NAMESPACE = true;// getBoolean(HONOUR_EXTENSION_ERROR_NAMESPACE);
+  private static boolean HONOURS_EXTENSION_NAMESPACE = getBoolean(HONOUR_EXTENSION_ERROR_NAMESPACE);
   private final ExceptionHandler exceptionHandler;
   private final ErrorType connectionErrorType;
 
@@ -127,5 +127,9 @@ public final class ExceptionHandlerManager {
 
   ExceptionHandler getExceptionHandler() {
     return exceptionHandler;
+  }
+
+  static void resetProperties() {
+    HONOURS_EXTENSION_NAMESPACE = getBoolean(HONOUR_EXTENSION_ERROR_NAMESPACE);
   }
 }

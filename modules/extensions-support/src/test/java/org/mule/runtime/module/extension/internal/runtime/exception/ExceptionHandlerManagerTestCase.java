@@ -168,6 +168,7 @@ public class ExceptionHandlerManagerTestCase {
   @Issue("W-10617943")
   @Description("This test checks for extension names with spaces and verifies that correct error type is picked based on namespace")
   public void handleConnectionExceptionExtensionWithSpacesAndCustomConnectivityError() {
+    ExceptionHandlerManager.resetProperties();
     Set<ErrorModel> errorModels = new HashSet<>();
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, EXTENSION_NAMESPACE).build());
     errorModels.add(ErrorModelBuilder.newError(CONNECTIVITY_ERROR_TYPE, MULE_NAMESPACE).build());
