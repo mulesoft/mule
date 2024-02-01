@@ -18,5 +18,6 @@ module org.mule.boot.tanuki {
 
   // Tanuki wrapper
   requires wrapper;
+  requires org.apache.commons.cli;
 
 }
