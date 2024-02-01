@@ -30,7 +30,8 @@
                                stereotypableIronManConfig="daIronMan"
                                stereotypableMultipleConfig="daHeisenberg"
                                stereotypableWeirdConfig="daIronMan" >
-        <module-stereotypes:connection stereotypableIronManConfigInConnection="daIronMan"/>
+        <module-stereotypes:connection stereotypableIronManConfigInConnection="daIronMan"
+                                       stereotypableWeirdConfigInConnection="daHeisenberg"/>
     </module-stereotypes:config>
 
     <flow name="testParameterizedStereotypeDoesCorrectBindingAndConnectorWorks">

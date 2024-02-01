@@ -14,6 +14,7 @@
     <property name="stereotypableWeirdConfig" type="string" />
     <connection>
         <property name="stereotypableIronManConfigInConnection" type="string"/>
+        <property name="stereotypableWeirdConfigInConnection" type="string"/>
     </connection>
 
     <!-- disregard the 'xmlns:connection="true"' as it's needed due to Smart Connectors goes over the XML to provide test connection and the purpose of this test is messing around with stereotypes -->
@@ -22,7 +23,9 @@
     </marvel:dr-strange-config>
 
     <marvel:dr-strange-config name="aSecondDrStrangeConfig" ironManConfig="#[vars.stereotypableWeirdConfig]">
-        <marvel:mystic-connection multipleConfig="#[vars.stereotypableWeirdConfig]" />
+        <marvel:mystic-connection multipleConfig="#[vars.stereotypableWeirdConfig]">
+			<marvel:target-realm realmConfig="#[vars.stereotypableWeirdConfigInConnection]"/>
+        </marvel:mystic-connection>
     </marvel:dr-strange-config>
 
     <marvel:dr-strange-config name="aThirdDrStrangeConfig" ironManConfig="#[vars.stereotypableIronManConfigInConnection]"/>
