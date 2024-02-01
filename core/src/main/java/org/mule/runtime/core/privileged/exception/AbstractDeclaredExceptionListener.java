@@ -38,6 +38,7 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
   private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   private String logException = TRUE.toString();
+  private boolean enableNotifications = true;
 
   public List<Processor> getMessageProcessors() {
     return messageProcessors;
@@ -107,6 +108,14 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
 
   public void setLogException(String logException) {
     this.logException = logException;
+  }
+
+  public boolean getEnableNotifications() {
+    return enableNotifications;
+  }
+
+  public void setEnableNotifications(boolean enableNotifications) {
+    this.enableNotifications = enableNotifications;
   }
 
 }
