@@ -285,6 +285,11 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
         public void onDeploymentSuccess(String artifactName) {
           deploymentDirectoryWatcher.stop();
         }
+
+        @Override
+        public void onDeploymentFailure(String artifactName, Throwable cause) {
+          deploymentErrorConsumer.accept(cause);
+        }
       });
 
       this.deploymentDirectoryWatcher.start();
