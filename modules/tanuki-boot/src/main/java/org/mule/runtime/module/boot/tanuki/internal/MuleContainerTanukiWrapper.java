@@ -12,6 +12,10 @@ import org.mule.runtime.module.boot.internal.AbstractMuleContainerWrapper;
 import org.mule.runtime.module.boot.internal.MuleContainerFactory;
 import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import org.apache.commons.cli.CommandLine;
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -28,6 +32,16 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
   private static final long EVENT_FLAG_LOGGING = 4L;
 
   private boolean isStarted = false;
+
+  @Override
+  public void configureAndStart(MuleContainerFactory muleContainerFactory, CommandLine commandLine) {
+    // Force early initialization of sun.util.locale.provider.LocaleProviderAdapter to prevent a deadlock between that class
+    // initialization and the configuration of the logging system (that deadlock manifests only when using tanuki's wrapperDebug
+    // option in Java 21).
+    NumberFormat.getInstance(Locale.getDefault());
+
+    super.configureAndStart(muleContainerFactory, commandLine);
+  }
 
   @Override
   protected void start(MuleContainerFactory muleContainerFactory, String[] args) {
