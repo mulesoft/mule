@@ -6,17 +6,14 @@
  */
 package org.mule.runtime.config.internal.registry;
 
-import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.REGISTRY;
 import static org.mule.test.allure.AllureConstants.RegistryFeature.ObjectRegistrationStory.OBJECT_REGISTRATION;
 
 import static java.util.Collections.singletonMap;
 
-import static junit.framework.Assert.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -34,21 +31,19 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.junit.Rule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -63,15 +58,12 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
 
   private ExecutorService executor;
 
-  @Rule
-  public SystemProperty failOnLifeCycleErrors = new SystemProperty(MULE_LIFECYCLE_FAIL_ON_FIRST_DISPOSE_ERROR, "true");
-
   @Before
   public void setUp() {
     appContext = mock(ConfigurableApplicationContext.class);
     beanFactory = mock(DefaultListableBeanFactory.class);
     when(appContext.getBeanFactory()).thenReturn(beanFactory);
-    executor = Executors.newFixedThreadPool(2);
+    executor = Executors.newFixedThreadPool(1);
   }
 
   @After
@@ -106,20 +98,11 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     // Previous phases are run for consistency of the Registry and the LifeCycleManager
     registry.fireLifecycle(Initialisable.PHASE_NAME);
     registry.fireLifecycle(Startable.PHASE_NAME);
-    // The stop phase will trigger a registry update intent via
-    Future<?> stopPhaseResult = executor.submit(() -> {
-      try {
-        registry.fireLifecycle(Stoppable.PHASE_NAME);
-      } catch (LifecycleException e) {
-        throw new RuntimeException(e);
-      }
-    });
-    try {
-      stopPhaseResult.get();
-      fail("New entries should not be added to the registry while stopping.");
-    } catch (Throwable e) {
-      assertThat(e, hasRootCause(isA(RegistrationException.class)));
-    }
+    // The stop phase will trigger a registry update intent via BeanWithLifeCycle.stop()
+    registry.fireLifecycle(Stoppable.PHASE_NAME);
+    assertThat(beanWithLifeCycle.getRegistrationException().isPresent(), is(true));
+    assertThat(beanWithLifeCycle.getRegistrationException().get().getMessage(),
+               containsString("Could not add entry with key 'stopObject': Registry was shutting down."));
   }
 
   @Test
@@ -135,19 +118,11 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     registry.fireLifecycle(Initialisable.PHASE_NAME);
     registry.fireLifecycle(Startable.PHASE_NAME);
     registry.fireLifecycle(Stoppable.PHASE_NAME);
-    Future<?> disposePhaseResult = executor.submit(() -> {
-      try {
-        registry.fireLifecycle(Disposable.PHASE_NAME);
-      } catch (LifecycleException e) {
-        throw new RuntimeException(e);
-      }
-    });
-    try {
-      disposePhaseResult.get();
-      fail("New entries should not be added to the registry while disposing.");
-    } catch (Throwable e) {
-      assertThat(e, hasRootCause(isA(RegistrationException.class)));
-    }
+    // The stop phase will trigger a registry update intent via BeanWithLifeCycle.dispose()
+    registry.fireLifecycle(Disposable.PHASE_NAME);
+    assertThat(beanWithLifeCycle.getRegistrationException().isPresent(), is(true));
+    assertThat(beanWithLifeCycle.getRegistrationException().get().getMessage(),
+               containsString("Could not add entry with key 'disposeObject': Registry was shutting down."));
   }
 
   /**
@@ -182,7 +157,6 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
         // The will return all the previously registered beans as lifecycle objects.
         return (Map<String, T>) singletonBeansToRegister;
       }
-
     };
   }
 
@@ -191,6 +165,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     private SpringRegistry registryUnderTest;
     private final ExecutorService registrationExecutor;
     private final String phaseUnderTest;
+    private volatile RegistrationException registrationException;
 
     /**
      * A bean that implements {@link Stoppable} and {@link Disposable} lifecycle phases and can try to register a bean as part of
@@ -233,6 +208,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
         try {
           registryUnderTest.registerObject(registryKey, objectToAdd);
         } catch (RegistrationException e) {
+          registrationException = e;
           // We throw the exception so the test can assert it.
           throw new RuntimeException(e);
         }
@@ -241,6 +217,10 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
 
     public void setRegistryUnderTest(SpringRegistry registryUnderTest) {
       this.registryUnderTest = registryUnderTest;
+    }
+
+    public Optional<RegistrationException> getRegistrationException() {
+      return Optional.ofNullable(registrationException);
     }
   }
 
