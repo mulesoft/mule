@@ -8,32 +8,38 @@ package org.mule.runtime.core.internal.util;
 
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.isRecommendedJdkVersion;
 import static org.mule.runtime.core.internal.util.JdkVersionUtils.isSupportedJdkVersion;
-import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.JdkVersionStory.JDK_VERSION;
 import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.SUPPORTED_ENVIRONMENTS;
+import static org.mule.test.allure.AllureConstants.SupportedEnvironmentsFeature.JdkVersionStory.JDK_VERSION;
 
 import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.OrderingComparison.comparesEqualTo;
+import static org.hamcrest.number.OrderingComparison.greaterThan;
+import static org.hamcrest.number.OrderingComparison.lessThan;
+import static org.hamcrest.text.IsEmptyString.emptyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(SUPPORTED_ENVIRONMENTS)
 @Story(JDK_VERSION)
@@ -68,37 +74,40 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void testIsSupportedJdkVersion() {
     // supported
-    assertTrue(isSupportedJdkVersion());
+    assertThat("Java version `" + getProperty("java.version") + "` not supported",
+               isSupportedJdkVersion(), is(true));
 
-    List<String> supported = Arrays.asList(
-                                           "1.8.0",
-                                           "1.8.20",
-                                           "1.8.0_129",
-                                           "9.0.0",
-                                           "10.0.0",
-                                           "11.0.0",
-                                           "12.0.0",
-                                           "13.0.0",
-                                           "14.0.0",
-                                           "15.0.0",
-                                           "16.0.0",
-                                           "17.0.0",
-                                           "17.0.6");
+    List<String> supported = asList(
+                                    "1.8.0",
+                                    "1.8.20",
+                                    "1.8.0_129",
+                                    "9.0.0",
+                                    "10.0.0",
+                                    "11.0.0",
+                                    "12.0.0",
+                                    "13.0.0",
+                                    "14.0.0",
+                                    "15.0.0",
+                                    "16.0.0",
+                                    "17.0.0",
+                                    "17.0.6");
 
     for (String version : supported) {
       setJdkVersion(version);
-      assertTrue(isSupportedJdkVersion());
+      assertThat("Java version `" + originalJavaVersion + "` not supported",
+                 isSupportedJdkVersion(), is(true));
     }
 
     // not supported
-    List<String> notSupported = Arrays.asList(
-                                              "1.7.2",
-                                              "1.7.2_12",
-                                              "18.0.0");
+    List<String> notSupported = asList(
+                                       "1.7.2",
+                                       "1.7.2_12",
+                                       "18.0.0");
 
     for (String version : notSupported) {
       setJdkVersion(version);
-      assertFalse(isSupportedJdkVersion());
+      assertThat("Java version `" + originalJavaVersion + "` supported",
+                 isSupportedJdkVersion(), is(false));
     }
   }
 
@@ -108,96 +117,105 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
 
     // not defined - blank
     setJdkPreferences("");
-    assertEquals("", JdkVersionUtils.getRecommendedJdks());
-    assertEquals("", JdkVersionUtils.getSupportedJdks());
+    assertThat(JdkVersionUtils.getRecommendedJdks(), emptyString());
+    assertThat(JdkVersionUtils.getSupportedJdks(), emptyString());
 
-    assertTrue(isRecommendedJdkVersion());
-    assertTrue(JdkVersionUtils.isSupportedJdkVendor());
-    assertTrue(isSupportedJdkVersion());
+    assertThat("Java version `" + getProperty("java.version") + "` not recommended",
+               isRecommendedJdkVersion());
+    assertThat("Java vendor `" + getProperty("java.vm.vendor") + "` not supported",
+               JdkVersionUtils.isSupportedJdkVendor());
+    assertThat("Java version `" + getProperty("java.version") + "` not supported",
+               isSupportedJdkVersion());
 
     // not defined - null
     setJdkPreferences(null);
-    assertNull(JdkVersionUtils.getRecommendedJdks());
-    assertNull(JdkVersionUtils.getSupportedJdks());
+    assertThat(JdkVersionUtils.getRecommendedJdks(), nullValue());
+    assertThat(JdkVersionUtils.getSupportedJdks(), nullValue());
 
-    assertTrue(isRecommendedJdkVersion());
-    assertTrue(JdkVersionUtils.isSupportedJdkVendor());
-    assertTrue(isSupportedJdkVersion());
+    assertThat("Java version `" + getProperty("java.version") + "` not recommended",
+               isRecommendedJdkVersion());
+    assertThat("Java vendor `" + getProperty("java.vm.vendor") + "` not supported",
+               JdkVersionUtils.isSupportedJdkVendor());
+    assertThat("Java version `" + getProperty("java.version") + "` not supported",
+               isSupportedJdkVersion());
   }
 
   private void setJdkPreferences(String preference) throws Exception {
     // mock the manifest (this is where the jdk preferences are taken from
-    Manifest manifest = Mockito.mock(Manifest.class);
-    Attributes attributes = Mockito.mock(Attributes.class);
-    Mockito.when(attributes.getValue(Mockito.any(Attributes.Name.class))).thenReturn(preference);
-    Mockito.when(manifest.getMainAttributes()).thenReturn(attributes);
+    Manifest manifest = mock(Manifest.class);
+    Attributes attributes = mock(Attributes.class);
+    when(attributes.getValue(any(Attributes.Name.class))).thenReturn(preference);
+    when(manifest.getMainAttributes()).thenReturn(attributes);
 
     setManifest(manifest);
   }
 
   @Test
   public void testSupportedJdkVendor() {
-    assertTrue(JdkVersionUtils.isSupportedJdkVendor());
+    assertThat("Java version `" + getProperty("java.version") + "` not supported",
+               JdkVersionUtils.isSupportedJdkVendor(), is(true));
   }
 
   @Test
   public void testRecommendedJdkVersion() {
     // recommended
-    List<String> recommended = Arrays.asList(
-                                             "1.8.0_181",
-                                             "1.8.20",
-                                             "11.0.0",
-                                             "17.0.0",
-                                             "17.0.6");
+    List<String> recommended = asList(
+                                      "1.8.0_181",
+                                      "1.8.20",
+                                      "11.0.0",
+                                      "17.0.0",
+                                      "17.0.6");
 
     for (String version : recommended) {
       setJdkVersion(version);
-      assertTrue(isRecommendedJdkVersion());
+      assertThat("Java version `" + originalJavaVersion + "` not recommended",
+                 isRecommendedJdkVersion(), is(true));
     }
 
     // not recommended
-    List<String> notRecommended = Arrays.asList(
-                                                "1.4.2",
-                                                "1.6",
-                                                "1.6.0_5",
-                                                "1.7.0",
-                                                "9.0.0",
-                                                "10.0.0",
-                                                "12.0.0",
-                                                "13.0.0",
-                                                "14.0.0",
-                                                "15.0.0",
-                                                "16.0.0",
-                                                "18.0.0");
+    List<String> notRecommended = asList(
+                                         "1.4.2",
+                                         "1.6",
+                                         "1.6.0_5",
+                                         "1.7.0",
+                                         "9.0.0",
+                                         "10.0.0",
+                                         "12.0.0",
+                                         "13.0.0",
+                                         "14.0.0",
+                                         "15.0.0",
+                                         "16.0.0",
+                                         "18.0.0");
 
     for (String version : notRecommended) {
       setJdkVersion(version);
-      assertFalse(isRecommendedJdkVersion());
+      assertThat("Java version `" + originalJavaVersion + "` recommended",
+                 isRecommendedJdkVersion(), is(false));
     }
   }
 
   @Test
   public void testJdkVersion() {
     JdkVersion jdkVersion = new JdkVersion("1.7");
-    assertEquals(new Integer(1), jdkVersion.getMajor());
-    assertEquals(new Integer(7), jdkVersion.getMinor());
-    assertNull(jdkVersion.getMicro());
-    assertNull(jdkVersion.getUpdate());
-    assertNull(jdkVersion.getMilestone());
+    assertThat(jdkVersion.getMajor(), is(1));
+    assertThat(jdkVersion.getMinor(), is(7));
+    assertThat(jdkVersion.getMicro(), nullValue());
+    assertThat(jdkVersion.getUpdate(), nullValue());
+    assertThat(jdkVersion.getMilestone(), nullValue());
 
     jdkVersion = new JdkVersion("1.7.0-ea");
-    assertEquals(new Integer(1), jdkVersion.getMajor());
-    assertEquals(new Integer(7), jdkVersion.getMinor());
-    assertEquals(new Integer(0), jdkVersion.getMicro());
-    assertNull(jdkVersion.getUpdate());
-    assertEquals("ea", jdkVersion.getMilestone());
+    assertThat(jdkVersion.getMajor(), is(1));
+    assertThat(jdkVersion.getMinor(), is(7));
+    assertThat(jdkVersion.getMicro(), is(0));
+    assertThat(jdkVersion.getUpdate(), nullValue());
+    assertThat(jdkVersion.getMilestone(), is("ea"));
 
     jdkVersion = new JdkVersion("1.6.0_29-b05");
-    assertEquals(new Integer(1), jdkVersion.getMajor());
-    assertEquals(new Integer(6), jdkVersion.getMinor());
-    assertEquals(new Integer(0), jdkVersion.getMicro());
-    assertEquals(new Integer(29), jdkVersion.getUpdate());
-    assertEquals("b05", jdkVersion.getMilestone());
+    assertThat(jdkVersion.getMajor(), is(1));
+    assertThat(jdkVersion.getMinor(), is(6));
+    assertThat(jdkVersion.getMicro(), is(0));
+    assertThat(jdkVersion.getUpdate(), is(29));
+    assertThat(jdkVersion.getMilestone(), is("b05"));
   }
 
   @Test
@@ -209,23 +227,23 @@ public class JdkVersionUtilsTestCase extends AbstractMuleTestCase {
     JdkVersion jdk1_6_0_29_b04 = new JdkVersion("1.6.0_29-b04");
     JdkVersion jdk1_6_0_29_b05 = new JdkVersion("1.6.0_29-b05");
 
-    assertTrue(jdk1_3.compareTo(jdk1_7) < 0);
-    assertTrue(jdk1_7.compareTo(jdk1_3) > 0);
-    assertTrue(jdk1_3.compareTo(jdk1_3) == 0);
-    assertTrue(jdk1_6_0_29_b05.compareTo(jdk1_6_0_29_b05) == 0);
+    assertThat(jdk1_3, lessThan(jdk1_7));
+    assertThat(jdk1_7, greaterThan(jdk1_3));
+    assertThat(jdk1_3, comparesEqualTo(jdk1_3));
+    assertThat(jdk1_6_0_29_b05, comparesEqualTo(jdk1_6_0_29_b05));
 
-    assertTrue(jdk1_6_0_5.compareTo(jdk1_6_0_29_b04) < 0);
-    assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_5) > 0);
-    assertTrue(jdk1_6_0_29.compareTo(jdk1_6_0_5) > 0);
-    assertTrue(jdk1_6_0_5.compareTo(jdk1_6_0_29) < 0);
-    assertTrue(jdk1_6_0_29.compareTo(jdk1_6_0_29_b04) < 0);
-    assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_29) > 0);
+    assertThat(jdk1_6_0_5, lessThan(jdk1_6_0_29_b04));
+    assertThat(jdk1_6_0_29_b04, greaterThan(jdk1_6_0_5));
+    assertThat(jdk1_6_0_29, greaterThan(jdk1_6_0_5));
+    assertThat(jdk1_6_0_5, lessThan(jdk1_6_0_29));
+    assertThat(jdk1_6_0_29, lessThan(jdk1_6_0_29_b04));
+    assertThat(jdk1_6_0_29_b04, greaterThan(jdk1_6_0_29));
 
-    assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_6_0_29_b05) < 0);
-    assertTrue(jdk1_6_0_29_b05.compareTo(jdk1_6_0_29_b04) > 0);
+    assertThat(jdk1_6_0_29_b04, lessThan(jdk1_6_0_29_b05));
+    assertThat(jdk1_6_0_29_b05, greaterThan(jdk1_6_0_29_b04));
 
-    assertTrue(jdk1_6_0_29_b04.compareTo(jdk1_7) < 0);
-    assertTrue(jdk1_7.compareTo(jdk1_6_0_29_b04) > 0);
+    assertThat(jdk1_6_0_29_b04, lessThan(jdk1_7));
+    assertThat(jdk1_7, greaterThan(jdk1_6_0_29_b04));
   }
 
   @Test
