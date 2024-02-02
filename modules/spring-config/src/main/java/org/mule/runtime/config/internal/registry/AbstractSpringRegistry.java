@@ -430,15 +430,15 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
-        // Avoid trying to register objects while the registry is being shut down.
+        // Avoid trying to register objects while the registry is being stopped.
         if (isShuttingDown.get()) {
-          throw new RegistrationException(createStaticMessage(String
-              .format("Could not add entry with key '%s': Registry was shutting down.", key)));
+          throw new RegistrationException(createStaticMessage(format("Could not add entry with key '%s': Registry has been stopped.",
+                                                                     key)));
         } else {
           synchronized (isShuttingDown) {
             if (isShuttingDown.get()) {
-              throw new RegistrationException(createStaticMessage(String
-                  .format("Could not add entry with key '%s': Registry was shutting down.", key)));
+              throw new RegistrationException(createStaticMessage(format("Could not add entry with key '%s': Registry has been stopped.",
+                                                                         key)));
             } else {
               doRegisterObject(key, value);
             }
