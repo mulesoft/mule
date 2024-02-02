@@ -83,6 +83,7 @@ module org.mule.runtime.spring.config {
   // Spring JNDI support
   requires java.naming;
   requires java.transaction;
+  requires org.mule.runtime.artifact.ast;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;

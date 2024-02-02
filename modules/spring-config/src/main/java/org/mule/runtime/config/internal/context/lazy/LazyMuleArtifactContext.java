@@ -117,6 +117,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final Map<String, String> artifactProperties;
   private final LockFactory runtimeLockFactory;
+  private ArtifactAst applicationModelBeforeMacroExpansion;
 
   /**
    * Parses configuration files creating a spring ApplicationContext which is used as a parent registry using the SpringRegistry
@@ -175,6 +176,9 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
 
+    this.applicationModelBeforeMacroExpansion = getApplicationModel();
+
+    initialize();
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
     this.graph = generateFor(getApplicationModel());
@@ -507,7 +511,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
         return emptyList();
       }
 
-      initializationRequest.validateRequestedAst(this::validateModel);
+      validateArtifact(applicationModelBeforeMacroExpansion);
       ArtifactAst minimalAst = initializationRequest.getFilteredAstToInitialize();
 
       initialize();
