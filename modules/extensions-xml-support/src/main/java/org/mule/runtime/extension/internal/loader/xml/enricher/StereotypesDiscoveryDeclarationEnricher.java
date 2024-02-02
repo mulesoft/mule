@@ -6,18 +6,15 @@
  */
 package org.mule.runtime.extension.internal.loader.xml.enricher;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.loader.DeclarationEnricherPhase.POST_STRUCTURE;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.metadata.api.model.StringType;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.el.BindingContextUtils;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
@@ -25,14 +22,11 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
-import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
-import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.declaration.fluent.util.IdempotentDeclarationWalker;
-import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.DeclarationEnricherPhase;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
@@ -41,10 +35,8 @@ import org.mule.runtime.extension.internal.ast.property.OperationComponentModelM
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 
 /**
@@ -63,17 +55,10 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
   @Override
   public void enrich(ExtensionLoadingContext extensionLoadingContext) {
     withContextClassLoader(extensionLoadingContext.getExtensionClassLoader(),
-                           () -> new EnricherDelegate(extensionLoadingContext.getDslResolvingContext())
-                               .apply(extensionLoadingContext));
+                           () -> new EnricherDelegate().apply(extensionLoadingContext));
   }
 
   private static class EnricherDelegate {
-
-    final DslResolvingContext dslResolvingContext;
-
-    EnricherDelegate(DslResolvingContext dslResolvingContext) {
-      this.dslResolvingContext = dslResolvingContext;
-    }
 
     public void apply(ExtensionLoadingContext extensionLoadingContext) {
       ExtensionDeclaration extensionDeclaration = extensionLoadingContext.getExtensionDeclarer().getDeclaration();
@@ -102,7 +87,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
 
                 declaration.getAllParameters().stream()
                     .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
-                    .forEach(parameterDeclaration -> traverseProperty(bodyComponentModel.directChildrenStream(),
+                    .forEach(parameterDeclaration -> traverseProperty(bodyComponentModel.directChildren(),
                                                                       parameterDeclaration));
               });
 
@@ -115,7 +100,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
                                  List<ParameterDeclaration> allParameters) {
       globalElementModelProperty.ifPresent(modelProperty -> allParameters.stream()
           .filter(parameterDeclaration -> parameterDeclaration.getType() instanceof StringType)
-          .forEach(parameterDeclaration -> traverseProperty(globalElementModelProperty.get().getGlobalElements().stream(),
+          .forEach(parameterDeclaration -> traverseProperty(modelProperty.getGlobalElements(),
                                                             parameterDeclaration)));
     }
 
@@ -130,7 +115,7 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
      * @param parameterDeclaration parameter used to look up in the elements' usages, and the one that will hold the stereotypes
      *                             if found.
      */
-    private void traverseProperty(Stream<ComponentAst> componentModels,
+    private void traverseProperty(Collection<ComponentAst> componentModels,
                                   ParameterDeclaration parameterDeclaration) {
       final List<List<StereotypeModel>> allowedStereotypeModels = new ArrayList<>();
       componentModels.forEach(componentModel -> {
@@ -159,57 +144,20 @@ public class StereotypesDiscoveryDeclarationEnricher implements DeclarationEnric
       return componentModel.getParameters().stream()
           .filter(paramAst -> expectedPropertyReference.equals(paramAst.getResolvedRawValue()))
           .map(paramAst -> paramAst.getModel().getName())
-          .map(attributeName -> findStereotypes(componentModel.getIdentifier(), attributeName))
+          .map(attributeName -> findStereotypes(componentModel, attributeName))
           .flatMap(Collection::stream)
           .collect(toList());
     }
 
-    private List<StereotypeModel> findStereotypes(ComponentIdentifier componentModelIdentifier, String attributeName) {
-      final List<StereotypeModel> allowedStereotypes = new ArrayList<>();
-      dslResolvingContext.getExtensions().stream()
-          .filter(extensionModel -> extensionModel.getXmlDslModel().getPrefix().equals(componentModelIdentifier.getNamespace()))
-          .findFirst()
-          .ifPresent(extensionModel -> {
-
-            final DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
-
-            new IdempotentExtensionWalker() {
-
-              @Override
-              protected void onConfiguration(ConfigurationModel configurationModel) {
-                allowedStereotypes
-                    .addAll(getStereotypeModels(configurationModel, attributeName, dslSyntaxResolver, componentModelIdentifier));
-              }
-
-              @Override
-              protected void onConnectionProvider(ConnectionProviderModel connectionProviderModel) {
-                allowedStereotypes
-                    .addAll(getStereotypeModels(connectionProviderModel, attributeName, dslSyntaxResolver,
-                                                componentModelIdentifier));
-              }
-
-              @Override
-              protected void onOperation(OperationModel operationModel) {
-                allowedStereotypes
-                    .addAll(getStereotypeModels(operationModel, attributeName, dslSyntaxResolver, componentModelIdentifier));
-              }
-            }.walk(extensionModel);
-          });
-      return allowedStereotypes;
+    private List<StereotypeModel> findStereotypes(ComponentAst componentModel, String attributeName) {
+      return componentModel.getModel(ParameterizedModel.class)
+          .flatMap(pmzd -> pmzd.getAllParameterModels()
+              .stream()
+              .filter(pm -> pm.getName().equals(attributeName))
+              .findAny())
+          .map(pm -> pm.getAllowedStereotypes())
+          .orElse(emptyList());
     }
 
-    private static List<StereotypeModel> getStereotypeModels(ParameterizedModel parameterizedModel, String attributeName,
-                                                             DslSyntaxResolver dslSyntaxResolver,
-                                                             ComponentIdentifier componentModelIdentifier) {
-      List<StereotypeModel> allowedStereotypes = Collections.EMPTY_LIST;
-      if (dslSyntaxResolver.resolve(parameterizedModel).getElementName().equals(componentModelIdentifier.getName())) {
-        allowedStereotypes = parameterizedModel.getAllParameterModels().stream()
-            .filter(parameterModel -> dslSyntaxResolver.resolve(parameterModel).getAttributeName().equals(attributeName))
-            .map(ParameterModel::getAllowedStereotypes)
-            .flatMap(Collection::stream)
-            .collect(toList());
-      }
-      return allowedStereotypes;
-    }
   }
 }

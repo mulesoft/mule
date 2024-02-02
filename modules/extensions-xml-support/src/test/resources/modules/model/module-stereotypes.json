@@ -3,12 +3,12 @@
   "description": "",
   "version": "4.0.0",
   "vendor": "MuleSoft",
-  "category": "COMMUNITY",
   "supportedJavaVersions": [
     "1.8",
     "11",
     "17"
   ],
+  "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "module-stereotypes",
     "namespace": "http://www.mulesoft.org/schema/mule/module-stereotypes",
@@ -359,13 +359,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "CALL-FLOW",
             "namespace": "MODULE-STEREOTYPES",
@@ -730,13 +730,13 @@
             "modelProperties": {}
           },
           "transactional": false,
-          "visibility": "PUBLIC",
           "requiresConnection": false,
           "supportsStreaming": false,
           "notifications": [],
           "nestedComponents": [],
           "errors": [],
           "semanticTerms": [],
+          "visibility": "PUBLIC",
           "stereotype": {
             "type": "DO-SOMETHING",
             "namespace": "MODULE-STEREOTYPES",
@@ -1124,6 +1124,46 @@
                   ],
                   "semanticTerms": [],
                   "name": "stereotypableIronManConfigInConnection",
+                  "displayModel": {},
+                  "description": "",
+                  "modelProperties": {}
+                },
+                {
+                  "type": {
+                    "format": "java",
+                    "type": "String"
+                  },
+                  "hasDynamicType": false,
+                  "required": true,
+                  "isConfigOverride": false,
+                  "isComponentId": false,
+                  "fieldValueProviderModels": [],
+                  "expressionSupport": "SUPPORTED",
+                  "role": "BEHAVIOUR",
+                  "dslConfiguration": {
+                    "allowsInlineDefinition": false,
+                    "allowsReferences": false,
+                    "allowTopLevelDefinition": false
+                  },
+                  "layoutModel": {
+                    "password": false,
+                    "text": false,
+                    "query": false,
+                    "order": 2,
+                    "tabName": "General"
+                  },
+                  "allowedStereotypeModels": [
+                    {
+                      "type": "CONFIG",
+                      "namespace": "HEISENBERG",
+                      "parent": {
+                        "type": "MODULE_CONFIG",
+                        "namespace": "MULE"
+                      }
+                    }
+                  ],
+                  "semanticTerms": [],
+                  "name": "stereotypableWeirdConfigInConnection",
                   "displayModel": {},
                   "description": "",
                   "modelProperties": {}

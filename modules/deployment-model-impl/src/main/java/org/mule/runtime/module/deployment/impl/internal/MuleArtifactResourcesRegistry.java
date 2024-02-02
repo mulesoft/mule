@@ -25,6 +25,7 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -99,6 +100,7 @@ import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -142,6 +144,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ProfiledMemoryManagementService memoryManagementService;
     private final Set<String> bootPackages = new HashSet<>();
     private final Set<String> additionalResourceDirectories = new HashSet<>();
+    private Consumer<ClassLoader> actionOnMuleArtifactDeployment = cl -> {
+    };
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -195,6 +199,21 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     }
 
     /**
+     * An action to perform on the classloader when the artifact is deployed.
+     *
+     * @since 4.7.0
+     *
+     * @param actionOnMuleArtifactDeployment the action to be performed.
+     * @return the current builder.
+     * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
+     */
+    public Builder withActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+      requireNonNull(actionOnMuleArtifactDeployment);
+      this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
+      return this;
+    }
+
+    /**
      * Builds the desired instance
      *
      * @return a new {@link MuleArtifactResourcesRegistry} with the provided configuration.
@@ -212,7 +231,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
       try {
         return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor,
-                                                 memoryManagementService);
+                                                 memoryManagementService, actionOnMuleArtifactDeployment);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
@@ -231,7 +250,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private MuleArtifactResourcesRegistry(ArtifactClassLoader containerClassLoader,
                                         ModuleRepository moduleRepository,
                                         ArtifactConfigurationProcessor artifactConfigurationProcessor,
-                                        ProfiledMemoryManagementService memoryManagementService)
+                                        ProfiledMemoryManagementService memoryManagementService,
+                                        Consumer<ClassLoader> actionOnMuleArtifactDeployment)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
     super(null);
@@ -329,7 +349,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        licenseValidator,
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,
-                                                       artifactConfigurationProcessor);
+                                                       artifactConfigurationProcessor,
+                                                       actionOnMuleArtifactDeployment);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);

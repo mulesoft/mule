@@ -17,6 +17,7 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -109,6 +111,7 @@ public class FakeMuleServer {
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
+        .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
