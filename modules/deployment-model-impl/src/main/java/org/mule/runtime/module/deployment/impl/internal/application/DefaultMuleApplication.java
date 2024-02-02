@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -100,6 +101,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   private final MemoryManagementService memoryManagementService;
   private final ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private final ArtifactConfigurationProcessor artifactConfigurationProcessor;
+  private final Consumer<ClassLoader> actionOnMuleArtifactDeployment;
   private ApplicationStatus status;
 
   protected MuleContextListener muleContextListener;
@@ -120,6 +122,24 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
                                 LockFactory runtimeLockFactory,
                                 MemoryManagementService memoryManagementService,
                                 ArtifactConfigurationProcessor artifactConfigurationProcessor) {
+    this(descriptor, deploymentClassLoader, artifactPlugins, domainRepository, serviceRepository, extensionModelLoaderRepository,
+         location, classLoaderRepository, applicationPolicyProvider, runtimeLockFactory, memoryManagementService,
+         artifactConfigurationProcessor, cl -> {
+         });
+
+  }
+
+  public DefaultMuleApplication(ApplicationDescriptor descriptor,
+                                MuleDeployableArtifactClassLoader deploymentClassLoader,
+                                List<ArtifactPlugin> artifactPlugins, DomainRepository domainRepository,
+                                ServiceRepository serviceRepository,
+                                ExtensionModelLoaderRepository extensionModelLoaderRepository, File location,
+                                ClassLoaderRepository classLoaderRepository,
+                                ApplicationPolicyProvider applicationPolicyProvider,
+                                LockFactory runtimeLockFactory,
+                                MemoryManagementService memoryManagementService,
+                                ArtifactConfigurationProcessor artifactConfigurationProcessor,
+                                Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
     super("app", "application", deploymentClassLoader);
     this.descriptor = descriptor;
     this.domainRepository = domainRepository;
@@ -133,6 +153,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
     this.memoryManagementService = memoryManagementService;
     this.expressionLanguageMetadataService = getExpressionLanguageMetadataService(serviceRepository);
     this.artifactConfigurationProcessor = artifactConfigurationProcessor;
+    this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
     if (this.deploymentClassLoader == null) {
       throw new IllegalArgumentException("Classloader cannot be null");
@@ -253,6 +274,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
               .setDefaultEncoding(descriptor.getEncoding())
               .setArtifactPlugins(artifactPlugins)
               .setExecutionClassloader(deploymentClassLoader.getClassLoader())
+              .setActionOnMuleArtifactDeployment(actionOnMuleArtifactDeployment)
               .setEnableLazyInit(lazy)
               .setDisableXmlValidations(disableXmlValidations)
               .setAddToolingObjectsToRegistry(addToolingObjectsToRegistry)
