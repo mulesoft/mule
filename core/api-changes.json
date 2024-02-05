@@ -1,4 +1,22 @@
 {
+  "4.6.1": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method boolean org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::getEnableNotifications()",
+          "justification": "W-14784223: On Error Continue - EnableNotifications check is not working"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.added",
+          "new": "method void org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::setEnableNotifications(boolean)",
+          "justification": "W-14784223: On Error Continue - EnableNotifications check is not working"
+        }
+      ]
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [

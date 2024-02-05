@@ -458,7 +458,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
                                                                    getLocation(), PROCESS_START));
-      getExceptionListener().fireNotification(exception, event);
+      if (getEnableNotifications()) {
+        getExceptionListener().fireNotification(exception, event);
+      }
       logException(exception, event);
       getExceptionListener().processStatistics();
       markExceptionAsHandledIfRequired(exception);
