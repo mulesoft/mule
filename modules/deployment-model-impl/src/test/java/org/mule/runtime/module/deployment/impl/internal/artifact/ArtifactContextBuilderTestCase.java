@@ -10,6 +10,7 @@ import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGIN
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
+import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_WAS_NOT_SET;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.EXECUTION_CLASSLOADER_WAS_NOT_SET;
@@ -134,6 +135,12 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
   public void buildWithoutClassloaderRepository() throws Exception {
     expectedException.expectMessage(CLASS_LOADER_REPOSITORY_WAS_NOT_SET);
     newBuilder().setExecutionClassloader(currentThread().getContextClassLoader()).build();
+  }
+
+  @Test
+  public void buildWithActionOnMuleArtifactDeployment() throws Exception {
+    expectedException.expectMessage(ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
+    newBuilder().setActionOnMuleArtifactDeployment(null).build();
   }
 
   @Test

@@ -7,11 +7,15 @@
 package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
 
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory;
+
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.core.selector.ContextSelector;
 
@@ -24,6 +28,9 @@ import org.apache.logging.log4j.core.selector.ContextSelector;
  */
 public final class MuleLog4jConfiguratorUtils {
 
+  private static ApplicationReconfigurableLoggerContextSelector SINGLE_APP_CONTEXT_SELECTOR =
+      new ApplicationReconfigurableLoggerContextSelector();
+
   private MuleLog4jConfiguratorUtils() {
     // private constructor to avoid wrong instantiations
   }
@@ -35,7 +42,11 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      configureSelector(contextFactory, SINGLE_APP_CONTEXT_SELECTOR);
+    } else {
+      configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
+    }
   }
 
   /**
@@ -53,9 +64,28 @@ public final class MuleLog4jConfiguratorUtils {
     }
   }
 
+  public static void configureSelector(MuleLog4jContextFactory contextFactory, ContextSelector contextSelector) {
+    contextFactory.setContextSelector(contextSelector, MuleLog4jConfiguratorUtils::disposeIfDisposable);
+  }
+
   private static void disposeIfDisposable(ContextSelector selector) {
     if (selector instanceof Disposable) {
       ((Disposable) selector).dispose();
     }
+  }
+
+  /**
+   * @return the default reconfiguration for the loggers according to the selector.
+   *
+   * @since 4.7.0
+   */
+  public static Consumer<ClassLoader> getDefaultReconfigurationAction() {
+    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+      return classloader -> SINGLE_APP_CONTEXT_SELECTOR
+          .reconfigureAccordingToAppClassloader(classloader);
+    }
+
+    return cl -> {
+    };
   }
 }
