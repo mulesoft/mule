@@ -37,6 +37,12 @@ public interface HttpServerFactory {
    */
   HttpServer lookup(String name) throws ServerNotFoundException;
 
-  HttpServer getOrCreateServer(String name, Supplier<? extends HttpServerConfiguration> configuration)
-      throws ServerCreationException;
+  default HttpServer getOrCreateServer(String name, Supplier<? extends HttpServerConfiguration> configuration)
+      throws ServerCreationException {
+    try {
+      return lookup(name);
+    } catch (ServerNotFoundException e) {
+      return create(configuration.get());
+    }
+  }
 }
