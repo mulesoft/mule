@@ -203,6 +203,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
   private static final String LOG_EXCEPTION = "logException";
+
+  private static final String ENABLE_NOTIFICATIONS = "enableNotifications";
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
@@ -227,7 +229,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
-        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build());
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
+        .withSetterParameterDefinition(ENABLE_NOTIFICATIONS,
+                                       fromSimpleParameter(ENABLE_NOTIFICATIONS).withDefaultValue("true").build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(ON_ERROR).withTypeDefinition(fromType(TemplateOnErrorHandler.class))
             .withObjectFactoryType(OnErrorFactoryBean.class)
