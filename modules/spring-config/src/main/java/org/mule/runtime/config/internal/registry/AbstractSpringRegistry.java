@@ -58,12 +58,14 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
    * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
    */
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
+  public static final String COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED =
+      "Could not add entry with key '%s': Registry has been stopped.";
 
   private ApplicationContext applicationContext;
   private RegistrationDelegate registrationDelegate;
   private boolean readOnly;
 
-  private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
+  private final AtomicBoolean isStopped = new AtomicBoolean(false);
 
   // This is used to track the Spring context lifecycle since there is no way to confirm the
   // lifecycle phase from the application context
@@ -308,8 +310,8 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
   @Override
   public synchronized void fireLifecycle(String phase) throws LifecycleException {
     // Avoid trying to register objects while the registry is being shut down.
-    synchronized (isShuttingDown) {
-      isShuttingDown.set(Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase));
+    synchronized (isStopped) {
+      isStopped.set(Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase));
     }
     super.fireLifecycle(phase);
   }
@@ -431,13 +433,13 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
         // Avoid trying to register objects while the registry is being stopped.
-        if (isShuttingDown.get()) {
-          throw new RegistrationException(createStaticMessage(format("Could not add entry with key '%s': Registry has been stopped.",
+        if (isStopped.get()) {
+          throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
                                                                      key)));
         } else {
-          synchronized (isShuttingDown) {
-            if (isShuttingDown.get()) {
-              throw new RegistrationException(createStaticMessage(format("Could not add entry with key '%s': Registry has been stopped.",
+          synchronized (isStopped) {
+            if (isStopped.get()) {
+              throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
                                                                          key)));
             } else {
               doRegisterObject(key, value);
