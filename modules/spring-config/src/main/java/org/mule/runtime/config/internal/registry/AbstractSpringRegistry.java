@@ -58,7 +58,7 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
    * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
    */
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
-  public static final String COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED =
+  private static final String COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED =
       "Could not add entry with key '%s': Registry has been stopped.";
 
   private ApplicationContext applicationContext;
