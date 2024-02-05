@@ -102,7 +102,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     registry.fireLifecycle(Stoppable.PHASE_NAME);
     assertThat(beanWithLifeCycle.getRegistrationException().isPresent(), is(true));
     assertThat(beanWithLifeCycle.getRegistrationException().get().getMessage(),
-               containsString("Could not add entry with key 'stopObject': Registry was shutting down."));
+               containsString("Could not add entry with key 'stopObject': Registry has been stopped."));
   }
 
   @Test
@@ -122,7 +122,7 @@ public class SpringRegistryTestCase extends AbstractMuleTestCase {
     registry.fireLifecycle(Disposable.PHASE_NAME);
     assertThat(beanWithLifeCycle.getRegistrationException().isPresent(), is(true));
     assertThat(beanWithLifeCycle.getRegistrationException().get().getMessage(),
-               containsString("Could not add entry with key 'disposeObject': Registry was shutting down."));
+               containsString("Could not add entry with key 'disposeObject': Registry has been stopped."));
   }
 
   /**
