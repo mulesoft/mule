@@ -236,7 +236,7 @@ public class DefaultMuleContainer implements MuleContainer {
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
-      deploymentService.onDeploymentError(e -> attemptContainerShutdown(e));
+      deploymentService.onDeploymentError(new WriteToRouteTerminationHandler(this::attemptContainerShutdown));
     } catch (MuleException e) {
       shutdown(e);
       throw e;
