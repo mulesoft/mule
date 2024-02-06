@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.test.allure.AllureConstants.ToolingSupport.TOOLING_SUPPORT;
@@ -14,10 +13,10 @@ import static org.mule.test.allure.AllureConstants.ToolingSupport.ServiceBuilder
 
 import static java.util.Collections.singletonMap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,6 +28,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -67,7 +67,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends Abs
                                         mock(ClassLoaderRepository.class), mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                         mock(PluginDependenciesResolver.class),
                                         discoverLicenseValidator(getClass().getClassLoader()),
-                                        getRuntimeLockFactory(),
+                                        mock(LockFactory.class),
                                         mock(MemoryManagementService.class),
                                         mock(ArtifactConfigurationProcessor.class)));
 

@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.util.store;
 
 import org.mule.runtime.api.store.ObjectStore;
+import org.mule.tck.core.util.store.InMemoryExpirableObjectStore;
 import org.mule.tck.core.util.store.TemplateObjectStoreContractTestCase;
-import org.mule.tck.core.util.store.InMemoryObjectStore;
 
 import java.io.Serializable;
 
@@ -16,7 +16,7 @@ public class InMemoryStoreContractTestCase extends TemplateObjectStoreContractTe
 
   @Override
   public ObjectStore<Serializable> getObjectStore() {
-    return new InMemoryObjectStore<>();
+    return new InMemoryExpirableObjectStore<>();
   }
 
   @Override

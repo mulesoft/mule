@@ -18,6 +18,8 @@ import java.util.Properties;
 @NoImplement
 public interface RegistryBootstrapDiscoverer {
 
+  String BOOTSTRAP_PROPERTIES = "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties";
+
   /**
    * Collects the Properties to be used in an ordered way.
    *

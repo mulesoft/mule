@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.resources;
 
-import static java.util.Collections.singletonList;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ENABLED;
 import static org.mule.tck.junit4.rule.SystemProperty.callWithProperty;
 import static org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase.ResourceExtensionUnitTest.newUnitTest;
+
+import static java.util.Collections.singletonList;
 
 import org.mule.test.oauth.TestOAuthExtension;
 
@@ -19,6 +19,11 @@ import java.util.List;
 import org.junit.runners.Parameterized;
 
 public class OCSExtensionModelJsonGeneratorTestCase extends ExtensionModelJsonGeneratorTestCase {
+
+  /**
+   * Property that if set signals that OCS is supported.
+   */
+  public static final String OCS_ENABLED = "ocs.enabled";
 
   @Parameterized.Parameters(name = "{1}")
   public static Collection<Object[]> data() {

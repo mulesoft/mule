@@ -6,21 +6,22 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.IdempotentMessageValidator.IDEMPOTENT_MESSAGE_VALIDATOR;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.IdempotentMessageValidator.IDEMPOTENT_MESSAGE_VALIDATOR;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,14 +35,13 @@ import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.exception.ValidationException;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.core.util.store.InMemoryObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.weave.v2.el.ByteArrayBasedCursorStreamProvider;
 import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
-import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
