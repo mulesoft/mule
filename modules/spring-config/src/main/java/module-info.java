@@ -26,6 +26,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
 module org.mule.runtime.spring.config {
 
   requires org.mule.runtime.api;
+  requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.dependency.graph;
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.artifact.declaration;
@@ -83,7 +84,6 @@ module org.mule.runtime.spring.config {
   // Spring JNDI support
   requires java.naming;
   requires java.transaction;
-  requires org.mule.runtime.artifact.ast;
 
   exports org.mule.runtime.config.api;
   exports org.mule.runtime.config.api.dsl;
