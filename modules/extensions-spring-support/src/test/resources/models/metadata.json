@@ -43469,12 +43469,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "METADATA:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "METADATA:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
       "handleable": true
     },
@@ -43483,12 +43483,12 @@
       "handleable": true
     },
     {
-      "error": "METADATA:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "METADATA:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     }

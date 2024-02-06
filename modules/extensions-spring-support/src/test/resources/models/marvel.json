@@ -15972,20 +15972,6 @@
   "notifications": [],
   "errors": [
     {
-      "error": "MARVEL:CUSTOM_ERROR",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "MARVEL:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
@@ -15996,8 +15982,22 @@
       "handleable": true
     },
     {
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MARVEL:CUSTOM_ERROR",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "MARVEL:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
       "handleable": true
     }
   ],
