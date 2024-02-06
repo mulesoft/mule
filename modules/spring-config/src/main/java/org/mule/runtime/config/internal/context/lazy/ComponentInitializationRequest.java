@@ -57,6 +57,7 @@ class ComponentInitializationRequest {
     private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
     private final boolean applyStartPhase;
     private final boolean keepPrevious;
+    private final ArtifactAstDependencyGraph graphWithoutMacroExpansion;
 
     /**
      * Creates a request builder from the given required parameters.
@@ -69,11 +70,13 @@ class ComponentInitializationRequest {
      * @param keepPrevious                    Whether previously initialized components should be kept unchanged.
      */
     public Builder(ArtifactAstDependencyGraph graph,
+                   ArtifactAstDependencyGraph graphWithoutMacroExpansion,
                    ComponentInitializationState componentInitializationState,
                    Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                    boolean applyStartPhase,
                    boolean keepPrevious) {
       this.graph = graph;
+      this.graphWithoutMacroExpansion = graphWithoutMacroExpansion;
       this.componentInitializationState = componentInitializationState;
       this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
       this.applyStartPhase = applyStartPhase;
@@ -86,6 +89,7 @@ class ComponentInitializationRequest {
      */
     public ComponentInitializationRequest build(Location location) {
       return new ComponentInitializationRequest(graph,
+                                                graphWithoutMacroExpansion,
                                                 componentInitializationState,
                                                 alwaysEnabledComponentPredicate,
                                                 buildFilterFromLocation(location),
@@ -100,6 +104,7 @@ class ComponentInitializationRequest {
      */
     public ComponentInitializationRequest build(Predicate<ComponentAst> componentFilter) {
       return new ComponentInitializationRequest(graph,
+                                                graphWithoutMacroExpansion,
                                                 componentInitializationState,
                                                 alwaysEnabledComponentPredicate,
                                                 componentFilter,
@@ -119,6 +124,7 @@ class ComponentInitializationRequest {
   }
 
   private final ArtifactAstDependencyGraph graph;
+  private final ArtifactAstDependencyGraph graphWithoutMacroExpansion;
   private final ComponentInitializationState componentInitializationState;
   private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
   private final Optional<Location> location;
@@ -128,10 +134,12 @@ class ComponentInitializationRequest {
 
   // Cached results to avoid multiple computations.
   private ArtifactAst minimalArtifactAst;
+  private ArtifactAst minimalArtifactAstWithoutMacroExpansion;
   private ArtifactAst artifactAstToInitialize;
   private Set<String> requestedLocations;
 
   private ComponentInitializationRequest(ArtifactAstDependencyGraph graph,
+                                         ArtifactAstDependencyGraph graphWithoutMacroExpansion,
                                          ComponentInitializationState componentInitializationState,
                                          Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                                          Predicate<ComponentAst> componentFilter,
@@ -139,6 +147,7 @@ class ComponentInitializationRequest {
                                          boolean applyStartPhase,
                                          boolean keepPrevious) {
     this.graph = graph;
+    this.graphWithoutMacroExpansion = graphWithoutMacroExpansion;
     this.componentInitializationState = componentInitializationState;
     this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
     this.location = location;
@@ -187,7 +196,15 @@ class ComponentInitializationRequest {
    * @throws ConfigurationException If the validation fails.
    */
   public void validateRequestedAst(ArtifactAstValidator astValidator) throws ConfigurationException {
-    astValidator.validate(getMinimalAst());
+    astValidator.validate(getMinimalAstWithoutMacroExpansion());
+  }
+
+  private ArtifactAst getMinimalAstWithoutMacroExpansion() {
+    if (minimalArtifactAstWithoutMacroExpansion == null) {
+      Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
+      return graphWithoutMacroExpansion.minimalArtifactFor(minimalApplicationFilter);
+    }
+    return minimalArtifactAstWithoutMacroExpansion;
   }
 
   /**
