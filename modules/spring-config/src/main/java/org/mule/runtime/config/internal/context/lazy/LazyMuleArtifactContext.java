@@ -109,8 +109,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
-  private final ArtifactAstDependencyGraph graph;
-  private final ArtifactAstDependencyGraph graphWithoutMacroExpansion;
+  // postProcessedGraph is used when we get locations and initialize some components
+  // while baseGraph is used when we validate Ast during lazy-init.
+  private final ArtifactAstDependencyGraph postProcessedGraph;
+  private final ArtifactAstDependencyGraph baseGraph;
   private final ComponentInitializationState currentComponentInitializationState;
 
   // Used for detecting cycles when initializing beans that are dynamically referenced
@@ -176,12 +178,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
 
-    this.graphWithoutMacroExpansion = generateFor(getApplicationModel());
+    this.baseGraph = generateFor(getApplicationModel());
 
     initialize();
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
-    this.graph = generateFor(getApplicationModel());
+    this.postProcessedGraph = generateFor(getApplicationModel());
   }
 
   @Override
@@ -423,8 +425,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private ComponentInitializationRequest.Builder getRequestBuilder(boolean applyStartPhase, boolean keepPrevious) {
-    return new ComponentInitializationRequest.Builder(graph,
-                                                      graphWithoutMacroExpansion,
+    return new ComponentInitializationRequest.Builder(postProcessedGraph,
+                                                      baseGraph,
                                                       currentComponentInitializationState,
                                                       MuleArtifactContext::isAlwaysEnabledComponent,
                                                       applyStartPhase,
@@ -456,11 +458,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void initializeComponentsFromParent(Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     if (parentComponentModelInitializerAdapter.isPresent()) {
       parentComponentModelInitializerAdapter.get()
-          .initializeComponents(componentModel -> graph.getMissingDependencies()
+          .initializeComponents(componentModel -> postProcessedGraph.getMissingDependencies()
               .stream()
               .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
     } else {
-      graph.getMissingDependencies().stream().forEach(missingDep -> {
+      postProcessedGraph.getMissingDependencies().stream().forEach(missingDep -> {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
         }
@@ -468,8 +470,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
-  private void validateRequestedComponentExists(Location location, ArtifactAst minimalArtifactAst) {
-    if (minimalArtifactAst.recursiveStream()
+  private void validateRequestedComponentExists(Location location, ArtifactAst postProcessedMinimalArtifactAst) {
+    if (postProcessedMinimalArtifactAst.recursiveStream()
         .noneMatch(comp -> comp.getLocation() != null
             && comp.getLocation().getLocation().equals(location.toString()))) {
       throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
@@ -651,8 +653,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
-    sort(sortedObjects, (o1, o2) -> graph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
-                                                                         componentNames.get(o2).getSecond()));
+    sort(sortedObjects, (o1, o2) -> postProcessedGraph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
+                                                                                      componentNames.get(o2).getSecond()));
     return sortedObjects;
   }
 
