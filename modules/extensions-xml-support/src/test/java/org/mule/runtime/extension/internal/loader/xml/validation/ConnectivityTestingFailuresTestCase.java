@@ -7,17 +7,20 @@
 package org.mule.runtime.extension.internal.loader.xml.validation;
 
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptySet;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
 import static org.mule.runtime.extension.internal.loader.xml.validator.TestConnectionValidator.TEST_CONNECTION_SELECTED_ELEMENT_INVALID;
+
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -63,7 +66,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
   public void multipleGlobalElementsWithXmlnsConnectionAttribute() {
     setExpectedMessage("first-config", "second-config");
     getExtensionModelFrom("validation/testconnection/module-multiple-global-element-xmlns-connection-true.xml",
-                          new HashSet<>(Arrays.asList(getPetstoreExtension(true))));
+                          new HashSet<>(asList(getPetstoreExtension(true))));
   }
 
   @Test
@@ -71,14 +74,14 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     setExpectedMessage("first-config-not-defined-to-which-one-do-test-connection",
                        "second-config-not-defined-to-which-one-do-test-connection");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection.xml",
-                          new HashSet<>(Arrays.asList(getPetstoreExtension(true))));
+                          new HashSet<>(asList(getPetstoreExtension(true))));
   }
 
   @Test
   public void multipleGlobalElementsWithTestConnectionAndNotEvenOneDefinedHttpAndFile() {
     setExpectedMessage("file-global-element", "http-global-element");
     getExtensionModelFrom("validation/testconnection/module-not-defined-test-connection-http-file.xml",
-                          new HashSet<>(Arrays.asList(getPetstoreExtension(true), getFileExtension())));
+                          new HashSet<>(asList(getPetstoreExtension(true), getFileExtension())));
   }
 
   @Test
@@ -96,7 +99,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
   @Test
   public void invalidTestConnectionElement() {
     ExtensionModel loaded = getExtensionModelFrom("validation/testconnection/module-invalid-test-connection.xml",
-                                                  new HashSet<>(Arrays.asList(getPetstoreExtension(false))));
+                                                  new HashSet<>(asList(getPetstoreExtension(false))));
     ProblemsReporter problemsReporter = new ProblemsReporter(loaded);
     new TestConnectionValidator().validate(loaded, problemsReporter);
 
