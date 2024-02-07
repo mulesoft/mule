@@ -6,17 +6,17 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 import org.mule.runtime.module.service.internal.manager.DefaultMethodInvoker;
 import org.mule.runtime.module.service.internal.manager.MethodInvoker;
 
@@ -96,7 +96,7 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
                                                                               target.toString())));
       } else {
         final Collection<?> lookupObjects = lookupAllByTypeCache.get(parameter.getType());
-        arg = new PreferredObjectSelector().select(lookupObjects.iterator());
+        arg = lookupObjects.iterator().next();
       }
       augmentedArgs.add(arg);
     }
