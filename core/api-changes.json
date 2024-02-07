@@ -4,6 +4,240 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::<init>(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::clearProperties()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Map<java.lang.String, org.mule.runtime.api.metadata.TypedValue> org.mule.runtime.core.privileged.event.DefaultMuleSession::getExtendedProperties()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.core.privileged.event.DefaultMuleSession::getProperties()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.DefaultMuleSession::getProperty(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.privileged.event.DefaultMuleSession::getPropertyDataType(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.privileged.event.DefaultMuleSession::getPropertyNamesAsSet()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::merge(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::removeNonSerializableProperties()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.DefaultMuleSession::removeProperty(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.lang.Object)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.lang.Object, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::clearProperties()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.MuleSession::getProperty(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.privileged.event.MuleSession::getPropertyDataType(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.privileged.event.MuleSession::getPropertyNamesAsSet()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::merge(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.MuleSession::removeProperty(java.lang.String)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.lang.Object)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.lang.Object, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_STOP_PROPERTY",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removedWithConstant",
+          "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::replyToDestination(java.lang.Object)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::replyToHandler(org.mule.runtime.core.privileged.connector.ReplyToHandler)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::session(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.connector.ReplyToHandler",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::replyToDestination(java.lang.Object)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::replyToHandler(org.mule.runtime.core.privileged.connector.ReplyToHandler)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::session(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.PrivilegedEvent::getReplyToDestination()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.connector.ReplyToHandler org.mule.runtime.core.privileged.event.PrivilegedEvent::getReplyToHandler()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.event.MuleSession org.mule.runtime.core.privileged.event.PrivilegedEvent::getSession()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.event.MuleSession org.mule.runtime.core.privileged.interception.InternalInterceptionEvent::getSession()",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.privileged.interception.InternalInterceptionEvent org.mule.runtime.core.privileged.interception.InternalInterceptionEvent::session(org.mule.runtime.core.privileged.event.MuleSession)",
+          "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
           "code": "java.field.removedWithConstant",
           "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT",
           "justification": "W-14572221: MVEL is removed"

@@ -21,14 +21,13 @@ import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
-
-import org.slf4j.MDC;
 
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import org.slf4j.MDC;
 
 /**
  * Allows access to the privileged behavior of the {@link Event} implementation.
@@ -57,31 +56,6 @@ public interface PrivilegedEvent extends CoreEvent {
    */
   @Deprecated
   String getLegacyCorrelationId();
-
-  /**
-   * Retrieves the service session for the current event
-   *
-   * @return the service session for the event
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  MuleSession getSession();
-
-  /**
-   * Return the replyToHandler (if any) that will be used to perform async reply
-   *
-   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-   */
-  @Deprecated
-  ReplyToHandler getReplyToHandler();
-
-  /**
-   * Return the destination (if any) that will be passed to the reply-to handler.
-   *
-   * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-   */
-  @Deprecated
-  Object getReplyToDestination();
 
   /**
    * Return the event associated with the currently executing thread.
@@ -221,38 +195,12 @@ public interface PrivilegedEvent extends CoreEvent {
     Builder correlationId(String correlationId);
 
     /**
-     *
-     * @param replyToHandler
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Deprecated
-    Builder replyToHandler(ReplyToHandler replyToHandler);
-
-    /**
-     *
-     * @param replyToDestination
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Deprecated
-    Builder replyToDestination(Object replyToDestination);
-
-    /**
-     * Disables the firing of notifications when processing the produced event.
+     * /** Disables the firing of notifications when processing the produced event.
      *
      * @deprecated Transport infrastructure is deprecated.
      */
     @Deprecated
     Builder disableNotifications();
-
-    /**
-     * @param session
-     * @return the builder instance
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder session(MuleSession session);
 
     /**
      * Build a new {@link PrivilegedEvent} based on the state configured in the {@link Builder}.

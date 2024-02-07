@@ -45,15 +45,7 @@ public class MuleProperties {
   public static final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
   public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
 
-  /**
-   * Prevents processing of the ReplyTo property by the Service. This is useful if you're component routed the message somewhere
-   * else which processed the ReplyTo.
-   */
-  public static final String MULE_REPLY_TO_STOP_PROPERTY = PROPERTY_PREFIX + "REPLYTO_STOP";
   public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
-  public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
-  @Deprecated // TODO MULE-9072
-  public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
   public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
   public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
   public static final String MULE_CORRELATION_GROUP_SIZE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_GROUP_SIZE";

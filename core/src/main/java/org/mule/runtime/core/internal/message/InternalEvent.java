@@ -14,9 +14,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 
@@ -189,26 +187,6 @@ public interface InternalEvent extends PrivilegedEvent {
     Builder correlationId(String correlationId);
 
     /**
-     *
-     * @param replyToHandler
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Override
-    @Deprecated
-    Builder replyToHandler(ReplyToHandler replyToHandler);
-
-    /**
-     *
-     * @param replyToDestination
-     * @return the builder instance
-     * @deprecated TODO MULE-10739 Move ReplyToHandler to compatibility module.
-     */
-    @Override
-    @Deprecated
-    Builder replyToDestination(Object replyToDestination);
-
-    /**
      * Disables the firing of notifications when processing the produced event.
      *
      * @deprecated Transport infrastructure is deprecated.
@@ -216,15 +194,6 @@ public interface InternalEvent extends PrivilegedEvent {
     @Override
     @Deprecated
     Builder disableNotifications();
-
-    /**
-     * @param session
-     * @return the builder instance
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Override
-    @Deprecated
-    Builder session(MuleSession session);
 
     @Override
     Builder message(Message message);

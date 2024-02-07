@@ -25,9 +25,7 @@ import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
@@ -55,21 +53,6 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   @Override
   public BaseEventContext getContext() {
     return event.getContext();
-  }
-
-  @Override
-  public MuleSession getSession() {
-    return event.getSession();
-  }
-
-  @Override
-  public ReplyToHandler getReplyToHandler() {
-    return event.getReplyToHandler();
-  }
-
-  @Override
-  public Object getReplyToDestination() {
-    return event.getReplyToDestination();
   }
 
   @Override

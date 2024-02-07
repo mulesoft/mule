@@ -27,10 +27,9 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -51,7 +50,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public static final MediaType APPLICATION_XML_DEFAULT = APPLICATION_XML.withCharset(DEFAULT_ENCODING);
   public static final MediaType APPLICATION_XML_CUSTOM = APPLICATION_XML.withCharset(CUSTOM_ENCODING);
 
-  private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private ExtendedTransformationService transformationService;
 
   @Before
@@ -267,22 +266,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   }
 
   @Test
-  public void setsDefaultSessionVariableDataType() throws Exception {
-    ((PrivilegedEvent) testEvent()).getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD);
-
-    assertSessionVariableDataType(testEvent(), STRING);
-  }
-
-  @Test
-  public void setsCustomSessionVariableDataType() throws Exception {
-    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
-
-    ((PrivilegedEvent) testEvent()).getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD, dataType);
-
-    assertSessionVariableDataType(testEvent(), dataType);
-  }
-
-  @Test
   public void setsCustomPropertyDataType() throws Exception {
     MediaType mediaType = APPLICATION_XML_CUSTOM;
     InternalMessage message =
@@ -328,11 +311,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
   private void assertVariableDataType(CoreEvent event, DataType dataType) {
     DataType actualDataType = event.getVariables().get(TEST_PROPERTY).getDataType();
-    assertThat(actualDataType, like(dataType));
-  }
-
-  private void assertSessionVariableDataType(CoreEvent event, DataType dataType) {
-    DataType actualDataType = ((PrivilegedEvent) event).getSession().getPropertyDataType(TEST_PROPERTY);
     assertThat(actualDataType, like(dataType));
   }
 }

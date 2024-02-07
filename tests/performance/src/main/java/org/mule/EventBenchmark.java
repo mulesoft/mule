@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -131,7 +130,6 @@ public class EventBenchmark extends AbstractBenchmark {
   @Benchmark
   public CoreEvent copyWith10FlowVarsAnd10PropertiesWrite1OfEach() throws Exception {
     return PrivilegedEvent.builder(eventWith10VariablesProperties)
-        .session(new DefaultMuleSession(((PrivilegedEvent) eventWith10VariablesProperties).getSession()))
         .addVariable("newKey", "val")
         .message(InternalMessage.builder(eventWith10VariablesProperties.getMessage()).addInboundProperty("newKey", "val")
             .addOutboundProperty("newKey", "val").build())
@@ -141,7 +139,6 @@ public class EventBenchmark extends AbstractBenchmark {
   @Benchmark
   public CoreEvent copyWith10FlowVarsAnd10PropertiesWrite5OfEach() throws Exception {
     final PrivilegedEvent.Builder eventBuilder = PrivilegedEvent.builder(eventWith50VariablesProperties);
-    eventBuilder.session(new DefaultMuleSession(((PrivilegedEvent) eventWith50VariablesProperties).getSession())).build();
     InternalMessage.Builder builder = InternalMessage.builder(eventWith50VariablesProperties.getMessage());
     for (int j = 1; j <= 5; j++) {
       eventBuilder.addVariable("newKey" + j, "val");
@@ -153,7 +150,6 @@ public class EventBenchmark extends AbstractBenchmark {
   @Benchmark
   public CoreEvent copyWith50FlowVarsAnd50PropertiesWrite1OfEach() throws Exception {
     return PrivilegedEvent.builder(eventWith50VariablesProperties)
-        .session(new DefaultMuleSession(((PrivilegedEvent) eventWith50VariablesProperties).getSession()))
         .addVariable("newKey", "val")
         .message(InternalMessage.builder(eventWith50VariablesProperties.getMessage()).addInboundProperty("newKey", "val")
             .addOutboundProperty("newKey", "val").build())
@@ -163,7 +159,6 @@ public class EventBenchmark extends AbstractBenchmark {
   @Benchmark
   public CoreEvent copyWith100FlowVarsAndPropertiesWrite25OfEach() throws Exception {
     final PrivilegedEvent.Builder eventBuilder = PrivilegedEvent.builder(eventWith100VariablesProperties);
-    eventBuilder.session(new DefaultMuleSession(((PrivilegedEvent) eventWith100VariablesProperties).getSession())).build();
     InternalMessage.Builder builder = InternalMessage.builder(eventWith100VariablesProperties.getMessage());
     for (int j = 1; j <= 25; j++) {
       eventBuilder.addVariable("newKey" + j, "val");

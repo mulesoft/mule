@@ -7,8 +7,8 @@
 package org.mule.functional.api.flow;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -29,7 +29,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.io.Serializable;
@@ -53,16 +52,15 @@ public class TestEventBuilder {
   private Object payload;
   private Object attributes;
   private MediaType mediaType = MediaType.ANY;
-  private Map<String, Serializable> inboundProperties = new HashMap<>();
-  private Map<String, Serializable> outboundProperties = new HashMap<>();
-  private Map<String, DataHandler> inboundAttachments = new HashMap<>();
-  private Map<String, Attachment> outboundAttachments = new HashMap<>();
-  private Map<String, Object> sessionProperties = new HashMap<>();
+  private final Map<String, Serializable> inboundProperties = new HashMap<>();
+  private final Map<String, Serializable> outboundProperties = new HashMap<>();
+  private final Map<String, DataHandler> inboundAttachments = new HashMap<>();
+  private final Map<String, Attachment> outboundAttachments = new HashMap<>();
 
   private String sourceCorrelationId = null;
   private ItemSequenceInfo itemSequenceInfo;
 
-  private Map<String, TypedValue> variables = new HashMap<>();
+  private final Map<String, TypedValue> variables = new HashMap<>();
 
   private Function<Message, Message> spyMessage = input -> input;
   private Function<CoreEvent, CoreEvent> spyEvent = input -> input;
@@ -165,21 +163,6 @@ public class TestEventBuilder {
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as a session property of the product.
-   *
-   * @param key   the key of the session property to add
-   * @param value the value of the session property to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  public TestEventBuilder withSessionProperty(String key, Object value) {
-    sessionProperties.put(key, value);
-
-    return this;
-  }
-
-  /**
    * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
@@ -196,6 +179,7 @@ public class TestEventBuilder {
    * @return this {@link TestEventBuilder}
    * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)} instead
    */
+  @Deprecated
   public TestEventBuilder withCorrelation(GroupCorrelation groupCorrelation) {
     return withItemSequenceInfo(fromGroupCorrelation(groupCorrelation));
   }
@@ -286,9 +270,6 @@ public class TestEventBuilder {
 
     for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
       event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
-    }
-    for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet()) {
-      ((PrivilegedEvent) event).getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
     }
 
     return spyEvent.apply(event);
