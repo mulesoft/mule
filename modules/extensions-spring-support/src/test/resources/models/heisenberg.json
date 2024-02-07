@@ -57482,15 +57482,6 @@
   ],
   "errors": [
     {
-      "error": "MULE:VALIDATION",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "HEISENBERG:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
@@ -57501,13 +57492,7 @@
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "HEISENBERG:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -57521,8 +57506,23 @@
       "handleable": true
     },
     {
+      "error": "HEISENBERG:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "HEISENBERG:VALIDATION",
       "parent": "MULE:VALIDATION",
+      "handleable": true
+    },
+    {
+      "error": "MULE:VALIDATION",
+      "parent": "MULE:ANY",
       "handleable": true
     }
   ],

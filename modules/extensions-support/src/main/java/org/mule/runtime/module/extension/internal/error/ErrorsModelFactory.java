@@ -25,10 +25,10 @@ import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser
 import org.mule.sdk.api.error.ErrorTypeDefinition;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.jgrapht.Graph;
@@ -118,7 +118,15 @@ public class ErrorsModelFactory {
    * @return A {@link Set} of converted {@link ErrorModel}s generated from the given {@link ErrorTypeDefinition} array
    */
   public Set<ErrorModel> getErrorModels() {
-    return new HashSet<>(errorModelMap.values());
+    final TreeSet<ErrorModel> sortedErrorModels = new TreeSet<>((em1, em2) -> {
+      final int namespaceComparation = em1.getNamespace().compareTo(em2.getNamespace());
+      if (namespaceComparation == 0) {
+        return em1.getType().compareTo(em2.getType());
+      }
+      return namespaceComparation;
+    });
+    sortedErrorModels.addAll(errorModelMap.values());
+    return sortedErrorModels;
   }
 
   /**

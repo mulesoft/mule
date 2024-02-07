@@ -5622,8 +5622,7 @@
   "notifications": [],
   "errors": [
     {
-      "error": "SUBTYPES:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -5632,12 +5631,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
+      "error": "SUBTYPES:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {

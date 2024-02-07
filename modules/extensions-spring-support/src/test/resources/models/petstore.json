@@ -39673,8 +39673,7 @@
   "notifications": [],
   "errors": [
     {
-      "error": "PETSTORE:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -39683,22 +39682,23 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "PETSTORE:PET_STORE_CONNECTIVITY",
-      "parent": "PETSTORE:CONNECTIVITY",
-      "handleable": true
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
+      "error": "PETSTORE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
+    },
+    {
       "error": "PETSTORE:PET_ERROR",
       "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "PETSTORE:PET_STORE_CONNECTIVITY",
+      "parent": "PETSTORE:CONNECTIVITY",
       "handleable": true
     },
     {

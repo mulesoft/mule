@@ -9592,6 +9592,11 @@
       "handleable": true
     },
     {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
@@ -9599,11 +9604,6 @@
     {
       "error": "SEMANTIC-TERMS:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
-      "handleable": true
-    },
-    {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
       "handleable": true
     },
     {

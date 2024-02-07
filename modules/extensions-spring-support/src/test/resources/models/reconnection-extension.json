@@ -6319,8 +6319,8 @@
       "handleable": true
     },
     {
-      "error": "RECONNECTION:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
@@ -6334,8 +6334,8 @@
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "RECONNECTION:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],
