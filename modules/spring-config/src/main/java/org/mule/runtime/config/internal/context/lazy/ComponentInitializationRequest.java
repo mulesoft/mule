@@ -188,7 +188,7 @@ class ComponentInitializationRequest {
    */
   public Set<String> getRequestedLocations() {
     if (requestedLocations == null) {
-      requestedLocations = doGetRequestedLocations(getMinimalAst());
+      requestedLocations = doGetRequestedLocations(getPostProcessedMinimalArtifactAst());
     }
     return requestedLocations;
   }
@@ -201,10 +201,10 @@ class ComponentInitializationRequest {
    * @throws ConfigurationException If the validation fails.
    */
   public void validateRequestedAst(ArtifactAstValidator astValidator) throws ConfigurationException {
-    astValidator.validate(getMinimalAstWithoutMacroExpansion());
+    astValidator.validate(getBaseMinimalArtifactAst());
   }
 
-  private ArtifactAst getMinimalAstWithoutMacroExpansion() {
+  private ArtifactAst getBaseMinimalArtifactAst() {
     if (baseMinimalArtifactAst == null) {
       Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
       return baseGraph.minimalArtifactFor(minimalApplicationFilter);
@@ -223,7 +223,7 @@ class ComponentInitializationRequest {
    */
   public ArtifactAst getFilteredAstToInitialize() {
     if (artifactAstToInitialize == null) {
-      artifactAstToInitialize = doGetFilteredAstToInitialize(getMinimalAst());
+      artifactAstToInitialize = doGetFilteredAstToInitialize(getPostProcessedMinimalArtifactAst());
     }
     return artifactAstToInitialize;
   }
@@ -242,14 +242,14 @@ class ComponentInitializationRequest {
         && comp.getLocation().getLocation().equals(location.toString());
   }
 
-  private ArtifactAst getMinimalAst() {
+  private ArtifactAst getPostProcessedMinimalArtifactAst() {
     if (postProcessedMinimalArtifactAst == null) {
-      postProcessedMinimalArtifactAst = doGetMinimalAst();
+      postProcessedMinimalArtifactAst = doGetPostProcessedMinimalArtifactAst();
     }
     return postProcessedMinimalArtifactAst;
   }
 
-  private ArtifactAst doGetMinimalAst() {
+  private ArtifactAst doGetPostProcessedMinimalArtifactAst() {
     Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
     return postProcessedGraph.minimalArtifactFor(minimalApplicationFilter);
   }
