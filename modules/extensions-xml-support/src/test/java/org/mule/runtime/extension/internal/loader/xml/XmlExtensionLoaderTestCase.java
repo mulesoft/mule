@@ -63,6 +63,8 @@ import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.marvel.MarvelExtension;
@@ -633,6 +635,21 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
     ErrorModel errorModel = extensionModel.getErrorModels().stream().findFirst().get();
     assertThat(errorModel.getNamespace(), is("RAISE-ERROR-IN-FLOW-REF"));
     assertThat(errorModel.getType(), is("CUSTOM_ERROR"));
+  }
+
+  @Test
+  @Issue("W-12244913")
+  public void connectionProvider() {
+    String modulePath = "modules/module-test-connection.xml";
+    ExtensionModel extensionModel = getExtensionModelFrom(modulePath);
+
+    final ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
+    assertThat("ConfigurationFactoryModelProperty not present",
+               configurationModel.getModelProperty(ConfigurationFactoryModelProperty.class).isPresent(), is(true));
+
+    final ConnectionProviderModel connectionProviderModel = configurationModel.getConnectionProviders().get(0);
+    assertThat("ConnectionProviderFactoryModelProperty not present",
+               connectionProviderModel.getModelProperty(ConnectionProviderFactoryModelProperty.class).isPresent(), is(true));
   }
 
   /**
