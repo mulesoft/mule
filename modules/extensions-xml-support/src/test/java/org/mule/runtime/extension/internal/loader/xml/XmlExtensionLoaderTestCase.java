@@ -16,9 +16,9 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
@@ -62,7 +62,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
-import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
@@ -502,6 +501,7 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-14943177")
   @Description("UX test to ensure parameterized stereotypes properly tells which config can be fed from the tools/UI")
   public void testModuleStereotypes() {
     String modulePath = "modules/module-stereotypes.xml";
@@ -527,11 +527,12 @@ public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
 
     assertThat(configurationModel.getConnectionProviders().size(), is(1));
     final ConnectionProviderModel connectionProviderModel = configurationModel.getConnectionProviders().get(0);
-    assertThat(connectionProviderModel.getAllParameterModels().size(), is(1));
-    final ParameterModel stereotypableIronManConfigInConnectionParameterModel =
-        connectionProviderModel.getAllParameterModels().get(0);
-    assertParameterWithStereotypes(stereotypableIronManConfigInConnectionParameterModel, "stereotypableIronManConfigInConnection",
+    assertThat(connectionProviderModel.getAllParameterModels().size(), is(2));
+    assertParameterWithStereotypes(connectionProviderModel.getAllParameterModels().get(0),
+                                   "stereotypableIronManConfigInConnection",
                                    ironManStereotype);
+    assertParameterWithStereotypes(connectionProviderModel.getAllParameterModels().get(1), "stereotypableWeirdConfigInConnection",
+                                   heisenbergStereotype);
 
     Optional<GlobalElementComponentModelModelProperty> globalElementComponentModelModelProperty =
         extensionModel.getModelProperty(GlobalElementComponentModelModelProperty.class);

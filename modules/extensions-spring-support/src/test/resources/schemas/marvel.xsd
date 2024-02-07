@@ -28,12 +28,27 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="target-realm">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel" base="marvel:org.mule.test.marvel.drstrange.Realm"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="optional" name="multipleConfig"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="targetRealm"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="org.mule.test.marvel.drstrange.Realm">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="required" name="realmConfig"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="pooling-mystic-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -41,8 +56,16 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="target-realm">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel" base="marvel:org.mule.test.marvel.drstrange.Realm"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="optional" name="multipleConfig"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="targetRealm"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
