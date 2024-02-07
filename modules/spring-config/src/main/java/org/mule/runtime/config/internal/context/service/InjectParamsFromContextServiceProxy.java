@@ -6,20 +6,19 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
+
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Proxy.newProxyInstance;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.ClassUtils.findImplementedInterfaces;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.container.internal.MetadataInvocationHandler;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -31,6 +30,8 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
  * Proxies a {@link Service} instance to automatically {@link Inject} parameters for invocations of implementation methods.
@@ -45,8 +46,8 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
       "No object found in the registry for parameter '%s' of method '%s' in service '%s'";
 
   private final Registry registry;
-  private com.github.benmanes.caffeine.cache.LoadingCache<Class<?>, Collection<?>> lookupAllByTypeCache;
-  private com.github.benmanes.caffeine.cache.LoadingCache<String, Optional<?>> lookupByNameCache;
+  private final com.github.benmanes.caffeine.cache.LoadingCache<Class<?>, Collection<?>> lookupAllByTypeCache;
+  private final com.github.benmanes.caffeine.cache.LoadingCache<String, Optional<?>> lookupByNameCache;
 
   /**
    * Creates a new proxy for the provided service instance.
@@ -81,7 +82,7 @@ public class InjectParamsFromContextServiceProxy extends MetadataInvocationHandl
                                                                                 getProxiedObject().getName())));
         } else {
           final Collection<?> lookupObjects = lookupAllByTypeCache.get(parameter.getType());
-          arg = new PreferredObjectSelector().select(lookupObjects.iterator());
+          arg = lookupObjects.iterator().next();
         }
         augmentedArgs.add(arg);
       }

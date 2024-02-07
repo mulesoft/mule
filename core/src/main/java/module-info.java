@@ -252,9 +252,6 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,
       org.mule.test.unit;
-  exports org.mule.runtime.core.internal.config.preferred to
-      org.mule.runtime.spring.config,
-      com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.connection to
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.extensions.support,
