@@ -6,14 +6,6 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.exception.MuleExceptionInfo.INFO_CAUSED_BY_KEY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
@@ -21,6 +13,16 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -40,9 +42,9 @@ import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
-import org.mule.runtime.core.privileged.connector.DispatchException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
+import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.tck.integration.transformer.ValidateResponse;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -84,7 +86,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   private final ErrorType CRITICAL = locator.lookupErrorType(ERROR.getClass());
   private final ErrorType CONNECTION = locator.lookupErrorType(CONNECTION_EXCEPTION.getClass());
   private final ErrorType TRANSFORMER = locator.lookupErrorType(TRANSFORMER_EXCEPTION.getClass());
-  private final ErrorType DISPATCH = locator.lookupErrorType(DispatchException.class);
+  private final ErrorType ROUTING = locator.lookupErrorType(RoutingException.class);
 
 
   private final MessagingExceptionResolver resolver = new MessagingExceptionResolver(processor);
@@ -203,10 +205,10 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18041")
   public void resolveSuppressedMuleException() {
-    ErrorType expected = DISPATCH;
-    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                suppressIfPresent(CONNECTION_EXCEPTION,
-                                                                  CONNECTION_EXCEPTION.getClass()));
+    ErrorType expected = ROUTING;
+    Throwable exception = new RoutingException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+                                               suppressIfPresent(CONNECTION_EXCEPTION,
+                                                                 CONNECTION_EXCEPTION.getClass()));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
@@ -218,10 +220,10 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18041")
   public void resolveSuppressedMuleExceptionLoggingCause() {
-    ErrorType expected = DISPATCH;
-    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                suppressIfPresent(CONNECTION_EXCEPTION,
-                                                                  CONNECTION_EXCEPTION.getClass()));
+    ErrorType expected = ROUTING;
+    Throwable exception = new RoutingException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+                                               suppressIfPresent(CONNECTION_EXCEPTION,
+                                                                 CONNECTION_EXCEPTION.getClass()));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());
@@ -233,11 +235,11 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
   @Test
   @Issue("MULE-18041")
   public void resolveSuppressedMessagingExceptionLoggingCause() {
-    ErrorType expected = DISPATCH;
-    Throwable exception = new DispatchException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
-                                                suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"),
-                                                                                         event),
-                                                                  MessagingException.class));
+    ErrorType expected = ROUTING;
+    Throwable exception = new RoutingException(createStaticMessage("DISPATCH PROBLEM"), new ValidateResponse(),
+                                               suppressIfPresent(new MessagingException(createStaticMessage("CONNECTION PROBLEM"),
+                                                                                        event),
+                                                                 MessagingException.class));
     MessagingException me = newMessagingException(exception, event, processor);
     MessagingExceptionResolver anotherResolver = new MessagingExceptionResolver(new TestProcessor());
     MessagingException resolved = anotherResolver.resolve(me, locator, emptyList());

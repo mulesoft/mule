@@ -4,6 +4,18 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.connector.DispatchException",
+          "justification": "W-14989528: Remove AbstractOutboundRouter and associated code, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter",
+          "justification": "W-14989528: Remove AbstractOutboundRouter and associated code, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
           "code": "java.method.removed",
           "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::<init>(org.mule.runtime.core.privileged.event.MuleSession)",
           "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
