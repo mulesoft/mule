@@ -19,7 +19,7 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
 import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
 import org.mule.test.petstore.extension.PetStoreConnector;
@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -47,7 +48,8 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
   private static final ExtensionModel PET_STORE_EXTENSION_MODEL = MuleExtensionUtils.loadExtension(PetStoreConnector.class);
 
-  private final DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
+  private final ExtensionSchemaGenerator extensionSchemaFactory =
+      ServiceLoader.load(ExtensionSchemaGenerator.class).iterator().next();
 
   @Parameterized.Parameters(name = "{index}: Validating xsd for {1}")
   public static Collection<Object[]> data() {

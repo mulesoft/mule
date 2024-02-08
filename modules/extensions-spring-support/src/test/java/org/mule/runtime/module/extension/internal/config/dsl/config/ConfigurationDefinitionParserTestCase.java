@@ -20,8 +20,8 @@ import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
+import org.mule.runtime.api.time.Time;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.core.internal.el.datetime.Date;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.TypeConverter;
@@ -33,6 +33,7 @@ import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.config.extension.SimpleExtension;
 import org.mule.tck.classlaoder.TestClassLoader;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-public class ConfigurationDefinitionParserTestCase {
+public class ConfigurationDefinitionParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void typeConverterUsesTheClassloaderOfTheParser() throws Exception {
@@ -80,13 +81,13 @@ public class ConfigurationDefinitionParserTestCase {
     String invocationArg = (invocations.get(invocations.size() - 1)).getSecond();
 
     assertThat(invocations, iterableWithSize(testClassLoaderInvocations + 2));
-    assertThat(invocationArg, is("org.mule.runtime.core.internal.el.datetime.Date"));
+    assertThat(invocationArg, is("org.mule.runtime.api.time.Time"));
   }
 
   private TestClassLoader getTestClassLoader() {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass("java.util.Map", Map.class);
-    classLoader.addClass("org.mule.runtime.core.internal.el.datetime.Date", Date.class);
+    classLoader.addClass("org.mule.runtime.api.time.Time", Time.class);
     return classLoader;
   }
 

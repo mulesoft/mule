@@ -24,6 +24,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.toMap;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
@@ -43,6 +44,7 @@ import static reactor.core.publisher.Mono.from;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.serialization.ObjectSerializer;
@@ -57,8 +59,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.lock.MuleLockFactory;
-import org.mule.runtime.core.internal.lock.SingleServerLockProvider;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.internal.processor.IdempotentRedeliveryPolicy.RedeliveryCounter;
 import org.mule.tck.SerializationTestUtils;
@@ -71,16 +71,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
+import org.reactivestreams.Publisher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.reactivestreams.Publisher;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 import reactor.core.publisher.Mono;
 
 @Feature(SOURCES)
@@ -133,9 +137,7 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
         waitLatch.await(2000, MILLISECONDS);
       })).transform(mockFailingMessageProcessor);
     });
-    MuleLockFactory muleLockFactory = new MuleLockFactory();
-    muleLockFactory.setLockProvider(new SingleServerLockProvider());
-    muleLockFactory.initialise();
+
     when(mockObjectStoreManager.getObjectStore(anyString())).thenReturn(inMemoryObjectStore);
     when(mockObjectStoreManager.createObjectStore(any(), any())).thenReturn(inMemoryObjectStore);
     when(event.getMessage()).thenReturn(message);
@@ -150,7 +152,9 @@ public class IdempotentRedeliveryPolicyTestCase extends AbstractMuleContextTestC
     irp.setAnnotations(singletonMap(LOCATION_KEY, TEST_CONNECTOR_LOCATION));
     irp.setMessageProcessors(singletonList(mockFailingMessageProcessor));
 
-    irp.setLockFactory(muleLockFactory);
+    final LockFactory lockFactory = mock(LockFactory.class);
+    when(lockFactory.createLock(anyString())).thenReturn(new ReentrantLock());
+    irp.setLockFactory(lockFactory);
     irp.setObjectStoreManager(mockObjectStoreManager);
   }
 

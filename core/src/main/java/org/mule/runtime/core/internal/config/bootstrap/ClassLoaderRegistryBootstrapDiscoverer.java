@@ -29,8 +29,6 @@ import java.util.Properties;
  */
 public class ClassLoaderRegistryBootstrapDiscoverer implements RegistryBootstrapDiscoverer {
 
-  public static final String BOOTSTRAP_PROPERTIES =
-      "META-INF/org/mule/runtime/core/config/registry-bootstrap.properties";
   private final ClassLoader classLoader;
 
   /**

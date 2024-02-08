@@ -14,14 +14,14 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
+import static org.mule.runtime.core.internal.routing.ForeachTestCase.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
-import static org.mule.runtime.core.internal.test.util.string.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR_EACH;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR_EACH;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -35,10 +35,10 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -70,11 +70,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.slf4j.Logger;
 
 @Feature(SCOPE)
 @Story(FOR_EACH)
@@ -565,5 +567,33 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     // All elements should be processed without exceptions
     assertTrue(exceptions.isEmpty());
     assertThat(secondForeachCounter.get(), is(CONCURRENCY * payload.size()));
+  }
+
+  public static class StringHashCodeCollisionGenerator {
+
+    public static List<String> stringsWithSameHashCode(int desiredRecords) {
+      List<String> strings = asList("Aa", "BB");
+      List<String> temp = new ArrayList<>();
+
+      boolean finished = false;
+      for (int i = 0; i < 5 && !finished; i++) {
+        temp = new ArrayList<>();
+        int count = 0;
+        for (String s : strings) {
+          for (String t : strings) {
+            if (count == desiredRecords) {
+              finished = true;
+              break;
+            }
+            temp.add(s + t);
+            count++;
+          }
+        }
+        strings = temp;
+      }
+      strings = temp;
+
+      return strings;
+    }
   }
 }
