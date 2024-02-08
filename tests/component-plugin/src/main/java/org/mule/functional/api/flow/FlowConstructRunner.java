@@ -75,67 +75,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as an inbound property of the {@link Message} to the configured
-   * flow.
-   *
-   * @param key   the key of the inbound property to add
-   * @param value the value of the inbound property to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public R withInboundProperty(String key, Serializable value) {
-    eventBuilder.withInboundProperty(key, value);
-
-    return (R) this;
-  }
-
-  /**
-   * Prepares the given properties map to be sent as inbound properties of the {@link Message} to the configured flow.
-   *
-   * @param properties the inbound properties to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public R withInboundProperties(Map<String, Serializable> properties) {
-    eventBuilder.withInboundProperties(properties);
-
-    return (R) this;
-  }
-
-  /**
-   * Prepares a property with the given key and value to be sent as an outbound property of the {@link Message} to the configured
-   * flow.
-   *
-   * @param key   the key of the outbound property to add
-   * @param value the value of the outbound property to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public R withOutboundProperty(String key, Serializable value) {
-    eventBuilder.withOutboundProperty(key, value);
-
-    return (R) this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the {@link Message} to the configured flow.
-   *
-   * @param key   the key of the attachment to add
-   * @param value the {@link DataHandler} for the attachment to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  public R withInboundAttachment(String key, DataHandler value) {
-    eventBuilder.withInboundAttachment(key, value);
-
-    return (R) this;
-  }
-
-  /**
    * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
@@ -152,6 +91,7 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
    * @return this {@link TestEventBuilder}
    * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)}
    */
+  @Deprecated
   public R withCorrelation(GroupCorrelation correlation) {
     return withItemSequenceInfo(fromGroupCorrelation(correlation));
   }

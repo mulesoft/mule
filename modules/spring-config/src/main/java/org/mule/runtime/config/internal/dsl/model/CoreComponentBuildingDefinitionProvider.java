@@ -136,7 +136,6 @@ import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
@@ -511,12 +510,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
             .withDefaultValue(ANY_SELECTOR_STRING)
             .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(MuleEncryptionEndpointSecurityFilter.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("security-manager")

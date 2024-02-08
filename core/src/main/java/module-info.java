@@ -431,9 +431,6 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
-  exports org.mule.runtime.core.internal.security.filter to
-      org.mule.runtime.spring.config,
-      spring.beans;
   exports org.mule.runtime.core.internal.security.tls to
       org.mule.runtime.tls,
       com.mulesoft.anypoint.gw.api;
