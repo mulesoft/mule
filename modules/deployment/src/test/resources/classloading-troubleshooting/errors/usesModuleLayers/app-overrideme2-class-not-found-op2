@@ -35,5 +35,5 @@ Module Layer Information:
 --------------------------------------
 
 Modules in each Module Layer:
-service/schedulerService: org.mule.service.scheduler.mock
+service/expressionLanguageService: org.mule.service.el.mock
 Mule Container Module Layer: (Empty Layer)
