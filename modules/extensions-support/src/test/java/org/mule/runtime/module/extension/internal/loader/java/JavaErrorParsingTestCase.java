@@ -34,6 +34,7 @@ import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.internal.loader.enricher.LevelErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -133,7 +134,7 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
     assertErrorPresent(extensionModel.getOperationModel("someOperation").get(), EXTENSION.getType());
 
     // W-12289050
-    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), EXTENSION.getType());
+    assertErrorPresent(extensionModel.getOperationModel("someConstruct").get(), EXTENSION.getType());
   }
 
   @Test
@@ -141,7 +142,7 @@ public class JavaErrorParsingTestCase extends AbstractMuleTestCase {
   public void constructHasErrorModels() {
     extensionModel = loadExtension(HeisenbergWithConstructThrows.class);
 
-    assertErrorPresent(extensionModel.getConstructModel("someConstruct").get(), CONSTRUCT.getType());
+    assertErrorPresent(extensionModel.getOperationModel("someConstruct").get(), CONSTRUCT.getType());
   }
 
   private void assertErrorPresent(ComponentModel componentModel, String errorType) {
