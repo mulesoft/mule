@@ -33,11 +33,12 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.processor.strategy.StreamPerEventSink;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.tck.SimpleUnitTestSupportSchedulerService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,6 +55,7 @@ import io.qameta.allure.Story;
 @Stories({@Story(ASYNC), @Story(BACKPRESSURE)})
 public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractAsyncDelegateMessageProcessorTestCase {
 
+  private final BackPressureGeneratorProcessingStrategy strategy = new BackPressureGeneratorProcessingStrategy();
   private FixingBackPressureSchedulerService service;
 
   public AsyncDelegateMessageProcessorBackPressureTestCase(Mode mode) {
@@ -61,13 +63,17 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
   }
 
   @Override
+  protected Map<String, Object> getStartUpRegistryObjects() {
+    Map<String, Object> objects = new HashMap<>(super.getStartUpRegistryObjects());
+    service = new FixingBackPressureSchedulerService(strategy);
+    objects.put("SchedulerService", service);
+    return objects;
+  }
+
+  @Override
   protected void doSetUp() throws Exception {
     super.doSetUp();
-    BackPressureGeneratorProcessingStrategy strategy = new BackPressureGeneratorProcessingStrategy();
     flow = createAndRegisterFlow(muleContext, APPLE_FLOW, componentLocator, (ctx, n) -> strategy);
-    service = new FixingBackPressureSchedulerService(strategy);
-    muleContext.getCustomizationService().registerCustomServiceImpl(muleContext.getSchedulerService().getName(), service);
-    ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(muleContext.getSchedulerService().getName(), service);
     async = createAsyncDelegateMessageProcessor(target, flow);
     async.start();
   }
@@ -110,7 +116,9 @@ public class AsyncDelegateMessageProcessorBackPressureTestCase extends AbstractA
     assertTargetEvent(request);
     assertResponse(result1);
     assertResponse(result2);
-    assertThat(service.getExecutions(), is(1));
+    // One for the ghostbuster,
+    // another one for the actual event processing
+    assertThat(service.getExecutions(), is(2));
   }
 
   @Test

@@ -9,14 +9,15 @@ package org.mule.runtime.module.deployment.impl.internal.domain.test;
 import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
 import static org.mule.tck.mockito.answer.BuilderAnswer.BUILDER_ANSWER;
+import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +29,6 @@ import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -68,7 +68,7 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
   private final ClassLoader originalThreadClassloader = mock(ClassLoader.class);
   private final ClassLoader domainClassloader = mock(ClassLoader.class);
   private final ArtifactContext artifactContext = mock(ArtifactContext.class);
-  private final MuleContext muleContext = mock(MuleContextWithRegistry.class);
+  private final MuleContext muleContext = mockMuleContext();
   private final MuleRegistry muleRegistry = mock(MuleRegistry.class);
   private final ArtifactStoppedPersistenceListener artifactStoppedPersistenceListener =
       mock(ArtifactStoppedPersistenceListener.class);
@@ -104,8 +104,6 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
 
     doAnswer(invocation -> artifactStoppedPersistenceListener).when(muleRegistry).lookupObject(ARTIFACT_STOPPED_LISTENER);
 
-    doAnswer(invocation -> muleRegistry).when((MuleContextWithRegistry) muleContext).getRegistry();
-
     domain.dispose();
 
     assertThat(classloaderUsedInDispose, sameInstance(domainClassloader));
@@ -120,8 +118,6 @@ public class MuleDomainClassloaderTestCase extends AbstractMuleTestCase {
     }).when(muleContext).stop();
 
     doAnswer(invocation -> artifactStoppedPersistenceListener).when(muleRegistry).lookupObject(ARTIFACT_STOPPED_LISTENER);
-
-    doAnswer(invocation -> muleRegistry).when((MuleContextWithRegistry) muleContext).getRegistry();
 
     domain.stop();
 
