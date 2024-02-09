@@ -37,17 +37,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.service.ServiceRepository;
-import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
@@ -62,7 +58,6 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
-import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
@@ -105,7 +100,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
   private Application application;
   private Registry appRegistry;
 
-  private MuleContextWithRegistry policyMuleContext;
+  private MuleContext policyMuleContext;
 
   public DefaultApplicationPolicyInstanceTestCase(boolean enablePolicyIsolationPropertyValue) {
     this.enablePolicyIsolation = enablePolicyIsolationPropertyValue;
@@ -122,7 +117,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
     application = mock(Application.class, RETURNS_DEEP_STUBS);
 
     ArtifactContext appArtifactContext = application.getArtifactContext();
-    MuleContextWithRegistry appMuleContext = mockContextWithServices();
+    MuleContext appMuleContext = mockContextWithServices();
     when(appArtifactContext.getMuleContext()).thenReturn(appMuleContext);
 
     appRegistry = appArtifactContext.getRegistry();
@@ -130,12 +125,7 @@ public class DefaultApplicationPolicyInstanceTestCase extends AbstractMuleTestCa
 
     doReturn(appRegistry).when(application).getRegistry();
 
-    MuleRegistry policyRegistry = mock(MuleRegistry.class);
-    when(policyRegistry.lookupObject(FeatureFlaggingService.class)).thenReturn(mock(FeatureFlaggingService.class));
-
-    policyMuleContext = mock(MuleContextWithRegistry.class);
-    when(policyMuleContext.getRegistry()).thenReturn(policyRegistry);
-    when(policyMuleContext.getInjector()).thenReturn(mock(Injector.class));
+    policyMuleContext = mockContextWithServices();
   }
 
   @Test

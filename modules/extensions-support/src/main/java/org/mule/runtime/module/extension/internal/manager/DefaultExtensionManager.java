@@ -37,7 +37,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -74,7 +73,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
+public final class DefaultExtensionManager implements ExtensionManager, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
 
@@ -102,7 +101,9 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
+  @Inject
   private MuleContext muleContext;
+
   private ExtensionRegistry extensionRegistry;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
 
@@ -319,7 +320,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     }
   }
 
-
   private Time getConfigurationExpirationFrequency() {
     return muleContext.getConfiguration().getDynamicConfigExpiration().getFrequency();
   }
@@ -341,11 +341,6 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
 
   ExtensionJdkValidator getExtensionJdkValidator() {
     return extensionJdkValidator;
-  }
-
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 
   public ReflectionCache getReflectionCache() {

@@ -15,6 +15,7 @@ import static org.mule.tck.util.MuleContextUtils.addExtensionModelToMock;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Optional.of;
+
 import static org.apache.commons.io.FileUtils.copyURLToFile;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -30,8 +31,8 @@ import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContextConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
@@ -46,12 +47,13 @@ import java.net.URLClassLoader;
 
 import javax.inject.Inject;
 
-import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+
+import io.qameta.allure.Issue;
 
 public class AstXmlParserArtifactConfigurationProcessorTestCase extends AbstractMuleTestCase {
 
@@ -64,7 +66,7 @@ public class AstXmlParserArtifactConfigurationProcessorTestCase extends Abstract
   private FeatureFlaggingService featureFlaggingService;
 
   private AstXmlParserArtifactConfigurationProcessor configurationBuilder;
-  private MuleContextWithRegistry muleContext;
+  private MuleContext muleContext;
 
   @Rule
   public ExpectedException expectedException = none();

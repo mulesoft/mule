@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
 import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactContextFactory;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_REGISTRY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL;
@@ -37,7 +36,7 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.config.api.ArtifactContextFactory;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactConfigurationProcessor;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
@@ -183,7 +182,7 @@ public class ArtifactContextBuilderTestCase extends AbstractMuleTestCase {
 
           ArtifactContext artifactContext = mock(ArtifactContext.class);
           when(artifactContext.getRegistry())
-              .thenReturn(((MuleContextWithRegistry) configBuilder.getMuleContext()).getRegistry().get(OBJECT_REGISTRY));
+              .thenReturn(new DefaultRegistry(configBuilder.getMuleContext()));
           return artifactContext;
         });
 
