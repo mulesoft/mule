@@ -21,7 +21,7 @@
 
     <properties>
         <javaModuleName>org.mule.test.extension.reusable.app</javaModuleName>
-        <mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
+        <mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
         <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
