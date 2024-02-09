@@ -567,7 +567,7 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
   }
 
   private void assertTestModuleOperations(ExtensionDeclaration extensionDeclaration) throws Exception {
-    assertThat(extensionDeclaration.getOperations(), hasSize(66));
+    assertThat(extensionDeclaration.getOperations(), hasSize(73));
 
     WithOperationsDeclaration withOperationsDeclaration = extensionDeclaration.getConfigurations().get(0);
     assertThat(withOperationsDeclaration.getOperations().size(), is(26));
@@ -612,6 +612,11 @@ public class JavaDeclarationDelegateTestCase extends AbstractJavaExtensionDeclar
     assertOperation(withOperationsDeclaration, "failingConnectivityPagedOperation", "");
     assertOperation(withOperationsDeclaration, "nameAsStreamConnected", "");
     assertOperation(withOperationsDeclaration, GET_SECOND_BARBER_PREFERENCE, "");
+    assertOperation(extensionDeclaration, "spy", "");
+    assertOperation(extensionDeclaration, "concurrentRouteExecutor", "");
+    assertOperation(extensionDeclaration, "simpleRouter", "");
+    assertOperation(extensionDeclaration, "stereotypedRoutes", "");
+    assertOperation(extensionDeclaration, "twoRoutesRouter", "");
 
     OperationDeclaration operation = getOperation(withOperationsDeclaration, SAY_MY_NAME_OPERATION);
     assertThat(operation, is(notNullValue()));

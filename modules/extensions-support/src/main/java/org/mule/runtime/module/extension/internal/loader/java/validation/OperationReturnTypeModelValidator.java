@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
 import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.message.Message;
@@ -22,6 +24,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
@@ -30,6 +33,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensi
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -97,19 +101,35 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
         .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
         .findFirst().ifPresent(extensionParameter -> {
           List<TypeGeneric> generics = extensionParameter.getType().getGenerics();
-          List<Type> superTypeGenerics = extensionParameter.getType().getSuperTypeGenerics(CompletionCallback.class);
           if (!generics.isEmpty()) {
             validateGenerics(extensionModel, extensionParameter, operationModel, genericToConcreteTypeList(generics),
                              CompletionCallback.class, problemsReporter);
-          } else if (!superTypeGenerics.isEmpty()) {
-            validateGenerics(extensionModel, extensionParameter, operationModel, superTypeGenerics, CompletionCallback.class,
-                             problemsReporter);
           } else {
-            problemsReporter
-                .addError(new Problem(extensionParameter, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                                 extensionModel.getName(), CompletionCallback.class.getName())));
+            Type executionParameterType = extensionParameter.getType();
+            Optional<List<Type>> superTypeGenerics =
+                routerCallbackParent(executionParameterType).map(executionParameterType::getSuperTypeGenerics);
+            if (superTypeGenerics.isPresent() && !superTypeGenerics.get().isEmpty()) {
+              validateGenerics(extensionModel, extensionParameter, operationModel, superTypeGenerics.get(),
+                               CompletionCallback.class,
+                               problemsReporter);
+            } else {
+              problemsReporter
+                  .addError(new Problem(extensionParameter, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                   extensionModel.getName(),
+                                                                   CompletionCallback.class.getName())));
+            }
           }
         });
+  }
+
+  private Optional<Class> routerCallbackParent(Type type) {
+    if (type.getTypeName().equals(RouterCompletionCallback.class.getName())) {
+      return of(CompletionCallback.class);
+    } else if (type.getTypeName().equals(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class.getName())) {
+      return of(org.mule.sdk.api.runtime.process.CompletionCallback.class);
+    } else {
+      return empty();
+    }
   }
 
   private void validateResultReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
