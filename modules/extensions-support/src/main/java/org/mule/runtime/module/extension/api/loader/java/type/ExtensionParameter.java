@@ -20,7 +20,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.extension.api.annotation.dsl.xml.ParameterDsl;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -88,7 +87,6 @@ public interface ExtensionParameter extends WithType, WithAnnotations, NamedObje
       .add(org.mule.sdk.api.notification.NotificationEmitter.class)
       .add(ExtensionsClient.class)
       .add(org.mule.sdk.api.client.ExtensionsClient.class)
-      .add(RetryPolicyTemplate.class)
       .build();
 
   Set<String> IMPLICIT_ARGUMENT_PACKAGES = ImmutableSet.<String>builder()
