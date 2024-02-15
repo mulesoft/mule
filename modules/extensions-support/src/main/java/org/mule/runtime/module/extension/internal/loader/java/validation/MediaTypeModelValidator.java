@@ -133,13 +133,13 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private boolean mediaTypeAnnotationIsMissing(ConnectableComponentModel model, MetadataType outputMetadataType) {
-        if (isCompatibilityRouter(model)) {
-          return false;
-        }
         return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
             !hasMediaTypeModelProperty(model) &&
         // Since the model property is missing, there is no media type
-            !hasStaticMetadataDefined(model, null);
+            !hasStaticMetadataDefined(model, null) &&
+        // if it is a router-operation and it has a RouterCompletionCallback, then we avoid this validation due to compatibility
+        // reasons
+            !isCompatibilityRouter(model);
       }
 
       private boolean isCompatibilityRouter(ConnectableComponentModel model) {
