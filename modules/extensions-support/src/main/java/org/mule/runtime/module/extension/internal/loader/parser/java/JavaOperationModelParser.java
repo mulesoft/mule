@@ -85,10 +85,9 @@ import org.mule.runtime.module.extension.internal.runtime.execution.CompletableO
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -516,8 +515,16 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void collectAdditionalModelProperties() {
-    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement));
+    boolean hasDeprecatedRouterCompletion = operationElement.getMethod().map(Executable::getParameters)
+        .flatMap(params -> Arrays.stream(params).filter(this::parameterOfRouterCompletionCallbackType).findFirst()).isPresent();
+    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement, hasDeprecatedRouterCompletion));
     operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
+  }
+
+  private boolean parameterOfRouterCompletionCallbackType(Parameter param) {
+    Class<?> type = param.getType();
+    return type.isAssignableFrom(RouterCompletionCallback.class)
+        || type.isAssignableFrom(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
   }
 
   @Override

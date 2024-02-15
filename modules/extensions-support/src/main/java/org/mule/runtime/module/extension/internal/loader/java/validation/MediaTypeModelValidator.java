@@ -133,10 +133,18 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
       }
 
       private boolean mediaTypeAnnotationIsMissing(ConnectableComponentModel model, MetadataType outputMetadataType) {
+        if (isCompatibilityRouter(model)) {
+          return false;
+        }
         return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
             !hasMediaTypeModelProperty(model) &&
         // Since the model property is missing, there is no media type
             !hasStaticMetadataDefined(model, null);
+      }
+
+      private boolean isCompatibilityRouter(ConnectableComponentModel model) {
+        return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .map(ExtensionOperationDescriptorModelProperty::hasDeprecatedRouterCompletionCallback).orElse(false);
       }
 
       private boolean hasStaticMetadataDefined(ConnectableComponentModel model, MediaType mediaTypeFromModelProperty) {
