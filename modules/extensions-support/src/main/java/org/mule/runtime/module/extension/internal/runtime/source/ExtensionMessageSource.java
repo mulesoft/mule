@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.COMPUTE_CONNECTION_ERRORS_IN_STATS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -351,6 +352,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
         .setTransactionFactoryManager(transactionFactoryManager)
         .setCursorStreamProviderFactory(getCursorProviderFactory())
         .setCompletionHandlerFactory(completionHandlerFactory)
+        .setErrorAfterTimeout(featureFlaggingService.isEnabled(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT))
         .build();
   }
 

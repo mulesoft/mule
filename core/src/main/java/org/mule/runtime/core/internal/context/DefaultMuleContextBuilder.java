@@ -7,9 +7,12 @@
 package org.mule.runtime.core.internal.context;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGING_SERVICE_KEY;
 import static org.mule.runtime.core.api.context.notification.ServerNotificationManager.createDefaultNotificationManager;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -94,12 +97,15 @@ public class DefaultMuleContextBuilder implements MuleContextBuilder {
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
     muleContext.setErrorTypeRepository(contributedErrorTypeRepository);
     final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
-    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+
     muleContext.setErrorTypeLocator(contributedErrorTypeLocator);
 
     final SimpleRegistry registry = new SimpleRegistry(muleContext, muleContext.getLifecycleInterceptor());
     muleContext.setRegistry(registry);
     muleContext.setInjector(registry);
+    FeatureFlaggingService featureFlaggingService = registry.get(FEATURE_FLAGGING_SERVICE_KEY);
+    contributedErrorTypeLocator
+        .setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository, of(featureFlaggingService)));
 
     muleContext.setExceptionListener(createExceptionListener(muleContext));
     muleContext.setExecutionClassLoader(getExecutionClassLoader());

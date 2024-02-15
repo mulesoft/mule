@@ -349,6 +349,15 @@
           "methodName": "setRollbackIfTimeout",
           "elementKind": "method",
           "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
+        },
+        {
+          "code": "java.field.added",
+          "new": "field org.mule.runtime.core.privileged.transaction.AbstractTransaction.rollbackAfterTimeout",
+          "package": "org.mule.runtime.core.privileged.transaction",
+          "classSimpleName": "AbstractTransaction",
+          "fieldName": "rollbackAfterTimeout",
+          "elementKind": "field",
+          "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
         }
       ]
     }

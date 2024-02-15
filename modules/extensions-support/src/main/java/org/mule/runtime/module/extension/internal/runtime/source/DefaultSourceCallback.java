@@ -153,6 +153,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
+    public Builder<T, A> setErrorAfterTimeout(boolean errorAfterTimeout) {
+      product.errorAfterTimeout = errorAfterTimeout;
+      return this;
+    }
+
     public org.mule.sdk.api.runtime.source.SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
       checkArgument(product.exceptionCallback, "exceptionCallback");
@@ -210,6 +215,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
   private MediaType mimeTypeInitParam;
   private Charset encodingParam;
+  private boolean errorAfterTimeout;
 
   private DefaultSourceCallback(ProfilingService profilingService) {
     this.profilingService = profilingService;
@@ -317,7 +323,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public SourceCallbackContext createContext() {
-    return new DefaultSourceCallbackContext(this, profilingService);
+    return new DefaultSourceCallbackContext(this, profilingService, errorAfterTimeout);
   }
 
   /**
