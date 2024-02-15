@@ -39,7 +39,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -87,7 +86,11 @@ import org.mule.sdk.api.annotation.Operations;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
