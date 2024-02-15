@@ -24,9 +24,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolv
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,11 +85,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
         continue;
       }
 
-      // if (parser.isRouter()) {
-      // routersDelegate.declareRouter(extensionDeclarer, extensionDevelopmentFramework, (HasConstructDeclarer) ownerDeclarer,
-      // parser);
-      // continue;
-      // }
       operationDeclarers.put(parser, createOperationDeclarer(parser, extensionDeclarer, actualDeclarer));
     }
   }
