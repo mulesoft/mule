@@ -21,10 +21,12 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMER
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.BINDING_PROVIDER_PREDICATE;
 import static org.mule.runtime.core.internal.config.bootstrap.AbstractRegistryBootstrap.TRANSFORMER_PREDICATE;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.scheduler.SchedulerContainerPoolsConfig;
@@ -96,7 +98,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
   }
 
   void createArtifactServices() {
-    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, originalRegistry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY));
+    FeatureFlaggingService featureFlaggingService = originalRegistry.lookupObject(FEATURE_FLAGGING_SERVICE_KEY);
+    registerConstantBeanDefinition(FEATURE_FLAGGING_SERVICE_KEY, featureFlaggingService);
 
     registerConstantBeanDefinition(ConfigurationComponentLocator.REGISTRY_KEY, new BaseConfigurationComponentLocator());
 
@@ -106,7 +109,8 @@ public class BaseSpringMuleContextServiceConfigurator extends AbstractSpringMule
     final ContributedErrorTypeRepository contributedErrorTypeRepository = new ContributedErrorTypeRepository();
     registerConstantBeanDefinition(ErrorTypeRepository.class.getName(), contributedErrorTypeRepository);
     final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
-    contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
+    contributedErrorTypeLocator
+        .setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository, of(featureFlaggingService)));
     registerConstantBeanDefinition(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator);
 
     registerConstantBeanDefinition(OBJECT_CONFIGURATION_PROPERTIES, configurationProperties);
