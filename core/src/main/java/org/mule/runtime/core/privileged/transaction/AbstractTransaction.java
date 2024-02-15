@@ -54,7 +54,7 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected String applicationName;
   protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
-  private boolean rollbackAfterTimeout = true;
+  protected boolean rollbackAfterTimeout;
 
   @Deprecated
   protected AbstractTransaction(MuleContext muleContext) {

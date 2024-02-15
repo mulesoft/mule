@@ -12,8 +12,13 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import static java.lang.Thread.sleep;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -29,6 +34,7 @@ import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -134,6 +140,14 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
+  @Test
+  public void sourceWithTxAndTimeout() throws Exception {
+    startFlow("sourceWithTimeout");
+
+    validateFlow(false);
+    validateRolledBackedTransaction(MessageStorage.messages.poll());
+  }
+
   private void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
   }
@@ -175,6 +189,20 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
       assertThat(((SdkTestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
     } else {
       throw new RuntimeException("Stored object is not a valid type of connection");
+    }
+  }
+
+
+  public static class SleepProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        sleep(3000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return event;
     }
   }
 }
