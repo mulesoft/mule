@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
@@ -93,16 +91,9 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .addExceptionMapping(MuleFatalException.class, errorTypeRepository.getErrorType(FATAL).get())
-            .addExceptionMapping(TransactionException.class,
-                                 errorTypeRepository.lookupErrorType(TRANSACTION)
-                                     .orElseGet(ErrorTypeLocatorFactory::createTransactionError))
+            .addExceptionMapping(TransactionException.class, errorTypeRepository.lookupErrorType(TRANSACTION).get())
             .build())
         .defaultError(unknown)
         .build();
-  }
-
-  private static ErrorType createTransactionError() {
-    ErrorType anyError = builder().namespace(ANY.getNamespace()).identifier(ANY.getName()).build();
-    return builder().namespace(TRANSACTION.getNamespace()).identifier(TRANSACTION.getName()).parentErrorType(anyError).build();
   }
 }
