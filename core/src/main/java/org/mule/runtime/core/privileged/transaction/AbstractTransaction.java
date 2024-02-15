@@ -6,19 +6,15 @@
  */
 package org.mule.runtime.core.privileged.transaction;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static java.lang.System.identityHashCode;
+import static java.text.MessageFormat.format;
+import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_COMMITTED;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_ROLLEDBACK;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.notMuleXaTransaction;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transactionMarkedForRollback;
-import static java.lang.System.identityHashCode;
-import static java.text.MessageFormat.format;
-import static java.time.Duration.between;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 import static org.slf4j.LoggerFactory.getLogger;
-
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.notification.NotificationDispatcher;
@@ -32,9 +28,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
-import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 
@@ -48,13 +42,11 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   protected String id = UUID.getUUID();
 
   protected int timeout;
-  private Instant beginTime;
   protected ComponentLocation componentLocation;
 
   protected String applicationName;
   protected MuleContext muleContext;
   protected final NotificationDispatcher notificationFirer;
-  private boolean rollbackAfterTimeout = true;
 
   @Deprecated
   protected AbstractTransaction(MuleContext muleContext) {
@@ -102,36 +94,27 @@ public abstract class AbstractTransaction implements TransactionAdapter {
     doBegin();
     TransactionCoordination.getInstance().bindTransaction(this);
     fireNotification(new TransactionNotification(getId(), TRANSACTION_BEGAN, getApplicationName()));
-    beginTime = now();
   }
 
   @Override
   public void commit() throws TransactionException {
-    boolean timeoutReached = timeoutReached();
     try {
-      if (isRollbackOnly()) {
-        throw new IllegalTransactionStateException(transactionMarkedForRollback());
-      }
-      if (rollbackAfterTimeout && timeoutReached) {
-        rollback();
-      }
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Committing transaction {}@{}", this.getClass().getName(), identityHashCode(this));
       }
+      if (isRollbackOnly()) {
+        throw new IllegalTransactionStateException(transactionMarkedForRollback());
+      }
+
       doCommit();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_COMMITTED, getApplicationName()));
     } finally {
-      unbindTransaction();
+      TransactionCoordination.getInstance().unbindTransaction(this);
     }
-  }
-
-  private boolean timeoutReached() {
-    return timeout > 0 && between(beginTime, now()).toMillis() > timeout;
   }
 
   @Override
   public void rollback() throws TransactionException {
-    boolean timeoutReached = timeoutReached();
     try {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Rolling back transaction {}@{}", this.getClass().getName(), identityHashCode(this));
@@ -139,11 +122,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
       setRollbackOnly();
       doRollback();
       fireNotification(new TransactionNotification(getId(), TRANSACTION_ROLLEDBACK, getApplicationName()));
-      if (rollbackAfterTimeout && timeoutReached) {
-        throw new TransactionException(createStaticMessage("Timeout Reached. Transaction rolled back."),
-                                       new TimeoutException(format("Execution time for transaction exceeded timeout ({0} ms)",
-                                                                   timeout)));
-      }
     } finally {
       unbindTransaction();
     }
@@ -234,11 +212,6 @@ public abstract class AbstractTransaction implements TransactionAdapter {
   @Override
   public void setComponentLocation(ComponentLocation componentLocation) {
     this.componentLocation = componentLocation;
-  }
-
-  @Override
-  public void setRollbackIfTimeout(boolean rollbackAfterTimeout) {
-    this.rollbackAfterTimeout = rollbackAfterTimeout;
   }
 
   @Override

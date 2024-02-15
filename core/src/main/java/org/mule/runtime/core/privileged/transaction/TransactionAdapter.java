@@ -29,11 +29,4 @@ public interface TransactionAdapter extends Transaction {
    * @param componentLocation
    */
   void setComponentLocation(ComponentLocation componentLocation);
-
-  /**
-   * Set if the transaction should be rolled back in case of timeout, or not.
-   * 
-   * @param rollbackIfTimeout
-   */
-  void setRollbackIfTimeout(boolean rollbackIfTimeout);
 }

@@ -23,7 +23,6 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
@@ -357,7 +356,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureCreateChildPolicyContextForParallelScopes();
       configureCommonsPool2DisableJmx();
       configureDisableSchedulerLogging();
-      configureErrorAndRollbackTxWhenTimeout();
     }
   }
 
@@ -1575,11 +1573,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableSchedulerLogging() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_SCHEDULER_LOGGING, minMuleVersion("4.6.0"));
-  }
-
-  private static void configureErrorAndRollbackTxWhenTimeout() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

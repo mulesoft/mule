@@ -16,7 +16,6 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 
 import javax.transaction.TransactionManager;
 
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +29,11 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
   private final NotificationDispatcher notificationDispatcher;
   private final boolean processOnException;
   private final boolean mustResolveAnyTransaction;
-  private final boolean errorAtTimeout;
 
   public BeginAndResolveTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
                                                String applicationName, NotificationDispatcher notificationDispatcher,
                                                TransactionManager transactionManager,
-                                               boolean processOnException, boolean mustResolveAnyTransaction,
-                                               boolean errorAtTimeout) {
+                                               boolean processOnException, boolean mustResolveAnyTransaction) {
     this.next = next;
     this.transactionConfig = transactionConfig;
     this.applicationName = applicationName;
@@ -44,7 +41,6 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
     this.transactionManager = transactionManager;
     this.processOnException = processOnException;
     this.mustResolveAnyTransaction = mustResolveAnyTransaction;
-    this.errorAtTimeout = errorAtTimeout;
   }
 
   @Override
@@ -66,9 +62,6 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
                                                            notificationDispatcher,
                                                            transactionManager);
       tx.setTimeout(timeout);
-      if (tx instanceof TransactionAdapter) {
-        ((TransactionAdapter) tx).setRollbackIfTimeout(errorAtTimeout);
-      }
       resolveStartedTransaction = true;
       if (logger.isDebugEnabled()) {
         logger.debug("Transaction successfully started: " + tx);

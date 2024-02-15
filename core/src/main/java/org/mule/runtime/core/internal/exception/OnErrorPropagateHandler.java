@@ -24,10 +24,8 @@ import org.mule.runtime.api.message.error.matcher.ErrorTypeMatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
-import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
@@ -36,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 /**
@@ -102,15 +99,7 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
   }
 
   public void rollback(Exception ex) {
-    Transaction tx = TransactionCoordination.getInstance().getTransaction();
-    if (tx == null) {
-      return;
-    }
-    try {
-      tx.rollback();
-    } catch (TransactionException e) {
-      ex.addSuppressed(e);
-    }
+    TransactionCoordination.getInstance().rollbackCurrentTransaction();
   }
 
   /**
