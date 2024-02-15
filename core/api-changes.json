@@ -13,6 +13,31 @@
           "code": "java.method.added",
           "new": "method void org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener::setEnableNotifications(boolean)",
           "justification": "W-14784223: On Error Continue - EnableNotifications check is not working"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSACTION",
+          "justification": "W-14608096: revert"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.config.MuleConfiguration, org.mule.runtime.api.notification.NotificationDispatcher, javax.transaction.TransactionManager, org.mule.runtime.core.api.transaction.TransactionConfig, boolean)",
+          "justification": "W-14608096: revert"
+
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.transaction.AbstractTransaction::setRollbackIfTimeout(boolean)",
+          "justification": "W-14608096: revert"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.privileged.transaction.TransactionAdapter::setRollbackIfTimeout(boolean)",
+          "justification": "W-14608096: revert"
         }
       ]
     }
