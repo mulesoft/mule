@@ -47,11 +47,9 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
   private static final Logger LOGGER = LoggerFactory.getLogger(OperationModelLoaderDelegate.class);
 
   private final Map<OperationModelParser, OperationDeclarer> operationDeclarers = new HashMap<>();
-  private final RouterModelLoaderDelegate routersDelegate;
 
   OperationModelLoaderDelegate(DefaultExtensionModelLoaderDelegate delegate) {
     super(delegate);
-    routersDelegate = new RouterModelLoaderDelegate(delegate);
   }
 
   void declareOperations(ExtensionDeclarer extensionDeclarer,
