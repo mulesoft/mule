@@ -1,7 +1,7 @@
 {
   "name": "Heisenberg",
   "description": "",
-  "version": "@mule.runtime.version@",
+  "version": "4.7.0-SNAPSHOT",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
@@ -14,7 +14,7 @@
     "prefix": "heisenberg",
     "namespace": "http://www.mulesoft.org/schema/mule/heisenberg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd",
-    "schemaVersion": "@mule.runtime.version@",
+    "schemaVersion": "4.7.0-SNAPSHOT",
     "xsdFileName": "mule-heisenberg.xsd"
   },
   "resources": [
@@ -51881,7 +51881,7 @@
       "kind": "operation"
     },
     {
-      "blocking": true,
+      "blocking": false,
       "executionType": "CPU_LITE",
       "output": {
         "type": {
@@ -56834,7 +56834,7 @@
       "kind": "operation"
     },
     {
-      "blocking": true,
+      "blocking": false,
       "executionType": "CPU_LITE",
       "output": {
         "type": {

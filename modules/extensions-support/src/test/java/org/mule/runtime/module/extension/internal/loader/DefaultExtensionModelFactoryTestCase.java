@@ -162,7 +162,8 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
                                                              "blockingNonBlocking", "nonBlocking", "callGusFringNonBlocking",
                                                              "tapPhones", "sdkExecuteForeingOrders", "concurrentRouteExecutor",
-                                                             "simpleRouter", "spy", "stereotypedRoutes", "twoRoutesRouter");
+                                                             "simpleRouter", "spy", "stereotypedRoutes", "twoRoutesRouter",
+                                                             "sdkVoidRouter", "voidRouter");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);
