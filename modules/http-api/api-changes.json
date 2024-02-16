@@ -1,4 +1,42 @@
 {
+  "4.7.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter java.util.concurrent.CompletableFuture<org.mule.runtime.http.api.ws.WebSocket> org.mule.runtime.http.api.ws.WebSocket::reconnect(===org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate===, org.mule.runtime.api.scheduler.Scheduler)",
+          "new": "parameter java.util.concurrent.CompletableFuture<org.mule.runtime.http.api.ws.WebSocket> org.mule.runtime.http.api.ws.WebSocket::reconnect(===org.mule.runtime.api.retry.policy.RetryPolicyTemplate===, org.mule.runtime.api.scheduler.Scheduler)",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate",
+          "newType": "org.mule.runtime.api.retry.policy.RetryPolicyTemplate",
+          "package": "org.mule.runtime.http.api.ws",
+          "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocket",
+          "classSimpleName": "WebSocket",
+          "methodName": "reconnect",
+          "elementKind": "parameter",
+          "breaksSemanticVersioning": "true",
+          "justification": "W-14610032: remove dependency on `mule-core`"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter java.util.concurrent.CompletableFuture<java.lang.Void> org.mule.runtime.http.api.ws.WebSocketBroadcaster::broadcast(java.util.Collection<org.mule.runtime.http.api.ws.WebSocket>, org.mule.runtime.api.metadata.TypedValue<java.io.InputStream>, java.util.function.BiConsumer<org.mule.runtime.http.api.ws.WebSocket, java.lang.Throwable>, ===org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate===, org.mule.runtime.api.scheduler.Scheduler)",
+          "new": "parameter java.util.concurrent.CompletableFuture<java.lang.Void> org.mule.runtime.http.api.ws.WebSocketBroadcaster::broadcast(java.util.Collection<org.mule.runtime.http.api.ws.WebSocket>, org.mule.runtime.api.metadata.TypedValue<java.io.InputStream>, java.util.function.BiConsumer<org.mule.runtime.http.api.ws.WebSocket, java.lang.Throwable>, ===org.mule.runtime.api.retry.policy.RetryPolicyTemplate===, org.mule.runtime.api.scheduler.Scheduler)",
+          "parameterIndex": "3",
+          "oldType": "org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate",
+          "newType": "org.mule.runtime.api.retry.policy.RetryPolicyTemplate",
+          "package": "org.mule.runtime.http.api.ws",
+          "classQualifiedName": "org.mule.runtime.http.api.ws.WebSocketBroadcaster",
+          "classSimpleName": "WebSocketBroadcaster",
+          "methodName": "broadcast",
+          "elementKind": "parameter",
+          "breaksSemanticVersioning": "true",
+          "justification": "W-14610032: remove dependency on `mule-core`"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [

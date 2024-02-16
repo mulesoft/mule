@@ -12,24 +12,12 @@ import org.mule.api.annotation.NoImplement;
  * This interface is a callback that allows actions to be performed after each retry attempt, such as firing notifications,
  * logging, etc.
  */
-@Deprecated
 @NoImplement
-public interface RetryNotifier extends org.mule.runtime.retry.api.RetryNotifier {
-
-  @Override
-  default void onFailure(org.mule.runtime.retry.api.RetryContext context, Throwable e) {
-    // Nothing to do
-  }
-
-  @Override
-  default void onSuccess(org.mule.runtime.retry.api.RetryContext context) {
-    // Nothing to do
-  }
+public interface RetryNotifier {
 
   /** Called each time a retry attempt fails. */
   void onFailure(RetryContext context, Throwable e);
 
   /** Called when a retry attempt finally suceeds. */
   void onSuccess(RetryContext context);
-
 }

@@ -125,7 +125,6 @@
         <module>core-tests</module>
         <module>modules</module>
         <module>tests</module>
-        <module>mule-retry-api</module>
     </modules>
 
     <properties>

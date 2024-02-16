@@ -13,36 +13,6 @@
           "code": "java.method.removed",
           "old": "method boolean org.mule.runtime.core.api.config.MuleProperties::isMelDefault()",
           "justification": "W-14572221: MVEL is removed"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.retry.api.RetryCallback",
-          "classSimpleName": "RetryCallback",
-          "package": "org.mule.runtime.retry.api",
-          "classQualifiedName": "org.mule.runtime.retry.api.RetryCallback",
-          "elementKind": "interface",
-          "justification": "W-14610032: new API added for retry configuration"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.retry.api.RetryContext",
-          "classSimpleName": "RetryContext",
-          "package": "org.mule.runtime.retry.api",
-          "classQualifiedName": "org.mule.runtime.retry.api.RetryContext",
-          "elementKind": "interface",
-          "justification": "W-14610032: new API added for retry configuration"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.externalClassExposedInAPI",
-          "new": "interface org.mule.runtime.retry.api.RetryNotifier",
-          "classSimpleName": "RetryNotifier",
-          "package": "org.mule.runtime.retry.api",
-          "classQualifiedName": "org.mule.runtime.retry.api.RetryNotifier",
-          "elementKind": "interface",
-          "justification": "W-14610032: new API added for retry configuration"
         }
       ]
     }
