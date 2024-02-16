@@ -518,16 +518,15 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void collectAdditionalModelProperties() {
-    boolean hasDeprecatedRouterCompletion = operationElement.getMethod().map(Executable::getParameters)
-        .flatMap(params -> Arrays.stream(params).filter(this::parameterOfRouterCompletionCallbackType).findFirst()).isPresent();
+    boolean hasDeprecatedRouterCompletion =
+        operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
     additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement, hasDeprecatedRouterCompletion));
     operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
   }
 
-  private boolean parameterOfRouterCompletionCallbackType(Parameter param) {
-    Class<?> type = param.getType();
-    return type.isAssignableFrom(RouterCompletionCallback.class)
-        || type.isAssignableFrom(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
+  private boolean parameterOfRouterCompletionCallbackType(ExtensionParameter param) {
+    return param.getType().isAssignableTo(RouterCompletionCallback.class)
+        || param.getType().isAssignableTo(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
   }
 
   @Override
@@ -535,7 +534,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     if (isScope()) {
       return "Scope";
     } else if (isRouter()) {
-      return "Construct";
+      return "Router";
     }
     return "Operation";
   }

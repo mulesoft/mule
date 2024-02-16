@@ -119,7 +119,10 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
             hasMediaTypeModelProperty(model) &&
             mediaTypeModelPropertyHasDefaultValue(mediaTypeModelProperty.get()) &&
         // Because the value is defaulted, the mediaType in the model property is null
-            !hasStaticMetadataDefined(model, null);
+            !hasStaticMetadataDefined(model, null) &&
+        // if it is a router-operation and it has a RouterCompletionCallback, then we avoid this validation due to compatibility
+        // reasons
+            !isCompatibilityRouter(model);
       }
 
       private boolean staticResolverClashesWithMediaTypeAnnotationValue(ConnectableComponentModel model,
