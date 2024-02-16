@@ -54,8 +54,7 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   @Before
   public void before() {
     beginAndResolveTransactionInterceptor =
-        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, null, true, true,
-                                                  true);
+        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, null, true, true);
   }
 
   @Test

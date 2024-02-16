@@ -322,33 +322,6 @@
           "methodName": "buildNewChainWithListOfProcessors",
           "elementKind": "method",
           "justification": "W-11503016: Reuse reactor chains for global error handlers to use the default processing strategy"
-        },
-        {
-          "code": "java.field.addedStaticField",
-          "new": "field org.mule.runtime.core.api.exception.Errors.ComponentIdentifiers.Handleable.TRANSACTION",
-          "package": "org.mule.runtime.core.api.exception",
-          "classSimpleName": "Handleable",
-          "fieldName": "TRANSACTION",
-          "elementKind": "field",
-          "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
-        },
-        {
-          "code": "java.method.added",
-          "new": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createScopeTransactionalExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig, boolean)",
-          "package": "org.mule.runtime.core.api.execution",
-          "classSimpleName": "TransactionalExecutionTemplate",
-          "methodName": "createScopeTransactionalExecutionTemplate",
-          "elementKind": "method",
-          "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
-        },
-        {
-          "code": "java.method.added",
-          "new": "method void org.mule.runtime.core.privileged.transaction.AbstractTransaction::setRollbackIfTimeout(boolean)",
-          "package": "org.mule.runtime.core.privileged.transaction",
-          "classSimpleName": "AbstractTransaction",
-          "methodName": "setRollbackIfTimeout",
-          "elementKind": "method",
-          "justification": "W-14608096: timeout is not being considered for local transactions and rollbacks are being silently executed"
         }
       ]
     }

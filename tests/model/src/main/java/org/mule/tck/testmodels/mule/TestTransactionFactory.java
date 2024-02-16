@@ -25,15 +25,8 @@ public class TestTransactionFactory implements TransactionFactory {
   // for testing properties
   private String value;
   private Transaction mockTransaction;
-  private boolean isXa;
 
-  public TestTransactionFactory() {
-    this(false);
-  }
-
-  public TestTransactionFactory(boolean isXa) {
-    this.isXa = isXa;
-  }
+  public TestTransactionFactory() {}
 
   public TestTransactionFactory(Transaction mockTransaction) {
     this.mockTransaction = mockTransaction;
@@ -58,7 +51,7 @@ public class TestTransactionFactory implements TransactionFactory {
     if (mockTransaction != null) {
       testTransaction = mockTransaction;
     } else {
-      testTransaction = new TestTransaction(applicationName, notificationFirer, isXa);
+      testTransaction = new TestTransaction(applicationName, notificationFirer, false);
     }
 
     testTransaction.begin();

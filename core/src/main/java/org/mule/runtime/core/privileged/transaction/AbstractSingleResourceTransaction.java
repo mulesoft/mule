@@ -88,11 +88,8 @@ public abstract class AbstractSingleResourceTransaction extends AbstractTransact
 
   @Override
   public void rollback() throws TransactionException {
-    try {
-      super.rollback();
-    } finally {
-      rolledBack.compareAndSet(false, true);
-    }
+    super.rollback();
+    rolledBack.compareAndSet(false, true);
   }
 
   @Override
