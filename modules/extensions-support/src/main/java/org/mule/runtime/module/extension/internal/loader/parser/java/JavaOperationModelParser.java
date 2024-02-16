@@ -120,6 +120,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean blocking = false;
   private boolean scope = false;
   private boolean router = false;
+  private boolean hasDeprecatedRouterCompletion = false;
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
@@ -267,6 +268,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Router '%s' is not declared in a void method.", getName()));
     }
+    hasDeprecatedRouterCompletion =
+        operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
   }
 
   private boolean isRouterCallback(ExtensionParameter p) {
@@ -518,15 +521,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void collectAdditionalModelProperties() {
-    boolean hasDeprecatedRouterCompletion =
-        operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
     additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement, hasDeprecatedRouterCompletion));
     operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
   }
 
   private boolean parameterOfRouterCompletionCallbackType(ExtensionParameter param) {
-    return param.getType().isAssignableTo(RouterCompletionCallback.class)
-        || param.getType().isAssignableTo(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
+    return param.getType().isSameType(RouterCompletionCallback.class)
+        || param.getType().isSameType(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
   }
 
   @Override

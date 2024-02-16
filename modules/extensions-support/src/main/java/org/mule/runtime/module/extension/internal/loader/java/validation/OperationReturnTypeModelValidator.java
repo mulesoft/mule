@@ -123,9 +123,9 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   }
 
   private Optional<Class> routerCallbackParent(Type type) {
-    if (type.getTypeName().equals(RouterCompletionCallback.class.getName())) {
+    if (type.isSameType(RouterCompletionCallback.class)) {
       return of(CompletionCallback.class);
-    } else if (type.getTypeName().equals(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class.getName())) {
+    } else if (type.isSameType(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class)) {
       return of(org.mule.sdk.api.runtime.process.CompletionCallback.class);
     } else {
       return empty();
