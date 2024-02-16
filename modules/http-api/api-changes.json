@@ -16,7 +16,7 @@
           "methodName": "reconnect",
           "elementKind": "parameter",
           "breaksSemanticVersioning": "true",
-          "justification": "W-14610032: remove dependency on `mule-core`"
+          "justification": "W-14610032: extract needed logic from `mule-core`'s `RetryPolicyTemplate` to `mule-api`"
         },
         {
           "ignore": true,
@@ -32,7 +32,7 @@
           "methodName": "broadcast",
           "elementKind": "parameter",
           "breaksSemanticVersioning": "true",
-          "justification": "W-14610032: remove dependency on `mule-core`"
+          "justification": "W-14610032: extract needed logic from `mule-core`'s `RetryPolicyTemplate` to `mule-api`"
         }
       ]
     }
