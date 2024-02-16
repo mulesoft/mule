@@ -19,9 +19,12 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.transaction.Transaction;
+import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 
 import javax.inject.Inject;
@@ -85,6 +88,18 @@ public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
       }
       return event;
     };
+  }
+
+  public void rollback(Exception ex) {
+    Transaction tx = TransactionCoordination.getInstance().getTransaction();
+    if (tx == null) {
+      return;
+    }
+    try {
+      tx.rollback();
+    } catch (TransactionException e) {
+      ex.addSuppressed(e);
+    }
   }
 
   /**

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
@@ -18,6 +20,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.SERVER_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.STREAM_MAXIMUM_SIZE_EXCEEDED;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSACTION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.UNKNOWN;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.VALIDATION;
@@ -34,6 +37,7 @@ import org.mule.runtime.api.security.NotPermittedException;
 import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
+import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
@@ -90,8 +94,16 @@ public class ErrorTypeLocatorFactory {
             .addExceptionMapping(StreamingBufferSizeExceededException.class,
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .addExceptionMapping(MuleFatalException.class, errorTypeRepository.getErrorType(FATAL).get())
+            .addExceptionMapping(TransactionException.class,
+                                 errorTypeRepository.lookupErrorType(TRANSACTION)
+                                     .orElseGet(ErrorTypeLocatorFactory::createTransactionError))
             .build())
         .defaultError(unknown)
         .build();
+  }
+
+  private static ErrorType createTransactionError() {
+    ErrorType anyError = builder().namespace(ANY.getNamespace()).identifier(ANY.getName()).build();
+    return builder().namespace(TRANSACTION.getNamespace()).identifier(TRANSACTION.getName()).parentErrorType(anyError).build();
   }
 }
