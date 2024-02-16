@@ -49,14 +49,13 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
   private TransactionalExecutionTemplate(String applicationName, NotificationDispatcher notificationDispatcher,
                                          SingleResourceTransactionFactoryManager transactionFactoryManager,
                                          TransactionManager transactionManager, TransactionConfig transactionConfig) {
-    this(applicationName, notificationDispatcher, transactionFactoryManager, transactionManager, transactionConfig, true, false,
-         true);
+    this(applicationName, notificationDispatcher, transactionFactoryManager, transactionManager, transactionConfig, true, false);
   }
 
   private TransactionalExecutionTemplate(String applicationName, NotificationDispatcher notificationDispatcher,
                                          SingleResourceTransactionFactoryManager transactionFactoryManager,
                                          TransactionManager transactionManager, TransactionConfig transactionConfig,
-                                         boolean resolveAnyTransaction, boolean resolvePreviousTx, boolean errorAtTimeout) {
+                                         boolean resolveAnyTransaction, boolean resolvePreviousTx) {
     if (transactionConfig == null) {
       transactionConfig = new MuleTransactionConfig();
     }
@@ -66,7 +65,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
         new BeginAndResolveTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig, applicationName,
                                                     notificationDispatcher, transactionFactoryManager,
                                                     transactionManager,
-                                                    processTransactionOnException, resolveAnyTransaction, errorAtTimeout);
+                                                    processTransactionOnException, resolveAnyTransaction);
     if (resolvePreviousTx) {
       tempExecutionInterceptor = new ResolvePreviousTransactionInterceptor<>(tempExecutionInterceptor, transactionConfig);
     }
@@ -104,7 +103,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
                                                 muleContext.getTransactionFactoryManager(),
                                                 muleContext.getTransactionManager(),
-                                                transactionConfig, true, true, true);
+                                                transactionConfig, true, true);
   }
 
   private static NotificationDispatcher getNotificationDispatcher(MuleContextWithRegistry muleContext) {
@@ -132,25 +131,7 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                 getNotificationDispatcher((MuleContextWithRegistry) muleContext),
                                                 muleContext.getTransactionFactoryManager(),
                                                 muleContext.getTransactionManager(),
-                                                transactionConfig, false, false, true);
-  }
-
-  /**
-   * Creates a TransactionalExecutionTemplate for inner scopes within a flow
-   *
-   * @param muleContext
-   * @param transactionConfig
-   * @param errorAfterTimeout
-   * @return <T>
-   */
-  public static <T> TransactionalExecutionTemplate<T> createScopeTransactionalExecutionTemplate(MuleContext muleContext,
-                                                                                                TransactionConfig transactionConfig,
-                                                                                                boolean errorAfterTimeout) {
-    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionFactoryManager(),
-                                                muleContext.getTransactionManager(),
-                                                transactionConfig, false, false, errorAfterTimeout);
+                                                transactionConfig, false, false);
   }
 
   @Override

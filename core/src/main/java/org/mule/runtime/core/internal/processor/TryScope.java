@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor;
 
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
@@ -41,7 +40,6 @@ import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.publisher.Mono.subscriberContext;
 
-import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -89,9 +87,6 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   @Inject
   private ProfilingService profilingService;
 
-  @Inject
-  private FeatureFlaggingService featureFlaggingService;
-
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> commitProducer;
@@ -109,9 +104,7 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           .transform(nestedChain);
     }
 
-    boolean errorAfterTimeout = featureFlaggingService.isEnabled(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT);
-    ExecutionTemplate<CoreEvent> executionTemplate =
-        createScopeTransactionalExecutionTemplate(muleContext, transactionConfig, errorAfterTimeout);
+    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
     return subscriberContext()
