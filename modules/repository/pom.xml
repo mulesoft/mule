@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.4.0-20240122</version>
+        <version>4.4.0-20240215</version>
     </parent>
     <artifactId>mule-module-repository</artifactId>
     <name>Bundle repository</name>
