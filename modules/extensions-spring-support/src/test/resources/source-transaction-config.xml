@@ -6,6 +6,8 @@
                http://www.mulesoft.org/schema/mule/tx http://www.mulesoft.org/schema/mule/tx/current/mule-tx.xsd">
 
     <object name="storeMessage" class="org.mule.test.transactional.connection.MessageStorage"/>
+    <object name="sleep" class="org.mule.test.module.extension.transaction.TransactionalSourceTestCase$SleepProcessor"/>
+    <configuration defaultTransactionTimeout="1000"/>
 
     <tx:config name="localTx1">
         <tx:connection>
@@ -69,6 +71,12 @@
         <try transactionalAction="ALWAYS_BEGIN">
             <tx:verify-transaction-begun config-ref="localTx2"/>
         </try>
+    </flow>
+
+    <flow name="sourceWithTimeout" initialState="stopped">
+        <tx:transactional-source config-ref="localTx1" transactionalAction="ALWAYS_BEGIN"/>
+        <flow-ref name="storeMessage"/>
+        <flow-ref name="sleep"/>
     </flow>
 
 </mule>
