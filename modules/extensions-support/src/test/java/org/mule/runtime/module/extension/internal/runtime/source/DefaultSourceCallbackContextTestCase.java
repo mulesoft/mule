@@ -47,7 +47,7 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
     when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.empty());
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
     expected.expect(TransactionException.class);
     try {
@@ -74,11 +74,11 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
     final TransactionSourceBinder binder = mock(TransactionSourceBinder.class);
     when(binder.bindToTransaction(txConfig, sourceCallback.getConfigurationInstance(), sourceCallback.getSourceLocation(),
-                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout()))
+                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout(), false))
                                       .thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
     expected.expect(TransactionException.class);
     try {
