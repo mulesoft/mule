@@ -58,6 +58,7 @@ import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.Collections.emptyMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
@@ -154,6 +155,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1251,22 +1253,29 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void resolveParameters(CoreEvent.Builder eventBuilder,
                                 BiConsumer<Map<String, Supplier<Object>>, ExecutionContext> afterConfigurer)
       throws MuleException {
-    if (componentExecutor instanceof OperationArgumentResolverFactory) {
-      ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
-      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
+    ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
+    PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
 
-      final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-      Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
-      if (throwable == null) {
-        final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
-            .createArgumentResolver(componentModel)
-            .apply(executionContext);
-        afterConfigurer.accept(resolvedArguments, executionContext);
-        executionContext.changeEvent(eventBuilder.build());
-      } else {
-        throw new DefaultMuleException("Interception execution for operation not ok", throwable);
-      }
+    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
+    Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
+    if (throwable == null) {
+      final Map<String, Supplier<Object>> resolvedArguments = getArgumentResolver()
+          .apply(executionContext);
+      afterConfigurer.accept(resolvedArguments, executionContext);
+      executionContext.changeEvent(eventBuilder.build());
+    } else {
+      throw new DefaultMuleException("Interception execution for operation not ok", throwable);
     }
+  }
+
+  private Function<ExecutionContext<T>, Map<String, Object>> getArgumentResolver() {
+    if (componentExecutor instanceof OperationArgumentResolverFactory) {
+      return ((OperationArgumentResolverFactory<T>) componentExecutor)
+          .createArgumentResolver(componentModel);
+    }
+
+    return ec -> emptyMap();
+
   }
 
   @Override
