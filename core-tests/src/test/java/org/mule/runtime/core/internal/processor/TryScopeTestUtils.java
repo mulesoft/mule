@@ -61,9 +61,6 @@ public class TryScopeTestUtils {
       scope.setTransactionConfig(createTransactionConfig("INDIFFERENT", false, timeout));
     }
     scope.setExceptionListener(mock(FlowExceptionHandler.class));
-    // scope.setProfilingService(profilingService);
-    // scope.setMuleConfiguration(mock(MuleConfiguration.class));
-    // scope.setTransactionManager(muleContext.getTransactionManager());
     scope.setMuleContext(muleContext);
     muleContext.getInjector().inject(scope);
     return scope;
