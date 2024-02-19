@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
@@ -29,6 +28,7 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
