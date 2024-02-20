@@ -100,6 +100,7 @@ public class DelegateTransaction extends AbstractTransaction {
     this.delegate = transactionFactory.beginTransaction(applicationName, notificationFirer, transactionFactoryManager,
                                                         transactionManager);
     this.delegate.setTimeout(timeout);
+    ((TransactionAdapter) delegate).setRollbackIfTimeout(this.rollbackAfterTimeout);
     this.delegate.bindResource(key, resource);
     ((TransactionAdapter) delegate).setComponentLocation(componentLocation);
   }
@@ -145,7 +146,14 @@ public class DelegateTransaction extends AbstractTransaction {
 
   @Override
   public void setTimeout(int timeout) {
+    super.setTimeout(timeout);
     delegate.setTimeout(timeout);
+  }
+
+  @Override
+  public void setRollbackIfTimeout(boolean rollbackAfterTimeout) {
+    super.setRollbackIfTimeout(rollbackAfterTimeout);
+    ((TransactionAdapter) delegate).setRollbackIfTimeout(rollbackAfterTimeout);
   }
 
   private class NullTransaction implements TransactionAdapter {
@@ -246,6 +254,11 @@ public class DelegateTransaction extends AbstractTransaction {
 
     @Override
     public void setComponentLocation(ComponentLocation componentLocation) {
+
+    }
+
+    @Override
+    public void setRollbackIfTimeout(boolean errorIfTimeout) {
 
     }
   }

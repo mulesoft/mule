@@ -6,17 +6,20 @@
  */
 package org.mule.test.module.extension.transaction;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT_PROPERTY;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static java.lang.Thread.sleep;
 
-import org.junit.Rule;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
+import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
@@ -26,11 +29,15 @@ import org.mule.test.transactional.connection.TestTransactionalConnection;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import javax.transaction.TransactionManager;
 
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public SystemProperty systemProperty = new SystemProperty(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT_PROPERTY, "true");
 
   @Override
   protected String getConfigFile() {
@@ -114,6 +121,14 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
+  @Test
+  public void sourceWithTxAndTimeout() throws Exception {
+    startFlow("sourceWithTimeout");
+
+    validateErrorFlow();
+    validateRolledBackedTransaction(MessageStorage.messages.poll());
+  }
+
   private void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
   }
@@ -148,5 +163,19 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
   private void validateErrorFlow() {
     validate(() -> TransactionalSource.isSuccess != null);
     assertThat(TransactionalSource.isSuccess, is(false));
+  }
+
+
+  public static class SleepProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        sleep(3000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return event;
+    }
   }
 }

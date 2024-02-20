@@ -58,7 +58,8 @@ public class TransactionSourceBinder {
                                                                                               ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler,
                                                                                               TransactionManager transactionManager,
-                                                                                              int timeout)
+                                                                                              int timeout,
+                                                                                              boolean errorAfterTimeout)
       throws ConnectionException, TransactionException {
 
     if (!transactionConfig.isTransacted()) {
@@ -70,6 +71,7 @@ public class TransactionSourceBinder {
                                                         transactionManager);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
+    ((TransactionAdapter) tx).setRollbackIfTimeout(errorAfterTimeout);
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)
         .orElseThrow(() -> new IllegalStateException(format(
