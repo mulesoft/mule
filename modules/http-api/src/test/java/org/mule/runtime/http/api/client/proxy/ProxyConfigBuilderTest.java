@@ -9,8 +9,8 @@ package org.mule.runtime.http.api.client.proxy;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.PROXY_CONFIG_BUILDER;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HttpStory.PROXY_CONFIG_BUILDER;
 
 import org.junit.Test;
 
