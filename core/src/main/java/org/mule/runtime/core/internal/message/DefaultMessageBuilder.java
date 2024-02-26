@@ -12,6 +12,7 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_TRANSFORMERS_REGISTRY;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
@@ -562,7 +563,7 @@ public final class DefaultMessageBuilder
       out.defaultWriteObject();
       serializeValue(out);
       TransformersRegistry transformersRegistry =
-          ((MuleContextWithRegistry) currentMuleContext.get()).getRegistry().lookupObject(TransformersRegistry.class);
+          ((MuleContextWithRegistry) currentMuleContext.get()).getRegistry().lookupObject(OBJECT_TRANSFORMERS_REGISTRY);
       out.writeObject(serializeAttachments(inboundAttachments, transformersRegistry));
       out.writeObject(serializeAttachments(outboundAttachments, transformersRegistry));
     }
