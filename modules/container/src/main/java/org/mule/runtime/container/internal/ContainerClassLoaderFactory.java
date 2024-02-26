@@ -109,7 +109,7 @@ public class ContainerClassLoaderFactory {
   protected ArtifactClassLoader createArtifactClassLoader(final ClassLoader parentClassLoader,
                                                           List<MuleContainerModule> muleModules,
                                                           ArtifactDescriptor artifactDescriptor) {
-    return createContainerFilteringClassLoader(parentClassLoader,
+    return createContainerFilteringClassLoader(parentClassLoaderResolver.apply(parentClassLoader),
                                                muleModules,
                                                preFilteredContainerClassLoaderCreator
                                                    .getPreFilteredContainerClassLoader(artifactDescriptor, parentClassLoader));
