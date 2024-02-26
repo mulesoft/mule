@@ -8,8 +8,8 @@ package org.mule.runtime.http.api.ws;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.metadata.TypedValue;
+import org.mule.runtime.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 
 import java.io.InputStream;
 import java.util.Collection;

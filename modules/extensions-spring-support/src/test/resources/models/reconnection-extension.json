@@ -312,7 +312,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.runtime.api.retry.policy.RetryPolicyTemplate"
+                  ],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false

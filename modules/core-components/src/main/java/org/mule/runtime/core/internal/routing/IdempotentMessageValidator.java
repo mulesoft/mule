@@ -44,12 +44,12 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.slf4j.Logger;
 
@@ -68,6 +68,10 @@ public class IdempotentMessageValidator extends AbstractComponent
   private static final Logger LOGGER = getLogger(IdempotentMessageValidator.class);
 
   protected MuleContext muleContext;
+
+  @Inject
+  @Named(OBJECT_STORE_MANAGER)
+  private ObjectStoreManager objectStoreManager;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
@@ -140,7 +144,6 @@ public class IdempotentMessageValidator extends AbstractComponent
   }
 
   protected ObjectStore<String> createMessageIdStore() throws InitialisationException {
-    ObjectStoreManager objectStoreManager = ((MuleContextWithRegistry) muleContext).getRegistry().get(OBJECT_STORE_MANAGER);
     return objectStoreManager.createObjectStore(storePrefix, ObjectStoreSettings.builder()
         .persistent(false)
         .entryTtl(MINUTES.toMillis(5))

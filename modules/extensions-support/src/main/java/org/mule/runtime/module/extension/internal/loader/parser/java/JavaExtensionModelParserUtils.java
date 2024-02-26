@@ -93,7 +93,8 @@ public final class JavaExtensionModelParserUtils {
         .filter(p -> {
           Type type = p.getType();
           return type.isAssignableTo(CompletionCallback.class) ||
-              type.isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class);
+              type.isAssignableTo(org.mule.sdk.api.runtime.process.CompletionCallback.class) ||
+              type.isAssignableTo(org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
         })
         .collect(toList());
   }

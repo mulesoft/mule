@@ -25,6 +25,7 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-api</artifactId>
         </dependency>
+        <!-- for the implementation of AbstractDataTypeBuilderFactory -->
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>

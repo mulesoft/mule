@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.tck.util.MuleContextUtils.addExtensionModelToMock;
+import static org.mule.tck.util.MuleContextUtils.getRegistry;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Collections.emptyMap;
@@ -27,8 +28,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -41,11 +40,10 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
-import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -57,7 +55,6 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -67,8 +64,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
-
-import org.mockito.ArgumentCaptor;
 
 import io.qameta.allure.Issue;
 
@@ -92,7 +87,7 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
 
   private SpringXmlConfigurationBuilder configurationBuilderWithUsedInvalidSchema;
   private SpringXmlConfigurationBuilder configurationBuilderWitUnusedInvalidSchema;
-  private MuleContextWithRegistry muleContext;
+  private MuleContext muleContext;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -172,16 +167,9 @@ public class SpringXmlConfigurationBuilderTestCase extends AbstractMuleTestCase 
       throws IOException, ConfigurationException {
     final SpringXmlConfigurationBuilder configurationBuilder =
         xmlConfigurationBuilderRelativeToPath(tempFolder.getRoot(), new String[] {"simple.xml"}, lazyInit);
-    ArgumentCaptor<Registry> registryCaptor = ArgumentCaptor.forClass(Registry.class);
+
     configurationBuilder.configure(muleContext);
-
-    verify(muleContext, atLeastOnce()).setRegistry(registryCaptor.capture());
-
-    List<Registry> registries = registryCaptor.getAllValues();
-
-    assertThat(registries.get(0), instanceOf(BaseSpringRegistry.class));
-
-    BaseSpringRegistry baseSpringRegistry = (BaseSpringRegistry) registries.get(0);
+    BaseSpringRegistry baseSpringRegistry = getRegistry(muleContext, BaseSpringRegistry.class);
     ExpressionLanguageAdaptor dataWeaveExpressionLanguageAdaptor =
         baseSpringRegistry.get(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER);
 

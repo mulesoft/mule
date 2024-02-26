@@ -161,8 +161,9 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
                                                              "blockingNonBlocking", "nonBlocking", "callGusFringNonBlocking",
-                                                             "tapPhones",
-                                                             "sdkExecuteForeingOrders");
+                                                             "tapPhones", "sdkExecuteForeingOrders", "concurrentRouteExecutor",
+                                                             "simpleRouter", "spy", "stereotypedRoutes", "twoRoutesRouter",
+                                                             "sdkVoidRouter", "voidRouter");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);

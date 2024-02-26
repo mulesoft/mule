@@ -19,10 +19,17 @@ import org.mule.runtime.module.extension.api.loader.java.type.Type;
  */
 public class ExtensionOperationDescriptorModelProperty implements ModelProperty {
 
-  private OperationElement operationElement;
+  private final OperationElement operationElement;
+  private final boolean hasDeprecatedRouterCompletionCallback;
 
   public ExtensionOperationDescriptorModelProperty(OperationElement operationMethod) {
+    this(operationMethod, false);
+  }
+
+  public ExtensionOperationDescriptorModelProperty(OperationElement operationMethod,
+                                                   boolean hasDeprecatedRouterCompletionCallback) {
     this.operationElement = operationMethod;
+    this.hasDeprecatedRouterCompletionCallback = hasDeprecatedRouterCompletionCallback;
   }
 
   public OperationElement getOperationElement() {
@@ -37,5 +44,9 @@ public class ExtensionOperationDescriptorModelProperty implements ModelProperty 
   @Override
   public boolean isPublic() {
     return false;
+  }
+
+  public boolean hasDeprecatedRouterCompletionCallback() {
+    return hasDeprecatedRouterCompletionCallback;
   }
 }

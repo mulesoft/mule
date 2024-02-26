@@ -157,8 +157,8 @@ public class StereotypesDeclarationTestCase extends AbstractJavaExtensionDeclara
   }
 
   @Test
-  public void defaultConstructStereotype() {
-    StereotypeModel stereotypeModel = heisenbergExtension.getConstructModel("simpleRouter").get().getStereotype();
+  public void defaultRouterStereotype() {
+    StereotypeModel stereotypeModel = heisenbergExtension.getOperationModel("simpleRouter").get().getStereotype();
 
     assertThat(stereotypeModel.isAssignableTo(PROCESSOR), is(true));
     String namespace = HEISENBERG.toUpperCase();

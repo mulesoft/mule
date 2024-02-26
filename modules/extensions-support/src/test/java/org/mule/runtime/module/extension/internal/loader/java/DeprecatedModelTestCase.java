@@ -19,7 +19,6 @@ import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectionProviderDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
@@ -132,21 +131,21 @@ public class DeprecatedModelTestCase extends AbstractMuleTestCase {
   @Test
   public void nonDeprecatedRouterTestCase() {
     ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
-    ConstructDeclaration constructDeclaration =
-        (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "nonDeprecatedRouter");
-    assertFalse(constructDeclaration.getDeprecation().isPresent());
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "nonDeprecatedRouter");
+    assertFalse(operationDeclaration.getDeprecation().isPresent());
   }
 
   @Test
   public void deprecatedRouterTestCase() {
     ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(DeprecatedExtension.class);
-    ConstructDeclaration constructDeclaration =
-        (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "deprecatedRouter");
-    assertTrue(constructDeclaration.getDeprecation().isPresent());
-    assertThat(constructDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedRouter instead."));
-    assertThat(constructDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
-    assertTrue(constructDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
-    assertThat(constructDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "deprecatedRouter");
+    assertTrue(operationDeclaration.getDeprecation().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use nonDeprecatedRouter instead."));
+    assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
+    assertTrue(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
   @Test
@@ -271,13 +270,13 @@ public class DeprecatedModelTestCase extends AbstractMuleTestCase {
   @Test
   public void sdkDeprecatedRouterTestCase() {
     ExtensionDeclaration extensionDeclaration = getExtensionDeclaration(SdkDeprecatedExtension.class);
-    ConstructDeclaration constructDeclaration =
-        (ConstructDeclaration) getNamedDeclaration(extensionDeclaration.getConstructs(), "sdkDeprecatedRouter");
-    assertTrue(constructDeclaration.getDeprecation().isPresent());
-    assertThat(constructDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedRouter instead."));
-    assertThat(constructDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
-    assertTrue(constructDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
-    assertThat(constructDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
+    OperationDeclaration operationDeclaration =
+        (OperationDeclaration) getNamedDeclaration(extensionDeclaration.getOperations(), "sdkDeprecatedRouter");
+    assertTrue(operationDeclaration.getDeprecation().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getMessage(), is("Use sdkNonDeprecatedRouter instead."));
+    assertThat(operationDeclaration.getDeprecation().get().getDeprecatedSince(), is("1.4.0"));
+    assertTrue(operationDeclaration.getDeprecation().get().getToRemoveIn().isPresent());
+    assertThat(operationDeclaration.getDeprecation().get().getToRemoveIn().get(), is("2.0.0"));
   }
 
   @Test

@@ -9,7 +9,6 @@ package org.mule.runtime.http.api.server;
 import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.tls.TlsContextFactory;
-import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 
 import java.util.Set;
 import java.util.function.Supplier;

@@ -321,6 +321,8 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
+  exports org.mule.runtime.core.internal.el.datetime to
+      org.mule.runtime.core.mvel;
   exports org.mule.runtime.core.internal.exception to
       org.mule.runtime.core.components,
       org.mule.runtime.core.mvel,
