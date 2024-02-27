@@ -142,6 +142,18 @@ public class MuleMetadataService implements MetadataService {
                                          format(EXCEPTION_RESOLVING_COMPONENT_METADATA, location));
   }
 
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
+                                                                         ScopePropagationContext ctx) {
+    return null;
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(Location location, MetadataKey key,
+                                                                          RouterPropagationContext ctx) {
+    return null;
+  }
+
   /**
    * {@inheritDoc}
    */

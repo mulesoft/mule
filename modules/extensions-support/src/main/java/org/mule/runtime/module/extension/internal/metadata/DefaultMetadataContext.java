@@ -6,15 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -28,6 +33,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
 
   private final MetadataCache cache;
   private final ClassTypeLoader classTypeLoader;
+  private final Optional<Supplier<MetadataType>> innerChainOutputType;
+  private final Map<String, Supplier<MetadataType>> innerRoutesOutputType;
 
   /**
    * Retrieves the configuration for the related component
@@ -40,9 +47,30 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    */
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader) {
+    this(configurationSupplier, connectionManager, cache, typeLoader, empty(), emptyMap());
+  }
+
+  public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
+                                Optional<Supplier<MetadataType>> innerChainOutputType) {
+    this(configurationSupplier, connectionManager, cache, typeLoader, innerChainOutputType, emptyMap());
+  }
+
+  public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
+                                Map<String, Supplier<MetadataType>> innerRoutesOutputType) {
+    this(configurationSupplier, connectionManager, cache, typeLoader, empty(), innerRoutesOutputType);
+  }
+
+  public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
+                                Optional<Supplier<MetadataType>> innerChainOutputType,
+                                Map<String, Supplier<MetadataType>> innerRoutesOutputType) {
     super(configurationSupplier, connectionManager);
     this.cache = cache;
     this.classTypeLoader = typeLoader;
+    this.innerRoutesOutputType = innerRoutesOutputType;
+    this.innerChainOutputType = innerChainOutputType;
   }
 
   /**
@@ -51,6 +79,16 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
   @Override
   public MetadataCache getCache() {
     return cache;
+  }
+
+  @Override
+  public Optional<Supplier<MetadataType>> getInnerChainOutputType() {
+    return innerChainOutputType;
+  }
+
+  @Override
+  public Map<String, Supplier<MetadataType>> getInnerRoutesOutputType() {
+    return innerRoutesOutputType;
   }
 
   /**

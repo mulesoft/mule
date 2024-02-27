@@ -154,6 +154,18 @@ public class LazyMetadataService implements MetadataService, Initialisable {
         .orElseGet(() -> metadataService.getEntityMetadata(location, key));
   }
 
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
+                                                                         ScopePropagationContext ctx) {
+    return null;
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(Location location, MetadataKey key,
+                                                                          RouterPropagationContext ctx) {
+    return null;
+  }
+
   private Optional<MetadataResult<?>> initializeComponent(Location location) {
     try {
       lazyMuleArtifactContext.initializeComponent(location, false);
