@@ -6,25 +6,26 @@
  */
 package org.mule.runtime.core.internal.routing;
 
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+
 import static java.util.Collections.singletonList;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
@@ -32,27 +33,25 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler;
+import org.mule.runtime.core.privileged.routing.RouterResultsHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
+
 public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
   protected RouterResultsHandler resultsHandler = new DefaultRouterResultsHandler();
   protected MuleContext muleContext = mockContextWithServices();
-  protected MuleSession session = mock(MuleSession.class);
   protected DefaultFlowBuilder.DefaultFlow flow = mock(DefaultFlowBuilder.DefaultFlow.class);
   private EventContext context;
 
@@ -77,12 +76,9 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     Message message1 = Message.of("test event A");
     InternalEvent event1 = InternalEvent.builder(context).message(message1).addVariable("key1", "value1").build();
-    event1.getSession().setProperty("key", "value");
 
     Message message2 = Message.of("test event B");
     InternalEvent event2 = InternalEvent.builder(context).message(message2).addVariable("key2", "value2").build();
-    event2.getSession().setProperty("key", "valueNEW");
-    event2.getSession().setProperty("key1", "value1");
 
     CoreEvent result = resultsHandler.aggregateResults(singletonList(event2), event1);
     assertSame(event2, result);
@@ -93,9 +89,6 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     assertThat(result.getVariables().get("key2").getValue(), equalTo("value2"));
 
     PrivilegedEvent privilegedResult = (PrivilegedEvent) result;
-    assertThat(privilegedResult.getSession().getProperty("key"), equalTo("valueNEW"));
-    assertThat(privilegedResult.getSession().getProperty("key1"), equalTo("value1"));
-
   }
 
   @Test
@@ -106,16 +99,10 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
     Message message3 = Message.of("test event C");
     PrivilegedEvent event1 =
         InternalEvent.builder(context).message(message1).addVariable("key1", "value1", simpleDateType1).build();
-    MuleSession session = event1.getSession();
-    PrivilegedEvent event2 = InternalEvent.builder(context).message(message2).session(session)
+    PrivilegedEvent event2 = InternalEvent.builder(context).message(message2)
         .addVariable("key2", "value2", simpleDateType1).build();
-    InternalEvent event3 = InternalEvent.builder(context).message(message3).session(session)
+    InternalEvent event3 = InternalEvent.builder(context).message(message3)
         .addVariable("key3", "value3", simpleDateType1).build();
-    event1.getSession().setProperty("key", "value");
-    event2.getSession().setProperty("key1", "value1");
-    event2.getSession().setProperty("key2", "value2");
-    event3.getSession().setProperty("KEY2", "value2NEW");
-    event3.getSession().setProperty("key3", "value3");
 
     List<CoreEvent> events = new ArrayList<>();
     events.add(event2);
@@ -137,12 +124,6 @@ public class DefaultRouterResultsHandlerTestCase extends AbstractMuleTestCase {
 
     // Root id
     assertThat(result.getCorrelationId(), equalTo(event1.getCorrelationId()));
-
-    assertThat(result.getSession().getProperty("key"), is("value"));
-    assertThat(result.getSession().getProperty("key1"), is("value1"));
-    assertThat(result.getSession().getProperty("key2"), is("value2NEW"));
-    assertThat(result.getSession().getProperty("key3"), is("value3"));
-    assertThat(result.getSession().getProperty("key4"), nullValue());
   }
 
   @Test

@@ -136,22 +136,6 @@ public abstract class FlowConstructRunner<R extends FlowConstructRunner> impleme
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as a session property of the {@link Message} to the configured
-   * flow.
-   *
-   * @param key   the key of the session property to add
-   * @param value the value of the session property to add
-   * @return this {@link FlowRunner}
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  public R withSessionProperty(String key, Object value) {
-    eventBuilder.withSessionProperty(key, value);
-
-    return (R) this;
-  }
-
-  /**
    * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}

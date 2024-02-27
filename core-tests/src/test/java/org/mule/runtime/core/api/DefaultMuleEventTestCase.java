@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.api;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
@@ -79,24 +80,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent = (PrivilegedEvent) CoreEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
-    assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
-  }
-
-  @Test
-  public void setSessionVariableDefaultDataType() throws Exception {
-    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
-
-    DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-    assertThat(dataType, like(String.class, MediaType.ANY, null));
-  }
-
-  @Test
-  public void setSessionVariableCustomDataType() throws Exception {
-    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
-
-    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
-
-    DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 

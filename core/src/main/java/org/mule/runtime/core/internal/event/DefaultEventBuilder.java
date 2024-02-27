@@ -6,10 +6,6 @@
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.lang.System.lineSeparator;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
@@ -23,6 +19,11 @@ import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.message.EventInternalContext.copyOf;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
+
+import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
@@ -47,9 +48,7 @@ import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
@@ -75,7 +74,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private boolean varsModified = false;
 
   private CaseInsensitiveHashMap<String, TypedValue<?>> parameters;
-  private CaseInsensitiveHashMap<String, TypedValue<?>> originalParameters;
+  private final CaseInsensitiveHashMap<String, TypedValue<?>> originalParameters;
   private boolean parametersModified = false;
 
   private CaseInsensitiveHashMap<String, String> loggingVariables;
@@ -84,7 +83,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
-  private MuleSession session;
   private SecurityContext securityContext;
   private FlowProcessMediatorContext flowProcessMediatorContext;
   private EventInternalContext sdkInternalContext;
@@ -98,7 +96,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
-    this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
     this.originalParameters = emptyCaseInsensitiveMap();
     this.internalParameters = new SmallMap<>();
@@ -112,7 +109,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.itemSequenceInfo = event.getItemSequenceInfo();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.securityContext = event.getSecurityContext();
-    this.session = event.getSession();
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
 
@@ -345,23 +341,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
-  public DefaultEventBuilder replyToHandler(ReplyToHandler replyToHandler) {
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder replyToDestination(Object replyToDestination) {
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder session(MuleSession session) {
-    this.session = session;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public DefaultEventBuilder securityContext(SecurityContext securityContext) {
     SecurityContext originalValue = this.securityContext;
     this.securityContext = securityContext;
@@ -387,7 +366,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              parametersModified ? parameters : originalParameters,
                                              loggingVariables,
                                              internalParameters,
-                                             session,
                                              securityContext,
                                              itemSequenceInfo,
                                              flowProcessMediatorContext,
@@ -446,7 +424,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final BaseEventContext context;
     // TODO MULE-10013 make this final
     private Message message;
-    private final MuleSession session;
+    // This is here just for backwards compatibility of preexisting serialized objects.
+    private final MuleSession session = null;
     private final SecurityContext securityContext;
 
     private final boolean notificationsEnabled;
@@ -472,7 +451,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     // Needed for deserialization with kryo
     private InternalEventImplementation() {
       this.context = null;
-      this.session = null;
       this.securityContext = null;
       this.notificationsEnabled = false;
       this.variables = null;
@@ -496,7 +474,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         CaseInsensitiveHashMap<String, TypedValue<?>> parameters,
                                         CaseInsensitiveHashMap<String, String> loggingVariables,
                                         Map<String, ?> internalParameters,
-                                        MuleSession session,
                                         SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         FlowProcessMediatorContext flowProcessMediatorContext,
@@ -509,7 +486,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         boolean notificationsEnabled) {
       this.context = context;
       this.loggingVariables = loggingVariables;
-      this.session = session;
       this.securityContext = securityContext;
       this.message = message;
       this.variables = variables.toImmutableCaseInsensitiveMap();
@@ -620,11 +596,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
           '}';
     }
 
-    @Override
-    public MuleSession getSession() {
-      return session;
-    }
-
     /**
      * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
      * This will get invoked after the object has been deserialized passing in the current MuleContext.
@@ -643,16 +614,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       if (context instanceof DefaultEventContext) {
         ((DefaultEventContext) context).createStreamingState();
       }
-    }
-
-    @Override
-    public ReplyToHandler getReplyToHandler() {
-      return null;
-    }
-
-    @Override
-    public Object getReplyToDestination() {
-      return null;
     }
 
     @Override

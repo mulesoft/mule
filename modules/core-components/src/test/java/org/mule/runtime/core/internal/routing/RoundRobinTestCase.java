@@ -6,15 +6,6 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -22,11 +13,21 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.RoundRobinStory.ROUND_ROBIN;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -39,8 +40,6 @@ import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.processor.ContextPropagationChecker;
 
@@ -93,7 +92,6 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
   @Test
   public void testRoundRobin() throws Exception {
     roundRobin.setAnnotations(getAppleFlowComponentLocationAnnotations());
-    MuleSession session = new DefaultMuleSession();
     List<TestProcessor> routes = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
       routes.add(new TestProcessor());
@@ -105,7 +103,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     List<Thread> threads = new ArrayList<>(NUMBER_OF_ROUTES);
     for (int i = 0; i < NUMBER_OF_ROUTES; i++) {
-      threads.add(new Thread(new TestDriver(session, roundRobin, NUMBER_OF_MESSAGES, getTestFlow(muleContext))));
+      threads.add(new Thread(new TestDriver(roundRobin, NUMBER_OF_MESSAGES, getTestFlow(muleContext))));
     }
     for (Thread t : threads) {
       t.start();
@@ -160,13 +158,11 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
 
     private final Processor target;
     private final int numMessages;
-    private final MuleSession session;
     private final FlowConstruct flowConstruct;
 
-    TestDriver(MuleSession session, Processor target, int numMessages, FlowConstruct flowConstruct) {
+    TestDriver(Processor target, int numMessages, FlowConstruct flowConstruct) {
       this.target = target;
       this.numMessages = numMessages;
-      this.session = session;
       this.flowConstruct = flowConstruct;
     }
 
@@ -175,7 +171,7 @@ public class RoundRobinTestCase extends AbstractMuleContextTestCase {
       for (int i = 0; i < numMessages; i++) {
         Message msg = of(TEST_MESSAGE + messageNumber.getAndIncrement());
         CoreEvent event =
-            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).session(session).build();
+            InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION)).message(msg).build();
         try {
           target.process(event);
         } catch (MuleException e) {
