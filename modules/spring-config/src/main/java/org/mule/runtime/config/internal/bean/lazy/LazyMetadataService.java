@@ -7,9 +7,12 @@
 package org.mule.runtime.config.internal.bean.lazy;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
+import static org.mule.runtime.api.metadata.MetadataProvider.RouterPropagationContext;
+import static org.mule.runtime.api.metadata.MetadataProvider.ScopePropagationContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;

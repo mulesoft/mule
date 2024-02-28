@@ -889,4 +889,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.cacheIdGeneratorFactory = cacheIdGeneratorFactory;
   }
 
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(MetadataKey key,
+                                                                         ScopePropagationContext scopePropagationContext)
+      throws MetadataResolvingException {
+    return null;
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(MetadataKey key,
+                                                                          RouterPropagationContext scopePropagationContext)
+      throws MetadataResolvingException {
+    return null;
+  }
 }
