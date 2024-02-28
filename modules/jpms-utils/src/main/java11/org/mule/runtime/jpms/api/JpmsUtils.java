@@ -69,7 +69,8 @@ public final class JpmsUtils {
       new HashSet<>(asList("java.se",
                            "org.mule.boot.tanuki",
                            "org.mule.runtime.jpms.utils",
-                           "com.fasterxml.jackson.core"));
+                           "com.fasterxml.jackson.core",
+                           "org.apache.commons.codec"));
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG =
       "--add-opens=java.base/java.lang=org.mule.runtime.jpms.utils";
   private static final String REQUIRED_ADD_OPENS_JAVA_LANG_REFLECT =
