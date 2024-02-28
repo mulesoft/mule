@@ -19,8 +19,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
-import static org.mule.runtime.core.internal.logging.LogUtil.LOGGER;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder.deploymentServiceBuilder;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
@@ -31,8 +29,8 @@ import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
-import static java.lang.System.getProperty;
 import static java.lang.System.exit;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -250,7 +248,7 @@ public class DefaultMuleContainer implements MuleContainer {
     try {
       shutdown(e);
     } catch (Throwable t) {
-      LOGGER.error("Error on attempting to shutdown the container", t);
+      logger.error("Error on attempting to shutdown the container", t);
     }
     exit(1);
   }
@@ -268,7 +266,7 @@ public class DefaultMuleContainer implements MuleContainer {
   private void showSplashScreen(List<String> additionalSplashEntries) {
     final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(additionalSplashEntries);
     splashScreen.doBody();
-    log(splashScreen.toString());
+    logger.info(splashScreen.toString());
   }
 
   /**

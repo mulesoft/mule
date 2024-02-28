@@ -9,7 +9,6 @@ package org.mule.runtime.module.deployment.internal;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
 
@@ -152,10 +151,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
     if (containsType(t, DeploymentStartException.class)) {
-      log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
+      logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
       logger.error(t.getMessage());
     } else {
-      log(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)));
+      logger.info(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)));
       logger.error(t.getMessage(), t);
     }
   }
@@ -230,10 +229,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       addZombieFile(addedApp, artifactDir);
 
       if (containsType(t, DeploymentStartException.class)) {
-        log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
+        logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
         logger.error(t.getMessage());
       } else {
-        log(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)));
+        logger.info(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)));
         logger.error(t.getMessage(), t);
       }
 
@@ -335,7 +334,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   }
 
   private void logArtifactUndeployed(T artifact) {
-    log(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
+    logger.info(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
   }
 
   private File installFrom(URI uri) throws IOException {
@@ -404,7 +403,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   @Override
   public void redeploy(String artifactName, Optional<Properties> deploymentProperties) throws DeploymentException {
-    log(miniSplash(format("Redeploying artifact '%s'", artifactName)));
+    logger.info(miniSplash(format("Redeploying artifact '%s'", artifactName)));
 
     T artifact = findArtifact(artifactName);
     final File artifactLocation = artifact.getLocation();
@@ -490,11 +489,12 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     } catch (Throwable t) {
       // error text has been created by the deployer already
       if (containsType(t, DeploymentStartException.class)) {
-        log(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
-                              artifact.getArtifactName())));
+        logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
+                                      artifact.getArtifactName())));
         logger.error(t.getMessage(), t);
       } else {
-        log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));
+        logger.info(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(),
+                                      t.getCause().getMessage())));
         logger.error(t.getMessage(), t);
       }
 

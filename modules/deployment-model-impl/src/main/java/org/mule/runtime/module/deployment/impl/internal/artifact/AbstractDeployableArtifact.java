@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.context.ArtifactStoppedPersistenceListener.ARTIFACT_STOPPED_LISTENER;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 
 import static java.lang.String.format;
@@ -26,7 +25,6 @@ import org.mule.runtime.deployment.model.api.DeploymentStopException;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import org.slf4j.Logger;
@@ -75,7 +73,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
     withContextClassLoader(null, () -> {
       if (LOGGER.isInfoEnabled()) {
-        log(miniSplash(format("Stopping %s '%s'", artifactType, getArtifactName())));
+        LOGGER.info(miniSplash(format("Stopping %s '%s'", artifactType, getArtifactName())));
       }
     });
 
@@ -88,7 +86,7 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   @Override
   public final void dispose() {
-    withContextClassLoader(null, () -> log(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName()))));
+    withContextClassLoader(null, () -> LOGGER.info(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName()))));
 
     // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
     // classloader cleanup

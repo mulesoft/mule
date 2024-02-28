@@ -354,13 +354,6 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
-  // TODO W-13824979 Remove splashScreen logic from mule-core
-  exports org.mule.runtime.core.internal.logging to
-      org.mule.runtime.launcher,
-      org.mule.runtime.service,
-      org.mule.runtime.deployment,
-      org.mule.runtime.deployment.model.impl,
-      com.mulesoft.mule.runtime.cluster;
   exports org.mule.runtime.core.internal.management.stats to
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
