@@ -101,8 +101,10 @@ import org.mule.sdk.api.data.sample.SampleDataException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -785,11 +787,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
+    return runWithMetadataContext(contextConsumer, metadataCache -> () -> getMetadataContext(metadataCache));
+  }
+
+  protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer,
+                                                         Function<MetadataCache, Callable<MetadataContext>> metadataContextSupplier)
+      throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
     try {
       MetadataCacheId cacheId = getMetadataCacheId();
       MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
-      context = withContextClassLoader(classLoader, () -> getMetadataContext(metadataCache));
+      context = withContextClassLoader(classLoader, metadataContextSupplier.apply(metadataCache));
       MetadataResult<R> result = contextConsumer.apply(context);
       if (result.isSuccess()) {
         metadataService.get().saveCache(cacheId.getValue(), metadataCache);
@@ -838,7 +846,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
-  private MetadataContext getMetadataContext(MetadataCache cache)
+  private MetadataContext getMetadataContext(MetadataCache cache) throws MetadataResolvingException {
+    return getMetadataContext(conf -> new DefaultMetadataContext(() -> conf, connectionManager, cache, typeLoader));
+  }
+
+  private MetadataContext getMetadataContext(Function<Optional<ConfigurationInstance>, MetadataContext> metadataContextCreator)
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
@@ -859,9 +871,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
         }
       }
 
-      return new DefaultMetadataContext(() -> configuration, connectionManager,
-                                        cache,
-                                        typeLoader);
+      return metadataContextCreator.apply(configuration);
     } finally {
       if (fakeEvent != null) {
         ((BaseEventContext) fakeEvent.getContext()).success();
@@ -893,13 +903,33 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(MetadataKey key,
                                                                          ScopePropagationContext scopePropagationContext)
       throws MetadataResolvingException {
-    return null;
+    try {
+      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getOutputMetadata(context, key)),
+                                    cache -> () -> getMetadataContext(conf -> new DefaultMetadataContext(() -> conf,
+                                                                                                         connectionManager, cache,
+                                                                                                         typeLoader,
+                                                                                                         scopePropagationContext
+                                                                                                             .getInnerChainResolver())));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
   }
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(MetadataKey key,
-                                                                          RouterPropagationContext scopePropagationContext)
+                                                                          RouterPropagationContext routerPropagationContext)
       throws MetadataResolvingException {
-    return null;
+    try {
+      return runWithMetadataContext(context -> withContextClassLoader(classLoader,
+                                                                      () -> metadataMediator.getOutputMetadata(context, key)),
+                                    cache -> () -> getMetadataContext(conf -> new DefaultMetadataContext(() -> conf,
+                                                                                                         connectionManager, cache,
+                                                                                                         typeLoader,
+                                                                                                         routerPropagationContext
+                                                                                                             .getRouteResolvers())));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
   }
 }

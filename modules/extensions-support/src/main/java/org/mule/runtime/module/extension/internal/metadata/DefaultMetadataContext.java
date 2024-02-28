@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static java.util.Optional.of;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -18,7 +19,6 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -52,8 +52,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
 
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
-                                Optional<Supplier<MetadataType>> innerChainOutputType) {
-    this(configurationSupplier, connectionManager, cache, typeLoader, innerChainOutputType, emptyMap());
+                                Supplier<MetadataType> innerChainOutputType) {
+    this(configurationSupplier, connectionManager, cache, typeLoader, of(innerChainOutputType), emptyMap());
   }
 
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
