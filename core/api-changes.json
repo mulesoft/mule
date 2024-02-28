@@ -250,7 +250,449 @@
         },
         {
           "ignore": true,
-          "code": "java.field.removedWithConstant",
+          "code": "java.method.removed",
+          "old": "method javax.activation.DataHandler org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundAttachmentNames()",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.io.Serializable org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method <T extends java.io.Serializable> T org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundProperty(java.lang.String, T)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundPropertyDataType(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundPropertyNames()",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method javax.activation.DataHandler org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundAttachmentNames()",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.io.Serializable org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method <T extends java.io.Serializable> T org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundProperty(java.lang.String, T)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundPropertyDataType(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundPropertyNames()",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::headersToStringBuilder(org.mule.runtime.core.internal.message.InternalMessage, java.lang.StringBuilder)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::initAfterDeserialisation(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "interface": "org.mule.runtime.core.internal.message.MessageProperties",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "interface": "org.mule.runtime.core.internal.message.MessageAttachments",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+          "interface": "org.mule.runtime.core.privileged.store.DeserializationPostInitialisable",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.util.Map org.mule.runtime.core.internal.message.ExceptionMessage::getProperties()",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.internal.message.ExceptionMessage::getProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.core.internal.message.ExceptionMessage::setProperty(java.lang.String, java.lang.Object)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundAttachment(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundProperty(java.lang.String)",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.core.internal.message.InternalMessage",
+          "new": "interface org.mule.runtime.core.internal.message.InternalMessage",
+          "interface": "org.mule.runtime.core.internal.message.MessageProperties",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.core.internal.message.InternalMessage",
+          "new": "interface org.mule.runtime.core.internal.message.InternalMessage",
+          "interface": "org.mule.runtime.core.internal.message.MessageAttachments",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.internal.message.MessageAttachments",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.internal.message.MessageProperties",
+          "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+           "code": "java.field.removedWithConstant",
           "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT",
           "justification": "W-14572221: MVEL is removed"
         },
