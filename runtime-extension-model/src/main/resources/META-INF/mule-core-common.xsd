@@ -1580,6 +1580,20 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- This element and type are used in the spring-module --> 
+    <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType" substitutionGroup="abstract-message-processor">
+        <xsd:annotation>
+            <xsd:documentation>
+                A placeholder for security filter elements, which control access to the system.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:complexType name="abstractSecurityFilterType">
+        <xsd:complexContent>
+            <xsd:extension base="abstractMessageProcessorType"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
     <!--==============================================================-->
     <!--   Interceptor elements                                       -->
     <!--==============================================================-->
