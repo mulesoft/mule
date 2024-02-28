@@ -163,7 +163,7 @@
         <hawtbufVersion>1.1</hawtbufVersion>
         <activemqProtobuf>1.1</activemqProtobuf>
         <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
-        <aspectjVersion>1.9.21</aspectjVersion>
+        <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
         <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>

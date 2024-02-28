@@ -433,17 +433,12 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
         // Avoid trying to register objects while the registry is being stopped.
-        if (isStopped.get()) {
-          throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
-                                                                     key)));
-        } else {
-          synchronized (isStopped) {
-            if (isStopped.get()) {
-              throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
-                                                                         key)));
-            } else {
-              doRegisterObject(key, value);
-            }
+        synchronized (isStopped) {
+          if (isStopped.get()) {
+            throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
+                                                                       key)));
+          } else {
+            doRegisterObject(key, value);
           }
         }
       } catch (RuntimeException e) {
