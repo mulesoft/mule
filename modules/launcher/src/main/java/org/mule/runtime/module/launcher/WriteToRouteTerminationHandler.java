@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.launcher;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_TERMINATION_LOG_ROUTE_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_TERMINATION_LOG_PATH_PROPERTY;
 
+import static java.lang.System.getenv;
 import static java.lang.System.getProperty;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 class WriteToRouteTerminationHandler implements Consumer<Throwable> {
 
   private static final Logger LOGGER = getLogger(DefaultMuleContainer.class);
+  public static final String MULE_TERMINATION_LOG_PATH_ENV_VARIABLE = "MULE_TERMINATION_LOG_PATH";
 
   private final Consumer<Throwable> shutdownConsumer;
 
@@ -36,7 +38,7 @@ class WriteToRouteTerminationHandler implements Consumer<Throwable> {
 
   @Override
   public void accept(Throwable terminationThrowable) {
-    String muleTerminationLogRoute = getProperty(MULE_TERMINATION_LOG_ROUTE_PROPERTY);
+    String muleTerminationLogRoute = resolveTerminationPath();
     if (muleTerminationLogRoute != null) {
       try (FileWriter errorWriter = new FileWriter(muleTerminationLogRoute)) {
         Throwable rootCause = getRootCause(terminationThrowable);
@@ -50,5 +52,18 @@ class WriteToRouteTerminationHandler implements Consumer<Throwable> {
       }
     }
     shutdownConsumer.accept(terminationThrowable);
+  }
+
+  /**
+   * @return the termination path defined by an env variable that can be overridden by a sys prop.
+   */
+  private static String resolveTerminationPath() {
+    String terminationPath = getProperty(MULE_TERMINATION_LOG_PATH_PROPERTY);
+
+    if (terminationPath == null) {
+      terminationPath = getenv(MULE_TERMINATION_LOG_PATH_ENV_VARIABLE);
+    }
+
+    return terminationPath;
   }
 }
