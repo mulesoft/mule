@@ -12,7 +12,6 @@ import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
 import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
 import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
@@ -24,7 +23,6 @@ import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
 import static org.mule.runtime.core.api.util.ObjectUtils.getString;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
-import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -44,13 +42,9 @@ import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ExceptionPayload;
-import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
 import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
 import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -515,7 +509,7 @@ public final class DefaultMessageBuilder
       return typedValue;
     }
 
-    public static class SerializedDataHandler implements Serializable {
+    private static class SerializedDataHandler implements Serializable {
 
       private static final long serialVersionUID = 1L;
 
@@ -523,28 +517,17 @@ public final class DefaultMessageBuilder
       private String contentType;
       private Object contents;
 
-      public SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
+      public SerializedDataHandler(DataHandler handler)
           throws IOException {
+        MuleContext muleContext;
         if (handler != null && !(handler instanceof Serializable)) {
           contentType = handler.getContentType();
           Object theContent = handler.getContent();
           if (theContent instanceof Serializable) {
             contents = theContent;
-          } else if (currentMuleContext.get() != null) {
-            try {
-              DataType source = fromObject(theContent);
-              Transformer transformer = transformersRegistry.lookupTransformer(source, BYTE_ARRAY);
-              if (transformer == null) {
-                throw new TransformerException(noTransformerFoundForMessage(source, BYTE_ARRAY));
-              }
-              contents = transformer.transform(theContent);
-            } catch (TransformerException ex) {
-              String message = format(
-                                      "Unable to serialize the attachment %s, which is of type %s with contents of type %s",
-                                      name, handler.getClass(), theContent.getClass());
-              logger.error(message);
-              throw new IOException(message);
-            }
+          } else if ((muleContext = currentMuleContext.get()) != null) {
+            DataType originalDataType = fromObject(theContent);
+            contents = muleContext.getTransformationService().transform(theContent, originalDataType, BYTE_ARRAY);
           } else {
             throw new NotSerializableException(handler.getClass().getName());
           }
@@ -561,14 +544,11 @@ public final class DefaultMessageBuilder
     private void writeObject(ObjectOutputStream out) throws Exception {
       out.defaultWriteObject();
       serializeValue(out);
-      TransformersRegistry transformersRegistry =
-          ((MuleContextWithRegistry) currentMuleContext.get()).getRegistry().lookupObject(TransformersRegistry.class);
-      out.writeObject(serializeAttachments(inboundAttachments, transformersRegistry));
-      out.writeObject(serializeAttachments(outboundAttachments, transformersRegistry));
+      out.writeObject(serializeAttachments(inboundAttachments));
+      out.writeObject(serializeAttachments(outboundAttachments));
     }
 
-    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments,
-                                                                    TransformersRegistry transformersRegistry)
+    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments)
         throws IOException {
       Map<String, SerializedDataHandler> toWrite;
       if (attachments == null) {
@@ -578,7 +558,7 @@ public final class DefaultMessageBuilder
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
           String name = entry.getKey();
           // TODO MULE-10013 remove this logic from here
-          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), transformersRegistry));
+          toWrite.put(name, new SerializedDataHandler(entry.getValue()));
         }
       }
 
