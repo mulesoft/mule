@@ -132,6 +132,7 @@
         <javaReleaseVersion>8</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
+        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -797,6 +798,9 @@
                                 <value>${project.build.directory}/allure-results</value>
                             </property>
                         </systemProperties>
+                        <environmentVariables>
+                            <MULE_TERMINATION_LOG_PATH>${mule.termination.log.path.env.variable}</MULE_TERMINATION_LOG_PATH>
+                        </environmentVariables>
                     </configuration>
                     <dependencies>
                         <dependency>
