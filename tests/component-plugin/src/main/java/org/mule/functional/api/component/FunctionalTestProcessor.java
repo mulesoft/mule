@@ -229,9 +229,13 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
     }
 
     final Message message = event.getMessage();
-    LOGGER.info("Message Received in flow: {}. Content is: {}",
-                getLocation().getRootContainerName(),
-                truncate(message.getPayload().getValue().toString(), 100, true));
+    if (LOGGER.isInfoEnabled()) {
+      LOGGER.info("Message Received in flow: {}. Content is: {}",
+                  getLocation().getRootContainerName(),
+                  message.getPayload().getValue() != null
+                      ? truncate(message.getPayload().getValue().toString(), 100, true)
+                      : (null));
+    }
 
     if (isLogMessageDetails() && LOGGER.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
