@@ -19,8 +19,8 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ComponentAst;
+import org.mule.runtime.config.internal.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.core.api.security.SecurityFilter;
 import org.mule.runtime.core.privileged.processor.SecurityFilterMessageProcessor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;

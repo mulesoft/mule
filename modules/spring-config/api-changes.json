@@ -1,4 +1,34 @@
 {
+  "4.7.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor",
+          "justification": "W-14572210: Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.config.privileged.dsl.PostProcessorIocHelper",
+          "justification": "W-14572210: Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator",
+          "justification": "W-14572210: Remove compatibility-plugin support"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean",
+          "justification": "W-14572210: Remove compatibility-plugin support"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [

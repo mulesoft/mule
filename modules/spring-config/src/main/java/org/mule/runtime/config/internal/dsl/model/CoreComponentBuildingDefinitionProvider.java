@@ -61,7 +61,9 @@ import org.mule.runtime.config.internal.bean.CustomEncryptionStrategyDelegate;
 import org.mule.runtime.config.internal.bean.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
+import org.mule.runtime.config.internal.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
+import org.mule.runtime.config.internal.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryBean;
@@ -83,8 +85,6 @@ import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorIterat
 import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator;
-import org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;

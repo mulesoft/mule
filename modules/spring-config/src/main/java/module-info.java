@@ -4,7 +4,6 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-import org.mule.api.annotation.jpms.PrivilegedApi;
 
 /**
  * Mule Builder for use with Spring 4.3.x Namespace based XML configuration.
@@ -12,17 +11,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
  * @moduleGraph
  * @since 4.6
  */
-@PrivilegedApi(
-    privilegedPackages = {
-        "org.mule.runtime.config.privileged.dsl",
-        "org.mule.runtime.config.privileged.dsl.processor",
-        "org.mule.runtime.config.privileged.dsl.spring"
-    },
-    privilegedArtifactIds = {
-        "com.mulesoft.mule.modules:mule-compatibility-module",
-        "com.mulesoft.anypoint:cxf-module-facade"
-    }
-)
 module org.mule.runtime.spring.config {
 
   requires org.mule.runtime.api;
@@ -99,10 +87,6 @@ module org.mule.runtime.spring.config {
   provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
       org.mule.runtime.config.internal.dsl.processor.xml.ModuleXmlNamespaceInfoProvider;
 
-  exports org.mule.runtime.config.privileged.dsl;
-  exports org.mule.runtime.config.privileged.dsl.processor;
-  exports org.mule.runtime.config.privileged.dsl.spring;
-
   exports org.mule.runtime.config.api.dsl.model.metadata to
       org.mule.runtime.tooling.support,
       spring.beans;
@@ -149,9 +133,6 @@ module org.mule.runtime.spring.config {
       net.bytebuddy,
       spring.core;
   opens org.mule.runtime.config.api.factories.streaming to
-      spring.core;
-  opens org.mule.runtime.config.privileged.dsl.processor to
-      net.bytebuddy,
       spring.core;
   opens org.mule.runtime.config.internal.bean to
       spring.core;

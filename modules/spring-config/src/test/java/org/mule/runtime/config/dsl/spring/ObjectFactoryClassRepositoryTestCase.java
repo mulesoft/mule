@@ -17,7 +17,7 @@ import static org.mockito.junit.MockitoJUnit.rule;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository;
-import org.mule.runtime.config.privileged.dsl.spring.SmartFactoryBeanInterceptor;
+import org.mule.runtime.config.internal.dsl.spring.SmartFactoryBeanInterceptor;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
