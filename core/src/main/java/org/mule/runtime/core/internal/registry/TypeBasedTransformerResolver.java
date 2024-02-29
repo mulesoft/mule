@@ -6,7 +6,10 @@
  */
 package org.mule.runtime.core.internal.registry;
 
-import org.mule.runtime.api.exception.MuleException;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformHasMultipleMatches;
+
+import static java.util.Arrays.asList;
+
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -14,11 +17,11 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
+import org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.privileged.transformer.TransformerChain;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.ArrayList;
@@ -78,32 +81,6 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
     }
 
     transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
-    // If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
-    // byte[]
-    Transformer secondPass;
-    if (transformer == null) {
-      // If no transformers were found but the outputType type is String or byte[] we can perform a more general search
-      // using Object.class and then convert to String or byte[] using the second pass transformer
-      if (String.class.equals(result.getType())) {
-        secondPass = objectToString;
-      } else if (byte[].class.equals(result.getType())) {
-        secondPass = objectToByteArray;
-      } else {
-        return null;
-      }
-      // Perform a more general search
-      trans = transformersRegistry.lookupTransformers(source, DataType.OBJECT);
-
-      transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
-      if (transformer != null) {
-        transformer = new TransformerChain(transformer, secondPass);
-        try {
-          transformersRegistry.registerTransformer(transformer);
-        } catch (MuleException e) {
-          throw new ResolverException(e.getI18nMessage(), e);
-        }
-      }
-    }
 
     if (transformer != null) {
       exactTransformerCache.put(source.toString() + result.toString(), transformer);
@@ -126,8 +103,8 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
         // We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
         TransformerWeighting current = weightings.get(index);
         if (!maxWeighting.getTransformer().getClass().equals(current.getTransformer().getClass())) {
-          List<Transformer> transformers = Arrays.asList(current.getTransformer(), maxWeighting.getTransformer());
-          throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output, transformers));
+          List<Transformer> transformers = asList(current.getTransformer(), maxWeighting.getTransformer());
+          throw new ResolverException(transformHasMultipleMatches(input, output, transformers));
         }
       }
 

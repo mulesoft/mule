@@ -11,12 +11,11 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
 
 /**
- * {@link ObjectFactory} for test:component return-data element.
+ * {@link AbstractComponentFactory} for test:component return-data element.
  *
  * @since 4.0
  */

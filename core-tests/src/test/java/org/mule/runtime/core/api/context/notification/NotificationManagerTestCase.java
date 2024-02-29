@@ -14,8 +14,8 @@ import static org.junit.Assert.assertTrue;
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import org.mule.runtime.api.util.concurrent.Latch;
+import org.mule.runtime.core.internal.context.notification.OptimisedNotificationHandler;
 import org.mule.runtime.core.internal.context.notification.Policy;
-import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
