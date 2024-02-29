@@ -8,7 +8,6 @@ package org.mule.functional.functional;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.IOUtils.ifInputStream;
-import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 
 import org.mule.functional.api.component.EventCallback;
 import org.mule.runtime.api.component.AbstractComponent;
@@ -25,12 +24,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.ClassUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A service that can be used by streaming functional tests. This service accepts an EventCallback that can be used to assert the
@@ -47,7 +46,7 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
   protected transient Logger logger = LoggerFactory.getLogger(getClass());
 
   private static AtomicInteger count = new AtomicInteger(0);
-  private int number = count.incrementAndGet();
+  private final int number = count.incrementAndGet();
 
   public static final int STREAM_SAMPLE_SIZE = 4;
   public static final int STREAM_BUFFER_SIZE = 4096;
@@ -159,10 +158,10 @@ public abstract class FunctionalStreamingTestComponent extends AbstractComponent
 
     summary = result.toString();
 
-    String msg = getBoilerPlate("Message Received in service: " + this.getLocation().getRootContainerName() + ". " + summary
-        + "\n callback: " + eventCallback, '*', 80);
-
-    logger.info(msg);
+    logger.info("Message Received in service: {}. {}\n callback: {}",
+                this.getLocation().getRootContainerName(),
+                summary,
+                eventCallback);
 
     if (eventCallback != null) {
       eventCallback.eventReceived(event, this, muleContext);

@@ -8,7 +8,6 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
@@ -195,7 +194,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
-        log(miniSplash("Mule is up and running in a fixed app set mode"));
+        logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
@@ -254,7 +253,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     artifactDirMonitorScheduler = schedulerServiceSupplier.get().customScheduler(schedulerConfig);
     artifactDirMonitorScheduler.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
-    log(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+    logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
 
   protected void deployPackedApps(String[] zips) {
@@ -554,7 +553,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     public void propertyChange(PropertyChangeEvent event) {
       if (event instanceof ElementAddedEvent) {
         Artifact artifactAdded = (T) event.getNewValue();
-        artifactConfigResourcesTimestaps.put(artifactAdded.getArtifactName(), new ArtifactResourcesTimestamp<T>(artifactAdded));
+        artifactConfigResourcesTimestaps.put(artifactAdded.getArtifactName(), new ArtifactResourcesTimestamp<>(artifactAdded));
       } else if (event instanceof ElementRemovedEvent) {
         Artifact artifactRemoved = (T) event.getNewValue();
         artifactConfigResourcesTimestaps.remove(artifactRemoved.getArtifactName());
