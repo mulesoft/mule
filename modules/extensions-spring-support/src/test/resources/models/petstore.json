@@ -1,7 +1,7 @@
 {
   "name": "petstore",
   "description": "",
-  "version": "@mule.runtime.version@",
+  "version": "@mule.runtime.version@"3,
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [

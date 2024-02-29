@@ -1,7 +1,7 @@
 {
   "name": "Marvel",
   "description": "",
-  "version": "@mule.runtime.version@",
+  "version": "@mule.runtime.version@"3,
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [

@@ -1,7 +1,7 @@
 {
   "name": "Heisenberg",
   "description": "",
-  "version": "@mule.runtime.version@"3,
+  "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
