@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
@@ -23,9 +24,9 @@ import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.core.scheduler.Schedulers.immediate;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.scheduler.Scheduler;
-import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -496,16 +497,14 @@ public class RxUtils {
   public static class MultiFluxSubscriber<T> implements CoreSubscriber<T> {
 
     public static String MULTI_FLUX_SUBSCRIBER = "MULTI_FLUX_SUBSCRIBER";
+    public static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
     private Throwable lastSubscriptionError;
-    private final Latch completionLatch;
     private final Phaser subscriptionPhaser = new Phaser(1);
     private final Scheduler subscriptionScheduler;
     private boolean subscribed = false;
-
     private final List<ContextView> pendingContexts = new ArrayList<>();
 
-    public MultiFluxSubscriber(Latch completionLatch, Scheduler subscriptionScheduler) {
-      this.completionLatch = completionLatch;
+    public MultiFluxSubscriber(Scheduler subscriptionScheduler) {
       this.subscriptionScheduler = subscriptionScheduler;
     }
 
@@ -534,13 +533,11 @@ public class RxUtils {
     @Override
     public void onError(Throwable throwable) {
       lastSubscriptionError = throwable;
-      completionLatch.release();
       subscriptionPhaser.forceTermination();
     }
 
     @Override
     public void onComplete() {
-      completionLatch.release();
       subscriptionPhaser.forceTermination();
     }
 
@@ -560,14 +557,15 @@ public class RxUtils {
 
     public void awaitAllSubscriptions() {
       subscriptionPhaser.awaitAdvance(0);
+      if (lastSubscriptionError != null) {
+        // Considerar cambiar el mensaje por uno que aclare mejor que hubo errores en la suscripcion.
+        throw new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
+                                       lastSubscriptionError);
+      }
     }
 
     public void failPendingSubscription(Throwable throwable) {
       this.onError(throwable);
-    }
-
-    public Throwable getLastSubscriptionError() {
-      return lastSubscriptionError;
     }
   }
 

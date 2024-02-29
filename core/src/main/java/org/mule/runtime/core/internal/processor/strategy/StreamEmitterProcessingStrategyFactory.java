@@ -14,6 +14,7 @@ import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingTy
 import static org.mule.runtime.core.internal.processor.strategy.reactor.builder.PipelineProcessingStrategyReactiveProcessorBuilder.pipelineProcessingStrategyReactiveProcessorFrom;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
+import static org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber.NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR;
 
 import static java.lang.Long.MIN_VALUE;
 import static java.lang.Math.min;
@@ -24,8 +25,8 @@ import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 import static java.time.Duration.ofMillis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.slf4j.LoggerFactory.getLogger;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.FluxSink.OverflowStrategy.BUFFER;
 
@@ -109,7 +110,6 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
   static class StreamEmitterProcessingStrategy extends AbstractReactorStreamProcessingStrategy {
 
     private static final Logger LOGGER = getLogger(StreamEmitterProcessingStrategy.class);
-    private static final String NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR = "No subscriptions active for processor.";
     private static final long SCHEDULER_BUSY_RETRY_INTERVAL_NS = MILLISECONDS.toNanos(SCHEDULER_BUSY_RETRY_INTERVAL_MS);
 
     private final int bufferSize;
@@ -229,21 +229,23 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
     public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor function) {
       List<ReactorSink<CoreEvent>> sinks = new ArrayList<>();
       final int bufferQueueSize = getBufferQueueSize();
+      Consumer<Throwable> subscriptionErrorConsumer = getSubscriptionErrorConsumer(flowConstruct);
 
       for (int i = 0; i < sinksCount; i++) {
         Latch completionLatch = new Latch();
         EmitterProcessor<CoreEvent> processor = EmitterProcessor.create(bufferQueueSize);
 
         MultiFluxSubscriber<CoreEvent> multiFluxSubscriber =
-            getCoreEventMultiFluxSubscriber(flowConstruct, completionLatch, getCpuLightScheduler());
+            getCoreEventMultiFluxSubscriber(subscriptionErrorConsumer, completionLatch, getCpuLightScheduler());
 
         processor.transform(function)
             .subscribe(multiFluxSubscriber);
 
-        // Ver si esto (await y error) no se puede encapsular dentro del MultiFluxSubscriber
+        // This will fail throwing an exception if a subscription error reaches the multiFluxSubscriber.
         multiFluxSubscriber.awaitAllSubscriptions();
-        if (!processor.hasDownstreams() || multiFluxSubscriber.getLastSubscriptionError() != null) {
-          throw resolveSubscriptionErrorCause(multiFluxSubscriber);
+        // Defensive check meant to deal with unexpected errors that prevent the subscription.
+        if (!processor.hasDownstreams()) {
+          throw new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR));
         }
 
         ReactorSink<CoreEvent> sink =
@@ -261,14 +263,16 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return new RoundRobinReactorSink<>(sinks);
     }
 
-    private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(FlowConstruct flowConstruct, Latch completionLatch,
+    private MultiFluxSubscriber<CoreEvent> getCoreEventMultiFluxSubscriber(Consumer<Throwable> errorConsumer,
+                                                                           Latch completionLatch,
                                                                            Scheduler subscriptionScheduler) {
-      return new MultiFluxSubscriber<CoreEvent>(completionLatch, subscriptionScheduler) {
+      return new MultiFluxSubscriber<CoreEvent>(subscriptionScheduler) {
 
         @Override
         public void onError(Throwable throwable) {
           try {
-            getSubscriptionErrorConsumer(flowConstruct, completionLatch).accept(throwable);
+            errorConsumer.accept(throwable);
+            completionLatch.release();
           } finally {
             super.onError(throwable);
           }
@@ -330,23 +334,8 @@ public class StreamEmitterProcessingStrategyFactory extends AbstractStreamProces
       return min(maxConcurrency, coresLoad);
     }
 
-    protected MuleRuntimeException resolveSubscriptionErrorCause(MultiFluxSubscriber<CoreEvent> multiFluxSubscriber) {
-      MuleRuntimeException exceptionToThrow;
-      if (multiFluxSubscriber.getLastSubscriptionError() != null) {
-        // Considerar cambiar el mensaje por uno que aclare que hubo errores en la suscripcion
-        exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
-                                                    multiFluxSubscriber.getLastSubscriptionError());
-      } else {
-        exceptionToThrow = new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR));
-      }
-      return exceptionToThrow;
-    }
-
-    protected Consumer<Throwable> getSubscriptionErrorConsumer(FlowConstruct flowConstruct, Latch completionLatch) {
-      return e -> {
-        LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
-        completionLatch.release();
-      };
+    protected Consumer<Throwable> getSubscriptionErrorConsumer(FlowConstruct flowConstruct) {
+      return e -> LOGGER.error("Exception reached PS subscriber for flow '" + flowConstruct.getName() + "'", e);
     }
 
     @Override
