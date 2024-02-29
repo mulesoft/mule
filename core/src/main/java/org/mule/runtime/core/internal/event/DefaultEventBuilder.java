@@ -538,9 +538,10 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       try {
         return (byte[]) transformMessage(DataType.BYTE_ARRAY, muleContext);
       } catch (Exception e) {
-        throw new DefaultMuleException(cannotReadPayloadAsBytes(message.getPayload().getValue()
-            .getClass()
-            .getName()), e);
+        final Object value = message.getPayload().getValue();
+        throw new DefaultMuleException(cannotReadPayloadAsBytes(value != null
+            ? value.getClass().getName()
+            : null), e);
       }
     }
 
