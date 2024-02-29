@@ -160,13 +160,15 @@ public class LazyMetadataService implements MetadataService, Initialisable {
   @Override
   public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
                                                                          ScopePropagationContext ctx) {
-    return null;
+    return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getScopeOutputMetadata(location, key, ctx));
   }
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(Location location, MetadataKey key,
                                                                           RouterPropagationContext ctx) {
-    return null;
+    return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getRouterOutputMetadata(location, key, ctx));
   }
 
   private Optional<MetadataResult<?>> initializeComponent(Location location) {
