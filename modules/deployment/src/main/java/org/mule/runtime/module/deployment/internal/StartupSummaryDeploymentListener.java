@@ -6,18 +6,15 @@
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.core.internal.util.splash.SimpleLoggingTable;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.deployment.model.api.application.Application;
+
+import java.util.Map;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
-
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +44,7 @@ public class StartupSummaryDeploymentListener implements StartupListener {
     this.deploymentService = deploymentService;
   }
 
+  @Override
   public void onAfterStartup() {
     Multimap<String, String> applicationsPerDomain = LinkedListMultimap.create();
 
@@ -94,6 +92,6 @@ public class StartupSummaryDeploymentListener implements StartupListener {
       message = String.format("%n%s", domainTable);
     }
 
-    log(message);
+    logger.info(message);
   }
 }

@@ -18,7 +18,6 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.data.sample.SampleDataService.SAMPLE_DATA_SERVICE_KEY;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
@@ -50,7 +49,6 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
 import org.mule.runtime.core.api.data.sample.SampleDataService;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
-import org.mule.runtime.core.internal.logging.LogUtil;
 import org.mule.runtime.deployment.model.api.DeploymentInitException;
 import org.mule.runtime.deployment.model.api.DeploymentStartException;
 import org.mule.runtime.deployment.model.api.InstallException;
@@ -181,7 +179,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
+      LOGGER.info(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
     });
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -217,7 +215,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void start() {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
+      LOGGER.info(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
       this.artifactContext.getMuleContext().start();
@@ -228,7 +226,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       withContextClassLoader(null, () -> {
         ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
         splashScreen.createMessage(descriptor);
-        LogUtil.log(splashScreen.toString());
+        LOGGER.info(splashScreen.toString());
       });
     } catch (Exception e) {
       setStatusToFailed();
@@ -258,7 +256,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   private void doInit(boolean lazy, boolean disableXmlValidations, boolean addToolingObjectsToRegistry) {
     withContextClassLoader(null, () -> {
-      log(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
+      LOGGER.info(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
       ArtifactContextBuilder artifactBuilder =
