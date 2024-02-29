@@ -33,5 +33,9 @@ public interface NestedChainModelParser extends SemanticTermsParser, AllowedSter
    */
   boolean isRequired();
 
+  /**
+   * @return the chain's {@link ChainExecutionOccurrence}
+   * @since 4.7.0
+   */
   ChainExecutionOccurrence getExecutionOccurrence();
 }

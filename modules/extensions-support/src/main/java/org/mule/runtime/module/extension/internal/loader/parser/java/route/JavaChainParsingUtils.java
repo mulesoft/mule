@@ -19,8 +19,19 @@ import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 
 import java.util.Optional;
 
+/**
+ * Utility methods for parsing chains defined through the Java SDK
+ *
+ * @since 4.7.0
+ */
 public final class JavaChainParsingUtils {
 
+  /**
+   * Parses the given {@code value} into a {@link ChainExecutionOccurrence}.
+   *
+   * @param value an optional {@link AnnotationValueFetcher} for the proper annotation
+   * @return the parsed value or {@link ChainExecutionOccurrence#UNKNOWN} if the value is not present
+   */
   public static ChainExecutionOccurrence parseChainExecutionOccurrence(Optional<AnnotationValueFetcher<ExecutionOccurrence>> value) {
     return value.map(a -> toModelApi(a.getEnumValue(ExecutionOccurrence::value))).orElse(UNKNOWN);
   }
