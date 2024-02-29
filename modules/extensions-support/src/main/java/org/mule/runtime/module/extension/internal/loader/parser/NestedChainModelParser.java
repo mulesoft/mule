@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
+import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
 
 /**
@@ -31,4 +32,6 @@ public interface NestedChainModelParser extends SemanticTermsParser, AllowedSter
    * @return whether the chain is required or not
    */
   boolean isRequired();
+
+  ChainExecutionOccurrence getExecutionOccurrence();
 }

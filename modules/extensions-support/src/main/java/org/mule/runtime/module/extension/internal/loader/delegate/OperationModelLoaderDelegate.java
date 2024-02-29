@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
+import static java.lang.String.format;
+import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
@@ -13,9 +15,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareOperationMetadataKeyIdModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
-
-import static java.lang.String.format;
-import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
@@ -29,13 +28,14 @@ import org.mule.runtime.module.extension.internal.loader.parser.InputResolverMod
 import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for declaring operations through a {@link DefaultExtensionModelLoaderDelegate}
@@ -154,7 +154,8 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
       parser.getNestedChainParser().ifPresent(chain -> {
         NestedChainDeclarer chainDeclarer = operation.withChain(chain.getName())
             .describedAs(chain.getDescription())
-            .setRequired(chain.isRequired());
+            .setRequired(chain.isRequired())
+            .setExecutionOccurrence(chain.getExecutionOccurrence());
         addSemanticTerms(chainDeclarer.getDeclaration(), chain);
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(chain, chainDeclarer);
       });
@@ -166,8 +167,11 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
             .withMinOccurs(route.getMinOccurs())
             .withMaxOccurs(route.getMaxOccurs().orElse(null));
 
-        NestedChainDeclarer chain = routeDeclarer.withChain();
+        NestedChainDeclarer chain = routeDeclarer
+            .withChain()
+            .setExecutionOccurrence(route.getExecutionOccurrence());
         getStereotypeModelLoaderDelegate().addAllowedStereotypes(route, chain);
+
         route.getAdditionalModelProperties().forEach(routeDeclarer::withModelProperty);
         loader.getParameterModelsLoaderDelegate().declare(routeDeclarer, route.getParameterGroupModelParsers());
       });

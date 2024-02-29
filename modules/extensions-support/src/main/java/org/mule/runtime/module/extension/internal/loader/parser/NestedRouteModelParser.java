@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
 
 import java.util.List;
@@ -66,4 +67,6 @@ public interface NestedRouteModelParser extends SemanticTermsParser, AllowedSter
    * @return the router's {@link DeprecationModel} if one was defined
    */
   Optional<DeprecationModel> getDeprecationModel();
+
+  ChainExecutionOccurrence getExecutionOccurrence();
 }

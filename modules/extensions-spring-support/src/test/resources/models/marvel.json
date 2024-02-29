@@ -14,7 +14,7 @@
     "prefix": "marvel",
     "namespace": "http://www.mulesoft.org/schema/mule/marvel",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd",
-    "schemaVersion": "@mule.runtime.version@",
+    "schemaVersion": "4.7.0-SNAPSHOT",
     "xsdFileName": "mule-marvel.xsd"
   },
   "resources": [],
@@ -10233,6 +10233,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -12683,6 +12684,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {

@@ -14,7 +14,7 @@
     "prefix": "heisenberg",
     "namespace": "http://www.mulesoft.org/schema/mule/heisenberg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd",
-    "schemaVersion": "@mule.runtime.version@",
+    "schemaVersion": "4.7.0-SNAPSHOT",
     "xsdFileName": "mule-heisenberg.xsd"
   },
   "resources": [
@@ -32631,6 +32631,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -34982,6 +34983,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -37254,6 +37256,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -37515,6 +37518,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -39660,6 +39664,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -46617,6 +46622,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": false,
           "allowedStereotypes": [
             {
@@ -47759,6 +47765,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -51976,6 +51983,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -52309,6 +52317,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -52669,6 +52678,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "ONCE",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -52702,6 +52712,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "ONCE",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -53197,6 +53208,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -53274,6 +53286,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -54460,6 +54473,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "ONCE",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -55292,6 +55306,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "ONCE_OR_NONE",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -55361,6 +55376,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
@@ -56929,6 +56945,7 @@
           "modelProperties": {},
           "childComponents": [
             {
+              "executionOccurrence": "UNKNOWN",
               "isRequired": true,
               "allowedStereotypes": [
                 {
