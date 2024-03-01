@@ -10,12 +10,8 @@ import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.message.EventInternalContext.copyOf;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
@@ -27,7 +23,6 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -42,7 +37,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalEvent;
@@ -56,7 +50,6 @@ import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -531,60 +524,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     @Override
     public Optional<Error> getError() {
       return ofNullable(error);
-    }
-
-    @Override
-    public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
-      try {
-        return (byte[]) transformMessage(DataType.BYTE_ARRAY, muleContext);
-      } catch (Exception e) {
-        final Object value = message.getPayload().getValue();
-        throw new DefaultMuleException(cannotReadPayloadAsBytes(value != null
-            ? value.getClass().getName()
-            : null), e);
-      }
-    }
-
-    @Override
-    public Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException {
-      if (outputType == null) {
-        throw new MessageTransformerException(objectIsNull("outputType"), null, message);
-      }
-
-      Message transformedMessage = muleContext.getTransformationService().transform(message, outputType);
-      if (message.getPayload().getDataType().isStreamType()) {
-        setMessage(transformedMessage);
-      }
-      return transformedMessage.getPayload().getValue();
-    }
-
-    @Override
-    public String getMessageAsString(MuleContext muleContext) throws MuleException {
-      return getMessageAsString(getMessage().getPayload().getDataType().getMediaType().getCharset()
-          .orElse(getDefaultEncoding(muleContext)), muleContext);
-    }
-
-    /**
-     * Returns the message contents for logging
-     *
-     * @param encoding    the encoding to use when converting bytes to a string, if necessary
-     * @param muleContext the Mule node.
-     * @return the message contents as a string
-     * @throws MuleException if the message cannot be converted into a string
-     */
-    @Override
-    public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
-      try {
-        Message transformedMessage = muleContext.getTransformationService()
-            .transform(message, DataType.builder().type(String.class).charset(encoding).build());
-        if (message.getPayload().getDataType().isStreamType()) {
-          setMessage(transformedMessage);
-        }
-
-        return (String) transformedMessage.getPayload().getValue();
-      } catch (Exception e) {
-        throw new DefaultMuleException(cannotReadPayloadAsString(message.getClass().getName()), e);
-      }
     }
 
     @Override

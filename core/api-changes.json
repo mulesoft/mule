@@ -4,6 +4,30 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.method.removed",
+          "old": "method byte[] org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsBytes(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+          "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsString(java.nio.charset.Charset, org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+          "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.String org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsString(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+          "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method java.lang.Object org.mule.runtime.core.privileged.event.PrivilegedEvent::transformMessage(org.mule.runtime.api.metadata.DataType, org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.core.api.transformer.MessageTransformerException",
+          "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+        },
+        {
+          "ignore": true,
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.object.AbstractObjectFactory",
           "justification": "W-15149969: Remove endpoint, muleClient and associated code"

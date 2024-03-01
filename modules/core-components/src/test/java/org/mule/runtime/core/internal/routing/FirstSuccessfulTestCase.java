@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.tck.MuleTestUtils.createErrorMock;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.test.allure.AllureConstants.RoutersFeature.ROUTERS;
@@ -26,10 +27,10 @@ import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -130,7 +131,13 @@ public class FirstSuccessfulTestCase extends AbstractMuleContextTestCase {
       try {
         Message msg;
         Error error = null;
-        String payload = ((InternalEvent) event).getMessageAsString(muleContext);
+
+        Message transformedMessage = muleContext.getTransformationService()
+            .transform(event.getMessage(), DataType.builder()
+                .type(String.class)
+                .charset(getDefaultEncoding(muleContext.getConfiguration()))
+                .build());
+        String payload = (String) transformedMessage.getPayload().getValue();
         if (payload.indexOf(rejectIfMatches) >= 0) {
           throw new DefaultMuleException("Saw " + rejectIfMatches);
         } else if (payload.toLowerCase().indexOf(rejectIfMatches) >= 0) {
