@@ -1,4 +1,17 @@
 {
+  "4.6.2": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.visibilityReduced",
+          "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+          "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler",
+          "justification": "W-14934278: This inner class is only used internally and it also belongs to an internal package."
+        }
+      ]
+    }
+  },
   "4.6.1": {
     "revapi": {
       "ignore": [
