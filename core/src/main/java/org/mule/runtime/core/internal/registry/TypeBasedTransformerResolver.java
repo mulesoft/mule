@@ -9,24 +9,23 @@ package org.mule.runtime.core.internal.registry;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformHasMultipleMatches;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.sort;
 
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.registry.TransformerResolver.RegistryAction;
 import org.mule.runtime.core.internal.transformer.ResolverException;
+import org.mule.runtime.core.internal.transformer.TransformerChain;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +80,32 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
     }
 
     transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
+    // If an exact match is not found, we have a 'second pass' transformer that can be used to converting to String or
+    // byte[]
+    Transformer secondPass;
+    if (transformer == null) {
+      // If no transformers were found but the outputType type is String or byte[] we can perform a more general search
+      // using Object.class and then convert to String or byte[] using the second pass transformer
+      if (String.class.equals(result.getType())) {
+        secondPass = objectToString;
+      } else if (byte[].class.equals(result.getType())) {
+        secondPass = objectToByteArray;
+      } else {
+        return null;
+      }
+      // Perform a more general search
+      trans = transformersRegistry.lookupTransformers(source, DataType.OBJECT);
+
+      transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
+      if (transformer != null) {
+        transformer = new TransformerChain(transformer, secondPass);
+        try {
+          transformersRegistry.registerTransformer(transformer);
+        } catch (MuleException e) {
+          throw new ResolverException(e.getI18nMessage(), e);
+        }
+      }
+    }
 
     if (transformer != null) {
       exactTransformerCache.put(source.toString() + result.toString(), transformer);
@@ -124,7 +149,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
       weightings.add(transformerWeighting);
     }
 
-    Collections.sort(weightings);
+    sort(weightings);
 
     return weightings;
   }
