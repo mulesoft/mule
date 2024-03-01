@@ -2,7 +2,6 @@
   "name": "Marvel",
   "description": "",
   "version": "@mule.runtime.version@",
-  "version": test,
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [
@@ -15,7 +14,7 @@
     "prefix": "marvel",
     "namespace": "http://www.mulesoft.org/schema/mule/marvel",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd",
-    "schemaVersion": "4.7.0-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-marvel.xsd"
   },
   "resources": [],

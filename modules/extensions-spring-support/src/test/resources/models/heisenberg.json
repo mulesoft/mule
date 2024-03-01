@@ -2,7 +2,6 @@
   "name": "Heisenberg",
   "description": "",
   "version": "@mule.runtime.version@",
-  "version": test,
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
   "supportedJavaVersions": [
@@ -15,7 +14,7 @@
     "prefix": "heisenberg",
     "namespace": "http://www.mulesoft.org/schema/mule/heisenberg",
     "schemaLocation": "http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd",
-    "schemaVersion": "4.7.0-SNAPSHOT",
+    "schemaVersion": "@mule.runtime.version@",
     "xsdFileName": "mule-heisenberg.xsd"
   },
   "resources": [
