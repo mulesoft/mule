@@ -7,7 +7,6 @@
 package org.mule.runtime.module.tls.internal.revocation;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;

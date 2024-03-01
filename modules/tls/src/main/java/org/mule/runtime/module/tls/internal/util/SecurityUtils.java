@@ -4,11 +4,12 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.util;
+package org.mule.runtime.module.tls.internal.util;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_SECURITY_SYSTEM_PROPERTY;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 
 import static java.lang.System.getProperty;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_SECURITY_SYSTEM_PROPERTY;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
 
 public final class SecurityUtils {
 

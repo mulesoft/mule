@@ -21,11 +21,10 @@ import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.security.tls.RestrictedSSLServerSocketFactory;
-import org.mule.runtime.core.internal.security.tls.RestrictedSSLSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
-import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
+import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
+import org.mule.runtime.module.tls.internal.socket.RestrictedSSLServerSocketFactory;
+import org.mule.runtime.module.tls.internal.socket.RestrictedSSLSocketFactory;
 
 import com.google.common.base.Joiner;
 

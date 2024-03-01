@@ -32,8 +32,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.processor.chain",
         "org.mule.runtime.core.privileged.registry",
         "org.mule.runtime.core.privileged.routing",
-        "org.mule.runtime.core.privileged.security",
-        "org.mule.runtime.core.privileged.security.tls",
         "org.mule.runtime.core.privileged.store",
         "org.mule.runtime.core.privileged.transformer",
         "org.mule.runtime.core.privileged.transformer.simple",
@@ -214,10 +212,6 @@ module org.mule.runtime.core {
       org.mule.runtime.core.components;
   exports org.mule.runtime.core.privileged.registry;
   exports org.mule.runtime.core.privileged.routing;
-  exports org.mule.runtime.core.privileged.security to
-      org.mule.runtime.tls;
-  exports org.mule.runtime.core.privileged.security.tls to
-      org.mule.runtime.tls;
   exports org.mule.runtime.core.privileged.store;
   exports org.mule.runtime.core.privileged.transaction;
   exports org.mule.runtime.core.privileged.transaction.xa;
@@ -409,9 +403,6 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       spring.beans;
-  exports org.mule.runtime.core.internal.security.tls to
-      org.mule.runtime.tls,
-      com.mulesoft.anypoint.gw.api;
   exports org.mule.runtime.core.internal.serialization to
       org.mule.runtime.artifact,
       com.mulesoft.mule.runtime.core.ee,

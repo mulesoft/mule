@@ -14,9 +14,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.tls.TlsContextFactory;
 import org.mule.runtime.api.tls.TlsContextFactoryBuilder;
 import org.mule.runtime.api.tls.TlsRevocationCheckBuilder;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.module.tls.internal.revocation.CrlFile;
 import org.mule.runtime.module.tls.internal.revocation.CustomOcspResponder;
+import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
 import org.mule.runtime.module.tls.internal.revocation.StandardRevocationCheck;
 
 import java.io.IOException;

@@ -17,12 +17,12 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_EL
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 
-import org.mule.runtime.core.privileged.security.RevocationCheck;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.tls.internal.DefaultTlsContextFactory;
 import org.mule.runtime.module.tls.internal.revocation.CrlFile;
 import org.mule.runtime.module.tls.internal.revocation.CustomOcspResponder;
+import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
 import org.mule.runtime.module.tls.internal.revocation.StandardRevocationCheck;
 
 import java.util.LinkedList;

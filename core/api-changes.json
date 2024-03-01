@@ -29,6 +29,42 @@
         {
           "ignore": true,
           "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.security.RevocationCheck",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.security.TlsDirectKeyStore",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.security.TlsDirectTrustStore",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.security.TlsIndirectKeyStore",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.security.TlsIndirectTrustStore",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.security.tls.TlsConfiguration",
+          "justification": "W-15162005: Move tls specific code from core to tls module"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.object.AbstractObjectFactory",
           "justification": "W-15149969: Remove endpoint, muleClient and associated code"
         },

@@ -4,9 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.security.tls;
+package org.mule.runtime.module.tls.internal.socket;
 
-import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
+import org.mule.runtime.module.tls.internal.TlsConfiguration;
 
 import java.io.IOException;
 import java.net.InetAddress;

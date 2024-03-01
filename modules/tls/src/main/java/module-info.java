@@ -32,6 +32,10 @@ module org.mule.runtime.tls {
   exports org.mule.runtime.module.tls.internal.config to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.module.tls.internal.util to
+      org.mule.runtime.launcher;
+  exports org.mule.runtime.module.tls.internal.socket to
+      com.mulesoft.anypoint.gw.api;
 
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
       org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;

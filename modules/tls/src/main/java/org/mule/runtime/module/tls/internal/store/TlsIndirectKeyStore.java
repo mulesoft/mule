@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.security;
+package org.mule.runtime.module.tls.internal.store;
 
-import org.mule.runtime.core.internal.security.tls.TlsPropertiesMapper;
-import org.mule.runtime.core.internal.security.tls.TlsPropertiesSocketFactory;
-import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
+import org.mule.runtime.module.tls.internal.TlsConfiguration;
+import org.mule.runtime.module.tls.internal.socket.TlsPropertiesMapper;
+import org.mule.runtime.module.tls.internal.socket.TlsPropertiesSocketFactory;
 
 import java.io.IOException;
 

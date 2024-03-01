@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.security.tls;
+package org.mule.runtime.module.tls.internal;
 
 import static java.lang.String.format;
 import static java.security.KeyStore.getInstance;
@@ -19,18 +19,18 @@ import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.internal.security.tls.RestrictedSSLServerSocketFactory;
-import org.mule.runtime.core.internal.security.tls.RestrictedSSLSocketFactory;
-import org.mule.runtime.core.internal.security.tls.TlsProperties;
-import org.mule.runtime.core.internal.security.tls.TlsPropertiesMapper;
-import org.mule.runtime.core.internal.security.tls.TlsPropertiesSocketFactory;
 import org.mule.runtime.core.internal.util.ArrayUtils;
-import org.mule.runtime.core.internal.util.SecurityUtils;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
-import org.mule.runtime.core.privileged.security.TlsDirectKeyStore;
-import org.mule.runtime.core.privileged.security.TlsDirectTrustStore;
-import org.mule.runtime.core.privileged.security.TlsIndirectKeyStore;
-import org.mule.runtime.core.privileged.security.TlsIndirectTrustStore;
+import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
+import org.mule.runtime.module.tls.internal.socket.RestrictedSSLServerSocketFactory;
+import org.mule.runtime.module.tls.internal.socket.RestrictedSSLSocketFactory;
+import org.mule.runtime.module.tls.internal.socket.TlsProperties;
+import org.mule.runtime.module.tls.internal.socket.TlsPropertiesMapper;
+import org.mule.runtime.module.tls.internal.socket.TlsPropertiesSocketFactory;
+import org.mule.runtime.module.tls.internal.store.TlsDirectKeyStore;
+import org.mule.runtime.module.tls.internal.store.TlsDirectTrustStore;
+import org.mule.runtime.module.tls.internal.store.TlsIndirectKeyStore;
+import org.mule.runtime.module.tls.internal.store.TlsIndirectTrustStore;
+import org.mule.runtime.module.tls.internal.util.SecurityUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.api;
+package org.mule.test.module.tls;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
@@ -19,16 +19,17 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_KEYSTORE;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SSL_TYPE;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.JSSE_NAMESPACE;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_KEYSTORE;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_SECURITY_MODEL;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_SSL_TYPE;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.JSSE_NAMESPACE;
+
 import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.api.lifecycle.CreateException;
-import org.mule.runtime.core.privileged.security.tls.TlsConfiguration;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.util.SecurityUtils;
+import org.mule.runtime.module.tls.internal.TlsConfiguration;
+import org.mule.runtime.module.tls.internal.util.SecurityUtils;
 
 import java.io.File;
 import java.io.IOException;

@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.security.RevocationCheck;
 
 import java.io.IOException;
 import java.io.InputStream;
