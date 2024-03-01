@@ -27179,6 +27179,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {

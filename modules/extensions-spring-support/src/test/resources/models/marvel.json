@@ -10233,6 +10233,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -12683,6 +12684,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {

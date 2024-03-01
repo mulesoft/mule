@@ -6,11 +6,15 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
+import static org.mule.runtime.module.extension.internal.loader.parser.java.route.JavaChainParsingUtils.parseChainExecutionOccurrence;
+
+import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils;
+import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,6 +51,11 @@ public class JavaNestedChainModelParser implements NestedChainModelParser {
   @Override
   public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
     return JavaStereotypeModelParserUtils.getAllowedStereotypes(extensionParameter, extensionParameter.getType(), factory);
+  }
+
+  @Override
+  public ChainExecutionOccurrence getExecutionOccurrence() {
+    return parseChainExecutionOccurrence(extensionParameter.getValueFromAnnotation(ExecutionOccurrence.class));
   }
 
   @Override
