@@ -558,7 +558,6 @@ public class RxUtils {
     public void awaitAllSubscriptions() {
       subscriptionPhaser.awaitAdvance(0);
       if (lastSubscriptionError != null) {
-        // Considerar cambiar el mensaje por uno que aclare mejor que hubo errores en la suscripcion.
         throw new MuleRuntimeException(createStaticMessage(NO_SUBSCRIPTIONS_ACTIVE_FOR_PROCESSOR),
                                        lastSubscriptionError);
       }
