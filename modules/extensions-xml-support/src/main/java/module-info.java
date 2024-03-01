@@ -31,8 +31,10 @@ module org.mule.runtime.extensions.xml.support {
 
   requires com.google.gson;
   requires java.inject;
+  requires java.xml;
 
   requires commons.beanutils;
+  requires net.bytebuddy;
   
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
       org.mule.runtime.extension.internal.ast.MacroExpansionAstPostProcessor;
