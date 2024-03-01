@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -63,7 +64,7 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
                                 Supplier<MetadataType> innerChainOutputType) {
-    this(configurationSupplier, connectionManager, cache, typeLoader, of(innerChainOutputType), emptyMap());
+    this(configurationSupplier, connectionManager, cache, typeLoader, ofNullable(innerChainOutputType), emptyMap());
   }
 
   /**
@@ -89,8 +90,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
     super(configurationSupplier, connectionManager);
     this.cache = cache;
     this.classTypeLoader = typeLoader;
-    this.innerRoutesOutputType = innerRoutesOutputType;
     this.innerChainOutputType = innerChainOutputType;
+    this.innerRoutesOutputType = unmodifiableMap(innerRoutesOutputType);
   }
 
   /**

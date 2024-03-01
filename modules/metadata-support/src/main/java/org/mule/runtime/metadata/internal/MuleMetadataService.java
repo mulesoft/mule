@@ -7,8 +7,9 @@
 package org.mule.runtime.metadata.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.metadata.MetadataProvider.RouterPropagationContext;
-import static org.mule.runtime.api.metadata.MetadataProvider.ScopePropagationContext;
+
+import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.ScopePropagationContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
