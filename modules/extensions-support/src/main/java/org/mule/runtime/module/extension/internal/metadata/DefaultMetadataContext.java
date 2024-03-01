@@ -83,10 +83,21 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
     this(configurationSupplier, connectionManager, cache, typeLoader, empty(), innerRoutesOutputType);
   }
 
-  private DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
-                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
-                                 Optional<Supplier<MetadataType>> innerChainOutputType,
-                                 Map<String, Supplier<MetadataType>> innerRoutesOutputType) {
+  /**
+   * Retrieves the configuration for the related component
+   *
+   * @param configurationSupplier Supplier of optional configurations
+   * @param connectionManager     {@link ConnectionManager} which is able to find a connection for the component using the
+   *                              {@param configInstance}
+   * @param cache                 instance of the {@link MetadataCache} for this context
+   * @param typeLoader            instance of a {@link ClassTypeLoader} in the context of this extension
+   * @param innerChainOutputType  Supplier of the {@link MetadataType} of the inner chain of a scope
+   * @param innerRoutesOutputType a map of suppliers for the {@link MetadataType} corresping to each router's routes (location)
+   */
+  public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
+                                Optional<Supplier<MetadataType>> innerChainOutputType,
+                                Map<String, Supplier<MetadataType>> innerRoutesOutputType) {
     super(configurationSupplier, connectionManager);
     this.cache = cache;
     this.classTypeLoader = typeLoader;

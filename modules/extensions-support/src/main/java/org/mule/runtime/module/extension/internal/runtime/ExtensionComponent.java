@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
+import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -92,6 +93,7 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -780,17 +782,20 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer)
       throws MetadataResolvingException, ConnectionException {
-    return runWithMetadataContext(contextConsumer, metadataCache -> () -> getMetadataContext(metadataCache));
+    return runWithMetadataContext(contextConsumer, empty(), empty());
   }
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer,
-                                                         Function<MetadataCache, Callable<MetadataContext>> metadataContextSupplier)
+                                                         Optional<ScopePropagationContext> scopePropagationContext,
+                                                         Optional<RouterPropagationContext> routerPropagationContext)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
     try {
       MetadataCacheId cacheId = getMetadataCacheId();
       MetadataCache metadataCache = metadataService.get().getMetadataCache(cacheId.getValue());
-      context = withContextClassLoader(classLoader, metadataContextSupplier.apply(metadataCache));
+      context =
+          withContextClassLoader(classLoader,
+                                 () -> getMetadataContext(metadataCache, scopePropagationContext, routerPropagationContext));
       MetadataResult<R> result = contextConsumer.apply(context);
       if (result.isSuccess()) {
         metadataService.get().saveCache(cacheId.getValue(), metadataCache);
@@ -839,11 +844,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
-  private MetadataContext getMetadataContext(MetadataCache cache) throws MetadataResolvingException {
-    return getMetadataContext(conf -> new DefaultMetadataContext(() -> conf, connectionManager, cache, typeLoader));
-  }
-
-  private MetadataContext getMetadataContext(Function<Optional<ConfigurationInstance>, MetadataContext> metadataContextCreator)
+  private MetadataContext getMetadataContext(MetadataCache cache, Optional<ScopePropagationContext> scopePropagationContext,
+                                             Optional<RouterPropagationContext> routerPropagationContext)
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
@@ -863,8 +865,10 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
         }
       }
-
-      return metadataContextCreator.apply(configuration);
+      return new DefaultMetadataContext(() -> configuration, connectionManager, cache, typeLoader,
+                                        scopePropagationContext.map(ScopePropagationContext::getInnerChainResolver),
+                                        routerPropagationContext.map(RouterPropagationContext::getRouteResolvers)
+                                            .orElse(emptyMap()));
     } finally {
       if (fakeEvent != null) {
         ((BaseEventContext) fakeEvent.getContext()).success();
@@ -899,11 +903,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)),
-                                    cache -> () -> getMetadataContext(conf -> new DefaultMetadataContext(() -> conf,
-                                                                                                         connectionManager, cache,
-                                                                                                         typeLoader,
-                                                                                                         scopePropagationContext
-                                                                                                             .getInnerChainResolver())));
+                                    of(scopePropagationContext), empty());
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -916,11 +916,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)),
-                                    cache -> () -> getMetadataContext(conf -> new DefaultMetadataContext(() -> conf,
-                                                                                                         connectionManager, cache,
-                                                                                                         typeLoader,
-                                                                                                         routerPropagationContext
-                                                                                                             .getRouteResolvers())));
+                                    empty(), of(routerPropagationContext));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
