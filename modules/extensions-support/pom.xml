@@ -168,12 +168,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-mvel</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-api</artifactId>
             <version>${muleExtensionsApiVersion}</version>
             <type>test-jar</type>

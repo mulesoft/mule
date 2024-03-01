@@ -270,7 +270,6 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.context to
       org.mule.runtime.core.components,
-      org.mule.runtime.core.mvel,
       org.mule.runtime.artifact,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.support,
@@ -296,7 +295,6 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
   exports org.mule.runtime.core.internal.el to
-      org.mule.runtime.core.mvel,
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
@@ -319,17 +317,13 @@ module org.mule.runtime.core {
       com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
-  exports org.mule.runtime.core.internal.el.datetime to
-      org.mule.runtime.core.mvel;
   exports org.mule.runtime.core.internal.exception to
       org.mule.runtime.core.components,
-      org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch,
-      mule.mvel2,
       spring.beans;
   exports org.mule.runtime.core.internal.execution to
       org.mule.runtime.core.components,
@@ -394,7 +388,6 @@ module org.mule.runtime.core {
       org.mule.runtime.tracer.internal.impl;
   exports org.mule.runtime.core.internal.registry to
       org.mule.runtime.core.components,
-      org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.mule.support,

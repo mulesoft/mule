@@ -121,7 +121,6 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.dsl.processor to
       spring.beans;
   exports org.mule.runtime.config.internal.dsl.spring to
-      org.mule.runtime.core.mvel,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.xml.support,

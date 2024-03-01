@@ -11,7 +11,7 @@ import static org.mule.runtime.core.api.event.EventContextFactory.create;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -50,7 +50,6 @@ import org.mockito.junit.MockitoRule;
         "org.mule.runtime:*:*:*:*",
         "org.mule.modules*:*:*:*:*",
         "org.mule.transports:*:*:*:*",
-        "org.mule.mvel:*:*:*:*",
         "org.mule.extensions:*:*:*:*",
         "org.mule.connectors:*:*:*:*",
         "org.mule.tests.plugin:*:*:*:*",

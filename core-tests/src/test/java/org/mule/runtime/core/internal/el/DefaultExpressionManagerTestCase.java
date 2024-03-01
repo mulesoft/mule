@@ -23,12 +23,12 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -209,7 +209,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that parsing works with inner expressions in MVEL but only with regular ones in DW.")
+  @Description("Verifies that parsing works only with regular ones in DW.")
   public void parseCompatibility() throws MuleException {
     assertThat(expressionManager.parse("#['this is ' ++ payload]", testEvent(), TEST_CONNECTOR_LOCATION),
                is(format("this is %s", TEST_PAYLOAD)));
@@ -225,7 +225,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL.")
+  @Description("Verifies that parsing works for log template scenarios for DW.")
   public void parseLog() throws MuleException {
     assertThat(expressionManager.parseLogTemplate("this is #[payload]", testEvent(), TEST_CONNECTOR_LOCATION,
                                                   NULL_BINDING_CONTEXT),
@@ -233,7 +233,7 @@ public class DefaultExpressionManagerTestCase extends AbstractMuleContextTestCas
   }
 
   @Test
-  @Description("Verifies that parsing works for log template scenarios for both DW and MVEL using the message.")
+  @Description("Verifies that parsing works for log template scenarios for DW using the message.")
   public void parseLogMessage() throws MuleException {
     String expectedOutput =
         "current message is \norg.mule.runtime.core.internal.message.DefaultMessageBuilder$MessageImplementation\n{"
