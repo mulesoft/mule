@@ -5,6 +5,102 @@
         {
           "ignore": true,
           "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.object.AbstractObjectFactory",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.transformer.AbstractMessageTransformer",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.TransformerChain",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.TransformerTemplate",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.client.MuleClientFlowConstruct",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.object.PrototypeObjectFactory",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.object.SingletonObjectFactory",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transport.LegacyConnector",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transport.LegacyInboundEndpoint",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.util.annotation.AnnotationUtils",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.util.monitor.Expirable",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.util.monitor.ExpiryMonitor",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.util.queue.QueueManagerUtils",
+          "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.connector.DispatchException",
           "justification": "W-14989528: Remove AbstractOutboundRouter and associated code, part of Remove compatibility-plugin support"
         },

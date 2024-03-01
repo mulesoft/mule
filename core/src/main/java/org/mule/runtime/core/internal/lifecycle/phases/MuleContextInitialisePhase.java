@@ -20,9 +20,9 @@ import org.mule.runtime.core.api.lifecycle.LifecycleUtils;
 import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
 import org.mule.runtime.core.privileged.routing.OutboundRouter;
-import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
-import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.lang.reflect.Method;

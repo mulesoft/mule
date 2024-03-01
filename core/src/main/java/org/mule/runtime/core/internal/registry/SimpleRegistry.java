@@ -43,7 +43,6 @@ import org.mule.runtime.core.internal.lifecycle.NullLifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -143,7 +142,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
     applyProcessors(lookupObjects(Transformer.class), null);
-    applyProcessors(lookupObjects(LegacyImmutableEndpoint.class), null);
     applyProcessors(lookupObjects(Object.class), null);
   }
 

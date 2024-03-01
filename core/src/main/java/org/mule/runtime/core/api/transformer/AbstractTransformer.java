@@ -236,7 +236,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
       sourceType = ((TypedValue) src).getDataType();
     } else if (src instanceof Message) {
       Message message = (Message) src;
-      if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
+      if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true))) {
         payload = message.getPayload().getValue();
         sourceType = message.getPayload().getDataType();
       } else {
