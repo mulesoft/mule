@@ -2,6 +2,7 @@
   "name": "Marvel",
   "description": "",
   "version": "@mule.runtime.version@",
+  "version": test,
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
   "supportedJavaVersions": [

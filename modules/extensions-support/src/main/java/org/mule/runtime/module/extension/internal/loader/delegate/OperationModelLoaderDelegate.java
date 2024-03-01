@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.delegate;
 
-import static java.lang.String.format;
-import static java.util.Optional.of;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.declareErrorModels;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
@@ -15,6 +13,9 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareOperationMetadataKeyIdModelProperty;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
+
+import static java.lang.String.format;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.HasOperationDeclarer;
