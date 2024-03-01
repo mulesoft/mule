@@ -21,9 +21,7 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.event",
         "org.mule.runtime.core.privileged.event.context",
         "org.mule.runtime.core.privileged.exception",
-        "org.mule.runtime.core.privileged.execution",
         "org.mule.runtime.core.privileged.interception",
-        "org.mule.runtime.core.privileged.lifecycle",
         "org.mule.runtime.core.privileged.message",
         // for DataWeave
         "org.mule.runtime.core.privileged.metadata",
@@ -191,14 +189,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.component;
   exports org.mule.runtime.core.privileged.el;
   exports org.mule.runtime.core.privileged.event;
-  exports org.mule.runtime.core.privileged.execution to
-      org.mule.runtime.properties.config,
-      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;
-  exports org.mule.runtime.core.privileged.lifecycle to
-      org.mule.runtime.extensions.support;
   // for MUnit
   exports org.mule.runtime.core.privileged.message;
   // for DataWeave
@@ -314,6 +307,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.execution to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.properties.config,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.interception to

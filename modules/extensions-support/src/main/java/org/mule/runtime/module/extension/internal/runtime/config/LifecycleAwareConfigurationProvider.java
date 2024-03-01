@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.lang.String.format;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.exception.DefaultMuleException;
@@ -28,7 +31,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.lifecycle.DefaultLifecycleManager;
-import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.SimpleLifecycleManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 

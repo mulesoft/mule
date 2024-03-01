@@ -12,8 +12,7 @@ import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMEN
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
-import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
+import static org.mule.runtime.core.internal.execution.LocationExecutionContextProvider.maskPasswords;
 
 import static java.util.stream.Collectors.toMap;
 
