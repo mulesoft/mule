@@ -180,7 +180,7 @@
         <muleHttpPolicyApiVersion>1.7.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.7.0-SNAPSHOT</mulePolicyApiVersion>
         <muleApiVersion>1.7.0-20240227</muleApiVersion>
-        <muleMetadataModelVersion>1.7.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleMetadataModelVersion>1.7.0-20240227</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!--Maven plugins versions-->
