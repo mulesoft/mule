@@ -13,7 +13,7 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.notification.ConnectorMessageNotification;
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler;
+import org.mule.runtime.core.internal.context.notification.OptimisedNotificationHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
