@@ -165,7 +165,7 @@
         <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <weaveVersion>2.7.0-20240227</weaveVersion>
+        <weaveVersion>2.7.0-20240301</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
         <sshdVersion>2.10.0</sshdVersion>
