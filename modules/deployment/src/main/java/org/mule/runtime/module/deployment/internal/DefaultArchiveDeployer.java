@@ -494,7 +494,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
                               artifact.getArtifactName())));
         logger.error(t.getMessage(), t);
       } else {
-        log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), t.getCause().getMessage())));
+        log(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), getCauseMessage(t))));
         logger.error(t.getMessage(), t);
       }
 
@@ -506,6 +506,15 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       } else {
         throw new DeploymentException(createStaticMessage("Failed to deploy artifact: " + artifact.getArtifactName()), t);
       }
+    }
+  }
+
+  private static String getCauseMessage(Throwable t) {
+    Throwable cause = t.getCause();
+    if (cause != null) {
+      return cause.getMessage();
+    } else {
+      return null;
     }
   }
 
