@@ -277,6 +277,8 @@
         <assertJVersion>3.5.2</assertJVersion>
         <byteBuddyVersion>1.14.0</byteBuddyVersion>
         <jettyVersion>9.4.53.v20231009</jettyVersion>
+
+        <mvel.version>4.6.1</mvel.version>
     </properties>
 
     <dependencyManagement>

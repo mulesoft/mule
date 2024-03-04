@@ -169,7 +169,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-mvel</artifactId>
-            <version>${project.version}</version>
+            <version>${mvel.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

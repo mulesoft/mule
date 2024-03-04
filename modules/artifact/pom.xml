@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core-mvel</artifactId>
-            <version>${project.version}</version>
+            <version>${mvel.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
