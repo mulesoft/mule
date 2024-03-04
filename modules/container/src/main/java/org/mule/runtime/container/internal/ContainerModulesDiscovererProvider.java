@@ -25,4 +25,9 @@ public class ContainerModulesDiscovererProvider {
     return new ClasspathModuleDiscoverer();
   }
 
+  public static ModuleDiscoverer containerModulesDiscoverer(Class<?> clazz) {
+    LOGGER.debug("Default 'ContainerModulesDiscovererProvider' implementation, using 'ClasspathModuleDiscoverer'...");
+    return new ClasspathModuleDiscoverer(clazz);
+  }
+
 }

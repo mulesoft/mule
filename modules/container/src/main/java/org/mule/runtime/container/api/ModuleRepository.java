@@ -10,6 +10,7 @@ import static org.mule.runtime.container.internal.ClasspathModuleDiscoverer.MODU
 
 import org.mule.runtime.container.internal.ClasspathModuleDiscoverer;
 import org.mule.runtime.container.internal.CompositeModuleDiscoverer;
+import org.mule.runtime.container.internal.ContainerModuleDiscoverer;
 import org.mule.runtime.container.internal.DefaultModuleRepository;
 import org.mule.runtime.container.internal.JreModuleDiscoverer;
 import org.mule.runtime.jpms.api.MuleContainerModule;
@@ -88,6 +89,10 @@ public interface ModuleRepository {
                                                                      new ClasspathModuleDiscoverer(serviceInterfaceToServiceFile,
                                                                                                    fileToResource,
                                                                                                    MODULE_PROPERTIES)));
+  }
+
+  static ModuleRepository createModuleRepository(Class<?> clazz) {
+    return new DefaultModuleRepository(new ContainerModuleDiscoverer(clazz));
   }
 
   /**

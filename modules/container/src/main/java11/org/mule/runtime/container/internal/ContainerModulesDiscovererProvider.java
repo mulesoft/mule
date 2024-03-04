@@ -34,4 +34,14 @@ public class ContainerModulesDiscovererProvider {
     }
   }
 
+  public static ModuleDiscoverer containerModulesDiscoverer(Class<?> clazz) {
+    if (classloaderContainerJpmsModuleLayer()) {
+      LOGGER.debug("MRJAR 'ContainerModulesDiscovererProvider' implementation, using 'JpmsModuleLayerModuleDiscoverer'...");
+      return new JpmsModuleLayerModuleDiscoverer(new ClasspathModuleDiscoverer(clazz), clazz);
+    } else {
+      LOGGER.debug("MRJAR 'ContainerModulesDiscovererProvider' implementation, using 'ClasspathModuleDiscoverer'...");
+      return new ClasspathModuleDiscoverer(clazz);
+    }
+  }
+
 }

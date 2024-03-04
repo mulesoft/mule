@@ -34,9 +34,16 @@ import java.util.stream.Stream;
 public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
 
   private final ClasspathModuleDiscoverer fallbackClasspathModuleDiscoverer;
+  private final Class<?> clazz;
 
   public JpmsModuleLayerModuleDiscoverer(ClasspathModuleDiscoverer fallbackClasspathModuleDiscoverer) {
     this.fallbackClasspathModuleDiscoverer = fallbackClasspathModuleDiscoverer;
+    clazz = this.getClass();
+  }
+
+  public JpmsModuleLayerModuleDiscoverer(ClasspathModuleDiscoverer fallbackClasspathModuleDiscoverer, Class<?> clazz) {
+    this.fallbackClasspathModuleDiscoverer = fallbackClasspathModuleDiscoverer;
+    this.clazz = clazz;
   }
 
   @Override
@@ -45,7 +52,7 @@ public class JpmsModuleLayerModuleDiscoverer implements ModuleDiscoverer {
       return fallbackClasspathModuleDiscoverer.discover();
     }
 
-    final List<MuleContainerModule> discoveredModules = this.getClass().getModule().getLayer().modules()
+    final List<MuleContainerModule> discoveredModules = clazz.getModule().getLayer().modules()
         .stream()
         .map(jpmsModule -> {
           if (jpmsModule.getDescriptor().isAutomatic()) {

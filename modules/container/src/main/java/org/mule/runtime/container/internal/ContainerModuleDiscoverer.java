@@ -28,13 +28,17 @@ public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
    * @param containerClassLoader container classloader used to find modules. Non null.
    */
   public ContainerModuleDiscoverer() {
-    this.moduleDiscoverers = getModuleDiscoverers();
+    moduleDiscoverers = getModuleDiscoverers(this.getClass());
   }
 
-  private List<ModuleDiscoverer> getModuleDiscoverers() {
+  public ContainerModuleDiscoverer(Class<?> clazz) {
+    moduleDiscoverers = getModuleDiscoverers(clazz);
+  }
+
+  private List<ModuleDiscoverer> getModuleDiscoverers(Class<?> clazz) {
     List<ModuleDiscoverer> result = new ArrayList<>();
     result.add(new JreModuleDiscoverer());
-    result.add(containerModulesDiscoverer());
+    result.add(containerModulesDiscoverer(clazz));
     return result;
   }
 

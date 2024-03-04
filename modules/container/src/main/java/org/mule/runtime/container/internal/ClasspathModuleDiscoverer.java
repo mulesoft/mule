@@ -58,6 +58,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   private final Function<String, File> serviceInterfaceToServiceFile;
   private final BiFunction<String, File, URL> fileToResource;
   private final String modulePropertiesResource;
+  private final Class<?> clazz;
 
   public ClasspathModuleDiscoverer() {
     this(createModulesTemporaryFolder());
@@ -72,6 +73,10 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
   }
 
   public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource) {
+    this(temporaryFolder, modulePropertiesResource, null);
+  }
+
+  public ClasspathModuleDiscoverer(File temporaryFolder, String modulePropertiesResource, Class<?> clazz) {
     this.serviceInterfaceToServiceFile =
         serviceInterface -> wrappingInIllegalStateException(() -> createTempFile(temporaryFolder.toPath(), serviceInterface,
                                                                                  TMP_FOLDER_SUFFIX).toFile(),
@@ -79,6 +84,11 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     this.fileToResource =
         (serviceInterface, serviceFile) -> wrappingInIllegalStateException(() -> serviceFile.toURI().toURL(), serviceInterface);
     this.modulePropertiesResource = modulePropertiesResource;
+    this.clazz = clazz == null ? this.getClass() : clazz;
+  }
+
+  public ClasspathModuleDiscoverer(Class<?> clazz) {
+    this(createModulesTemporaryFolder(), MODULE_PROPERTIES, clazz);
   }
 
   private <T> T wrappingInIllegalStateException(CheckedSupplier<T> supplier, String serviceInterface) {
@@ -95,6 +105,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     this.serviceInterfaceToServiceFile = serviceInterfaceToServiceFile;
     this.fileToResource = fileToResource;
     this.modulePropertiesResource = modulePropertiesResource;
+    clazz = this.getClass();
   }
 
   protected static File createModulesTemporaryFolder() {
@@ -123,7 +134,7 @@ public final class ClasspathModuleDiscoverer implements ModuleDiscoverer {
     Set<String> moduleNames = new HashSet<>();
 
     try {
-      for (Properties moduleProperties : discoverProperties(this.getClass().getClassLoader(), getModulePropertiesFileName())) {
+      for (Properties moduleProperties : discoverProperties(clazz.getClassLoader(), getModulePropertiesFileName())) {
         final MuleModule module = createModule(moduleProperties);
 
         if (moduleNames.contains(module.getName())) {
