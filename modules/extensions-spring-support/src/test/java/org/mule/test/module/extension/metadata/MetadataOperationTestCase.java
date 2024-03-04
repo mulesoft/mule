@@ -43,15 +43,14 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.api.metadata.MetadataKey;
-import org.mule.runtime.api.metadata.MetadataKeyBuilder;
-import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.*;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -76,6 +75,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -267,6 +267,29 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   public void outputMultipleInputWithKeyIdExplicitParameterResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult = metadataService.getOutputMetadata(location, CAR_KEY);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void outputScopeZaraza() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    ScopePropagationContext scopeContext = new ScopePropagationContext() {
+
+      @Override
+      public Supplier<MetadataType> getInnerChainResolver() {
+        return () -> carType;
+      }
+
+      @Override
+      public Supplier<MessageMetadataType> getMessageTypeResolver() {
+        return null;
+      }
+    };
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getScopeOutputMetadata(location, CAR_KEY, scopeContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));

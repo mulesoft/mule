@@ -25,6 +25,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
@@ -39,26 +41,7 @@ import org.mule.test.metadata.extension.model.shops.Order;
 import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
-import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
-import org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver;
-import org.mule.test.metadata.extension.resolver.SdkTestOutputAttributesResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestAttributesResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestBooleanMetadataResolver;
-import org.mule.test.metadata.extension.resolver.TestEnumMetadataResolver;
-import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithoutKeyResolverAndKeyIdParam;
-import org.mule.test.metadata.extension.resolver.TestInputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputAttributesResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolverUsingConfig;
-import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolver;
-import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
-import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
+import org.mule.test.metadata.extension.resolver.*;
 
 import java.io.InputStream;
 import java.util.Collections;
@@ -376,6 +359,13 @@ public class MetadataOperations {
   @MediaType(value = ANY, strict = false)
   public Object inputMetadataResolverInParameterInParameterGroup(@ParameterGroup(
       name = "Animal shelter") AnimalShelter animalShelter) {
+    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = ScopeTestResolver.class)
+  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Void, Void> cb) {
+    chain.process(cb::success, (t, e) -> cb.error(t));
     return null;
   }
 }
