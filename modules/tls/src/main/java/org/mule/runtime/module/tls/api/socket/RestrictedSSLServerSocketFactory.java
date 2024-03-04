@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.tls.internal.socket;
+package org.mule.runtime.module.tls.api.socket;
 
 import org.mule.runtime.core.internal.util.ArrayUtils;
 

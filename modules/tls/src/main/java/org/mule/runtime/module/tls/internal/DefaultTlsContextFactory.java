@@ -22,9 +22,9 @@ import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.util.ArrayUtils;
+import org.mule.runtime.module.tls.api.socket.RestrictedSSLServerSocketFactory;
+import org.mule.runtime.module.tls.api.socket.RestrictedSSLSocketFactory;
 import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
-import org.mule.runtime.module.tls.internal.socket.RestrictedSSLServerSocketFactory;
-import org.mule.runtime.module.tls.internal.socket.RestrictedSSLSocketFactory;
 
 import com.google.common.base.Joiner;
 
