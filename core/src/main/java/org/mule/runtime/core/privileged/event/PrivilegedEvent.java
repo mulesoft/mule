@@ -9,20 +9,16 @@ package org.mule.runtime.core.privileged.event;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.SecurityContext;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.source.MessageSource;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -89,54 +85,6 @@ public interface PrivilegedEvent extends CoreEvent {
    * @return A dictionary with the logging variables.
    */
   Optional<Map<String, String>> getLoggingVariables();
-
-  /**
-   * Returns the contents of the message as a byte array.
-   *
-   * @param muleContext the Mule node.
-   * @return the contents of the message as a byte array
-   * @throws MuleException if the message cannot be converted into an array of bytes
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException;
-
-  /**
-   * Transforms the message into the requested format. The transformer used is the one configured on the endpoint through which
-   * this event was received.
-   *
-   * @param outputType  The requested output type.
-   * @param muleContext the Mule node.
-   * @return the message transformed into it's recognized or expected format.
-   * @throws MessageTransformerException if a failure occurs in the transformer
-   * @see org.mule.runtime.core.api.transformer.Transformer if the transform fails or the outputtype is null
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException;
-
-  /**
-   * Returns the message contents as a string if necessary. This will use the encoding set on the event
-   *
-   * @param muleContext the Mule node.
-   * @return the message contents as a string
-   * @throws MuleException if the message cannot be converted into a string
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  String getMessageAsString(MuleContext muleContext) throws MuleException;
-
-  /**
-   * Returns the message contents as a string
-   *
-   * @param encoding    the encoding to use when converting the message to string
-   * @param muleContext the Mule node.
-   * @return the message contents as a string
-   * @throws MuleException if the message cannot be converted into a string
-   * @deprecated TODO MULE-10013 Move message serialization logic from within the message to an external service
-   */
-  @Deprecated
-  String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException;
 
   /**
    * Indicates if notifications should be fired when processing this message.
