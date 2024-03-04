@@ -24,8 +24,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PR
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.util.NetworkUtils;
-import org.mule.runtime.core.internal.util.SecurityUtils;
 import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.module.tls.internal.util.SecurityUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;

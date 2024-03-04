@@ -37,14 +37,13 @@
             <artifactId>mule-module-spring-config</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!--TODO: MULE-10837-->
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-service</artifactId>
+            <artifactId>mule-module-container</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
+
+        <!-- test dependencies -->
         <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
@@ -62,20 +61,7 @@
             <artifactId>mule-dwb-api</artifactId> 
             <scope>provided</scope>               
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-container</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
 
-        <!-- test dependencies -->
         <dependency>
             <groupId>org.mule.tests.plugin</groupId>
             <artifactId>mule-tests-component-plugin</artifactId>
