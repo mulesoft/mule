@@ -21,9 +21,9 @@ import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.concurrent.CompletableFuture;

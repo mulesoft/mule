@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.core.internal.policy;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.internal.execution.utils.SourcePolicyTestUtils.block;
 
 import static reactor.core.publisher.Mono.error;
 
@@ -22,19 +23,18 @@ import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-
-import com.google.common.collect.ImmutableMap;
 
 import reactor.core.publisher.Flux;
 
@@ -47,7 +47,7 @@ public class NoSourcePolicyTestCase extends AbstractMuleTestCase {
       mock(MessageSourceResponseParametersProcessor.class, RETURNS_DEEP_STUBS);
 
   private CoreEvent updatedEvent;
-  private ReactiveProcessor flowProcessor = Mockito.mock(ReactiveProcessor.class);
+  private ReactiveProcessor flowProcessor = mock(ReactiveProcessor.class);
   private SourcePolicyContext sourcePolicyContext;
 
   @Before

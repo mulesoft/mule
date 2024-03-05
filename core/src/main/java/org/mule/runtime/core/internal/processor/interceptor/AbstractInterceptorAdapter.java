@@ -21,8 +21,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 

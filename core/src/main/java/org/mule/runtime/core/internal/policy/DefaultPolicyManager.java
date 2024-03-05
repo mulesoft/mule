@@ -40,7 +40,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyProvider;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.policy.api.OperationPolicyPointcutParametersFactory;

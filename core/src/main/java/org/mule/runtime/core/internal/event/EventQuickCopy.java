@@ -12,7 +12,6 @@ import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 

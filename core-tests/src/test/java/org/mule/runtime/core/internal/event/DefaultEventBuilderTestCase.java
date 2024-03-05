@@ -6,18 +6,20 @@
  */
 package org.mule.runtime.core.internal.event;
 
+import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
+
 import static java.util.Collections.singletonMap;
+
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
-import io.qameta.allure.Issue;
+import org.mule.runtime.api.exception.MuleException;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;
-import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.tck.junit4.AbstractMuleTestCase;
+
+import io.qameta.allure.Issue;
 
 public class DefaultEventBuilderTestCase extends AbstractMuleTestCase {
 

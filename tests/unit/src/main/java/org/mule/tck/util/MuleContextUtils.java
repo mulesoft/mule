@@ -79,7 +79,6 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.exception.OnErrorPropagateHandler;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
@@ -424,7 +423,7 @@ public class MuleContextUtils {
   public static <B extends CoreEvent.Builder> B eventBuilder(MuleContext muleContext) throws MuleException {
     FlowConstruct flowConstruct = getTestFlow(muleContext);
     ((MuleContextWithRegistry) muleContext).getRegistry().registerFlowConstruct(flowConstruct);
-    return (B) InternalEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
+    return (B) CoreEvent.builder(create(flowConstruct, TEST_CONNECTOR_LOCATION));
   }
 
   public static void verifyRegistration(MuleContext muleContext, String registryKey, ArgumentCaptor captor) {

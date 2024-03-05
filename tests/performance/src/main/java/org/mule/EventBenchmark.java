@@ -21,7 +21,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 

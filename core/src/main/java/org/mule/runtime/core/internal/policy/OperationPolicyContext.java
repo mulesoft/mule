@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.policy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 
 /**

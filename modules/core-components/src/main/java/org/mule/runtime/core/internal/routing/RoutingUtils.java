@@ -7,8 +7,8 @@
 package org.mule.runtime.core.internal.routing;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.SourcePolicyContext;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;

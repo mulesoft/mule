@@ -31,7 +31,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;

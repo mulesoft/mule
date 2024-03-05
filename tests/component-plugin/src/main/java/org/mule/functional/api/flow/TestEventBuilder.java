@@ -28,7 +28,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
 import java.util.HashMap;
@@ -191,7 +190,7 @@ public class TestEventBuilder {
 
     EventContext eventContext = getEventContext(flow);
 
-    CoreEvent.Builder builder = InternalEvent.builder(eventContext)
+    CoreEvent.Builder builder = CoreEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).itemSequenceInfo(ofNullable(itemSequenceInfo));
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
