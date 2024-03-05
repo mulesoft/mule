@@ -103,6 +103,7 @@ module org.mule.runtime.spring.config {
   exports org.mule.runtime.config.internal.context.metrics to
       spring.beans;
   exports org.mule.runtime.config.internal.dsl.processor to
+      org.mule.runtime.core,
       spring.beans;
   exports org.mule.runtime.config.internal.dsl.spring to
       org.mule.runtime.extensions.spring.support,
