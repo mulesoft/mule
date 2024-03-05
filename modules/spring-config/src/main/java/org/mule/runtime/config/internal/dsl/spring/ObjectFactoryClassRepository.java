@@ -22,6 +22,7 @@ import static net.bytebuddy.implementation.MethodDelegation.toField;
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 
+import org.mule.runtime.config.privileged.dsl.spring.SmartFactoryBeanInterceptor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
