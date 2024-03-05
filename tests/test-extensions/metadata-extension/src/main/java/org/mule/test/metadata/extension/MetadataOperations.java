@@ -364,7 +364,7 @@ public class MetadataOperations {
 
   @MediaType(value = ANY, strict = false)
   @OutputResolver(output = ScopeTestResolver.class)
-  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Void, Void> cb) {
+  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Object, Void> cb) {
     chain.process(cb::success, (t, e) -> cb.error(t));
     return null;
   }
