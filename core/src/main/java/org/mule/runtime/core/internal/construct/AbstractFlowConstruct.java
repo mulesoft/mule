@@ -37,8 +37,8 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.lifecycle.EmptyLifecycleCallback;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
-import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.exception.MessagingExceptionHandlerAcceptor;
+import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 
 import java.util.Optional;

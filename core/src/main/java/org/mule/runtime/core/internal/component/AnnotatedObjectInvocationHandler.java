@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.component;
+package org.mule.runtime.core.internal.component;
 
 import static org.mule.runtime.core.internal.util.MultiParentClassLoaderUtils.multiParentClassLoaderFor;
 
@@ -22,8 +22,8 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentAdditionalInterceptor;
-import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentAdditionalInterceptor;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;

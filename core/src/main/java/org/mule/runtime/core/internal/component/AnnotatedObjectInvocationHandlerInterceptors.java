@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.component;
+package org.mule.runtime.core.internal.component;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.reflect.Modifier.isStatic;
