@@ -12,27 +12,29 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 public class SubscribedProcessors {
 
   private Context context;
   private boolean trackSubscribedComponents = true;
   private List<String> subscribedComponents = Collections.emptyList();
-  private int subscribedProcessors = 0;
+  private int subscribedProcessorsCount = 0;
 
   private SubscribedProcessors(Context context, boolean trackSubscribedComponents) {
     this.context = context;
     this.trackSubscribedComponents = trackSubscribedComponents;
   }
 
-  private SubscribedProcessors(int subscribedProcessors) {
-    this.subscribedProcessors = subscribedProcessors;
+  private SubscribedProcessors(int subscribedProcessorsCount) {
+    this.subscribedProcessorsCount = subscribedProcessorsCount;
   }
 
-  private SubscribedProcessors(int subscribedProcessors, List<String> subscribedComponents) {
-    this.subscribedProcessors = subscribedProcessors;
+  private SubscribedProcessors(int subscribedProcessorsCount, List<String> subscribedComponents) {
+    this.subscribedProcessorsCount = subscribedProcessorsCount;
     this.subscribedComponents = subscribedComponents;
   }
 
@@ -42,6 +44,10 @@ public class SubscribedProcessors {
 
   public static SubscribedProcessors subscribedProcessors(Context context, boolean trackSubscribedComponents) {
     return context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(context, trackSubscribedComponents));
+  }
+
+  public static Optional<SubscribedProcessors> subscribedProcessors(ContextView context) {
+    return context.getOrEmpty("SUBSCRIBED_PROCESSORS");
   }
 
   // We intentionally leave the previous SubscribedProcessor instance unchanged because the context is sent
@@ -56,13 +62,17 @@ public class SubscribedProcessors {
       List<String> updatedSubscribedComponents = new ArrayList<>(subscribedComponents.size() + 1);
       updatedSubscribedComponents.addAll(subscribedComponents);
       updatedSubscribedComponents.add(getProcessorComponentLocation(processor));
-      updatedSubscribedProcessors = new SubscribedProcessors(subscribedProcessors + 1, updatedSubscribedComponents);
+      updatedSubscribedProcessors = new SubscribedProcessors(subscribedProcessorsCount + 1, updatedSubscribedComponents);
     } else {
-      updatedSubscribedProcessors = new SubscribedProcessors(subscribedProcessors + 1);
+      updatedSubscribedProcessors = new SubscribedProcessors(subscribedProcessorsCount + 1);
     }
     Context updatedContext = context.put("SUBSCRIBED_PROCESSORS", updatedSubscribedProcessors);
     updatedSubscribedProcessors.context = updatedContext;
     return updatedContext;
+  }
+
+  public int getSubscribedProcessorsCount() {
+    return subscribedProcessorsCount;
   }
 
   private static String getProcessorComponentLocation(Processor processor) {
@@ -76,6 +86,6 @@ public class SubscribedProcessors {
   @Override
   public String toString() {
     return Thread.currentThread().getName() + " - StackTrace lines: " + Thread.currentThread().getStackTrace().length + " - "
-        + "Subscribed processors: " + subscribedProcessors;
+        + "Subscribed processors: " + subscribedProcessorsCount;
   }
 }

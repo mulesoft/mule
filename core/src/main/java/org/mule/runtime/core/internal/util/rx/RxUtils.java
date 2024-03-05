@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber.MULTI_FLUX_SUBSCRIBER;
+import static org.mule.runtime.core.internal.util.rx.SubscribedProcessors.subscribedProcessors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -22,6 +23,7 @@ import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 import static reactor.core.scheduler.Schedulers.immediate;
+import static reactor.util.context.Context.of;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -169,19 +171,26 @@ public class RxUtils {
           just(ctx)
               .publishOn(getSubscriptionScheduler(ctx))
               .doOnNext(c -> deferredSubscriber
-                  .contextWrite(ctx)
-                  .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer))
+                  .subscribe(consumer, throwable -> handleSubscriptionError(throwable, errorConsumer, ctx), completeConsumer,
+                             of(ctx)))
               .subscribe(RxUtils::completePendingSubscription, throwable -> failPendingSubscription(throwable, ctx));
         }));
   }
 
   private static reactor.core.scheduler.Scheduler getSubscriptionScheduler(ContextView ctx) {
     MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
-    if (multiFluxSubscriber != null && multiFluxSubscriber.subscriptionScheduler != null) {
+    if (multiFluxSubscriber != null && multiFluxSubscriber.subscriptionScheduler != null
+        && isSubscribedProcessorsLimitReached(ctx)) {
       return fromExecutorService(multiFluxSubscriber.subscriptionScheduler);
     } else {
       return immediate();
     }
+  }
+
+  private static boolean isSubscribedProcessorsLimitReached(ContextView ctx) {
+    return subscribedProcessors(ctx)
+        .map(SubscribedProcessors::getSubscribedProcessorsCount)
+        .filter(subscribedProcessorsCount -> subscribedProcessorsCount % 40 == 0).isPresent();
   }
 
   private static void handleSubscriptionError(Throwable throwable, Consumer<? super Throwable> errorConsumer, ContextView ctx) {
@@ -565,6 +574,10 @@ public class RxUtils {
 
     public void failPendingSubscription(Throwable throwable) {
       this.onError(throwable);
+    }
+
+    public List<ContextView> getPendingContexts() {
+      return pendingContexts;
     }
   }
 
