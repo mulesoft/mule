@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.message;
 
+import org.mule.runtime.core.internal.event.InternalEvent;
+
 /**
  * Base contract for a context object that keeps feature-specific state as part of the state of a given {@link InternalEvent}.
  * <p>

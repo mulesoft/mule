@@ -66,7 +66,6 @@ import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.util.ObjectUtils;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
@@ -542,7 +541,7 @@ public class DefaultMessageProcessorChainTestCase extends AbstractReactiveProces
             .build();
     nested.setMuleContext(muleContext);
     initialiseIfNeeded(nested, muleContext);
-    builder.chain(getAppendingMP("1"), event -> nested.process(InternalEvent.builder(event)
+    builder.chain(getAppendingMP("1"), event -> nested.process(CoreEvent.builder(event)
         .message(event.getMessage()).build()), getAppendingMP("2"));
     messageProcessor = builder.build();
     assertThat(process(messageProcessor, getTestEventUsingFlow("0")).getMessage().getPayload().getValue(), equalTo("01ab2"));

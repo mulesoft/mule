@@ -39,7 +39,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
@@ -142,9 +141,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   @Test
   public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
+    CoreEvent lastEventCreated = CoreEvent.builder(context).message(of("")).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(CoreEvent.builder(context).message(of(""))
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
