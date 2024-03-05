@@ -43,6 +43,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -365,7 +366,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
     final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
-    final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+    final ErrorTypeLocator errorTypeLocator =
+        createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 
     final Set<ExtensionModel> dependencies = artifactAst.dependencies();
     registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
