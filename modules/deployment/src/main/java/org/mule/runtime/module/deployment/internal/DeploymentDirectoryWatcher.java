@@ -11,6 +11,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.deployExplodedDomains;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.listFiles;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -49,7 +51,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -174,7 +175,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         String[] packagedDomains = listFiles(domainsDir, JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
-        deployExplodedDomains(explodedDomains);
+        deployExplodedDomains(domainArchiveDeployer, explodedDomains);
         String[] apps = appString.split(":");
         apps = removeDuplicateAppNames(apps);
 
@@ -323,7 +324,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         domains = listFiles(domainsDir, DIRECTORY);
       }
 
-      deployExplodedDomains(domains);
+      deployExplodedDomains(domainArchiveDeployer, domains);
 
       redeployModifiedApplications();
 
@@ -367,16 +368,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // Ignore and continue
       }
     }
-  }
-
-  private String[] listFiles(File directory, FilenameFilter filter) {
-    String[] files = directory.list(filter);
-    if (files == null) {
-      throw new IllegalStateException(format("We got a null while listing the contents of director '%s'. Some common " +
-          "causes for this is a lack of permissions to the directory or that it's being deleted concurrently",
-                                             directory.getName()));
-    }
-    return files;
   }
 
   public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
@@ -449,18 +440,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
       anchors[i++] = artifact.getArtifactName() + ARTIFACT_ANCHOR_SUFFIX;
     }
     return anchors;
-  }
-
-  private void deployExplodedDomains(String[] domains) {
-    for (String addedDomain : domains) {
-      try {
-        if (domainArchiveDeployer.isUpdatedZombieArtifact(addedDomain)) {
-          domainArchiveDeployer.deployExplodedArtifact(addedDomain, empty());
-        }
-      } catch (DeploymentException e) {
-        logger.error("Error deploying domain '{}'", addedDomain, e);
-      }
-    }
   }
 
   private void deployPackedDomains(String[] zips) {
