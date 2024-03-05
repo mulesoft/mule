@@ -264,7 +264,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
     final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
-    final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+    final ErrorTypeLocator errorTypeLocator =
+        createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 
     final Set<ExtensionModel> dependencies = artifactAst.dependencies();
     registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
