@@ -65,6 +65,7 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyEx
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowConstructStatistics;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
@@ -73,7 +74,6 @@ import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyContext;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
 import org.mule.runtime.core.internal.policy.SourcePolicySuccessResult;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;

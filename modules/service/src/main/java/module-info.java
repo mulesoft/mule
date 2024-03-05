@@ -38,5 +38,7 @@ module org.mule.runtime.service {
   exports org.mule.runtime.module.service.internal.manager to
       org.mule.runtime.spring.config,
       org.mule.runtime.deployment.model.impl;
+  exports org.mule.runtime.module.service.internal.util to
+      org.mule.runtime.spring.config;
 
 }

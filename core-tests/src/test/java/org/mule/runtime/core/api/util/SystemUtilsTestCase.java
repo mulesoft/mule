@@ -11,12 +11,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import org.mule.runtime.core.privileged.util.MapUtils;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.Test;
@@ -82,7 +85,7 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase {
     expected = Collections.singletonMap("key", "quoted");
     assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"quoted\""));
 
-    expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"key", "foo"}, new String[] {"-Dvalue", "bar"});
+    expected = mapWithKeysAndValues(HashMap.class, new String[] {"key", "foo"}, new String[] {"-Dvalue", "bar"});
     assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=-Dvalue -Dfoo=bar"));
 
     assertEquals(Collections.EMPTY_MAP, SystemUtils.parsePropertyDefinitions("-D=-Dfoo-D== =foo"));
@@ -91,7 +94,7 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase {
     assertEquals(expected, SystemUtils.parsePropertyDefinitions("-Dkey=\"split value\""));
 
     expected =
-        MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"key1", "key2"}, new String[] {"split one", "split two"});
+        mapWithKeysAndValues(HashMap.class, new String[] {"key1", "key2"}, new String[] {"split one", "split two"});
     input = "-Dkey1=\"split one\" -Dkey2=\"split two\" ";
     assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
 
@@ -99,10 +102,49 @@ public class SystemUtilsTestCase extends AbstractMuleTestCase {
     input = "-Dkey=\"open end";
     assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
 
-    expected = MapUtils.mapWithKeysAndValues(HashMap.class, new String[] {"keyOnly", "mule.foo", "mule.bar"},
-                                             new String[] {"true", "xfoo", "xbar"});
+    expected = mapWithKeysAndValues(HashMap.class, new String[] {"keyOnly", "mule.foo", "mule.bar"},
+                                    new String[] {"true", "xfoo", "xbar"});
     input = "  standalone key=value -D -D= -DkeyOnly -D=noKey -Dmule.foo=xfoo -Dmule.bar=xbar ";
     assertEquals(expected, SystemUtils.parsePropertyDefinitions(input));
+  }
+
+  /**
+   * Convenience method for CollectionUtil#mapWithKeysAndValues(Class, Iterator, Iterator); keys and values can be null or empty.
+   */
+  private static <K, V> Map<K, V> mapWithKeysAndValues(Class<? extends Map> mapClass, K[] keys, V[] values) {
+    Collection<K> keyCollection = (keys != null ? Arrays.asList(keys) : Collections.EMPTY_LIST);
+    Collection<V> valuesCollection = (values != null ? Arrays.asList(values) : Collections.EMPTY_LIST);
+    return mapWithKeysAndValues(mapClass, keyCollection.iterator(), valuesCollection.iterator());
+  }
+
+  /**
+   * Create & populate a Map of arbitrary class. Populating stops when either the keys or values iterator is null or exhausted.
+   *
+   * @param mapClass the Class of the Map to instantiate
+   * @param keys     iterator for Objects ued as keys
+   * @param values   iterator for Objects used as values
+   * @return the instantiated Map
+   */
+  private static <K, V> Map<K, V> mapWithKeysAndValues(Class<? extends Map> mapClass, Iterator<K> keys, Iterator<V> values) {
+    Map<K, V> m = null;
+
+    if (mapClass == null) {
+      throw new IllegalArgumentException("Map class must not be null!");
+    }
+
+    try {
+      m = mapClass.newInstance();
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+
+    if (keys != null && values != null) {
+      while (keys.hasNext() && values.hasNext()) {
+        m.put(keys.next(), values.next());
+      }
+    }
+
+    return m;
   }
 
 }

@@ -6,7 +6,11 @@
  */
 package org.mule.functional.junit4;
 
+import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
 import static java.util.Collections.emptyList;
+import static java.util.Collections.enumeration;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -14,10 +18,8 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
@@ -26,7 +28,6 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -70,17 +71,17 @@ public class TestBootstrapRegistryConfigurationBuilderTestCase extends AbstractM
       final ArtifactClassLoader pluginClassLoader1 = mock(ArtifactClassLoader.class);
       when(pluginClassLoader1.getClassLoader()).thenReturn(this.getClass().getClassLoader());
       final List<ArtifactClassLoader> artifactClassLoaders = new ArrayList<>();
-      artifactClassLoaders.add(new FilteringArtifactClassLoader(pluginClassLoader1, filter, Collections.emptyList()));
+      artifactClassLoaders.add(new FilteringArtifactClassLoader(pluginClassLoader1, filter, emptyList()));
 
       final List<URL> urls = new ArrayList<>();
       urls.add(this.getClass().getResource("/plugin1-bootstrap.properties"));
       urls.add(this.getClass().getResource("/plugin2-bootstrap.properties"));
-      when(pluginClassLoader1.findResources(BOOTSTRAP_PROPERTIES)).thenReturn(new EnumerationAdapter<>(urls));
+      when(pluginClassLoader1.findResources(BOOTSTRAP_PROPERTIES)).thenReturn(enumeration(urls));
 
       final ArtifactClassLoader appClassLoader = mock(ArtifactClassLoader.class);
       when(appClassLoader.getClassLoader()).thenReturn(this.getClass().getClassLoader());
-      when(appClassLoader.findResources(BOOTSTRAP_PROPERTIES)).thenReturn(new EnumerationAdapter<>(emptyList()));
-      final ClassLoader executionClassLoader = new FilteringArtifactClassLoader(appClassLoader, filter, Collections.emptyList());
+      when(appClassLoader.findResources(BOOTSTRAP_PROPERTIES)).thenReturn(enumeration(emptyList()));
+      final ClassLoader executionClassLoader = new FilteringArtifactClassLoader(appClassLoader, filter, emptyList());
       return new TestBootstrapServiceDiscovererConfigurationBuilder(getClass().getClassLoader(), executionClassLoader,
                                                                     artifactClassLoaders);
     } catch (IOException e) {

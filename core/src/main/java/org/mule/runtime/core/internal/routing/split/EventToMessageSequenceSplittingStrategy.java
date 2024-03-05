@@ -15,7 +15,6 @@ import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.NodeListMessageSequence;
-import org.mule.runtime.core.internal.util.Copiable;
 import org.mule.runtime.internal.util.collection.ImmutableEntry;
 
 import java.util.Collection;

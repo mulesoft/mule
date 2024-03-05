@@ -25,8 +25,8 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.util.StringUtils;
+import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
 
 import java.nio.charset.Charset;
 import java.util.Optional;

@@ -28,13 +28,13 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceProxyInvocationHandler;
 import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
+import org.mule.runtime.module.service.internal.util.TypeSupplier;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
