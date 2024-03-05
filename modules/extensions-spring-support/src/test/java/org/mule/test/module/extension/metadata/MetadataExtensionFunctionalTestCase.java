@@ -100,6 +100,7 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID = "outputMetadataWithoutKeysWithKeyId";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
   protected static final String SCOPE_WITH_OUTPUT_RESOLVER = "scopeWithOutputResolver";
+  protected static final String ROUTER_WITH_OUTPUT_RESOLVER = "routerWithOutputResolver";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG =
       "contentAndOutputWithCacheResolverWithSpecificConfig";
   protected static final String QUERY_FLOW = "queryOperation";

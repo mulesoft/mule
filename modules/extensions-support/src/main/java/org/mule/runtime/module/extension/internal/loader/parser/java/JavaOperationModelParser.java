@@ -105,7 +105,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                RouterCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
                                                                                VoidCompletionCallback.class,
-                                                                               org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
+                                                                               org.mule.sdk.api.runtime.process.VoidCompletionCallback.class,
+                                                                               CompletionCallback.class,
+                                                                               org.mule.sdk.api.runtime.process.CompletionCallback.class);
 
   private final JavaExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;

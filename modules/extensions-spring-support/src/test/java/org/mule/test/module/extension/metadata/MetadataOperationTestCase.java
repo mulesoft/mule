@@ -6,6 +6,7 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -71,10 +72,7 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -290,6 +288,29 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
         metadataService.getScopeOutputMetadata(location, CAR_KEY, scopeContext);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void outputRouterZaraza() throws Exception {
+    location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
+
+      @Override
+      public Map<String, Supplier<MetadataType>> getRouteResolvers() {
+        return singletonMap("metaroute", () -> carType);
+      }
+
+      @Override
+      public Supplier<MessageMetadataType> getMessageTypeResolver() {
+        return null;
+      }
+    };
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerPropagationContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));

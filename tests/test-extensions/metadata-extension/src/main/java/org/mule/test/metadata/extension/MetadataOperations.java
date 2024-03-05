@@ -368,4 +368,10 @@ public class MetadataOperations {
     chain.process(cb::success, (t, e) -> cb.error(t));
     return null;
   }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = RouterTestResolver.class)
+  public void routerWithMetadataResolver(MetadataRoute metaroute, CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
+  }
 }
