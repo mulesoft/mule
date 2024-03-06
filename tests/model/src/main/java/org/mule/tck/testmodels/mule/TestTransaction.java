@@ -8,7 +8,7 @@ package org.mule.tck.testmodels.mule;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction;
+import org.mule.runtime.core.internal.transaction.AbstractSingleResourceTransaction;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

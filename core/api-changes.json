@@ -4,6 +4,72 @@
       "ignore": [
         {
           "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.SingleResourceTransactionFactoryManager org.mule.runtime.core.api.MuleContext::getTransactionFactoryManager()",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.SingleResourceTransactionFactoryManager",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createCompatibilityExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.api.SingleResourceTransactionFactoryManager, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transaction.AbstractTransaction",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transaction.TransactionAdapter",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transaction.XaTransaction",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory",
+          "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+        },
+        {
+          "ignore": true,
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider",
           "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"

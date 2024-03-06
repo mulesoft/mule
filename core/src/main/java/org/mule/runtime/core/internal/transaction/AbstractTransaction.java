@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.transaction;
+package org.mule.runtime.core.internal.transaction;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.notification.TransactionNotification.TRANSACTION_BEGAN;
@@ -29,8 +29,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
 
 import java.time.Instant;
 import java.util.Optional;

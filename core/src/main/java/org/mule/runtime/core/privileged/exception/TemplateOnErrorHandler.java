@@ -59,14 +59,13 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

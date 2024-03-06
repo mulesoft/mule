@@ -26,7 +26,7 @@ import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.re
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;

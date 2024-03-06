@@ -116,7 +116,6 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -256,9 +255,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
   private String clusterNodeIdPrefix = "";
-
-  private final SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
-      new SingleResourceTransactionFactoryManager();
 
   private LockFactory lockFactory;
 
@@ -991,11 +987,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                        OptionalInt.empty(),
                                                        OptionalInt.empty());
     return new DefaultComponentLocation(of(name), singletonList(part));
-  }
-
-  @Override
-  public SingleResourceTransactionFactoryManager getTransactionFactoryManager() {
-    return this.singleResourceTransactionFactoryManager;
   }
 
   @Override

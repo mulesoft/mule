@@ -19,7 +19,7 @@ import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 public final class TransactionUtils {
 
