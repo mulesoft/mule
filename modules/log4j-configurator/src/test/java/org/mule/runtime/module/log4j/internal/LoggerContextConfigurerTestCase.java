@@ -120,7 +120,12 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     contextConfigurer.update(context);
     ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
     verify(context.getConfiguration(), atLeastOnce()).addAppender(appenderCaptor.capture());
-    assertThat(appenderCaptor.getValue().getFileName().contains(":"), is(false));
+    assertThat(getFileName(appenderCaptor).contains(":"), is(false));
+  }
+
+  private static String getFileName(ArgumentCaptor<RollingFileAppender> appenderCaptor) {
+    String filename = appenderCaptor.getValue().getFileName();
+    return filename.substring(filename.lastIndexOf("/") + 1);
   }
 
   @Test
