@@ -14,6 +14,7 @@ import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.construct.Flow;
@@ -28,14 +29,14 @@ import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Common behaviour for deployable artifacts to handle the stop/dispose phases.
  */
 public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDescriptor> implements DeployableArtifact<D> {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractDeployableArtifact.class);
+  private static final Logger LOGGER = getLogger(AbstractDeployableArtifact.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   protected final String shortArtifactType;
   protected final String artifactType;
@@ -63,8 +64,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     if (this.artifactContext == null
         || !this.artifactContext.getMuleContext().getLifecycleManager().isDirectTransition(Stoppable.PHASE_NAME)) {
       // domain never started, maybe due to a previous error
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info(format("Stopping %s '%s' with no mule context", shortArtifactType, getArtifactName()));
+      if (SPLASH_LOGGER.isInfoEnabled()) {
+        SPLASH_LOGGER.info(format("Stopping %s '%s' with no mule context", shortArtifactType, getArtifactName()));
       }
       return;
     }
@@ -72,8 +73,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
     artifactContext.getMuleContext().getLifecycleManager().checkPhase(Stoppable.PHASE_NAME);
 
     withContextClassLoader(null, () -> {
-      if (LOGGER.isInfoEnabled()) {
-        LOGGER.info(miniSplash(format("Stopping %s '%s'", artifactType, getArtifactName())));
+      if (SPLASH_LOGGER.isInfoEnabled()) {
+        SPLASH_LOGGER.info(miniSplash(format("Stopping %s '%s'", artifactType, getArtifactName())));
       }
     });
 
@@ -86,7 +87,8 @@ public abstract class AbstractDeployableArtifact<D extends DeployableArtifactDes
 
   @Override
   public final void dispose() {
-    withContextClassLoader(null, () -> LOGGER.info(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName()))));
+    withContextClassLoader(null,
+                           () -> SPLASH_LOGGER.info(miniSplash(format("Disposing %s '%s'", artifactType, getArtifactName()))));
 
     // moved wrapper logic into the actual implementation, as redeploy() invokes it directly, bypassing
     // classloader cleanup

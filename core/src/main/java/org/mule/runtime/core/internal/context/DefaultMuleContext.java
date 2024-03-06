@@ -202,7 +202,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * logger used by this class
    */
-  private static Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final CustomizationService customizationService = new DefaultCustomizationService();
 
@@ -455,9 +456,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       startLatch.release();
 
-      if (LOGGER.isInfoEnabled()) {
+      if (SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen startupScreen = buildStartupSplash();
-        LOGGER.info(startupScreen.toString());
+        SPLASH_LOGGER.info(startupScreen.toString());
       }
     }
   }
@@ -549,9 +550,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       disposeManagers();
 
-      if ((getStartDate() > 0) && LOGGER.isInfoEnabled()) {
+      if ((getStartDate() > 0) && SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen shutdownScreen = buildShutdownSplash();
-        LOGGER.info(shutdownScreen.toString());
+        SPLASH_LOGGER.info(shutdownScreen.toString());
       }
 
       setExecutionClassLoader(null);
