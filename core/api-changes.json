@@ -5,6 +5,24 @@
         {
           "ignore": true,
           "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider",
+          "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager<O>",
+          "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager<O>",
+          "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
           "old": "interface org.mule.runtime.core.internal.message.InternalEvent",
           "justification": "W-15184345: Encapsulate org.mule.runtime.core.internal.message.InternalEvent"
         },
