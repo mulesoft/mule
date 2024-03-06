@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.config.privileged.dsl.processor;
+package org.mule.runtime.config.internal.dsl.processor;
 
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 
