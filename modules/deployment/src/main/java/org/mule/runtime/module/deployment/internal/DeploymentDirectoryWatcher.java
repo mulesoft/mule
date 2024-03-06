@@ -27,6 +27,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -64,7 +65,6 @@ import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * It's in charge of the whole deployment process.
@@ -84,7 +84,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(DeploymentDirectoryWatcher.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer;
@@ -194,7 +195,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
-        logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+        SPLASH_LOGGER.info(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
@@ -253,7 +254,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     artifactDirMonitorScheduler = schedulerServiceSupplier.get().customScheduler(schedulerConfig);
     artifactDirMonitorScheduler.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
-    logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+    SPLASH_LOGGER.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
 
   protected void deployPackedApps(String[] zips) {

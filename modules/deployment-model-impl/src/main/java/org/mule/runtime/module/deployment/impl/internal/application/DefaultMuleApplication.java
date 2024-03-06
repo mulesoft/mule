@@ -29,6 +29,7 @@ import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -87,7 +88,8 @@ import org.slf4j.LoggerFactory;
 
 public class DefaultMuleApplication extends AbstractDeployableArtifact<ApplicationDescriptor> implements Application {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleApplication.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleApplication.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   protected final ApplicationDescriptor descriptor;
   private final DomainRepository domainRepository;
@@ -179,7 +181,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      LOGGER.info(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
+      SPLASH_LOGGER.info(miniSplash(format("New %s '%s'", shortArtifactType, descriptor.getName())));
     });
     // set even though it might be redundant, just in case the app is been redeployed
     updateStatusFor(NotInLifecyclePhase.PHASE_NAME);
@@ -215,7 +217,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
   @Override
   public void start() {
     withContextClassLoader(null, () -> {
-      LOGGER.info(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
+      SPLASH_LOGGER.info(miniSplash(format("Starting %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
       this.artifactContext.getMuleContext().start();
@@ -226,7 +228,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       withContextClassLoader(null, () -> {
         ApplicationStartedSplashScreen splashScreen = new ApplicationStartedSplashScreen();
         splashScreen.createMessage(descriptor);
-        LOGGER.info(splashScreen.toString());
+        SPLASH_LOGGER.info(splashScreen.toString());
       });
     } catch (Exception e) {
       setStatusToFailed();
@@ -256,7 +258,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
 
   private void doInit(boolean lazy, boolean disableXmlValidations, boolean addToolingObjectsToRegistry) {
     withContextClassLoader(null, () -> {
-      LOGGER.info(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
+      SPLASH_LOGGER.info(miniSplash(format("Initializing %s '%s'", shortArtifactType, descriptor.getName())));
     });
     try {
       ArtifactContextBuilder artifactBuilder =

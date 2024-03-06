@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 public class LazyServiceProxy implements ServiceProxyInvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ServiceAssembly assembly;
   private final DefaultServiceRegistry serviceRegistry;
@@ -172,7 +173,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
       startIfNeeded(service);
       String splash = service.getSplashMessage();
       if (isNotEmpty(splash)) {
-        LOGGER.info(new ServiceSplashScreen(service.toString(), splash).toString());
+        SPLASH_LOGGER.info(new ServiceSplashScreen(service.toString(), splash).toString());
       }
     });
   }

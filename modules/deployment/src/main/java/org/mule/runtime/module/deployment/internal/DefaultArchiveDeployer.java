@@ -21,6 +21,7 @@ import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -45,7 +46,6 @@ import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Deployer of an artifact within mule container. - Keeps track of deployed artifacts - Avoid already deployed artifacts to be
@@ -57,7 +57,8 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   public static final String ARTIFACT_NAME_PROPERTY = "artifactName";
   public static final String JAR_FILE_SUFFIX = ".jar";
   public static final String ZIP_FILE_SUFFIX = ".zip";
-  private static final Logger logger = LoggerFactory.getLogger(DefaultArchiveDeployer.class);
+  private static final Logger logger = getLogger(DefaultArchiveDeployer.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
   public static final String START_ARTIFACT_ON_DEPLOYMENT_PROPERTY = "startArtifactOnDeployment";
 
   private final ArtifactDeployer<T> deployer;
@@ -151,10 +152,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   private void logDeploymentFailure(Throwable t, String artifactName) {
     if (containsType(t, DeploymentStartException.class)) {
-      logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
+      SPLASH_LOGGER.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", artifactName)));
       logger.error(t.getMessage());
     } else {
-      logger.info(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)));
+      SPLASH_LOGGER.info(miniSplash(format("Failed to deploy artifact '%s', see below", artifactName)));
       logger.error(t.getMessage(), t);
     }
   }
@@ -229,10 +230,10 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
       addZombieFile(addedApp, artifactDir);
 
       if (containsType(t, DeploymentStartException.class)) {
-        logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
+        SPLASH_LOGGER.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details", addedApp)));
         logger.error(t.getMessage());
       } else {
-        logger.info(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)));
+        SPLASH_LOGGER.info(miniSplash(format("Failed to deploy artifact '%s', see below", addedApp)));
         logger.error(t.getMessage(), t);
       }
 
@@ -334,7 +335,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
   }
 
   private void logArtifactUndeployed(T artifact) {
-    logger.info(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
+    SPLASH_LOGGER.info(miniSplash(format("Undeployed artifact '%s'", artifact.getArtifactName())));
   }
 
   private File installFrom(URI uri) throws IOException {
@@ -403,7 +404,7 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
 
   @Override
   public void redeploy(String artifactName, Optional<Properties> deploymentProperties) throws DeploymentException {
-    logger.info(miniSplash(format("Redeploying artifact '%s'", artifactName)));
+    SPLASH_LOGGER.info(miniSplash(format("Redeploying artifact '%s'", artifactName)));
 
     T artifact = findArtifact(artifactName);
     final File artifactLocation = artifact.getLocation();
@@ -489,11 +490,12 @@ public class DefaultArchiveDeployer<D extends DeployableArtifactDescriptor, T ex
     } catch (Throwable t) {
       // error text has been created by the deployer already
       if (containsType(t, DeploymentStartException.class)) {
-        logger.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
-                                      artifact.getArtifactName())));
+        SPLASH_LOGGER.info(miniSplash(format("Failed to deploy artifact '%s', see artifact's log for details",
+                                             artifact.getArtifactName())));
         logger.error(t.getMessage(), t);
       } else {
-        logger.info(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), getCauseMessage(t))));
+        SPLASH_LOGGER
+            .info(miniSplash(format("Failed to deploy artifact '%s', %s", artifact.getArtifactName(), getCauseMessage(t))));
         logger.error(t.getMessage(), t);
       }
 
