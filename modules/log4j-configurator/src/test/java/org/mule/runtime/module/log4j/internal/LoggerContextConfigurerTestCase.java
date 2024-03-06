@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUT
 import static org.mule.runtime.module.log4j.internal.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.runtime.module.log4j.internal.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
+import static java.io.File.separator;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -145,7 +146,12 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
     contextConfigurer.update(context);
     ArgumentCaptor<RollingFileAppender> appenderCaptor = ArgumentCaptor.forClass(RollingFileAppender.class);
     verify(context.getConfiguration(), atLeastOnce()).addAppender(appenderCaptor.capture());
-    assertThat(appenderCaptor.getValue().getFileName().contains(":"), is(false));
+    assertThat(getFileName(appenderCaptor).contains(":"), is(false));
+  }
+
+  private static String getFileName(ArgumentCaptor<RollingFileAppender> appenderCaptor) {
+    String filename = appenderCaptor.getValue().getFileName();
+    return filename.substring(filename.lastIndexOf(separator) + 1);
   }
 
   @Test
