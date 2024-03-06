@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.internal.component;
+package org.mule.runtime.core.privileged.component;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 
 /**
  * Marker interface used by {@link AnnotatedObjectInvocationHandler} to identify any classes created by it.

@@ -15,6 +15,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.core.privileged.component.DynamicallyComponent;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;

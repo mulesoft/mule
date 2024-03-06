@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.internal.component;
 
+import org.mule.runtime.core.privileged.component.DynamicallyComponent;
+
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 

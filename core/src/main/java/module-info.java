@@ -185,6 +185,7 @@ module org.mule.runtime.core {
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
   exports org.mule.runtime.core.privileged;
+  exports org.mule.runtime.core.privileged.component;
   exports org.mule.runtime.core.privileged.el;
   exports org.mule.runtime.core.privileged.event;
   exports org.mule.runtime.core.privileged.exception;
