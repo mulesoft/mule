@@ -44,7 +44,7 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.util.OneTimeWarning;
+import org.mule.runtime.core.internal.util.log.OneTimeWarning;
 import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.util.TemplateParser;
 
