@@ -11,10 +11,12 @@ import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_MUT
 import static org.mule.runtime.module.log4j.internal.LoggerContextConfigurer.FORCED_CONSOLE_APPENDER_NAME;
 import static org.mule.runtime.module.log4j.internal.LoggerContextConfigurer.PER_APP_FILE_APPENDER_NAME;
 
+import static java.io.File.separator;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -125,7 +127,7 @@ public class LoggerContextConfigurerTestCase extends AbstractMuleTestCase {
 
   private static String getFileName(ArgumentCaptor<RollingFileAppender> appenderCaptor) {
     String filename = appenderCaptor.getValue().getFileName();
-    return filename.substring(filename.lastIndexOf("/") + 1);
+    return filename.substring(filename.lastIndexOf(separator) + 1);
   }
 
   @Test
