@@ -22,8 +22,8 @@ import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.Component;
-import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentAdditionalInterceptor;
 import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandlerInterceptors.ComponentInterceptor;
+import org.mule.runtime.core.privileged.component.ComponentAdditionalInterceptor;
 import org.mule.runtime.core.privileged.component.DynamicallyComponent;
 
 import java.io.Serializable;

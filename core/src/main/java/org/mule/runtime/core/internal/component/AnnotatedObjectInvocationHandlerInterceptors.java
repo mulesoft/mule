@@ -6,11 +6,9 @@
  */
 package org.mule.runtime.core.internal.component;
 
-import static java.lang.Integer.toHexString;
 import static java.lang.reflect.Modifier.isStatic;
 
 import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
@@ -104,30 +102,6 @@ public class AnnotatedObjectInvocationHandlerInterceptors {
     @Override
     public String getDslSource() {
       return super.getDslSource();
-    }
-  }
-
-  public static class ComponentAdditionalInterceptor {
-
-    private Component obj;
-
-    public Object writeReplace()
-        throws Throwable {
-      return removeDynamicAnnotations(obj);
-    }
-
-    @Override
-    public String toString() {
-      String base = obj.getClass().getName() + "@" + toHexString(obj.hashCode()) + "; location: ";
-      if (obj.getLocation() != null) {
-        return base + obj.getLocation().getLocation();
-      } else {
-        return base + "(null)";
-      }
-    }
-
-    public void setObj(Component obj) {
-      this.obj = obj;
     }
   }
 
