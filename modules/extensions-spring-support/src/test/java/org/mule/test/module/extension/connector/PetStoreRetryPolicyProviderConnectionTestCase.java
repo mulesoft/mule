@@ -6,16 +6,6 @@
  */
 package org.mule.test.module.extension.connector;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.empty;
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.core.Every.everyItem;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.functional.api.flow.TransactionConfigEnum.ACTION_ALWAYS_BEGIN;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.CONNECTIVITY_ERROR_IDENTIFIER;
 import static org.mule.tck.SimpleUnitTestSupportSchedulerService.UNIT_TEST_THREAD_GROUP;
@@ -23,11 +13,19 @@ import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.getConnectionThreads;
 import static org.mule.test.petstore.extension.PetStoreOperationsWithFailures.resetConnectionThreads;
 
+import static java.lang.Thread.currentThread;
+import static java.util.stream.Collectors.toSet;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Every.everyItem;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.transaction.TransactionAdapter;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.testmodels.mule.TestTransactionFactory;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
@@ -157,12 +155,11 @@ public class PetStoreRetryPolicyProviderConnectionTestCase extends AbstractExten
   }
 
   private Transaction createTransactionMock() throws TransactionException {
-    TransactionAdapter transaction = mock(TransactionAdapter.class);
+    Transaction transaction = mock(Transaction.class);
     doAnswer((invocationOnMock -> {
       TransactionCoordination.getInstance().bindTransaction(transaction);
       return null;
     })).when(transaction).begin();
-    when(transaction.getComponentLocation()).thenReturn(empty());
     return transaction;
   }
 

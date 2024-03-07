@@ -10,7 +10,9 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.tx.TransactionType.XA;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -37,10 +39,14 @@ public final class TransactionUtils {
     if (!isTransactionActive() && !type.equals(TX_START)) {
       return;
     }
-    TransactionAdapter tx = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+    Transaction tx = TransactionCoordination.getInstance().getTransaction();
     TransactionType txType = tx.isXA() ? XA : LOCAL;
-    dataProducer.triggerProfilingEvent(new DefaultTransactionProfilingEventContext(tx.getComponentLocation(), location, txType,
-                                                                                   currentTimeMillis()));
+    dataProducer.triggerProfilingEvent(new DefaultTransactionProfilingEventContext(
+                                                                                   tx instanceof TransactionAdapter
+                                                                                       ? ((TransactionAdapter) tx)
+                                                                                           .getComponentLocation()
+                                                                                       : empty(),
+                                                                                   location, txType, currentTimeMillis()));
   }
 
 }
