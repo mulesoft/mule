@@ -6,25 +6,9 @@
  */
 package org.mule.runtime.extension.internal.ast;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.Boolean.valueOf;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-import static java.util.stream.Stream.concat;
 import static org.mule.runtime.api.el.BindingContextUtils.VARS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_DYNAMIC_CONFIG_REF_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.ast.api.ComponentGenerationInformation.EMPTY_GENERATION_INFO;
 import static org.mule.runtime.ast.api.ComponentMetadataAst.EMPTY_METADATA;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsNamespace;
@@ -33,8 +17,19 @@ import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursi
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.FLOW_ELEMENT;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.SUBFLOW_ELEMENT;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static org.mule.runtime.extension.internal.ast.XmlSdkImplicitConfig.IMPLICIT_CONFIG_NAME_SUFFIX;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;
+
+import static java.lang.Boolean.getBoolean;
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Stream.concat;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -65,8 +60,6 @@ import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,6 +71,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
 
 /**
  * A {@link MacroExpansionModuleModel} works tightly with an {@link ArtifactAst} to go over all the registered
@@ -132,12 +127,6 @@ public class MacroExpansionModuleModel {
       "An implicit config is being used for extension %s, this is not fully supported for this extension." +
           " All operation usages of this extension should have a reference to an explicit configuration.";
 
-  /**
-   * If true avoid the creation of an implicit configuration
-   */
-  private final boolean disable_xml_sdk_implicit_configuration_creation =
-      valueOf(getProperty(MULE_DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, "true"));
-
   private final ArtifactAst applicationModel;
   private final ExtensionModel extensionModel;
 
@@ -171,12 +160,7 @@ public class MacroExpansionModuleModel {
 
     if (shouldAddImplicitConfiguration()) {
       LOGGER.warn(format(IMPLICIT_CONFIG_WARNING, extensionModel.getName()));
-      if (!disable_xml_sdk_implicit_configuration_creation) {
-        expandedArtifactAst = copyRecursively(applicationModel, identity(),
-                                              () -> singletonList(new XmlSdkImplicitConfig(extensionModel)), comp -> false);
-      } else {
-        expandedArtifactAst = applicationModel;
-      }
+      expandedArtifactAst = applicationModel;
     } else {
       expandedArtifactAst = applicationModel;
     }
@@ -455,15 +439,9 @@ public class MacroExpansionModuleModel {
         operationModel.getModelProperty(OperationComponentModelModelProperty.class).get();
     final ComponentAst operationModuleComponentModel = operationComponentModelModelProperty
         .getBodyComponentModel();
-    Optional<String> configRefName = referencesOperationsWithinModule(operationRefModel)
+    Optional<String> configRef = referencesOperationsWithinModule(operationRefModel)
         ? configRefParentTnsName
         : getConfigRefName(operationRefModel);
-
-    final Optional<String> configRef =
-        !configRefName.isPresent() && extensionModel.getConfigurationModel(MODULE_CONFIG_GLOBAL_ELEMENT_NAME).isPresent()
-            && (shouldAddImplicitConfiguration() && !disable_xml_sdk_implicit_configuration_creation)
-                ? of(format(IMPLICIT_CONFIG_NAME_SUFFIX, extensionModel.getName()))
-                : configRefName;
 
     Map<String, String> propertiesMap = extractProperties(expandedArtifactAst, configRef);
     Map<String, String> parametersMap = operationRefModel.getParameters().stream()

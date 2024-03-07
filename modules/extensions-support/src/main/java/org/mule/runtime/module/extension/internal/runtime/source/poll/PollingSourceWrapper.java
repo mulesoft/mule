@@ -6,23 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source.poll;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.String.format;
-import static java.lang.System.getProperty;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.notification.AbstractServerNotification.NO_ACTION_ID;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_DISPATCHED;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_IDEMPOTENCY;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_SOURCE_STOPPING;
-import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
-import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
-import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_STARTED;
-import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedPersistent;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
-import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 import static org.mule.runtime.core.internal.util.ConcurrencyUtils.safeUnlock;
@@ -40,6 +26,11 @@ import static org.mule.sdk.api.runtime.source.PollingSource.RECENTLY_PROCESSED_I
 import static org.mule.sdk.api.runtime.source.PollingSource.UPDATED_WATERMARK_ITEM_OS_KEY;
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_ITEM_OS_KEY;
 import static org.mule.sdk.api.runtime.source.PollingSource.WATERMARK_OS_NAME_SUFFIX;
+
+import static java.lang.String.format;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Optional.ofNullable;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.execution.CompletableCallback;
@@ -49,8 +40,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.notification.NotificationDispatcher;
-import org.mule.runtime.api.notification.PollingSourceNotification;
-import org.mule.runtime.api.notification.PollingSourceItemNotification;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;
@@ -60,7 +49,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
-import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceCallbackContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.source.SourceWrapper;
 import org.mule.sdk.api.runtime.operation.Result;
@@ -120,7 +108,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
   private final SchedulingStrategy scheduler;
   private final int maxItemsPerPoll;
   private final SystemExceptionHandler systemExceptionHandler;
-  private final boolean emitNotifications = parseBoolean(getProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS));
 
   @Inject
   private LockFactory lockFactory;
@@ -232,14 +219,11 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
       DefaultPollContext pollContext = new DefaultPollContext(sourceCallback, getCurrentWatermark(), getUpdatedWatermark());
 
       try {
-        dispatchPollingSourceNotification(POLL_STARTED, componentLocation.getLocation(), pollContext.getPollId());
         delegate.poll(pollContext);
-        dispatchPollingSourceNotification(POLL_SUCCESS, componentLocation.getLocation(), pollContext.getPollId());
       } catch (RuntimeException e) {
         LOGGER.error(format("Found exception trying to process item on source at flow '%s'. %s",
                             flowName, e.getMessage()),
                      e);
-        dispatchPollingSourceNotification(POLL_FAILURE, componentLocation.getLocation(), pollContext.getPollId());
         systemExceptionHandler.handleException(e, componentLocation);
         return;
       }
@@ -335,12 +319,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
           status = FILTERED_BY_WATERMARK;
         } else if (currentPollItems < maxItemsPerPoll) {
           currentPollItems++;
-          if (emitNotifications) {
-            callbackContext
-                .addVariable(ACCEPTED_POLL_ITEM_INFORMATION,
-                             new PollItemInformation(getPollId(), itemId, pollItem.getWatermark(),
-                                                     componentLocation.getLocation()));
-          }
           sourceCallback.handle(pollItem.getResult(), callbackContext);
           saveWatermarkValue(watermarkStatus, pollItem);
         } else {
@@ -351,14 +329,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
 
       if (status != ACCEPTED || currentPollItemLimitApplied) {
         LOGGER.debug(REJECTED_ITEM_MESSAGE, itemId, status);
-        if (emitNotifications && !currentPollItemLimitApplied) {
-          notificationDispatcher.dispatch(new PollingSourceItemNotification(statusToNotificationType(status,
-                                                                                                     currentPollItemLimitApplied),
-                                                                            getPollId(), itemId,
-                                                                            pollItem.getWatermark().orElse(null),
-                                                                            "",
-                                                                            componentLocation.getLocation()));
-        }
         rejectItem(pollItem.getResult(), callbackContext);
       } else {
         LOGGER.debug(ACCEPTED_ITEM_MESSAGE, itemId);
@@ -792,26 +762,6 @@ public class PollingSourceWrapper<T, A> extends SourceWrapper<T, A> implements R
     if (executor != null) {
       executor.stop();
       executor = null;
-    }
-  }
-
-  private int statusToNotificationType(PollContext.PollItemStatus status, boolean currentPollItemLimitApplied) {
-    switch (status) {
-      case ACCEPTED:
-        return ITEM_DISPATCHED;
-      case FILTERED_BY_WATERMARK:
-        return ITEM_REJECTED_WATERMARK;
-      case ALREADY_IN_PROCESS:
-        return ITEM_REJECTED_IDEMPOTENCY;
-      case SOURCE_STOPPING:
-        return ITEM_REJECTED_SOURCE_STOPPING;
-    }
-    return NO_ACTION_ID;
-  }
-
-  private void dispatchPollingSourceNotification(int action, String componentLocation, String pollId) {
-    if (emitNotifications) {
-      notificationDispatcher.dispatch(new PollingSourceNotification(action, componentLocation, pollId));
     }
   }
 

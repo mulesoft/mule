@@ -6,20 +6,21 @@
  */
 package org.mule.test.module.extension.source;
 
-import static java.lang.String.valueOf;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mule.runtime.api.notification.PipelineMessageNotification.PROCESS_COMPLETE;
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_IDEMPOTENCY;
 import static org.mule.runtime.api.notification.PollingSourceItemNotification.ITEM_REJECTED_WATERMARK;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_FAILURE;
 import static org.mule.runtime.api.notification.PollingSourceNotification.POLL_SUCCESS;
-import static org.mule.runtime.api.util.MuleSystemProperties.EMIT_POLLING_SOURCE_NOTIFICATIONS;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SOURCES;
 import static org.mule.test.allure.AllureConstants.SourcesFeature.SourcesStories.POLLING;
 import static org.mule.test.petstore.extension.PetAdoptionSource.ALL_PETS;
 import static org.mule.test.petstore.extension.WatermarkingPetAdoptionSource.resetSource;
+
+import static java.lang.String.valueOf;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
@@ -33,17 +34,16 @@ import org.mule.runtime.api.notification.PollingSourceNotificationListener;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.Test;
 
 @Feature(SOURCES)
 @Story(POLLING)
@@ -57,9 +57,6 @@ public class PollingSourceNotificationsTestCase extends AbstractExtensionFunctio
   private static final String ITEM_DISPATCHED_MESSAGE = "item dispatched to flow";
   private static final String ITEM_REJECTED_IDEMPOTENCY_MESSAGE = "item rejected due to idempotency";
   private static final String ITEM_REJECTED_WATERMARK_MESSAGE = "item rejected due to watermark";
-
-  @Rule
-  public SystemProperty emitNotifications = new SystemProperty(EMIT_POLLING_SOURCE_NOTIFICATIONS, "true");
 
   public static class AdoptionProcessor implements Processor {
 

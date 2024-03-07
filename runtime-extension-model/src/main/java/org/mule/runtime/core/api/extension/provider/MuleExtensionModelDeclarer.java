@@ -18,8 +18,6 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTP
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.isParseTemplateUseLegacyDefaultTargetValue;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -86,7 +84,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -486,19 +483,11 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
-    if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
-      setVariable.onDefaultParameterGroup()
-          .withRequiredParameter("variableName")
-          .ofType(STRING_TYPE)
-          .withExpressionSupport(NOT_SUPPORTED)
-          .describedAs("The name of the variable.");
-    } else {
-      setVariable.onDefaultParameterGroup()
-          .withOptionalParameter("variableName")
-          .ofType(STRING_TYPE)
-          .withExpressionSupport(SUPPORTED)
-          .describedAs("The name of the variable.");
-    }
+    setVariable.onDefaultParameterGroup()
+        .withRequiredParameter("variableName")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
@@ -551,19 +540,6 @@ class MuleExtensionModelDeclarer {
         .ofType(STRING_TYPE)
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
-
-    if (isParseTemplateUseLegacyDefaultTargetValue()) {
-      parseTemplate.onParameterGroup(OUTPUT)
-          .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-          .ofType(STRING_TYPE)
-          .defaultingTo("#[message]")
-          .withExpressionSupport(REQUIRED)
-          .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
-          .withRole(BEHAVIOUR)
-          .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
-          .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-          .withModelProperty(new TargetModelProperty());
-    }
 
     parseTemplate.onDefaultParameterGroup().withExclusiveOptionals(of("content", "location"), true);
   }

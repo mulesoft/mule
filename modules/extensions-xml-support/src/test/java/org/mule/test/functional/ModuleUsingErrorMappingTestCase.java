@@ -6,20 +6,19 @@
  */
 package org.mule.test.functional;
 
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 
+import static java.util.Collections.emptyMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
@@ -35,9 +34,6 @@ public class ModuleUsingErrorMappingTestCase extends AbstractCeXmlExtensionMuleA
   private static final String EXPRESSION_ERROR_MESSAGE = "Bad expression.";
   private static final String TIMEOUT_ERROR_MESSAGE = "Timeout happened!";
   private static final String SECURITY_ERROR_MESSAGE = "simple operation called";
-
-  @Rule
-  public SystemProperty laxErrorType = new SystemProperty(MULE_LAX_ERROR_TYPES, "true");
 
   @Override
   protected String getModulePath() {

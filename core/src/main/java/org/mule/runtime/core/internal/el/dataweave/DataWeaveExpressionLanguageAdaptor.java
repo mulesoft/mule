@@ -10,13 +10,10 @@ import static org.mule.runtime.api.el.BindingContextUtils.PAYLOAD;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBuindingsToBuilder;
 import static org.mule.runtime.api.el.BindingContextUtils.addFlowNameBindingsToBuilder;
 import static org.mule.runtime.api.metadata.DataType.fromType;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.expressionEvaluationFailed;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
-
-import static java.lang.System.getProperty;
 
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.artifact.Registry;
@@ -193,9 +190,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     try {
       return expressionExecutor.compile(sanitize(expression), bindingContext);
     } catch (ExpressionCompilationException e) {
-      if (badExpressionFailsDeployment()) {
-        throw e;
-      }
       return new IllegalCompiledExpression(expression, e);
     }
   }
@@ -204,10 +198,6 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
   public ScopePhaseValidationMessages collectScopePhaseValidationMessages(String script, String nameIdentifier,
                                                                           TypeBindings bindings) {
     return expressionExecutor.collectScopePhaseValidationMessages(script, nameIdentifier, bindings);
-  }
-
-  private boolean badExpressionFailsDeployment() {
-    return getProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT) != null;
   }
 
   /**

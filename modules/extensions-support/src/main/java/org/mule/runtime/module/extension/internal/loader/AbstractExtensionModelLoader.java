@@ -7,13 +7,10 @@
 package org.mule.runtime.module.extension.internal.loader;
 
 import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
-import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
 import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
 import static org.mule.runtime.extension.api.ExtensionConstants.VERSION_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_COMPONENT_IGNORE;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.ENABLE_POLLING_SOURCE_LIMIT_PARAMETER;
 
 import static java.lang.String.format;
@@ -37,7 +34,6 @@ import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourc
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -47,7 +43,6 @@ import java.util.Set;
  */
 public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader {
 
-  private static boolean IGNORE_DISABLED = getProperty(DISABLE_SDK_IGNORE_COMPONENT) != null;
   private static final boolean ENABLE_POLLING_SOURCE_LIMIT = getProperty(ENABLE_SDK_POLLING_SOURCE_LIMIT) != null;
 
   private final List<ExtensionModelValidator> validators = unmodifiableList(asList(
@@ -57,34 +52,12 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
                                                                                    new ParameterPluralNameModelValidator()));
 
   /**
-   * As part of our effort to remove the powermock dependency for the Java 17 upgrade("W-13116494"), we have temporarily
-   * introduced this setter for test use only. We will need to refactor the class so that the field does not have to be static.
-   * 
-   * @param value // TODO: W-13510775 Refactor AbstractExtensionModelLoader to make IGNORE_DISABLED not static
-   */
-  public static void setIgnoreDisabled(boolean value) {
-    IGNORE_DISABLED = value;
-  }
-
-  public static boolean getIgnoreDisabled() {
-    return IGNORE_DISABLED;
-  }
-
-  /**
    * {@inheritDoc}
    */
   @Override
   protected void configureContextBeforeDeclaration(ExtensionLoadingContext context) {
     context.addCustomValidators(validators);
 
-    Optional<Object> disableComponentIgnore = context.getParameter(DISABLE_COMPONENT_IGNORE);
-    disableComponentIgnore
-        .ifPresent(value -> checkState(value instanceof Boolean,
-                                       format("Property value for %s expected to be boolean", DISABLE_COMPONENT_IGNORE)));
-
-    if (IGNORE_DISABLED && !disableComponentIgnore.isPresent()) {
-      context.addParameter(DISABLE_COMPONENT_IGNORE, true);
-    }
     if (ENABLE_POLLING_SOURCE_LIMIT) {
       context.addParameter(ENABLE_POLLING_SOURCE_LIMIT_PARAMETER, true);
     }

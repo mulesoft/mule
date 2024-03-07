@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_STREAMING_BUFFER_SIZE;
+
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
-import static org.mule.runtime.core.api.config.MuleProperties.MULE_STREAMING_BUFFER_SIZE;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.message.ds.ByteArrayDataSource;
 import org.mule.runtime.core.api.message.ds.InputStreamDataSource;

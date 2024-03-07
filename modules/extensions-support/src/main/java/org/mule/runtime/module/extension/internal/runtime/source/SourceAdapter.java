@@ -111,7 +111,6 @@ import org.slf4j.Logger;
 public class SourceAdapter implements Lifecycle, Restartable {
 
   private static final Logger LOGGER = getLogger(SourceAdapter.class);
-  private static final Boolean COMMIT_ON_REDELIVERY = getBoolean(COMMIT_REDELIVERY_EXHAUSTED);
 
   private final ExtensionModel extensionModel;
   private final SourceModel sourceModel;
@@ -337,9 +336,6 @@ public class SourceAdapter implements Lifecycle, Restartable {
       final boolean isBackPressureError = event.getError()
           .map(e -> flowBackPressueErrorType.equals(e.getErrorType()))
           .orElse(false);
-      final boolean isRedeliveryExhaustedError = event.getError()
-          .map(e -> redeliveryExhaustedErrorType.equals(e.getErrorType()))
-          .orElse(false);
 
       SourceCallbackExecutor executor;
       if (isBackPressureError) {
@@ -352,11 +348,7 @@ public class SourceAdapter implements Lifecycle, Restartable {
       }
 
       if (context.getTransactionHandle().isTransacted()) {
-        if (isRedeliveryExhaustedError && COMMIT_ON_REDELIVERY) {
-          callback = callback.finallyBefore(this::commit);
-        } else {
-          callback = callback.finallyBefore(this::rollback);
-        }
+        callback = callback.finallyBefore(this::rollback);
       }
 
       executor.execute(event, parameters, context, callback);

@@ -27,7 +27,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -39,8 +38,6 @@ import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.Exp
 
 import static java.io.File.separator;
 import static java.lang.String.format;
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
@@ -55,7 +52,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -691,17 +688,6 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   public void compilationExceptionDoesntPropagate() {
     CompiledExpression compiled = expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of("")));
     assertThat(compiled, is(instanceOf(IllegalCompiledExpression.class)));
-  }
-
-  @Test
-  public void compilationExceptionPropagates() {
-    setProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT, "true");
-    expectedEx.expect(ExpressionCompilationException.class);
-    try {
-      expressionLanguage.compile("#[ble]", getTargetBindingContext(Message.of("")));
-    } finally {
-      clearProperty(MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT);
-    }
   }
 
   @Test

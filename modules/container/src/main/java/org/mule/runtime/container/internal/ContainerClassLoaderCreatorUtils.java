@@ -6,13 +6,11 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.stream;
 
@@ -40,7 +38,6 @@ public class ContainerClassLoaderCreatorUtils {
   private static final String MULE_SDK_API_PACKAGE = "org.mule.sdk.api";
   private static final String MULE_SDK_COMPATIBILITY_API_PACKAGE = "org.mule.sdk.compatibility.api";
   private static final String MULE_OAUTH_CLIENT_API_PACKAGE = "org.mule.runtime.oauth.api";
-  private static final boolean ALLOW_JRE_EXTENSION = parseBoolean(getProperty(MULE_ALLOW_JRE_EXTENSION, "true"));
   private static final String[] JRE_EXTENDABLE_PACKAGES =
       getProperty(MULE_JRE_EXTENSION_PACKAGES, DEFAULT_JRE_EXTENSION_PACKAGES).split(",");
 
@@ -114,7 +111,7 @@ public class ContainerClassLoaderCreatorUtils {
     }
 
     // Let artifacts extend non "java." JRE packages
-    if (ALLOW_JRE_EXTENSION && stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
+    if (stream(JRE_EXTENDABLE_PACKAGES).anyMatch(exportedPackage::startsWith)) {
       return PARENT_FIRST;
     }
     return null;

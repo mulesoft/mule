@@ -6,26 +6,24 @@
  */
 package org.mule.test.functional;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.RAISE_ERROR;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.marvel.drstrange.CustomErrorException;
 
-import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -34,9 +32,6 @@ import io.qameta.allure.Story;
 @Feature(ERROR_HANDLING)
 @Story(RAISE_ERROR)
 public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
-
-  @Rule
-  public SystemProperty laxErrorType = new SystemProperty(MULE_LAX_ERROR_TYPES, "true");
 
   @Override
   protected String getModulePath() {
