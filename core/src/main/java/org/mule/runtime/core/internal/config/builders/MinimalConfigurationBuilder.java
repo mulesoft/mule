@@ -11,7 +11,7 @@ import static org.mule.runtime.api.scheduler.SchedulerConfig.config;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUGIN_INSTALLED;
+import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
@@ -21,7 +21,6 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_SER
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTIVITY_TESTER_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_LANGUAGE;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_EXPRESSION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_FACTORY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_LOCK_PROVIDER;
@@ -45,7 +44,6 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.config.builders.RegistryBootstrap.defaultRegistryBoostrap;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.LOCAL_QUEUE_MANAGER_KEY;
 import static org.mule.runtime.core.internal.exception.ErrorTypeLocatorFactory.createDefaultErrorTypeLocator;
-import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory.getDummyComponentTracerFactory;
 import static org.mule.runtime.core.internal.profiling.NoopCoreEventTracer.getNoopCoreEventTracer;
 import static org.mule.runtime.core.internal.util.store.DefaultObjectStoreFactoryBean.createDefaultInMemoryObjectStore;
@@ -113,7 +111,6 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -163,8 +160,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
     final ContributedErrorTypeLocator contributedErrorTypeLocator = new ContributedErrorTypeLocator();
     contributedErrorTypeLocator.setDelegate(createDefaultErrorTypeLocator(contributedErrorTypeRepository));
     registerObject(ErrorTypeLocator.class.getName(), contributedErrorTypeLocator, muleContext);
-
-    tryRegisterMvel(muleContext);
 
     registerObject(OBJECT_STREAMING_GHOST_BUSTER, new StreamingGhostBuster(), muleContext);
     registerStreamingManager(muleContext);
@@ -246,19 +241,6 @@ public class MinimalConfigurationBuilder extends AbstractConfigurationBuilder {
   protected DefaultExpressionLanguageFactoryService getExpressionLanguageFactoryService(MuleRegistry registry)
       throws RegistrationException {
     return registry.lookupObject(DefaultExpressionLanguageFactoryService.class);
-  }
-
-  protected void tryRegisterMvel(MuleContext muleContext) throws InstantiationException, IllegalAccessException,
-      InvocationTargetException, NoSuchMethodException, RegistrationException {
-    try {
-      Class<?> mvelLangCls = Class.forName("org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage");
-      mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext);
-      registerObject(OBJECT_EXPRESSION_LANGUAGE, mvelLangCls.getConstructor(MuleContext.class).newInstance(muleContext),
-                     muleContext);
-      registerObject(COMPATIBILITY_PLUGIN_INSTALLED, true, muleContext);
-    } catch (ClassNotFoundException cnfe) {
-      // no mvel in classpath, move on
-    }
   }
 
   protected void registerTransformerRegistry(MuleContext muleContext) throws RegistrationException {
