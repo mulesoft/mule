@@ -11,13 +11,14 @@ import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.ENF
 
 import static org.junit.rules.ExpectedException.none;
 
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 @SmallTest
 @Feature(SDK)

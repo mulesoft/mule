@@ -7,13 +7,13 @@
 package org.mule.runtime.module.extension.internal.manager.jdk;
 
 import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
-import static org.mule.runtime.core.internal.util.JdkVersionUtils.isJava8;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.isJava8;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 
 /**
  * Base implementation for {@link ExtensionJdkValidator}

@@ -9,31 +9,37 @@ package org.mule.runtime.module.extension.internal.manager.jdk;
 import static org.mule.test.allure.AllureConstants.Sdk.SDK;
 import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.ENFORCE_EXTENSION_JAVA_VERSION;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
 import org.mule.tck.size.SmallTest;
+
+import org.slf4j.Logger;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 @Feature(SDK)
 @Story(ENFORCE_EXTENSION_JAVA_VERSION)
 public class LooseExtensionJdkValidatorTestCase extends BaseExtensionJdkValidatorTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private Logger logger;

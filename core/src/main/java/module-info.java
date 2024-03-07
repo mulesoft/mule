@@ -477,6 +477,8 @@ module org.mule.runtime.core {
       org.mule.runtime.metadata.support;
   exports org.mule.runtime.core.internal.util.collection to
       org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.util.log to
+      com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.util.mediatype to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.message to
@@ -508,6 +510,9 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.version to
+      org.mule.runtime.extensions.support,
+      com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
       spring.beans;

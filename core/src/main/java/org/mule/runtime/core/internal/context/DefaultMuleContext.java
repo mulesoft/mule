@@ -76,7 +76,8 @@ import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.validateJdk;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -159,7 +160,6 @@ import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ArtifactStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
@@ -372,7 +372,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       }
 
       try {
-        JdkVersionUtils.validateJdk();
+        validateJdk();
       } catch (RuntimeException e) {
         throw new InitialisationException(invalidJdk(JAVA_VERSION, getSupportedJdks()), this);
       }
