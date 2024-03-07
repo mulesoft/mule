@@ -30,7 +30,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.registry",
         // for DataWeave
         "org.mule.runtime.core.privileged.routing",
-        "org.mule.runtime.core.privileged.util",
         "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
         "org.mule.runtime.core.privileged.profiling.tracing"
@@ -291,6 +290,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.exception to
@@ -457,7 +457,6 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.core.components,
-      org.mule.runtime.artifact,
       org.mule.runtime.container,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
@@ -468,17 +467,18 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.repository,
       org.mule.runtime.spring.config,
-      org.mule.runtime.launcher,
-      org.mule.runtime.tls,
-      com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
-      com.mulesoft.anypoint.gw.core,
-      com.mulesoft.anypoint.gw.module.deployment,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.attribute to
+      org.mule.runtime.core.components,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.mule.support,
+      com.mulesoft.mule.runtime.cache,
+      com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.util.cache to
       org.mule.runtime.metadata.support;
   exports org.mule.runtime.core.internal.util.collection to
