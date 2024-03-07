@@ -8,18 +8,12 @@ package org.mule.runtime.core.internal.component;
 
 import static java.lang.reflect.Modifier.isStatic;
 
-import org.mule.runtime.api.component.AbstractComponent;
-import org.mule.runtime.api.component.ComponentIdentifier;
-import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.privileged.component.DynamicallyComponent;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 public class AnnotatedObjectInvocationHandlerInterceptors {
 
@@ -59,49 +53,6 @@ public class AnnotatedObjectInvocationHandlerInterceptors {
       }
     } else {
       return (T) annotated;
-    }
-  }
-
-  public static class ComponentInterceptor extends AbstractComponent {
-
-    @Override
-    public Object getAnnotation(QName qName) {
-      return super.getAnnotation(qName);
-    }
-
-    @Override
-    public Map<QName, Object> getAnnotations() {
-      return super.getAnnotations();
-    }
-
-    @Override
-    public void setAnnotations(Map<QName, Object> newAnnotations) {
-      super.setAnnotations(newAnnotations);
-    }
-
-    @Override
-    public ComponentLocation getLocation() {
-      return super.getLocation();
-    }
-
-    @Override
-    public Location getRootContainerLocation() {
-      return super.getRootContainerLocation();
-    }
-
-    @Override
-    public ComponentIdentifier getIdentifier() {
-      return super.getIdentifier();
-    }
-
-    @Override
-    public String getRepresentation() {
-      return super.getRepresentation();
-    }
-
-    @Override
-    public String getDslSource() {
-      return super.getDslSource();
     }
   }
 
