@@ -16,7 +16,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.STRICT_STUBS;
 
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils;
 import org.mule.tck.size.SmallTest;
@@ -40,7 +39,7 @@ import io.qameta.allure.Story;
 public class LooseExtensionJdkValidatorTestCase extends BaseExtensionJdkValidatorTestCase {
 
   @Rule
-  public MockitoRule rule = MockitoJUnit.rule().strictness(STRICT_STUBS);
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private Logger logger;
