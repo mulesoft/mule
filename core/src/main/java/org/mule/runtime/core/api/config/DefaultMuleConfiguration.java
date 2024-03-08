@@ -6,6 +6,16 @@
  */
 package org.mule.runtime.core.api.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
+import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
+import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -14,19 +24,11 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENCODING_SYSTEM_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_FLOW_TRACE;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.initialisationFailure;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.propertyHasInvalidValue;
-import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleBase;
-import static org.mule.runtime.core.internal.util.StandaloneServerUtils.getMuleHome;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.api.annotation.NoExtend;
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -34,7 +36,6 @@ import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.serialization.ObjectSerializer;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.component.InternalComponent;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.context.MuleContextAware;
@@ -73,12 +74,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   protected static final Logger logger = getLogger(DefaultMuleConfiguration.class);
 
   private MuleVersion minMuleVersion;
-
-  /**
-   * When true, each event will keep trace information of the flows and components it traverses to be shown as part of an
-   * exception message if an exception occurs. Switching on DEBUG level logging with automatically set this flag to true.
-   */
-  public static boolean flowTrace = false;
 
   /**
    * The type of model used for the internal system model where system created services are registered
@@ -316,12 +311,6 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
     if (p != null) {
       autoWrapMessageAwareTransform = BooleanUtils.toBoolean(p);
     }
-    p = getProperty(MULE_FLOW_TRACE);
-    if (p != null) {
-      flowTrace = BooleanUtils.toBoolean(p);
-    } else {
-      flowTrace = false;
-    }
 
     p = getProperty(SYSTEM_PROPERTY_PREFIX + "validate.expressions");
     if (p != null) {
@@ -345,9 +334,11 @@ public class DefaultMuleConfiguration implements MuleConfiguration, MuleContextA
   /**
    * @return {@code true} if the log is set to debug or if the system property {@code mule.flowTrace} is set to {@code true}.
    *         {@code false} otherwise.
+   * @deprecated
    */
+  @Deprecated
   public static boolean isFlowTrace() {
-    return flowTrace;
+    return false;
   }
 
   protected void validateEncoding() throws FatalException {
