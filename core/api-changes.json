@@ -2,6 +2,12 @@
   "4.7.0": {
     "revapi": {
       "ignore": [
+		{
+		  "ignore": true,
+		  "code": "java.field.removed",
+		  "old": "field org.mule.runtime.core.api.config.DefaultMuleConfiguration.flowTrace",
+		  "justification": "W-14572236: Remove killswitches"
+		},
         {
           "ignore": true,
           "code": "java.method.removed",
