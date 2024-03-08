@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.transaction.xa;
+package org.mule.runtime.core.internal.transaction.xa;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotStartTransaction;
 
@@ -15,8 +15,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
-import org.mule.runtime.core.privileged.transaction.XaTransaction;
 
 import javax.transaction.TransactionManager;
 

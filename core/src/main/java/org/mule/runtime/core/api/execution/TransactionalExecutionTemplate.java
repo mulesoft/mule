@@ -107,23 +107,6 @@ public final class TransactionalExecutionTemplate<T> implements ExecutionTemplat
                                                 transactionConfig);
   }
 
-  /**
-   * Creates a ExecutionTemplate that will manage transactional context according to configured TransactionConfig. This is a
-   * template which maintains the TX logic for compatibility components.
-   *
-   * @param muleContext       MuleContext for this application
-   * @param transactionConfig transaction config for the execution context
-   * @deprecated support for Compatibility plugin will be removed in 4.9.
-   */
-  @Deprecated
-  public static <T> TransactionalExecutionTemplate<T> createCompatibilityExecutionTemplate(MuleContext muleContext,
-                                                                                           TransactionConfig transactionConfig) {
-    return new TransactionalExecutionTemplate<>(getApplicationName(muleContext),
-                                                getNotificationDispatcher((MuleContextWithRegistry) muleContext),
-                                                muleContext.getTransactionManager(),
-                                                transactionConfig, true, true, true);
-  }
-
   private static NotificationDispatcher getNotificationDispatcher(MuleContextWithRegistry muleContext) {
     try {
       return muleContext.getRegistry().lookupObject(NotificationDispatcher.class);

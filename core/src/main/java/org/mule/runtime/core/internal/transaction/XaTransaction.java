@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.transaction;
+package org.mule.runtime.core.internal.transaction;
 
 import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -23,8 +23,8 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.TransactionRollbackException;
 import org.mule.runtime.core.api.transaction.TransactionStatusException;
-import org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException;
-import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.internal.transaction.xa.IllegalTransactionStateException;
+import org.mule.runtime.core.internal.transaction.xa.XaResourceFactoryHolder;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -10,7 +10,6 @@ import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 
 import javax.transaction.TransactionManager;
@@ -32,24 +31,6 @@ public interface TransactionFactory {
    */
   @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
-
-  /**
-   * Create and begins a new transaction
-   *
-   * @return a new Transaction
-   * @throws TransactionException if the transaction cannot be created or begun
-   * @param applicationName        will be part of the notification
-   * @param notificationDispatcher allows the Mule container to fire notifications
-   * 
-   * @deprecated since 4.6. Use {@link #beginTransaction(String, NotificationDispatcher, TransactionManager)} instead
-   */
-  @Deprecated
-  default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
-                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
-                                       TransactionManager transactionManager)
-      throws TransactionException {
-    return beginTransaction(applicationName, notificationDispatcher, transactionManager);
-  }
 
   /**
    * Create and begins a new transaction

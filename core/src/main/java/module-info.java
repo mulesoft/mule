@@ -32,8 +32,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.store",
         "org.mule.runtime.core.privileged.transformer",
         "org.mule.runtime.core.privileged.transformer.simple",
-        "org.mule.runtime.core.privileged.transaction",
-        "org.mule.runtime.core.privileged.transaction.xa",
         "org.mule.runtime.core.privileged.util",
         "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
@@ -205,8 +203,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.registry;
   exports org.mule.runtime.core.privileged.routing;
   exports org.mule.runtime.core.privileged.store;
-  exports org.mule.runtime.core.privileged.transaction;
-  exports org.mule.runtime.core.privileged.transaction.xa;
   exports org.mule.runtime.core.privileged.transformer;
   exports org.mule.runtime.core.privileged.util;
 
@@ -432,12 +428,17 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction to
+      org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
-      com.mulesoft.mule.runtime.cluster;
+      com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.xa;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;

@@ -20,8 +20,8 @@ import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.privileged.transaction.XaTransaction;
-import org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder;
+import org.mule.runtime.core.internal.transaction.XaTransaction;
+import org.mule.runtime.core.internal.transaction.xa.XaResourceFactoryHolder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
