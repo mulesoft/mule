@@ -16,7 +16,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
     privilegedPackages = {
         "org.mule.runtime.core.internal.message",
         "org.mule.runtime.core.privileged",
-        "org.mule.runtime.core.privileged.component",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
         "org.mule.runtime.core.privileged.event.context",
@@ -270,6 +269,7 @@ module org.mule.runtime.core {
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component to
       org.mule.runtime.core.components,
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
@@ -539,8 +539,6 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.api.streaming to
       spring.core;
 
-  opens org.mule.runtime.core.privileged.component to
-      spring.core;
   opens org.mule.runtime.core.privileged.event to
       kryo.shaded;
   opens org.mule.runtime.core.privileged.exception to

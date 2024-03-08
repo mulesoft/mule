@@ -7,6 +7,7 @@
 package org.mule.runtime.core.privileged.component;
 
 import org.mule.runtime.api.component.Component;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 
 /**
  * Marker interface used by {@link AnnotatedObjectInvocationHandler} to identify any classes created by it.

@@ -85,11 +85,11 @@ import org.mule.runtime.core.internal.profiling.context.DefaultComponentThreadin
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
-import org.mule.runtime.core.privileged.component.AbstractExecutableComponent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
+import org.mule.runtime.core.privileged.processor.AbstractExecutableComponent;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;

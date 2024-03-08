@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.component;
+package org.mule.runtime.core.privileged.processor;
 
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -31,7 +31,6 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.processor.MessageProcessors;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

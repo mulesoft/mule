@@ -5,6 +5,69 @@
         {
           "ignore": true,
           "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.component.AbstractExecutableComponent",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+          "new": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+          "new": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+          "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+          "new": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+          "new": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+          "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.noLongerInheritsFromClass",
+          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.nonFinalClassInheritsFromNewClass",
+          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+          "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+          "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.internal.message.InternalEvent",
+          "justification": "W-15184345: Encapsulate org.mule.runtime.core.internal.message.InternalEvent"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider",
           "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
         },
