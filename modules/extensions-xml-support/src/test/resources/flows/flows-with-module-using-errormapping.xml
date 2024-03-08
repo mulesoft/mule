@@ -90,49 +90,6 @@
         </error-handler>
     </flow>
 
-    <flow name="simpleMappingProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
-                                              errorMappingTargetType="APP:MY_REQUESTER"/>
-        <error-handler>
-            <on-error-continue type="APP:MY_REQUESTER">
-                <set-payload value="Could not connect."/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="complexMappingProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
-                                              errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"/>
-        <error-handler>
-            <on-error-continue type="APP:MY_REQUESTER">
-                <set-payload value="Could not connect."/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="multipleMappingsProxy">
-        <module-using-errormapping:fail-proxy config-ref="petstoreconfig" petNames="#[vars.names]" failExpression="#[vars.failExpression]"
-                                              errorMappingTargetType="APP:MY_REQUESTER" errorMappingSourceType="CONNECTIVITY"
-                                              secondErrorMappingTargetType="APP:MY_OTHER_ERROR" secondErrorMappingSourceType="EXPRESSION"/>
-        <error-handler>
-            <on-error-continue type="APP:MY_REQUESTER">
-                <set-payload value="Could not connect."/>
-            </on-error-continue>
-            <on-error-continue type="APP:MY_OTHER_ERROR">
-                <set-payload value="Bad expression."/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
     <flow name="globalMappingWithDefaultErrorHandlerTimeout">
         <module-using-errormapping:fail-by-timeout config-ref="petstoreconfig" petNames="#[vars.names]"/>
     </flow>

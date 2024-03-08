@@ -6,26 +6,24 @@
  */
 package org.mule.test.functional;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.exception.MuleException.INFO_LOCATION_KEY;
 import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CONNECTIVITY;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.RAISE_ERROR;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM_ERROR;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.test.marvel.drstrange.CustomErrorException;
 
-import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Feature;
@@ -34,9 +32,6 @@ import io.qameta.allure.Story;
 @Feature(ERROR_HANDLING)
 @Story(RAISE_ERROR)
 public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArtifactFunctionalTestCase {
-
-  @Rule
-  public SystemProperty laxErrorType = new SystemProperty(MULE_LAX_ERROR_TYPES, "true");
 
   @Override
   protected String getModulePath() {
@@ -59,21 +54,6 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArt
   }
 
   @Test
-  public void muleParameterErrorRaised() throws Exception {
-    verifyResultFrom("simpleProxy", "Could not route: A bad error occurred.");
-  }
-
-  @Test
-  public void customParameterErrorRaised() throws Exception {
-    verifyResultFrom("complexProxy", "Custom error: Something went wrong.");
-  }
-
-  @Test
-  public void muleErrorCanBeMapped() throws Exception {
-    verifyResultFrom("simpleMapping", "Handled");
-  }
-
-  @Test
   public void customErrorCanBeMapped() throws Exception {
     verifyResultFrom("complexMapping", "Handled");
   }
@@ -91,7 +71,7 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArt
     assertThat(me.getInfo().get(INFO_SOURCE_XML_KEY),
                is("<module-using-raise-error:fail-raise-error></module-using-raise-error:fail-raise-error>"));
     assertThat(me.getInfo().get(INFO_LOCATION_KEY),
-               is("simpleWithNoHandlingFlow/processors/0 @ ModuleUsingRaiseErrorTestCase#simpleWithNoHandling:flows/flows-with-module-using-raise-error.xml:85"));
+               is("simpleWithNoHandlingFlow/processors/0 @ ModuleUsingRaiseErrorTestCase#simpleWithNoHandling:flows/flows-with-module-using-raise-error.xml:47"));
   }
 
   @Test
@@ -112,7 +92,7 @@ public class ModuleUsingRaiseErrorTestCase extends AbstractCeXmlExtensionMuleArt
     assertThat(me.getInfo().get(INFO_SOURCE_XML_KEY),
                is("<module-using-raise-error:fail-custom-exception content=\"#[vars.food]\"></module-using-raise-error:fail-custom-exception>"));
     assertThat(me.getInfo().get(INFO_LOCATION_KEY),
-               is("simpleWithCustomJavaExceptionFlow/processors/0 @ ModuleUsingRaiseErrorTestCase#simpleWithCustomJavaException:flows/flows-with-module-using-raise-error.xml:89"));
+               is("simpleWithCustomJavaExceptionFlow/processors/0 @ ModuleUsingRaiseErrorTestCase#simpleWithCustomJavaException:flows/flows-with-module-using-raise-error.xml:51"));
 
     // we ensure the real cause of error is the one thrown by the marvel:read-data operation
     assertThat(me.getCause(), instanceOf(CustomErrorException.class));
