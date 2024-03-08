@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.routing;
+package org.mule.runtime.core.internal.routing.result;
 
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.api.i18n.I18nMessage;

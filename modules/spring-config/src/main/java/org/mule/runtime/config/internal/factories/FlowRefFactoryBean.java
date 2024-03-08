@@ -56,9 +56,9 @@ import org.mule.runtime.core.internal.exception.DeepSubFlowNestingFlowRefExcepti
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.RecursiveFlowRefException;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.routing.result.RoutePathNotFoundException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 

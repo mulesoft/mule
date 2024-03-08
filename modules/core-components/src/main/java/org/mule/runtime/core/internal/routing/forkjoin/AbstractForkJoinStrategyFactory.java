@@ -39,9 +39,9 @@ import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
+import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
+import org.mule.runtime.core.internal.routing.result.RoutingResult;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
-import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import java.time.Duration;
 import java.util.ArrayList;

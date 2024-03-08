@@ -28,7 +28,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.processor.simple",
         "org.mule.runtime.core.privileged.processor.chain",
         "org.mule.runtime.core.privileged.registry",
-        "org.mule.runtime.core.privileged.routing",
         "org.mule.runtime.core.privileged.store",
         "org.mule.runtime.core.privileged.transformer",
         "org.mule.runtime.core.privileged.transformer.simple",
@@ -201,7 +200,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
   exports org.mule.runtime.core.privileged.registry;
-  exports org.mule.runtime.core.privileged.routing;
   exports org.mule.runtime.core.privileged.store;
   exports org.mule.runtime.core.privileged.transformer;
   exports org.mule.runtime.core.privileged.util;
@@ -383,6 +381,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.routing.outbound to
       org.mule.runtime.core.components,
       com.mulesoft.mule.runtime.batch;
+  exports org.mule.runtime.core.internal.routing.result to
+      org.mule.runtime.core.components,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.split to
       org.mule.runtime.core.components,
       com.mulesoft.mule.runtime.batch;

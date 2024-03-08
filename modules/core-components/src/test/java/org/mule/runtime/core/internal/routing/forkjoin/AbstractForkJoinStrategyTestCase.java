@@ -7,11 +7,22 @@
 package org.mule.runtime.core.internal.routing.forkjoin;
 
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
+import static org.mule.runtime.core.api.event.CoreEvent.builder;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
+import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
+import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
+
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.IntStream.range;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,15 +40,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TIMEOUT;
-import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
-import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
-import static org.mule.test.allure.AllureConstants.ForkJoinStrategiesFeature.FORK_JOIN_STRATEGIES;
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.publisher.Flux.fromIterable;
 import static reactor.core.publisher.Mono.from;
@@ -60,10 +62,10 @@ import org.mule.runtime.core.api.util.func.CheckedConsumer;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
+import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
+import org.mule.runtime.core.internal.routing.result.RoutingResult;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
-import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -406,13 +408,7 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   protected Processor createProcessorSpy(Message result) throws MuleException {
     // Mockito does not support lambda
-    return spy(new InternalTestProcessor() {
-
-      @Override
-      public CoreEvent process(CoreEvent event) throws MuleException {
-        return CoreEvent.builder(event).message(result).build();
-      }
-    });
+    return spy((InternalTestProcessor) event -> CoreEvent.builder(event).message(result).build());
   }
 
   protected RoutingPair createRoutingPair(Processor processor) throws MuleException {
