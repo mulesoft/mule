@@ -6,7 +6,6 @@
  */
 package org.mule.functional.junit4;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -72,9 +71,6 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
-
-  @Rule
-  public SystemProperty parallelExtensionModelLoading = new SystemProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY, "true");
 
   @Inject
   protected Registry registry;
