@@ -6,6 +6,10 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.AT_LEAST_ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.MULTIPLE_OR_NONE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE_OR_NONE;
 import static org.mule.runtime.api.util.MuleSystemProperties.PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE;
 import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
 import static org.mule.test.allure.AllureConstants.MuleDsl.DslValidationStory.DSL_VALIDATION_STORY;
@@ -25,9 +29,8 @@ import static org.junit.Assert.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.mule.runtime.api.meta.ExpressionSupport;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ParameterDeclaration;
+import org.mule.runtime.api.meta.model.declaration.fluent.*;
+import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 
 import java.util.Collection;
@@ -125,5 +128,35 @@ public class MuleExtensionModelDeclarerTestCase {
       assertThat(parseTemplateOperation.getParameterGroup(ParameterGroupModel.OUTPUT).getParameters().stream()
           .filter(parameterDeclaration -> parameterDeclaration.getName().equals("targetValue")).collect(toList()), is(empty()));
     }
+  }
+
+  @Test
+  public void scopeAndRoutersShouldHaveOccurrence() {
+    MuleExtensionModelDeclarer muleExtensionModelDeclarer = new MuleExtensionModelDeclarer();
+    ExtensionDeclarer extensionDeclarer = muleExtensionModelDeclarer.createExtensionModel();
+    // TODO W-14954497: Scope and routers should be declared as Operations
+    ConstructDeclaration choiceDeclaration = extensionDeclarer.getDeclaration().getConstructs().stream()
+        .filter(operationDeclaration -> operationDeclaration.getName().equals("choice")).findFirst().get();
+    NestedChainDeclaration when =
+        (NestedChainDeclaration) choiceDeclaration.getNestedComponents().get(0).getNestedComponents().get(0);
+    NestedChainDeclaration otherwise =
+        (NestedChainDeclaration) choiceDeclaration.getNestedComponents().get(1).getNestedComponents().get(0);
+    assertThat(when.getOccurrence(), is(ONCE_OR_NONE));
+    assertThat(otherwise.getOccurrence(), is(ONCE_OR_NONE));
+
+    ConstructDeclaration foreachDeclaration = extensionDeclarer.getDeclaration().getConstructs().stream()
+        .filter(operationDeclaration -> operationDeclaration.getName().equals("foreach")).findFirst().get();
+    NestedChainDeclaration chain = (NestedChainDeclaration) foreachDeclaration.getNestedComponents().get(0);
+    assertThat(chain.getOccurrence(), is(MULTIPLE_OR_NONE));
+
+    ConstructDeclaration untilSuccessful = extensionDeclarer.getDeclaration().getConstructs().stream()
+        .filter(operationDeclaration -> operationDeclaration.getName().equals("untilSuccessful")).findFirst().get();
+    chain = (NestedChainDeclaration) untilSuccessful.getNestedComponents().get(0);
+    assertThat(chain.getOccurrence(), is(AT_LEAST_ONCE));
+
+    ConstructDeclaration tryScope = extensionDeclarer.getDeclaration().getConstructs().stream()
+        .filter(operationDeclaration -> operationDeclaration.getName().equals("try")).findFirst().get();
+    chain = (NestedChainDeclaration) tryScope.getNestedComponents().get(0);
+    assertThat(chain.getOccurrence(), is(ONCE));
   }
 }
