@@ -380,7 +380,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel = prepareAstForRuntime(applicationModel, applicationModel.dependencies());
+    applicationModel =
+        prepareAstForRuntime(applicationModel, applicationModel.dependencies(), ofNullable(featureFlaggingService));
   }
 
   @Override

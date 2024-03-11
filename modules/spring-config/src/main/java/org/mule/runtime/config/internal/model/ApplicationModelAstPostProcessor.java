@@ -8,12 +8,14 @@ package org.mule.runtime.config.internal.model;
 
 import static com.google.common.collect.Lists.newLinkedList;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -39,7 +41,8 @@ public interface ApplicationModelAstPostProcessor {
    * @param extensionModels the extensions that are registered for this AST's artifact.
    * @return a newly created AST
    */
-  ArtifactAst postProcessAst(ArtifactAst ast, Set<ExtensionModel> extensionModels);
+  ArtifactAst postProcessAst(ArtifactAst ast, Set<ExtensionModel> extensionModels,
+                             Optional<FeatureFlaggingService> featureFlaggingService);
 
   /**
    * Create a new set of root components to create Spring bean definitions for.
