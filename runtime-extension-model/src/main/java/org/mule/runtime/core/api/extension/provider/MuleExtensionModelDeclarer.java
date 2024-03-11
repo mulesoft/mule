@@ -734,7 +734,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer roundRobin = extensionDeclarer.withConstruct("roundRobin")
+    OperationDeclarer roundRobin = extensionDeclarer.withOperation("roundRobin")
         .describedAs("Send each message received to the next message processor in a circular list of targets.");
 
     addTrackingModuleParameters(roundRobin,
@@ -746,6 +746,9 @@ class MuleExtensionModelDeclarer {
         .withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE)
         .setExecutionOccurrence(ONCE_OR_NONE);
+
+    roundRobin.withOutput().ofDynamicType(ANY_TYPE);
+    roundRobin.withOutputAttributes().ofDynamicType(ANY_TYPE);
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
