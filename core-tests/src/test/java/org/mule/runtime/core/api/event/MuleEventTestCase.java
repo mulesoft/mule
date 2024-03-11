@@ -36,10 +36,10 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.internal.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;

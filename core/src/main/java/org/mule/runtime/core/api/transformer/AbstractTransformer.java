@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.transformer;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
@@ -26,8 +26,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.transformer.TransformerUtils;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;

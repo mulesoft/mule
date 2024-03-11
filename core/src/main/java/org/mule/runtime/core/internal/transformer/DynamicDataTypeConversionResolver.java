@@ -11,7 +11,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.DataTypeConversionResolver;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.List;
 

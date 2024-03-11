@@ -30,8 +30,8 @@ import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -290,7 +290,7 @@ public final class DefaultMessageBuilder
       private String contentType;
       private Object contents;
 
-      public SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
+      private SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
           throws IOException {
         if (handler != null && !(handler instanceof Serializable)) {
           contentType = handler.getContentType();

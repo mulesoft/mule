@@ -41,11 +41,11 @@ import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import org.mule.runtime.core.internal.event.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.EventInternalContext;
 import org.mule.runtime.core.internal.message.InternalMessage;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

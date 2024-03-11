@@ -26,10 +26,10 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Converter;
-
+import org.mule.runtime.core.internal.transformer.CompositeConverter;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
 import org.mule.runtime.core.internal.transformer.simple.InputStreamToByteArray;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
-
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

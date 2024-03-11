@@ -2,12 +2,69 @@
   "4.7.0": {
     "revapi": {
       "ignore": [
-		{
-		  "ignore": true,
-		  "code": "java.field.removed",
-		  "old": "field org.mule.runtime.core.api.config.DefaultMuleConfiguration.flowTrace",
-		  "justification": "W-14572236: Remove killswitches"
-		},
+        {
+          "ignore": true,
+          "code": "java.method.visibilityReduced",
+          "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.privileged.transformer.TransformersRegistry) throws java.io.IOException",
+          "new": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.internal.transformer.TransformersRegistry) throws java.io.IOException",
+          "oldVisibility": "public",
+          "newVisibility": "private",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.store.DeserializationPostInitialisable",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.CompositeConverter",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.ExtendedTransformationService",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.TransformerUtils",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.transformer.TransformersRegistry",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+        },
+        {
+          "ignore": true,
+          "code": "java.field.removed",
+          "old": "field org.mule.runtime.core.api.config.DefaultMuleConfiguration.flowTrace",
+          "justification": "W-14572236: Remove killswitches"
+        },
         {
           "ignore": true,
           "code": "java.method.removed",

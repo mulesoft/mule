@@ -30,9 +30,6 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged.registry",
         // for DataWeave
         "org.mule.runtime.core.privileged.routing",
-        "org.mule.runtime.core.privileged.store",
-        "org.mule.runtime.core.privileged.transformer",
-        "org.mule.runtime.core.privileged.transformer.simple",
         "org.mule.runtime.core.privileged.util",
         "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
@@ -195,17 +192,19 @@ module org.mule.runtime.core {
   // for DataWeave
   exports org.mule.runtime.core.privileged.metadata;
   exports org.mule.runtime.core.privileged.processor;
+  // for MUnit and Validation
   exports org.mule.runtime.core.privileged.processor.chain;
+  // for MTF
   exports org.mule.runtime.core.privileged.processor.objectfactory;
+  // for MTF
   exports org.mule.runtime.core.privileged.processor.simple;
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
+  // for Aggregators
   exports org.mule.runtime.core.privileged.registry;
   // for DataWeave
   exports org.mule.runtime.core.privileged.routing;
-  exports org.mule.runtime.core.privileged.store;
-  exports org.mule.runtime.core.privileged.transformer;
   exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
@@ -407,6 +406,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.store to
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
       org.mule.runtime.core.components,

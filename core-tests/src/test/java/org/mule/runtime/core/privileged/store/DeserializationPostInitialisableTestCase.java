@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.core.privileged.store;
 
+import static org.mule.runtime.core.internal.store.DeserializationPostInitialisable.Implementation.init;
+
 import static org.hamcrest.Matchers.is;
-import static org.mule.runtime.core.privileged.store.DeserializationPostInitialisable.Implementation.init;
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Test;

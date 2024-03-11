@@ -30,8 +30,8 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

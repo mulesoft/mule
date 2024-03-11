@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.core.privileged.transformer;
+package org.mule.runtime.core.internal.transformer;
 
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotRegistered;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformUnexpectedType;
