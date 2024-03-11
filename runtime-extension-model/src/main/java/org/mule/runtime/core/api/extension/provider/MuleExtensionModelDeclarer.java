@@ -746,7 +746,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    ConstructDeclarer scatterGather = extensionDeclarer.withConstruct("scatterGather")
+    OperationDeclarer scatterGather = extensionDeclarer.withOperation("scatterGather")
         .describedAs("Sends the same message to multiple message processors in parallel.")
         .withErrorModel(compositeRoutingError);
 
@@ -800,6 +800,10 @@ class MuleExtensionModelDeclarer {
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
         .withModelProperty(new TargetModelProperty());
+
+    // Comment to remember for the PR: how to set array of any?
+    scatterGather.withOutput().ofDynamicType(ANY_TYPE);
+    scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)

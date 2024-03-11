@@ -11,8 +11,12 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.*;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.AT_LEAST_ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.MULTIPLE_OR_NONE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE_OR_NONE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
@@ -22,6 +26,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
@@ -58,11 +63,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
 import org.mule.metadata.api.model.VoidType;
-import org.mule.metadata.api.model.impl.DefaultAnyType;
-import org.mule.metadata.api.model.impl.DefaultBooleanType;
-import org.mule.metadata.api.model.impl.DefaultNumberType;
-import org.mule.metadata.api.model.impl.DefaultObjectType;
-import org.mule.metadata.api.model.impl.DefaultStringType;
+import org.mule.metadata.api.model.impl.*;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -156,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(9));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(20));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(11));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(18));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -464,7 +465,9 @@ public class CoreExtensionModelTestCase {
     assertThat(parameterModels, hasSize(4));
 
     Set<String> parameterNames = parameterModels.stream().map(NamedObject::getName).collect(toSet());
-    assertThat(parameterNames, containsInAnyOrder("enableDefaultEvents", "target", "targetValue", "errorMappings"));
+    assertThat(parameterNames,
+               containsInAnyOrder("enableDefaultEvents", TARGET_PARAMETER_NAME, TARGET_VALUE_PARAMETER_NAME,
+                                  ERROR_MAPPINGS_PARAMETER_NAME));
 
     assertThat(choiceModel.getNestedComponents(), hasSize(2));
 
@@ -478,19 +481,24 @@ public class CoreExtensionModelTestCase {
     assertThat(whenRouteModel.getAllParameterModels().get(0).getExpressionSupport(), is(SUPPORTED));
     assertThat(whenRouteModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultBooleanType.class));
     assertThat(whenRouteModel.getAllParameterModels().get(0).isRequired(), is(true));
+    assertThat(whenRouteModel.getNestedComponents(), hasSize(1));
+    final NestedChainModel whenChainModel = (NestedChainModel) whenRouteModel.getNestedComponents().get(0);
+    assertThat(whenChainModel.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
 
     final NestedRouteModel otherwiseRouteModel = (NestedRouteModel) choiceModel.getNestedComponents().get(1);
     assertThat(otherwiseRouteModel.getName(), is("otherwise"));
     assertThat(otherwiseRouteModel.getMinOccurs(), is(0));
     assertThat(otherwiseRouteModel.getMaxOccurs().get(), is(1));
     assertThat(otherwiseRouteModel.getAllParameterModels(), empty());
+    final NestedChainModel otherwiseChainModel = (NestedChainModel) otherwiseRouteModel.getNestedComponents().get(0);
+    assertThat(otherwiseChainModel.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
   }
 
   @Test
   public void scatterGather() {
-    final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
+    final OperationModel scatterGatherModel = coreExtensionModel.getOperationModel("scatterGather").get();
 
-    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(5));
+    assertThat(scatterGatherModel.getAllParameterModels(), hasSize(6));
 
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getName(), is("timeout"));
     assertThat(scatterGatherModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
@@ -507,15 +515,9 @@ public class CoreExtensionModelTestCase {
     assertThat(scatterGatherModel.getAllParameterModels().get(2).getType(), instanceOf(DefaultObjectType.class));
     assertThat(scatterGatherModel.getAllParameterModels().get(2).isRequired(), is(false));
 
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).getType(), instanceOf(DefaultStringType.class));
-    assertThat(scatterGatherModel.getAllParameterModels().get(3).isRequired(), is(false));
-
-    assertThat(scatterGatherModel.getAllParameterModels().get(4).getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(scatterGatherModel.getAllParameterModels().get(4).getExpressionSupport(), is(REQUIRED));
-    assertThat(scatterGatherModel.getAllParameterModels().get(4).getType(), instanceOf(StringType.class));
-    assertThat(scatterGatherModel.getAllParameterModels().get(4).isRequired(), is(false));
+    assertTarget(scatterGatherModel.getAllParameterModels().get(3));
+    assertTargetValue(scatterGatherModel.getAllParameterModels().get(4));
+    assertErrorMappings(scatterGatherModel.getAllParameterModels().get(5));
 
     assertThat(scatterGatherModel.getNestedComponents(), hasSize(1));
 
@@ -524,12 +526,16 @@ public class CoreExtensionModelTestCase {
     assertThat(routeModel.getMinOccurs(), is(2));
     assertThat(routeModel.getMaxOccurs(), is(Optional.empty()));
     assertThat(routeModel.getAllParameterModels(), empty());
+    assertThat(routeModel.getNestedComponents(), hasSize(1));
+
+    final NestedChainModel chainModel = (NestedChainModel) routeModel.getNestedComponents().get(0);
+    assertThat(chainModel.getChainExecutionOccurrence(), is(ONCE));
   }
 
   @Test
   @Issue("MULE-19653")
   public void scatterGatherOutputParams() {
-    final ConstructModel scatterGatherModel = coreExtensionModel.getConstructModel("scatterGather").get();
+    final OperationModel scatterGatherModel = coreExtensionModel.getOperationModel("scatterGather").get();
 
     ParameterGroupModel outputGroup =
         scatterGatherModel.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
@@ -572,17 +578,8 @@ public class CoreExtensionModelTestCase {
     assertThat(maxConcurrency.getType(), instanceOf(DefaultNumberType.class));
     assertThat(maxConcurrency.isRequired(), is(false));
 
-    final ParameterModel target = parallelForeach.getAllParameterModels().get(3);
-    assertThat(target.getName(), is(TARGET_PARAMETER_NAME));
-    assertThat(target.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(target.getType(), instanceOf(DefaultStringType.class));
-    assertThat(target.isRequired(), is(false));
-
-    final ParameterModel targetValue = parallelForeach.getAllParameterModels().get(4);
-    assertThat(targetValue.getName(), is(TARGET_VALUE_PARAMETER_NAME));
-    assertThat(targetValue.getExpressionSupport(), is(REQUIRED));
-    assertThat(targetValue.getType(), instanceOf(StringType.class));
-    assertThat(targetValue.isRequired(), is(false));
+    assertTarget(parallelForeach.getAllParameterModels().get(3));
+    assertTargetValue(parallelForeach.getAllParameterModels().get(4));
   }
 
   @Test
@@ -619,10 +616,10 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void tryScope() {
-    final ConstructModel tryModel = coreExtensionModel.getConstructModel("try").get();
+    final OperationModel tryModel = coreExtensionModel.getOperationModel("try").get();
 
     List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(2));
+    assertThat(allParameterModels, hasSize(5));
 
     ParameterModel action = allParameterModels.get(0);
     assertThat(action.getName(), is("transactionalAction"));
@@ -635,6 +632,18 @@ public class CoreExtensionModelTestCase {
     assertThat(type.getType(), is(instanceOf(DefaultStringType.class)));
     assertThat(type.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(type.isRequired(), is(false));
+
+    assertTarget(allParameterModels.get(2));
+    assertTargetValue(allParameterModels.get(3));
+    assertErrorMappings(allParameterModels.get(4));
+
+    assertThat(tryModel.getNestedComponents(), hasSize(2));
+
+    NestedChainModel chain = (NestedChainModel) tryModel.getNestedComponents().get(0);
+    assertThat(chain.getName(), is("processors"));
+    assertThat(chain.getChainExecutionOccurrence(), is(ONCE));
+
+    assertThat(tryModel.getNestedComponents().get(1).getName(), is("errorHandler"));
   }
 
   @Test
@@ -947,11 +956,17 @@ public class CoreExtensionModelTestCase {
   }
 
   private void assertTarget(final ParameterModel targetParameterModel) {
-    assertThat(targetParameterModel.getName(), is("target"));
+    assertThat(targetParameterModel.getName(), is(TARGET_PARAMETER_NAME));
     assertThat(targetParameterModel.getExpressionSupport(), is(NOT_SUPPORTED));
-    assertThat(targetParameterModel.getType(), instanceOf(DefaultStringType.class));
     assertThat(targetParameterModel.getType(), is(instanceOf(StringType.class)));
     assertThat(targetParameterModel.isRequired(), is(false));
+  }
+
+  private void assertTargetValue(final ParameterModel targetValueParameterModel) {
+    assertThat(targetValueParameterModel.getName(), is(TARGET_VALUE_PARAMETER_NAME));
+    assertThat(targetValueParameterModel.getType(), is(instanceOf(DefaultStringType.class)));
+    assertThat(targetValueParameterModel.getExpressionSupport(), is(REQUIRED));
+    assertThat(targetValueParameterModel.isRequired(), is(false));
   }
 
   private void assertErrorType(ParameterModel errorTypeParam, String paramName) {
@@ -992,15 +1007,16 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.getType(), is(instanceOf(BooleanType.class)));
   }
 
+  private void assertErrorMappings(ParameterModel errorMappings) {
+    assertThat(errorMappings.getName(), is(ERROR_MAPPINGS_PARAMETER_NAME));
+    assertThat(errorMappings.getType(), is(instanceOf(DefaultArrayType.class)));
+    assertThat(errorMappings.getExpressionSupport(), is(NOT_SUPPORTED));
+    assertThat(errorMappings.isRequired(), is(false));
+  }
+
   @Test
   public void scopeAndRoutersShouldHaveOccurrence() {
     // TODO W-14954497: Scope and routers should be declared as Operations
-    OperationModel choice = coreExtensionModel.getOperationModel("choice").get();
-    NestedChainModel when = (NestedChainModel) choice.getNestedComponents().get(0).getNestedComponents().get(0);
-    NestedChainModel otherwise = (NestedChainModel) choice.getNestedComponents().get(1).getNestedComponents().get(0);
-    assertThat(when.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
-    assertThat(otherwise.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
-
     ConstructModel foreach = coreExtensionModel.getConstructModel("foreach").get();
     NestedChainModel chain = (NestedChainModel) foreach.getNestedComponents().get(0);
     assertThat(chain.getChainExecutionOccurrence(), is(MULTIPLE_OR_NONE));
@@ -1008,9 +1024,5 @@ public class CoreExtensionModelTestCase {
     ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
     chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
     assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
-
-    OperationModel tryScope = coreExtensionModel.getOperationModel("try").get();
-    chain = (NestedChainModel) tryScope.getNestedComponents().get(0);
-    assertThat(chain.getChainExecutionOccurrence(), is(ONCE));
   }
 }
