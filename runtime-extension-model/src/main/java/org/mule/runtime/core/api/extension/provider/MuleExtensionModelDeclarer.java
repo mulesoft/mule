@@ -810,7 +810,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    ConstructDeclarer parallelForeach = extensionDeclarer.withConstruct("parallelForeach")
+    OperationDeclarer parallelForeach = extensionDeclarer.withOperation("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
@@ -856,6 +856,10 @@ class MuleExtensionModelDeclarer {
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
         .withModelProperty(new TargetModelProperty());
+
+    // Comment to remember for the PR: how to set array of any?
+    parallelForeach.withOutput().ofDynamicType(ANY_TYPE);
+    parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {

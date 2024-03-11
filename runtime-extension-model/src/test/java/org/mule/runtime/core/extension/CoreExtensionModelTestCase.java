@@ -157,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(11));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(18));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(12));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(17));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -546,16 +546,17 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void parallelForeach() {
-    final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
+    final OperationModel parallelForeach = coreExtensionModel.getOperationModel("parallelForeach").get();
 
     assertThat(parallelForeach.getModelProperty(SinceMuleVersionModelProperty.class).map(mp -> mp.getVersion().toString())
         .orElse("NO MODEL PROPERTY"), equalTo("4.2.0"));
 
-    NestableElementModel processorsChain = parallelForeach.getNestedComponents().get(0);
+    NestedChainModel processorsChain = (NestedChainModel) parallelForeach.getNestedComponents().get(0);
     assertThat(processorsChain, instanceOf(NestedChainModel.class));
     assertThat(processorsChain.isRequired(), is(true));
+    assertThat(processorsChain.getChainExecutionOccurrence(), is(MULTIPLE_OR_NONE));
 
-    assertThat(parallelForeach.getAllParameterModels(), hasSize(5));
+    assertThat(parallelForeach.getAllParameterModels(), hasSize(6));
 
     final ParameterModel collection = parallelForeach.getAllParameterModels().get(0);
     assertThat(collection.getName(), is("collection"));
@@ -580,12 +581,13 @@ public class CoreExtensionModelTestCase {
 
     assertTarget(parallelForeach.getAllParameterModels().get(3));
     assertTargetValue(parallelForeach.getAllParameterModels().get(4));
+    assertErrorMappings(parallelForeach.getAllParameterModels().get(5));
   }
 
   @Test
   @Issue("MULE-19653")
   public void parallelForeachOutputParams() {
-    final ConstructModel parallelForeach = coreExtensionModel.getConstructModel("parallelForeach").get();
+    final OperationModel parallelForeach = coreExtensionModel.getOperationModel("parallelForeach").get();
 
     ParameterGroupModel outputGroup =
         parallelForeach.getParameterGroupModels().stream().filter(pg -> pg.getName().equals(OUTPUT)).findAny().get();
