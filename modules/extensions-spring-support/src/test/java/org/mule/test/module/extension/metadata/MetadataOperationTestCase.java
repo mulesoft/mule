@@ -38,6 +38,7 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA_DISPLAY_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -72,11 +73,16 @@ import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderRes
 import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import io.qameta.allure.Issue;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -262,6 +268,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-15158118")
   public void outputMultipleInputWithKeyIdExplicitParameterResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult = metadataService.getOutputMetadata(location, CAR_KEY);
@@ -272,6 +279,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-15158118")
   public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     ScopePropagationContext scopeContext = new ScopePropagationContext() {
