@@ -101,6 +101,7 @@ import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
+import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
@@ -648,7 +649,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer choice = extensionDeclarer.withConstruct("choice")
+    OperationDeclarer choice = extensionDeclarer.withOperation("choice")
         .describedAs("Sends the message to the first message processor whose condition is satisfied. "
             + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
             + "or fails if there is none.")
@@ -666,6 +667,8 @@ class MuleExtensionModelDeclarer {
 
     choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE)
         .setExecutionOccurrence(ONCE_OR_NONE);
+    choice.withOutput().ofDynamicType(ANY_TYPE);
+    choice.withOutputAttributes().ofDynamicType(ANY_TYPE);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -1441,7 +1444,8 @@ class MuleExtensionModelDeclarer {
   }
 
   // Tracking is an EE module that uses parameters defined in Core components. This method adds those parameters.
-  private void addTrackingModuleParameters(ConstructDeclarer componentDeclarer, String description) {
+  private <T extends ComponentDeclarer, D extends ComponentDeclaration> void addTrackingModuleParameters(ComponentDeclarer<T, D> componentDeclarer,
+                                                                                                         String description) {
     componentDeclarer.onParameterGroup(BUSINESS_EVENTS)
         .withOptionalParameter("enableDefaultEvents")
         .describedAs(description)

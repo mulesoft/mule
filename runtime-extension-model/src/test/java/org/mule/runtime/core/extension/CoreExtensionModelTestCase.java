@@ -11,6 +11,7 @@ import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
 import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.*;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.TRANSFORMATION;
@@ -34,10 +35,12 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toSet;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -61,6 +64,7 @@ import org.mule.metadata.api.model.impl.DefaultNumberType;
 import org.mule.metadata.api.model.impl.DefaultObjectType;
 import org.mule.metadata.api.model.impl.DefaultStringType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
 import org.mule.runtime.api.meta.model.SubTypesModel;
@@ -85,6 +89,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -151,8 +156,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(8));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(21));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(9));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(20));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -453,15 +458,13 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void choice() {
-    final ConstructModel choiceModel = coreExtensionModel.getConstructModel("choice").get();
-
-    assertThat(choiceModel.allowsTopLevelDeclaration(), is(false));
+    final OperationModel choiceModel = coreExtensionModel.getOperationModel("choice").get();
 
     final List<ParameterModel> parameterModels = choiceModel.getAllParameterModels();
-    assertThat(parameterModels, hasSize(1));
+    assertThat(parameterModels, hasSize(4));
 
-    ParameterModel trackingEnableDefaultEvents = parameterModels.get(0);
-    assertThat(trackingEnableDefaultEvents.getName(), is("enableDefaultEvents"));
+    Set<String> parameterNames = parameterModels.stream().map(NamedObject::getName).collect(toSet());
+    assertThat(parameterNames, containsInAnyOrder("enableDefaultEvents", "target", "targetValue", "errorMappings"));
 
     assertThat(choiceModel.getNestedComponents(), hasSize(2));
 
@@ -987,5 +990,27 @@ public class CoreExtensionModelTestCase {
     assertThat(paramModel.isRequired(), is(false));
     assertThat(paramModel.getDefaultValue(), is(false));
     assertThat(paramModel.getType(), is(instanceOf(BooleanType.class)));
+  }
+
+  @Test
+  public void scopeAndRoutersShouldHaveOccurrence() {
+    // TODO W-14954497: Scope and routers should be declared as Operations
+    OperationModel choice = coreExtensionModel.getOperationModel("choice").get();
+    NestedChainModel when = (NestedChainModel) choice.getNestedComponents().get(0).getNestedComponents().get(0);
+    NestedChainModel otherwise = (NestedChainModel) choice.getNestedComponents().get(1).getNestedComponents().get(0);
+    assertThat(when.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
+    assertThat(otherwise.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
+
+    ConstructModel foreach = coreExtensionModel.getConstructModel("foreach").get();
+    NestedChainModel chain = (NestedChainModel) foreach.getNestedComponents().get(0);
+    assertThat(chain.getChainExecutionOccurrence(), is(MULTIPLE_OR_NONE));
+
+    ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
+    chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
+    assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
+
+    ConstructModel tryScope = coreExtensionModel.getConstructModel("try").get();
+    chain = (NestedChainModel) tryScope.getNestedComponents().get(0);
+    assertThat(chain.getChainExecutionOccurrence(), is(ONCE));
   }
 }
