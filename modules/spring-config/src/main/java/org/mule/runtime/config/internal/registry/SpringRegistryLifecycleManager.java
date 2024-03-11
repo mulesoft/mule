@@ -24,14 +24,12 @@ import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolve
 import org.mule.runtime.config.internal.resolvers.DeclaredDependencyResolver;
 import org.mule.runtime.config.internal.resolvers.DependencyGraphBeanDependencyResolver;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.Transformer;
@@ -49,7 +47,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.OutboundRouter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.util.Map;
@@ -110,10 +107,7 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
           ExtensionManager.class,
           AbstractSpringRegistry.class,
           SpringRegistryBootstrap.class,
-          Component.class,
-          InterceptingMessageProcessor.class,
           FlowExceptionHandler.class,
-          OutboundRouter.class,
           MessageProcessorChain.class,
           MuleContext.class,
           Service.class
@@ -172,9 +166,6 @@ public class SpringRegistryLifecycleManager extends RegistryLifecycleManager {
     public SpringContextDisposePhase() {
       super();
       Class<?>[] ignoredObjects = new Class[] {
-          Component.class,
-          InterceptingMessageProcessor.class,
-          OutboundRouter.class,
           MuleContext.class,
           ServerNotificationManager.class,
           Service.class,

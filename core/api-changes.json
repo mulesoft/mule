@@ -77,6 +77,120 @@
         {
           "ignore": true,
           "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.component.Component",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.processor.InterceptingMessageProcessor",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.processor.AbstractRedeliveryPolicy",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.CompositeRoutingException",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.Matchable",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.MatchableMessageProcessor",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.MatchableRouter",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.OutboundRouter",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.ResponseTimeoutException",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.RoutePathNotFoundException",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.RouterResultsHandler",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.RoutingException",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.routing.RoutingResult",
+          "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+        },
+        {
+          "ignore": true,
+          "code": "java.class.removed",
           "old": "class org.mule.runtime.core.privileged.component.AbstractExecutableComponent",
           "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
         },
