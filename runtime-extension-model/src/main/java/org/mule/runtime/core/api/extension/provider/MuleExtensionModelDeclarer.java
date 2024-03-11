@@ -385,7 +385,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer async = extensionDeclarer.withConstruct("async")
+    OperationDeclarer async = extensionDeclarer.withOperation("async")
         .describedAs("Processes the nested list of message processors asynchronously.");
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
@@ -400,6 +400,8 @@ class MuleExtensionModelDeclarer {
         .describedAs("The maximum concurrency. This value determines the maximum level of parallelism that this async router can use to optimize its performance when processing messages.")
         .ofType(BASE_TYPE_BUILDER.numberType().integer().range(1, null).build())
         .withExpressionSupport(NOT_SUPPORTED);
+    async.withOutput().ofType(VOID_TYPE);
+    async.withOutputAttributes().ofType(VOID_TYPE);
   }
 
   private void declareFlowRef(ExtensionDeclarer extensionDeclarer) {

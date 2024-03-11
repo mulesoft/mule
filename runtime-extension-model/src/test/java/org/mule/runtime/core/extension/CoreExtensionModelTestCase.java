@@ -157,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(14));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(15));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(14));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -598,14 +598,15 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void async() {
-    final ConstructModel asyncModel = coreExtensionModel.getConstructModel("async").get();
+    final OperationModel asyncModel = coreExtensionModel.getOperationModel("async").get();
 
     assertThat(asyncModel.getNestedComponents(), hasSize(1));
-    NestableElementModel processors = asyncModel.getNestedComponents().get(0);
+    NestedChainModel processors = (NestedChainModel) asyncModel.getNestedComponents().get(0);
     assertThat(processors, instanceOf(NestedChainModel.class));
     assertThat(processors.isRequired(), is(true));
+    assertThat(processors.getChainExecutionOccurrence(), is(ONCE));
 
-    assertThat(asyncModel.getAllParameterModels(), hasSize(2));
+    assertThat(asyncModel.getAllParameterModels(), hasSize(3));
     assertThat(asyncModel.getAllParameterModels().get(0).getName(), is("name"));
     assertThat(asyncModel.getAllParameterModels().get(0).getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(asyncModel.getAllParameterModels().get(0).getType(), instanceOf(DefaultStringType.class));
@@ -614,6 +615,7 @@ public class CoreExtensionModelTestCase {
     assertThat(asyncModel.getAllParameterModels().get(1).getName(), is("maxConcurrency"));
     assertThat(asyncModel.getAllParameterModels().get(1).getType(), instanceOf(DefaultNumberType.class));
     assertThat(asyncModel.getAllParameterModels().get(1).isRequired(), is(false));
+    assertErrorMappings(asyncModel.getAllParameterModels().get(2));
   }
 
   @Test
