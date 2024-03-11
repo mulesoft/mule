@@ -23,6 +23,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.processor.Router;
+import org.mule.runtime.core.privileged.routing.RoutingResult;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

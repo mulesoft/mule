@@ -63,9 +63,9 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
-import org.mule.runtime.core.internal.routing.result.RoutingResult;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.core.privileged.routing.RoutingResult;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 
@@ -408,7 +408,13 @@ public abstract class AbstractForkJoinStrategyTestCase extends AbstractMuleConte
 
   protected Processor createProcessorSpy(Message result) throws MuleException {
     // Mockito does not support lambda
-    return spy((InternalTestProcessor) event -> CoreEvent.builder(event).message(result).build());
+    return spy(new InternalTestProcessor() {
+
+      @Override
+      public CoreEvent process(CoreEvent event) throws MuleException {
+        return CoreEvent.builder(event).message(result).build();
+      }
+    });
   }
 
   protected RoutingPair createRoutingPair(Processor processor) throws MuleException {
