@@ -1009,7 +1009,7 @@ public class CoreExtensionModelTestCase {
     chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
     assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
 
-    ConstructModel tryScope = coreExtensionModel.getConstructModel("try").get();
+    OperationModel tryScope = coreExtensionModel.getOperationModel("try").get();
     chain = (NestedChainModel) tryScope.getNestedComponents().get(0);
     assertThat(chain.getChainExecutionOccurrence(), is(ONCE));
   }

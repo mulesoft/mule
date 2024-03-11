@@ -855,7 +855,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer tryScope = extensionDeclarer.withConstruct("try")
+    OperationDeclarer tryScope = extensionDeclarer.withOperation("try")
         .describedAs("Processes the nested list of message processors, "
             + "within a transaction and with it's own error handler if required.")
         .withErrorModel(transactionError);
@@ -877,11 +877,13 @@ class MuleExtensionModelDeclarer {
             + "though LOCAL is always available.");
 
     tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
+    tryScope.withOutput().ofDynamicType(ANY_TYPE);
+    tryScope.withOutputAttributes().ofDynamicType(ANY_TYPE);
 
     addErrorHandling(tryScope);
   }
 
-  private void addErrorHandling(ConstructDeclarer chain) {
+  private <T extends ComponentDeclarer, D extends ComponentDeclaration> void addErrorHandling(ComponentDeclarer<T, D> chain) {
     final NestedComponentDeclarer errorHandler = chain.withOptionalComponent("errorHandler");
     errorHandler
         .withAllowedStereotypes(ERROR_HANDLER)
