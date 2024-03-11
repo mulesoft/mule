@@ -18,36 +18,6 @@
         </petstore:pets>
     </petstore:config>
 
-    <operation name="fail-proxy">
-        <parameters>
-            <parameter name="petNames" type="string"/>
-            <parameter name="errorMappingTargetType" type="string" defaultValue="APP:A_DEFAULT_TARGET"/>
-            <parameter name="errorMappingSourceType" type="string" defaultValue="ANY"/>
-            <parameter name="secondErrorMappingTargetType" type="string" defaultValue="APP:ANOTHER_DEFAULT_TARGET"/>
-            <parameter name="secondErrorMappingSourceType" type="string" defaultValue="ANY"/>
-            <parameter name="failExpression" type="boolean"/>
-        </parameters>
-        <body>
-            <mule:choice>
-                <!-- TODO MULE-13638: Partial fix until there's a way to make the calling to petstore:fail breaks differently depending on the 'petNames' parametrization -->
-                <mule:when expression="#[vars.failExpression]">
-                    <!-- defining an expression that will always fail -->
-                    <petstore:fail petNames="#[ ' ++ as Object  ]">
-                        <mule:error-mapping targetType="#[vars.errorMappingTargetType]" sourceType="#[vars.errorMappingSourceType]"/>
-                        <mule:error-mapping targetType="#[vars.secondErrorMappingTargetType]" sourceType="#[vars.secondErrorMappingSourceType]"/>
-                    </petstore:fail>
-                </mule:when>
-                <mule:otherwise>
-                    <petstore:fail petNames="#[vars.petNames]">
-                        <mule:error-mapping targetType="#[vars.errorMappingTargetType]" sourceType="#[vars.errorMappingSourceType]"/>
-                        <mule:error-mapping targetType="#[vars.secondErrorMappingTargetType]" sourceType="#[vars.secondErrorMappingSourceType]"/>
-                    </petstore:fail>
-                </mule:otherwise>
-            </mule:choice>
-        </body>
-        <output type="string"/>
-    </operation>
-
     <operation name="fail-raise-error">
         <parameters>
             <parameter name="petNames" type="string"/>
