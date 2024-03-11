@@ -717,7 +717,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer firstSuccessful = extensionDeclarer.withConstruct("firstSuccessful")
+    OperationDeclarer firstSuccessful = extensionDeclarer.withOperation("firstSuccessful")
         .describedAs("Sends a message to a list of message processors until one processes it successfully.");
 
     addTrackingModuleParameters(firstSuccessful,
@@ -728,6 +728,9 @@ class MuleExtensionModelDeclarer {
         .withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE)
         .setExecutionOccurrence(ONCE_OR_NONE);
+
+    firstSuccessful.withOutput().ofDynamicType(ANY_TYPE);
+    firstSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {

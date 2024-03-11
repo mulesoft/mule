@@ -157,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(12));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(17));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(13));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(16));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -672,13 +672,27 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void firstSuccessful() {
-    final ConstructModel firstSuccessful = coreExtensionModel.getConstructModel("firstSuccessful").get();
+    final OperationModel firstSuccessful = coreExtensionModel.getOperationModel("firstSuccessful").get();
 
     List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(1));
+    assertThat(allParameterModels, hasSize(4));
 
     ParameterModel trackingEnableDefaultEvents = allParameterModels.get(0);
     assertThat(trackingEnableDefaultEvents.getName(), is("enableDefaultEvents"));
+    assertTarget(allParameterModels.get(1));
+    assertTargetValue(allParameterModels.get(2));
+    assertErrorMappings(allParameterModels.get(3));
+
+    assertThat(firstSuccessful.getNestedComponents(), hasSize(1));
+    final NestedRouteModel routeModel = (NestedRouteModel) firstSuccessful.getNestedComponents().get(0);
+    assertThat(routeModel.getName(), is("route"));
+    assertThat(routeModel.getMinOccurs(), is(0));
+    assertThat(routeModel.getMaxOccurs(), is(Optional.empty()));
+    assertThat(routeModel.getAllParameterModels(), empty());
+    assertThat(routeModel.getNestedComponents(), hasSize(1));
+
+    final NestedChainModel chainModel = (NestedChainModel) routeModel.getNestedComponents().get(0);
+    assertThat(chainModel.getChainExecutionOccurrence(), is(ONCE_OR_NONE));
   }
 
   @Test
