@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
@@ -161,9 +160,9 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     if (!(chainLocation instanceof DefaultComponentLocation)) {
       return chainLocation;
     }
+    // As per W-15158118, we need to remove the 'processors' added to the location of the scope, that identifies the chain
     Optional<String> name = ((DefaultComponentLocation) chainLocation).getName();
     List<LocationPart> originalParts = chainLocation.getParts();
-    // As per W-15158118, we need to remove the 'processors' added to the location of the scope, that identifies the chain
     List<DefaultComponentLocation.DefaultLocationPart> parts = new ArrayList<>();
     for (LocationPart part : originalParts.subList(0, originalParts.size() - 1)) {
       parts.add((DefaultComponentLocation.DefaultLocationPart) part);
