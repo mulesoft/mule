@@ -272,7 +272,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
-  public void outputScopeZaraza() throws Exception {
+  public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     ScopePropagationContext scopeContext = new ScopePropagationContext() {
 
@@ -295,7 +295,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
-  public void outputRouterZaraza() throws Exception {
+  public void outputResolverForRouter() throws Exception {
     location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
 
