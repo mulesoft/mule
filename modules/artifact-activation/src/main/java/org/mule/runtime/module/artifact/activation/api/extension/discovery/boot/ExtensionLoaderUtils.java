@@ -6,10 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery.boot;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionModelLoaderProviders;
-
-import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
@@ -59,7 +56,7 @@ public final class ExtensionLoaderUtils {
   }
 
   public static boolean isParallelExtensionModelLoadingEnabled() {
-    return getBoolean(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY);
+    return true;
   }
 
   private ExtensionLoaderUtils() {}
