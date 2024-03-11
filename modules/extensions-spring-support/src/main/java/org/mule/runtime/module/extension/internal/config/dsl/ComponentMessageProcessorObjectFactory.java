@@ -16,6 +16,7 @@ import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -24,6 +25,7 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -33,7 +35,10 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMes
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 
+import javax.xml.namespace.QName;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
@@ -82,7 +87,13 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
                                                                              nestedChain)));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
-      nestedChain.setAnnotations(this.getAnnotations());
+      // Update: For W-15158118, to avoid issues with the registration of the chain in the component locator, we are adding the
+      // location with the 'processors' part, since the location that we want to model is the chain's one, not the scope. This is
+      // then updated in the ChildContextChainExecutor
+      Map<QName, Object> annotations = new HashMap<>(this.getAnnotations());
+      ComponentLocation chainLocation = ((DefaultComponentLocation) annotations.get(LOCATION_KEY)).appendProcessorsPart();
+      annotations.put(LOCATION_KEY, chainLocation);
+      nestedChain.setAnnotations(annotations);
     } else {
       nestedChain = null;
     }

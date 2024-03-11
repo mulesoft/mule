@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -19,12 +21,15 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -71,7 +76,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(streamingManager, this.originalEvent, this.chain);
-    this.location = chain.getLocation();
+    this.location = calculateComponentLocation(chain.getLocation());
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 
@@ -150,5 +155,19 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   @Override
   public CoreEvent getOriginalEvent() {
     return originalEvent;
+  }
+
+  private ComponentLocation calculateComponentLocation(ComponentLocation chainLocation) {
+    if (!(chainLocation instanceof DefaultComponentLocation)) {
+      return chainLocation;
+    }
+    Optional<String> name = ((DefaultComponentLocation) chainLocation).getName();
+    List<LocationPart> originalParts = chainLocation.getParts();
+    // As per W-15158118, we need to remove the 'processors' added to the location of the scope, that identifies the chain
+    List<DefaultComponentLocation.DefaultLocationPart> parts = new ArrayList<>();
+    for (LocationPart part : originalParts.subList(0, originalParts.size() - 1)) {
+      parts.add((DefaultComponentLocation.DefaultLocationPart) part);
+    }
+    return new DefaultComponentLocation(name, parts);
   }
 }
