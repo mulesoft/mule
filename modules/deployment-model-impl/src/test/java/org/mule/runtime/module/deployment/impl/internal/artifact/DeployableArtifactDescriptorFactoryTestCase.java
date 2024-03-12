@@ -59,13 +59,19 @@ import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorL
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
+import org.mule.runtime.module.deployment.impl.internal.domain.test.DomainDescriptorFactoryTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -110,7 +116,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   protected static final String ARTIFACT_NAME = "test";
 
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException {
+  public static void beforeClass() throws URISyntaxException, IOException {
     echoTestJarFile = new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
         .including(getResourceFile("/test-resource.txt"), "META-INF/MANIFEST.MF")
         .including(getResourceFile("/test-resource.txt"), "README.txt")
@@ -371,9 +377,78 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
       throws Exception {
+    replacePlaceholderInClassloaderModel();
     final String location = "/plugin-dependency-with-additional-dependencies-lightweight-local-repository";
     populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "local-repository"));
     assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
+  }
+
+  private void replacePlaceholderInClassloaderModel() throws IOException {
+    String root;
+    if (getClass().equals(DomainDescriptorFactoryTestCase.class)) {
+      root = "/domains";
+    } else {
+      root = "/apps";
+    }
+
+    String content =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json"));
+
+    String content2 =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json"));
+
+    System.setProperty("outputDirectory",
+                       getClass().getResource("/").toString());
+
+    String replacedContent = replacePlaceholderWithSystemProperty(content, "outputDirectory");
+    String replacedContent2 = replacePlaceholderWithSystemProperty(content2, "outputDirectory");
+
+
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json")
+        .getPath(),
+              replacedContent);
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json")
+        .getPath(),
+              replacedContent2);
+  }
+
+  private static String readFile(InputStream inputStream) throws IOException {
+    StringBuilder content = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        content.append(line).append(System.lineSeparator());
+      }
+    }
+    return content.toString();
+  }
+
+  private static void writeFile(String filePath, String content) throws IOException {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+      writer.write(content);
+    }
+  }
+
+  private static String replacePlaceholderWithSystemProperty(String content, String placeholder) {
+    // Replace ${placeholder} with the system property value
+    String placeholderString = "${" + placeholder + "}";
+    String replacement = System.getProperty(placeholder);
+
+    if (replacement != null) {
+      content = content.replace(placeholderString, replacement);
+    } else {
+      System.err.println("System property not set for " + placeholderString);
+    }
+
+    return content;
   }
 
   @Test
