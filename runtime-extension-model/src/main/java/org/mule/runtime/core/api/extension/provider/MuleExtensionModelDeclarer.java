@@ -587,7 +587,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
-    ConstructDeclarer forEach = extensionDeclarer.withConstruct("foreach")
+    OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
             + " generating a message for each element.");
 
@@ -623,6 +623,9 @@ class MuleExtensionModelDeclarer {
         .defaultingTo("counter")
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("Variable name for the item number being processed.");
+
+    forEach.withOutput().ofType(VOID_TYPE);
+    forEach.withOutputAttributes().ofType(VOID_TYPE);
 
   }
 

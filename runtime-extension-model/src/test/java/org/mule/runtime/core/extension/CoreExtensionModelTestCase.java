@@ -157,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(15));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(14));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(16));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(13));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -365,14 +365,14 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void foreach() {
-    final ConstructModel foreach = coreExtensionModel.getConstructModel("foreach").get();
+    final OperationModel foreach = coreExtensionModel.getOperationModel("foreach").get();
 
     assertThat(foreach.getNestedComponents().size(), is(1));
     NestableElementModel processorsChain = foreach.getNestedComponents().get(0);
     assertThat(processorsChain, instanceOf(NestedChainModel.class));
     assertThat(processorsChain.isRequired(), is(true));
 
-    assertThat(foreach.getAllParameterModels(), hasSize(4));
+    assertThat(foreach.getAllParameterModels(), hasSize(5));
 
     ParameterModel collection = foreach.getAllParameterModels().get(0);
     assertThat(collection.getName(), is("collection"));
@@ -400,6 +400,12 @@ public class CoreExtensionModelTestCase {
     assertThat(counter.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(counter.getType(), instanceOf(DefaultStringType.class));
     assertThat(counter.isRequired(), is(false));
+
+    assertErrorMappings(foreach.getAllParameterModels().get(4));
+
+    assertThat(foreach.getNestedComponents(), hasSize(1));
+    NestedChainModel chain = (NestedChainModel) foreach.getNestedComponents().get(0);
+    assertThat(chain.getChainExecutionOccurrence(), is(MULTIPLE_OR_NONE));
   }
 
   @Test
@@ -1059,13 +1065,8 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void scopeAndRoutersShouldHaveOccurrence() {
-    // TODO W-14954497: Scope and routers should be declared as Operations
-    ConstructModel foreach = coreExtensionModel.getConstructModel("foreach").get();
-    NestedChainModel chain = (NestedChainModel) foreach.getNestedComponents().get(0);
-    assertThat(chain.getChainExecutionOccurrence(), is(MULTIPLE_OR_NONE));
-
     ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
-    chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
+    NestedChainModel chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
     assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
   }
 }
