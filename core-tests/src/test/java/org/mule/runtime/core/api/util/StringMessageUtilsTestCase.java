@@ -9,8 +9,9 @@ package org.mule.runtime.core.api.util;
 import static java.lang.System.lineSeparator;
 
 import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -74,7 +75,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(test);
-    assertTrue(result.endsWith("[..]}"));
+    assertThat(result, endsWith("[..]}"));
     assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
   }
 
@@ -102,7 +103,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(list);
-    assertTrue(result.endsWith("[..]]"));
+    assertThat(result, endsWith("[..]]"));
     assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
   }
 

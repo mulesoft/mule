@@ -13,6 +13,7 @@ import static java.lang.System.lineSeparator;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,12 +173,51 @@ public final class StringMessageUtils {
     } else if (o instanceof Map) {
       return o.toString();
     } else if (o.getClass().isArray()) {
-      return ArrayUtils.toString(o);
+      return arrayToString(o, MAX_ELEMENTS);
     } else if (o instanceof Collection) {
       return collectionToString((Collection<?>) o, MAX_ELEMENTS, false);
     } else {
       return o.toString();
     }
+  }
+
+  /**
+   * Like {@link #toString(Object)} but considers at most <code>maxElements</code> values; overflow is indicated by an appended
+   * "[..]" ellipsis.
+   */
+  public static String arrayToString(Object array, int maxElements) {
+    String result;
+
+    Class componentType = array.getClass().getComponentType();
+    if (Object.class.isAssignableFrom(componentType)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((Object[]) array, 0, maxElements)));
+    } else if (componentType.equals(Boolean.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((boolean[]) array, 0, maxElements)));
+    } else if (componentType.equals(Byte.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((byte[]) array, 0, maxElements)));
+    } else if (componentType.equals(Character.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((char[]) array, 0, maxElements)));
+    } else if (componentType.equals(Short.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((short[]) array, 0, maxElements)));
+    } else if (componentType.equals(Integer.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((int[]) array, 0, maxElements)));
+    } else if (componentType.equals(Long.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((long[]) array, 0, maxElements)));
+    } else if (componentType.equals(Float.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((float[]) array, 0, maxElements)));
+    } else if (componentType.equals(Double.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((double[]) array, 0, maxElements)));
+    } else {
+      throw new IllegalArgumentException("Unknown array service type: " + componentType.getName());
+    }
+
+    if (Array.getLength(array) > maxElements) {
+      StringBuilder buf = new StringBuilder(result);
+      buf.insert(buf.length() - 1, " [..]");
+      result = buf.toString();
+    }
+
+    return result;
   }
 
   /**
