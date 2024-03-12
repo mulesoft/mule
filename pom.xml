@@ -238,6 +238,7 @@
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
+        <skipRevapiCheck>${skipMuleModuleMojos}</skipRevapiCheck>
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
         <surefire.additional.jacoco.args></surefire.additional.jacoco.args>
@@ -1023,7 +1024,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <skip>${skipMuleModuleMojos}</skip>
+                    <skip>${skipRevapiCheck}</skip>
                     <oldVersion>${oldMuleArtifactVersion}</oldVersion>
                     <checkDependencies>${revapi.checkDependencies}</checkDependencies>
                     <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
@@ -1036,14 +1037,10 @@
                                         "behavior" : "report"
                                     }
                                 },
-                                "semver": {
-                                  "ignore": {
-                                    "enabled": true,
-                                    "versionIncreaseAllows" : {
-                                      "major" : "breaking",
-                                      "minor" : "nonBreaking",
-                                      "patch" : "equivalent"
-                                    }
+                                "versions": {
+                                  "enabled": true,
+                                  "onAllowed": {
+                                    "criticality" : "documented"
                                   }
                                 }
                             }
