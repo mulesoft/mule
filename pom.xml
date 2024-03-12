@@ -1036,14 +1036,10 @@
                                         "behavior" : "report"
                                     }
                                 },
-                                "semver": {
-                                  "ignore": {
-                                    "enabled": true,
-                                    "versionIncreaseAllows" : {
-                                      "major" : "breaking",
-                                      "minor" : "nonBreaking",
-                                      "patch" : "equivalent"
-                                    }
+                                "versions": {
+                                  "enabled": true,
+                                  "onAllowed": {
+                                    "criticality" : "documented"
                                   }
                                 }
                             }
