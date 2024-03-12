@@ -19,13 +19,11 @@ import reactor.util.context.ContextView;
 
 public class SubscribedProcessors {
 
-  private Context context;
   private boolean trackSubscribedComponents = true;
   private List<String> subscribedComponents = Collections.emptyList();
   private int subscribedProcessorsCount = 0;
 
-  private SubscribedProcessors(Context context, boolean trackSubscribedComponents) {
-    this.context = context;
+  private SubscribedProcessors(boolean trackSubscribedComponents) {
     this.trackSubscribedComponents = trackSubscribedComponents;
   }
 
@@ -38,25 +36,13 @@ public class SubscribedProcessors {
     this.subscribedComponents = subscribedComponents;
   }
 
-  public static SubscribedProcessors subscribedProcessors(Context context) {
-    return context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(context, false));
-  }
-
-  public static SubscribedProcessors subscribedProcessors(Context context, boolean trackSubscribedComponents) {
-    return context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(context, trackSubscribedComponents));
-  }
-
-  public static Optional<SubscribedProcessors> subscribedProcessors(ContextView context) {
-    return context.getOrEmpty("SUBSCRIBED_PROCESSORS");
-  }
-
   // We intentionally leave the previous SubscribedProcessor instance unchanged because the context is sent
   // through multiple subscription paths that must track independent collections of subscribed components.
   // **************************/--- A
   // Example: ---C--(merge)----
   // **************************\--- B
   // Where A and B onSubscribe must see only C as a subscribed component.
-  public Context addSubscribedProcessor(Processor processor) {
+  private SubscribedProcessors addSubscribedProcessor(Processor processor) {
     SubscribedProcessors updatedSubscribedProcessors;
     if (trackSubscribedComponents && getProcessorComponentLocation(processor) != null) {
       List<String> updatedSubscribedComponents = new ArrayList<>(subscribedComponents.size() + 1);
@@ -66,9 +52,7 @@ public class SubscribedProcessors {
     } else {
       updatedSubscribedProcessors = new SubscribedProcessors(subscribedProcessorsCount + 1);
     }
-    Context updatedContext = context.put("SUBSCRIBED_PROCESSORS", updatedSubscribedProcessors);
-    updatedSubscribedProcessors.context = updatedContext;
-    return updatedContext;
+    return updatedSubscribedProcessors;
   }
 
   public int getSubscribedProcessorsCount() {
@@ -87,5 +71,39 @@ public class SubscribedProcessors {
   public String toString() {
     return Thread.currentThread().getName() + " - StackTrace lines: " + Thread.currentThread().getStackTrace().length + " - "
         + "Subscribed processors: " + subscribedProcessorsCount;
+  }
+
+  public static class SubscribedProcessorsContext {
+
+    private final Context context;
+    private final SubscribedProcessors subscribedProcessors;
+
+    private SubscribedProcessorsContext(Context context) {
+      this.context = context;
+      this.subscribedProcessors = context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(false));
+    }
+
+    private SubscribedProcessorsContext(Context context, boolean trackSubscribedComponents) {
+      this.context = context;
+      this.subscribedProcessors =
+          context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(trackSubscribedComponents));
+    }
+
+    public static SubscribedProcessorsContext subscribedProcessors(Context context) {
+      return new SubscribedProcessorsContext(context);
+    }
+
+    public static SubscribedProcessorsContext subscribedProcessors(Context context, boolean trackSubscribedComponents) {
+      return new SubscribedProcessorsContext(context, trackSubscribedComponents);
+    }
+
+    public static Optional<SubscribedProcessors> subscribedProcessors(ContextView context) {
+      return context.getOrEmpty("SUBSCRIBED_PROCESSORS");
+    }
+
+    public Context addSubscribedProcessor(Processor processor) {
+      subscribedProcessors.addSubscribedProcessor(processor);
+      return context.put("SUBSCRIBED_PROCESSORS", subscribedProcessors.addSubscribedProcessor(processor));
+    }
   }
 }
