@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain.CHAIN_LOCATION;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
 
 import static java.util.Optional.empty;
@@ -87,12 +88,12 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
                                                                              nestedChain)));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
-      // Update: For W-15158118, to avoid issues with the registration of the chain in the component locator, we are adding the
-      // location with the 'processors' part, since the location that we want to model is the chain's one, not the scope. This is
-      // then updated in the ChildContextChainExecutor
+      // Update: For W-15158118, to avoid issues with the registration of the chain in the component locator, we are not
+      // adding the location as the location key but as another annotation.
       Map<QName, Object> annotations = new HashMap<>(this.getAnnotations());
-      ComponentLocation chainLocation = ((DefaultComponentLocation) annotations.get(LOCATION_KEY)).appendProcessorsPart();
-      annotations.put(LOCATION_KEY, chainLocation);
+      ComponentLocation chainLocation = ((DefaultComponentLocation) annotations.get(LOCATION_KEY));
+      annotations.remove(LOCATION_KEY);
+      annotations.put(CHAIN_LOCATION, chainLocation);
       nestedChain.setAnnotations(annotations);
     } else {
       nestedChain = null;

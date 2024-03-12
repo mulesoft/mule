@@ -75,7 +75,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(streamingManager, this.originalEvent, this.chain);
-    this.location = calculateComponentLocation(chain.getLocation());
+    this.location = (ComponentLocation) chain.getAnnotation(CHAIN_LOCATION);
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 
@@ -154,19 +154,5 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
   @Override
   public CoreEvent getOriginalEvent() {
     return originalEvent;
-  }
-
-  private ComponentLocation calculateComponentLocation(ComponentLocation chainLocation) {
-    if (!(chainLocation instanceof DefaultComponentLocation)) {
-      return chainLocation;
-    }
-    // As per W-15158118, we need to remove the 'processors' added to the location of the scope, that identifies the chain
-    Optional<String> name = ((DefaultComponentLocation) chainLocation).getName();
-    List<LocationPart> originalParts = chainLocation.getParts();
-    List<DefaultComponentLocation.DefaultLocationPart> parts = new ArrayList<>();
-    for (LocationPart part : originalParts.subList(0, originalParts.size() - 1)) {
-      parts.add((DefaultComponentLocation.DefaultLocationPart) part);
-    }
-    return new DefaultComponentLocation(name, parts);
   }
 }
