@@ -6,6 +6,8 @@
  */
 package org.mule.functional.client;
 
+import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 
 import org.mule.functional.api.component.TestConnectorQueueHandler;
@@ -51,7 +53,9 @@ public class QueueWriterMessageProcessor extends AbstractComponent implements Pr
     String attribute = content == null ? "#[payload]" : content;
 
     final TypedValue evaluated =
-        expressionManager.evaluate(attribute, fromType(contentJavaType == null ? Object.class : contentJavaType));
+        expressionManager.evaluate(attribute,
+                                   fromType(contentJavaType == null ? Object.class : contentJavaType),
+                                   addEventBindings(event, NULL_BINDING_CONTEXT));
 
     CoreEvent copy;
     Object payloadValue = evaluated.getValue();
