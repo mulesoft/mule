@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -59,7 +60,6 @@ import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorL
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.domain.test.DomainDescriptorFactoryTestCase;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
@@ -384,12 +384,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   }
 
   private void replacePlaceholderInClassloaderModel() throws IOException {
-    String root;
-    if (getClass().equals(DomainDescriptorFactoryTestCase.class)) {
-      root = "/domains";
-    } else {
-      root = "/apps";
-    }
+    String root = getRoot();
 
     String content =
         readFile(getClass()
@@ -420,6 +415,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
               replacedContent2);
   }
 
+  protected String getRoot() {
+    return "/apps";
+  }
+
   private static String readFile(InputStream inputStream) throws IOException {
     StringBuilder content = new StringBuilder();
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -445,7 +444,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     if (replacement != null) {
       content = content.replace(placeholderString, replacement);
     } else {
-      System.err.println("System property not set for " + placeholderString);
+      fail("System property not set for " + placeholderString);
     }
 
     return content;
