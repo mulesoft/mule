@@ -26,7 +26,7 @@ import org.mule.runtime.api.store.ObjectStoreNotAvailableException;
 import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.UUID;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
