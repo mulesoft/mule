@@ -204,7 +204,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.registry;
   // for DataWeave
   exports org.mule.runtime.core.privileged.routing;
-  exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,

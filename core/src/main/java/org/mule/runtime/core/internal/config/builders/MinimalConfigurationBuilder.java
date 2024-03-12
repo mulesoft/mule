@@ -12,7 +12,6 @@ import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_IN_MEMORY_OBJECT_STORE_KEY;
 import static org.mule.runtime.api.store.ObjectStoreManager.BASE_PERSISTENT_OBJECT_STORE_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
-import static org.mule.runtime.core.api.config.MuleProperties.INTERCEPTOR_MANAGER_REGISTRY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_COMPONENT_TRACER_FACTORY_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EVENT_TRACER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CORE_EXPORTER_FACTORY_KEY;
@@ -100,12 +99,8 @@ import org.mule.runtime.core.internal.time.LocalTimeSupplier;
 import org.mule.runtime.core.internal.transaction.TransactionFactoryLocator;
 import org.mule.runtime.core.internal.transformer.DefaultTransformersRegistry;
 import org.mule.runtime.core.internal.transformer.DynamicDataTypeConversionResolver;
-<<<<<<< Upstream, based on origin/master
 import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.internal.transformer.TransformersRegistry;
-import org.mule.runtime.core.internal.util.DefaultResourceLocator;
-=======
->>>>>>> 460939e W-15188084: Encapsulate org.mule.runtime.core.privileged.util
 import org.mule.runtime.core.internal.util.DefaultStreamCloserService;
 import org.mule.runtime.core.internal.util.queue.TransactionalQueueManager;
 import org.mule.runtime.core.internal.util.store.MuleObjectStoreManager;

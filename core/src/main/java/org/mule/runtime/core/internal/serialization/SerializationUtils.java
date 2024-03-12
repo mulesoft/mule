@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.serialization;
 
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
