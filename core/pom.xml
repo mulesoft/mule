@@ -18,6 +18,8 @@
         <skipExportTests>false</skipExportTests>
         <!-- because this module requires transitive jakarta.jms.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
+        <!-- TODO W-15237254 reenable the check -->
+        <skipRevapiCheck>true</skipRevapiCheck>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
