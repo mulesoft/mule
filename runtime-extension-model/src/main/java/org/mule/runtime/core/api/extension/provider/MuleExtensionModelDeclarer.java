@@ -630,7 +630,7 @@ class MuleExtensionModelDeclarer {
   }
 
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
-    ConstructDeclarer untilSuccessful = extensionDeclarer.withConstruct("untilSuccessful")
+    OperationDeclarer untilSuccessful = extensionDeclarer.withOperation("untilSuccessful")
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
@@ -651,6 +651,9 @@ class MuleExtensionModelDeclarer {
         .describedAs("Specifies the minimum time interval between two process retries in milliseconds.\n" +
             " The actual time interval depends on the previous execution but should not exceed twice this number.\n" +
             " Default value is 60000 (one minute)");
+
+    untilSuccessful.withOutput().ofType(ANY_TYPE);
+    untilSuccessful.withOutputAttributes().ofType(ANY_TYPE);
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer) {

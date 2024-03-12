@@ -157,8 +157,8 @@ public class CoreExtensionModelTestCase {
     assertThat(coreExtensionModel.getExternalLibraryModels(), empty());
     assertThat(coreExtensionModel.getImportedTypes(), empty());
     assertThat(coreExtensionModel.getConfigurationModels(), empty());
-    assertThat(coreExtensionModel.getOperationModels(), hasSize(16));
-    assertThat(coreExtensionModel.getConstructModels(), hasSize(13));
+    assertThat(coreExtensionModel.getOperationModels(), hasSize(17));
+    assertThat(coreExtensionModel.getConstructModels(), hasSize(12));
     assertThat(coreExtensionModel.getConnectionProviders(), empty());
     assertThat(coreExtensionModel.getSourceModels(), hasSize(1));
 
@@ -658,10 +658,10 @@ public class CoreExtensionModelTestCase {
 
   @Test
   public void untilSuccessful() {
-    final ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
+    final OperationModel untilSuccessful = coreExtensionModel.getOperationModel("untilSuccessful").get();
 
     List<ParameterModel> allParameterModels = untilSuccessful.getAllParameterModels();
-    assertThat(allParameterModels, hasSize(2));
+    assertThat(allParameterModels, hasSize(5));
 
     ParameterModel action = allParameterModels.get(0);
     assertThat(action.getName(), is("maxRetries"));
@@ -676,6 +676,14 @@ public class CoreExtensionModelTestCase {
     assertThat(type.getExpressionSupport(), is(SUPPORTED));
     assertThat(type.getDefaultValue(), is(60000));
     assertThat(type.isRequired(), is(false));
+
+    assertTarget(allParameterModels.get(2));
+    assertTargetValue(allParameterModels.get(3));
+    assertErrorMappings(allParameterModels.get(4));
+
+    assertThat(untilSuccessful.getNestedComponents(), hasSize(1));
+    NestedChainModel chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
+    assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
   }
 
   @Test
@@ -1063,10 +1071,4 @@ public class CoreExtensionModelTestCase {
     assertThat(errorMappings.isRequired(), is(false));
   }
 
-  @Test
-  public void scopeAndRoutersShouldHaveOccurrence() {
-    ConstructModel untilSuccessful = coreExtensionModel.getConstructModel("untilSuccessful").get();
-    NestedChainModel chain = (NestedChainModel) untilSuccessful.getNestedComponents().get(0);
-    assertThat(chain.getChainExecutionOccurrence(), is(AT_LEAST_ONCE));
-  }
 }
