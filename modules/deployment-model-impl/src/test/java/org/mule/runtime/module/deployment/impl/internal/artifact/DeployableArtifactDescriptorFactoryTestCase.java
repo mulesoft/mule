@@ -116,7 +116,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   protected static final String ARTIFACT_NAME = "test";
 
   @BeforeClass
-  public static void beforeClass() throws URISyntaxException, IOException {
+  public static void beforeClass() throws URISyntaxException {
     echoTestJarFile = new CompilerUtils.JarCompiler().compiling(getResourceFile("/org/foo/EchoTest.java"))
         .including(getResourceFile("/test-resource.txt"), "META-INF/MANIFEST.MF")
         .including(getResourceFile("/test-resource.txt"), "README.txt")
