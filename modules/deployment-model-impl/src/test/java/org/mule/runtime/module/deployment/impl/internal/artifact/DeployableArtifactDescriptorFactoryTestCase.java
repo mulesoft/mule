@@ -43,6 +43,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -64,8 +65,13 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -371,9 +377,77 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
       throws Exception {
+    replacePlaceholderInClassloaderModel();
     final String location = "/plugin-dependency-with-additional-dependencies-lightweight-local-repository";
     populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "local-repository"));
     assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
+  }
+
+  private void replacePlaceholderInClassloaderModel() throws IOException {
+    String root = getRoot();
+
+    String content =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json"));
+
+    String content2 =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json"));
+
+    System.setProperty("outputDirectory",
+                       getClass().getProtectionDomain().getCodeSource().getLocation().toString());
+
+    String replacedContent = replacePlaceholderWithSystemProperty(content, "outputDirectory");
+    String replacedContent2 = replacePlaceholderWithSystemProperty(content2, "outputDirectory");
+
+
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json")
+        .getPath(),
+              replacedContent);
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json")
+        .getPath(),
+              replacedContent2);
+  }
+
+  protected String getRoot() {
+    return "/apps";
+  }
+
+  private static String readFile(InputStream inputStream) throws IOException {
+    StringBuilder content = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        content.append(line).append(System.lineSeparator());
+      }
+    }
+    return content.toString();
+  }
+
+  private static void writeFile(String filePath, String content) throws IOException {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+      writer.write(content);
+    }
+  }
+
+  private static String replacePlaceholderWithSystemProperty(String content, String placeholder) {
+    // Replace ${placeholder} with the system property value
+    String placeholderString = "${" + placeholder + "}";
+    String replacement = System.getProperty(placeholder);
+
+    if (replacement != null) {
+      content = content.replace(placeholderString, replacement);
+    } else {
+      fail("System property not set for " + placeholderString);
+    }
+
+    return content;
   }
 
   @Test

@@ -16,7 +16,7 @@
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-empty-plugin/4.2.0-SNAPSHOT/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-empty-plugin/4.2.0-SNAPSHOT/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
     },
     {
       "artifactCoordinates": {
@@ -26,7 +26,7 @@
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/test-dependant-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/test-dependant-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
     }
   ],
   "additionalPluginDependencies": [
@@ -41,7 +41,7 @@
             "version": "4.4",
             "type": "jar"
           },
-          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar",
+          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar",
           "packages": [
             "org.apache.commons.collections4",
             "org.apache.commons.collections4.bag",
@@ -78,7 +78,7 @@
             "version": "2.15.1",
             "type": "jar"
           },
-          "uri": "file://${project.build.testOutputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar",
+          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar",
           "packages": [
             "",
             "org.apache.commons.io",
