@@ -97,10 +97,7 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
                 .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           }
 
-          beanDefinition = servImpl instanceof TypeSupplier
-              ? getFixedTypeConstantObjectBeanDefinition(servImpl, (Class<?>) ((TypeSupplier) servImpl).getType())
-              : getConstantObjectBeanDefinition(servImpl);
-
+          beanDefinition = getConstantObjectBeanDefinition(servImpl);
         } else {
           beanDefinition =
               getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
