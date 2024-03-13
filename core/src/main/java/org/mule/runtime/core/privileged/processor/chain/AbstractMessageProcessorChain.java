@@ -30,7 +30,7 @@ import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUt
 import static org.mule.runtime.core.internal.profiling.tracing.event.span.condition.NotNullSpanAssertion.getNotNullSpanTracingCondition;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.REACTOR_RECREATE_ROUTER;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
-import static org.mule.runtime.core.internal.util.rx.SubscribedProcessors.SubscribedProcessorsContext.subscribedProcessors;
+import static org.mule.runtime.core.internal.util.rx.SubscribedProcessorsContext.subscribedProcessors;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.runtime.core.privileged.processor.chain.ChainErrorHandlingUtils.getLocalOperatorErrorHook;

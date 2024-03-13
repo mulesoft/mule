@@ -12,26 +12,23 @@ import org.mule.runtime.core.api.processor.Processor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
-import reactor.util.context.Context;
-import reactor.util.context.ContextView;
 
 public class SubscribedProcessors {
 
-  private boolean trackSubscribedComponents = true;
+  private boolean isTrackSubscribedComponents = false;
   private List<String> subscribedComponents = Collections.emptyList();
   private int subscribedProcessorsCount = 0;
 
-  private SubscribedProcessors(boolean trackSubscribedComponents) {
-    this.trackSubscribedComponents = trackSubscribedComponents;
+  protected SubscribedProcessors(boolean isTrackSubscribedComponents) {
+    this.isTrackSubscribedComponents = isTrackSubscribedComponents;
   }
 
-  private SubscribedProcessors(int subscribedProcessorsCount) {
+  protected SubscribedProcessors(int subscribedProcessorsCount) {
     this.subscribedProcessorsCount = subscribedProcessorsCount;
   }
 
   private SubscribedProcessors(int subscribedProcessorsCount, List<String> subscribedComponents) {
+    this.isTrackSubscribedComponents = true;
     this.subscribedProcessorsCount = subscribedProcessorsCount;
     this.subscribedComponents = subscribedComponents;
   }
@@ -42,9 +39,9 @@ public class SubscribedProcessors {
   // Example: ---C--(merge)----
   // **************************\--- B
   // Where A and B onSubscribe must see only C as a subscribed component.
-  private SubscribedProcessors addSubscribedProcessor(Processor processor) {
+  protected SubscribedProcessors addSubscribedProcessor(Processor processor) {
     SubscribedProcessors updatedSubscribedProcessors;
-    if (trackSubscribedComponents && getProcessorComponentLocation(processor) != null) {
+    if (isTrackSubscribedComponents && getProcessorComponentLocation(processor) != null) {
       List<String> updatedSubscribedComponents = new ArrayList<>(subscribedComponents.size() + 1);
       updatedSubscribedComponents.addAll(subscribedComponents);
       updatedSubscribedComponents.add(getProcessorComponentLocation(processor));
@@ -57,6 +54,14 @@ public class SubscribedProcessors {
 
   public int getSubscribedProcessorsCount() {
     return subscribedProcessorsCount;
+  }
+
+  public List<String> getSubscribedComponents() {
+    return subscribedComponents;
+  }
+
+  public boolean isTrackSubscribedComponents() {
+    return isTrackSubscribedComponents;
   }
 
   private static String getProcessorComponentLocation(Processor processor) {
@@ -73,37 +78,4 @@ public class SubscribedProcessors {
         + "Subscribed processors: " + subscribedProcessorsCount;
   }
 
-  public static class SubscribedProcessorsContext {
-
-    private final Context context;
-    private final SubscribedProcessors subscribedProcessors;
-
-    private SubscribedProcessorsContext(Context context) {
-      this.context = context;
-      this.subscribedProcessors = context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(false));
-    }
-
-    private SubscribedProcessorsContext(Context context, boolean trackSubscribedComponents) {
-      this.context = context;
-      this.subscribedProcessors =
-          context.getOrDefault("SUBSCRIBED_PROCESSORS", new SubscribedProcessors(trackSubscribedComponents));
-    }
-
-    public static SubscribedProcessorsContext subscribedProcessors(Context context) {
-      return new SubscribedProcessorsContext(context);
-    }
-
-    public static SubscribedProcessorsContext subscribedProcessors(Context context, boolean trackSubscribedComponents) {
-      return new SubscribedProcessorsContext(context, trackSubscribedComponents);
-    }
-
-    public static Optional<SubscribedProcessors> subscribedProcessors(ContextView context) {
-      return context.getOrEmpty("SUBSCRIBED_PROCESSORS");
-    }
-
-    public Context addSubscribedProcessor(Processor processor) {
-      subscribedProcessors.addSubscribedProcessor(processor);
-      return context.put("SUBSCRIBED_PROCESSORS", subscribedProcessors.addSubscribedProcessor(processor));
-    }
-  }
 }

@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTr
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.pushTxToSubscriberContext;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.MultiFluxSubscriber.MULTI_FLUX_SUBSCRIBER;
-import static org.mule.runtime.core.internal.util.rx.SubscribedProcessors.SubscribedProcessorsContext.subscribedProcessors;
+import static org.mule.runtime.core.internal.util.rx.SubscribedProcessorsContext.subscribedProcessors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
