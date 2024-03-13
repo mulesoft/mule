@@ -190,6 +190,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.message;
   // for DataWeave
   exports org.mule.runtime.core.privileged.metadata;
+  // for MUnit, ApiKit and Validation
   exports org.mule.runtime.core.privileged.processor;
   // for MUnit and Validation
   exports org.mule.runtime.core.privileged.processor.chain;
