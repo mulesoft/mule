@@ -10,6 +10,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
 import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getLoaderById;
@@ -37,6 +38,8 @@ import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.capability.xml.schema.ExtensionAnnotationProcessor;
+import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorProblemsHandler;
+import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +59,6 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import com.google.common.base.Joiner;
-import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorProblemsHandler;
-import org.mule.runtime.module.extension.internal.resources.AnnotationProcessorResourceGenerator;
 
 /**
  * Annotation processor that picks up all the extensions annotated with {@link Extension} or
@@ -92,8 +93,6 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
     log("Starting Resources generator for Extensions");
-
-    System.setProperty(FORCE_EXTENSION_VALIDATION_PROPERTY_NAME, "true");
 
     ResourcesGenerator generator = new AnnotationProcessorResourceGenerator(fetchResourceFactories(), processingEnv);
 
@@ -141,6 +140,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     params.put(PROBLEMS_HANDLER, new AnnotationProcessorProblemsHandler(processingEnv));
     params.put(PROCESSING_ENVIRONMENT, processingEnv);
     params.put(ROUND_ENVIRONMENT, roundEnvironment);
+    params.put(FORCE_EXTENSION_VALIDATION_PROPERTY_NAME, true);
 
     if (!simulateRuntimeLoading()) {
       // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
@@ -148,7 +148,9 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     }
 
     return getExtensionModelLoader()
-        .loadExtensionModel(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())), params);
+        .loadExtensionModel(builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())))
+            .addParameters(params)
+            .build());
   }
 
   private Optional<TypeElement> getExtension(RoundEnvironment env) {
