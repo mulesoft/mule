@@ -77,7 +77,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
 
   private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
     final Class<? extends Service> contract = assembly.getServiceContract();
-    return (Service) newProxyInstance(contract.getClassLoader(),
+    return (Service) newProxyInstance(assembly.getClassLoader(),
                                       new Class[] {contract, Startable.class, Stoppable.class, TypeSupplier.class},
                                       handler);
   }
