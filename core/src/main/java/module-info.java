@@ -18,37 +18,30 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
         "org.mule.runtime.core.privileged",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
-        "org.mule.runtime.core.privileged.event.context",
         "org.mule.runtime.core.privileged.exception",
         "org.mule.runtime.core.privileged.interception",
         "org.mule.runtime.core.privileged.message",
-        // for DataWeave
         "org.mule.runtime.core.privileged.metadata",
         "org.mule.runtime.core.privileged.processor",
-        "org.mule.runtime.core.privileged.processor.simple",
         "org.mule.runtime.core.privileged.processor.chain",
-        "org.mule.runtime.core.privileged.registry",
-        // for DataWeave
-        "org.mule.runtime.core.privileged.routing",
+        "org.mule.runtime.core.privileged.processor.simple",
         "org.mule.runtime.core.privileged.processor.objectfactory",
+        "org.mule.runtime.core.privileged.registry",
+        "org.mule.runtime.core.privileged.routing",
         "org.mule.runtime.core.privileged.profiling",
         "org.mule.runtime.core.privileged.profiling.tracing"
     },
     privilegedArtifactIds = {
-        "com.mulesoft.mule.modules:mule-compatibility-module",
         "com.mulesoft.munit:munit-runner",
         "com.mulesoft.munit:munit-tools",
         "com.mulesoft.munit:mtf-tools",
-        "org.mule.modules:mule-scripting-module",
+        "org.mule.modules:mule-aggregators-module",
+        "org.mule.modules:mule-apikit-module",
+        "org.mule.modules:mule-tracing-module",
         "org.mule.modules:mule-validation-module",
         "org.mule.tests.plugin:mule-tests-component-plugin",
         "org.mule.tests:test-processor-chains",
-        "org.mule.tests:test-components",
-        "com.mulesoft.anypoint:cxf-module-facade",
-        "org.mule.modules:mule-apikit-module",
-        "org.mule.modules:mule-tracing-module",
-        "org.mule.modules:mule-aggregators-module",
-        "org.mule.modules:mule-streaming-utils-module"
+        "org.mule.tests:test-components"
     })
 module org.mule.runtime.core {
 
@@ -179,10 +172,15 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  // for MUnit, MTF
   exports org.mule.runtime.core.privileged;
+  // for ByteBuddy dynamically generated classes
   exports org.mule.runtime.core.privileged.component;
+  // for MUnit and muleFwk
   exports org.mule.runtime.core.privileged.el;
+  // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
+  // for MuleFwk, MUnit, ApiKit and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;
@@ -190,7 +188,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.message;
   // for DataWeave
   exports org.mule.runtime.core.privileged.metadata;
-  // for MUnit, ApiKit and Validation
+  // for MUnit, MTF, ApiKit and Validation
   exports org.mule.runtime.core.privileged.processor;
   // for MUnit and Validation
   exports org.mule.runtime.core.privileged.processor.chain;
@@ -198,6 +196,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.privileged.processor.objectfactory;
   // for MTF
   exports org.mule.runtime.core.privileged.processor.simple;
+  // for test-components
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
@@ -330,6 +329,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
+  // and for MUnit and ApiKit
   exports org.mule.runtime.core.internal.message;
   exports org.mule.runtime.core.internal.metadata to
       com.mulesoft.mule.runtime.kryo;
