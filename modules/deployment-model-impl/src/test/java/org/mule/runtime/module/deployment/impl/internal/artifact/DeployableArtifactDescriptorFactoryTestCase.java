@@ -397,7 +397,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
                 + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json"));
 
     System.setProperty("outputDirectory",
-                       getClass().getResource("/").toString());
+                       getClass().getProtectionDomain().getCodeSource().getLocation().toString());
 
     String replacedContent = replacePlaceholderWithSystemProperty(content, "outputDirectory");
     String replacedContent2 = replacePlaceholderWithSystemProperty(content2, "outputDirectory");
