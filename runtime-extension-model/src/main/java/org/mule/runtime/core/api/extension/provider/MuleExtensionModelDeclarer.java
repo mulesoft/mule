@@ -95,9 +95,11 @@ import static com.google.common.collect.ImmutableSet.of;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataFormat;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.UnionType;
+import org.mule.metadata.api.model.impl.DefaultArrayType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -817,8 +819,7 @@ class MuleExtensionModelDeclarer {
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
         .withModelProperty(new TargetModelProperty());
 
-    // Comment to remember for the PR: how to set array of any?
-    scatterGather.withOutput().ofDynamicType(ANY_TYPE);
+    scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
@@ -873,8 +874,7 @@ class MuleExtensionModelDeclarer {
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
         .withModelProperty(new TargetModelProperty());
 
-    // Comment to remember for the PR: how to set array of any?
-    parallelForeach.withOutput().ofDynamicType(ANY_TYPE);
+    parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
   }
 
