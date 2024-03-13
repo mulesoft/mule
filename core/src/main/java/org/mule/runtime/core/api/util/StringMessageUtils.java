@@ -6,23 +6,24 @@
  */
 package org.mule.runtime.core.api.util;
 
-import static java.lang.System.lineSeparator;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToConvertStringUsingEncoding;
 
+import static java.lang.System.lineSeparator;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.internal.util.ArrayUtils;
-import org.mule.runtime.core.privileged.util.CollectionUtils;
-import org.mule.runtime.core.privileged.util.MapUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Useful methods for formatting message strings for logging or exceptions.
@@ -37,15 +38,6 @@ public final class StringMessageUtils {
   /** Do not instanciate. */
   private StringMessageUtils() {
     // no-op
-  }
-
-  public static String getFormattedMessage(String msg, Object[] arguments) {
-    if (arguments != null) {
-      for (int i = 0; i < arguments.length; i++) {
-        arguments[i] = toString(arguments[i]);
-      }
-    }
-    return MessageFormat.format(msg, arguments);
   }
 
   public static String getBoilerPlate(String message) {
@@ -107,18 +99,18 @@ public final class StringMessageUtils {
       buf.append(StringUtils.repeat(c, maxlength));
     }
 
-    for (int i = 0; i < messages.size(); i++) {
+    for (String message : messages) {
       buf.append(lineSeparator());
       if (c != ' ') {
         buf.append(c);
       }
       buf.append(" ");
-      buf.append(messages.get(i));
+      buf.append(message);
 
       String osEncoding = Charset.defaultCharset().name();
       int padding;
       try {
-        padding = trimLength - messages.get(i).toString().getBytes(osEncoding).length;
+        padding = trimLength - message.toString().getBytes(osEncoding).length;
       } catch (UnsupportedEncodingException ueex) {
         throw new MuleRuntimeException(failedToConvertStringUsingEncoding(osEncoding), ueex);
       }
@@ -172,7 +164,6 @@ public final class StringMessageUtils {
   /**
    * @see ArrayUtils#toString(Object, int)
    * @see CollectionUtils#toString(Collection, int)
-   * @see MapUtils#toString(Map, boolean)
    */
   public static String toString(Object o) {
     if (o == null) {
@@ -180,13 +171,115 @@ public final class StringMessageUtils {
     } else if (o instanceof Class<?>) {
       return ((Class<?>) o).getName();
     } else if (o instanceof Map) {
-      return MapUtils.toString((Map<?, ?>) o, false);
+      return o.toString();
     } else if (o.getClass().isArray()) {
-      return ArrayUtils.toString(o, MAX_ELEMENTS);
+      return arrayToString(o, MAX_ELEMENTS);
     } else if (o instanceof Collection) {
-      return CollectionUtils.toString((Collection<?>) o, MAX_ELEMENTS);
+      return collectionToString((Collection<?>) o, MAX_ELEMENTS, false);
     } else {
       return o.toString();
     }
+  }
+
+  /**
+   * Like {@link #toString(Object)} but considers at most <code>maxElements</code> values; overflow is indicated by an appended
+   * "[..]" ellipsis.
+   */
+  public static String arrayToString(Object array, int maxElements) {
+    String result;
+
+    Class componentType = array.getClass().getComponentType();
+    if (Object.class.isAssignableFrom(componentType)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((Object[]) array, 0, maxElements)));
+    } else if (componentType.equals(Boolean.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((boolean[]) array, 0, maxElements)));
+    } else if (componentType.equals(Byte.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((byte[]) array, 0, maxElements)));
+    } else if (componentType.equals(Character.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((char[]) array, 0, maxElements)));
+    } else if (componentType.equals(Short.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((short[]) array, 0, maxElements)));
+    } else if (componentType.equals(Integer.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((int[]) array, 0, maxElements)));
+    } else if (componentType.equals(Long.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((long[]) array, 0, maxElements)));
+    } else if (componentType.equals(Float.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((float[]) array, 0, maxElements)));
+    } else if (componentType.equals(Double.TYPE)) {
+      result = ArrayUtils.toString((ArrayUtils.subarray((double[]) array, 0, maxElements)));
+    } else {
+      throw new IllegalArgumentException("Unknown array service type: " + componentType.getName());
+    }
+
+    if (Array.getLength(array) > maxElements) {
+      StringBuilder buf = new StringBuilder(result);
+      buf.insert(buf.length() - 1, " [..]");
+      result = buf.toString();
+    }
+
+    return result;
+  }
+
+  /**
+   * Creates a String representation of the given Collection, with optional newlines between elements. Class objects are
+   * represented by their full names. Considers at most <code>maxElements</code> values; overflow is indicated by an appended
+   * "[..]" ellipsis.
+   *
+   * @param c           the Collection to format
+   * @param maxElements the maximum number of elements to take into account
+   * @param newline     indicates whether elements are to be split across lines
+   * @return the formatted String
+   */
+  private static String collectionToString(Collection c, int maxElements, boolean newline) {
+    if (c == null || c.isEmpty()) {
+      return "[]";
+    }
+
+    int origNumElements = c.size();
+    int numElements = Math.min(origNumElements, maxElements);
+    boolean tooManyElements = (origNumElements > maxElements);
+
+    StringBuilder buf = new StringBuilder(numElements * 32);
+    buf.append('[');
+
+    if (newline) {
+      buf.append(lineSeparator());
+    }
+
+    Iterator items = c.iterator();
+    for (int i = 0; i < numElements - 1; i++) {
+      Object item = items.next();
+
+      if (item instanceof Class) {
+        buf.append(((Class) item).getName());
+      } else {
+        buf.append(item);
+      }
+
+      if (newline) {
+        buf.append(lineSeparator());
+      } else {
+        buf.append(',').append(' ');
+      }
+    }
+
+    // don't forget the last one
+    Object lastItem = items.next();
+    if (lastItem instanceof Class) {
+      buf.append(((Class) lastItem).getName());
+    } else {
+      buf.append(lastItem);
+    }
+
+    if (newline) {
+      buf.append(lineSeparator());
+    }
+
+    if (tooManyElements) {
+      buf.append(" [..]");
+    }
+
+    buf.append(']');
+    return buf.toString();
   }
 }

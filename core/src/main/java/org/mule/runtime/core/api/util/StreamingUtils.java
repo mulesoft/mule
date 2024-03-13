@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.util;
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
+import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;

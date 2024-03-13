@@ -8,6 +8,8 @@ package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.runtime.core.api.config.bootstrap.RegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 
+import static java.util.Collections.enumeration;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -16,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -75,7 +76,7 @@ public class ArtifactBootstrapRegistryConfigurationBuilderTestCase extends Abstr
       urls.add(this.getClass().getResource("/plugin1-bootstrap.properties"));
       urls.add(this.getClass().getResource("/plugin2-bootstrap.properties"));
       when(pluginClassLoader1.findResources(BOOTSTRAP_PROPERTIES))
-          .thenReturn(new EnumerationAdapter<>(urls));
+          .thenReturn(enumeration(urls));
       return new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins);
     } catch (IOException e) {
       throw new RuntimeException(e);

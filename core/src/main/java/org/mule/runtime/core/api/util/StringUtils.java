@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.api.util;
 
-import org.mule.runtime.core.internal.util.ArrayUtils;
+import static org.apache.commons.lang3.ArrayUtils.EMPTY_STRING_ARRAY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,20 +40,21 @@ public class StringUtils {
     }
 
     if (StringUtils.isEmpty(string)) {
-      return ArrayUtils.EMPTY_STRING_ARRAY;
+      return EMPTY_STRING_ARRAY;
     }
 
     String[] rawTokens = org.apache.commons.lang3.StringUtils.split(string, delim);
-    List<String> tokens = new ArrayList<String>();
+    List<String> tokens = new ArrayList<>();
     if (rawTokens != null) {
-      for (int i = 0; i < rawTokens.length; i++) {
-        String token = StringUtils.trim(rawTokens[i]);
+      for (String rawToken : rawTokens) {
+        String token = StringUtils.trim(rawToken);
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(token)) {
           tokens.add(token);
         }
       }
     }
-    return (String[]) ArrayUtils.toArrayOfComponentType(tokens.toArray(), String.class);
+
+    return tokens.stream().toArray(s -> new String[s]);
   }
 
   /**

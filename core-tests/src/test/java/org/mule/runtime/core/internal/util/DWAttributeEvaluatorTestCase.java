@@ -30,7 +30,7 @@ import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 

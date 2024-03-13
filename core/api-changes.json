@@ -5,6 +5,60 @@
         "differences": [
           {
             "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.api.util.StringMessageUtils::getFormattedMessage(java.lang.String, java.lang.Object[])",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.AttributeEvaluator",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.BeanUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.CollectionUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.EventUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.MapUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.NumberUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.ObjectNameHelper",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.TemplateParser",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
             "code": "java.method.visibilityReduced",
             "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.privileged.transformer.TransformersRegistry) throws java.io.IOException",
             "new": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.internal.transformer.TransformersRegistry) throws java.io.IOException",

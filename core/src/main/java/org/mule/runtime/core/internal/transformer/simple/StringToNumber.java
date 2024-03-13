@@ -10,7 +10,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.DiscoverableTransformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
-import org.mule.runtime.core.privileged.util.NumberUtils;
 
 import java.nio.charset.Charset;
 import java.text.NumberFormat;

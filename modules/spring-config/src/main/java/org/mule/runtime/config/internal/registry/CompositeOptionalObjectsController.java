@@ -8,12 +8,12 @@ package org.mule.runtime.config.internal.registry;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.core.internal.util.ArrayUtils;
-
 import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Implementation of {@link OptionalObjectsController} which groups a list of controllers and executes every operation on all of

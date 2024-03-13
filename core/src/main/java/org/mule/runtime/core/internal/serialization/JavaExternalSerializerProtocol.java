@@ -15,7 +15,6 @@ import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
-import org.mule.runtime.core.internal.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.InputStream;

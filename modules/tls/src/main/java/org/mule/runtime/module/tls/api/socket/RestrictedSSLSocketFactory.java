@@ -7,8 +7,9 @@
 package org.mule.runtime.module.tls.api.socket;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.tls.internal.util.ArrayUtils.intersection;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.module.tls.internal.TlsConfiguration;
 
 import java.io.IOException;
@@ -37,13 +38,13 @@ public class RestrictedSSLSocketFactory extends SSLSocketFactory {
     if (cipherSuites == null) {
       cipherSuites = sslSocketFactory.getDefaultCipherSuites();
     }
-    this.enabledCipherSuites = ArrayUtils.intersection(cipherSuites, sslSocketFactory.getSupportedCipherSuites());
-    this.defaultCipherSuites = ArrayUtils.intersection(cipherSuites, sslSocketFactory.getDefaultCipherSuites());
+    this.enabledCipherSuites = intersection(cipherSuites, sslSocketFactory.getSupportedCipherSuites());
+    this.defaultCipherSuites = intersection(cipherSuites, sslSocketFactory.getDefaultCipherSuites());
 
     if (protocols == null) {
       protocols = sslContext.getDefaultSSLParameters().getProtocols();
     }
-    this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
+    this.enabledProtocols = intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
   }
 
   @Override
