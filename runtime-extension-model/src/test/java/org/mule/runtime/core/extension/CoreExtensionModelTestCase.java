@@ -370,6 +370,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void foreach() {
     final OperationModel foreach = coreExtensionModel.getOperationModel("foreach").get();
+    assertThat(foreach.isBlocking(), is(false));
 
     assertThat(foreach.getNestedComponents().size(), is(1));
     NestableElementModel processorsChain = foreach.getNestedComponents().get(0);
@@ -470,6 +471,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void choice() {
     final OperationModel choiceModel = coreExtensionModel.getOperationModel("choice").get();
+    assertThat(choiceModel.isBlocking(), is(false));
 
     final List<ParameterModel> parameterModels = choiceModel.getAllParameterModels();
     assertThat(parameterModels, hasSize(4));
@@ -507,6 +509,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void scatterGather() {
     final OperationModel scatterGatherModel = coreExtensionModel.getOperationModel("scatterGather").get();
+    assertThat(scatterGatherModel.isBlocking(), is(false));
 
     assertThat(scatterGatherModel.getAllParameterModels(), hasSize(6));
 
@@ -557,6 +560,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void parallelForeach() {
     final OperationModel parallelForeach = coreExtensionModel.getOperationModel("parallelForeach").get();
+    assertThat(parallelForeach.isBlocking(), is(false));
 
     assertThat(parallelForeach.getModelProperty(SinceMuleVersionModelProperty.class).map(mp -> mp.getVersion().toString())
         .orElse("NO MODEL PROPERTY"), equalTo("4.2.0"));
@@ -609,6 +613,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void async() {
     final OperationModel asyncModel = coreExtensionModel.getOperationModel("async").get();
+    assertThat(asyncModel.isBlocking(), is(false));
 
     assertThat(asyncModel.getNestedComponents(), hasSize(1));
     NestedChainModel processors = (NestedChainModel) asyncModel.getNestedComponents().get(0);
@@ -631,6 +636,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void tryScope() {
     final OperationModel tryModel = coreExtensionModel.getOperationModel("try").get();
+    assertThat(tryModel.isBlocking(), is(false));
 
     List<ParameterModel> allParameterModels = tryModel.getAllParameterModels();
     assertThat(allParameterModels, hasSize(5));
@@ -663,6 +669,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void untilSuccessful() {
     final OperationModel untilSuccessful = coreExtensionModel.getOperationModel("untilSuccessful").get();
+    assertThat(untilSuccessful.isBlocking(), is(false));
 
     List<ParameterModel> allParameterModels = untilSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(5));
@@ -693,6 +700,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void firstSuccessful() {
     final OperationModel firstSuccessful = coreExtensionModel.getOperationModel("firstSuccessful").get();
+    assertThat(firstSuccessful.isBlocking(), is(false));
 
     List<ParameterModel> allParameterModels = firstSuccessful.getAllParameterModels();
     assertThat(allParameterModels, hasSize(4));
@@ -718,6 +726,7 @@ public class CoreExtensionModelTestCase {
   @Test
   public void roundRobin() {
     final OperationModel roundRobin = coreExtensionModel.getOperationModel("roundRobin").get();
+    assertThat(roundRobin.isBlocking(), is(false));
 
     List<ParameterModel> allParameterModels = roundRobin.getAllParameterModels();
     assertThat(allParameterModels, hasSize(4));
