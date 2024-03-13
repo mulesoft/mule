@@ -386,7 +386,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareAsync(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer async = extensionDeclarer.withOperation("async")
-        .describedAs("Processes the nested list of message processors asynchronously.");
+        .describedAs("Processes the nested list of message processors asynchronously.").blocking(false);
 
     async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
     async.onDefaultParameterGroup()
@@ -589,7 +589,8 @@ class MuleExtensionModelDeclarer {
   private void declareForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer forEach = extensionDeclarer.withOperation("foreach")
         .describedAs("The foreach Processor allows iterating over a collection payload, or any collection obtained by an expression,"
-            + " generating a message for each element.");
+            + " generating a message for each element.")
+        .blocking(false);
 
     forEach.withChain()
         .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
@@ -632,7 +633,8 @@ class MuleExtensionModelDeclarer {
   private void declareUntilSuccessful(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer untilSuccessful = extensionDeclarer.withOperation("untilSuccessful")
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
-            "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
+            "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.")
+        .blocking(false);
 
     untilSuccessful.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(AT_LEAST_ONCE);
 
@@ -661,7 +663,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Sends the message to the first message processor whose condition is satisfied. "
             + "If none of the conditions are satisfied, it sends the message to the configured default message processor "
             + "or fails if there is none.")
-        .withErrorModel(routingError);
+        .withErrorModel(routingError).blocking(false);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
     when.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE_OR_NONE);
@@ -726,7 +728,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareFirstSuccessful(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer firstSuccessful = extensionDeclarer.withOperation("firstSuccessful")
-        .describedAs("Sends a message to a list of message processors until one processes it successfully.");
+        .describedAs("Sends a message to a list of message processors until one processes it successfully.").blocking(false);
 
     addTrackingModuleParameters(firstSuccessful,
                                 "Enabling this option will activate event tracking for this element and its children.");
@@ -743,7 +745,7 @@ class MuleExtensionModelDeclarer {
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer roundRobin = extensionDeclarer.withOperation("roundRobin")
-        .describedAs("Send each message received to the next message processor in a circular list of targets.");
+        .describedAs("Send each message received to the next message processor in a circular list of targets.").blocking(false);
 
     addTrackingModuleParameters(roundRobin,
                                 "Enabling this option will activate event tracking for this element and its children.");
@@ -762,7 +764,7 @@ class MuleExtensionModelDeclarer {
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer scatterGather = extensionDeclarer.withOperation("scatterGather")
         .describedAs("Sends the same message to multiple message processors in parallel.")
-        .withErrorModel(compositeRoutingError);
+        .withErrorModel(compositeRoutingError).blocking(false);
 
     scatterGather.withRoute("route")
         .withMinOccurs(2)
@@ -826,7 +828,7 @@ class MuleExtensionModelDeclarer {
   private void declareParallelForEach(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
     OperationDeclarer parallelForeach = extensionDeclarer.withOperation("parallelForeach")
         .describedAs("Splits the same message and processes each part in parallel.")
-        .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
+        .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0")).blocking(false);
 
     parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
@@ -880,7 +882,7 @@ class MuleExtensionModelDeclarer {
     OperationDeclarer tryScope = extensionDeclarer.withOperation("try")
         .describedAs("Processes the nested list of message processors, "
             + "within a transaction and with it's own error handler if required.")
-        .withErrorModel(transactionError);
+        .withErrorModel(transactionError).blocking(false);
 
     tryScope.onDefaultParameterGroup()
         .withOptionalParameter("transactionalAction")
