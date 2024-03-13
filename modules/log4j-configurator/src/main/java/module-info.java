@@ -32,6 +32,6 @@ module org.mule.runtime.log4j {
   requires org.apache.logging.log4j;
 
   exports org.mule.runtime.module.log4j.internal to
-      org.mule.runtime.launcher;
+      org.mule.runtime.launcher, org.mule.test.infrastructure;
 
 }

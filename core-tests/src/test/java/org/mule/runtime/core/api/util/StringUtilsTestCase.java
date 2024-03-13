@@ -6,12 +6,13 @@
  */
 package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.lang3.ArrayUtils.EMPTY_STRING_ARRAY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.internal.util.ArrayUtils;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -30,11 +31,11 @@ public class StringUtilsTestCase extends AbstractMuleTestCase {
 
     result = StringUtils.splitAndTrim("", ",");
     assertNotNull(result);
-    assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+    assertTrue(Arrays.equals(EMPTY_STRING_ARRAY, result));
 
     result = StringUtils.splitAndTrim(" ", ",");
     assertNotNull(result);
-    assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+    assertTrue(Arrays.equals(EMPTY_STRING_ARRAY, result));
   }
 
   @Test

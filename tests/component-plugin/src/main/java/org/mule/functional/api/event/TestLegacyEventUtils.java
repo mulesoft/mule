@@ -6,7 +6,6 @@
  */
 package org.mule.functional.api.event;
 
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
@@ -56,18 +55,6 @@ public final class TestLegacyEventUtils {
     } finally {
       exceptionHandlerField.setAccessible(false);
     }
-  }
-
-  public static Object getSessionProperty(CoreEvent event, String property) {
-    return ((PrivilegedEvent) event).getSession().getProperty(property);
-  }
-
-  public static DataType getSessionPropertyDataType(CoreEvent event, String property) {
-    return ((PrivilegedEvent) event).getSession().getPropertyDataType(property);
-  }
-
-  public static Object removeSessionProperty(CoreEvent event, String property) {
-    return ((PrivilegedEvent) event).getSession().removeProperty(property);
   }
 
   /**

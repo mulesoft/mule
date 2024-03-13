@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.config.internal.model;
 
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.component.Component.ANNOTATIONS_PROPERTY_NAME;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
@@ -36,7 +35,10 @@ import static org.mule.runtime.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDE
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -149,11 +151,12 @@ public abstract class ApplicationModel {
    *
    * @param extensionModels Extension models to be used when macro expand the current {@link ApplicationModel}
    */
-  public static ArtifactAst prepareAstForRuntime(ArtifactAst ast, Set<ExtensionModel> extensionModels) {
+  public static ArtifactAst prepareAstForRuntime(ArtifactAst ast, Set<ExtensionModel> extensionModels,
+                                                 Optional<FeatureFlaggingService> featureFlaggingService) {
     ast = processSourcesRedeliveryPolicy(ast);
 
     for (ApplicationModelAstPostProcessor astPostProcessor : AST_POST_PROCESSORS.get()) {
-      ast = astPostProcessor.postProcessAst(ast, extensionModels);
+      ast = astPostProcessor.postProcessAst(ast, extensionModels, featureFlaggingService);
     }
 
     return ast;

@@ -39,7 +39,6 @@ import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -85,6 +84,9 @@ import org.mule.runtime.module.extension.internal.runtime.execution.CompletableO
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
 
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -118,6 +120,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean blocking = false;
   private boolean scope = false;
   private boolean router = false;
+  private boolean hasDeprecatedRouterCompletion = false;
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
@@ -265,6 +268,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Router '%s' is not declared in a void method.", getName()));
     }
+    hasDeprecatedRouterCompletion =
+        operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
   }
 
   private boolean isRouterCallback(ExtensionParameter p) {
@@ -516,8 +521,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void collectAdditionalModelProperties() {
-    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement));
+    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement, hasDeprecatedRouterCompletion));
     operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
+  }
+
+  private boolean parameterOfRouterCompletionCallbackType(ExtensionParameter param) {
+    return param.getType().isSameType(RouterCompletionCallback.class)
+        || param.getType().isSameType(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
   }
 
   @Override
@@ -525,7 +535,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     if (isScope()) {
       return "Scope";
     } else if (isRouter()) {
-      return "Construct";
+      return "Router";
     }
     return "Operation";
   }

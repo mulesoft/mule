@@ -6,16 +6,9 @@
  */
 package org.mule.runtime.extension.internal.loader.xml.validation;
 
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptySet;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.rules.ExpectedException.none;
-
+import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
-import static org.mule.runtime.config.internal.model.dsl.properties.DefaultConfigurationPropertiesProviderFactory.CONFIGURATION_PROPERTIES;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
@@ -27,14 +20,28 @@ import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPr
 import static org.mule.runtime.extension.internal.loader.xml.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptySet;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.rules.ExpectedException.none;
+
+import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
-import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
+import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
+import org.mule.runtime.extension.internal.loader.xml.validator.InnerConnectionParametersAsConnectionParameters;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -45,12 +52,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
+import com.google.common.collect.ImmutableSet;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.collect.ImmutableSet;
+import io.qameta.allure.Issue;
 
 /**
  * Tests the defaults {@link org.apache.maven.model.validation.ModelValidator}s provided by the {@link ExtensionModelFactory}
@@ -60,46 +68,51 @@ import com.google.common.collect.ImmutableSet;
 @SmallTest
 public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
+  public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
+  public static final ComponentIdentifier CONFIGURATION_PROPERTIES =
+      builder().namespace(CORE_PREFIX).name(CONFIGURATION_PROPERTIES_ELEMENT).build();
+
   @Rule
   public ExpectedException exception = none();
 
-  @Before
-  public void setUp() {
-    exception.expect(IllegalModelDefinitionException.class);
-  }
-
   @Test
   public void repeatedParameterNamesThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("repeated-parameter");
     getExtensionModelFrom("validation/module-repeated-parameters.xml", getDependencyExtensions());
   }
 
   @Test
   public void repeatedOperationNamesThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("repeated-operation");
     getExtensionModelFrom("validation/module-repeated-operations.xml", getDependencyExtensions());
   }
 
   @Test
   public void repeatedOperationNamesTnsThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("repeated-operation-tns");
     getExtensionModelFrom("validation/module-repeated-operations-tns.xml");
   }
 
   @Test
   public void parameterWithRequiredAndDefaultThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("aWrongDefinedParameter");
     getExtensionModelFrom("validation/module-parameter-required-default.xml");
   }
 
   @Test
   public void propertyWithRequiredAndDefaultThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage("aWrongDefinedProperty");
     getExtensionModelFrom("validation/module-property-required-default.xml");
   }
 
   @Test
   public void wrongNamingForXmlThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString("[operation with spaces] is not a valid one"),
                                   containsString("[parameters with spaces] is not a valid one"),
@@ -109,6 +122,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void emptyTypeInRaiseErrorThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString(format(
                                                         EMPTY_TYPE_FORMAT_MESSAGE,
@@ -125,6 +139,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void wrongTypeInRaiseErrorNestedThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString(format(
                                                         WRONG_VALUE_FORMAT_MESSAGE,
@@ -147,6 +162,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void emptyTargetTypeInErrorMappingThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString(format(
                                                         EMPTY_TYPE_FORMAT_MESSAGE,
@@ -163,6 +179,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void wrongTargetTypeInErrorMappingNestedThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString(format(
                                                         WRONG_VALUE_FORMAT_MESSAGE,
@@ -185,6 +202,7 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void wrongGlobalElementNamesThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(allOf(
                                   containsString(format(
                                                         REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE,
@@ -205,8 +223,25 @@ public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
   @Test
   public void forbiddenConfigurationPropertiesThrowsException() {
+    exception.expect(IllegalModelDefinitionException.class);
     exception.expectMessage(format(CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE, CONFIGURATION_PROPERTIES.toString()));
     getExtensionModelFrom("validation/module-configuration-property-file.xml", getDependencyExtensions());
+  }
+
+  @Test
+  @Issue("W-14970561")
+  public void configParamsUsedForConnectivity() {
+    ExtensionModel loaded = getExtensionModelFrom("modules/module-global-element.xml", getDependencyExtensions());
+
+    ProblemsReporter problemsReporter = new ProblemsReporter(loaded);
+    new InnerConnectionParametersAsConnectionParameters().validate(loaded, problemsReporter);
+
+    assertThat(problemsReporter.getWarnings().size(), is(1));
+    assertThat(problemsReporter.getWarnings().get(0).getMessage(),
+               is("Connection provider for 'petstore' uses properties [password, username] that are defined at the config level, not within <connection>"));
+    assertThat(problemsReporter.getWarnings().get(0).getComponent(),
+               is(loaded.getConfigurationModels().get(0)));
+
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

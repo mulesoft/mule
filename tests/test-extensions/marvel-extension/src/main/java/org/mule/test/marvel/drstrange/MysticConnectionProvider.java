@@ -28,6 +28,10 @@ public class MysticConnectionProvider implements ConnectionProvider<MysticConnec
   @Optional
   private String multipleConfig;
 
+  @Parameter
+  @Optional
+  private Realm targetRealm;
+
   @Override
   public MysticConnection connect() throws ConnectionException {
     return new MysticConnection();

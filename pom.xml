@@ -132,6 +132,7 @@
         <javaReleaseVersion>8</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
+        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -228,7 +229,7 @@
 
         <allureReportVersion>2.8.1</allureReportVersion>
         <allure.maven.plugin.version>2.12.0</allure.maven.plugin.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.11</jacoco.version>
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -237,13 +238,15 @@
         <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
+        <skipRevapiCheck>${skipMuleModuleMojos}</skipRevapiCheck>
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
+        <surefire.additional.jacoco.args></surefire.additional.jacoco.args>
         <surefire.args.base>
             -XX:+TieredCompilation
             -Dfile.encoding=UTF-8
             -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
-            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'
+            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'${surefire.additional.jacoco.args}
         </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
         <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
@@ -257,7 +260,7 @@
             -XX:+IgnoreUnrecognizedVMOptions
             --module-path=${org.slf4j:slf4j-api:jar}
             --add-modules=org.slf4j
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
@@ -796,6 +799,9 @@
                                 <value>${project.build.directory}/allure-results</value>
                             </property>
                         </systemProperties>
+                        <environmentVariables>
+                            <MULE_TERMINATION_LOG_PATH>${mule.termination.log.path.env.variable}</MULE_TERMINATION_LOG_PATH>
+                        </environmentVariables>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -1018,7 +1024,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <skip>${skipMuleModuleMojos}</skip>
+                    <skip>${skipRevapiCheck}</skip>
                     <oldVersion>${oldMuleArtifactVersion}</oldVersion>
                     <checkDependencies>${revapi.checkDependencies}</checkDependencies>
                     <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
@@ -1031,14 +1037,10 @@
                                         "behavior" : "report"
                                     }
                                 },
-                                "semver": {
-                                  "ignore": {
-                                    "enabled": true,
-                                    "versionIncreaseAllows" : {
-                                      "major" : "breaking",
-                                      "minor" : "nonBreaking",
-                                      "patch" : "equivalent"
-                                    }
+                                "versions": {
+                                  "enabled": true,
+                                  "onAllowed": {
+                                    "criticality" : "documented"
                                   }
                                 }
                             }

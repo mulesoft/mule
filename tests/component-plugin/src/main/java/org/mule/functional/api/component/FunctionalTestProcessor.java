@@ -6,17 +6,19 @@
  */
 package org.mule.functional.api.component;
 
-import static java.lang.Thread.currentThread;
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.mule.functional.api.notification.FunctionalTestNotification.EVENT_RECEIVED;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
-import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
 import static org.mule.runtime.core.api.util.StringMessageUtils.truncate;
+
+import static java.lang.System.lineSeparator;
+import static java.lang.Thread.currentThread;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.functional.api.exception.FunctionalTestException;
 import org.mule.functional.api.notification.FunctionalTestNotification;
 import org.mule.functional.api.notification.FunctionalTestNotificationListener;
@@ -39,6 +41,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.api.transformer.TransformerException;
 
 import java.util.ArrayList;
@@ -227,18 +230,18 @@ public class FunctionalTestProcessor extends AbstractComponent implements Proces
 
     final Message message = event.getMessage();
     if (LOGGER.isInfoEnabled()) {
-      String msg = getBoilerPlate("Message Received in flow: "
-          + getLocation().getRootContainerName() + ". Content is: "
-          + truncate(message.getPayload().getValue().toString(), 100, true), '*', 80);
-
-      LOGGER.info(msg);
+      LOGGER.info("Message Received in flow: {}. Content is: {}",
+                  getLocation().getRootContainerName(),
+                  message.getPayload().getValue() != null
+                      ? truncate(message.getPayload().getValue().toString(), 100, true)
+                      : (null));
     }
 
     if (isLogMessageDetails() && LOGGER.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
 
-      sb.append("Full Message: ").append(LINE_SEPARATOR);
-      sb.append(message.getPayload().getValue().toString()).append(LINE_SEPARATOR);
+      sb.append("Full Message: ").append(lineSeparator());
+      sb.append(message.getPayload().getValue().toString()).append(lineSeparator());
       sb.append(message.toString());
       LOGGER.info(sb.toString());
     }

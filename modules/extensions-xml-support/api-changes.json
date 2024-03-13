@@ -1,44 +1,46 @@
 {
   "4.7.0": {
     "revapi": {
-      "ignore": [
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelDeclarer",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProvider",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.extension.XmlSdk1RuntimeExtensionModelProvider",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        },
-        {
-          "ignore": true,
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation",
-          "justification": "W-13829806: Removed from API, not used/required by external uers"
-        }
-      ]
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelDeclarer",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProvider",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.extension.XmlSdk1RuntimeExtensionModelProvider",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation",
+            "justification": "W-13829806: Removed from API, not used/required by external uers"
+          }
+        ]
+      }
     }
   },
   "4.5.0": {
@@ -63,6 +65,7 @@
           "justification": "API is impossible to implement nor consume"
         }
       ]
+      }
     }
   },
   "4.1.3": {

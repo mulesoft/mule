@@ -17,9 +17,6 @@ import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
 import static org.mule.test.allure.AllureConstants.ComponentsFeature.ParseTemplateStory.PARSE_TEMPLATE;
 
-import static java.util.Arrays.asList;
-import static java.lang.Boolean.parseBoolean;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -36,37 +33,30 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.MuleSystemProperties;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.tck.junit4.AbstractMuleTestCase;
-import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.size.SmallTest;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 
-import io.qameta.allure.Issue;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
 @Story(PARSE_TEMPLATE)
 @SmallTest
-@RunWith(Parameterized.class)
 public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   private static final String LOCATION = "error.html";
@@ -82,19 +72,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
-
-  @Rule
-  public SystemProperty isUseLegacyDefaultTargetValue;
-
-  @Parameters(name = "isUseLegacyTargetValueDefaultValue: {0}")
-  public static Collection<String> getParameters() {
-    return asList("true", "false");
-  }
-
-  public ParseTemplateProcessorTestCase(String isUseLegacyDefaultTargetValue) {
-    this.isUseLegacyDefaultTargetValue =
-        new SystemProperty(MuleSystemProperties.PARSE_TEMPLATE_USE_LEGACY_DEFAULT_TARGET_VALUE, isUseLegacyDefaultTargetValue);
-  }
 
   @Before
   public void setUp() throws MuleException {
@@ -148,9 +125,7 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
     String expectedExpression = getResourceAsString(LOCATION, this.getClass());
     when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
     parseTemplateProcessor.initialise();
-    if (!parseBoolean(isUseLegacyDefaultTargetValue.getValue())) {
-      expectedException.expect(IllegalArgumentException.class);
-    }
+    expectedException.expect(IllegalArgumentException.class);
     CoreEvent response = parseTemplateProcessor.process(event);
     assertEquals("Parsed", response.getMessage().getPayload().getValue());
   }
@@ -159,7 +134,6 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   public void parseTemplateFromLocation() throws InitialisationException, IOException {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.initialise();
-    when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
     String expectedExpression = getResourceAsString(LOCATION, this.getClass());
 
     when(mockMuleMessage.getPayload()).thenReturn(of("Parsed"));

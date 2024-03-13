@@ -48,7 +48,6 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
@@ -65,6 +64,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,7 +74,6 @@ import org.junit.rules.ExpectedException;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
-import org.slf4j.Logger;
 import reactor.core.publisher.Flux;
 
 //TODO: MULE-9307 re-write junits for rollback exception strategy
@@ -192,9 +191,9 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
 
   @Test
   public void testHandleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
+    CoreEvent lastEventCreated = CoreEvent.builder(context).message(of("")).build();
     onErrorPropagateHandler
-        .setMessageProcessors(asList(createChangingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChangingEventMessageProcessor(CoreEvent.builder(context).message(of(""))
             .build()),
                                      createChangingEventMessageProcessor(lastEventCreated)));
     onErrorPropagateHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -268,7 +267,7 @@ public class OnErrorPropagateHandlerTestCase extends AbstractErrorHandlerTestCas
     AtomicReference<Throwable> thownRef = new AtomicReference<>();
     final Consumer<Exception> router = onErrorPropagateHandler
         .router(pub -> Flux.from(pub)
-            .subscriberContext(contextPropagationChecker.contextPropagationFlag()),
+            .contextWrite(contextPropagationChecker.contextPropagationFlag()),
                 e -> {
                 },
                 thownRef::set);

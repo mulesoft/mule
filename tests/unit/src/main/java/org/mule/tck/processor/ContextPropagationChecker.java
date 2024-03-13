@@ -59,7 +59,7 @@ public class ContextPropagationChecker implements Processor {
   public static final void assertContextPropagation(CoreEvent event, Processor routerOrScope, ContextPropagationChecker checker) {
     final CoreEvent result = just(event)
         .transform(routerOrScope)
-        .subscriberContext(checker.contextPropagationFlag())
+        .contextWrite(checker.contextPropagationFlag())
         .blockFirst();
 
     assertThat(result, not(nullValue()));

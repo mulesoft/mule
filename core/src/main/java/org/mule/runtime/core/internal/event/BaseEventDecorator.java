@@ -14,7 +14,6 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
 import org.mule.runtime.api.security.SecurityContext;
@@ -22,16 +21,11 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,41 +49,6 @@ abstract class BaseEventDecorator implements InternalEvent, DeserializationPostI
   @Override
   public BaseEventContext getContext() {
     return event.getContext();
-  }
-
-  @Override
-  public MuleSession getSession() {
-    return event.getSession();
-  }
-
-  @Override
-  public ReplyToHandler getReplyToHandler() {
-    return event.getReplyToHandler();
-  }
-
-  @Override
-  public Object getReplyToDestination() {
-    return event.getReplyToDestination();
-  }
-
-  @Override
-  public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
-    return event.getMessageAsBytes(muleContext);
-  }
-
-  @Override
-  public Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException {
-    return event.transformMessage(outputType, muleContext);
-  }
-
-  @Override
-  public String getMessageAsString(MuleContext muleContext) throws MuleException {
-    return event.getMessageAsString(muleContext);
-  }
-
-  @Override
-  public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
-    return event.getMessageAsString(encoding, muleContext);
   }
 
   @Override

@@ -61,13 +61,12 @@ import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.ErrorHandlerFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.tck.junit4.AbstractReactiveProcessorTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -150,7 +149,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = InternalEvent.builder(context).message(of("request")).build();
+    event = CoreEvent.builder(context).message(of("request")).build();
 
     process(pipeline, event);
 
@@ -180,7 +179,7 @@ public class PipelineMessageNotificationTestCase extends AbstractReactiveProcess
     pipeline.initialise();
     pipeline.start();
 
-    event = InternalEvent.builder(context).message(of("request")).build();
+    event = CoreEvent.builder(context).message(of("request")).build();
 
     thrown.expect(instanceOf(MessagingException.class));
     thrown.expectCause(instanceOf(IllegalStateException.class));

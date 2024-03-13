@@ -9,6 +9,7 @@ package org.mule.runtime.module.log4j.boot.api;
 import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
 import static java.util.concurrent.Executors.newCachedThreadPool;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static org.apache.logging.log4j.LogManager.setFactory;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -18,10 +19,10 @@ import org.mule.runtime.module.log4j.boot.internal.ContextSelectorWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import com.lmax.disruptor.ExceptionHandler;
+
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.xml.XmlConfigurationFactory;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
@@ -169,7 +170,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory implements Shut
         executorService.submit(hook);
       }
       try {
-        executorService.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        executorService.awaitTermination(1000, MILLISECONDS);
       } catch (InterruptedException e) {
         // Nothing to do, not even log since we are shutting down the logger
       }

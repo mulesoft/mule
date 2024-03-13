@@ -12,7 +12,7 @@ import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPubl
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.privileged.routing.RoutingException;
+import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;

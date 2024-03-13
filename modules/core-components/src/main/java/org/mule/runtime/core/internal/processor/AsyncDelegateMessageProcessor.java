@@ -60,11 +60,10 @@ import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFacto
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.construct.FromFlowRejectedExecutionException;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.strategy.DirectProcessingStrategyFactory;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -261,7 +260,7 @@ public class AsyncDelegateMessageProcessor extends AbstractMessageProcessorOwner
     // Clone event, make it async, remove ReplyToHandler and set child SourcePolicyContext
     InternalEvent copy = (InternalEvent) PrivilegedEvent
         .builder(child((event.getContext()), ofNullable(getLocation()), LoggingExceptionHandler.getInstance()), event)
-        .session(new DefaultMuleSession(event.getSession())).build();
+        .build();
     setSourcePolicyChildContext(copy, featureFlaggingService);
     return copy;
   }

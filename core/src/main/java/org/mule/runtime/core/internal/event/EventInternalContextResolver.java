@@ -10,7 +10,6 @@ import static org.mule.runtime.api.util.collection.SmallMap.of;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 
 import java.util.function.Supplier;
 

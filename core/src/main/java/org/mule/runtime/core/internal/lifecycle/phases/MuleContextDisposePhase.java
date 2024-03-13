@@ -9,16 +9,13 @@ package org.mule.runtime.core.internal.lifecycle.phases;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.component.Component;
 import org.mule.runtime.core.api.config.Config;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.construct.FlowConstruct;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.context.DefaultMuleContext;
-import org.mule.runtime.core.privileged.routing.OutboundRouter;
-import org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData;
-import org.mule.runtime.core.privileged.util.annotation.AnnotationUtils;
+import org.mule.runtime.core.internal.util.annotation.AnnotationMetaData;
+import org.mule.runtime.core.internal.util.annotation.AnnotationUtils;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 
 import java.lang.reflect.Method;
@@ -76,9 +73,6 @@ public class MuleContextDisposePhase extends DefaultLifecyclePhase {
      * and not managed by DI containers such as Spring after the creation of the object
      */
     setIgnoredObjectTypes(new Class[] {
-        Component.class,
-        InterceptingMessageProcessor.class,
-        OutboundRouter.class,
         Transformer.class,
         MuleContext.class
     });

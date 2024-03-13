@@ -24,8 +24,8 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_SECURITY_MODEL;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;

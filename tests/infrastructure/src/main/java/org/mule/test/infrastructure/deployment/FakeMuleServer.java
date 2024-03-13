@@ -17,6 +17,7 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import static java.lang.System.setProperty;
 import static java.lang.Thread.currentThread;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.container.api.MuleCoreExtension;
@@ -46,7 +48,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -109,6 +111,7 @@ public class FakeMuleServer {
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
+        .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
@@ -140,9 +143,11 @@ public class FakeMuleServer {
                                                muleArtifactResourcesRegistry.getDomainFactory(),
                                                muleArtifactResourcesRegistry.getApplicationFactory(),
                                                muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
-    deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                  muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                  () -> findSchedulerService(serviceManager));
+    deploymentService = DeploymentServiceBuilder.deploymentServiceBuilder()
+        .withArtifactStartExecutorSupplier(() -> findSchedulerService(serviceManager))
+        .withDomainFactory(muleArtifactResourcesRegistry.getDomainFactory())
+        .withApplicationFactory(muleArtifactResourcesRegistry.getApplicationFactory())
+        .build();
     deploymentListener = mock(DeploymentListener.class);
     doAnswer(inv -> {
       final String artifactName = inv.getArgument(0);

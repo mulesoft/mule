@@ -17,7 +17,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.testmodels.fruit.InvalidSatsuma;
 

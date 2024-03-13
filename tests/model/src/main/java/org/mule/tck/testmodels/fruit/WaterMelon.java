@@ -61,7 +61,7 @@ public class WaterMelon implements Fruit, Startable, Stoppable, Disposable {
 
   public void myEventHandler(CoreEvent event, MuleContext muleContext) throws MuleException {
     logger.debug("Water Melon received an event in MyEventHandler! MuleEvent says: "
-        + ((PrivilegedEvent) event).getMessageAsString(null));
+        + ((PrivilegedEvent) event).getMessage().getPayload().getValue());
     bite();
   }
 

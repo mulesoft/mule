@@ -7,50 +7,31 @@
 package org.mule.runtime.core.internal.message;
 
 import static org.mule.runtime.api.metadata.DataType.BYTE_ARRAY;
-import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.DataType.fromObject;
 import static org.mule.runtime.api.metadata.TypedValue.of;
-import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectNotOfCorrectType;
-import static org.mule.runtime.core.api.util.ObjectUtils.getBoolean;
-import static org.mule.runtime.core.api.util.ObjectUtils.getByte;
-import static org.mule.runtime.core.api.util.ObjectUtils.getDouble;
-import static org.mule.runtime.core.api.util.ObjectUtils.getFloat;
-import static org.mule.runtime.core.api.util.ObjectUtils.getInt;
-import static org.mule.runtime.core.api.util.ObjectUtils.getLong;
-import static org.mule.runtime.core.api.util.ObjectUtils.getShort;
-import static org.mule.runtime.core.api.util.ObjectUtils.getString;
 import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.DataTypeBuilder;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.api.util.CaseInsensitiveMapWrapper;
-import org.mule.runtime.api.util.collection.SmallMap;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.privileged.metadata.DefaultCollectionDataType;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -61,11 +42,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Function;
 
 import javax.activation.DataHandler;
 
@@ -76,48 +53,17 @@ public final class DefaultMessageBuilder
     implements InternalMessage.Builder, InternalMessage.PayloadBuilder, InternalMessage.CollectionBuilder,
     InternalMessage.MapBuilder {
 
-  private static final String INBOUND_NAME = "INBOUND";
-  private static final String OUTBOUND_NAME = "OUTBOUND";
-
   private static final TypedValue NULL_TYPED_VALUE = of(null);
 
   private TypedValue payload = of(NULL_TYPED_VALUE);
   private TypedValue attributes = of(NULL_TYPED_VALUE);
 
-  private final Map<String, TypedValue<Serializable>> inboundProperties = new CaseInsensitiveMapWrapper<>();
-  private final Map<String, TypedValue<Serializable>> outboundProperties = new CaseInsensitiveMapWrapper<>();
-  private Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
-  private Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
-
   public DefaultMessageBuilder() {}
-
-  private void copyMessageAttributes(InternalMessage message) {
-    message.getInboundPropertyNames().forEach(key -> {
-      if (message.getInboundPropertyDataType(key) != null) {
-        addInboundProperty(key, message.getInboundProperty(key), message.getInboundPropertyDataType(key));
-      } else {
-        addInboundProperty(key, message.getInboundProperty(key));
-      }
-    });
-    message.getOutboundPropertyNames().forEach(key -> {
-      if (message.getOutboundPropertyDataType(key) != null) {
-        addOutboundProperty(key, message.getOutboundProperty(key), message.getOutboundPropertyDataType(key));
-      } else {
-        addOutboundProperty(key, message.getOutboundProperty(key));
-      }
-    });
-    message.getInboundAttachmentNames().forEach(name -> addInboundAttachment(name, message.getInboundAttachment(name)));
-    message.getOutboundAttachmentNames().forEach(name -> addOutboundAttachment(name, message.getOutboundAttachment(name)));
-  }
 
   public DefaultMessageBuilder(org.mule.runtime.api.message.Message message) {
     requireNonNull(message);
     this.payload = message.getPayload();
     this.attributes = message.getAttributes();
-
-    if (message instanceof InternalMessage) {
-      copyMessageAttributes((InternalMessage) message);
-    }
   }
 
   @Override
@@ -244,113 +190,8 @@ public final class DefaultMessageBuilder
   }
 
   @Override
-  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value) {
-    inboundProperties.put(key, new TypedValue<>(value, value != null ? fromObject(value) : OBJECT));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, MediaType mediaType) {
-    inboundProperties.put(key,
-                          new TypedValue<>(value, builder().type(value.getClass()).mediaType(mediaType).build()));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addInboundProperty(String key, Serializable value, DataType dataType) {
-    inboundProperties.put(key, new TypedValue<>(value, dataType));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value) {
-    outboundProperties.put(key, new TypedValue<>(value, value != null ? fromObject(value) : OBJECT));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, MediaType mediaType) {
-    outboundProperties.put(key, new TypedValue<>(value, builder().type(value.getClass()).mediaType(mediaType).build()));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addOutboundProperty(String key, Serializable value, DataType dataType) {
-    outboundProperties.put(key, new TypedValue<>(value, dataType));
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder removeInboundProperty(String key) {
-    inboundProperties.remove(key);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder removeOutboundProperty(String key) {
-    outboundProperties.remove(key);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addInboundAttachment(String key, DataHandler value) {
-    inboundAttachments.put(key, value);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder addOutboundAttachment(String key, DataHandler value) {
-    outboundAttachments.put(key, value);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder removeInboundAttachment(String key) {
-    inboundAttachments.remove(key);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder removeOutboundAttachment(String key) {
-    outboundAttachments.remove(key);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder inboundProperties(Map<String, Serializable> inboundProperties) {
-    requireNonNull(inboundProperties);
-    this.inboundProperties.clear();
-    inboundProperties.forEach(this::addInboundProperty);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder outboundProperties(Map<String, Serializable> outboundProperties) {
-    requireNonNull(outboundProperties);
-    this.outboundProperties.clear();
-    outboundProperties.forEach(this::addOutboundProperty);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments) {
-    requireNonNull(inboundAttachments);
-    this.inboundAttachments = new LinkedHashMap<>(inboundAttachments);
-    return this;
-  }
-
-  @Override
-  public InternalMessage.CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments) {
-    requireNonNull(outbundAttachments);
-    this.outboundAttachments = new LinkedHashMap<>(outbundAttachments);
-    return this;
-  }
-
-  @Override
   public InternalMessage build() {
-    return new MessageImplementation(payload, attributes,
-                                     inboundProperties, outboundProperties, inboundAttachments,
-                                     outboundAttachments);
+    return new MessageImplementation(payload, attributes);
   }
 
   private DataType resolveDataType(Object value) {
@@ -386,39 +227,23 @@ public final class DefaultMessageBuilder
    * <code>MuleMessageImplementation</code> is a wrapper that contains a payload and properties associated with the payload.
    */
   // This is public so that DataWeave can get and invoke its methods and not fallback to change the accessibility of its fields
-  public static class MessageImplementation implements InternalMessage, DeserializationPostInitialisable {
+  public static class MessageImplementation implements InternalMessage {
 
     private static final String NOT_SET = "<not set>";
 
     private static final long serialVersionUID = 1541720810851984845L;
     private static final Logger logger = LoggerFactory.getLogger(MessageImplementation.class);
 
-    /**
-     * Collection of attachments that were attached to the incoming message
-     */
-    private transient Map<String, DataHandler> inboundAttachments = new LinkedHashMap<>();
-
-    /**
-     * Collection of attachments that will be sent out with this message
-     */
-    private transient Map<String, DataHandler> outboundAttachments = new LinkedHashMap<>();
-
     private transient TypedValue typedValue;
     private final TypedValue typedAttributes;
 
-    private final Map<String, TypedValue<Serializable>> inboundMap = new CaseInsensitiveMapWrapper<>();
-    private final Map<String, TypedValue<Serializable>> outboundMap = new CaseInsensitiveMapWrapper<>();
+    // keep compatibility with preexistent serialized data
+    private final Map<String, TypedValue<Serializable>> inboundMap = null;
+    private final Map<String, TypedValue<Serializable>> outboundMap = null;
 
-    private MessageImplementation(TypedValue typedValue, TypedValue typedAttributes,
-                                  Map<String, TypedValue<Serializable>> inboundProperties,
-                                  Map<String, TypedValue<Serializable>> outboundProperties,
-                                  Map<String, DataHandler> inboundAttachments, Map<String, DataHandler> outboundAttachments) {
+    private MessageImplementation(TypedValue typedValue, TypedValue typedAttributes) {
       this.typedValue = typedValue;
       this.typedAttributes = typedAttributes;
-      this.inboundMap.putAll(inboundProperties);
-      this.outboundMap.putAll(outboundProperties);
-      this.inboundAttachments = inboundAttachments;
-      this.outboundAttachments = outboundAttachments;
     }
 
     /**
@@ -447,67 +272,9 @@ public final class DefaultMessageBuilder
       buf.append(lineSeparator());
       buf.append("  attributesMediaType=").append(getAttributes().getDataType().getMediaType());
       buf.append(lineSeparator());
-      if (!getInboundPropertyNames().isEmpty() || !getOutboundPropertyNames().isEmpty()) {
-        headersToStringBuilder(this, buf);
-      }
       // no new line here, as headersToString() adds one
       buf.append('}');
       return buf.toString();
-    }
-
-    public static void headersToStringBuilder(InternalMessage m, StringBuilder buf) {
-      buf.append("  Message properties:").append(lineSeparator());
-
-      try {
-        if (!m.getInboundPropertyNames().isEmpty()) {
-          Set<String> inboundNames = new TreeSet(m.getInboundPropertyNames());
-          buf.append("    ").append(INBOUND_NAME).append(" scoped properties:").append(lineSeparator());
-          appendPropertyValues(m, buf, inboundNames, name -> m.getInboundProperty(name));
-        }
-
-        if (!m.getOutboundPropertyNames().isEmpty()) {
-          Set<String> outboundNames = new TreeSet(m.getOutboundPropertyNames());
-          buf.append("    ").append(OUTBOUND_NAME).append(" scoped properties:").append(lineSeparator());
-          appendPropertyValues(m, buf, outboundNames, name -> m.getOutboundProperty(name));
-        }
-      } catch (IllegalArgumentException e) {
-        // ignored
-      }
-    }
-
-    private static void appendPropertyValues(InternalMessage m, StringBuilder buf, Set<String> names,
-                                             Function<String, Serializable> valueResolver) {
-      for (String name : names) {
-        Serializable value = valueResolver.apply(name);
-        // avoid calling toString recursively on Messages
-        if (value instanceof InternalMessage) {
-          value = "<<<Message>>>";
-        }
-        if (name.equals("password") || name.toString().contains("secret") || name.equals("pass")) {
-          value = "****";
-        }
-        buf.append("    ").append(name).append("=").append(value).append(lineSeparator());
-      }
-    }
-
-    @Override
-    public DataHandler getInboundAttachment(String name) {
-      return inboundAttachments.get(name);
-    }
-
-    @Override
-    public DataHandler getOutboundAttachment(String name) {
-      return outboundAttachments.get(name);
-    }
-
-    @Override
-    public Set<String> getInboundAttachmentNames() {
-      return unmodifiableSet(inboundAttachments.keySet());
-    }
-
-    @Override
-    public Set<String> getOutboundAttachmentNames() {
-      return unmodifiableSet(outboundAttachments.keySet());
     }
 
     @Override
@@ -523,7 +290,7 @@ public final class DefaultMessageBuilder
       private String contentType;
       private Object contents;
 
-      public SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
+      private SerializedDataHandler(String name, DataHandler handler, TransformersRegistry transformersRegistry)
           throws IOException {
         if (handler != null && !(handler instanceof Serializable)) {
           contentType = handler.getContentType();
@@ -561,28 +328,11 @@ public final class DefaultMessageBuilder
     private void writeObject(ObjectOutputStream out) throws Exception {
       out.defaultWriteObject();
       serializeValue(out);
-      TransformersRegistry transformersRegistry =
-          ((MuleContextWithRegistry) currentMuleContext.get()).getRegistry().lookupObject(TransformersRegistry.class);
-      out.writeObject(serializeAttachments(inboundAttachments, transformersRegistry));
-      out.writeObject(serializeAttachments(outboundAttachments, transformersRegistry));
-    }
-
-    private Map<String, SerializedDataHandler> serializeAttachments(Map<String, DataHandler> attachments,
-                                                                    TransformersRegistry transformersRegistry)
-        throws IOException {
-      Map<String, SerializedDataHandler> toWrite;
-      if (attachments == null) {
-        toWrite = null;
-      } else {
-        toWrite = forSize(attachments.size());
-        for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
-          String name = entry.getKey();
-          // TODO MULE-10013 remove this logic from here
-          toWrite.put(name, new SerializedDataHandler(name, entry.getValue(), transformersRegistry));
-        }
-      }
-
-      return toWrite;
+      // keep compatibility with preexistent serialized data
+      // inboundAttachments
+      out.writeObject(null);
+      // outboundAttachments
+      out.writeObject(null);
     }
 
     protected void serializeValue(ObjectOutputStream out) throws Exception {
@@ -616,42 +366,15 @@ public final class DefaultMessageBuilder
       }
     }
 
-    private Map<String, DataHandler> deserializeAttachments(Map<String, SerializedDataHandler> attachments) throws IOException {
-      Map<String, DataHandler> toReturn;
-      if (attachments == null) {
-        toReturn = emptyMap();
-      } else {
-        toReturn = forSize(attachments.size());
-        for (Map.Entry<String, SerializedDataHandler> entry : attachments.entrySet()) {
-          toReturn.put(entry.getKey(), entry.getValue().getHandler());
-        }
-      }
-
-      return toReturn;
-    }
-
     private void readObject(ObjectInputStream in) throws Exception {
       in.defaultReadObject();
       typedValue = new TypedValue(deserializeValue(in), (DataType) in.readObject());
-      inboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
-      outboundAttachments = deserializeAttachments((Map<String, SerializedDataHandler>) in.readObject());
-    }
 
-    /**
-     * Invoked after deserialization. This is called when the marker interface {@link DeserializationPostInitialisable} is used.
-     * This will get invoked after the object has been deserialized passing in the current mulecontext.
-     *
-     * @param context the current muleContext instance
-     * @throws MuleException if there is an error initializing
-     */
-    public void initAfterDeserialisation(MuleContext context) throws MuleException {
-      if (this.inboundAttachments == null) {
-        this.inboundAttachments = new SmallMap<>();
-      }
-
-      if (this.outboundAttachments == null) {
-        this.outboundAttachments = new SmallMap<>();
-      }
+      // keep compatibility with preexistent serialized data
+      // inboundAttachments
+      in.readObject();
+      // outboundAttachments
+      in.readObject();
     }
 
     @Override
@@ -659,84 +382,5 @@ public final class DefaultMessageBuilder
       return typedAttributes;
     }
 
-    @Override
-    public Serializable getInboundProperty(String name) {
-      return getInboundProperty(name, null);
-    }
-
-    @Override
-    public <T extends Serializable> T getInboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((TypedValue<T>) inboundMap.get(name), defaultValue);
-    }
-
-    @Override
-    public Serializable getOutboundProperty(String name) {
-      return getOutboundProperty(name, null);
-    }
-
-    @Override
-    public <T extends Serializable> T getOutboundProperty(String name, T defaultValue) {
-      return getValueOrDefault((TypedValue<T>) outboundMap.get(name), defaultValue);
-    }
-
-    @Override
-    public Set<String> getInboundPropertyNames() {
-      return unmodifiableSet(inboundMap.keySet());
-    }
-
-    @Override
-    public Set<String> getOutboundPropertyNames() {
-      return unmodifiableSet(outboundMap.keySet());
-    }
-
-    @Override
-    public DataType getInboundPropertyDataType(String name) {
-      TypedValue typedValue = inboundMap.get(name);
-      return typedValue == null ? null : typedValue.getDataType();
-    }
-
-    @Override
-    public DataType getOutboundPropertyDataType(String name) {
-      TypedValue typedValue = outboundMap.get(name);
-      return typedValue == null ? null : typedValue.getDataType();
-    }
-
-    private <T extends Serializable> T getValueOrDefault(TypedValue<T> typedValue, T defaultValue) {
-      if (typedValue == null) {
-        return defaultValue;
-      }
-      T value = typedValue.getValue();
-      // Note that we need to keep the (redundant) casts in here because the compiler compiler complains
-      // about primitive types being cast to a generic type
-      if (defaultValue == null) {
-        return value;
-      } else if (defaultValue instanceof Boolean) {
-        return (T) (Boolean) getBoolean(value, (Boolean) defaultValue);
-      } else if (defaultValue instanceof Byte) {
-        return (T) (Byte) getByte(value, (Byte) defaultValue);
-      } else if (defaultValue instanceof Integer) {
-        return (T) (Integer) getInt(value, (Integer) defaultValue);
-      } else if (defaultValue instanceof Short) {
-        return (T) (Short) getShort(value, (Short) defaultValue);
-      } else if (defaultValue instanceof Long) {
-        return (T) (Long) getLong(value, (Long) defaultValue);
-      } else if (defaultValue instanceof Float) {
-        return (T) (Float) getFloat(value, (Float) defaultValue);
-      } else if (defaultValue instanceof Double) {
-        return (T) (Double) getDouble(value, (Double) defaultValue);
-      } else if (defaultValue instanceof String) {
-        return (T) getString(value, (String) defaultValue);
-      } else {
-        if (value == null) {
-          return defaultValue;
-        }
-        // If defaultValue is set and the result is not null, then validate that they are assignable
-        else if (defaultValue.getClass().isAssignableFrom(value.getClass())) {
-          return value;
-        } else {
-          throw new IllegalArgumentException(objectNotOfCorrectType(value.getClass(), defaultValue.getClass()).getMessage());
-        }
-      }
-    }
   }
 }

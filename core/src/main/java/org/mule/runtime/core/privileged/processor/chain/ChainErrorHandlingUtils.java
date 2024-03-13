@@ -25,8 +25,8 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
 
 import java.util.Collection;
 import java.util.function.BiFunction;

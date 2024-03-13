@@ -38,6 +38,7 @@ module org.mule.runtime.extensions.spring.support {
   requires org.apache.commons.lang3;
   requires org.dom4j;
   requires org.jsoup;
+  requires reflections;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.module.extension.internal.config.dsl.DefaultExtensionBuildingDefinitionProvider;
@@ -55,6 +56,7 @@ module org.mule.runtime.extensions.spring.support {
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.connection to
       org.mule.runtime.spring.config,
+      org.mule.runtime.extensions.xml.support,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.config to
       org.mule.runtime.spring.config,
@@ -66,6 +68,7 @@ module org.mule.runtime.extensions.spring.support {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.parameter to
+      org.mule.runtime.extensions.xml.support,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.module.extension.internal.config.dsl.source to

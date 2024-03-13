@@ -6,25 +6,24 @@
  */
 package org.mule.runtime.config.internal.context.service;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Proxy.newProxyInstance;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.NO_OBJECT_FOUND_FOR_PARAM;
 import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceProxy.createInjectProviderParamsServiceProxy;
 import static org.mule.runtime.config.utils.Utils.augmentedParam;
-import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+
+import static java.lang.String.format;
+import static java.lang.reflect.Proxy.newProxyInstance;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedSubclassMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedSubclassOverridesMethodService;
-import org.mule.runtime.config.utils.Utils.AugmentedWithPreferredMethodService;
 import org.mule.runtime.config.utils.Utils.BaseOverloadedService;
 import org.mule.runtime.config.utils.Utils.BaseOverloadedService2;
 import org.mule.runtime.config.utils.Utils.BaseService;
@@ -32,8 +31,6 @@ import org.mule.runtime.config.utils.Utils.BasicService;
 import org.mule.runtime.config.utils.Utils.HiddenAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.InvalidAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.InvalidNamedAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.MyBean;
-import org.mule.runtime.config.utils.Utils.MyPreferredBean;
 import org.mule.runtime.config.utils.Utils.NamedAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService2;
@@ -106,21 +103,6 @@ public class InjectParamsFromContextServiceProxyTestCase extends AbstractMuleCon
     serviceProxy.augmented();
 
     assertThat(augmentedParam, is(true));
-  }
-
-  @Test
-  public void augmentedWithPreferredInvocation() throws Exception {
-    registerObject(muleContext, "myBean", new MyBean());
-    final MyPreferredBean preferredBean = new MyPreferredBean();
-    registerObject(muleContext, "myPreferredBean", preferredBean);
-
-    BaseService service = new AugmentedWithPreferredMethodService();
-
-    final BaseService serviceProxy = (BaseService) createInjectProviderParamsServiceProxy(service, registry);
-
-    serviceProxy.augmented();
-
-    assertThat(augmentedParam, sameInstance(preferredBean));
   }
 
   @Test

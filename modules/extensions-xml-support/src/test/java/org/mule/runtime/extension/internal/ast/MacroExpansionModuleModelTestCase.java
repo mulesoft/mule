@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Arrays.asList;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
@@ -51,6 +52,7 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.qameta.allure.Issue;
 import io.qameta.allure.Feature;
@@ -74,7 +76,7 @@ public class MacroExpansionModuleModelTestCase extends AbstractMuleTestCase {
         getExtensionModel("macroExpandableExtensionModel", "used-extension", singletonList(macroExpandableFlow));
 
     ArtifactAst macroExpandedArtifactAst =
-        new MacroExpansionModuleModel(spy(BaseArtifactAst.class), macroExpandableExtensionModel).expand();
+        new MacroExpansionModuleModel(spy(BaseArtifactAst.class), macroExpandableExtensionModel, empty()).expand();
 
     assertThat(macroExpandedArtifactAst.recursiveStream().collect(toList()),
                containsInAnyOrder(macroExpandedArtifactAst.recursiveStream().toArray()));

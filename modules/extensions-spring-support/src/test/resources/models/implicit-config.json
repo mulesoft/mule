@@ -2344,13 +2344,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
-      "parent": "MULE:ANY",
+      "error": "IMPLICIT:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
-      "error": "IMPLICIT:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:RETRY_EXHAUSTED",
+      "parent": "MULE:ANY",
       "handleable": true
     }
   ],

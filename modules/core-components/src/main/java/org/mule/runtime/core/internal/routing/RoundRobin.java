@@ -17,9 +17,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.routing.result.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.privileged.routing.RoutingException;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;

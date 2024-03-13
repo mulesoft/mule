@@ -20,8 +20,6 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionFactory;
-import org.mule.runtime.core.privileged.transaction.AbstractTransaction;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 
 import java.util.Optional;
 
@@ -117,6 +115,7 @@ public class DelegateTransaction extends AbstractTransaction {
                           notificationFirer,
                           transactionManager);
     this.delegate.setTimeout(timeout);
+    ((TransactionAdapter) delegate).setRollbackIfTimeout(this.rollbackAfterTimeout);
     this.delegate.bindResource(key, resource);
     ((TransactionAdapter) delegate).setComponentLocation(componentLocation);
   }
@@ -164,6 +163,12 @@ public class DelegateTransaction extends AbstractTransaction {
   public void setTimeout(int timeout) {
     super.setTimeout(timeout);
     delegate.setTimeout(timeout);
+  }
+
+  @Override
+  public void setRollbackIfTimeout(boolean rollbackAfterTimeout) {
+    super.setRollbackIfTimeout(rollbackAfterTimeout);
+    ((TransactionAdapter) delegate).setRollbackIfTimeout(rollbackAfterTimeout);
   }
 
   private class NullTransaction implements TransactionAdapter {

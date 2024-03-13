@@ -6,17 +6,19 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
+
 import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.toMetadataType;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.el.CompiledExpression;
@@ -29,6 +31,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.annotation.param.NullSafe;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.runtime.parameter.Literal;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
@@ -38,15 +41,22 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTestCase {
+
+  // Creating new rule with recommended Strictness setting
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS, lenient = true)
   private CoreEvent event;
@@ -82,6 +92,22 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     when(expressionManager.openSession(any())).thenReturn(session);
 
     assertExpected(new StaticValueResolver(null), toMetadataType(DynamicPojo.class), true, new DynamicPojo(5));
+
+    verify(event, times(1)).asBindingContext();
+  }
+
+  @Test
+  @Issue("W-14954976")
+  public void testPojoTypeWithLiteralExpression() throws Exception {
+    ExpressionManagerSession session = mock(ExpressionManagerSession.class);
+    when(session.evaluate(any(CompiledExpression.class), any(DataType.class)))
+        .thenAnswer(inv -> new TypedValue<>(5, inv.getArgument(1)));
+    when(expressionManager.openSession(any())).thenReturn(session);
+
+    assertExpected(new StaticValueResolver(null),
+                   toMetadataType(DynamicPojoWithLiteralParam.class),
+                   false,
+                   new DynamicPojoWithLiteralParam(new ImmutableLiteral("#[5]", Integer.class)));
 
     verify(event, times(1)).asBindingContext();
   }
@@ -148,6 +174,42 @@ public class NullSafeValueResolverWrapperTestCase extends AbstractMuleContextTes
     @Override
     public int hashCode() {
       return Objects.hash(time);
+    }
+  }
+
+
+  public static class DynamicPojoWithLiteralParam {
+
+    public DynamicPojoWithLiteralParam() {}
+
+    public DynamicPojoWithLiteralParam(Literal<Integer> time) {
+      this.time = time;
+    }
+
+    @Parameter
+    @Optional(defaultValue = "#[5]")
+    private Literal<Integer> time;
+
+    public Literal<Integer> getTime() {
+      return time;
+    }
+
+    public void setTime(Literal<Integer> time) {
+      this.time = time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof DynamicPojoWithLiteralParam) {
+        DynamicPojoWithLiteralParam that = (DynamicPojoWithLiteralParam) o;
+        return time.getLiteralValue().equals(that.time.getLiteralValue());
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(time.getLiteralValue());
     }
   }
 

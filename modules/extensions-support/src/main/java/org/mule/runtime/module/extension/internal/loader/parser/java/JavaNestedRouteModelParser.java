@@ -9,9 +9,11 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static java.util.Optional.empty;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getParameterGroupParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.ParameterDeclarationContext.forRoute;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.route.JavaChainParsingUtils.parseChainExecutionOccurrence;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
+import org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence;
 import org.mule.runtime.api.meta.model.stereotype.StereotypeModel;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -21,6 +23,7 @@ import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModel
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils;
+import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -87,6 +90,11 @@ public class JavaNestedRouteModelParser implements NestedRouteModelParser {
   @Override
   public List<StereotypeModel> getAllowedStereotypes(StereotypeModelFactory factory) {
     return JavaStereotypeModelParserUtils.getAllowedStereotypes(route, route.getType(), factory);
+  }
+
+  @Override
+  public ChainExecutionOccurrence getExecutionOccurrence() {
+    return parseChainExecutionOccurrence(route.getValueFromAnnotation(ExecutionOccurrence.class));
   }
 
   @Override

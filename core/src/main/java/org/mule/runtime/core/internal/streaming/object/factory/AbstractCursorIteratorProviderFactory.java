@@ -8,7 +8,7 @@ package org.mule.runtime.core.internal.streaming.object.factory;
 
 import static java.lang.Boolean.getBoolean;
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACK_CURSOR_PROVIDER_CLOSE_PROPERTY;
-import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
+import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;

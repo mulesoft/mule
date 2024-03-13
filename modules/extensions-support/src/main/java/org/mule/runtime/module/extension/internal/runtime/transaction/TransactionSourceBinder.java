@@ -19,7 +19,7 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
 
@@ -54,7 +54,8 @@ public class TransactionSourceBinder {
                                                                                               ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler,
                                                                                               TransactionManager transactionManager,
-                                                                                              int timeout)
+                                                                                              int timeout,
+                                                                                              boolean errorAfterTimeout)
       throws ConnectionException, TransactionException {
 
     if (!transactionConfig.isTransacted()) {
@@ -66,6 +67,7 @@ public class TransactionSourceBinder {
                                                         transactionManager);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
+    ((TransactionAdapter) tx).setRollbackIfTimeout(errorAfterTimeout);
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)
         .orElseThrow(() -> new IllegalStateException(format(

@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 

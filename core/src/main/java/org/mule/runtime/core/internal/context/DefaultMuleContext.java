@@ -8,14 +8,15 @@ package org.mule.runtime.core.internal.context;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
@@ -73,11 +74,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.validateJdk;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -116,7 +117,6 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -160,7 +160,6 @@ import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ArtifactStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
@@ -186,6 +185,7 @@ import java.util.function.Predicate;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -202,7 +202,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * logger used by this class
    */
-  private static Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final CustomizationService customizationService = new DefaultCustomizationService();
 
@@ -255,9 +256,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
   private String clusterNodeIdPrefix = "";
-
-  private final SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
-      new SingleResourceTransactionFactoryManager();
 
   private LockFactory lockFactory;
 
@@ -358,6 +356,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureCommonsPool2DisableJmx();
       configureDisableSchedulerLogging();
       configureErrorAndRollbackTxWhenTimeout();
+      configureDisableXmlSdkImplicitConfigurationCreation();
     }
   }
 
@@ -371,7 +370,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       }
 
       try {
-        JdkVersionUtils.validateJdk();
+        validateJdk();
       } catch (RuntimeException e) {
         throw new InitialisationException(invalidJdk(JAVA_VERSION, getSupportedJdks()), this);
       }
@@ -455,9 +454,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       startLatch.release();
 
-      if (LOGGER.isInfoEnabled()) {
+      if (SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen startupScreen = buildStartupSplash();
-        log(startupScreen.toString());
+        SPLASH_LOGGER.info(startupScreen.toString());
       }
     }
   }
@@ -549,9 +548,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       disposeManagers();
 
-      if ((getStartDate() > 0) && LOGGER.isInfoEnabled()) {
+      if ((getStartDate() > 0) && SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen shutdownScreen = buildShutdownSplash();
-        log(shutdownScreen.toString());
+        SPLASH_LOGGER.info(shutdownScreen.toString());
       }
 
       setExecutionClassLoader(null);
@@ -990,11 +989,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                        OptionalInt.empty(),
                                                        OptionalInt.empty());
     return new DefaultComponentLocation(of(name), singletonList(part));
-  }
-
-  @Override
-  public SingleResourceTransactionFactoryManager getTransactionFactoryManager() {
-    return this.singleResourceTransactionFactoryManager;
   }
 
   @Override
@@ -1580,6 +1574,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureErrorAndRollbackTxWhenTimeout() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
+  }
+
+  private static void configureDisableXmlSdkImplicitConfigurationCreation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, minMuleVersion("4.7.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

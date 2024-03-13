@@ -7,8 +7,8 @@
 package org.mule.functional.api.flow;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
+import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
@@ -28,20 +28,14 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-
-import javax.activation.DataHandler;
 
 import org.mockito.Mockito;
 
@@ -53,16 +47,11 @@ public class TestEventBuilder {
   private Object payload;
   private Object attributes;
   private MediaType mediaType = MediaType.ANY;
-  private Map<String, Serializable> inboundProperties = new HashMap<>();
-  private Map<String, Serializable> outboundProperties = new HashMap<>();
-  private Map<String, DataHandler> inboundAttachments = new HashMap<>();
-  private Map<String, Attachment> outboundAttachments = new HashMap<>();
-  private Map<String, Object> sessionProperties = new HashMap<>();
 
   private String sourceCorrelationId = null;
   private ItemSequenceInfo itemSequenceInfo;
 
-  private Map<String, TypedValue> variables = new HashMap<>();
+  private final Map<String, TypedValue> variables = new HashMap<>();
 
   private Function<Message, Message> spyMessage = input -> input;
   private Function<CoreEvent, CoreEvent> spyEvent = input -> input;
@@ -106,80 +95,6 @@ public class TestEventBuilder {
   }
 
   /**
-   * Prepares a property with the given key and value to be sent as an inbound property of the product.
-   *
-   * @param key   the key of the inbound property to add
-   * @param value the value of the inbound property to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public TestEventBuilder withInboundProperty(String key, Serializable value) {
-    inboundProperties.put(key, value);
-
-    return this;
-  }
-
-  /**
-   * Prepares the given properties map to be sent as inbound properties of the product.
-   *
-   * @param properties the inbound properties to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public TestEventBuilder withInboundProperties(Map<String, Serializable> properties) {
-    inboundProperties.putAll(properties);
-
-    return this;
-  }
-
-  /**
-   * Prepares a property with the given key and value to be sent as an outbound property of the product.
-   *
-   * @param key   the key of the outbound property to add
-   * @param value the value of the outbound property to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-   */
-  @Deprecated
-  public TestEventBuilder withOutboundProperty(String key, Serializable value) {
-    outboundProperties.put(key, value);
-
-    return this;
-  }
-
-  /**
-   * Prepares an attachment with the given key and value to be sent in the product.
-   *
-   * @param key   the key of the attachment to add
-   * @param value the {@link DataHandler} for the attachment to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  public TestEventBuilder withInboundAttachment(String key, DataHandler value) {
-    inboundAttachments.put(key, value);
-
-    return this;
-  }
-
-  /**
-   * Prepares a property with the given key and value to be sent as a session property of the product.
-   *
-   * @param key   the key of the session property to add
-   * @param value the value of the session property to add
-   * @return this {@link TestEventBuilder}
-   * @deprecated Transport infrastructure is deprecated.
-   */
-  @Deprecated
-  public TestEventBuilder withSessionProperty(String key, Object value) {
-    sessionProperties.put(key, value);
-
-    return this;
-  }
-
-  /**
    * Configures the product event to have the provided {@code sourceCorrelationId}. See {@link CoreEvent#getCorrelationId()}.
    *
    * @return this {@link TestEventBuilder}
@@ -196,6 +111,7 @@ public class TestEventBuilder {
    * @return this {@link TestEventBuilder}
    * @deprecated use {@link #withItemSequenceInfo(ItemSequenceInfo)} instead
    */
+  @Deprecated
   public TestEventBuilder withCorrelation(GroupCorrelation groupCorrelation) {
     return withItemSequenceInfo(fromGroupCorrelation(groupCorrelation));
   }
@@ -267,9 +183,6 @@ public class TestEventBuilder {
 
     messageBuilder = Message.builder().value(payload).mediaType(mediaType);
 
-    setInboundProperties(messageBuilder, inboundProperties);
-    setOutboundProperties(messageBuilder, outboundProperties);
-
     if (attributes != null) {
       messageBuilder.attributesValue(attributes);
     }
@@ -277,19 +190,12 @@ public class TestEventBuilder {
 
     EventContext eventContext = getEventContext(flow);
 
-    CoreEvent.Builder builder = InternalEvent.builder(eventContext)
+    CoreEvent.Builder builder = CoreEvent.builder(eventContext)
         .message(spyMessage.apply(muleMessage)).itemSequenceInfo(ofNullable(itemSequenceInfo));
     for (Entry<String, TypedValue> variableEntry : variables.entrySet()) {
       builder.addVariable(variableEntry.getKey(), variableEntry.getValue().getValue(), variableEntry.getValue().getDataType());
     }
     CoreEvent event = builder.build();
-
-    for (Entry<String, Attachment> outboundAttachmentEntry : outboundAttachments.entrySet()) {
-      event = outboundAttachmentEntry.getValue().addOutboundTo(event, outboundAttachmentEntry.getKey());
-    }
-    for (Entry<String, Object> sessionPropertyEntry : sessionProperties.entrySet()) {
-      ((PrivilegedEvent) event).getSession().setProperty(sessionPropertyEntry.getKey(), sessionPropertyEntry.getValue());
-    }
 
     return spyEvent.apply(event);
   }
@@ -309,27 +215,4 @@ public class TestEventBuilder {
     return eventContext;
   }
 
-  private void setInboundProperties(Message.Builder messageBuilder, Map<String, Serializable> inboundProperties) {
-    // TODO(pablo.kraan): MULE-12280 - remove methods that use the legacy message API once all the tests using it are migrated
-    try {
-      Method inboundPropertiesMethod = messageBuilder.getClass().getMethod("inboundProperties", Map.class);
-      inboundPropertiesMethod.invoke(messageBuilder, inboundProperties);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  private void setOutboundProperties(Message.Builder messageBuilder, Map<String, Serializable> outboundProperties) {
-    try {
-      Method outboundPropertiesMethod = messageBuilder.getClass().getMethod("outboundProperties", Map.class);
-      outboundPropertiesMethod.invoke(messageBuilder, outboundProperties);
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  private interface Attachment {
-
-    CoreEvent addOutboundTo(CoreEvent event, String key);
-  }
 }

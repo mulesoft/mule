@@ -8,11 +8,14 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
+import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.sdk.api.metadata.MetadataCache;
 import org.mule.sdk.api.metadata.MetadataContext;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SdkMetadataContextAdapter implements MetadataContext {
 
@@ -45,5 +48,15 @@ public class SdkMetadataContextAdapter implements MetadataContext {
   @Override
   public MetadataCache getCache() {
     return new SdkMetadataCacheAdapter(delegate.getCache());
+  }
+
+  @Override
+  public Optional<Supplier<MetadataType>> getInnerChainOutputType() {
+    return delegate.getInnerChainOutputType();
+  }
+
+  @Override
+  public Map<String, Supplier<MetadataType>> getInnerRoutesOutputType() {
+    return delegate.getInnerRoutesOutputType();
   }
 }

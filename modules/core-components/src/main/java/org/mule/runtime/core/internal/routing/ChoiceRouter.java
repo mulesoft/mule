@@ -24,8 +24,8 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.routing.result.RouterStatisticsRecorder;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
 import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;

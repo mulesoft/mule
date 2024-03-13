@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
@@ -27,7 +28,9 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FATAL;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.FLOW_BACK_PRESSURE;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhandleable.OVERLOAD;
+import static java.util.Optional.empty;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleFatalException;
@@ -45,12 +48,13 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
+import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
+import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
-import org.mule.runtime.core.privileged.routing.RoutingException;
 
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
@@ -60,13 +64,18 @@ import java.util.concurrent.RejectedExecutionException;
  */
 public class ErrorTypeLocatorFactory {
 
+  public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
+    return createDefaultErrorTypeLocator(errorTypeRepository, empty());
+  }
+
   /**
    * Creates the default {@link ErrorTypeLocator} to use in mule.
    *
    * @param errorTypeRepository error type repository. Commonly created using {@link ErrorTypeRepositoryFactory}.
    * @return a new {@link ErrorTypeLocator}.
    */
-  public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository) {
+  public static ErrorTypeLocator createDefaultErrorTypeLocator(ErrorTypeRepository errorTypeRepository,
+                                                               Optional<FeatureFlaggingService> featureFlaggingService) {
     ErrorType unknown = errorTypeRepository.getErrorType(UNKNOWN).get();
     return ErrorTypeLocator.builder(errorTypeRepository)
         .defaultExceptionMapper(ExceptionMapper.builder()
@@ -94,8 +103,9 @@ public class ErrorTypeLocatorFactory {
                                  errorTypeRepository.lookupErrorType(STREAM_MAXIMUM_SIZE_EXCEEDED).get())
             .addExceptionMapping(MuleFatalException.class, errorTypeRepository.getErrorType(FATAL).get())
             .addExceptionMapping(TransactionException.class,
-                                 errorTypeRepository.lookupErrorType(TRANSACTION)
-                                     .orElseGet(ErrorTypeLocatorFactory::createTransactionError))
+                                 useTransactionErrorIfEnabled(errorTypeRepository.lookupErrorType(TRANSACTION)
+                                     .orElseGet(ErrorTypeLocatorFactory::createTransactionError), unknown,
+                                                              featureFlaggingService))
             .build())
         .defaultError(unknown)
         .build();
@@ -104,5 +114,11 @@ public class ErrorTypeLocatorFactory {
   private static ErrorType createTransactionError() {
     ErrorType anyError = builder().namespace(ANY.getNamespace()).identifier(ANY.getName()).build();
     return builder().namespace(TRANSACTION.getNamespace()).identifier(TRANSACTION.getName()).parentErrorType(anyError).build();
+  }
+
+  private static ErrorType useTransactionErrorIfEnabled(ErrorType txError, ErrorType unknown,
+                                                        Optional<FeatureFlaggingService> featureFlaggingService) {
+    return featureFlaggingService.map(service -> service.isEnabled(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT) ? txError : unknown)
+        .orElse(txError);
   }
 }

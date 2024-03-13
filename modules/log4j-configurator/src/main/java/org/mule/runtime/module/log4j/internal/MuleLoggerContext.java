@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.log4j.internal;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -23,10 +25,7 @@ import org.apache.logging.log4j.message.MessageFactory;
 /**
  * Subclass of {@link LoggerContext} which adds some information about the mule artifact being logged.
  * <p/>
- * The most important function of this class though is to override the {@link #reconfigure()} method to to its inherited purpose
- * plus invoking {@link LoggerContextConfigurer#configure(MuleLoggerContext)}.
- * <p/>
- * The {@link LoggerContextConfigurer} needs to be invoked here so that it's invoked each time the configuration is reloaded.
+ * The most important function of this class though is to override the {@link #reconfigure()} method to to its inherited purpose.
  * <p/>
  * This class must not hold any reference to a {@link ClassLoader} since otherwise {@link Logger} instances held on static fields
  * will make that class loader GC unreachable
@@ -64,7 +63,7 @@ class MuleLoggerContext extends LoggerContext {
     this.standalone = standalone;
     this.logSeparationEnabled = logSeparationEnabled;
     ownerClassLoaderHash =
-        ownerClassLoader != null ? ownerClassLoader.hashCode() : getClass().getClassLoader().getSystemClassLoader().hashCode();
+        ownerClassLoader != null ? ownerClassLoader.hashCode() : getSystemClassLoader().hashCode();
 
     if (ownerClassLoader instanceof ArtifactClassLoader) {
       artifactClassloader = true;
@@ -93,7 +92,6 @@ class MuleLoggerContext extends LoggerContext {
 
   @Override
   public synchronized void reconfigure() {
-    loggerContextConfigurer.configure(this);
     if (loggerContextConfigurer.shouldConfigureContext(this)) {
       super.reconfigure();
     }

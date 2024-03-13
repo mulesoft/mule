@@ -69387,8 +69387,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "TEST-OAUTH:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
@@ -69397,17 +69401,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "TEST-OAUTH:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "TEST-OAUTH:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],
@@ -69417,6 +69417,7 @@
       "format": "xml",
       "type": "Object",
       "annotations": {
+        "typeId": "#root:shiporder",
         "classInformation": {
           "classname": "java.io.InputStream",
           "hasDefaultConstructor": true,
@@ -69428,8 +69429,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "#root:shiporder"
+        }
       },
       "fields": [
         {
@@ -69580,6 +69580,7 @@
       "format": "json",
       "type": "Object",
       "annotations": {
+        "typeId": "http://example.com/example.json",
         "label": "Person",
         "classInformation": {
           "classname": "java.io.InputStream",
@@ -69592,8 +69593,7 @@
           "parent": "",
           "genericTypes": [],
           "isMap": false
-        },
-        "typeId": "http://example.com/example.json"
+        }
       },
       "open": {
         "type": "Any"

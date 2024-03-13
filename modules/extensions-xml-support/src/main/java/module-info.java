@@ -29,10 +29,17 @@ module org.mule.runtime.extensions.xml.support {
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.spring.config;
 
+  requires java.inject;
+  requires java.xml;
+
+  requires commons.beanutils;
+  requires com.google.common;
   requires com.google.gson;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
-  requires java.inject;
+  requires org.jgrapht.core;
+  requires net.bytebuddy;
+  requires vibur.object.pool;
 
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
       org.mule.runtime.extension.internal.ast.MacroExpansionAstPostProcessor;

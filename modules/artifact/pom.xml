@@ -12,12 +12,7 @@
     <name>Mule Artifact Module</name>
 
     <properties>
-        <surefire.args.base>
-            -XX:+TieredCompilation
-            -Dfile.encoding=UTF-8
-            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
-            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec',excludes=mypackage.MyClass
-        </surefire.args.base>
+        <surefire.additional.jacoco.args>,excludes=mypackage.MyClass</surefire.additional.jacoco.args>
         <!-- open internal required stuff from org.mule.runtime.core to the test infrastructure -->
         <surefire.args>
             -XX:+IgnoreUnrecognizedVMOptions
@@ -27,7 +22,7 @@
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.el.datetime=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
             --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
-            ${surefire.args.base}
+            ${surefire.test.unit.open.args}
         </surefire.args>
 
         <javaModuleName>org.mule.runtime.artifact</javaModuleName>
@@ -68,12 +63,6 @@
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-mvel</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>

@@ -34,6 +34,7 @@
        org.mule.runtime.extensions.spring.support;
 
    requires java.inject;
+   requires com.google.common;
 
    opens org.mule.runtime.module.extension.soap.internal.runtime.connection to spring.core;
    opens org.mule.runtime.module.extension.soap.api.runtime.connection.transport to spring.core;

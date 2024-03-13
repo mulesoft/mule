@@ -13,8 +13,6 @@
 module org.mule.runtime.http.api {
 
   requires transitive org.mule.runtime.api;
-  // for api.retry.policy and api.config.bootstrap
-  requires org.mule.runtime.core;
 
   requires com.github.benmanes.caffeine;
 

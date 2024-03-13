@@ -20,9 +20,9 @@ import static java.lang.Boolean.getBoolean;
 import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.rules.ExpectedException.none;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -41,13 +41,15 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.slf4j.Logger;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(REUSE)
 @Story(EXTENSION_EXTENSION_MODEL)
@@ -58,7 +60,7 @@ public class MuleSdkPluginExtensionModelLoaderTestCase extends AbstractMuleSdkAs
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
-  private final ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer();
+  private final ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer(true);
 
   @Rule
   public ExpectedException expectedException = none();

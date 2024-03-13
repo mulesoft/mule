@@ -11,17 +11,18 @@ import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_COUNTER_VARIABLE;
 import static org.mule.runtime.core.internal.routing.Foreach.DEFAULT_ROOT_MESSAGE_VARIABLE;
 import static org.mule.runtime.core.internal.routing.ForeachRouter.MAP_NOT_SUPPORTED_MESSAGE;
+import static org.mule.runtime.core.internal.routing.ForeachTestCase.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
-import static org.mule.runtime.core.internal.test.util.string.StringHashCodeCollisionGenerator.stringsWithSameHashCode;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChildContext;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.processor.ContextPropagationChecker.assertContextPropagation;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
-import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR_EACH;
 import static org.mule.test.allure.AllureConstants.ScopeFeature.SCOPE;
+import static org.mule.test.allure.AllureConstants.ScopeFeature.ForeachStory.FOR_EACH;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -35,10 +36,10 @@ import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -48,15 +49,15 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
+import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.streaming.CursorProvider;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.streaming.ManagedCursorProvider;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.SensingNullMessageProcessor;
 import org.mule.tck.processor.ContextPropagationChecker;
@@ -70,11 +71,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.slf4j.Logger;
 
 @Feature(SCOPE)
 @Story(FOR_EACH)
@@ -345,8 +348,8 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     foreach.process(eventBuilder(muleContext).message(of(asList(1, 2, 3))).build());
 
     assertThat(processedEvents, hasSize(2));
-    assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
-    assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
+    assertThat(getMessageAsString(processedEvents.get(0)), is("[1, 2]:foo:zas"));
+    assertThat(getMessageAsString(processedEvents.get(1)), is("[3]:foo:zas"));
 
     assertForEachContextConsumption((InternalEvent) processedEvents.get(0));
     assertForEachContextConsumption((InternalEvent) processedEvents.get(1));
@@ -363,11 +366,22 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     foreach.process(eventBuilder(muleContext).addVariable("collection", asList(1, 2, 3)).message(of(null)).build());
 
     assertThat(processedEvents, hasSize(2));
-    assertThat(((PrivilegedEvent) processedEvents.get(0)).getMessageAsString(muleContext), is("[1, 2]:foo:zas"));
-    assertThat(((PrivilegedEvent) processedEvents.get(1)).getMessageAsString(muleContext), is("[3]:foo:zas"));
+
+    assertThat(getMessageAsString(processedEvents.get(0)), is("[1, 2]:foo:zas"));
+    assertThat(getMessageAsString(processedEvents.get(1)), is("[3]:foo:zas"));
 
     assertForEachContextConsumption((InternalEvent) processedEvents.get(0));
     assertForEachContextConsumption((InternalEvent) processedEvents.get(1));
+  }
+
+  private String getMessageAsString(final CoreEvent event) {
+    Message transformedMessage = muleContext.getTransformationService()
+        .transform(event.getMessage(), DataType.builder()
+            .type(String.class)
+            .charset(getDefaultEncoding(muleContext.getConfiguration()))
+            .build());
+    String payload = (String) transformedMessage.getPayload().getValue();
+    return payload;
   }
 
   @Test
@@ -565,5 +579,33 @@ public class ForeachTestCase extends AbstractForeachTestCase {
     // All elements should be processed without exceptions
     assertTrue(exceptions.isEmpty());
     assertThat(secondForeachCounter.get(), is(CONCURRENCY * payload.size()));
+  }
+
+  public static class StringHashCodeCollisionGenerator {
+
+    public static List<String> stringsWithSameHashCode(int desiredRecords) {
+      List<String> strings = asList("Aa", "BB");
+      List<String> temp = new ArrayList<>();
+
+      boolean finished = false;
+      for (int i = 0; i < 5 && !finished; i++) {
+        temp = new ArrayList<>();
+        int count = 0;
+        for (String s : strings) {
+          for (String t : strings) {
+            if (count == desiredRecords) {
+              finished = true;
+              break;
+            }
+            temp.add(s + t);
+            count++;
+          }
+        }
+        strings = temp;
+      }
+      strings = temp;
+
+      return strings;
+    }
   }
 }

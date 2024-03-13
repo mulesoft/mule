@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.IOUtils;
-import org.mule.runtime.core.privileged.transformer.CompositeConverter;
+import org.mule.runtime.core.internal.transformer.CompositeConverter;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;

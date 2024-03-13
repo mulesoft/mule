@@ -87,9 +87,9 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
   public Sink createSink(FlowConstruct flowConstruct, ReactiveProcessor pipeline) {
     Sink delegateSink = delegate.createSink(flowConstruct, pipeline);
     Sink syncSink = new ReactorSinkProviderBasedSink(new DefaultCachedThreadReactorSinkProvider(flowConstruct, p -> from(p)
-        .subscriberContext(popTxFromSubscriberContext())
+        .contextWrite(popTxFromSubscriberContext())
         .transform(pipeline)
-        .subscriberContext(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, featureFlaggingService));
+        .contextWrite(pushTxToSubscriberContext("source")), NULL_EVENT_CONSUMER, featureFlaggingService));
     return new TransactionalDelegateSink(syncSink, delegateSink);
   }
 

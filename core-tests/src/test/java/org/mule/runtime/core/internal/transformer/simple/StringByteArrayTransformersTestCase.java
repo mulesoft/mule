@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.transformer.simple;
 
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
 import org.mule.tck.core.transformer.AbstractTransformerTestCase;
 
 import java.util.Arrays;

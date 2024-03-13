@@ -6,36 +6,6 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.collection.IsMapContaining.hasEntry;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsSame.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.builder;
@@ -54,6 +24,38 @@ import static org.mule.tck.junit4.matcher.EventMatcher.hasErrorTypeThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withEventThat;
 import static org.mule.tck.junit4.matcher.MessagingExceptionMatcher.withFailingComponent;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsSame.sameInstance;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static reactor.core.Exceptions.errorCallbackNotImplemented;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
@@ -83,9 +85,9 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
@@ -109,9 +111,10 @@ import java.util.function.Supplier;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
+import com.google.common.collect.ImmutableMap;
+
+import org.reactivestreams.Publisher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -120,13 +123,16 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+
 import org.mockito.InOrder;
 import org.mockito.verification.VerificationMode;
-import org.reactivestreams.Publisher;
-
-import com.google.common.collect.ImmutableMap;
 
 import io.qameta.allure.Issue;
+
 import reactor.core.publisher.Mono;
 
 @SmallTest
@@ -2209,7 +2215,7 @@ public class ReactiveInterceptorAdapterTestCase extends AbstractMuleContextTestC
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       return from(publisher)
           .handle(nullSafeMap(checkedFunction(this::process)))
-          .subscriberContext(ctx -> {
+          .contextWrite(ctx -> {
             if (useMockInterceptor) {
               assertThat(ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false), is(true));
             }

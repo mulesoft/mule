@@ -26,7 +26,6 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
 import org.mule.runtime.core.internal.registry.TypeBasedTransformerResolver;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;

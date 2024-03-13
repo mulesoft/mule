@@ -19,11 +19,12 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.api.util.DataSize;
+import org.mule.runtime.core.api.streaming.bytes.ByteBufferManager;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamConfig;
 import org.mule.runtime.core.api.streaming.bytes.InMemoryCursorStreamProvider;
 import org.mule.runtime.core.api.util.func.CheckedConsumer;
@@ -71,7 +72,7 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
   private CursorStreamProvider streamProvider;
   private CountDownLatch controlLatch;
   private CountDownLatch mainThreadLatch;
-  protected PoolingByteBufferManager bufferManager;
+  private PoolingByteBufferManager bufferManager;
 
   public CursorStreamProviderTestCase(String name, int dataSize, int bufferSize, int maxBufferSize) {
     super(dataSize);
@@ -402,5 +403,9 @@ public class CursorStreamProviderTestCase extends AbstractByteStreamingTestCase 
     for (int i = 0; i < read; i++) {
       accumulator.append((char) buffer[i]);
     }
+  }
+
+  public ByteBufferManager getBufferManager() {
+    return bufferManager;
   }
 }

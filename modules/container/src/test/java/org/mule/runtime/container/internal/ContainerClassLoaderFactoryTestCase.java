@@ -7,7 +7,7 @@
 package org.mule.runtime.container.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_CONTAINER_JPMS_MODULE_LAYER;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+import static org.mule.runtime.core.api.config.bootstrap.RegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
 import static org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy.PARENT_FIRST;
 
@@ -102,7 +102,8 @@ public class ContainerClassLoaderFactoryTestCase extends AbstractMuleTestCase {
     final ArtifactClassLoader containerClassLoader =
         factory.createContainerClassLoader(this.getClass().getClassLoader()).getContainerClassLoader();
 
-    final Enumeration<URL> resources = containerClassLoader.getClassLoader().getResources(BOOTSTRAP_PROPERTIES);
+    final Enumeration<URL> resources =
+        containerClassLoader.getClassLoader().getResources(BOOTSTRAP_PROPERTIES);
     assertThat(resources.hasMoreElements(), is(true));
 
     Set<String> items = new HashSet<>();

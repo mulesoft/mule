@@ -61,7 +61,9 @@ import org.mule.runtime.config.internal.bean.CustomEncryptionStrategyDelegate;
 import org.mule.runtime.config.internal.bean.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
+import org.mule.runtime.config.internal.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
+import org.mule.runtime.config.internal.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryBean;
@@ -83,8 +85,6 @@ import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorIterat
 import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator;
-import org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
@@ -136,13 +136,12 @@ import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.internal.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
-import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -197,6 +196,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
   private static final String LOG_EXCEPTION = "logException";
+
+  private static final String ENABLE_NOTIFICATIONS = "enableNotifications";
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
@@ -221,7 +222,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
-        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build());
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
+        .withSetterParameterDefinition(ENABLE_NOTIFICATIONS,
+                                       fromSimpleParameter(ENABLE_NOTIFICATIONS).withDefaultValue("true").build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(ON_ERROR).withTypeDefinition(fromType(TemplateOnErrorHandler.class))
             .withObjectFactoryType(OnErrorFactoryBean.class)
@@ -507,12 +510,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withConstructorParameterDefinition(fromSimpleParameter("subscription", getNotificationSubscriptionConverter())
             .withDefaultValue(ANY_SELECTOR_STRING)
             .build())
-        .build());
-
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(MuleEncryptionEndpointSecurityFilter.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .withIgnoredConfigurationParameter(NAME)
         .build());
 
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("security-manager")

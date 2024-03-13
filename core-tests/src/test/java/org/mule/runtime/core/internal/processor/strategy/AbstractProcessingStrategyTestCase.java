@@ -101,10 +101,10 @@ import org.mule.runtime.core.api.util.concurrent.NamedThreadFactory;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.util.rx.RetrySchedulerWrapper;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.InternalProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -367,8 +367,8 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
   }
 
   @Override
-  protected InternalEvent.Builder getEventBuilder() throws MuleException {
-    return InternalEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
+  protected PrivilegedEvent.Builder getEventBuilder() throws MuleException {
+    return PrivilegedEvent.builder(create(flow, TEST_CONNECTOR_LOCATION));
   }
 
   protected ProcessingStrategyFactory createProcessingStrategyFactory() {
@@ -1031,7 +1031,7 @@ public abstract class AbstractProcessingStrategyTestCase extends AbstractMuleCon
     @Override
     public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
       Flux<CoreEvent> schedulerTrackingPublisher = from(publisher)
-          .doOnEach(signal -> signal.getContext().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
+          .doOnEach(signal -> signal.getContextView().getOrEmpty(PROCESSOR_SCHEDULER_CONTEXT_KEY)
               .ifPresent(sch -> schedulers.add(((Scheduler) sch).getName())));
 
       if (getProcessingType() == CPU_LITE_ASYNC) {

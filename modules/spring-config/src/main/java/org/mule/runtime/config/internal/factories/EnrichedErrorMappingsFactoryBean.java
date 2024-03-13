@@ -6,13 +6,13 @@
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.lang.Boolean.getBoolean;
-import static java.lang.String.format;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.error.matcher.ErrorTypeMatcherUtils.createErrorTypeMatcher;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -66,9 +66,6 @@ public class EnrichedErrorMappingsFactoryBean extends AbstractComponentFactory<E
 
     if (lookupErrorType.isPresent()) {
       return lookupErrorType.get();
-    } else if (getBoolean(MULE_LAX_ERROR_TYPES)) {
-      LOGGER.warn("Could not find synthetic error '{}' in registry", errorIdentifier);
-      return errorTypeRepository.addErrorType(errorIdentifier, errorTypeRepository.getAnyErrorType());
     } else {
       throw new MuleRuntimeException(createStaticMessage("Could not find synthetic error '%s' in registry",
                                                          errorIdentifier));

@@ -8,23 +8,18 @@ package org.mule.runtime.core.internal.message;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.message.ExceptionPayload;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
-
-import javax.activation.DataHandler;
 
 /**
  * Message
  */
 @NoImplement
-public interface InternalMessage extends Message, MessageProperties, MessageAttachments {
+public interface InternalMessage extends Message {
 
   /**
    * Provides a builder to create {@link Message} objects.
@@ -103,146 +98,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     @Deprecated
     Builder exceptionPayload(ExceptionPayload exceptionPayload);
 
-    /**
-     * @param key
-     * @param value
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addInboundProperty(String key, Serializable value);
-
-    /**
-     * @param key
-     * @param value
-     * @param mediaType
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addInboundProperty(String key, Serializable value, MediaType mediaType);
-
-    /**
-     * @param key
-     * @param value
-     * @param dataType
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addInboundProperty(String key, Serializable value, DataType dataType);
-
-    /**
-     * @param key
-     * @param value
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addOutboundProperty(String key, Serializable value);
-
-    /**
-     * @param key
-     * @param value
-     * @param mediaType
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addOutboundProperty(String key, Serializable value, MediaType mediaType);
-
-    /**
-     * @param key
-     * @param value
-     * @param dataType
-     * @return
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder addOutboundProperty(String key, Serializable value, DataType dataType);
-
-    /**
-     * @param key
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder removeInboundProperty(String key);
-
-    /**
-     * @param key
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder removeOutboundProperty(String key);
-
-    /**
-     * @param key
-     * @param value
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder addInboundAttachment(String key, DataHandler value);
-
-    /**
-     * @param key
-     * @param value
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder addOutboundAttachment(String key, DataHandler value);
-
-    /**
-     * @param key
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder removeInboundAttachment(String key);
-
-    /**
-     * @param key
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder removeOutboundAttachment(String key);
-
-    /**
-     * @param inboundProperties
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder inboundProperties(Map<String, Serializable> inboundProperties);
-
-    /**
-     * @param outboundProperties
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated. Use {@link Message#getAttributes()} instead.
-     */
-    @Deprecated
-    Builder outboundProperties(Map<String, Serializable> outboundProperties);
-
-    /**
-     * @param inboundAttachments
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder inboundAttachments(Map<String, DataHandler> inboundAttachments);
-
-    /**
-     * @param outbundAttachments
-     * @return a {@link Builder}
-     * @deprecated Transport infrastructure is deprecated.
-     */
-    @Deprecated
-    Builder outboundAttachments(Map<String, DataHandler> outbundAttachments);
-
     @Override
     InternalMessage build();
   }
@@ -273,54 +128,6 @@ public interface InternalMessage extends Message, MessageProperties, MessageAtta
     @Deprecated
     @Override
     CollectionBuilder exceptionPayload(ExceptionPayload exceptionPayload);
-
-    @Override
-    CollectionBuilder addInboundProperty(String key, Serializable value);
-
-    @Override
-    CollectionBuilder addInboundProperty(String key, Serializable value, MediaType mediaType);
-
-    @Override
-    CollectionBuilder addInboundProperty(String key, Serializable value, DataType dataType);
-
-    @Override
-    CollectionBuilder addOutboundProperty(String key, Serializable value);
-
-    @Override
-    CollectionBuilder addOutboundProperty(String key, Serializable value, MediaType mediaType);
-
-    @Override
-    CollectionBuilder addOutboundProperty(String key, Serializable value, DataType dataType);
-
-    @Override
-    CollectionBuilder removeInboundProperty(String key);
-
-    @Override
-    CollectionBuilder removeOutboundProperty(String key);
-
-    @Override
-    CollectionBuilder addInboundAttachment(String key, DataHandler value);
-
-    @Override
-    CollectionBuilder addOutboundAttachment(String key, DataHandler value);
-
-    @Override
-    CollectionBuilder removeInboundAttachment(String key);
-
-    @Override
-    CollectionBuilder removeOutboundAttachment(String key);
-
-    @Override
-    CollectionBuilder inboundProperties(Map<String, Serializable> inboundProperties);
-
-    @Override
-    CollectionBuilder outboundProperties(Map<String, Serializable> outboundProperties);
-
-    @Override
-    CollectionBuilder inboundAttachments(Map<String, DataHandler> inboundAttachments);
-
-    @Override
-    CollectionBuilder outboundAttachments(Map<String, DataHandler> outbundAttachments);
 
     @Override
     InternalMessage build();

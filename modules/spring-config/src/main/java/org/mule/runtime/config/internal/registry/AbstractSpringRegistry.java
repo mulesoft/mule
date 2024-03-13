@@ -17,8 +17,10 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ge
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.LifecycleException;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
 import org.mule.runtime.config.internal.resolvers.ConfigurationDependencyResolver;
@@ -26,7 +28,6 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.lifecycle.LifecycleManager;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.AbstractRegistry;
@@ -57,10 +58,14 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
    * Key used to lookup Spring Application Context from SpringRegistry via Mule's Registry interface.
    */
   public static final String SPRING_APPLICATION_CONTEXT = "springApplicationContext";
+  private static final String COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED =
+      "Could not add entry with key '%s': Registry has been stopped.";
 
   private ApplicationContext applicationContext;
   private RegistrationDelegate registrationDelegate;
   private boolean readOnly;
+
+  private final AtomicBoolean isStopped = new AtomicBoolean(false);
 
   // This is used to track the Spring context lifecycle since there is no way to confirm the
   // lifecycle phase from the application context
@@ -302,6 +307,15 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     getLifecycleManager().applyPhase(object, startPhase, toPhase);
   }
 
+  @Override
+  public synchronized void fireLifecycle(String phase) throws LifecycleException {
+    // Avoid trying to register objects while the registry is being shut down.
+    synchronized (isStopped) {
+      isStopped.set(Stoppable.PHASE_NAME.equals(phase) || Disposable.PHASE_NAME.equals(phase));
+    }
+    super.fireLifecycle(phase);
+  }
+
   protected final <T> T initialiseObject(ConfigurableApplicationContext applicationContext, String key, T object)
       throws LifecycleException {
     applicationContext.getBeanFactory().autowireBean(object);
@@ -418,7 +432,15 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
     @Override
     public void registerObject(String key, Object value) throws RegistrationException {
       try {
-        getMuleContext().withLifecycleLock((CheckedRunnable) () -> doRegisterObject(key, value));
+        // Avoid trying to register objects while the registry is being stopped.
+        synchronized (isStopped) {
+          if (isStopped.get()) {
+            throw new RegistrationException(createStaticMessage(format(COULD_NOT_ADD_ENTRY_REGISTRY_HAS_BEEN_STOPPED,
+                                                                       key)));
+          } else {
+            doRegisterObject(key, value);
+          }
+        }
       } catch (RuntimeException e) {
         Throwable cause = e.getCause();
         if (cause instanceof RegistrationException) {
@@ -490,4 +512,5 @@ public abstract class AbstractSpringRegistry extends AbstractRegistry implements
       }
     }
   }
+
 }

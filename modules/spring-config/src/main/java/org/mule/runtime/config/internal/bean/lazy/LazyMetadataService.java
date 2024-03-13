@@ -7,9 +7,13 @@
 package org.mule.runtime.config.internal.bean.lazy;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
+
+import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.ScopePropagationContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -152,6 +156,20 @@ public class LazyMetadataService implements MetadataService, Initialisable {
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(Location location, MetadataKey key) {
     return (MetadataResult<TypeMetadataDescriptor>) initializeComponent(location)
         .orElseGet(() -> metadataService.getEntityMetadata(location, key));
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
+                                                                         ScopePropagationContext ctx) {
+    return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getScopeOutputMetadata(location, key, ctx));
+  }
+
+  @Override
+  public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(Location location, MetadataKey key,
+                                                                          RouterPropagationContext ctx) {
+    return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getRouterOutputMetadata(location, key, ctx));
   }
 
   private Optional<MetadataResult<?>> initializeComponent(Location location) {

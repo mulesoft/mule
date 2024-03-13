@@ -23,7 +23,6 @@ import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.transformer.builder.MockConverterBuilder;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 

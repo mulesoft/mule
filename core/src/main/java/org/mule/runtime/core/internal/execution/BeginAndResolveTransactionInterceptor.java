@@ -13,10 +13,10 @@ import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 import javax.transaction.TransactionManager;
 
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,9 +18,8 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.security.Authentication;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.interception.InternalInterceptionEvent;
 
@@ -87,11 +86,6 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   }
 
   @Override
-  public MuleSession getSession() {
-    return interceptedInput.getSession();
-  }
-
-  @Override
   public DefaultInterceptionEvent message(Message message) {
     interceptedOutput = interceptedOutput.message(message).removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
     return this;
@@ -119,12 +113,6 @@ public class DefaultInterceptionEvent implements InternalInterceptionEvent {
   @Override
   public DefaultInterceptionEvent removeVariable(String key) {
     interceptedOutput = interceptedOutput.removeVariable(key).removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
-    return this;
-  }
-
-  @Override
-  public DefaultInterceptionEvent session(MuleSession session) {
-    interceptedOutput = interceptedOutput.session(session).removeInternalParameter(INTERCEPTION_RESOLVED_PARAMS);
     return this;
   }
 

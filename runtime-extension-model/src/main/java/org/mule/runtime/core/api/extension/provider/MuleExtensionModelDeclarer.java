@@ -14,12 +14,14 @@ import static org.mule.runtime.api.meta.ExpressionSupport.SUPPORTED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.display.PathModel.Type.FILE;
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.AT_LEAST_ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.MULTIPLE_OR_NONE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE;
+import static org.mule.runtime.api.meta.model.nested.ChainExecutionOccurrence.ONCE_OR_NONE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTPUT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
-import static org.mule.runtime.api.util.MuleSystemProperties.REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.isParseTemplateUseLegacyDefaultTargetValue;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -86,7 +88,6 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_SCHEMA_LOCATION;
 import static org.mule.runtime.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -386,7 +387,7 @@ class MuleExtensionModelDeclarer {
     ConstructDeclarer async = extensionDeclarer.withConstruct("async")
         .describedAs("Processes the nested list of message processors asynchronously.");
 
-    async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    async.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
     async.onDefaultParameterGroup()
         .withOptionalParameter("name")
         .withExpressionSupport(NOT_SUPPORTED)
@@ -486,19 +487,11 @@ class MuleExtensionModelDeclarer {
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
 
-    if (getBoolean(REVERT_SUPPORT_EXPRESSIONS_IN_VARIABLE_NAME_IN_SET_VARIABLE_PROPERTY)) {
-      setVariable.onDefaultParameterGroup()
-          .withRequiredParameter("variableName")
-          .ofType(STRING_TYPE)
-          .withExpressionSupport(NOT_SUPPORTED)
-          .describedAs("The name of the variable.");
-    } else {
-      setVariable.onDefaultParameterGroup()
-          .withOptionalParameter("variableName")
-          .ofType(STRING_TYPE)
-          .withExpressionSupport(SUPPORTED)
-          .describedAs("The name of the variable.");
-    }
+    setVariable.onDefaultParameterGroup()
+        .withRequiredParameter("variableName")
+        .ofType(STRING_TYPE)
+        .withExpressionSupport(NOT_SUPPORTED)
+        .describedAs("The name of the variable.");
 
     setVariable.onDefaultParameterGroup()
         .withRequiredParameter("value")
@@ -552,19 +545,6 @@ class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs("The mime type to be assigned to the result generated when parsing the template, e.g. text/plain or application/json");
 
-    if (isParseTemplateUseLegacyDefaultTargetValue()) {
-      parseTemplate.onParameterGroup(OUTPUT)
-          .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
-          .ofType(STRING_TYPE)
-          .defaultingTo("#[message]")
-          .withExpressionSupport(REQUIRED)
-          .describedAs(TARGET_VALUE_PARAMETER_DESCRIPTION)
-          .withRole(BEHAVIOUR)
-          .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
-          .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-          .withModelProperty(new TargetModelProperty());
-    }
-
     parseTemplate.onDefaultParameterGroup().withExclusiveOptionals(of("content", "location"), true);
   }
 
@@ -609,7 +589,7 @@ class MuleExtensionModelDeclarer {
             + " generating a message for each element.");
 
     forEach.withChain()
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+        .withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
     forEach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -648,7 +628,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Attempts to route a message to its inner chain in a synchronous manner. " +
             "Routing is considered successful if no error has been raised and, optionally, if the response matches an expression.");
 
-    untilSuccessful.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    untilSuccessful.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(AT_LEAST_ONCE);
 
     untilSuccessful.onDefaultParameterGroup()
         .withOptionalParameter("maxRetries")
@@ -675,7 +655,7 @@ class MuleExtensionModelDeclarer {
         .withErrorModel(routingError);
 
     NestedRouteDeclarer when = choice.withRoute("when").withMinOccurs(1);
-    when.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    when.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE_OR_NONE);
     when.onDefaultParameterGroup()
         .withRequiredParameter("expression")
         .ofType(BOOLEAN_TYPE)
@@ -684,7 +664,8 @@ class MuleExtensionModelDeclarer {
 
     addTrackingModuleParameters(choice, "Enabling this option will activate event tracking for this element and its children.");
 
-    choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    choice.withRoute("otherwise").withMaxOccurs(1).withChain().withModelProperty(NoWrapperModelProperty.INSTANCE)
+        .setExecutionOccurrence(ONCE_OR_NONE);
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -739,9 +720,11 @@ class MuleExtensionModelDeclarer {
     addTrackingModuleParameters(firstSuccessful,
                                 "Enabling this option will activate event tracking for this element and its children.");
 
+    // how to distinguish first (ONCE) from the rest (ONCE OR NONE)?
     firstSuccessful.withRoute("route")
         .withChain()
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+        .withModelProperty(NoWrapperModelProperty.INSTANCE)
+        .setExecutionOccurrence(ONCE_OR_NONE);
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -755,7 +738,8 @@ class MuleExtensionModelDeclarer {
         // it doesn't make sense for it to have less than two routes, but the XSD allows for just one.
         .withMinOccurs(1)
         .withChain()
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+        .withModelProperty(NoWrapperModelProperty.INSTANCE)
+        .setExecutionOccurrence(ONCE_OR_NONE);
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -766,7 +750,8 @@ class MuleExtensionModelDeclarer {
     scatterGather.withRoute("route")
         .withMinOccurs(2)
         .withChain()
-        .withModelProperty(NoWrapperModelProperty.INSTANCE);
+        .withModelProperty(NoWrapperModelProperty.INSTANCE)
+        .setExecutionOccurrence(ONCE);
 
     scatterGather.onDefaultParameterGroup()
         .withOptionalParameter("timeout")
@@ -822,7 +807,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Splits the same message and processes each part in parallel.")
         .withErrorModel(compositeRoutingError).withModelProperty(new SinceMuleVersionModelProperty("4.2.0"));
 
-    parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    parallelForeach.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(MULTIPLE_OR_NONE);
 
     parallelForeach.onDefaultParameterGroup()
         .withOptionalParameter("collection")
@@ -888,7 +873,7 @@ class MuleExtensionModelDeclarer {
         .describedAs("Transaction type supported. Availability will depend on the runtime version, "
             + "though LOCAL is always available.");
 
-    tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE);
+    tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
 
     addErrorHandling(tryScope);
   }

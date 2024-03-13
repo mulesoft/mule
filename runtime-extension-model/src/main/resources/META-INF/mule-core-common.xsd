@@ -1580,6 +1580,7 @@
         </xsd:complexContent>
     </xsd:complexType>
 
+    <!-- This element and type are used in the spring-module --> 
     <xsd:element name="abstract-security-filter" abstract="true" type="abstractSecurityFilterType" substitutionGroup="abstract-message-processor">
         <xsd:annotation>
             <xsd:documentation>
@@ -1634,28 +1635,6 @@
     </xsd:element>
 
     <!-- security filters -->
-
-    <xsd:element name="encryption-security-filter" type="encryptionSecurityFilterType"
-                 substitutionGroup="abstract-security-filter">
-        <xsd:annotation>
-            <xsd:documentation>
-                A filter that provides password-based encyption.
-            </xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:complexType name="encryptionSecurityFilterType">
-        <xsd:complexContent>
-            <xsd:extension base="abstractSecurityFilterType">
-                <xsd:attribute name="strategy-ref" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation>
-                            The name of the encryption strategy to use. This should be configured using the 'password-encryption-strategy' element, inside a 'security-manager' element at the top level.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
 
     <xsd:complexType name="abstractAddPropertyProcessorType">
         <xsd:complexContent>
