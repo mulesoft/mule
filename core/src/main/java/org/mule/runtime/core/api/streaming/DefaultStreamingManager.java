@@ -12,8 +12,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.instantiateClass;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;

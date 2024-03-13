@@ -15,7 +15,7 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 
 import javax.inject.Inject;
 

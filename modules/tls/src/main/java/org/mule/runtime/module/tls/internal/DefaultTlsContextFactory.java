@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.tls.internal;
 
-import static java.util.Arrays.copyOf;
-
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.tls.internal.util.ArrayUtils.intersection;
+
+import static java.util.Arrays.copyOf;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -21,12 +22,9 @@ import org.mule.runtime.api.tls.TlsContextKeyStoreConfiguration;
 import org.mule.runtime.api.tls.TlsContextTrustStoreConfiguration;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.core.api.util.StringUtils;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.module.tls.api.socket.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.module.tls.api.socket.RestrictedSSLSocketFactory;
 import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
-
-import com.google.common.base.Joiner;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -40,6 +38,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.xml.namespace.QName;
+
+import com.google.common.base.Joiner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
 
   private final TlsConfiguration tlsConfiguration;
 
-  private AtomicBoolean initialized = new AtomicBoolean(false);
+  private final AtomicBoolean initialized = new AtomicBoolean(false);
   private boolean trustStoreInsecure = false;
   private String[] enabledProtocols;
   private String[] enabledCipherSuites;
@@ -97,7 +97,7 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
     if (!isUseDefaults(enabledProtocols)) {
       String[] globalEnabledProtocols = tlsConfiguration.getEnabledProtocols();
       if (globalEnabledProtocols != null) {
-        String[] validProtocols = ArrayUtils.intersection(enabledProtocols, globalEnabledProtocols);
+        String[] validProtocols = intersection(enabledProtocols, globalEnabledProtocols);
         if (validProtocols.length < enabledProtocols.length) {
           globalConfigNotHonored("protocols", globalEnabledProtocols);
         }
@@ -107,7 +107,7 @@ public class DefaultTlsContextFactory extends AbstractComponent implements TlsCo
     if (!isUseDefaults(enabledCipherSuites)) {
       String[] globalEnabledCipherSuites = tlsConfiguration.getEnabledCipherSuites();
       if (globalEnabledCipherSuites != null) {
-        String[] validCipherSuites = ArrayUtils.intersection(enabledCipherSuites, globalEnabledCipherSuites);
+        String[] validCipherSuites = intersection(enabledCipherSuites, globalEnabledCipherSuites);
         if (validCipherSuites.length < enabledCipherSuites.length) {
           globalConfigNotHonored("cipher suites", globalEnabledCipherSuites);
         }

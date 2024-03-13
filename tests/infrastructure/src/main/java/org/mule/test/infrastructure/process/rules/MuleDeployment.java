@@ -22,7 +22,6 @@ import static org.awaitility.Awaitility.await;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
@@ -497,7 +496,7 @@ public class MuleDeployment extends MuleInstallation {
    */
   @Attachment(value = "Properties")
   public String attachProperties() {
-    return MapUtils.toString(properties, true).replaceAll("(?<=\\.password=)(.*)", "****");
+    return properties.toString().replaceAll("(?<=\\.password=)(.*)", "****");
   }
 
   /***

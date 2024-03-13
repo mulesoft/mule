@@ -23,7 +23,7 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 
 import java.util.Collection;

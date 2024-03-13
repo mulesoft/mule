@@ -27,7 +27,6 @@ import org.mule.runtime.api.store.ObjectStoreManager;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.oauth.api.OAuthService;
 
 import java.lang.reflect.Field;

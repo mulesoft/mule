@@ -19,6 +19,7 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.enumeration;
 import static java.util.Collections.list;
 import static java.util.Collections.singleton;
 
@@ -37,7 +38,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.test.TestArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -56,13 +56,15 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.hamcrest.CoreMatchers;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(ARTIFACT_CLASSLOADERS)
@@ -194,7 +196,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     classLoaders.forEach(classLoader -> regionClassLoader.addClassLoader(classLoader, NULL_CLASSLOADER_FILTER));
 
     URL resource = regionClassLoader.getResource(RESOURCE_NAME);
-    Assert.assertThat(resource, CoreMatchers.equalTo(null));
+    assertThat(resource, CoreMatchers.equalTo(null));
   }
 
   @Test
@@ -209,7 +211,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                                      new DefaultArtifactClassLoaderFilter(emptySet(), singleton(RESOURCE_NAME)));
 
     URL resource = regionClassLoader.getResource(RESOURCE_NAME);
-    Assert.assertThat(resource, CoreMatchers.equalTo(PARENT_LOADED_RESOURCE));
+    assertThat(resource, CoreMatchers.equalTo(PARENT_LOADED_RESOURCE));
   }
 
   @Test
@@ -228,13 +230,13 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
                                      new DefaultArtifactClassLoaderFilter(emptySet(), singleton(RESOURCE_NAME)));
 
     URL resource = regionClassLoader.getResource(RESOURCE_NAME);
-    Assert.assertThat(resource, CoreMatchers.equalTo(PLUGIN_LOADED_RESOURCE));
+    assertThat(resource, CoreMatchers.equalTo(PLUGIN_LOADED_RESOURCE));
   }
 
   @Test
   public void getsAllResources() throws Exception {
     final ClassLoader parentClassLoader = mock(ClassLoader.class);
-    when(parentClassLoader.getResources(RESOURCE_NAME)).thenReturn(new EnumerationAdapter<>(singleton(PARENT_LOADED_RESOURCE)));
+    when(parentClassLoader.getResources(RESOURCE_NAME)).thenReturn(enumeration(singleton(PARENT_LOADED_RESOURCE)));
 
     RegionClassLoader regionClassLoader = new RegionClassLoader(ARTIFACT_ID, artifactDescriptor, parentClassLoader, lookupPolicy);
     createClassLoaders(regionClassLoader);
@@ -252,7 +254,7 @@ public class RegionClassLoaderTestCase extends AbstractMuleTestCase {
     expectedResources.add(PLUGIN_LOADED_RESOURCE);
     expectedResources.add(PARENT_LOADED_RESOURCE);
 
-    Assert.assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
+    assertThat(resources, EnumerationMatcher.equalTo(expectedResources));
   }
 
   @Test

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
+import static org.mule.runtime.core.internal.exception.InternalExceptionUtils.createErrorEvent;
 
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.streaming.bytes.factory;
 
-import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
+import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.event.EventContext;

@@ -23,10 +23,10 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.exception.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;

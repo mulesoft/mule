@@ -46,7 +46,6 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.util.log.OneTimeWarning;
-import org.mule.runtime.core.privileged.util.TemplateParser;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;

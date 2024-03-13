@@ -16,11 +16,11 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.enumeration;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -156,7 +156,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
                                       exportedServiceProviders));
         }
       }
-      return new EnumerationAdapter<>(exportedServiceProviders);
+      return enumeration(exportedServiceProviders);
     } else if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
@@ -164,7 +164,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
         logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
       }
-      return new EnumerationAdapter<>(emptyList());
+      return enumeration(emptyList());
     }
   }
 

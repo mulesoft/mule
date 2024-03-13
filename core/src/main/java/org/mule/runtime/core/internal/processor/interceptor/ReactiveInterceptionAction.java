@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.core.internal.processor.interceptor;
 
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.getErrorFromFailingProcessor;
+import static org.mule.runtime.core.internal.exception.InternalExceptionUtils.getErrorFromFailingProcessor;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
