@@ -70,4 +70,9 @@ public class DomainDescriptorFactoryTestCase
                                                ArtifactDescriptorValidatorBuilder.builder())),
                                        createDescriptorLoaderRepository(), ArtifactDescriptorValidatorBuilder.builder());
   }
+
+  @Override
+  protected String getRoot() {
+    return "/domains";
+  }
 }

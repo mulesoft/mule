@@ -16,7 +16,7 @@
         "type": "jar",
         "classifier": "mule-plugin"
       },
-      "uri": "file://${project.build.testOutputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-empty-plugin/4.2.0-SNAPSHOT/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
+      "uri": "${outputDirectory}/domains/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/mule/tests/test-empty-plugin/4.2.0-SNAPSHOT/test-empty-plugin-4.2.0-SNAPSHOT-mule-plugin.jar"
     }
   ]
 }
