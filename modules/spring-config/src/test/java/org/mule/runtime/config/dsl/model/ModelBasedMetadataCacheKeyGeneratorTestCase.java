@@ -66,7 +66,7 @@ import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.RequiredForMetadataModelProperty;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.extension.internal.metadata.MetadataResolverFactoryModelProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;

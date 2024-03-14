@@ -32,7 +32,7 @@ import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
+import org.mule.runtime.extension.internal.metadata.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
@@ -41,7 +41,6 @@ import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsPar
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
