@@ -33,6 +33,8 @@ module org.mule.runtime.tls {
   exports org.mule.runtime.module.tls.internal.config to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.module.tls.internal.revocation to
+      spring.beans;
   exports org.mule.runtime.module.tls.internal.util to
       org.mule.runtime.launcher;
 
