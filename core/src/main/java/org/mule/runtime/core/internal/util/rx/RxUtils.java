@@ -6,7 +6,9 @@
  */
 package org.mule.runtime.core.internal.util.rx;
 
+import static java.lang.Integer.getInteger;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.util.MuleSystemProperties.MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.internal.util.rx.ReactorTransactionUtils.popTxFromSubscriberContext;
@@ -68,13 +70,13 @@ import reactor.util.context.ContextView;
 public class RxUtils {
 
   private static final Logger LOGGER = getLogger(RxUtils.class);
-
   public static final String KEY_ON_NEXT_ERROR_STRATEGY = "reactor.onNextError.localStrategy";
   public static final String ON_NEXT_FAILURE_STRATEGY = "reactor.core.publisher.OnNextFailureStrategy$ResumeStrategy";
 
   // Some components involve inner chains that may reference to a global error handler (for example, the parallel-for-each).
   // Those should recreate the error routers for each thread to avoid issues with the inflight counter. (W-12556497)
   public static final String REACTOR_RECREATE_ROUTER = "recreateRouter";
+  public static final int DEFAULT_MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD = 40;
 
   /**
    * Defers the subscription of the <it>deferredSubscriber</it> until <it>triggeringSubscriber</it> subscribes. Once that occurs
@@ -188,9 +190,13 @@ public class RxUtils {
   }
 
   private static boolean isSubscribedProcessorsLimitReached(ContextView ctx) {
+    int maxComponentsPerSubscriptionThread =
+        getInteger(MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD, DEFAULT_MAX_COMPONENTS_PER_REACTIVE_SUBSCRIPTION_THREAD);
     return subscribedProcessors(ctx)
         .map(SubscribedProcessors::getSubscribedProcessorsCount)
-        .filter(subscribedProcessorsCount -> subscribedProcessorsCount % 40 == 0).isPresent();
+        .filter(subscribedProcessorsCount -> subscribedProcessorsCount > 0 && maxComponentsPerSubscriptionThread > 0
+            && subscribedProcessorsCount % maxComponentsPerSubscriptionThread == 0)
+        .isPresent();
   }
 
   private static void handleSubscriptionError(Throwable throwable, Consumer<? super Throwable> errorConsumer, ContextView ctx) {
@@ -217,12 +223,11 @@ public class RxUtils {
     }
   }
 
-  private static ContextView startPendingSubscription(ContextView ctx) {
+  private static void startPendingSubscription(ContextView ctx) {
     MultiFluxSubscriber<CoreEvent> multiFluxSubscriber = ctx.getOrDefault(MULTI_FLUX_SUBSCRIBER, null);
     if (multiFluxSubscriber != null) {
       multiFluxSubscriber.startPendingSubscription(ctx);
     }
-    return ctx;
   }
 
   /**
