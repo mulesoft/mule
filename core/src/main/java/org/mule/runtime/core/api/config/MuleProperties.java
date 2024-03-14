@@ -366,18 +366,6 @@ public class MuleProperties {
   public static final String MULE_DISABLE_RESPONSE_TIMEOUT = MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
 
   /**
-   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_ALLOW_JRE_EXTENSION} instead
-   */
-  @Deprecated
-  public static final String MULE_ALLOW_JRE_EXTENSION = MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
-
-  /**
-   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_JRE_EXTENSION_PACKAGES} instead
-   */
-  @Deprecated
-  public static final String MULE_JRE_EXTENSION_PACKAGES = MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
-
-  /**
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT} instead
    */
   @Deprecated

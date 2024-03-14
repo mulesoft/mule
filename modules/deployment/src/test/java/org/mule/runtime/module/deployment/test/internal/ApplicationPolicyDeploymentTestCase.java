@@ -138,21 +138,14 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   public ExpectedException expectedEx = none();
 
   @Rule
-  public SystemProperty shareErrorTypeRepoSystemProperty;
-
-  @Rule
   public SystemProperty enablePolicyIsolationSystemProperty;
 
-  private final boolean shareErrorTypeRepository;
-
-  @Parameterized.Parameters(name = "Parallel: {0} - Share ErrorType repo: {1} - Enable policy isolation {2}")
+  @Parameterized.Parameters(name = "Parallel: {0} - Enable policy isolation {1}")
   public static List<Object[]> parameters() {
     // Only run without parallel deployment since this configuration does not affect policy deployment at all
     return asList(
-                  new Object[] {false, false, false},
-                  new Object[] {false, false, true},
-                  new Object[] {false, true, true},
-                  new Object[] {false, true, false});
+                  new Object[] {false, true},
+                  new Object[] {false, false});
   }
 
   // Policy artifact file builders
@@ -180,11 +173,8 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
                                                 new MuleArtifactLoaderDescriptor(MULE_LOADER_ID, emptyMap()))
           .build());
 
-  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean shareErrorType, boolean enablePolicyIsolation) {
+  public ApplicationPolicyDeploymentTestCase(boolean parallelDeployment, boolean enablePolicyIsolation) {
     super(parallelDeployment);
-    this.shareErrorTypeRepository = shareErrorType;
-    this.shareErrorTypeRepoSystemProperty =
-        new SystemProperty(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY, Boolean.toString(shareErrorType));
     this.enablePolicyIsolationSystemProperty =
         new SystemProperty((ENABLE_POLICY_ISOLATION.getOverridingSystemPropertyName().get()),
                            Boolean.toString(enablePolicyIsolation));
@@ -783,25 +773,17 @@ public class ApplicationPolicyDeploymentTestCase extends AbstractDeploymentTestC
   @Issue("MULE-18196")
   @Description("The application declares an ErrorType that is needed by the policy and but the policy doesn't have it in its own ErrorType repository")
   public void appliesPolicyUsingErrorTypeDeclaredOnAppDependency() throws Exception {
-    if (!shareErrorTypeRepository && parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
+    if (parseBoolean(enablePolicyIsolationSystemProperty.getValue())) {
       expectPolicyRegistrationException();
     }
 
     configureAppWithErrorDeclarationAndPolicyWithErrorMapping();
-
-    if (shareErrorTypeRepository) {
-      executeApplicationFlow("main");
-      assertThat(invocationCount, equalTo(1));
-    }
+    executeApplicationFlow("main");
   }
 
   @Test
   @Issue("MULE-18196")
   public void appliesPolicyAndAppWithCollidingErrorNamespace() throws Exception {
-    if (shareErrorTypeRepository) {
-      expectPolicyRegistrationException();
-    }
-
     ArtifactPluginFileBuilder simpleExtensionPlugin = createSingleExtensionPlugin();
 
     policyManager.registerPolicyTemplate(policyWithPluginAndResource().getArtifactFile());

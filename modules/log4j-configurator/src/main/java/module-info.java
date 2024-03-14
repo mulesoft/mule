@@ -27,7 +27,7 @@ module org.mule.runtime.log4j {
   requires it.unimi.dsi.fastutil;
   requires org.apache.commons.lang3;
   requires org.apache.logging.log4j.core;
-  requires reflections;
+  requires org.reflections;
 
   requires org.apache.logging.log4j;
 

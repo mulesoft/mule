@@ -6,17 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static com.google.common.base.Predicates.or;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.annotation.param.DefaultEncoding;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.module.extension.internal.loader.java.property.DefaultEncodingModelProperty;
-import java.lang.reflect.Field;
 
-import com.google.common.base.Predicate;
+import java.lang.reflect.Field;
+import java.util.function.Predicate;
+
+import org.reflections.util.ReflectionUtilsPredicates;
 
 /**
  * A {@link DeclarationEnricher} which looks classes with fields annotated with {@link DefaultEncoding}.
@@ -37,7 +38,8 @@ public final class DefaultEncodingDeclarationEnricher extends AbstractAnnotatedF
 
   @Override
   protected Predicate<Field> getFieldHasAnnotationPredicate() {
-    return or(withAnnotation(DefaultEncoding.class), withAnnotation(org.mule.sdk.api.annotation.param.DefaultEncoding.class));
+    return ReflectionUtilsPredicates.<Field>withAnnotation(DefaultEncoding.class)
+        .or(withAnnotation(org.mule.sdk.api.annotation.param.DefaultEncoding.class));
   }
 
   @Override
@@ -45,6 +47,7 @@ public final class DefaultEncodingDeclarationEnricher extends AbstractAnnotatedF
     return "DefaultEncoding";
   }
 
+  @Override
   protected Class getImplementingClass() {
     return String.class;
   }

@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
-import static org.reflections.ReflectionUtils.withAnnotation;
-
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
@@ -16,8 +14,9 @@ import org.mule.runtime.module.extension.internal.loader.java.property.RuntimeVe
 import org.mule.sdk.api.annotation.param.RuntimeVersion;
 
 import java.lang.reflect.Field;
+import java.util.function.Predicate;
 
-import com.google.common.base.Predicate;
+import org.reflections.util.ReflectionUtilsPredicates;
 
 /**
  * {@link DeclarationEnricher} which looks at classes with fields annotated with {@link RuntimeVersion}. It validates that the
@@ -37,7 +36,7 @@ public class RuntimeVersionDeclarationEnricher extends AbstractAnnotatedFieldDec
 
   @Override
   protected Predicate<Field> getFieldHasAnnotationPredicate() {
-    return withAnnotation(RuntimeVersion.class);
+    return ReflectionUtilsPredicates.<Field>withAnnotation(RuntimeVersion.class);
   }
 
   @Override
