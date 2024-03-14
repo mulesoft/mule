@@ -34,7 +34,6 @@ import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceProxyInvocationHandler;
 import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
-import org.mule.runtime.module.service.internal.util.TypeSupplier;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -78,7 +77,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
   private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
     final Class<? extends Service> contract = assembly.getServiceContract();
     return (Service) newProxyInstance(contract.getClassLoader(),
-                                      new Class[] {contract, Startable.class, Stoppable.class, TypeSupplier.class},
+                                      new Class[] {contract, Startable.class, Stoppable.class},
                                       handler);
   }
 
@@ -119,8 +118,6 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
       return handleStart();
     } else if (methodClass == Stoppable.class) {
       return handleStop();
-    } else if (methodClass == TypeSupplier.class) {
-      return assembly.getServiceContract();
     } else {
       return methodInvoker.invoke(getService(), method, args);
     }
