@@ -63,7 +63,6 @@ import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
-import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 import java.util.ArrayList;
@@ -80,7 +79,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -448,7 +446,7 @@ public class BeanDefinitionFactory {
               .build();
 
           final ComponentIdentifier paramValueComponentIdentifier =
-              getParamValueComponentIdentifier(param, paramSyntax, paramComponentIdentifier);
+              getParamValueComponentIdentifier(param, paramComponentIdentifier);
 
           return resolveComplexParamBuildingDefinition(param, paramValueComponentIdentifier)
               .map(buildingDefinition -> {
@@ -470,7 +468,7 @@ public class BeanDefinitionFactory {
         });
   }
 
-  private static ComponentIdentifier getParamValueComponentIdentifier(ComponentParameterAst param, DslElementSyntax paramSyntax,
+  private static ComponentIdentifier getParamValueComponentIdentifier(ComponentParameterAst param,
                                                                       ComponentIdentifier paramComponentIdentifier) {
     if (param.getValue().getValue().isPresent()) {
       Object valueObject = param.getValue().getValue().get();
@@ -480,7 +478,7 @@ public class BeanDefinitionFactory {
       }
     }
     return param.getGenerationInformation().getSyntax()
-        .filter(paramValueSyntax -> !isEmpty(paramSyntax.getElementName())) // aca no deberia ser paramValueSyntax?
+        .filter(paramValueSyntax -> !isEmpty(paramValueSyntax.getElementName()))
         .map(paramValueSyntax -> ComponentIdentifier.builder()
             .namespaceUri(paramValueSyntax.getNamespace())
             .namespace(paramValueSyntax.getPrefix())
