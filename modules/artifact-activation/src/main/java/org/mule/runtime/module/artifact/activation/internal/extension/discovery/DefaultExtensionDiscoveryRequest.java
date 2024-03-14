@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.internal.util.collection.UnmodifiableMap.unmodifiableMap;
 
 import static java.util.Collections.emptyMap;
@@ -18,7 +17,6 @@ import org.mule.runtime.module.artifact.activation.api.extension.discovery.Exten
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -36,23 +34,26 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   private final boolean parallelDiscovery;
   private final boolean enrichDescriptions;
   private final boolean ocsEnabled;
+  private final boolean forceExtensionValidation;
   private final Map<String, Object> customParameters;
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions,
                                           boolean parallelDiscovery,
                                           boolean enrichDescriptions) {
-    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, emptyMap());
+    this(artifactPlugins, parentArtifactExtensions, parallelDiscovery, enrichDescriptions, false, false, emptyMap());
   }
 
   public DefaultExtensionDiscoveryRequest(Collection<ArtifactPluginDescriptor> artifactPlugins,
                                           Set<ExtensionModel> parentArtifactExtensions, boolean parallelDiscovery,
-                                          boolean enrichDescriptions, boolean ocsEnabled, Map<String, Object> customParameters) {
+                                          boolean enrichDescriptions, boolean ocsEnabled, boolean forceExtensionValidation,
+                                          Map<String, Object> customParameters) {
     this.artifactPlugins = artifactPlugins;
     this.parentArtifactExtensions = parentArtifactExtensions;
     this.parallelDiscovery = parallelDiscovery;
     this.enrichDescriptions = enrichDescriptions;
     this.ocsEnabled = ocsEnabled;
+    this.forceExtensionValidation = forceExtensionValidation;
     this.customParameters = unmodifiableMap(customParameters);
   }
 
@@ -89,6 +90,11 @@ public class DefaultExtensionDiscoveryRequest implements ExtensionDiscoveryReque
   @Override
   public boolean isOCSEnabled() {
     return ocsEnabled;
+  }
+
+  @Override
+  public boolean isForceExtensionValidation() {
+    return forceExtensionValidation;
   }
 
 }
