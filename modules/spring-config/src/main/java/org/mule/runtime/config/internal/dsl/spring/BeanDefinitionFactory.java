@@ -63,6 +63,7 @@ import org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionRegistry
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
+import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 
 import java.util.ArrayList;
@@ -446,14 +447,8 @@ public class BeanDefinitionFactory {
               .name(paramSyntax.getElementName())
               .build();
 
-          final ComponentIdentifier paramValueComponentIdentifier = param.getGenerationInformation().getSyntax()
-              .filter(paramValueSyntax -> !isEmpty(paramSyntax.getElementName()))
-              .map(paramValueSyntax -> ComponentIdentifier.builder()
-                  .namespaceUri(paramValueSyntax.getNamespace())
-                  .namespace(paramValueSyntax.getPrefix())
-                  .name(paramValueSyntax.getElementName())
-                  .build())
-              .orElse(paramComponentIdentifier);
+          final ComponentIdentifier paramValueComponentIdentifier =
+              getParamValueComponentIdentifier(param, paramSyntax, paramComponentIdentifier);
 
           return resolveComplexParamBuildingDefinition(param, paramValueComponentIdentifier)
               .map(buildingDefinition -> {
@@ -473,6 +468,25 @@ public class BeanDefinitionFactory {
                 return request.getSpringComponentModel();
               });
         });
+  }
+
+  private static ComponentIdentifier getParamValueComponentIdentifier(ComponentParameterAst param, DslElementSyntax paramSyntax,
+                                                                      ComponentIdentifier paramComponentIdentifier) {
+    if (param.getValue().getValue().isPresent()) {
+      Object valueObject = param.getValue().getValue().get();
+      if (valueObject instanceof ComponentAst) {
+        ComponentAst valueAst = (ComponentAst) valueObject;
+        return valueAst.getIdentifier();
+      }
+    }
+    return param.getGenerationInformation().getSyntax()
+        .filter(paramValueSyntax -> !isEmpty(paramSyntax.getElementName())) // aca no deberia ser paramValueSyntax?
+        .map(paramValueSyntax -> ComponentIdentifier.builder()
+            .namespaceUri(paramValueSyntax.getNamespace())
+            .namespace(paramValueSyntax.getPrefix())
+            .name(paramValueSyntax.getElementName())
+            .build())
+        .orElse(paramComponentIdentifier);
   }
 
   private Optional<ComponentBuildingDefinition<?>> resolveComplexParamBuildingDefinition(ComponentParameterAst param,
