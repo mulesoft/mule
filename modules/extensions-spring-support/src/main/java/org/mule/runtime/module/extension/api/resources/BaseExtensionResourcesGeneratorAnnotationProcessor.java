@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.api.resources;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.util.MuleSystemProperties.FORCE_EXTENSION_VALIDATION_PROPERTY_NAME;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -140,7 +139,6 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     params.put(PROBLEMS_HANDLER, new AnnotationProcessorProblemsHandler(processingEnv));
     params.put(PROCESSING_ENVIRONMENT, processingEnv);
     params.put(ROUND_ENVIRONMENT, roundEnvironment);
-    params.put(FORCE_EXTENSION_VALIDATION_PROPERTY_NAME, true);
 
     if (!simulateRuntimeLoading()) {
       // TODO MULE-14517: This workaround should be replaced for a better and more complete mechanism
@@ -150,6 +148,7 @@ public abstract class BaseExtensionResourcesGeneratorAnnotationProcessor extends
     return getExtensionModelLoader()
         .loadExtensionModel(builder(classLoader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())))
             .addParameters(params)
+            .setForceExtensionValidation(true)
             .build());
   }
 
