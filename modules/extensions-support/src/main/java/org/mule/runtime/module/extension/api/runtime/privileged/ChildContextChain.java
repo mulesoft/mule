@@ -21,7 +21,12 @@ import java.util.function.Consumer;
  */
 public interface ChildContextChain extends Chain {
 
-  QName CHAIN_LOCATION = new QName("http://www.mulesoft.org/schema/mule/parser-metadata", "CHAIN_LOCATION");
+  /**
+   * Key for annotation to be used to set the location of the owner of this {@link ChildContextChain}.
+   * 
+   * @since 4.7
+   */
+  QName CHAIN_OWNER_LOCATION_KEY = new QName("http://www.mulesoft.org/schema/mule/parser-metadata", "CHAIN_OWNER_LOCATION");
 
   /**
    * Same as {@link Chain#process(Consumer, BiConsumer)}, setting the correlation id within the execution as the the one passed.

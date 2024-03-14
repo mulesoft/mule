@@ -12,7 +12,6 @@ import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
-import org.mule.runtime.api.component.location.LocationPart;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
@@ -20,15 +19,12 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedResult;
 import org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -75,7 +71,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(streamingManager, this.originalEvent, this.chain);
-    this.location = (ComponentLocation) chain.getAnnotation(CHAIN_LOCATION);
+    this.location = (ComponentLocation) chain.getAnnotation(CHAIN_OWNER_LOCATION_KEY);
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 
