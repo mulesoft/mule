@@ -21,7 +21,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.AbstractRaiseErrorProcessor;
-import org.mule.runtime.core.privileged.util.AttributeEvaluator;
+import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
 
 /**
  * Processor capable of raising errors within a Mule Operation's body on demand, given a type and optionally a message.

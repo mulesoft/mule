@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.exception;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -30,7 +29,6 @@ import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -40,7 +38,6 @@ import org.mule.tck.junit4.rule.VerboseExceptions;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,7 +78,7 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
     flow = getTestFlow(muleContext);
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = InternalEvent.builder(context).message(of("")).build();
+    muleEvent = CoreEvent.builder(context).message(of("")).build();
 
     when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
   }

@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.core.privileged.execution;
 
+import static org.mule.runtime.core.internal.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
+
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.addMetadataAnnotationsFromDocAttributes;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;

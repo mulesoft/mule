@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.LinkedHashSet;

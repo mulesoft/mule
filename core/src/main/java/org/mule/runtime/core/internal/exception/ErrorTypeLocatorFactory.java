@@ -48,11 +48,11 @@ import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
+import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
+import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.core.internal.routing.split.DuplicateMessageException;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.MessageRedeliveredException;
-import org.mule.runtime.core.privileged.routing.CompositeRoutingException;
-import org.mule.runtime.core.privileged.routing.RoutingException;
 
 import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;

@@ -6,9 +6,6 @@
  */
 package org.mule.runtime.module.tls.internal;
 
-import static java.lang.String.format;
-import static java.security.KeyStore.getInstance;
-import static java.util.Collections.list;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotLoadFromClasspath;
@@ -16,10 +13,13 @@ import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToLoad;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 
+import static java.lang.String.format;
+import static java.security.KeyStore.getInstance;
+import static java.util.Collections.list;
+
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.lifecycle.CreateException;
 import org.mule.runtime.core.api.util.FileUtils;
-import org.mule.runtime.core.internal.util.ArrayUtils;
 import org.mule.runtime.module.tls.api.socket.RestrictedSSLServerSocketFactory;
 import org.mule.runtime.module.tls.api.socket.RestrictedSSLSocketFactory;
 import org.mule.runtime.module.tls.internal.revocation.RevocationCheck;
@@ -49,6 +49,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -141,7 +142,7 @@ public final class TlsConfiguration extends AbstractComponent
   public static final String PROPERTIES_FILE_PATTERN = "tls-%s.conf";
   public static final String DEFAULT_SECURITY_MODEL = "default";
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private String sslType;
 
@@ -174,7 +175,7 @@ public final class TlsConfiguration extends AbstractComponent
   private boolean explicitTrustStoreOnly = false;
   private boolean requireClientAuthentication = false;
 
-  private TlsProperties tlsProperties = new TlsProperties();
+  private final TlsProperties tlsProperties = new TlsProperties();
 
   // certificate revocation checking
   private RevocationCheck revocationCheck = null;
@@ -424,8 +425,9 @@ public final class TlsConfiguration extends AbstractComponent
   public void setSslType(String sslType) {
     String[] enabledProtocols = tlsProperties.getEnabledProtocols();
 
-    if (enabledProtocols != null && !ArrayUtils.contains(enabledProtocols, sslType)) {
-      throw new IllegalArgumentException(String.format("Protocol %s is not allowed in current configuration", sslType));
+    if (enabledProtocols != null && Stream.of(enabledProtocols)
+        .noneMatch(sslType::equals)) {
+      throw new IllegalArgumentException(format("Protocol %s is not allowed in current configuration", sslType));
     }
 
     this.sslType = sslType;

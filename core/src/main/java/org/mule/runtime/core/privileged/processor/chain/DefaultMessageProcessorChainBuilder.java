@@ -10,11 +10,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
-import static org.mule.runtime.core.internal.processor.strategy.BlockingProcessingStrategyFactory.BLOCKING_PROCESSING_STRATEGY_INSTANCE;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 import org.mule.api.annotation.NoExtend;
@@ -25,9 +22,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
-import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.HasLocation;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
@@ -46,10 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * Constructs a chain of {@link Processor}s and wraps the invocation of the chain in a composite MessageProcessor. Both
- * MessageProcessors and InterceptingMessageProcessor's can be chained together arbitrarily in a single chain.
- * InterceptingMessageProcessors simply intercept the next MessageProcessor in the chain. When other non-intercepting
- * MessageProcessors are used an adapter is used internally to chain the MessageProcessor with the next in the chain.
+ * Constructs a chain of {@link Processor}s and wraps the invocation of the chain in a composite MessageProcessor.
  * </p>
  * <p>
  * The MessageProcessor instance that this builder builds can be nested in other chains as required.
@@ -62,57 +54,20 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMessageProcessorChainBuilder.class);
 
   /**
-   * This builder supports the chaining together of message processors that intercept and also those that don't. While one can
-   * iterate over message processor intercepting message processors need to be chained together. One solution is make all message
-   * processors intercepting (via adaption) and chain them all together, this results in huge stack traces and recursive calls
-   * with adaptor. The alternative is to build the chain in such a way that we iterate when we can and chain where we need to.
-   * <br>
    * We iterate over the list of message processor to be chained together in reverse order collecting up those that can be
-   * iterated over in a temporary list, as soon as we have an intercepting message processor we create a
-   * DefaultMessageProcessorChain using the temporary list and set it as a listener of the intercepting message processor and then
-   * we continue with the algorithm
+   * iterated over in a temporary list.
    */
   @Override
   public MessageProcessorChain build() {
     LinkedList<Processor> tempList = new LinkedList<>();
 
-    final LinkedList<Processor> processorsForLifecycle = new LinkedList<>();
-    boolean atLeastOneIntercepting = false;
-
     // Start from last but one message processor and work backwards
     for (int i = processors.size() - 1; i >= 0; i--) {
       Processor processor = initializeMessageProcessor(processors.get(i));
-      if (processor instanceof InterceptingMessageProcessor) {
-        atLeastOneIntercepting = true;
-        InterceptingMessageProcessor interceptingProcessor = (InterceptingMessageProcessor) processor;
-        // Processor is intercepting so we can't simply iterate
-        if (i + 1 < processors.size()) {
-          // Wrap processors in chain, unless single processor that is already a chain
-          final MessageProcessorChain innerChain =
-              createSimpleInterceptedChain(tempList,
-                                           interceptingProcessor.isBlocking() ? of(BLOCKING_PROCESSING_STRATEGY_INSTANCE)
-                                               : ofNullable(processingStrategy));
-          processorsForLifecycle.addFirst(innerChain);
-          interceptingProcessor.setListener(innerChain);
-        }
-        tempList = new LinkedList<>(singletonList(processor));
-      } else {
-        // Processor is not intercepting so we can invoke it using iteration
-        // (add to temp list)
-        tempList.addFirst(processor);
-      }
+      tempList.addFirst(processor);
     }
 
-    if (atLeastOneIntercepting) {
-      // Create the final chain using the current tempList after reverse iteration is complete. This temp
-      // list contains the first n processors in the chain that are not intercepting.. with processor n+1
-      // having been injected as the listener of processor n
-      MessageProcessorChain head = createSimpleChain(tempList, ofNullable(processingStrategy));
-      processorsForLifecycle.addFirst(head);
-      return createInterceptingChain(head, processors, processorsForLifecycle);
-    } else {
-      return createSimpleChain(tempList, ofNullable(processingStrategy));
-    }
+    return createSimpleChain(tempList, ofNullable(processingStrategy));
   }
 
   protected MessageProcessorChain createSimpleChain(List<Processor> tempList,
@@ -130,42 +85,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
                                            location);
     }
 
-    if (chainComponentTracer != null) {
-      messageProcessorChain.setComponentTracer(chainComponentTracer);
-    }
-
-    return messageProcessorChain;
-  }
-
-  private MessageProcessorChain createSimpleInterceptedChain(List<Processor> tempList,
-                                                             Optional<ProcessingStrategy> processingStrategyOptional) {
-    DefaultMessageProcessorChain messageProcessorChain;
-
-    if (tempList.size() == 1 && tempList.get(0) instanceof DefaultMessageProcessorChain) {
-      messageProcessorChain = (DefaultMessageProcessorChain) tempList.get(0);
-    } else {
-      messageProcessorChain =
-          new DefaultMessageProcessorChain(name != null ? "(chain) of " + name : "(chain)",
-                                           processingStrategyOptional,
-                                           new ArrayList<>(tempList),
-                                           NullExceptionHandler.getInstance(),
-                                           location);
-    }
-
-    if (chainComponentTracer != null) {
-      messageProcessorChain.setComponentTracer(chainComponentTracer);
-    }
-
-    return messageProcessorChain;
-  }
-
-  protected MessageProcessorChain createInterceptingChain(Processor head, List<Processor> processors,
-                                                          List<Processor> processorsForLifecycle) {
-    InterceptingMessageProcessorChain messageProcessorChain =
-        new InterceptingMessageProcessorChain(name != null ? "(intercepting chain) of " + name : "(intercepting chain)",
-                                              ofNullable(processingStrategy), head,
-                                              processors, processorsForLifecycle, NullExceptionHandler.getInstance(),
-                                              location);
     if (chainComponentTracer != null) {
       messageProcessorChain.setComponentTracer(chainComponentTracer);
     }
@@ -242,49 +161,6 @@ public class DefaultMessageProcessorChainBuilder extends AbstractMessageProcesso
       super(name, processingStrategyOptional, processors,
             // just let the error be propagated to the outer chain...
             (exception, event) -> null);
-    }
-
-    @Override
-    public ComponentLocation resolveLocation() {
-      return pipeLineLocation;
-    }
-  }
-
-
-  static class InterceptingMessageProcessorChain extends AbstractMessageProcessorChain implements HasLocation {
-
-    private final Processor head;
-    private final List<Processor> processorsForLifecycle;
-    private final ComponentLocation pipeLineLocation;
-
-    protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
-                                                Processor head,
-                                                List<Processor> processors,
-                                                List<Processor> processorsForLifecycle,
-                                                FlowExceptionHandler messagingExceptionHandler) {
-      this(name, processingStrategyOptional, head, processors, processorsForLifecycle, messagingExceptionHandler, null);
-    }
-
-    protected InterceptingMessageProcessorChain(String name, Optional<ProcessingStrategy> processingStrategyOptional,
-                                                Processor head,
-                                                List<Processor> processors,
-                                                List<Processor> processorsForLifecycle,
-                                                FlowExceptionHandler messagingExceptionHandler,
-                                                ComponentLocation pipeLineLocation) {
-      super(name, processingStrategyOptional, processors, messagingExceptionHandler);
-      this.head = head;
-      this.processorsForLifecycle = processorsForLifecycle;
-      this.pipeLineLocation = pipeLineLocation;
-    }
-
-    @Override
-    protected List<Processor> getMessageProcessorsForLifecycle() {
-      return processorsForLifecycle;
-    }
-
-    @Override
-    protected List<Processor> getProcessorsToExecute() {
-      return singletonList(head);
     }
 
     @Override

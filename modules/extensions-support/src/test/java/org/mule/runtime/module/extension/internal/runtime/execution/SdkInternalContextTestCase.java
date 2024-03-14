@@ -6,11 +6,13 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.execution;
 
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.exception.MuleException;

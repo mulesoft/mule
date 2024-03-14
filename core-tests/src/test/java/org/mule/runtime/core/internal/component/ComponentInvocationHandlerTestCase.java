@@ -8,8 +8,8 @@ package org.mule.runtime.core.internal.component;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import static java.util.Collections.singletonMap;

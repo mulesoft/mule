@@ -28,13 +28,13 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
 import org.mule.runtime.module.service.api.manager.ServiceProxyInvocationHandler;
 import org.mule.runtime.module.service.api.manager.ServiceRegistry;
 import org.mule.runtime.module.service.internal.discoverer.LazyServiceAssembly;
+import org.mule.runtime.module.service.internal.util.TypeSupplier;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 public class LazyServiceProxy implements ServiceProxyInvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ServiceAssembly assembly;
   private final DefaultServiceRegistry serviceRegistry;
@@ -172,7 +173,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
       startIfNeeded(service);
       String splash = service.getSplashMessage();
       if (isNotEmpty(splash)) {
-        LOGGER.info(new ServiceSplashScreen(service.toString(), splash).toString());
+        SPLASH_LOGGER.info(new ServiceSplashScreen(service.toString(), splash).toString());
       }
     });
   }

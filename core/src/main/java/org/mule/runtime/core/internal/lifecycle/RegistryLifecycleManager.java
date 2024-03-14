@@ -28,7 +28,6 @@ import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStartPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.MuleContextStopPhase;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -11,6 +11,8 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.deployExplodedDomains;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.listFiles;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -27,6 +29,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.scheduler.SchedulerConfig;
@@ -48,7 +51,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +66,6 @@ import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * It's in charge of the whole deployment process.
@@ -84,7 +85,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(DeploymentDirectoryWatcher.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer;
@@ -173,7 +175,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         String[] packagedDomains = listFiles(domainsDir, JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
-        deployExplodedDomains(explodedDomains);
+        deployExplodedDomains(domainArchiveDeployer, explodedDomains);
         String[] apps = appString.split(":");
         apps = removeDuplicateAppNames(apps);
 
@@ -194,7 +196,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
-        logger.info(miniSplash("Mule is up and running in a fixed app set mode"));
+        SPLASH_LOGGER.info(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
@@ -253,7 +255,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     artifactDirMonitorScheduler = schedulerServiceSupplier.get().customScheduler(schedulerConfig);
     artifactDirMonitorScheduler.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
-    logger.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+    SPLASH_LOGGER.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
 
   protected void deployPackedApps(String[] zips) {
@@ -322,7 +324,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         domains = listFiles(domainsDir, DIRECTORY);
       }
 
-      deployExplodedDomains(domains);
+      deployExplodedDomains(domainArchiveDeployer, domains);
 
       redeployModifiedApplications();
 
@@ -366,16 +368,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // Ignore and continue
       }
     }
-  }
-
-  private String[] listFiles(File directory, FilenameFilter filter) {
-    String[] files = directory.list(filter);
-    if (files == null) {
-      throw new IllegalStateException(format("We got a null while listing the contents of director '%s'. Some common " +
-          "causes for this is a lack of permissions to the directory or that it's being deleted concurrently",
-                                             directory.getName()));
-    }
-    return files;
   }
 
   public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
@@ -448,18 +440,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
       anchors[i++] = artifact.getArtifactName() + ARTIFACT_ANCHOR_SUFFIX;
     }
     return anchors;
-  }
-
-  private void deployExplodedDomains(String[] domains) {
-    for (String addedDomain : domains) {
-      try {
-        if (domainArchiveDeployer.isUpdatedZombieArtifact(addedDomain)) {
-          domainArchiveDeployer.deployExplodedArtifact(addedDomain, empty());
-        }
-      } catch (DeploymentException e) {
-        logger.error("Error deploying domain '{}'", addedDomain, e);
-      }
-    }
   }
 
   private void deployPackedDomains(String[] zips) {

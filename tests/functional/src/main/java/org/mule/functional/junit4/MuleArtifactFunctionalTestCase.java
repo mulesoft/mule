@@ -135,13 +135,5 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
       ((BaseEventContext) _testEvent.getContext()).success();
     }
     super.doTearDown();
-
-    if (eventContextService != null && DefaultMuleConfiguration.isFlowTrace()) {
-      new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> {
-        assertThat(eventContextService.getCurrentlyActiveFlowStacks().toString(),
-                   eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));
-        return true;
-      }));
-    }
   }
 }

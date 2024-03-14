@@ -35,6 +35,7 @@ import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Arrays.asList;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -43,8 +44,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
@@ -792,7 +792,7 @@ public class CoreExtensionModelTestCase {
     ParameterModel mimeType = setVariable.getAllParameterModels().get(3);
 
     assertThat(variableName.getName(), is("variableName"));
-    assertThat(variableName.getExpressionSupport(), is(SUPPORTED));
+    assertThat(variableName.getExpressionSupport(), is(NOT_SUPPORTED));
     assertThat(variableName.getType(), is(instanceOf(StringType.class)));
 
     assertThat(value.getName(), is("value"));

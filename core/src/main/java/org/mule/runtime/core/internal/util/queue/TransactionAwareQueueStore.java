@@ -11,7 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.queue.Queue;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.Serializable;
 

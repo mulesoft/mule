@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.config.internal.registry;
 
+import static org.mule.runtime.core.internal.transformer.TransformerUtils.generateTransformerName;
+
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.mule.runtime.core.privileged.transformer.TransformerUtils.generateTransformerName;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.rootBeanDefinition;
 
 import org.mule.runtime.api.lifecycle.Initialisable;

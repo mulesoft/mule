@@ -6,9 +6,7 @@
  */
 package org.mule.runtime.module.tls.api.socket;
 
-import org.mule.runtime.core.internal.util.ArrayUtils;
-
-import com.google.common.base.Joiner;
+import static org.mule.runtime.module.tls.internal.util.ArrayUtils.intersection;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,6 +15,8 @@ import java.net.ServerSocket;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+
+import com.google.common.base.Joiner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +40,13 @@ public class RestrictedSSLServerSocketFactory extends SSLServerSocketFactory {
     if (cipherSuites == null) {
       cipherSuites = sslServerSocketFactory.getDefaultCipherSuites();
     }
-    this.enabledCipherSuites = ArrayUtils.intersection(cipherSuites, sslServerSocketFactory.getSupportedCipherSuites());
-    this.defaultCipherSuites = ArrayUtils.intersection(cipherSuites, sslServerSocketFactory.getDefaultCipherSuites());
+    this.enabledCipherSuites = intersection(cipherSuites, sslServerSocketFactory.getSupportedCipherSuites());
+    this.defaultCipherSuites = intersection(cipherSuites, sslServerSocketFactory.getDefaultCipherSuites());
 
     if (protocols == null) {
       protocols = sslContext.getDefaultSSLParameters().getProtocols();
     }
-    this.enabledProtocols = ArrayUtils.intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
+    this.enabledProtocols = intersection(protocols, sslContext.getSupportedSSLParameters().getProtocols());
 
     if (this.enabledProtocols.length != protocols.length) {
       logger.warn("Current context supports less SSL protocols than configured. Only the following are enabled: [{}]",

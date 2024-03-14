@@ -6,19 +6,18 @@
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
+import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.ExtensionModelDiscoveryStory.PARALLEL_EXTENSION_MODEL_LOADING;
+
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.verify;
 import static org.mockito.junit.MockitoJUnit.rule;
-import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
-import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
-import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.ExtensionModelDiscoveryStory.PARALLEL_EXTENSION_MODEL_LOADING;
 
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
@@ -29,14 +28,16 @@ import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 
 @SmallTest
 @Feature(EXTENSION_MODEL_DISCOVERY)
@@ -69,31 +70,9 @@ public class ArtifactExtensionManagerFactoryTestCase extends AbstractMuleTestCas
   }
 
   @Test
-  public void parallelExtensionModelLoadingDisabledByDefault() {
+  public void parallelExtensionModelLoadingEnabled() {
     ExtensionDiscoveryRequest request = captureExtensionDiscoveryRequest();
-    assertThat(request.isParallelDiscovery(), is(false));
-  }
-
-  @Test
-  public void enableParallelExtensionModelLoading() {
-    setProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY, "true");
-    try {
-      ExtensionDiscoveryRequest request = captureExtensionDiscoveryRequest();
-      assertThat(request.isParallelDiscovery(), is(true));
-    } finally {
-      clearProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY);
-    }
-  }
-
-  @Test
-  public void parallelExtensionModelLoadingExplicitlyDisabled() {
-    setProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY, "false");
-    try {
-      ExtensionDiscoveryRequest request = captureExtensionDiscoveryRequest();
-      assertThat(request.isParallelDiscovery(), is(false));
-    } finally {
-      clearProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY);
-    }
+    assertThat(request.isParallelDiscovery(), is(true));
   }
 
   private ExtensionDiscoveryRequest captureExtensionDiscoveryRequest() {

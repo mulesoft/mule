@@ -20,10 +20,10 @@ import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.transformer.ResolverException;
 import org.mule.runtime.core.internal.transformer.TransformerChain;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

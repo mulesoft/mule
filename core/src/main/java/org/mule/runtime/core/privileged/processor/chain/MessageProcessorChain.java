@@ -11,7 +11,6 @@ import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.api.processor.InterceptingMessageProcessor;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Scope;
 
@@ -24,9 +23,7 @@ import java.util.List;
 public interface MessageProcessorChain extends ExecutableComponent, Lifecycle, MuleContextAware, Scope {
 
   /**
-   * Obtain the list of {@link Processor}'s that this chains was created from. Note that this is the linear view of all processors
-   * that the chains was constructed from and does not represent in any way the structure of the chain once
-   * {@link InterceptingMessageProcessor}'s have been taken into account.
+   * Obtain the list of {@link Processor}'s that this chains was created from.
    *
    * @return list of processors.
    */

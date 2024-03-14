@@ -9,17 +9,6 @@
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
            http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd">
 
-    <operation name="fail-proxy">
-        <parameters>
-            <parameter name="errorToRaise" type="string" defaultValue="ROUTING"/>
-            <parameter name="description" type="string" defaultValue="A bad error occurred."/>
-        </parameters>
-        <body>
-            <mule:raise-error type="#[vars.errorToRaise]" description="#[vars.description]"/>
-        </body>
-        <output type="string"/>
-    </operation>
-
     <operation name="fail-raise-error">
         <parameters>
             <parameter name="custom" type="boolean" defaultValue="false"/>

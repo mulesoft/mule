@@ -7,31 +7,8 @@
 package org.mule.runtime.core.internal.util;
 
 import static java.io.File.separator;
-import org.mule.runtime.core.api.util.FileUtils;
-
-import java.io.File;
 
 public class FilenameUtils {
-
-  public static File fileWithPathComponents(String[] pathComponents) {
-    if (pathComponents == null) {
-      return null;
-    }
-
-    StringBuilder buf = new StringBuilder(64);
-    for (int i = 0; i < pathComponents.length; i++) {
-      String component = pathComponents[i];
-      if (component == null) {
-        continue;
-      }
-
-      buf.append(component);
-      if (i < pathComponents.length - 1) {
-        buf.append(separator);
-      }
-    }
-    return FileUtils.newFile(buf.toString());
-  }
 
   public static String normalizeDecodedPath(String resource, boolean isWindows) {
     if (resource == null) {

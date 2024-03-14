@@ -9,7 +9,10 @@ package org.mule.runtime.module.deployment.internal.singleapp;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppsFolder;
+import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.deployExplodedDomains;
 
+import static java.lang.System.getenv;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static java.util.Optional.empty;
@@ -40,8 +43,6 @@ import org.mule.runtime.module.deployment.internal.DomainArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.DomainBundleArchiveDeployer;
 import org.mule.runtime.module.deployment.internal.util.DebuggableReentrantLock;
 import org.mule.runtime.module.deployment.internal.util.ObservableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +62,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A {@link DeploymentService} that allows only the deployment of one application.
  *
@@ -69,6 +73,7 @@ import java.util.function.Supplier;
 public class SingleAppDeploymentService implements DeploymentService, Startable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SingleAppDeploymentService.class);
+  public static final String MULE_APPS_PATH_ENV = "MULE_APPS_PATH";
 
   private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
 
@@ -198,18 +203,18 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
     deploy(appArchiveUri, ofNullable(appProperties));
   }
 
-  private synchronized void deploy(final URI appArchiveUri, final Optional<Properties> deploymentProperties) throws IOException {
+  private synchronized void deploy(final URI appUri, final Optional<Properties> deploymentProperties) throws IOException {
     if (!applications.isEmpty()) {
       throw new UnsupportedOperationException("A deployment cannot be done if there is an already deployed app in single app mode.");
     }
 
     try {
-      File artifactLocation = fileResolver.resolve(appArchiveUri);
+      File artifactLocation = fileResolver.resolve(appUri);
       String fileName = artifactLocation.getName();
       if (fileName.endsWith(".jar")) {
-        applicationDeployer.deployPackagedArtifact(appArchiveUri, deploymentProperties);
+        applicationDeployer.deployPackagedArtifact(appUri, deploymentProperties);
       } else {
-        if (!artifactLocation.getParent().equals(appArchiveUri.getPath())) {
+        if (!artifactLocation.getParent().equals(appUri.getPath())) {
           try {
             copyDirectory(artifactLocation, new File(getAppsFolder(), fileName));
           } catch (IOException e) {
@@ -276,27 +281,44 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
   @Override
   public void start() {
     try {
-      this.deploymentDirectoryWatcher =
-          resolveDeploymentDirectoryWatcher();
-
-      applicationDeploymentListener.addDeploymentListener(new DeploymentListener() {
-
-        @Override
-        public void onDeploymentSuccess(String artifactName) {
-          deploymentDirectoryWatcher.stop();
+      String muleAppsPath = getenv(MULE_APPS_PATH_ENV);
+      if (muleAppsPath != null) {
+        if (muleAppsPath.toLowerCase().endsWith(JAR_FILE_SUFFIX)) {
+          throw new IllegalArgumentException("Invalid Mule app path: '" + muleAppsPath + "'");
         }
-
-        @Override
-        public void onDeploymentFailure(String artifactName, Throwable cause) {
-          deploymentErrorConsumer.accept(cause);
-        }
-      });
-
-      this.deploymentDirectoryWatcher.start();
+        startDeployment(new File(muleAppsPath).toURI());
+      } else {
+        startDeploymentDirectoryWatcher();
+      }
       notifyStartupListeners();
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error on starting single app mode"), e);
     }
+  }
+
+  private void startDeployment(URI appUri) throws IOException {
+    deployExplodedDomains(domainDeployer);
+    deploy(appUri);
+  }
+
+  private void startDeploymentDirectoryWatcher() {
+    this.deploymentDirectoryWatcher =
+        resolveDeploymentDirectoryWatcher();
+
+    applicationDeploymentListener.addDeploymentListener(new DeploymentListener() {
+
+      @Override
+      public void onDeploymentSuccess(String artifactName) {
+        deploymentDirectoryWatcher.stop();
+      }
+
+      @Override
+      public void onDeploymentFailure(String artifactName, Throwable cause) {
+        deploymentErrorConsumer.accept(cause);
+      }
+    });
+
+    this.deploymentDirectoryWatcher.start();
   }
 
   private DeploymentDirectoryWatcher resolveDeploymentDirectoryWatcher() {

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.manager.jdk;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.internal.util.JdkVersionUtils.JdkVersion;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 
 /**
  * {@link ExtensionJdkValidator} implementation that throws {@link JavaVersionNotSupportedByExtensionException} upon validation

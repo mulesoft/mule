@@ -22,10 +22,9 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.util.Map;
 import java.util.Optional;

@@ -80,6 +80,8 @@ public class DefaultMuleContainer implements MuleContainer {
    */
   private static final Logger logger;
 
+  private static final Logger SPLASH_LOGGER = LoggerFactory.getLogger("org.mule.runtime.core.internal.logging");
+
   /**
    * The Runtime shutdown thread used to undeploy this server
    */
@@ -266,7 +268,7 @@ public class DefaultMuleContainer implements MuleContainer {
   private void showSplashScreen(List<String> additionalSplashEntries) {
     final MuleContainerStartupSplashScreen splashScreen = new MuleContainerStartupSplashScreen(additionalSplashEntries);
     splashScreen.doBody();
-    logger.info(splashScreen.toString());
+    SPLASH_LOGGER.info(splashScreen.toString());
   }
 
   /**

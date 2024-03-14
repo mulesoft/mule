@@ -12,7 +12,7 @@ import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDef
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.PROPERTY_ELEMENT;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -21,9 +21,9 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.config.internal.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
 import org.mule.runtime.config.internal.model.dsl.config.RuntimeConfigurationException;
-import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
 
 import java.util.List;
 import java.util.Map;

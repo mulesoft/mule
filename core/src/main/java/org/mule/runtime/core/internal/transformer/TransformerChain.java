@@ -25,7 +25,6 @@ import org.mule.runtime.core.api.transformer.AbstractTransformer;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.privileged.transformer.TransformerUtils;
 
 import java.nio.charset.Charset;
 import java.util.LinkedList;

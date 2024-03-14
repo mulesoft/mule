@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.api.config.i18n;
 
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
+
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import org.mule.runtime.api.i18n.I18nMessage;
@@ -23,11 +25,11 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.internal.util.DateUtils;
 
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class CoreMessages extends I18nMessageFactory {
 
@@ -52,7 +54,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage version() {
-    String version = defaultString(MuleManifest.getProductVersion(), notSet().getMessage());
+    String version = Objects.toString(getProductVersion(), notSet().getMessage());
     return factory.createMessage(BUNDLE_PATH, 6, version);
   }
 
@@ -65,7 +67,7 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage serverWasUpForDuration(long duration) {
-    String formattedDuration = DateUtils.getFormattedDuration(duration);
+    String formattedDuration = getFormattedDuration(duration);
     return factory.createMessage(BUNDLE_PATH, 8, formattedDuration);
   }
 
@@ -820,8 +822,26 @@ public class CoreMessages extends I18nMessageFactory {
   }
 
   public static I18nMessage applicationWasUpForDuration(long duration) {
-    String formattedDuration = DateUtils.getFormattedDuration(duration);
+    String formattedDuration = getFormattedDuration(duration);
     return factory.createMessage(BUNDLE_PATH, 308, formattedDuration);
+  }
+
+  private static String getFormattedDuration(long mills) {
+    long days = mills / 86400000;
+    mills = mills - (days * 86400000);
+    long hours = mills / 3600000;
+    mills = mills - (hours * 3600000);
+    long mins = mills / 60000;
+    mills = mills - (mins * 60000);
+    long secs = mills / 1000;
+    mills = mills - (secs * 1000);
+
+    StringBuilder bf = new StringBuilder(60);
+    bf.append(days).append(" ").append(CoreMessages.days().getMessage()).append(", ");
+    bf.append(hours).append(" ").append(CoreMessages.hours().getMessage()).append(", ");
+    bf.append(mins).append(" ").append(CoreMessages.minutes().getMessage()).append(", ");
+    bf.append(secs).append(".").append(mills).append(" ").append(CoreMessages.seconds().getMessage());
+    return bf.toString();
   }
 
   public static I18nMessage errorSchedulingMessageProcessorForAsyncInvocation(Processor processor) {

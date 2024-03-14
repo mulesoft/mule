@@ -43,6 +43,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -112,6 +113,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -119,8 +121,7 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
-import org.mule.runtime.core.internal.util.DefaultResourceLocator;
-import org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler;
+import org.mule.runtime.core.internal.config.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -365,7 +366,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
     final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
-    final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+    final ErrorTypeLocator errorTypeLocator =
+        createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 
     final Set<ExtensionModel> dependencies = artifactAst.dependencies();
     registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
@@ -378,7 +380,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel = prepareAstForRuntime(applicationModel, applicationModel.dependencies());
+    applicationModel =
+        prepareAstForRuntime(applicationModel, applicationModel.dependencies(), ofNullable(featureFlaggingService));
   }
 
   @Override

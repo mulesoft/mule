@@ -15,8 +15,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Test;

@@ -16,47 +16,32 @@ import org.mule.api.annotation.jpms.PrivilegedApi;
     privilegedPackages = {
         "org.mule.runtime.core.internal.message",
         "org.mule.runtime.core.privileged",
-        "org.mule.runtime.core.privileged.component",
         "org.mule.runtime.core.privileged.el",
         "org.mule.runtime.core.privileged.event",
-        "org.mule.runtime.core.privileged.event.context",
         "org.mule.runtime.core.privileged.exception",
-        "org.mule.runtime.core.privileged.execution",
         "org.mule.runtime.core.privileged.interception",
-        "org.mule.runtime.core.privileged.lifecycle",
         "org.mule.runtime.core.privileged.message",
-        // for DataWeave
         "org.mule.runtime.core.privileged.metadata",
         "org.mule.runtime.core.privileged.processor",
-        "org.mule.runtime.core.privileged.processor.simple",
         "org.mule.runtime.core.privileged.processor.chain",
+        "org.mule.runtime.core.privileged.processor.simple",
+        "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.registry",
         "org.mule.runtime.core.privileged.routing",
-        "org.mule.runtime.core.privileged.store",
-        "org.mule.runtime.core.privileged.transformer",
-        "org.mule.runtime.core.privileged.transformer.simple",
-        "org.mule.runtime.core.privileged.transaction",
-        "org.mule.runtime.core.privileged.transaction.xa",
-        "org.mule.runtime.core.privileged.util",
-        "org.mule.runtime.core.privileged.processor.objectfactory",
         "org.mule.runtime.core.privileged.profiling",
         "org.mule.runtime.core.privileged.profiling.tracing"
     },
     privilegedArtifactIds = {
-        "com.mulesoft.mule.modules:mule-compatibility-module",
         "com.mulesoft.munit:munit-runner",
         "com.mulesoft.munit:munit-tools",
         "com.mulesoft.munit:mtf-tools",
-        "org.mule.modules:mule-scripting-module",
+        "org.mule.modules:mule-aggregators-module",
+        "org.mule.modules:mule-apikit-module",
+        "org.mule.modules:mule-tracing-module",
         "org.mule.modules:mule-validation-module",
         "org.mule.tests.plugin:mule-tests-component-plugin",
         "org.mule.tests:test-processor-chains",
-        "org.mule.tests:test-components",
-        "com.mulesoft.anypoint:cxf-module-facade",
-        "org.mule.modules:mule-apikit-module",
-        "org.mule.modules:mule-tracing-module",
-        "org.mule.modules:mule-aggregators-module",
-        "org.mule.modules:mule-streaming-utils-module"
+        "org.mule.tests:test-components"
     })
 module org.mule.runtime.core {
 
@@ -187,36 +172,38 @@ module org.mule.runtime.core {
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;
 
+  // for MUnit, MTF
   exports org.mule.runtime.core.privileged;
+  // for ByteBuddy dynamically generated classes
   exports org.mule.runtime.core.privileged.component;
+  // for MUnit and muleFwk
   exports org.mule.runtime.core.privileged.el;
+  // for MuleFwk, MUnit, MTF, ApiGateway, Tracing and Validation
   exports org.mule.runtime.core.privileged.event;
-  exports org.mule.runtime.core.privileged.execution to
-      org.mule.runtime.properties.config,
-      org.mule.runtime.spring.config;
+  // for MuleFwk, MUnit, ApiKit and Validation
   exports org.mule.runtime.core.privileged.exception;
   // for MUnit
   exports org.mule.runtime.core.privileged.interception;
-  exports org.mule.runtime.core.privileged.lifecycle to
-      org.mule.runtime.extensions.support;
   // for MUnit
   exports org.mule.runtime.core.privileged.message;
   // for DataWeave
   exports org.mule.runtime.core.privileged.metadata;
+  // for MUnit, MTF, ApiKit and Validation
   exports org.mule.runtime.core.privileged.processor;
+  // for MUnit and Validation
   exports org.mule.runtime.core.privileged.processor.chain;
+  // for MTF
   exports org.mule.runtime.core.privileged.processor.objectfactory;
+  // for MTF
   exports org.mule.runtime.core.privileged.processor.simple;
+  // for test-components
   exports org.mule.runtime.core.privileged.profiling;
   exports org.mule.runtime.core.privileged.profiling.tracing to
       org.mule.runtime.core.components;
+  // for Aggregators
   exports org.mule.runtime.core.privileged.registry;
+  // for DataWeave
   exports org.mule.runtime.core.privileged.routing;
-  exports org.mule.runtime.core.privileged.store;
-  exports org.mule.runtime.core.privileged.transaction;
-  exports org.mule.runtime.core.privileged.transaction.xa;
-  exports org.mule.runtime.core.privileged.transformer;
-  exports org.mule.runtime.core.privileged.util;
 
   exports org.mule.runtime.core.internal.cluster to
       org.mule.runtime.spring.config,
@@ -277,6 +264,7 @@ module org.mule.runtime.core {
   // Needed for byte-buddy proxies (generated in the unnamed-module) for visibility
   exports org.mule.runtime.core.internal.component to
       org.mule.runtime.core.components,
+      org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.batch;
@@ -301,6 +289,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       org.mule.runtime.tooling.support,
       com.mulesoft.mule.runtime.batch,
+      com.mulesoft.mule.runtime.core.ee,
       com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.exception to
@@ -314,6 +303,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.execution to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
+      org.mule.runtime.properties.config,
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.interception to
@@ -339,6 +329,7 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   // Required because this is used in test components that end up in the unnamed module
+  // and for MUnit and ApiKit
   exports org.mule.runtime.core.internal.message;
   exports org.mule.runtime.core.internal.metadata to
       com.mulesoft.mule.runtime.kryo;
@@ -393,6 +384,9 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.routing.outbound to
       org.mule.runtime.core.components,
       com.mulesoft.mule.runtime.batch;
+  exports org.mule.runtime.core.internal.routing.result to
+      org.mule.runtime.core.components,
+      org.mule.runtime.spring.config;
   exports org.mule.runtime.core.internal.routing.split to
       org.mule.runtime.core.components,
       com.mulesoft.mule.runtime.batch;
@@ -412,6 +406,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.store to
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.kryo,
       spring.beans;
   exports org.mule.runtime.core.internal.streaming to
       org.mule.runtime.core.components,
@@ -438,12 +433,17 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction to
+      org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
       org.mule.runtime.spring.config,
+      com.mulesoft.mule.runtime.bti,
       spring.beans;
   exports org.mule.runtime.core.internal.transaction.xa to
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.bti,
-      com.mulesoft.mule.runtime.cluster;
+      com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.xa;
   exports org.mule.runtime.core.internal.transformer to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -457,7 +457,6 @@ module org.mule.runtime.core {
       spring.beans;
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.core.components,
-      org.mule.runtime.artifact,
       org.mule.runtime.container,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
@@ -468,21 +467,24 @@ module org.mule.runtime.core {
       org.mule.runtime.extensions.xml.support,
       org.mule.runtime.repository,
       org.mule.runtime.spring.config,
-      org.mule.runtime.launcher,
-      org.mule.runtime.tls,
-      com.mulesoft.mule.runtime.batch,
       com.mulesoft.mule.runtime.bti,
       com.mulesoft.mule.runtime.cluster,
       com.mulesoft.mule.runtime.kryo,
       com.mulesoft.mule.runtime.plugin,
       com.mulesoft.mule.service.oauth.ee,
-      com.mulesoft.anypoint.gw.core,
-      com.mulesoft.anypoint.gw.module.deployment,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.attribute to
+      org.mule.runtime.core.components,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.mule.support,
+      com.mulesoft.mule.runtime.cache,
+      com.mulesoft.mule.runtime.core.ee;
   exports org.mule.runtime.core.internal.util.cache to
       org.mule.runtime.metadata.support;
   exports org.mule.runtime.core.internal.util.collection to
       org.mule.runtime.extensions.support;
+  exports org.mule.runtime.core.internal.util.log to
+      com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.util.mediatype to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.message to
@@ -514,6 +516,9 @@ module org.mule.runtime.core {
       org.mule.runtime.spring.config,
       com.mulesoft.mule.runtime.cluster,
       spring.beans;
+  exports org.mule.runtime.core.internal.util.version to
+      org.mule.runtime.extensions.support,
+      com.mulesoft.anypoint.gw.core;
   exports org.mule.runtime.core.internal.value to
       org.mule.runtime.spring.config,
       spring.beans;
@@ -540,8 +545,6 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.api.streaming to
       spring.core;
 
-  opens org.mule.runtime.core.privileged.component to
-      spring.core;
   opens org.mule.runtime.core.privileged.event to
       kryo.shaded;
   opens org.mule.runtime.core.privileged.exception to

@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.core.privileged.component;
 
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
+
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 

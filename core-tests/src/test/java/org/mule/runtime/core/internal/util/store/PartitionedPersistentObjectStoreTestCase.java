@@ -19,8 +19,8 @@ import static org.mule.tck.SerializationTestUtils.addJavaSerializerToMockMuleCon
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.internal.store.PartitionedPersistentObjectStore;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
