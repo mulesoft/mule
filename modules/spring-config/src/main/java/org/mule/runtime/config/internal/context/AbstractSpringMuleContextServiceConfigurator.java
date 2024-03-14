@@ -18,11 +18,9 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
-import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.core.internal.config.CustomService;
 import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
-import org.mule.runtime.module.service.internal.util.TypeSupplier;
 
 import java.lang.reflect.InvocationHandler;
 import java.util.Optional;
@@ -97,10 +95,7 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
                 .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           }
 
-          beanDefinition = servImpl instanceof TypeSupplier
-              ? getFixedTypeConstantObjectBeanDefinition(servImpl, (Class<?>) ((TypeSupplier) servImpl).getType())
-              : getConstantObjectBeanDefinition(servImpl);
-
+          beanDefinition = getConstantObjectBeanDefinition(servImpl);
         } else {
           beanDefinition =
               getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
@@ -121,13 +116,6 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
 
   protected static BeanDefinition getConstantObjectBeanDefinition(Object impl) {
     return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
-  }
-
-  protected static BeanDefinition getFixedTypeConstantObjectBeanDefinition(Object object, Class<?> type) {
-    return getBeanDefinitionBuilder(FixedTypeConstantFactoryBean.class)
-        .addConstructorArgValue(object)
-        .addConstructorArgValue(type)
-        .getBeanDefinition();
   }
 
   protected static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {
