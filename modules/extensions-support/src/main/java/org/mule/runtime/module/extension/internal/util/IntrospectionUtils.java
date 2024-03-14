@@ -38,7 +38,7 @@ import static javax.lang.model.element.ElementKind.METHOD;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -951,9 +951,10 @@ public final class IntrospectionUtils {
   private static Stream<Method> getMethodsStream(Class<?> declaringClass, boolean superClasses) {
     Stream<Method> methodStream;
     if (superClasses) {
-      methodStream = ReflectionUtils.getAllSuperTypes(declaringClass).stream()
-          .filter(type -> !type.isInterface())
-          .flatMap(type -> Stream.of(type.getDeclaredMethods()));
+      methodStream = Stream.concat(Stream.of(declaringClass.getDeclaredMethods()),
+                                   ReflectionUtils.getAllSuperTypes(declaringClass).stream()
+                                       .filter(type -> !type.isInterface())
+                                       .flatMap(type -> Stream.of(type.getDeclaredMethods())));
     } else {
       methodStream = Stream.of(declaringClass.getDeclaredMethods());
     }

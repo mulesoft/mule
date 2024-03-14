@@ -38,7 +38,7 @@ module org.mule.runtime.extensions.spring.support {
   requires org.apache.commons.lang3;
   requires org.dom4j;
   requires org.jsoup;
-  requires reflections;
+  requires org.reflections;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.module.extension.internal.config.dsl.DefaultExtensionBuildingDefinitionProvider;
