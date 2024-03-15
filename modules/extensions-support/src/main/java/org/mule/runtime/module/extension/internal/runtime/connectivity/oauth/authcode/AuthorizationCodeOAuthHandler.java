@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.au
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContext;
@@ -277,14 +278,17 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
       CoreEvent event = (CoreEvent) callbackContext.getParameter(DANCE_CALLBACK_EVENT_KEY)
           .orElseGet(() -> createEvent(state, config, flow));
 
-      event = CoreEvent.builder(event).message(Message.builder().value(state).build()).build();
+      event = CoreEvent.builder(event)
+          .message(withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder()).value(state).build())
+          .build();
       runFlow(flow, event, config, "after");
     };
   }
 
   private CoreEvent createEvent(Object payload, OAuthConfig config, Flow flow) {
     return CoreEvent.builder(create(flow, from(config.getOwnerConfigName())))
-        .message(Message.builder().value(payload).build()).build();
+        .message(withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder()).value(payload).build())
+        .build();
   }
 
   private CoreEvent runFlow(Flow flow, CoreEvent event, OAuthConfig config, String callbackType) {

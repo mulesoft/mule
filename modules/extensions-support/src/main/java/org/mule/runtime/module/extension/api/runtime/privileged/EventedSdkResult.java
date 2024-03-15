@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.api.runtime.privileged;
 
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.message.Message;
@@ -44,7 +46,8 @@ public class EventedSdkResult<T, A> extends Result<T, A> {
   @Override
   public Builder<T, A> copy() {
     final CoreEvent.Builder product = CoreEvent.builder(event);
-    final Message.Builder message = Message.builder(event.getMessage());
+    final Message.Builder message =
+        withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(event.getMessage()));
 
     return new Builder<T, A>() {
 

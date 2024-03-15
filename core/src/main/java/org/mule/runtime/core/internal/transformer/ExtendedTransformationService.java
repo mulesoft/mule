@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.transformer;
 
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
 
@@ -210,7 +211,7 @@ public class ExtendedTransformationService extends DefaultTransformationService 
       // a new message instance. This issue goes away once transformers are cleaned up and always return event or
       // message. See MULE-9342
       Message messagePostTransform = (event != null && event.getMessage() != null) ? event.getMessage() : message;
-      return Message.builder(messagePostTransform).value(result)
+      return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(messagePostTransform)).value(result)
           .mediaType(mergeMediaType(messagePostTransform, transformer.getReturnDataType())).build();
     }
   }

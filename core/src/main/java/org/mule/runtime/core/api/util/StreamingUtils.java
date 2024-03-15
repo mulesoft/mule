@@ -8,6 +8,7 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 
@@ -249,7 +250,8 @@ public final class StreamingUtils {
    * @since 4.1
    */
   public static CoreEvent consumeRepeatablePayload(CoreEvent event) {
-    TypedValue payload = event.getMessage().getPayload();
+    Message message = event.getMessage();
+    TypedValue payload = message.getPayload();
 
     if (payload.getValue() == null) {
       return event;
@@ -258,9 +260,10 @@ public final class StreamingUtils {
     TypedValue replacedPayload = consumeRepeatableValue(payload);
     if (replacedPayload != payload) {
       event = CoreEvent.builder(event).message(
-                                               Message.builder(event.getMessage())
-                                                   .payload(replacedPayload)
-                                                   .build())
+                                               withContextClassLoader(StreamingUtils.class.getClassLoader(),
+                                                                      () -> Message.builder(message))
+                                                                          .payload(replacedPayload)
+                                                                          .build())
           .build();
     }
 
@@ -322,7 +325,7 @@ public final class StreamingUtils {
 
   private static CoreEvent replacePayload(CoreEvent event, Object newPayload) {
     return CoreEvent.builder(event)
-        .message(Message.builder(event.getMessage())
+        .message(withContextClassLoader(StreamingUtils.class.getClassLoader(), () -> Message.builder(event.getMessage()))
             .value(newPayload)
             .build())
         .build();
@@ -388,9 +391,10 @@ public final class StreamingUtils {
         if (updatedPayload == payload) {
           return event;
         } else {
-          Message message = Message.builder(event.getMessage())
-              .payload(updatedPayload)
-              .build();
+          Message message =
+              withContextClassLoader(StreamingUtils.class.getClassLoader(), () -> Message.builder(event.getMessage()))
+                  .payload(updatedPayload)
+                  .build();
           return CoreEvent.builder(event).message(message).build();
         }
       }

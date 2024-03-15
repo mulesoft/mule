@@ -10,6 +10,7 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noTransformerFoundForMessage;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectNotOfSpecifiedType;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -70,7 +71,8 @@ public class DefaultTransformationService implements TransformationService {
     checkNotNull(message, "Message cannot be null");
     checkNotNull(outputDataType, "DataType cannot be null");
 
-    return Message.builder(message).value(getPayload(message, outputDataType, resolveEncoding(message))).build();
+    return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(message))
+        .value(getPayload(message, outputDataType, resolveEncoding(message))).build();
   }
 
   /**
@@ -150,7 +152,8 @@ public class DefaultTransformationService implements TransformationService {
   protected void checkResultDataType(Message message, DataType resultType, Object value) throws MessageTransformerException {
     if (value != null && !resultType.getType().isAssignableFrom(value.getClass())) {
       TypedValue<Object> actualType = TypedValue.of(value);
-      Message transformedMessage = Message.builder(message).payload(actualType).build();
+      Message transformedMessage =
+          withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(message)).payload(actualType).build();
       throw new MessageTransformerException(transformOnObjectNotOfSpecifiedType(resultType, actualType), null,
                                             transformedMessage);
     }

@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.util.message;
 
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StreamingUtils.streamingContent;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -455,7 +456,8 @@ public final class MessageUtils {
   }
 
   private static Message toMessage(Result<?, ?> result, DataType dataType, Object value) {
-    Message.Builder builder = Message.builder().payload(new TypedValue<>(value, dataType, result.getByteLength()));
+    Message.Builder builder = withContextClassLoader(MessageUtils.class.getClassLoader(), () -> Message.builder())
+        .payload(new TypedValue<>(value, dataType, result.getByteLength()));
 
     if (result.getAttributes().isPresent()) {
       // Don't change: SonarQube detects this code as java:S3655 bug, but by using Optional#ifPresent(Consumer) introduces

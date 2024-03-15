@@ -13,6 +13,7 @@ import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_LIST;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -52,7 +53,10 @@ public class CollectListForkJoinStrategyFactory extends AbstractForkJoinStrategy
   @Override
   protected Function<List<CoreEvent>, CoreEvent> createResultEvent(CoreEvent original,
                                                                    CoreEvent.Builder resultBuilder) {
-    return list -> resultBuilder.message(of(list.stream().map(event -> event.getMessage()).collect(toList()))).build();
+    return list -> resultBuilder
+        .message(withContextClassLoader(this.getClass().getClassLoader(),
+                                        () -> of(list.stream().map(event -> event.getMessage()).collect(toList()))))
+        .build();
   }
 
   @Override
