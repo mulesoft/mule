@@ -10,7 +10,6 @@ import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.noCurrentEventForTransformer;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -90,7 +89,7 @@ public final class TransformerChain extends AbstractTransformer {
     if (src instanceof Message) {
       message = (Message) src;
     } else if (muleContext.getConfiguration().isAutoWrapMessageAwareTransform()) {
-      message = withContextClassLoader(this.getClass().getClassLoader(), () -> of(src));
+      message = of(src, this.getClass().getClassLoader());
     } else {
       throw new TransformerException(noCurrentEventForTransformer(), this);
     }
@@ -115,7 +114,7 @@ public final class TransformerChain extends AbstractTransformer {
       if (temp instanceof Message) {
         result = (Message) temp;
       } else {
-        result = withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(message)).value(temp).build();
+        result = Message.builder(message, this.getClass().getClassLoader()).value(temp).build();
       }
     }
     if (lastTransformer != null && Message.class.isAssignableFrom(lastTransformer.getReturnDataType().getType())) {

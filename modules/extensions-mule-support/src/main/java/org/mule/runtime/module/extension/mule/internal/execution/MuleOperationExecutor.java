@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.mule.internal.execution;
 import static org.mule.runtime.api.exception.ExceptionHelper.getExceptionsAsList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -45,7 +44,7 @@ import javax.inject.Inject;
  */
 public class MuleOperationExecutor implements CompletableComponentExecutor<ComponentModel>, Initialisable {
 
-  private static final Message NULL_MESSAGE = withContextClassLoader(MuleOperationExecutor.class.getClassLoader(), () -> Message.builder()).nullValue().build();
+  private static final Message NULL_MESSAGE = Message.builder(MuleOperationExecutor.class.getClassLoader()).nullValue().build();
 
   private final ComponentModel operationModel;
   private Operation operation;

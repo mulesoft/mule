@@ -22,7 +22,6 @@ import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JAVA;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.execution.ComponentExecutionException;
@@ -82,13 +81,12 @@ public class LookupFunction implements ExpressionFunction {
 
     if (component instanceof Flow) {
       Message incomingMessage =
-          lookupValue(context, MESSAGE,
-                      withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder()).nullValue().build());
+          lookupValue(context, MESSAGE, Message.builder(this.getClass().getClassLoader()).nullValue().build());
       Map<String, ?> incomingVariables = lookupValue(context, VARS, EMPTY_MAP);
       Error incomingError = lookupValue(context, ERROR, null);
 
-      Message message = withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(incomingMessage))
-          .value(payload).mediaType(APPLICATION_JAVA).build();
+      Message message =
+          Message.builder(incomingMessage, this.getClass().getClassLoader()).value(payload).mediaType(APPLICATION_JAVA).build();
       CoreEvent event = CoreEvent.builder(PrivilegedEvent.getCurrentEvent().getContext())
           .variables(incomingVariables)
           .error(incomingError)

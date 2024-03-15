@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueWithCursorProvider;
 
 import org.mule.runtime.api.message.Message;
@@ -70,7 +69,7 @@ public class ImmutableProcessorChainExecutor implements ProcessorChainExecutor {
   @Override
   public void process(Object payload, Object attributes, Consumer<Result> onSuccess, BiConsumer<Throwable, Result> onError) {
     CoreEvent customEvent = CoreEvent.builder(originalEvent)
-        .message(withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
+        .message(Message.builder(this.getClass().getClassLoader())
             .payload(updateTypedValueWithCursorProvider(TypedValue.of(payload), streamingManager))
             .attributes(TypedValue.of(attributes))
             .build())

@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
@@ -143,12 +142,10 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   private Message createMessage(TypedValue<?> partTypedValue, CoreEvent event) {
     if (featureFlaggingService.isEnabled(PARALLEL_FOREACH_FLATTEN_MESSAGE) && partTypedValue.getValue() instanceof Message) {
       Message message = (Message) partTypedValue.getValue();
-      return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(message))
-          .payload(manageTypedValuePayload(partTypedValue, event)).build();
-    } else {
-      return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
-          .payload(manageTypedValuePayload(partTypedValue, event))
+      return Message.builder(message, this.getClass().getClassLoader()).payload(manageTypedValuePayload(partTypedValue, event))
           .build();
+    } else {
+      return Message.builder(this.getClass().getClassLoader()).payload(manageTypedValuePayload(partTypedValue, event)).build();
     }
   }
 }

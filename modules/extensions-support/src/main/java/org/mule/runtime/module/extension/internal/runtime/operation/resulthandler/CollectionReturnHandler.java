@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.runtime.operation.resulthandler;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 
 import org.mule.metadata.api.model.MetadataType;
@@ -40,8 +39,7 @@ public final class CollectionReturnHandler implements ReturnHandler<Collection> 
    */
   @Override
   public Message.Builder toMessageBuilder(Collection value) {
-    return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
-        .payload(new TypedValue<>(value, getDataType()));
+    return Message.builder(this.getClass().getClassLoader()).payload(new TypedValue<>(value, getDataType()));
   }
 
   /**

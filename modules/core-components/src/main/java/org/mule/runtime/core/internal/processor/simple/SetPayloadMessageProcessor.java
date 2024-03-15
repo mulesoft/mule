@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.processor.simple;
 
 import static org.mule.runtime.api.metadata.DataType.OBJECT;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -38,8 +37,7 @@ public class SetPayloadMessageProcessor extends SimpleMessageProcessor {
 
   @Override
   public CoreEvent process(CoreEvent event) throws MuleException {
-    final Message.Builder builder =
-        withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(event.getMessage()));
+    final Message.Builder builder = Message.builder(event.getMessage(), this.getClass().getClassLoader());
     final CoreEvent.Builder eventBuilder = CoreEvent.builder(event);
 
     if (dataType == null) {

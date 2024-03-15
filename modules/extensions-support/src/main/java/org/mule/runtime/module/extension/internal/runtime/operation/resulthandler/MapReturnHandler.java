@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation.resulthandler;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 
@@ -42,8 +41,7 @@ public final class MapReturnHandler implements ReturnHandler<Map> {
    */
   @Override
   public Message.Builder toMessageBuilder(Map value) {
-    return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
-        .payload(new TypedValue<>(value, getDataType()));
+    return Message.builder(this.getClass().getClassLoader()).payload(new TypedValue<>(value, getDataType()));
   }
 
   /**

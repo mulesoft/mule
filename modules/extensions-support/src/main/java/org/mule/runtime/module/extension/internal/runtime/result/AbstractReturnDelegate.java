@@ -9,7 +9,6 @@ package org.mule.runtime.module.extension.internal.runtime.result;
 import static org.apache.commons.io.IOUtils.EOF;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
@@ -176,12 +175,11 @@ public abstract class AbstractReturnDelegate implements ReturnDelegate {
       // TODO MULE-13302: this doesn't completely makes sense. IT doesn't account for an Iterator<Message>
       // org.mule.runtime.api.metadata.DataType.MULE_MESSAGE_COLLECTION doesn't completely makes sense
       if (returnsListOfMessages && value instanceof Collection) {
-        messageBuilder = withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
-            .collectionValue((Collection) value, Message.class);
+        messageBuilder = Message.builder(this.getClass().getClassLoader()).collectionValue((Collection) value, Message.class);
       } else if (isSpecialHandling && returnHandler.handles(value)) {
         messageBuilder = returnHandler.toMessageBuilder(value);
       } else {
-        messageBuilder = withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder()).value(value);
+        messageBuilder = Message.builder(this.getClass().getClassLoader()).value(value);
       }
 
       return messageBuilder.mediaType(mediaType).build();

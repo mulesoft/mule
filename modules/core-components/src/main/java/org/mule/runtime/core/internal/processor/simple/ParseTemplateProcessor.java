@@ -12,7 +12,6 @@ import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
@@ -133,9 +132,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
     evaluateCorrectArguments();
 
     String result = expressionManager.parseLogTemplate(content, event, getLocation(), NULL_BINDING_CONTEXT);
-    Message.Builder messageBuilder =
-        withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(event.getMessage())).value(result)
-            .nullAttributesValue();
+    Message.Builder messageBuilder = Message.builder(event.getMessage(), this.getClass().getClassLoader()).value(result)
+        .nullAttributesValue();
     MediaType configuredMediaType = buildMediaType();
     if (configuredMediaType != null) {
       messageBuilder.mediaType(configuredMediaType);

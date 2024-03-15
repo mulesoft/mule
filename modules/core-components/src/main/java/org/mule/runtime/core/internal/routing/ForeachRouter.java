@@ -11,7 +11,6 @@ import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.metadata.DataType.MULE_MESSAGE;
 import static org.mule.runtime.api.metadata.DataType.NUMBER;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.addContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.getContext;
 import static org.mule.runtime.core.internal.routing.ForeachInternalContextManager.removeContext;
@@ -234,11 +233,11 @@ class ForeachRouter {
     } else if (currentValue.getValue() instanceof Message) {
       // If value is a Message then use it directly conserving attributes and properties.
       Message message = (Message) currentValue.getValue();
-      partEventBuilder.message(withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder(message))
+      partEventBuilder.message(Message.builder(message, this.getClass().getClassLoader())
           .payload(managedValue).build());
     } else {
       // Otherwise create a new message
-      partEventBuilder.message(withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder())
+      partEventBuilder.message(Message.builder(this.getClass().getClassLoader())
           .payload(managedValue).build());
     }
     return partEventBuilder

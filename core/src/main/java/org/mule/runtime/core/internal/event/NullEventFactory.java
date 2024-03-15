@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.event;
 import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 
@@ -117,9 +116,7 @@ public final class NullEventFactory {
       }
     };
 
-    return withContextClassLoader(NullEventFactory.class
-        .getClassLoader(), () -> InternalEvent.builder(create(flowConstruct, from(INITIALIZER_EVENT)))
-            .message(of(null))
-            .build());
+    return InternalEvent.builder(create(flowConstruct, from(INITIALIZER_EVENT)))
+        .message(of(null, NullEventFactory.class.getClassLoader())).build();
   }
 }

@@ -8,7 +8,6 @@ package org.mule.runtime.core.api.util;
 
 import static org.mule.runtime.core.api.rx.Exceptions.rxExceptionToMuleException;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
 import static org.mule.runtime.core.internal.event.EventUtils.getRoot;
 
@@ -250,8 +249,7 @@ public final class StreamingUtils {
    * @since 4.1
    */
   public static CoreEvent consumeRepeatablePayload(CoreEvent event) {
-    Message message = event.getMessage();
-    TypedValue payload = message.getPayload();
+    TypedValue payload = event.getMessage().getPayload();
 
     if (payload.getValue() == null) {
       return event;
@@ -260,10 +258,9 @@ public final class StreamingUtils {
     TypedValue replacedPayload = consumeRepeatableValue(payload);
     if (replacedPayload != payload) {
       event = CoreEvent.builder(event).message(
-                                               withContextClassLoader(StreamingUtils.class.getClassLoader(),
-                                                                      () -> Message.builder(message))
-                                                                          .payload(replacedPayload)
-                                                                          .build())
+                                               Message.builder(event.getMessage(), StreamingUtils.class.getClassLoader())
+                                                   .payload(replacedPayload)
+                                                   .build())
           .build();
     }
 
@@ -325,10 +322,7 @@ public final class StreamingUtils {
 
   private static CoreEvent replacePayload(CoreEvent event, Object newPayload) {
     return CoreEvent.builder(event)
-        .message(withContextClassLoader(StreamingUtils.class.getClassLoader(), () -> Message.builder(event.getMessage()))
-            .value(newPayload)
-            .build())
-        .build();
+        .message(Message.builder(event.getMessage(), StreamingUtils.class.getClassLoader()).value(newPayload).build()).build();
   }
 
   private static void handlePossibleException(Reference<Throwable> exception) throws MuleException {
@@ -392,9 +386,7 @@ public final class StreamingUtils {
           return event;
         } else {
           Message message =
-              withContextClassLoader(StreamingUtils.class.getClassLoader(), () -> Message.builder(event.getMessage()))
-                  .payload(updatedPayload)
-                  .build();
+              Message.builder(event.getMessage(), StreamingUtils.class.getClassLoader()).payload(updatedPayload).build();
           return CoreEvent.builder(event).message(message).build();
         }
       }

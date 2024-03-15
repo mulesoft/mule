@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation.resulthandler;
 
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -49,7 +47,7 @@ public interface ReturnHandler<T> {
 
     @Override
     public Message.Builder toMessageBuilder(T value) {
-      return withContextClassLoader(this.getClass().getClassLoader(), () -> Message.builder().payload(TypedValue.of(value)));
+      return Message.builder(this.getClass().getClassLoader()).payload(TypedValue.of(value));
     }
 
     @Override

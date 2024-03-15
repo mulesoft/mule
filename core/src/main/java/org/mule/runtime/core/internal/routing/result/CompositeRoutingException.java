@@ -8,7 +8,6 @@ package org.mule.runtime.core.internal.routing.result;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
 import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyMap;
@@ -148,7 +147,7 @@ public final class CompositeRoutingException extends MuleException implements Co
 
   @Override
   public Message getErrorMessage() {
-    return withContextClassLoader(this.getClass().getClassLoader(), () -> of(routingResult));
+    return of(routingResult, this.getClass().getClassLoader());
   }
 
 }
