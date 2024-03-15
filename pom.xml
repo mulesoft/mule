@@ -440,6 +440,11 @@
                 <artifactId>commons-exec</artifactId>
                 <version>${commonsExecVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.testing.compile</groupId>
+                <artifactId>compile-testing</artifactId>
+                <version>0.21.0</version>
+            </dependency>
 
             <!-- NOT the service (with mule-service classifier) -->
             <!-- this raw jar is used in unit tests only -->
