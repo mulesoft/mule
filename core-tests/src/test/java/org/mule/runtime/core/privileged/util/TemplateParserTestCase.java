@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 @SmallTest
@@ -314,6 +315,23 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid("#['']"));
     assertFalse(tp.isValid("#[']"));
     assertFalse(tp.isValid("#[']'"));
+  }
+
+  @Test
+  @Issue("W-15141905")
+  public void muleParserShouldValidateEscapedCharacters() {
+    TemplateParser tp = createMuleStyleParser();
+
+    assertTrue(tp.isValid("#[\"\\test\\\"]"));
+    assertTrue(tp.isValid("#['\\test\\']"));
+    assertTrue(tp.isValid("#[\"\\test\\\"\"]"));
+    assertTrue(tp.isValid("#['\\test\\'']"));
+    assertTrue(tp.isValid("#[\\\"\\test\\\\\"]"));
+    assertTrue(tp.isValid("#[\\'\\test\\\\']"));
+    assertTrue(tp.isValid("#[abc\\\"def]"));
+    assertTrue(tp.isValid("#[abc\\'def]"));
+    assertTrue(tp.isValid("\\\\#["));
+    assertTrue(tp.isValid("\\\\#['"));
   }
 
   @Test
