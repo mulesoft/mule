@@ -184,7 +184,7 @@
         <muleTxExtVersion>4.6.0</muleTxExtVersion>
 
         <!-- Test Extensions -->
-        <muleTestingProcessingStrategiesExtensionVersion>4.6.0-rc5</muleTestingProcessingStrategiesExtensionVersion>
+        <muleTestingProcessingStrategiesExtensionVersion>4.6.0</muleTestingProcessingStrategiesExtensionVersion>
 
         <!--Maven plugins versions-->
         <dependency.plugin.version>3.5.0</dependency.plugin.version>
