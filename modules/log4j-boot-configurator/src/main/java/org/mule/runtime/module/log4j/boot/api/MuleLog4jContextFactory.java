@@ -62,7 +62,8 @@ import org.apache.logging.log4j.spi.LoggerContextFactory;
  *
  * @since 4.5
  */
-public class MuleLog4jContextFactory extends Log4jContextFactory implements ShutdownCallbackRegistry {
+public class MuleLog4jContextFactory extends Log4jContextFactory
+    implements ShutdownCallbackRegistry {
 
   private static final String LOG_CONFIGURATION_FACTORY_PROPERTY = "log4j.configurationFactory";
   private static final String DEFAULT_LOG_CONFIGURATION_FACTORY = XmlConfigurationFactory.class.getName();

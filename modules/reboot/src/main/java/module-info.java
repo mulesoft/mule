@@ -13,6 +13,7 @@
 module org.mule.boot {
 
   requires org.mule.boot.api;
+  requires org.mule.boot.commons;
 
   requires org.apache.commons.cli;
 }

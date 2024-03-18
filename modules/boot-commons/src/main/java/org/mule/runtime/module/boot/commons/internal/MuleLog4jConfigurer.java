@@ -4,7 +4,8 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal;
+package org.mule.runtime.module.boot.commons.internal;
+
 
 import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 

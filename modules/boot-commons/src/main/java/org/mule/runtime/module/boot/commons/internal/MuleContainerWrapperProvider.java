@@ -4,10 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal;
+package org.mule.runtime.module.boot.commons.internal;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+
+import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapper;
+import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider;
 
 /**
  * Helps with the creation and provisioning of the {@link MuleContainerWrapper} implementation instance as a singleton.
@@ -16,7 +19,7 @@ import static java.lang.System.getProperty;
  *
  * @since 4.5
  */
-public class MuleContainerWrapperProvider {
+public class MuleContainerWrapperProvider implements MuleContainerLifecycleWrapperProvider {
 
   private static final String MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY = "mule.bootstrap.container.wrapper.class";
   private static MuleContainerWrapper INSTANCE;
@@ -32,6 +35,12 @@ public class MuleContainerWrapperProvider {
       INSTANCE = createContainerWrapper();
     }
 
+    return INSTANCE;
+  }
+
+  @Override
+  public MuleContainerLifecycleWrapper getMuleContainerLifecycleWrapper() {
+    getMuleContainerWrapper();
     return INSTANCE;
   }
 

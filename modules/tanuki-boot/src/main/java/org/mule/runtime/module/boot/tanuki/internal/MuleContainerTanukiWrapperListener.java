@@ -16,7 +16,7 @@ import static org.tanukisoftware.wrapper.WrapperManager.getWrapperPID;
 import static org.tanukisoftware.wrapper.WrapperManager.log;
 
 import org.mule.runtime.module.boot.api.MuleContainer;
-import org.mule.runtime.module.boot.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerFactory;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

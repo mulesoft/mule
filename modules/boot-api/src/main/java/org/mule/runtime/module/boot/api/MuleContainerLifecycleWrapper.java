@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.boot.api;
 
-import org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider;
-
 /**
  * Manages the lifecycle of the {@link MuleContainer}.
  * 
@@ -20,9 +18,7 @@ public interface MuleContainerLifecycleWrapper {
    *
    * @return The {@link MuleContainerLifecycleWrapper} implementation.
    */
-  public static MuleContainerLifecycleWrapper getMuleContainerWrapper() {
-    return MuleContainerWrapperProvider.getMuleContainerWrapper();
-  }
+  public MuleContainerLifecycleWrapper getMuleContainerWrapper();
 
   /**
    * Requests that the JVM be restarted but then returns. This allows components to initiate a JVM exit and then continue,

@@ -6,11 +6,14 @@
  */
 package org.mule.runtime.module.boot.tanuki.internal;
 
+import static org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider.load;
+
 import static org.tanukisoftware.wrapper.WrapperManager.addWrapperEventListener;
 
-import org.mule.runtime.module.boot.internal.AbstractMuleContainerWrapper;
-import org.mule.runtime.module.boot.internal.MuleContainerFactory;
-import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
+import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapper;
+import org.mule.runtime.module.boot.commons.internal.AbstractMuleContainerWrapper;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerWrapper;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -67,6 +70,11 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
   @Override
   public void stop(int exitCode) {
     WrapperManager.stopAndReturn(exitCode);
+  }
+
+  @Override
+  public MuleContainerLifecycleWrapper getMuleContainerWrapper() {
+    return load(this.getClass().getClassLoader()).getMuleContainerLifecycleWrapper();
   }
 
   @Override

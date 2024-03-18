@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal.util;
+package org.mule.runtime.module.boot.commons.internal.util;
 
 import java.util.HashMap;
 import java.util.Map;
