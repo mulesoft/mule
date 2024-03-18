@@ -300,4 +300,18 @@
         <logger/>
     </flow>
 
+    <flow name="scopeWithOutputResolver">
+        <metadata:scope-with-metadata-resolver>
+            <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+        </metadata:scope-with-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithOutputResolver">
+        <metadata:router-with-metadata-resolver>
+            <metadata:metaroute>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:metaroute>
+        </metadata:router-with-metadata-resolver>
+    </flow>
+
 </mule>

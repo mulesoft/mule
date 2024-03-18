@@ -71,7 +71,7 @@ public class ImmutableProcessorChildContextChainExecutor implements ChildContext
     this.chain = chain;
     this.oldContext = (BaseEventContext) this.originalEvent.getContext();
     this.delegate = new ImmutableProcessorChainExecutor(streamingManager, this.originalEvent, this.chain);
-    this.location = chain.getLocation();
+    this.location = (ComponentLocation) chain.getAnnotation(CHAIN_OWNER_LOCATION_KEY);
     this.chainExecutor = new ChainExecutor(chain, originalEvent);
   }
 

@@ -25,6 +25,8 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
@@ -40,6 +42,8 @@ import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
+import org.mule.test.metadata.extension.resolver.RouterTestResolver;
+import org.mule.test.metadata.extension.resolver.ScopeTestResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAttributesResolverWithKeyResolver;
@@ -377,5 +381,18 @@ public class MetadataOperations {
   public Object inputMetadataResolverInParameterInParameterGroup(@ParameterGroup(
       name = "Animal shelter") AnimalShelter animalShelter) {
     return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = ScopeTestResolver.class)
+  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Object, Void> cb) {
+    chain.process(cb::success, (t, e) -> cb.error(t));
+    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = RouterTestResolver.class)
+  public void routerWithMetadataResolver(MetadataRoute metaroute, CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
   }
 }

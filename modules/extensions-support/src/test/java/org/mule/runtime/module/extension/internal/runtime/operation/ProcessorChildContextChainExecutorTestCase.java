@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain.CHAIN_OWNER_LOCATION_KEY;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CORRELATION_ID;
 import static org.mule.test.allure.AllureConstants.CorrelationIdFeature.CorrelationIdOnSourcesStory.CORRELATION_ID_MODIFICATION;
 
@@ -79,7 +80,7 @@ public class ProcessorChildContextChainExecutorTestCase extends AbstractMuleCont
     SdkInternalContext content = new SdkInternalContext();
     ((InternalEvent) this.coreEvent).setSdkInternalContext(content);
     content.putContext(someLocation, coreEvent.getCorrelationId());
-    when(chain.getLocation()).thenReturn(someLocation);
+    when(chain.getAnnotation(CHAIN_OWNER_LOCATION_KEY)).thenReturn(someLocation);
     when(chain.apply(any())).thenAnswer(inv -> Mono.<CoreEvent>from(inv.getArgument(0))
         .map(event -> {
           try {
