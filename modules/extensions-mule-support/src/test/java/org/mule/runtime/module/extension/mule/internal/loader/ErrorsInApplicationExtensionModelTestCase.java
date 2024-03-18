@@ -56,15 +56,16 @@ public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunct
     // We can't guess what errors will set-payload raise (this operation will raise a "MULE:EXPRESSION" error).
     expectedErrors.put("divisionByZero", emptySet());
 
-    expectedErrors.put("operationSilencingOneSpecificErrorAndRaisingAnother", asSet("HEISENBERG:OAUTH2", "THIS:CUSTOM"));
-    expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", singleton("THIS:CUSTOM"));
-    expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", singleton("THIS:HEALTH"));
-    expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", singleton("HEISENBERG:OAUTH2"));
+    expectedErrors.put("operationSilencingOneSpecificErrorAndRaisingAnother",
+                       asSet("HEISENBERG:OAUTH2", "THIS:CUSTOM", "MULE:TRANSACTION"));
+    expectedErrors.put("operationSilencingAllErrorsAndRaisingAnother", asSet("THIS:CUSTOM", "MULE:TRANSACTION"));
+    expectedErrors.put("operationSilencingAllHeisenbergErrorsAndRaisingAnother", asSet("THIS:HEALTH", "MULE:TRANSACTION"));
+    expectedErrors.put("operationSilencingAllHealthErrorsWithinACatchAll", asSet("HEISENBERG:OAUTH2", "MULE:TRANSACTION"));
 
-    expectedErrors.put("operationRaisingUniqueErrorAndCatchingIt", emptySet());
+    expectedErrors.put("operationRaisingUniqueErrorAndCatchingIt", singleton("MULE:TRANSACTION"));
 
-    expectedErrors.put("operationWithMultipleOnErrorContinues", emptySet());
-    expectedErrors.put("operationCatchingAllButWithWhen", asSet("HEISENBERG:OAUTH2", "HEISENBERG:HEALTH"));
+    expectedErrors.put("operationWithMultipleOnErrorContinues", singleton("MULE:TRANSACTION"));
+    expectedErrors.put("operationCatchingAllButWithWhen", asSet("HEISENBERG:OAUTH2", "HEISENBERG:HEALTH", "MULE:TRANSACTION"));
   }
 
   @Inject
@@ -92,7 +93,7 @@ public class ErrorsInApplicationExtensionModelTestCase extends MuleArtifactFunct
                containsInAnyOrder("THIS:CONNECTIVITY", "MULE:ANY", "MULE:RETRY_EXHAUSTED", "THIS:RETRY_EXHAUSTED",
                                   "MULE:CONNECTIVITY", "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2", "THIS:CUSTOM", "THIS:HEALTH",
                                   "THIS:UNIQUE", "MY:MAPPED", "MY:MAPPEDCONNECTIVITY", "THIS:FOURTH", "THIS:THIRD", "THIS:SECOND",
-                                  "THIS:FIRST"));
+                                  "THIS:FIRST", "MULE:TRANSACTION"));
   }
 
   @Test

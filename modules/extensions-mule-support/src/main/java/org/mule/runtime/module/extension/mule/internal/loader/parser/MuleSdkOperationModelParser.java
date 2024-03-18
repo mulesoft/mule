@@ -403,14 +403,14 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
           if (filtered.contains(componentAst) || ignoreCondition.test(componentAstWithHierarchy)) {
             return Stream.empty();
+          } else if (filterCondition.test(componentAstWithHierarchy)) {
+            recursiveAddToFiltered(componentAst, filtered);
+            return Stream.empty();
           }
           Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
           if (operationModel.isPresent()) {
             // It's an operation ast, with an operation model.
             return Stream.of(componentAstWithHierarchy);
-          } else if (filterCondition.test(componentAstWithHierarchy)) {
-            recursiveAddToFiltered(componentAst, filtered);
-            return Stream.empty();
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
             return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAstWithHierarchy,
                                                filterCondition, ignoreCondition);

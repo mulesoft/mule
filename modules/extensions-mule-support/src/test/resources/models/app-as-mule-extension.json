@@ -51,7 +51,9 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -1265,6 +1267,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -1748,6 +1751,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2138,6 +2142,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2555,6 +2560,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2902,7 +2908,9 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -3551,6 +3559,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -4343,6 +4352,11 @@
     {
       "error": "THIS:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "MULE:ROUTING",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
