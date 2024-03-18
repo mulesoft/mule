@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <groupId>org.mule.tests.plugin</groupId>
     <artifactId>mule-tests-component-plugin</artifactId>
@@ -13,6 +13,9 @@
     <description>Mule test framework components (TCK)</description>
 
     <properties>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+
+        <javaModuleName>org.mule.test.component.plugin</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -64,6 +67,11 @@
             <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

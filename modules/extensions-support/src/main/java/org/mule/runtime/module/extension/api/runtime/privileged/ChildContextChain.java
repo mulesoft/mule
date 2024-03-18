@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.api.runtime.privileged;
 
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+
+import javax.xml.namespace.QName;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -18,6 +20,13 @@ import java.util.function.Consumer;
  * @since 4.4.0
  */
 public interface ChildContextChain extends Chain {
+
+  /**
+   * Key for annotation to be used to set the location of the owner of this {@link ChildContextChain}.
+   * 
+   * @since 4.7
+   */
+  QName CHAIN_OWNER_LOCATION_KEY = new QName("http://www.mulesoft.org/schema/mule/parser-metadata", "CHAIN_OWNER_LOCATION");
 
   /**
    * Same as {@link Chain#process(Consumer, BiConsumer)}, setting the correlation id within the execution as the the one passed.

@@ -1,19 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
+import static org.mule.oauth.client.api.builder.ClientCredentialsLocation.BODY;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.store.ObjectStoreSettings.unmanagedTransient;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.getCallbackValuesExtractors;
-import static org.mule.runtime.oauth.api.builder.ClientCredentialsLocation.BODY;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.store.ObjectStore;
@@ -25,7 +27,6 @@ import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdap
 import org.mule.runtime.oauth.api.PlatformManagedOAuthDancer;
 import org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder;
 import org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;
 import java.util.function.Function;

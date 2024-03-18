@@ -1,21 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.api.span.info;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
-
 import static java.util.Collections.emptyMap;
+
+import org.mule.runtime.api.profiling.tracing.Span;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * Initial info for a starting an {@link InternalSpan}.
+ * Initial info for a starting an {@link Span}.
  *
  * @since 4.5.0
  */
@@ -27,18 +26,18 @@ public interface InitialSpanInfo {
   String getName();
 
   /**
+   * @return indicates that the {@link Span} belongs to a policy.
+   */
+  default boolean isPolicySpan() {
+    return false;
+  }
+
+  // TODO: Technical debt: verify order of spans in the case of policies (W-12041739)
+  /**
    * @return initial attributes for the span.
    */
   default Map<String, String> getInitialAttributes() {
     return emptyMap();
-  }
-
-  /**
-   * @return indicates that the {@link InternalSpan} belongs to a policy. TODO: Technical debt: verify order of spans in the case
-   *         of policies (W-12041739)
-   */
-  default boolean isPolicySpan() {
-    return false;
   }
 
   /**

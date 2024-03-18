@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -85,7 +85,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -110,7 +109,10 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
   private final Optional<ComponentModelInitializer> parentComponentModelInitializer;
 
-  private final ArtifactAstDependencyGraph graph;
+  // postProcessedGraph is used when we get locations and initialize some components
+  // while baseGraph is used when we validate Ast during lazy-init.
+  private final ArtifactAstDependencyGraph postProcessedGraph;
+  private final ArtifactAstDependencyGraph baseGraph;
   private final ComponentInitializationState currentComponentInitializationState;
 
   // Used for detecting cycles when initializing beans that are dynamically referenced
@@ -176,10 +178,12 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     this.artifactProperties = artifactProperties;
     this.runtimeLockFactory = runtimeLockFactory;
 
+    this.baseGraph = generateFor(getApplicationModel());
+
     initialize();
     // Graph should be generated after the initialize() method since the applicationModel will change by macro expanding XmlSdk
     // components.
-    this.graph = generateFor(getApplicationModel());
+    this.postProcessedGraph = generateFor(getApplicationModel());
   }
 
   @Override
@@ -227,36 +231,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   @Override
-  public Object getBean(String name, Object... args) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(name, args);
-  }
-
-  @Override
-  public <T> T getBean(Class<T> requiredType) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(requiredType);
-  }
-
-  @Override
-  public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
-    throwIfInitializationAlreadyDone();
-    return super.getBean(requiredType, args);
-  }
-
-  @Override
-  public <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType) {
-    throwIfInitializationAlreadyDone();
-    return super.getBeanProvider(requiredType);
-  }
-
-  @Override
-  public <T> ObjectProvider<T> getBeanProvider(ResolvableType requiredType) {
-    throwIfInitializationAlreadyDone();
-    return super.getBeanProvider(requiredType);
-  }
-
-  @Override
   public boolean containsBean(String name) {
     return tryWithLazyInitializationFallback(name, () -> super.containsBean(name));
   }
@@ -296,12 +270,6 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   @Override
   public String[] getAliases(String name) {
     return tryWithLazyInitializationFallback(name, () -> super.getAliases(name));
-  }
-
-  private void throwIfInitializationAlreadyDone() {
-    if (currentComponentInitializationState.isInitializationAlreadyDone()) {
-      throw new UnsupportedOperationException("Operation is not supported after initialization");
-    }
   }
 
   private <T> T tryWithLazyInitializationFallback(String name, Supplier<T> supplier) {
@@ -457,7 +425,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   }
 
   private ComponentInitializationRequest.Builder getRequestBuilder(boolean applyStartPhase, boolean keepPrevious) {
-    return new ComponentInitializationRequest.Builder(graph,
+    return new ComponentInitializationRequest.Builder(postProcessedGraph,
+                                                      baseGraph,
                                                       currentComponentInitializationState,
                                                       MuleArtifactContext::isAlwaysEnabledComponent,
                                                       applyStartPhase,
@@ -489,11 +458,11 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
   private void initializeComponentsFromParent(Optional<ComponentModelInitializerAdapter> parentComponentModelInitializerAdapter) {
     if (parentComponentModelInitializerAdapter.isPresent()) {
       parentComponentModelInitializerAdapter.get()
-          .initializeComponents(componentModel -> graph.getMissingDependencies()
+          .initializeComponents(componentModel -> postProcessedGraph.getMissingDependencies()
               .stream()
               .anyMatch(missingDep -> missingDep.isSatisfiedBy(componentModel)));
     } else {
-      graph.getMissingDependencies().stream().forEach(missingDep -> {
+      postProcessedGraph.getMissingDependencies().stream().forEach(missingDep -> {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("Ignoring dependency {} because it does not exist.", missingDep);
         }
@@ -501,8 +470,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
     }
   }
 
-  private void validateRequestedComponentExists(Location location, ArtifactAst minimalArtifactAst) {
-    if (minimalArtifactAst.recursiveStream()
+  private void validateRequestedComponentExists(Location location, ArtifactAst postProcessedMinimalArtifactAst) {
+    if (postProcessedMinimalArtifactAst.recursiveStream()
         .noneMatch(comp -> comp.getLocation() != null
             && comp.getLocation().getLocation().equals(location.toString()))) {
       throw new NoSuchComponentModelException(createStaticMessage("No object found at location "
@@ -615,6 +584,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Handle orphan components without name, rely on the location.
     orphanComponents.stream()
+        .filter(cm -> !isIgnored(cm))
         .forEach(cm -> {
           final SpringComponentModel springCompModel = springComponentModels.get(cm);
           final BeanDefinition beanDef = springCompModel.getBeanDefinition();
@@ -683,8 +653,8 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
 
     // Sort in order to later initialize and start components according to their dependencies
     List<Object> sortedObjects = new ArrayList<>(objects.values());
-    sort(sortedObjects, (o1, o2) -> graph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
-                                                                         componentNames.get(o2).getSecond()));
+    sort(sortedObjects, (o1, o2) -> postProcessedGraph.dependencyComparator().compare(componentNames.get(o1).getSecond(),
+                                                                                      componentNames.get(o2).getSecond()));
     return sortedObjects;
   }
 
@@ -754,7 +724,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       try {
         unregisterObject(getMuleContext(), beanName);
       } catch (Exception e) {
-        logger.error(
+        LOGGER.error(
                      format("Exception unregistering an object during lazy initialization of component %s, exception message is %s",
                             beanName, e.getMessage()));
         throw new MuleRuntimeException(I18nMessageFactory

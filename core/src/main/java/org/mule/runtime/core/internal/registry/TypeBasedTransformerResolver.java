@@ -1,29 +1,31 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformHasMultipleMatches;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.sort;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
-import org.mule.runtime.core.api.config.i18n.CoreMessages;
 import org.mule.runtime.core.api.transformer.Converter;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.transformer.ResolverException;
+import org.mule.runtime.core.internal.transformer.TransformerChain;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.transformer.graph.GraphTransformerResolver;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToString;
-import org.mule.runtime.core.privileged.transformer.TransformerChain;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +80,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
     }
 
     transformer = getNearestTransformerMatch(trans, source.getType(), result.getType());
-    // If an exact mach is not found, we have a 'second pass' transformer that can be used to converting to String or
+    // If an exact match is not found, we have a 'second pass' transformer that can be used to converting to String or
     // byte[]
     Transformer secondPass;
     if (transformer == null) {
@@ -126,8 +128,8 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
         // We may have two transformers that are exactly the same, in which case we can use either i.e. use the current
         TransformerWeighting current = weightings.get(index);
         if (!maxWeighting.getTransformer().getClass().equals(current.getTransformer().getClass())) {
-          List<Transformer> transformers = Arrays.asList(current.getTransformer(), maxWeighting.getTransformer());
-          throw new ResolverException(CoreMessages.transformHasMultipleMatches(input, output, transformers));
+          List<Transformer> transformers = asList(current.getTransformer(), maxWeighting.getTransformer());
+          throw new ResolverException(transformHasMultipleMatches(input, output, transformers));
         }
       }
 
@@ -147,7 +149,7 @@ public class TypeBasedTransformerResolver implements TransformerResolver, Dispos
       weightings.add(transformerWeighting);
     }
 
-    Collections.sort(weightings);
+    sort(weightings);
 
     return weightings;
   }

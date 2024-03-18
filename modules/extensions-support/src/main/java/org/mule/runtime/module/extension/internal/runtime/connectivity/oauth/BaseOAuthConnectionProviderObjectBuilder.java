@@ -1,18 +1,17 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OAUTH_STORE_CONFIG_GROUP_NAME;
 import static org.mule.runtime.extension.api.connectivity.oauth.ExtensionOAuthConstants.OBJECT_STORE_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.HEADERS;
-import static org.mule.runtime.extension.api.runtime.parameter.HttpParameterPlacement.QUERY_PARAMS;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
@@ -23,8 +22,8 @@ import org.mule.runtime.api.util.MultiMap;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.MapValueResolver;
@@ -165,12 +164,18 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
 
       final MultiMap<String, String> target;
 
-      if (property.getPlacement() == QUERY_PARAMS) {
-        target = params.getQueryParams();
-      } else if (property.getPlacement() == HEADERS) {
-        target = params.getHeaders();
-      } else {
-        throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
+      switch (property.getPlacement()) {
+        case QUERY_PARAMS:
+          target = params.getQueryParams();
+          break;
+        case HEADERS:
+          target = params.getHeaders();
+          break;
+        case BODY:
+          target = params.getBodyParams();
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown parameter placement: " + property.getPlacement());
       }
 
       if (value instanceof Map) {
@@ -185,17 +190,4 @@ public abstract class BaseOAuthConnectionProviderObjectBuilder<C> extends Defaul
     return params;
   }
 
-  protected class CustomOAuthParameters {
-
-    private MultiMap<String, String> queryParams = new MultiMap<>();
-    private MultiMap<String, String> headers = new MultiMap<>();
-
-    public MultiMap<String, String> getQueryParams() {
-      return queryParams;
-    }
-
-    public MultiMap<String, String> getHeaders() {
-      return headers;
-    }
-  }
 }

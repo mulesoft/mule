@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,13 +7,18 @@
 package org.mule.test.module.extension.transaction;
 
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
 
+import static java.lang.Thread.sleep;
+
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.construct.Flow;
+import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -29,16 +34,15 @@ import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
-
-import javax.transaction.TransactionManager;
 
 @RunnerDelegateTo(Parameterized.class)
 public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTestCase {
 
-  private boolean isSdkApi;
-  private String configFile;
+  private final boolean isSdkApi;
+  private final String configFile;
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
@@ -63,7 +67,6 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     MessageStorage.clean();
     TransactionalSource.isSuccess = null;
     SdkTransactionalSource.isSuccess = null;
-    muleContext.setTransactionManager(mock(TransactionManager.class));
   }
 
   @After
@@ -137,6 +140,14 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
     validateNonTxConnection(MessageStorage.messages.poll());
   }
 
+  @Test
+  public void sourceWithTxAndTimeout() throws Exception {
+    startFlow("sourceWithTimeout");
+
+    validateFlow(false);
+    validateRolledBackedTransaction(MessageStorage.messages.poll());
+  }
+
   private void startFlow(String flowName) throws Exception {
     ((Flow) getFlowConstruct(flowName)).start();
   }
@@ -178,6 +189,20 @@ public class TransactionalSourceTestCase extends AbstractExtensionFunctionalTest
       assertThat(((SdkTestTransactionalConnection) connection).isTransactionRolledback(), is(rolledBack));
     } else {
       throw new RuntimeException("Stored object is not a valid type of connection");
+    }
+  }
+
+
+  public static class SleepProcessor implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      try {
+        sleep(3000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return event;
     }
   }
 }

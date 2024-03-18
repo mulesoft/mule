@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.service.internal.discoverer;
 
 import org.mule.runtime.api.service.Service;
@@ -16,6 +15,7 @@ import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * Resolves {@link Service} instances given a set of {@link ServiceProvider} instances.
@@ -32,17 +32,22 @@ public class ReflectionServiceResolver implements ServiceResolver {
 
   private final ServiceRegistry serviceRegistry;
   private final Injector containerInjector;
+  private final BiFunction<Service, ServiceAssembly, Service> serviceWrapper;
 
-  public ReflectionServiceResolver(ServiceRegistry serviceRegistry, Injector containerInjector) {
+  public ReflectionServiceResolver(ServiceRegistry serviceRegistry,
+                                   Injector containerInjector,
+                                   BiFunction<Service, ServiceAssembly, Service> serviceWrapper) {
     this.serviceRegistry = serviceRegistry;
     this.containerInjector = containerInjector;
+    this.serviceWrapper = serviceWrapper;
   }
 
   @Override
   public List<Service> resolveServices(List<ServiceAssembly> assemblies) {
     List<Service> services = new ArrayList<>(assemblies.size());
     for (ServiceAssembly assembly : assemblies) {
-      Service service = LazyServiceProxy.from(assembly, serviceRegistry, containerInjector);
+      Service service = serviceWrapper.apply(LazyServiceProxy.from(assembly, serviceRegistry, containerInjector),
+                                             assembly);
 
       serviceRegistry.register(service, assembly.getServiceContract());
       services.add(service);

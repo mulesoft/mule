@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +11,7 @@ import static org.mule.runtime.config.internal.context.BaseSpringMuleContextServ
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.tck.util.MuleContextUtils.getRegistry;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
 
 import static java.util.Collections.emptyMap;
@@ -19,19 +20,23 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.lazy.LazyExpressionLanguageAdaptor;
 import org.mule.runtime.config.internal.registry.BaseSpringRegistry;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.context.DefaultMuleContext;
 import org.mule.runtime.core.internal.el.ExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.dataweave.DataWeaveExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.registry.Registry;
@@ -44,7 +49,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -66,7 +70,7 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
   public static final String SCHEMA_VALIDATION_ERROR =
       "Can't resolve http://www.mulesoft.org/schema/mule/invalid-namespace/current/invalid-schema.xsd, A dependency or plugin might be missing";
 
-  private MuleContextWithRegistry muleContext;
+  private MuleContext muleContext;
 
   @Rule
   public ExpectedException expectedException = none();
@@ -96,23 +100,15 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
       ConfigurationException {
     final ArtifactAstConfigurationBuilder configurationBuilder =
         astConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), lazyInit);
-    ArgumentCaptor<Registry> registryCaptor = ArgumentCaptor.forClass(Registry.class);
     configurationBuilder.configure(muleContext);
 
-    verify(muleContext, atLeastOnce()).setRegistry(registryCaptor.capture());
-
-    List<Registry> registries = registryCaptor.getAllValues();
-
-    assertThat(registries.get(0), instanceOf(BaseSpringRegistry.class));
-
-    BaseSpringRegistry baseSpringRegistry = (BaseSpringRegistry) registries.get(0);
+    BaseSpringRegistry baseSpringRegistry = getRegistry(muleContext, BaseSpringRegistry.class);
     ExpressionLanguageAdaptor dataWeaveExpressionLanguageAdaptor =
         baseSpringRegistry.get(OBJECT_DW_EXPRESSION_LANGUAGE_ADAPTER);
 
     assertThat(dataWeaveExpressionLanguageAdaptor, is(notNullValue()));
     assertThat(dataWeaveExpressionLanguageAdaptor, instanceOf(expectedClass));
   }
-
 
   @Test
   public void memoryManagementCanBeInjectedInBean() throws MuleException, IOException {
@@ -125,6 +121,32 @@ public class ArtifactAstConfigurationBuilderTestCase extends AbstractMuleTestCas
     artifactContext.getMuleContext().getInjector().inject(memoryManagementInjected);
 
     assertThat(memoryManagementInjected.getMemoryManagementService(), is(notNullValue()));
+  }
+
+  @Test
+  @Issue("W-13969259")
+  public void baseRegistryDisposedOnDeploymentError() throws IOException {
+    final ArtifactAstConfigurationBuilder configurationBuilder =
+        astConfigurationBuilderRelativeToPath(tempFolder.getRoot(), emptyArtifact(), false);
+
+    final ArgumentCaptor<Registry> registryCaptor = forClass(Registry.class);
+    doNothing()
+        .when((DefaultMuleContext) muleContext)
+        .setRegistry(registryCaptor.capture());
+
+    doThrow(IllegalStateException.class)
+        .when((DefaultMuleContext) muleContext)
+        // some method called within the configuration that uses the baseRegistry
+        .getExtensionManager();
+
+    try {
+      configurationBuilder.configure(muleContext);
+      fail("Expected IllegalStateException");
+    } catch (ConfigurationException e) {
+      assertThat(e.getCause(), instanceOf(IllegalStateException.class));
+      final BaseSpringRegistry baseRegistry = (BaseSpringRegistry) (registryCaptor.getValue());
+      assertThat(baseRegistry.getLifecycleManager().getLastExecutedPhase(), is(Disposable.PHASE_NAME));
+    }
   }
 
   private ArtifactAstConfigurationBuilder astConfigurationBuilderRelativeToPath(File basePath, ArtifactAst artifactAst,

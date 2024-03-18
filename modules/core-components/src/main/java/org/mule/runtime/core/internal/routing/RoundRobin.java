@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,10 +17,10 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.routing.result.CouldNotRouteOutboundMessageException;
+import org.mule.runtime.core.internal.routing.result.RoutingException;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException;
-import org.mule.runtime.core.privileged.routing.RoutingException;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +49,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  ComponentTracerFactory componentTracerFactory;
 
   @Override
   public void setMuleContext(MuleContext context) {
@@ -63,7 +63,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   @Override
   public void initialise() throws InitialisationException {
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
+      route.setComponentTracer(componentTracerFactory.fromComponent(this, ROUND_ROBIN_ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -94,7 +94,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
+    routes.add(new ProcessorRoute(processor, componentTracerFactory));
   }
 
   @Override
@@ -121,7 +121,7 @@ public class RoundRobin extends AbstractComponent implements Router, Lifecycle, 
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, initialSpanInfoProvider);
+      super(publisher, routes, componentTracerFactory);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -119,7 +119,10 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
             hasMediaTypeModelProperty(model) &&
             mediaTypeModelPropertyHasDefaultValue(mediaTypeModelProperty.get()) &&
         // Because the value is defaulted, the mediaType in the model property is null
-            !hasStaticMetadataDefined(model, null);
+            !hasStaticMetadataDefined(model, null) &&
+        // if it is a router-operation and it has a RouterCompletionCallback, then we avoid this validation due to compatibility
+        // reasons
+            !isCompatibilityRouter(model);
       }
 
       private boolean staticResolverClashesWithMediaTypeAnnotationValue(ConnectableComponentModel model,
@@ -136,7 +139,15 @@ public class MediaTypeModelValidator implements ExtensionModelValidator {
         return outputTypeNeedsMediaTypeAnnotation(outputMetadataType) &&
             !hasMediaTypeModelProperty(model) &&
         // Since the model property is missing, there is no media type
-            !hasStaticMetadataDefined(model, null);
+            !hasStaticMetadataDefined(model, null) &&
+        // if it is a router-operation and it has a RouterCompletionCallback, then we avoid this validation due to compatibility
+        // reasons
+            !isCompatibilityRouter(model);
+      }
+
+      private boolean isCompatibilityRouter(ConnectableComponentModel model) {
+        return model.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
+            .map(ExtensionOperationDescriptorModelProperty::hasDeprecatedRouterCompletionCallback).orElse(false);
       }
 
       private boolean hasStaticMetadataDefined(ConnectableComponentModel model, MediaType mediaTypeFromModelProperty) {

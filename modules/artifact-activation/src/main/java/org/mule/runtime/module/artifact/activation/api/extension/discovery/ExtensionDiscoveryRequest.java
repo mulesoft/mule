@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -88,6 +88,11 @@ public interface ExtensionDiscoveryRequest {
    */
   boolean isOCSEnabled();
 
+  /**
+   * @return whether the validation must be validated after being loaded.
+   */
+  boolean isForceExtensionValidation();
+
   @NoInstantiate
   final class ExtensionDiscoveryRequestBuilder {
 
@@ -96,6 +101,7 @@ public interface ExtensionDiscoveryRequest {
     private boolean parallelDiscovery = false;
     private boolean enrichDescriptions = true;
     private boolean ocsEnabled = false;
+    private boolean forceExtensionValidation = false;
     private final Map<String, Object> customParameters = new HashMap<>();
 
     public ExtensionDiscoveryRequestBuilder setArtifactPlugins(Collection<ArtifactPluginDescriptor> artifactPlugins) {
@@ -120,6 +126,11 @@ public interface ExtensionDiscoveryRequest {
 
     public ExtensionDiscoveryRequestBuilder setOCSEnabled(boolean ocsEnabled) {
       this.ocsEnabled = ocsEnabled;
+      return this;
+    }
+
+    public ExtensionDiscoveryRequestBuilder setForceExtensionValidation(boolean forceExtensionValidation) {
+      this.forceExtensionValidation = forceExtensionValidation;
       return this;
     }
 
@@ -151,8 +162,13 @@ public interface ExtensionDiscoveryRequest {
     }
 
     public ExtensionDiscoveryRequest build() {
-      return new DefaultExtensionDiscoveryRequest(artifactPlugins, parentArtifactExtensions,
-                                                  parallelDiscovery, enrichDescriptions, ocsEnabled, customParameters);
+      return new DefaultExtensionDiscoveryRequest(artifactPlugins,
+                                                  parentArtifactExtensions,
+                                                  parallelDiscovery,
+                                                  enrichDescriptions,
+                                                  ocsEnabled,
+                                                  forceExtensionValidation,
+                                                  customParameters);
     }
   }
 }

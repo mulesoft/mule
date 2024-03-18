@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-modules</artifactId>
     <packaging>pom</packaging>
@@ -20,29 +20,33 @@
         <module>all-modules</module>
         <module>artifact</module>
         <module>artifact-activation</module>
+        <module>boot-api</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>
         <module>deployment-model-impl</module>
         <module>core-components</module>
-        <module>core-mvel</module>
         <module>extensions-support</module>
         <module>extensions-xml-support</module>
         <module>global-config</module>
         <module>javaee</module>
         <module>launcher</module>
         <module>license-api</module>
+        <module>log4j-boot-configurator</module>
+        <module>log4j-configurator</module>
         <module>logging</module>
         <module>metadata-support</module>
         <module>http-api</module>
         <module>oauth-api</module>
         <module>reboot</module>
+        <module>tanuki-boot</module>
+        <module>jpms-utils</module>
         <module>properties-config</module>
         <module>spring-config</module>
         <module>service</module>
-        <module>troubleshooting</module>
         <module>feature-management</module>
         <module>memory-management-parent</module>
+        <module>jar-handling-utils</module>
 
         <!-- depends on spring-config so it has to go after it -->
         <module>extensions-spring-support</module>
@@ -52,7 +56,10 @@
         <module>soap-api</module>
         <module>extensions-soap-support</module>
         <module>tracing</module>
+        <module>metrics</module>
+        <module>troubleshooting</module>
         <module>tooling-support</module>
+        <module>observability</module>
     </modules>
 
     <build>

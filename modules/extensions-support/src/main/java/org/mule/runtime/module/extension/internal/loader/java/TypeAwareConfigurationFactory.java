@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,13 +9,14 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.checkInstantiable;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationFactory;
+import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 /**
@@ -49,9 +50,15 @@ public final class TypeAwareConfigurationFactory implements ConfigurationFactory
       } else {
         return withContextClassLoader(this.extensionClassLoader, () -> {
           // We must add the annotations support with a proxy to avoid the SDK user to clutter the POJO definitions in an
-          // extension
-          // with the annotations stuff.
-          return addAnnotationsToClass(configurationType);
+          // extension with the annotations stuff.
+          Class<?> annotated = addAnnotationsToClass(configurationType);
+          if (extensionClassLoader instanceof WithAttachedClassLoaders) {
+            // The annotated class is added to a spring cache that has to be cleared later, and for that we'll need the
+            // classloader it was loaded with (or a classloader in the parents' hierarchy).
+            // For the cleaning part, see MuleArtifactContext code.
+            ((WithAttachedClassLoaders) extensionClassLoader).attachClassLoader(annotated.getClassLoader().getParent());
+          }
+          return annotated;
         });
       }
     });

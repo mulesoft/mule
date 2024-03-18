@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -38,6 +38,7 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
   private final AtomicBoolean initialised = new AtomicBoolean(false);
 
   private String logException = TRUE.toString();
+  private boolean enableNotifications = true;
 
   public List<Processor> getMessageProcessors() {
     return messageProcessors;
@@ -107,6 +108,14 @@ public abstract class AbstractDeclaredExceptionListener extends AbstractMessageP
 
   public void setLogException(String logException) {
     this.logException = logException;
+  }
+
+  public boolean getEnableNotifications() {
+    return enableNotifications;
+  }
+
+  public void setEnableNotifications(boolean enableNotifications) {
+    this.enableNotifications = enableNotifications;
   }
 
 }

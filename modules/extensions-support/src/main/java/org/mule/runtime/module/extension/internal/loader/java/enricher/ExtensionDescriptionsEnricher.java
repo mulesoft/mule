@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -47,7 +47,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
    */
   @Override
   public void enrich(ExtensionLoadingContext loadingContext) {
-    if (isDisableDscriptionsEnrichment(loadingContext)) {
+    if (isDisableDescriptionsEnrichment(loadingContext)) {
       return;
     }
 
@@ -67,7 +67,7 @@ public final class ExtensionDescriptionsEnricher implements DeclarationEnricher 
     }
   }
 
-  public boolean isDisableDscriptionsEnrichment(ExtensionLoadingContext loadingContext) {
+  public boolean isDisableDescriptionsEnrichment(ExtensionLoadingContext loadingContext) {
     return loadingContext.getParameter(DISABLE_DESCRIPTIONS_ENRICHMENT)
         .map(v -> v instanceof Boolean ? (Boolean) v : false)
         .orElse(false);

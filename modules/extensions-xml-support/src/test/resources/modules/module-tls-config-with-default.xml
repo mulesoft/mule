@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="module-tls-config-with-default"
+        xmlns="http://www.mulesoft.org/schema/mule/module"
+        xmlns:petstore="http://www.mulesoft.org/schema/mule/petstore"
+        xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
+           http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+           http://www.mulesoft.org/schema/mule/petstore http://www.mulesoft.org/schema/mule/petstore/current/mule-petstore.xsd ">
+
+    <property name="someUserConfig" type="string"/>
+    <property name="somePassConfig" type="string"/>
+
+    <petstore:config name="petstore-config" cashierName="cashierName">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]" xmlns:tlsEnabled="true">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit2"/>
+            </tls:context>
+        </petstore:connection>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <petstore:config name="petstore-config-fixed-tls" cashierName="cashierName" xmlns:connection="true">
+        <petstore:connection username="#[vars.someUserConfig]" password="#[vars.somePassConfig]">
+            <tls:context>
+                <tls:trust-store path="ssltest-cacerts.jks" password="changeit2"/>
+            </tls:context>
+        </petstore:connection>
+        <petstore:pets>
+            <petstore:pet value="Dog"/>
+        </petstore:pets>
+    </petstore:config>
+
+    <operation name="get-pet-store-client">
+        <body>
+            <petstore:get-client config-ref="petstore-config" />
+        </body>
+        <output type="any"/>
+    </operation>
+
+    <operation name="get-pet-store-client-fixed-tls">
+        <body>
+            <petstore:get-client config-ref="petstore-config-fixed-tls" />
+        </body>
+        <output type="any"/>
+    </operation>
+</module>

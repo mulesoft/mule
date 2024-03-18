@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.lang.Thread.currentThread;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -27,14 +28,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
 @SmallTest
 public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTestCase {
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
   private SystemExceptionHandler exceptionHandler;
@@ -62,14 +67,18 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
     processingManager.setPolicyManager(policyManager);
 
     processingManager.initialise();
-
-    when(spyContext.getTransactionManager()).thenReturn(null);
   }
 
   @Test
   public void processesWithClassLoader() {
     ClassLoader classLoader = new URLClassLoader(new URL[] {}, currentThread().getContextClassLoader());
     when(messageProcessContext.getExecutionClassLoader()).thenReturn(classLoader);
+
+    doAnswer(inv -> {
+      exceptionHandler.handleException(inv.getArgument(0));
+      return null;
+    }).when(template).sendFailureResponseToClient(any(), any(), any());
+
     doAnswer(inv -> {
       assertThat(currentThread().getContextClassLoader(), is(sameInstance(classLoader)));
       return null;

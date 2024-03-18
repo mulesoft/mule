@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,9 +14,9 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.Answers.RETURNS_MOCKS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atLeastOnce;
@@ -29,13 +29,14 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.api.util.tck.ExtensionModelTestUtils.visitableMock;
+import static org.mule.runtime.api.test.util.tck.ExtensionModelTestUtils.visitableMock;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STREAMING_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
@@ -84,7 +85,6 @@ import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
@@ -138,7 +138,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Rule
   public MockitoRule rule = MockitoJUnit.rule().silent();
 
-  @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
+  @Mock(answer = RETURNS_MOCKS, lenient = true)
   protected ExtensionModel extensionModel;
 
   @Mock(answer = RETURNS_DEEP_STUBS, lenient = true)
@@ -156,8 +156,8 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
   @Mock(lenient = true)
   protected CompletableComponentExecutorFactory operationExecutorFactory;
 
-  @Mock(extraInterfaces = {Lifecycle.class, MuleContextAware.class, OperationArgumentResolverFactory.class}, lenient = true)
-  protected CompletableComponentExecutor operationExecutor;
+  @Mock(lenient = true)
+  protected CompletableComponentExecutorOperationArgumentResolverFactory operationExecutor;
 
   @Mock(lenient = true)
   protected ExecutorCallback executorCallback;
@@ -352,18 +352,18 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     when(configurationModel.getOperationModels()).thenReturn(asList(operationModel));
     when(configurationModel.getOperationModel(OPERATION_NAME)).thenReturn(of(operationModel));
 
-    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(ReconnectionConfig.getDefault()));
+    when(connectionProviderWrapper.getReconnectionConfig()).thenReturn(of(defaultReconnectionConfig()));
     when(connectionProviderWrapper.getRetryPolicyTemplate()).thenReturn(new NoRetryPolicyTemplate());
 
     mockSubTypes(extensionModel);
     mockClassLoaderModelProperty(extensionModel, getClass().getClassLoader());
-    when(extensionManager.getConfiguration(anyString(), anyObject())).thenReturn(configurationInstance);
+    when(extensionManager.getConfiguration(anyString(), any())).thenReturn(configurationInstance);
     when(extensionManager.getConfiguration(extensionModel, operationModel, event)).thenReturn(of(configurationInstance));
-    when(configurationProvider.get(anyObject())).thenReturn(configurationInstance);
+    when(configurationProvider.get(any())).thenReturn(configurationInstance);
     when(extensionManager.getConfigurationProvider(extensionModel, operationModel)).thenReturn(of(configurationProvider));
     when(extensionManager.getConfigurationProvider(CONFIG_NAME)).thenReturn(of(configurationProvider));
 
-    when(stringType.getAnnotation(anyObject())).thenReturn(empty());
+    when(stringType.getAnnotation(any())).thenReturn(empty());
 
     when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenAnswer(invocationOnMock -> {
       if (mockOperationPolicy == null) {
@@ -381,7 +381,7 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     when(executionContext.getRetryPolicyTemplate()).thenReturn(empty());
     when(connectionManagerAdapter.getConnection(anyString())).thenReturn(null);
-    when(connectionManagerAdapter.getReconnectionConfigFor(any())).thenReturn(ReconnectionConfig.getDefault());
+    when(connectionManagerAdapter.getReconnectionConfigFor(any())).thenReturn(defaultReconnectionConfig());
     messageProcessor = setUpOperationMessageProcessor();
   }
 
@@ -404,9 +404,14 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
     after();
     OperationMessageProcessor messageProcessor = createOperationMessageProcessor();
     messageProcessor.setMuleContext(context);
+    messageProcessor.setMuleConfiguration(context.getConfiguration());
     ((MuleContextWithRegistry) muleContext).getRegistry().registerObject(OBJECT_CONNECTION_MANAGER, connectionManagerAdapter);
 
     initialiseIfNeeded(messageProcessor, muleContext);
+
+    // Since the initialization of the message processor reassigns its inner resolver set, we need to set the spy back.
+    messageProcessor.resolverSet = resolverSet;
+
     startIfNeeded(messageProcessor);
 
     return messageProcessor;
@@ -432,6 +437,11 @@ public abstract class AbstractOperationMessageProcessorTestCase extends Abstract
 
     verify((Stoppable) operationExecutor).stop();
     verify((Disposable) operationExecutor).dispose();
+  }
+
+  public interface CompletableComponentExecutorOperationArgumentResolverFactory
+      extends CompletableComponentExecutor, Lifecycle, MuleContextAware, OperationArgumentResolverFactory {
+
   }
 
 }

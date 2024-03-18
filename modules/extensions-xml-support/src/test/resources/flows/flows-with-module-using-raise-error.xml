@@ -29,44 +29,6 @@
         </error-handler>
     </flow>
 
-    <flow name="simpleProxy">
-        <module-using-raise-error:fail-proxy/>
-        <error-handler>
-            <on-error-continue type="ROUTING">
-                <set-payload value="#['Could not route: ' ++ error.description]"/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="complexProxy">
-        <module-using-raise-error:fail-proxy errorToRaise="MODULE-USING-RAISE-ERROR:CUSTOM" description="#['Something went wrong.']"/>
-        <error-handler>
-            <on-error-continue type="MODULE-USING-RAISE-ERROR:CUSTOM">
-                <set-payload value="#['Custom error: ' ++ error.description]"/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
-    <flow name="simpleMapping">
-        <module-using-raise-error:fail-proxy>
-            <error-mapping sourceType="ROUTING" targetType="APP:CUSTOM"/>
-        </module-using-raise-error:fail-proxy>
-        <error-handler>
-            <on-error-continue type="APP:CUSTOM">
-                <set-payload value="Handled"/>
-            </on-error-continue>
-            <on-error-continue>
-                <set-payload value="Error."/>
-            </on-error-continue>
-        </error-handler>
-    </flow>
-
     <flow name="complexMapping">
         <module-using-raise-error:fail-raise-error custom="true">
             <error-mapping sourceType="MODULE-USING-RAISE-ERROR:SMART_CONNECTOR_CUSTOM" targetType="APP:CUSTOM"/>

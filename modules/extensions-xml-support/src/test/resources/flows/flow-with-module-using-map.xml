@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:module-using-map="http://www.mulesoft.org/schema/mule/module-using-map"
+      xsi:schemaLocation="
+          http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+          http://www.mulesoft.org/schema/mule/module-using-map http://www.mulesoft.org/schema/mule/module-using-map/current/mule-module-using-map.xsd">
+
+    <module-using-map:config name="petstoreConfigRef"/>
+
+    <flow name="testPetstoreWithMap">
+        <module-using-map:do-get-cage config-ref="petstoreConfigRef"/>
+    </flow>
+
+</mule>

@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.registry;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_APPLY_OBJECT_PROCESSOR_PROPERTY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -24,10 +25,12 @@ import org.mule.runtime.core.api.lifecycle.LifecycleStateAware;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCase {
@@ -35,6 +38,10 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
   private static final String KEY = "key";
   private static final String KEY2 = "key2";
   private static final String EXTENDED_KEY = "extendedKey";
+
+  // TODO W-10781591 Remove this, some tests specifically tests features provided by ObjectProcessors
+  @Rule
+  public SystemProperty disableApplyObjectProcessor = new SystemProperty(DISABLE_APPLY_OBJECT_PROCESSOR_PROPERTY, "false");
 
   public RegistrationAndInjectionTestCase() {
     setStartContext(true);
@@ -90,6 +97,7 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     assertThat(object.getKey2Child(), is(sameInstance(child2)));
   }
 
+  // TODO W-10781591 Remove this test
   @Test
   public void muleContextAware() throws Exception {
     MuleContextAware muleContextAware = mock(MuleContextAware.class);
@@ -98,6 +106,7 @@ public class RegistrationAndInjectionTestCase extends AbstractMuleContextTestCas
     verify(muleContextAware).setMuleContext(muleContext);
   }
 
+  // TODO W-10781591 Remove this test
   @Test
   public void lifecycleSateAware() throws Exception {
     LifecycleStateAware lifecycleStateAware = mock(LifecycleStateAware.class);

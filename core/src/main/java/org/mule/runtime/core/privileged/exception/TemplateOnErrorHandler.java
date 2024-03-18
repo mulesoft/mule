@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -51,17 +51,19 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager;
 import org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ErrorHandlerContext;
 import org.mule.runtime.core.internal.exception.ExceptionRouter;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.profiling.tracing.event.span.condition.SpanNameAssertion;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,9 +78,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.mule.runtime.tracer.api.EventTracer;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
@@ -93,7 +92,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private static final Logger LOGGER = getLogger(TemplateOnErrorHandler.class);
 
   private static final Pattern ERROR_HANDLER_LOCATION_PATTERN = compile("[^/]*/[^/]*/[^/]*");
-  private InitialSpanInfo initialSpanInfo;
+  private ComponentTracer<CoreEvent> componentTracer;
 
   private boolean fromGlobalErrorHandler = false;
 
@@ -110,10 +109,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   private InternalProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
-
-  private EventTracer<CoreEvent> coreEventEventTracer;
-
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
   protected Optional<String> flowLocation = empty();
   private MessageProcessorChain configuredMessageProcessors;
 
@@ -153,9 +149,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         onErrorFlux = onErrorFlux.transformDeferred(TemplateOnErrorHandler.this::route);
       } else {
         // We need to start the tracing that would be started by the on error handler MessageProcessorChain.
-        onErrorFlux = onErrorFlux.doOnNext(coreEvent -> coreEventEventTracer
-            .startComponentSpan(coreEvent,
-                                initialSpanInfo));
+        onErrorFlux = onErrorFlux.doOnNext(coreEvent -> componentTracer.startSpan(coreEvent));
       }
 
       onErrorFlux = Flux.from(publisherPostProcessor
@@ -169,9 +163,8 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
               .doOnNext(result -> {
                 if (getMessageProcessors().isEmpty()) {
                   // We end the current span verifying that the name of the current span is the expected.
-                  coreEventEventTracer
-                      .endCurrentSpan(result,
-                                      new SpanNameAssertion(initialSpanInfo.getName()));
+                  componentTracer
+                      .endCurrentSpan(result);
                 }
                 ErrorHandlerContextManager.resolveHandling(TemplateOnErrorHandler.this, result);
               })))
@@ -206,8 +199,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   @Override
   public synchronized void initialise() throws InitialisationException {
-    initialSpanInfo = initialSpanInfoProvider.getInitialSpanInfo(TemplateOnErrorHandler.this);
-    coreEventEventTracer = profilingService.getCoreEventTracer();
+    componentTracer = componentTracerFactory.fromComponent(TemplateOnErrorHandler.this);
     super.initialise();
   }
 
@@ -349,7 +341,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
     }
     configuredMessageProcessors =
         buildNewChainWithListOfProcessors(processingStrategy, getMessageProcessors(), NullExceptionHandler.getInstance(),
-                                          initialSpanInfo);
+                                          componentTracer);
 
     fluxFactory = new OnErrorHandlerFluxObjectFactory(processingStrategy);
 
@@ -464,7 +456,9 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
                                                                    getLocation(), PROCESS_START));
-      getExceptionListener().fireNotification(exception, event);
+      if (getEnableNotifications()) {
+        getExceptionListener().fireNotification(exception, event);
+      }
       logException(exception, event);
       getExceptionListener().processStatistics();
       markExceptionAsHandledIfRequired(exception);
@@ -539,19 +533,21 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
   }
 
   protected boolean isOwnedTransaction(Exception exception) {
-    TransactionAdapter transaction = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
-    if (transaction == null || !transaction.getComponentLocation().isPresent()) {
+    Transaction transaction = TransactionCoordination.getInstance().getTransaction();
+    if (transaction == null || !(transaction instanceof TransactionAdapter)
+        || !((TransactionAdapter) transaction).getComponentLocation().isPresent()) {
       return false;
     }
 
+    final TransactionAdapter txAdapter = (TransactionAdapter) transaction;
     if (inDefaultErrorHandler()) {
       // This case is for an implicit error handler, if we are in a configured default error handler then
       // it will be the same as the global error handler case.
-      return defaultErrorHandlerOwnsTransaction(transaction);
+      return defaultErrorHandlerOwnsTransaction(txAdapter);
     }
 
     if (fromGlobalErrorHandler && exception != null) {
-      String transactionLocation = transaction.getComponentLocation().get().getLocation();
+      String transactionLocation = txAdapter.getComponentLocation().get().getLocation();
       String failingComponentLocation = ((MessagingException) exception).getFailingComponent().getLocation().getLocation();
       // Get the location of the Try that contains this component.
       failingComponentLocation = failingComponentLocation.substring(0, failingComponentLocation.lastIndexOf('/'));
@@ -559,7 +555,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
       return failingComponentLocation.equals(transactionLocation);
     }
 
-    return isOwnedTransactionByLocalErrorHandler(transaction);
+    return isOwnedTransactionByLocalErrorHandler(txAdapter);
   }
 
   private boolean isOwnedTransactionByLocalErrorHandler(TransactionAdapter transaction) {

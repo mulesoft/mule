@@ -1,23 +1,27 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.exporter.impl.optel.resources;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_QUEUE_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_BATCH_SCHEDULED_DELAY;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_METRICS_LOG_FREQUENCY;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_TYPE;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties.OTEL_TRACES_SAMPLER_ARG_ENV;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterEnvProperties.OTEL_TRACES_SAMPLER_ENV;
 import static org.mule.runtime.tracer.exporter.impl.config.type.OpenTelemetryExporterTransport.valueOf;
 
-import static java.time.Duration.ofMillis;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
+import static java.time.Duration.ofMillis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import static io.opentelemetry.context.propagation.ContextPropagators.create;
@@ -25,6 +29,7 @@ import static io.opentelemetry.sdk.resources.Resource.getDefault;
 import static io.opentelemetry.sdk.trace.export.BatchSpanProcessor.builder;
 
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
+import org.mule.runtime.tracer.exporter.impl.OpenTelemetrySpanExporterUtils;
 import org.mule.runtime.tracer.exporter.impl.metrics.OpenTelemetryExportQueueMetrics;
 
 import java.util.Collection;
@@ -38,9 +43,12 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.MetricReader;
 import io.opentelemetry.sdk.metrics.export.PeriodicMetricReader;
 import io.opentelemetry.sdk.resources.Resource;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A Retriever open telemetry resources.
@@ -48,6 +56,8 @@ import io.opentelemetry.sdk.trace.export.SpanExporter;
  * @since 4.5.0
  */
 public class OpenTelemetryResources {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetryResources.class);
 
   private OpenTelemetryResources() {}
 
@@ -81,6 +91,11 @@ public class OpenTelemetryResources {
                                                                 SpanExporterConfiguration privilegedSpanExporterConfiguration,
                                                                 SpanExporter spanExporter)
       throws SpanExporterConfiguratorException {
+
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Endpoint is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENDPOINT));
+    LOGGER.debug("Mule Open Telemetry Tracer Exporter Protocol Type is {}",
+                 spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_TYPE));
 
     int maxBatchSize = parseInt(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_MAX_BATCH_SIZE));
 
@@ -116,9 +131,26 @@ public class OpenTelemetryResources {
   }
 
   /**
+   * @param spanExporterConfiguration the spanExporterConfiguration.
+   *
+   * @return the sampler for the {@link SpanExporter}.
+   */
+  public static Sampler getSampler(SpanExporterConfiguration spanExporterConfiguration) {
+    return OpenTelemetrySpanExporterUtils
+        .getSampler(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER),
+                    spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_OTEL_TRACES_SAMPLER_ARG));
+  }
+
+  /**
    * A dummy span exporter.
    */
   public static class NoOpSpanExporter implements SpanExporter {
+
+    public static SpanExporter getInstance() {
+      return new NoOpSpanExporter();
+    }
+
+    private NoOpSpanExporter() {}
 
     @Override
     public CompletableResultCode export(Collection<SpanData> collection) {

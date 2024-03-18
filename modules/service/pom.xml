@@ -5,13 +5,14 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-service</artifactId>
     <name>Mule Services</name>
     <description>Mule service module. Provides services support to Mule container.</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.service</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
         <project.build.java11SourceDirectory>${project.basedir}/src/main/java11</project.build.java11SourceDirectory>
@@ -23,7 +24,6 @@
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
-                <version>${javaFormatter.plugin.version}</version>
                 <configuration>
                     <directories>
                         <directory>${project.build.sourceDirectory}</directory>
@@ -46,7 +46,7 @@
                         <configuration>
                             <release>11</release>
                             <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                                <compileSourceRoot>${project.build.java11SourceDirectory}</compileSourceRoot>
                             </compileSourceRoots>
                             <multiReleaseOutput>true</multiReleaseOutput>
                         </configuration>
@@ -67,7 +67,6 @@
 	        <plugin>
 	            <groupId>org.codehaus.mojo</groupId>
 	            <artifactId>build-helper-maven-plugin</artifactId>
-	            <version>3.2.0</version>
 	            <executions>
 	                <execution>
                         <!-- Add the java 11 sources to the source artifact -->
@@ -96,6 +95,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mule.runtime.boot</groupId>
+            <artifactId>mule-module-jpms-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-container</artifactId>
             <version>${project.version}</version>
@@ -113,25 +117,10 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-artifact</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -144,6 +133,11 @@
         <dependency>
             <groupId>org.mule.tools.maven</groupId>
             <artifactId>mule-classloader-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
 </project>

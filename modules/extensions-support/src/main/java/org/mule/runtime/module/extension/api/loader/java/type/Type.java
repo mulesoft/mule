@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -185,13 +185,13 @@ public interface Type extends WithAnnotations, WithName, WithAlias, WithDeclarin
 
   /**
    * @return true if this Type represent a Java native array
-   * @since 4.6
+   * @since 4.5
    */
   boolean isArray();
 
   /**
    * @return the component type if this Type represents an array, otherwise empty
-   * @since 4.6
+   * @since 4.5
    */
   Optional<Type> getArrayComponentType();
 }

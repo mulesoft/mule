@@ -4,6 +4,11 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "vegan",
@@ -18606,8 +18611,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "VEGAN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
@@ -18616,17 +18625,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "VEGAN:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "VEGAN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

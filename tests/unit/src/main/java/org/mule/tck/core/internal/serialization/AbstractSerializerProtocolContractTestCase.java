@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,11 +9,10 @@ package org.mule.tck.core.internal.serialization;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -41,7 +40,7 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
 
     private final InputStream inputStream;
 
-    private AtomicInteger closeCount = new AtomicInteger();
+    private final AtomicInteger closeCount = new AtomicInteger();
 
     public CloseCounterInputStreamWrapper(InputStream inputStream) {
       this.inputStream = inputStream;
@@ -52,6 +51,7 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
       return inputStream.read();
     }
 
+    @Override
     public void close() throws IOException {
       closeCount.incrementAndGet();
       inputStream.close();
@@ -66,12 +66,12 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
 
   protected SerializationProtocol serializationProtocol;
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public final void nullBytes() throws Exception {
     serializationProtocol.deserialize((byte[]) null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public final void nullStream() throws Exception {
     serializationProtocol.deserialize((InputStream) null);
   }
@@ -80,7 +80,7 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
   public final void nullObject() throws Exception {
     byte[] bytes = serializationProtocol.serialize(null);
     Object object = serializationProtocol.deserialize(bytes);
-    assertNull(object);
+    assertThat(object, nullValue());
   }
 
   @Test
@@ -108,7 +108,7 @@ public abstract class AbstractSerializerProtocolContractTestCase extends Abstrac
     InternalMessage message = serializationProtocol.deserialize(bytes);
     DateTime deserealized = (DateTime) message.getPayload().getValue();
 
-    assertEquals(calendar, deserealized.toCalendar());
-    assertEquals(dateTime.format(), deserealized.format());
+    assertThat(calendar, equalTo(deserealized.toCalendar()));
+    assertThat(dateTime.format(), equalTo(deserealized.format()));
   }
 }

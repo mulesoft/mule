@@ -5,13 +5,14 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>test-processor-chains</artifactId>
     <packaging>mule-plugin</packaging>
 
     <properties>
+        <javaModuleName>org.mule.test.processor.chains</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

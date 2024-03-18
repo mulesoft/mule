@@ -1,20 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.core.internal.util.JarUtils.getUrlWithinJar;
-import static org.mule.runtime.core.internal.util.JarUtils.getUrlsWithinJar;
-import static org.mule.runtime.core.internal.util.JarUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.loadFileContentFrom;
+import static org.mule.runtime.core.internal.util.jar.JarLoadingUtils.getJarConnection;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM;
 import static org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor.MULE_POM_PROPERTIES;
 import static org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.module.deployment.impl.internal.util.JarUtils.getUrlWithinJar;
+import static org.mule.runtime.module.deployment.impl.internal.util.JarUtils.getUrlsWithinJar;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
@@ -58,7 +58,7 @@ public class MavenUtils {
     URL possibleUrl;
     try {
       possibleUrl = getUrlWithinJar(artifactFile, mavenMetadataFilePath);
-      JarURLConnection jarConnection = (JarURLConnection) possibleUrl.openConnection();
+      JarURLConnection jarConnection = getJarConnection(possibleUrl);
       jarConnection.setUseCaches(false);
       try (InputStream ignored = jarConnection.getInputStream()) {
         return possibleUrl;

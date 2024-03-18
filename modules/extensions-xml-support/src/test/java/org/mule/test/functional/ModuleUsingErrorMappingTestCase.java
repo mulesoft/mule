@@ -1,25 +1,24 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.functional;
 
-import static java.util.Collections.emptyMap;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mule.functional.junit4.matchers.MessageMatchers.hasPayload;
 import static org.mule.functional.junit4.matchers.ThatMatcher.that;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LAX_ERROR_TYPES;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHandlingStory.ERROR_MAPPINGS;
 
+import static java.util.Collections.emptyMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.tck.junit4.rule.SystemProperty;
 
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
@@ -35,9 +34,6 @@ public class ModuleUsingErrorMappingTestCase extends AbstractCeXmlExtensionMuleA
   private static final String EXPRESSION_ERROR_MESSAGE = "Bad expression.";
   private static final String TIMEOUT_ERROR_MESSAGE = "Timeout happened!";
   private static final String SECURITY_ERROR_MESSAGE = "simple operation called";
-
-  @Rule
-  public SystemProperty laxErrorType = new SystemProperty(MULE_LAX_ERROR_TYPES, "true");
 
   @Override
   protected String getModulePath() {
@@ -85,31 +81,6 @@ public class ModuleUsingErrorMappingTestCase extends AbstractCeXmlExtensionMuleA
   public void multipleMappingsRequest() throws Exception {
     verifyFailingExpression("multipleMappings", EXPRESSION_ERROR_MESSAGE);
     verifySuccessExpression("multipleMappings", CONNECT_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that a mapped error via wildcard is handled through the proxy smart connector.")
-  public void mappedRequestProxy() throws Exception {
-    verifySuccessExpression("simpleMappingProxy", CONNECT_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that a mapped error via a custom matcher is handled through the proxy smart connector.")
-  public void matchingMappedRequestProxy() throws Exception {
-    verifySuccessExpression("complexMappingProxy", CONNECT_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that an unmapped error is handled as ANY through the proxy smart connector.")
-  public void noMatchingMappedRequestProxy() throws Exception {
-    verifyFailingExpression("complexMappingProxy", UNMATCHED_ERROR_MESSAGE);
-  }
-
-  @Test
-  @Description("Verifies that each error is correctly handled given an operation with multiple mappings through the proxy smart connector.")
-  public void multipleMappingsRequestProxy() throws Exception {
-    verifyFailingExpression("multipleMappingsProxy", EXPRESSION_ERROR_MESSAGE);
-    verifySuccessExpression("multipleMappingsProxy", CONNECT_ERROR_MESSAGE);
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,17 +16,14 @@ public interface LicenseValidatorProvider {
   static LicenseValidator discoverLicenseValidator(ClassLoader classLoader) {
     ServiceLoader<LicenseValidator> factories = ServiceLoader.load(LicenseValidator.class, classLoader);
     Iterator<LicenseValidator> iterator = factories.iterator();
-    LicenseValidator licenseValidator = null;
+    LicenseValidator licenseValidator = new DefaultLicenseValidator();
     while (iterator.hasNext()) {
       LicenseValidator discoveredLicenseValidator = iterator.next();
       if (licenseValidator == null || !(discoveredLicenseValidator instanceof DefaultLicenseValidator)) {
         licenseValidator = discoveredLicenseValidator;
       }
     }
-    if (licenseValidator == null) {
-      throw new IllegalStateException(String.format("Could not find %s service implementation through SPI",
-                                                    LicenseValidator.class.getName()));
-    }
+
     return licenseValidator;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,8 +17,10 @@ import static org.mule.runtime.internal.memory.management.DefaultMemoryManagemen
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.MuleDeploymentService.findSchedulerService;
 import static org.mule.runtime.module.deployment.internal.processor.SerializedAstArtifactConfigurationProcessor.serializedAstWithFallbackArtifactConfigurationProcessor;
+import static org.mule.runtime.module.log4j.internal.MuleLog4jConfiguratorUtils.getDefaultReconfigurationAction;
 
 import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
 
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.copyFile;
@@ -28,11 +30,14 @@ import static org.apache.commons.io.FilenameUtils.getName;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeEndIgnoreCase;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -43,7 +48,7 @@ import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.MuleArtifactResourcesRegistry;
-import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder;
 import org.mule.runtime.module.launcher.coreextension.DefaultMuleCoreExtensionManagerServer;
 import org.mule.runtime.module.launcher.coreextension.ReflectionMuleCoreExtensionDependencyResolver;
 import org.mule.runtime.module.repository.api.RepositoryService;
@@ -106,6 +111,7 @@ public class FakeMuleServer {
         // This is done to guarantee that different fake servers (containers)
         // have different memory management services.
         .withMemoryManagementService(newDefaultMemoryManagementService())
+        .withActionOnMuleArtifactDeployment(getDefaultReconfigurationAction())
         .build();
     muleArtifactResourcesRegistry.inject(muleArtifactResourcesRegistry.getContainerProfilingService());
     containerClassLoader = muleArtifactResourcesRegistry.getContainerClassLoader();
@@ -137,10 +143,23 @@ public class FakeMuleServer {
                                                muleArtifactResourcesRegistry.getDomainFactory(),
                                                muleArtifactResourcesRegistry.getApplicationFactory(),
                                                muleArtifactResourcesRegistry.getToolingApplicationDescriptorFactory());
-    deploymentService = new MuleDeploymentService(muleArtifactResourcesRegistry.getDomainFactory(),
-                                                  muleArtifactResourcesRegistry.getApplicationFactory(),
-                                                  () -> findSchedulerService(serviceManager));
+    deploymentService = DeploymentServiceBuilder.deploymentServiceBuilder()
+        .withArtifactStartExecutorSupplier(() -> findSchedulerService(serviceManager))
+        .withDomainFactory(muleArtifactResourcesRegistry.getDomainFactory())
+        .withApplicationFactory(muleArtifactResourcesRegistry.getApplicationFactory())
+        .build();
     deploymentListener = mock(DeploymentListener.class);
+    doAnswer(inv -> {
+      final String artifactName = inv.getArgument(0);
+      final Throwable cause = inv.getArgument(1);
+
+      System.err.println("Deployment failure for " + artifactName + ":");
+      cause.printStackTrace();
+
+      return null;
+    })
+        .when(deploymentListener)
+        .onDeploymentFailure(anyString(), any());
     deploymentService.addDeploymentListener(deploymentListener);
     domainDeploymentListener = mock(DeploymentListener.class);
     deploymentService.addDomainDeploymentListener(domainDeploymentListener);
@@ -258,7 +277,7 @@ public class FakeMuleServer {
     createFolder(DOMAINS_FOLDER + "/default");
 
     File confDir = createFolder("conf");
-    URL log4jFile = getClass().getResource("/log4j2-test.xml");
+    URL log4jFile = currentThread().getContextClassLoader().getResource("log4j2-test.xml");
     copyURLToFile(log4jFile, new File(confDir, "log4j2-test.xml"));
   }
 
@@ -276,7 +295,7 @@ public class FakeMuleServer {
 
   /**
    * Copies a given app archive to the apps folder for deployment.
-   * 
+   *
    * @throws URISyntaxException
    */
   public void addAppArchive(URL url) throws IOException, URISyntaxException {
@@ -317,7 +336,7 @@ public class FakeMuleServer {
 
   /**
    * Copies a given app archive with a given target name to the apps folder for deployment
-   * 
+   *
    * @throws URISyntaxException
    */
   private void addAppArchive(URL url, String targetFile) throws IOException, URISyntaxException {

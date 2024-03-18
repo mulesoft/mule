@@ -1,26 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyVararg;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_ACTIVE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_IDLE;
 import static org.mule.runtime.api.config.PoolingProfile.DEFAULT_MAX_POOL_WAIT;
@@ -30,8 +15,26 @@ import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_FAIL;
 import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_WAIT;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.MuleTestUtils.spyInjector;
+
+import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.slf4j.event.Level.DEBUG;
 
 import org.mule.runtime.api.config.PoolingProfile;
@@ -46,6 +49,13 @@ import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
+import io.qameta.allure.Issue;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,13 +63,13 @@ import org.junit.Test;
 
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.slf4j.LoggerFactory;
 
 public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleContextTestCase {
 
   private static final CustomLogger logger = (CustomLogger) LoggerFactory.getLogger(PoolingConnectionManagementStrategy.class);
   private static final int MAX_ACTIVE = 2;
   private static final String ownerConfigName = "SomeConfigName";
+  public static final String POOL_NAME = "org.apache.commons.pool2:type=GenericObjectPool,name=pool";
 
   private ConnectionProvider<Object> connectionProvider;
 
@@ -85,8 +95,13 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
   }
 
   @After
-  public void restoreLogger() {
+  public void after() throws Exception {
     logger.resetLevel();
+    ObjectName objectName = new ObjectName(POOL_NAME);
+    MBeanServer mBeanServer = getPlatformMBeanServer();
+    if (mBeanServer.isRegistered(objectName)) {
+      mBeanServer.unregisterMBean(objectName);
+    }
   }
 
   @Test
@@ -166,7 +181,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     connection1 = strategy.getConnectionHandler();
     connection2 = strategy.getConnectionHandler();
 
-    when(connectionProvider.validate(anyVararg())).thenReturn(ConnectionValidationResult
+    when(connectionProvider.validate(any())).thenReturn(ConnectionValidationResult
         .failure("Invalid username or password",
                  new Exception("401: UNAUTHORIZED")));
     strategy.getConnectionHandler().getConnection();
@@ -178,7 +193,7 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
     connection1 = strategy.getConnectionHandler();
     connection2 = strategy.getConnectionHandler();
 
-    when(connectionProvider.validate(anyVararg())).thenReturn(null);
+    when(connectionProvider.validate(any())).thenReturn(null);
     strategy.getConnectionHandler().getConnection();
   }
 
@@ -304,16 +319,36 @@ public class PoolingConnectionManagementStrategyTestCase extends AbstractMuleCon
                    DEFAULT_POOL_INITIALISATION_POLICY);
   }
 
+  @Test
+  @Issue("W-12422473")
+  public void jmxEnabled() throws MalformedObjectNameException {
+    initStrategy();
+    assertTrue(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
+  }
+
+  @Test
+  @Issue("W-12422473")
+  public void jmxDisabled() throws MalformedObjectNameException {
+    initStrategyJmxDisabled();
+    assertFalse(getPlatformMBeanServer().isRegistered(new ObjectName(POOL_NAME)));
+  }
+
   private void resetConnectionProvider() throws ConnectionException {
     ConnectionProvider<Object> connectionProvider = mock(ConnectionProvider.class);
     when(connectionProvider.connect()).thenAnswer(i -> mock(Lifecycle.class));
-    when(connectionProvider.validate(anyObject())).thenReturn(ConnectionValidationResult.success());
+    when(connectionProvider.validate(any())).thenReturn(ConnectionValidationResult.success());
     this.connectionProvider = spy(new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext));
   }
 
   private void initStrategy() {
     strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
-                                                         ownerConfigName);
+                                                         ownerConfigName, f -> false);
+  }
+
+  private void initStrategyJmxDisabled() {
+    // enable mule.commons.pool2.disableJmx feature flag
+    strategy = new PoolingConnectionManagementStrategy<>(connectionProvider, poolingProfile, poolingListener, muleContext,
+                                                         ownerConfigName, f -> true);
   }
 
   private void verifyConnections(int numToCreate) throws ConnectionException {

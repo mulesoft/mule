@@ -1,15 +1,16 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.artifact.classloader;
 
-import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
-import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.module.artifact.api.classloader.ChildFirstLookupStrategy.CHILD_FIRST;
+import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
+import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
@@ -17,47 +18,42 @@ import static java.lang.Thread.activeCount;
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.enumerate;
 
-import static org.apache.commons.io.FileUtils.toFile;
+import static org.apache.commons.lang3.JavaVersion.JAVA_17;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
-import org.mule.maven.client.api.MavenClient;
-import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
-import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
 import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
-
-@Feature(LEAK_PREVENTION)
+@Features({@Feature(LEAK_PREVENTION), @Feature(JAVA_SDK)})
+@Stories({@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY), @Story(ARTIFACT_LIFECYCLE_LISTENER)})
 @RunWith(Parameterized.class)
-@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY)
 public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   private final static String DRIVER_ARTIFACT_ID = "activemq-all";
@@ -73,38 +69,7 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   public ActiveMQResourceReleaserTestCase(String driverVersion) {
     this.driverVersion = driverVersion;
-    this.testLookupPolicy = new ClassLoaderLookupPolicy() {
-
-      @Override
-      public LookupStrategy getClassLookupStrategy(String className) {
-        return CHILD_FIRST;
-      }
-
-      @Override
-      public LookupStrategy getPackageLookupStrategy(String packageName) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Map<String, LookupStrategy> lookupStrategies, boolean overwrite) {
-        return null;
-      }
-
-      @Override
-      public ClassLoaderLookupPolicy extend(Stream<String> packages, LookupStrategy lookupStrategy, boolean overwrite) {
-        return null;
-      }
-    };
+    this.testLookupPolicy = CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
   }
 
   @Parameterized.Parameters(name = "Testing Driver {0}")
@@ -116,26 +81,19 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
   @Before
   public void setup() throws Exception {
+    assumeThat("When running on Java 17, the resource releaser logic from the Mule Runtime will not be used. " +
+        "The resource releasing responsibility will be delegated to each connector instead.",
+               isJavaVersionAtLeast(JAVA_17), is(false));
 
-    URL settingsUrl = getClass().getClassLoader().getResource("custom-settings.xml");
-    final MavenClientProvider mavenClientProvider = discoverProvider(this.getClass().getClassLoader());
+    // TODO W-14821737: we should review why this is happening and remove this assume when the issue is fixed.
+    assumeThat("When running on Windows the threads created keep spamming a NoClassDefFoundError error in the logs.",
+               IS_OS_WINDOWS, is(false));
 
-    final Supplier<File> localMavenRepository =
-        mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
-
-    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder =
-        newMavenConfigurationBuilder().globalSettingsLocation(toFile(settingsUrl));
-
-    MavenClient mavenClient = mavenClientProvider
-        .createMavenClient(mavenConfigurationBuilder.localMavenRepositoryLocation(localMavenRepository.get()).build());
-
-    BundleDescriptor bundleDescriptor = new BundleDescriptor.Builder().setGroupId(DRIVER_GROUP_ID)
-        .setArtifactId(DRIVER_ARTIFACT_ID).setVersion(driverVersion).build();
-
-    BundleDependency dependency = mavenClient.resolveBundleDescriptor(bundleDescriptor);
     artifactClassLoader =
-        new MulePluginClassLoader("ActiveMQResourceReleaserTestCase", mock(ArtifactDescriptor.class),
-                                  new URL[] {dependency.getBundleUri().toURL()}, currentThread().getContextClassLoader(),
+        new MulePluginClassLoader("ActiveMQResourceReleaserTestCase",
+                                  mock(ArtifactDescriptor.class),
+                                  new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
+                                  currentThread().getContextClassLoader(),
                                   testLookupPolicy);
 
     CompositeClassLoader classLoader = from(artifactClassLoader);
@@ -143,9 +101,22 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void checkIfActiveMQResourceReleaserInterruptAbstractInactivityMonitorThread() throws ClassNotFoundException,
-      NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+  public void checkIfActiveMQResourceReleaserInterruptAbstractInactivityMonitorThread() throws ReflectiveOperationException {
+    startActiveMQConnectionThread();
+    artifactClassLoader.dispose();
+    assertFalse(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
+  }
 
+  @Test
+  public void checkIfActiveMQResourceReleaserCanBeInvokedManyTimes() throws ReflectiveOperationException {
+    startActiveMQConnectionThread();
+    new ActiveMQResourceReleaser(artifactClassLoader).release();
+    new ActiveMQResourceReleaser(artifactClassLoader).release();
+    artifactClassLoader.dispose();
+    assertFalse(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
+  }
+
+  private void startActiveMQConnectionThread() throws ReflectiveOperationException {
     Class<?> activeMqFactoryClass = Class.forName(DRIVER_CLASS_NAME, true, artifactClassLoader);
     Object activeMpFactoryObject = activeMqFactoryClass.getDeclaredConstructor(String.class).newInstance(ACTIVEMQ_URL_CONFIG);
 
@@ -158,8 +129,6 @@ public class ActiveMQResourceReleaserTestCase extends AbstractMuleTestCase {
     activeMQConnectionThread.start();
 
     await().atMost(1, TimeUnit.SECONDS).until(listOfThreadsContainInactivityMonitorThread());
-    artifactClassLoader.dispose();
-    assertFalse(getNameListOfActiveThreads().contains(ACTIVEMQ_DRIVER_TIMER_THREAD_NAME));
   }
 
   private Callable<Boolean> listOfThreadsContainInactivityMonitorThread() {

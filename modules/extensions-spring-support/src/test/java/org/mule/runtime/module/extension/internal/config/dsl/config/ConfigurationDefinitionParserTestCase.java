@@ -1,25 +1,27 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.config.dsl.config;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.spy;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtils.declarerFor;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsIterableWithSize.iterableWithSize;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.internal.el.datetime.Date;
+import org.mule.runtime.api.time.Time;
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.dsl.api.component.TypeConverter;
@@ -31,26 +33,23 @@ import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.config.extension.SimpleExtension;
 import org.mule.tck.classlaoder.TestClassLoader;
+import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-import org.mockito.internal.invocation.InterceptedInvocation;
-
-public class ConfigurationDefinitionParserTestCase {
+public class ConfigurationDefinitionParserTestCase extends AbstractMuleTestCase {
 
   @Test
-  @Ignore("W-12625688")
   public void typeConverterUsesTheClassloaderOfTheParser() throws Exception {
     List<ComponentBuildingDefinition> componentBuildingDefinitions;
 
     Thread thread = Thread.currentThread();
     ClassLoader currentClassLoader = thread.getContextClassLoader();
-    TestClassLoader classLoader = spy(getTestClassLoader());
+    TestClassLoader classLoader = getTestClassLoader();
     setContextClassLoader(thread, currentClassLoader, classLoader);
     try {
       Builder<?> definitionBuilder = new Builder<>().withIdentifier("test").withNamespace("namespace");
@@ -76,19 +75,19 @@ public class ConfigurationDefinitionParserTestCase {
 
     Optional<TypeConverter<?, ?>> typeConverter = componentBuildingDefinitions.get(1).getTypeConverter();
 
-    int testClassLoaderInvocations = mockingDetails(classLoader).getInvocations().size();
+    int testClassLoaderInvocations = classLoader.getInvocations().size();
     typeConverter.get().convert(null);
-    List<?> invocations = ((List<?>) mockingDetails(classLoader).getInvocations());
-    String invocation = ((InterceptedInvocation) invocations.get(invocations.size() - 1)).getArgument(0);
+    List<Pair<String, String>> invocations = classLoader.getInvocations();
+    String invocationArg = (invocations.get(invocations.size() - 1)).getSecond();
 
-    assertThat(testClassLoaderInvocations + 2, is(invocations.size()));
-    assertThat(invocation, is("org.mule.runtime.core.internal.el.datetime.Date"));
+    assertThat(invocations, iterableWithSize(testClassLoaderInvocations + 2));
+    assertThat(invocationArg, is("org.mule.runtime.api.time.Time"));
   }
 
   private TestClassLoader getTestClassLoader() {
     TestClassLoader classLoader = new TestClassLoader(null);
     classLoader.addClass("java.util.Map", Map.class);
-    classLoader.addClass("org.mule.runtime.core.internal.el.datetime.Date", Date.class);
+    classLoader.addClass("org.mule.runtime.api.time.Time", Time.class);
     return classLoader;
   }
 

@@ -6,13 +6,14 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-module-test-plugins</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>test-dependant-plugin</artifactId>
     <packaging>mule-plugin</packaging>
 
     <properties>
+        <javaModuleName>org.mule.test.plugin.dependant</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -20,7 +21,7 @@
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>test-empty-plugin</artifactId>
-            <version>4.6.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
         </dependency>
     </dependencies>

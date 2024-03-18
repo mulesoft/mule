@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.6.0-SNAPSHOT</version>
+    <version>4.7.0-SNAPSHOT</version>
 
     <!-- Organization -->
     <organization>
@@ -130,6 +130,9 @@
     <properties>
         <javaVersion>1.8</javaVersion>
         <javaReleaseVersion>8</javaReleaseVersion>
+        <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
+        <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
+        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -153,42 +156,38 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.6.0-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
+        <muleMavenClientBomVersion>2.2.0-SNAPSHOT</muleMavenClientBomVersion>
 
-        <activemqVersion>5.15.12</activemqVersion>
+        <activemqVersion>5.15.15</activemqVersion>
+        <hawtbufVersion>1.1</hawtbufVersion>
+        <activemqProtobuf>1.1</activemqProtobuf>
+        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
-        <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
-        <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <weaveVersion>2.6.0-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
+        <commonsNet.version>3.9.0</commonsNet.version>
+        <sshdVersion>2.10.0</sshdVersion>
+        <ftpServerVersion>1.2.0</ftpServerVersion>
+        <commonsExecVersion>1.3</commonsExecVersion>
+        <testcontainersVersion>1.17.6</testcontainersVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.2.0-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.6.0-SNAPSHOT</muleExtensionsApiVersion>
+        <mulePropertiesApiVersion>1.3.0-SNAPSHOT</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.7.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.6.0-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.8.0-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.8.0-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.8.0-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.6.0-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.6.0-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.6.0-SNAPSHOT</muleMetadataModelVersion>
+        <muleHttpPolicyApiVersion>1.7.0-SNAPSHOT</muleHttpPolicyApiVersion>
+        <mulePolicyApiVersion>1.7.0-SNAPSHOT</mulePolicyApiVersion>
+        <muleApiVersion>1.7.0-SNAPSHOT</muleApiVersion>
+        <muleMetadataModelVersion>1.7.0-SNAPSHOT</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
-        <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
-         its version is not changed by the versions:set plugin -->
-        <muleTestComponentsVersion>4.6.0-SNAPSHOT</muleTestComponentsVersion>
-        <muleTxExtVersion>4.6.0-SNAPSHOT</muleTxExtVersion>
-
-        <!-- Test Extensions -->
-        <muleTestingProcessingStrategiesExtensionVersion>1.0.0-SNAPSHOT</muleTestingProcessingStrategiesExtensionVersion>
-
         <!--Maven plugins versions-->
-        <dependency.plugin.version>3.1.2</dependency.plugin.version>
+        <dependency.plugin.version>3.5.0</dependency.plugin.version>
         <deploy.plugin.version>2.8.2</deploy.plugin.version>
-        <assembly.plugin.version>3.3.0</assembly.plugin.version>
-        <jar.plugin.version>3.3.0</jar.plugin.version>
+        <assembly.plugin.version>3.7.0</assembly.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
         <jxr.plugin.version>2.5</jxr.plugin.version>
         <project.info.reports.plugin.version>3.0.0</project.info.reports.plugin.version>
         <rar.plugin.version>2.4</rar.plugin.version>
@@ -197,80 +196,89 @@
         <site.plugin.version>3.8.2</site.plugin.version>
         <source.plugin.version>3.1.0</source.plugin.version>
         <war.plugin.version>3.2.0</war.plugin.version>
-        <shade.plugin.version>3.1.0</shade.plugin.version>
-        <build.helper.maven.plugin.version>3.0.0</build.helper.maven.plugin.version>
+        <shade.plugin.version>3.4.1</shade.plugin.version>
+        <build.helper.maven.plugin.version>3.2.0</build.helper.maven.plugin.version>
         <maven.help.plugin.version>2.2</maven.help.plugin.version>
         <antrun.plugin.version>1.8</antrun.plugin.version>
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
-        <license.maven.plugin.version>2.11</license.maven.plugin.version>
+ 
+        <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
+        <license.maven.plugin.version>4.2</license.maven.plugin.version>
+        <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
+        <licenseYear>2023</licenseYear>
+
         <gpg.plugin.version>1.6</gpg.plugin.version>
         <gmavenPluginVersion>2.1.0</gmavenPluginVersion>
         <javadocPluginVersion>3.2.0</javadocPluginVersion>
         <mavenCompilerVersion>3.11.0</mavenCompilerVersion>
         <eclipsePluginVersion>2.10</eclipsePluginVersion>
         <maven.buildnumber.plugin.version>1.4</maven.buildnumber.plugin.version>
-        <maven.surefire.plugin.version>3.0.0</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.5.0-SNAPSHOT</mule.module.maven.plugin.version>
-        <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.6.0-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.6.0-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.6.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleAnnotationsApiVersion>1.6.0-SNAPSHOT</muleAnnotationsApiVersion>
+        <mule.module.maven.plugin.version>1.7.0-SNAPSHOT</mule.module.maven.plugin.version>
+        <revapi-maven-plugin.version>0.15.0</revapi-maven-plugin.version>
+        <muleRevapiExtensionVersion>1.7.0-SNAPSHOT</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.7.0-SNAPSHOT</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.7.0-SNAPSHOT</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
-        <powermockVersion>2.0.0</powermockVersion>
         <allureReportVersion>2.8.1</allureReportVersion>
-        <allure.maven.plugin.version>2.9</allure.maven.plugin.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <allure.maven.plugin.version>2.12.0</allure.maven.plugin.version>
+        <jacoco.version>0.8.11</jacoco.version>
         <awaitilityVersion>3.0.0</awaitilityVersion>
 
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <formatterGoal>validate</formatterGoal>
-        <oldMuleArtifactVersion>4.5.0-SNAPSHOT</oldMuleArtifactVersion>
+        <oldMuleArtifactVersion>4.6.0-rc1</oldMuleArtifactVersion>
+        <revapi.checkDependencies>false</revapi.checkDependencies>
         <revapi.failOnUnresolvedArtifacts>true</revapi.failOnUnresolvedArtifacts>
+        <skipMuleModuleMojos>false</skipMuleModuleMojos>
+        <skipRevapiCheck>${skipMuleModuleMojos}</skipRevapiCheck>
+        <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
         
-        <surefire.args.base>-XX:+TieredCompilation -Dfile.encoding=UTF-8 -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'</surefire.args.base>
+        <surefire.additional.jacoco.args></surefire.additional.jacoco.args>
+        <surefire.args.base>
+            -XX:+TieredCompilation
+            -Dfile.encoding=UTF-8
+            -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjVersion}/aspectjweaver-${aspectjVersion}.jar
+            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'${surefire.additional.jacoco.args}
+        </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
+        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
+        <surefire.test.unit.open.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=java.base/java.lang=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.test.unit.open.args>
+        <!-- Emulate the behaviour in standalone, where slf4j is loaded in the boot layer -->
+        <surefire.slf4j.module.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${org.slf4j:slf4j-api:jar}
+            --add-modules=org.slf4j
+            ${surefire.test.unit.open.args}
+        </surefire.slf4j.module.args>
 
         <commonsCollectionsVersion>3.2.2</commonsCollectionsVersion>
-        <!-- this groovy version is to be used during the build process, not bundled in the distro -->
+        <!-- this groovy version is to be used during the build process or for tests, not bundled in the distro -->
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
-        <allureJunitVersion>2.8.1</allureJunitVersion>
+        <junitVersion>4.13.2</junitVersion>
+        <hamcrestVersion>2.2</hamcrestVersion>
+        <allureJunitVersion>2.22.2</allureJunitVersion>
         <multithreadedtcVersion>1.01</multithreadedtcVersion>
-        <tikaVersion>1.24.1</tikaVersion>
+        <tikaVersion>1.28.3</tikaVersion>
+        <mockitoVersion>4.11.0</mockitoVersion>
+        <xmlUnitVersion>1.6</xmlUnitVersion>
+        <assertJVersion>3.5.2</assertJVersion>
+        <byteBuddyVersion>1.14.0</byteBuddyVersion>
+        <jettyVersion>9.4.53.v20231009</jettyVersion>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <!-- More info: http://www.cs.umd.edu/projects/PL/multithreadedtc/overview.html  -->
-            <groupId>com.googlecode.multithreadedtc</groupId>
-            <artifactId>multithreadedtc</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-junit4</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.tika</groupId>
-                    <artifactId>tika-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -287,6 +295,23 @@
                 <artifactId>multithreadedtc</artifactId>
                 <version>${multithreadedtcVersion}</version>
             </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>${hamcrestVersion}</version>
+            </dependency>
             <dependency>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-junit4</artifactId>
@@ -297,8 +322,138 @@
                 <artifactId>tika-core</artifactId>
                 <version>${tikaVersion}</version>
             </dependency>
-        </dependencies>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockitoVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockitoVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertJVersion}</version>
+            </dependency>
+            <!-- Added to avoid conflicting transitive versions from Mockito and PowerMock -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byteBuddyVersion}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitilityVersion}</version>
+                <exclusions>
+                   <exclusion>
+                       <groupId>org.hamcrest</groupId>
+                       <artifactId>hamcrest-library</artifactId>
+                   </exclusion>
+                   <exclusion>
+                       <groupId>org.hamcrest</groupId>
+                       <artifactId>hamcrest-core</artifactId>
+                   </exclusion>
+                </exclusions>
+            </dependency>
+            
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlUnitVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Other deps used in testing -->
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derby</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbynet</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.derby</groupId>
+                <artifactId>derbytools</artifactId>
+                <version>${derbyVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${commonsNet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpServerVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jettyVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.jetty.orbit</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-osgi</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-common</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshdVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commonsExecVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.testing.compile</groupId>
+                <artifactId>compile-testing</artifactId>
+                <version>0.21.0</version>
+            </dependency>
+
+            <!-- NOT the service (with mule-service classifier) -->
+            <!-- this raw jar is used in unit tests only -->
+            <dependency>
+                <groupId>org.mule.services</groupId>
+                <artifactId>mule-service-weave</artifactId>
+                <version>${weaveVersion}</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <distributionManagement>
@@ -436,6 +591,10 @@
                     <configuration>
                         <encoding>ISO-8859-1</encoding>
                         <proc>none</proc>
+                        <source>${javaVersion}</source>
+                        <target>${javaVersion}</target>
+                        <testRelease>${javaReleaseVersion}</testRelease>
+                        <parameters>true</parameters>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -465,8 +624,6 @@
 
                                     <!-- Logging related artifacts are exposed by the BOOTSTRAP ClassLoader -->
                                     <ignoredUsedUndeclaredDependency>org.slf4j:slf4j-api</ignoredUsedUndeclaredDependency>
-                                    <ignoredUsedUndeclaredDependency>javax.inject:javax.inject</ignoredUsedUndeclaredDependency>
-                                    <ignoredUsedUndeclaredDependency>javax.mail:javax.mail-api</ignoredUsedUndeclaredDependency>
                                 </ignoredUsedUndeclaredDependencies>
                                 <ignoredUnusedDeclaredDependencies>
                                     <!-- Don't need to worry about this -->
@@ -476,16 +633,94 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.bsc.maven</groupId>
+                    <artifactId>maven-processor-plugin</artifactId>
+                    <version>4.5</version>
+                    <configuration>
+                        <skipSourcesUnchanged>true</skipSourcesUnchanged>
+                    </configuration>
+                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${deploy.plugin.version}</version>
                 </plugin>
+                <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
+                    where <packaging>jar</packaging> is used. -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>${jar.plugin.version}</version>
+                    <version>${maven.jar.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-test-jar</id>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                            <configuration>
+                                <skip>${skipExportTests}</skip>
+                                <skipIfEmpty>true</skipIfEmpty>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${javaTestModuleName}</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>default-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <archive>
+                                    <manifestEntries>
+                                        <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+                                    </manifestEntries>
+                                </archive>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <archive>
+                            <!--
+                                Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
+                                and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
+                             -->
+                            <index>false</index>
+                            <!-- List dependencies in the MANIFEST.MF -->
+                            <manifest>
+                                <!-- Note that we do not generate a classpath into the manifest, since doing so
+                                     significantly slows down compilations that use the jar -->
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            </manifest>
+                            <!-- Custom Entries -->
+                            <manifestEntries>
+                                <!-- include repository revision from buildnumber plugin -->
+                                <Build-Revision>${buildNumber}</Build-Revision>
+                                <Build-Date>${timestamp}</Build-Date>
+                                <Dev-List-Email>${dev.list}</Dev-List-Email>
+                                <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
+                                <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
+                                <More-Info>For more information go to ${productUrl}</More-Info>
+                                <Support>Get commercial support: ${project.organization.url}/support</Support>
+                                <Description>Mule Runtime and Integration Platform</Description>
+                                <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
+                                <Vendor-Url>${project.organization.url}</Vendor-Url>
+                                <Product-Url>${productUrl}</Product-Url>
+                                <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
+                                <Git-tags>${git.tags}</Git-tags>
+                                <Git-branch>${git.branch}</Git-branch>
+                                <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
+                                <Git-commit-id>${git.commit.id}</Git-commit-id>
+                                <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
+                                <Git-commit-time>${git.commit.time}</Git-commit-time>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -540,6 +775,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <workingDirectory>${project.build.directory}</workingDirectory>
                         <argLine>${surefire.args}</argLine>
                         <trimStackTrace>false</trimStackTrace>
@@ -568,6 +804,9 @@
                                 <value>${project.build.directory}/allure-results</value>
                             </property>
                         </systemProperties>
+                        <environmentVariables>
+                            <MULE_TERMINATION_LOG_PATH>${mule.termination.log.path.env.variable}</MULE_TERMINATION_LOG_PATH>
+                        </environmentVariables>
                     </configuration>
                     <dependencies>
                         <dependency>
@@ -582,6 +821,17 @@
                             <classifier>runtime</classifier>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <configuration>
+                        <!-- Exclude alternate versions for multi-release modules-->
+                        <excludes>
+                            <exclude>META-INF/**/*</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -607,45 +857,18 @@
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license.maven.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.mulesoft.license</groupId>
+                            <artifactId>license</artifactId>
+                            <version>${mulesoftLicenseVersion}</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
-                        <skip>${skipVerifications}</skip>
-                        <header>com/mycila/maven/plugin/license/templates/CPAL.txt</header>
+                        <header>${licensePath}</header>
                         <properties>
-                            <owner>MuleSoft, Inc</owner>
-                            <project.url>http://www.mulesoft.com</project.url>
+                            <year>${licenseYear}</year>
                         </properties>
-                        <excludes>
-                            <exclude>target/**</exclude>
-                            <exclude>**/.gitignore</exclude>
-                            <exclude>**/*.txt</exclude>
-                            <exclude>**/*.groovy</exclude>
-                            <exclude>**/*.sh</exclude>
-                            <exclude>**/*.bat</exclude>
-                            <exclude>**/*.ftl</exclude>
-                            <exclude>**/*.xml</exclude>
-                            <exclude>**/*.properties</exclude>
-                            <exclude>**/*.sample</exclude>
-                            <exclude>**/*.md</exclude>
-                            <exclude>**/*.xsl</exclude>
-                            <exclude>**/*.html</exclude>
-                            <exclude>**/*.css</exclude>
-                            <exclude>**/build-number.txt</exclude>
-
-                            <exclude>**/org/springframework/**</exclude>
-                            <exclude>**/HttpTransactionContext.java</exclude>
-                            <exclude>**/HttpConnection.java</exclude>
-                            <exclude>**/BndMojo.java</exclude>
-                            <exclude>**/BobberArchetype.java</exclude>
-                            <exclude>**/BobberArchetypeMojo.java</exclude>
-                            <exclude>**/DummySSLServerSocketFactory.java</exclude>
-                            <exclude>**/MultipartConfiguration.java</exclude>
-
-                            <exclude>**/ParamReader.java</exclude>
-                            <exclude>**/Part.java</exclude>
-                            <exclude>**/XMLStreamReaderToContentHandler.java</exclude>
-                            <exclude>**/__artifactId__IBean.java</exclude>
-                            <exclude>**/__artifactId__IBeanTestCase.java</exclude>
-                        </excludes>
                         <includes>
                             <include>**/*.java</include>
                         </includes>
@@ -690,6 +913,17 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -749,6 +983,94 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-module-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>analyze</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>analyze</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${skipMuleModuleMojos}</skip>
+                    <fillOptionalPackages>${mule.module.maven.plugin.fillOptionalPackages}</fillOptionalPackages>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.revapi</groupId>
+                <artifactId>revapi-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mule.tools.maven</groupId>
+                        <artifactId>mule-revapi-extension</artifactId>
+                        <version>${muleRevapiExtensionVersion}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <skip>${skipRevapiCheck}</skip>
+                    <oldVersion>${oldMuleArtifactVersion}</oldVersion>
+                    <checkDependencies>${revapi.checkDependencies}</checkDependencies>
+                    <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
+                    <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
+                    <analysisConfiguration><![CDATA[
+                        {
+                            "revapi" : {
+                                "java" : {
+                                    "missing-classes" : {
+                                        "behavior" : "report"
+                                    }
+                                },
+                                "versions": {
+                                  "enabled": true,
+                                  "onAllowed": {
+                                    "criticality" : "documented"
+                                  }
+                                }
+                            }
+                        }
+                    ]]></analysisConfiguration>
+                    <analysisConfigurationFiles combine.children="append">
+                        <configurationFile>
+                            <path>api-changes.json</path>
+                            <roots>
+                                <root>
+                                    ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
+                                </root>
+                            </roots>
+                        </configurationFile>
+                    </analysisConfigurationFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>api-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -785,61 +1107,6 @@
                 </configuration>
             </plugin>
 
-            <!-- The maven-jar-plugin generates the MANIFEST.MF for all modules
-                where <packaging>jar</packaging> is used. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <skip>${skipExportTests}</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <archive>
-                        <!--
-                            Disabled for http://mule.mulesoft.org/jira/browse/MULE-1153
-                            and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4408526
-                         -->
-                        <index>false</index>
-                        <!-- List dependencies in the MANIFEST.MF -->
-                        <manifest>
-                            <!-- Note that we do not generate a classpath into the manifest, since doing so
-                                 significantly slows down compilations that use the jar -->
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                        <!-- Custom Entries -->
-                        <manifestEntries>
-                            <!-- include repository revision from buildnumber plugin -->
-                            <Build-Revision>${buildNumber}</Build-Revision>
-                            <Build-Date>${timestamp}</Build-Date>
-                            <Dev-List-Email>${dev.list}</Dev-List-Email>
-                            <Supported-Jdks>[${javaVersion}.0,18)</Supported-Jdks>
-                            <Recommended-Jdks>[${javaVersion}.0_181,9),[11,12),[17,18)</Recommended-Jdks>
-                            <More-Info>For more information go to ${productUrl}</More-Info>
-                            <Support>Get commercial support: ${project.organization.url}/support</Support>
-                            <Description>Mule Runtime and Integration Platform</Description>
-                            <License>CPAL v1.0 http://www.mulesoft.com/CPAL/</License>
-                            <Vendor-Url>${project.organization.url}</Vendor-Url>
-                            <Product-Url>${productUrl}</Product-Url>
-                            <Build-Date>${mvn.timestamp.yyyy-MM-dd-HH:mm:ss}</Build-Date>
-                            <Git-tags>${git.tags}</Git-tags>
-                            <Git-branch>${git.branch}</Git-branch>
-                            <Git-remote-origin-url>${git.remote.origin.url}</Git-remote-origin-url>
-                            <Git-commit-id>${git.commit.id}</Git-commit-id>
-                            <Git-commit-id-describe>${git.commit.id.describe}</Git-commit-id-describe>
-                            <Git-commit-time>${git.commit.time}</Git-commit-time>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
@@ -951,32 +1218,6 @@
     </reporting>
     <profiles>
         <profile>
-            <id>j11</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <version>${mavenCompilerVersion}</version>
-                            <configuration>
-                                <encoding>ISO-8859-1</encoding>
-                                <source>${javaVersion}</source>
-                                <target>${javaVersion}</target>
-                                <release>${javaReleaseVersion}</release>
-                                <testRelease>${javaReleaseVersion}</testRelease>
-                                <proc>none</proc>
-                                <parameters>true</parameters>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
             <id>testJdkWithoutXmlModule</id>
             <activation>
                 <!-- This profile cannot be activated based on the jdk because the jdk on which this has to be activated or not -->
@@ -997,7 +1238,7 @@
                                     <!-- Add this to the classpath so it is available when running tests with jvm8 -->
                                     <!-- but it does not interfere with the module system --> 
                                     <!-- (it has colliding packages with java.xml module) when running with java11+ -->
-                                    <additionalClasspathElement>${org.mule.apache:xerces2-xsd11:jar:}</additionalClasspathElement>
+                                    <additionalClasspathElement>${settings.localRepository}/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</additionalClasspathElement>
                                 </additionalClasspathElements>
                             </configuration>
                         </plugin>
@@ -1007,26 +1248,21 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.5.0</version>
                         <executions>
                             <execution>
+                                <id>get-xml-apis</id>
+                                <phase>process-test-resources</phase>
                                 <goals>
-                                    <goal>properties</goal>
+                                    <goal>get</goal>
                                 </goals>
+                                <configuration>
+                                    <artifact>xml-apis:xml-apis:1.4.01</artifact>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                    <!-- This is needed only for jdk8, the required classes from here -->
-                    <!-- are already available in the jdk on versions 11+ -->
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>mac</id>
@@ -1094,11 +1330,6 @@
                                     <rules>
                                         <requireReleaseDeps>
                                             <message>No Snapshots Allowed in Deps!</message>
-                                            <excludes>
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
-                                            </excludes>
                                         </requireReleaseDeps>
                                         <requireReleaseVersion>
                                             <message>No Snapshots Allowed in Project Version!</message>
@@ -1147,107 +1378,11 @@
 
                                                 <exclude>org.raml:raml-parser-2</exclude>
                                                 <exclude>org.raml:yagi</exclude>
-
-                                                <exclude>org.mule.tests:test-components</exclude>
-                                                <exclude>org.mule.tests.extensions:mule-tx-extension</exclude>
-                                                <exclude>org.mule.extension:mule-testing-processing-strategies</exclude>
                                             </excludes>
                                         </requireReleaseDeps>
                                     </rules>
                                     <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
                                 </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>mule-module</id>
-            <activation>
-                <file>
-                    <exists>src/main/resources/META-INF/mule-module.properties</exists>
-                </file>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.mule.tools.maven</groupId>
-                        <artifactId>mule-module-maven-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>analyze</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>analyze</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>parse-version</id>
-                                <goals>
-                                    <goal>parse-version</goal>
-                                </goals>
-                                <phase>validate</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.revapi</groupId>
-                        <artifactId>revapi-maven-plugin</artifactId>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.mule.tools.maven</groupId>
-                                <artifactId>mule-revapi-extension</artifactId>
-                                <version>${muleRevapiExtensionVersion}</version>
-                            </dependency>
-                        </dependencies>
-                        <configuration>
-                            <oldVersion>${oldMuleArtifactVersion}</oldVersion>
-                            <failOnUnresolvedArtifacts>{revapi.failOnUnresolvedArtifacts}</failOnUnresolvedArtifacts>
-                            <failOnMissingConfigurationFiles>false</failOnMissingConfigurationFiles>
-                            <analysisConfiguration><![CDATA[
-                                {
-                                    "revapi" : {
-                                        "java" : {
-                                            "missing-classes" : {
-                                                "behavior" : "report"
-                                            }
-                                        },
-                                        "semver": {
-                                          "ignore": {
-                                            "enabled": true,
-                                            "versionIncreaseAllows" : {
-                                              "major" : "breaking",
-                                              "minor" : "nonBreaking",
-                                              "patch" : "equivalent"
-                                            }
-                                          }
-                                        }
-                                    }
-                                }
-                            ]]></analysisConfiguration>
-                            <analysisConfigurationFiles combine.children="append">
-                                <configurationFile>
-                                    <path>api-changes.json</path>
-                                    <roots>
-                                        <root>
-                                            ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-                                        </root>
-                                    </roots>
-                                </configurationFile>
-                            </analysisConfigurationFiles>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>api-check</id>
-                                <goals><goal>check</goal></goals>
                             </execution>
                         </executions>
                     </plugin>

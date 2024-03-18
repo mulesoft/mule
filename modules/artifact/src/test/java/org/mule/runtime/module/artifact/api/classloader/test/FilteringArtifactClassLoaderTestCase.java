@@ -1,0 +1,293 @@
+/*
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
+ * The software in this package is published under the terms of the CPAL v1.0
+ * license, a copy of which has been included with this distribution in the
+ * LICENSE.txt file.
+ */
+package org.mule.runtime.module.artifact.api.classloader.test;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
+import static org.mule.tck.util.EnumerationMatcher.equalTo;
+
+import static java.lang.System.lineSeparator;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.enumeration;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
+import org.mule.runtime.module.artifact.api.classloader.ExportedService;
+import org.mule.runtime.module.artifact.api.classloader.FilteringArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
+import org.mule.tck.classlaoder.TestClassLoader;
+import org.mule.tck.junit4.AbstractMuleTestCase;
+import org.mule.tck.junit4.rule.SystemProperty;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import org.hamcrest.CoreMatchers;
+
+@RunWith(Parameterized.class)
+public class FilteringArtifactClassLoaderTestCase extends AbstractMuleTestCase {
+
+  private static final String CLASS_NAME = "java.lang.Object";
+  private static final String CLASS_PACKAGE_NAME = "java.lang";
+  private static final String ANOTHER_CLASS_NAME = "java.util.Collection";
+  private static final String ANOTHER_CLASS_PACKAGE_NAME = "java.util";
+  public static final String RESOURCE_NAME = "dummy.txt";
+  private static final String SERVICE_INTERFACE_NAME = "org.foo.Service";
+  private static final String SERVICE_RESOURCE_NAME = "META-INF/services/" + SERVICE_INTERFACE_NAME;
+
+
+  @Rule
+  public ExpectedException expected = ExpectedException.none();
+
+  public boolean verboseClassloadingLog;
+  @Rule
+  public SystemProperty verboseClassloading;
+
+  protected FilteringArtifactClassLoader filteringArtifactClassLoader;
+  protected final ClassLoaderFilter filter = mock(ClassLoaderFilter.class);
+  protected final ArtifactClassLoader artifactClassLoader = mock(ArtifactClassLoader.class);
+
+  @Parameters(name = "verbose: {0}")
+  public static Collection<Object[]> params() {
+    return asList(new Object[][] {{true}, {false}});
+  }
+
+  public FilteringArtifactClassLoaderTestCase(boolean verboseClassloadingLog) {
+    this.verboseClassloadingLog = verboseClassloadingLog;
+    verboseClassloading = new SystemProperty(MULE_LOG_VERBOSE_CLASSLOADING, Boolean.toString(verboseClassloadingLog));
+  }
+
+  @Before
+  public void before() {
+    when(artifactClassLoader.getArtifactId()).thenReturn("mockArtifact");
+  }
+
+  @Test
+  public void throwClassNotFoundErrorWhenClassIsNotExported() throws ClassNotFoundException {
+    expected.expect(NotExportedClassException.class);
+    if (verboseClassloadingLog) {
+      expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'."
+          + lineSeparator() + filter.toString()));
+    } else {
+      expected.expectMessage(is("Class '" + CLASS_NAME + "' not found in classloader for artifact 'mockArtifact'."));
+    }
+
+    when(filter.exportsClass(CLASS_NAME)).thenReturn(false);
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    filteringArtifactClassLoader.loadClass(CLASS_NAME);
+  }
+
+  protected FilteringArtifactClassLoader doCreateClassLoader(List<ExportedService> exportedServices) {
+    return new FilteringArtifactClassLoader(artifactClassLoader, filter, exportedServices);
+  }
+
+  protected Package[] getPackages(FilteringArtifactClassLoader classLoader) {
+    try {
+      final Method getPackagesMethod = FilteringArtifactClassLoader.class.getDeclaredMethod("getPackages");
+      getPackagesMethod.setAccessible(true);
+      return (Package[]) getPackagesMethod.invoke(classLoader);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected Package getPackage(FilteringArtifactClassLoader classLoader, String name) {
+    try {
+      final Method getPackageMethod = FilteringArtifactClassLoader.class.getDeclaredMethod("getPackage", String.class);
+      getPackageMethod.setAccessible(true);
+      return (Package) getPackageMethod.invoke(classLoader, name);
+    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+        | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
+  public void loadsExportedClass() throws ClassNotFoundException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    Class expectedClass = this.getClass();
+    classLoader.addClass(CLASS_NAME, expectedClass);
+
+    when(filter.exportsClass(CLASS_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Class<?> aClass = filteringArtifactClassLoader.loadClass(CLASS_NAME);
+    assertThat(aClass, equalTo(expectedClass));
+  }
+
+  @Test
+  public void filtersResourceWhenNotExported() throws ClassNotFoundException {
+    when(filter.exportsClass(RESOURCE_NAME)).thenReturn(false);
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
+    assertThat(resource, CoreMatchers.equalTo(null));
+  }
+
+  @Test
+  public void loadsExportedResource() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
+
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+    when(artifactClassLoader.findResource(RESOURCE_NAME)).thenReturn(expectedResource);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    URL resource = filteringArtifactClassLoader.getResource(RESOURCE_NAME);
+    assertThat(resource, equalTo(expectedResource));
+  }
+
+  @Test
+  public void getExportedPackage() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package aPackage = getPackage(filteringArtifactClassLoader, CLASS_PACKAGE_NAME);
+    assertThat(aPackage.getName(), equalTo(CLASS_PACKAGE_NAME));
+  }
+
+  @Test
+  public void getExportedPackages() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+    classLoader.addClass(ANOTHER_CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(true);
+    when(filter.exportsPackage(ANOTHER_CLASS_PACKAGE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package[] packageList = getPackages(filteringArtifactClassLoader);
+    assertThat(packageList.length, is(1));
+    assertThat(packageList[0].getName(), equalTo(CLASS_PACKAGE_NAME));
+
+    // No exported package should return null
+    assertThat(getPackage(filteringArtifactClassLoader, ANOTHER_CLASS_PACKAGE_NAME), is(nullValue()));
+    // Default package should return null
+    assertThat(getPackage(filteringArtifactClassLoader, ""), is(nullValue()));
+  }
+
+  @Test
+  public void getNoExportedPackages() throws ClassNotFoundException, IOException {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    classLoader.addClass(CLASS_NAME, this.getClass());
+
+    when(filter.exportsPackage(CLASS_PACKAGE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+    Package[] packageList = getPackages(filteringArtifactClassLoader);
+    assertThat(packageList.length, is(0));
+  }
+
+  @Test
+  public void loadsExportedService() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
+
+    filteringArtifactClassLoader =
+        doCreateClassLoader(singletonList(new ExportedService(SERVICE_INTERFACE_NAME, expectedResource)));
+
+    URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
+
+    assertThat(resource, equalTo(expectedResource));
+    verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
+    verify(artifactClassLoader, never()).findResource(SERVICE_RESOURCE_NAME);
+  }
+
+  @Test
+  public void filtersResources() throws Exception {
+    TestClassLoader classLoader = new TestClassLoader(null);
+    URL blockedResource = new URL("file:///app.txt");
+    classLoader.addResource(RESOURCE_NAME, blockedResource);
+
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(false);
+    when(artifactClassLoader.getClassLoader()).thenReturn(classLoader);
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
+    assertThat(resources, equalTo(emptyList()));
+  }
+
+  @Test
+  public void getsExportedResources() throws Exception {
+    URL resource = new URL("file:/app.txt");
+
+    when(filter.exportsResource(RESOURCE_NAME)).thenReturn(true);
+    when(artifactClassLoader.findResources(RESOURCE_NAME)).thenReturn(enumeration(singleton(resource)));
+
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(RESOURCE_NAME);
+    assertThat(resources, equalTo(singletonList(resource)));
+  }
+
+  @Test
+  public void loadsExportedServices() throws ClassNotFoundException, IOException {
+    URL expectedResource = new URL("file:///app.txt");
+
+    filteringArtifactClassLoader =
+        doCreateClassLoader(singletonList(new ExportedService(SERVICE_INTERFACE_NAME, expectedResource)));
+
+    URL resource = filteringArtifactClassLoader.getResource(SERVICE_RESOURCE_NAME);
+
+    Enumeration<URL> resources = filteringArtifactClassLoader.getResources(SERVICE_RESOURCE_NAME);
+    assertThat(resources, equalTo(singletonList(resource)));
+
+    verify(filter, never()).exportsResource(SERVICE_RESOURCE_NAME);
+    verify(artifactClassLoader, never()).findResources(SERVICE_RESOURCE_NAME);
+  }
+
+  @Test
+  public void returnsCorrectClassLoader() throws Exception {
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    final ClassLoader classLoader = filteringArtifactClassLoader.getClassLoader();
+
+    assertThat(classLoader, is(filteringArtifactClassLoader));
+  }
+
+  @Test
+  public void doesNotDisposesFilteredClassLoader() throws Exception {
+    filteringArtifactClassLoader = doCreateClassLoader(emptyList());
+
+    filteringArtifactClassLoader.dispose();
+
+    verify(artifactClassLoader, never()).dispose();
+  }
+}

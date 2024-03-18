@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonMap;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
@@ -73,6 +74,7 @@ public class AbstractBenchmark {
     builderList.add(new SimpleConfigurationBuilder(getStartUpRegistryObjects()));
     builderList.add(new BasicRuntimeServicesConfigurationBuilder());
     builderList.add(new MinimalConfigurationBuilder());
+    builderList.addAll(getAdditionalConfigurationBuilders());
     return muleContextFactory.createMuleContext(builderList.toArray(new ConfigurationBuilder[] {}));
   }
 
@@ -84,6 +86,10 @@ public class AbstractBenchmark {
 
   protected Map<String, Object> getStartUpRegistryObjects() {
     return new HashMap<>();
+  }
+
+  protected List<ConfigurationBuilder> getAdditionalConfigurationBuilders() {
+    return emptyList();
   }
 
   public CoreEvent createEvent(Flow flow) {

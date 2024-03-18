@@ -1,26 +1,29 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.manager;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getJdkVersion;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getConfigurationForComponent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.manager.DefaultConfigurationExpirationMonitor.Builder.newBuilder;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplicitConfigurationProviderName;
+
+import static java.lang.String.format;
+import static java.lang.System.getProperty;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -34,15 +37,19 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.time.Time;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
+import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.runtime.module.extension.internal.manager.jdk.ExtensionJdkValidator;
+import org.mule.runtime.module.extension.internal.manager.jdk.LooseExtensionJdkValidator;
+import org.mule.runtime.module.extension.internal.manager.jdk.NullExtensionJdkValidator;
+import org.mule.runtime.module.extension.internal.manager.jdk.StrictExtensionJdkValidator;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.config.ImplicitConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -66,9 +73,20 @@ import org.slf4j.LoggerFactory;
  *
  * @since 3.7.0
  */
-public final class DefaultExtensionManager implements ExtensionManager, MuleContextAware, Initialisable, Startable, Stoppable {
+public final class DefaultExtensionManager implements ExtensionManager, Initialisable, Startable, Stoppable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultExtensionManager.class);
+
+  /**
+   * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
+   * it will be for internal use only.
+   *
+   * @since 4.5.0
+   */
+  static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
+  static final String JVM_ENFORCEMENT_STRICT = "STRICT";
+  static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
+  static final String JVM_ENFORCEMENT_DISABLED = "DISABLED";
 
   private final ImplicitConfigurationProviderFactory implicitConfigurationProviderFactory =
       new DefaultImplicitConfigurationProviderFactory();
@@ -83,11 +101,14 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
   @Inject
   private FeatureFlaggingService featureFlaggingService;
 
+  @Inject
   private MuleContext muleContext;
+
   private ExtensionRegistry extensionRegistry;
   private ConfigurationExpirationMonitor configurationExpirationMonitor;
 
   private ExtensionActivator extensionActivator;
+  private ExtensionJdkValidator extensionJdkValidator;
 
   @Override
   public void initialise() throws InitialisationException {
@@ -95,6 +116,7 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
       extensionRegistry = new ExtensionRegistry(new DefaultRegistry(muleContext));
       extensionActivator = new ExtensionActivator(muleContext);
       initialiseIfNeeded(implicitConfigurationProviderFactory, muleContext);
+      resolveJdkValidator();
     }
   }
 
@@ -133,6 +155,8 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Registering extension {} (version: {} vendor: {} )", extensionName, extensionVersion, extensionVendor);
     }
+
+    extensionJdkValidator.validateJdkSupport(extensionModel);
 
     if (extensionRegistry.containsExtension(extensionName)) {
       if (LOGGER.isDebugEnabled()) {
@@ -300,9 +324,23 @@ public final class DefaultExtensionManager implements ExtensionManager, MuleCont
     return muleContext.getConfiguration().getDynamicConfigExpiration().getFrequency();
   }
 
-  @Override
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  void resolveJdkValidator() {
+    JdkVersion runningJdkVersion = getJdkVersion();
+    String enforcementMode = getProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_STRICT);
+
+    if (JVM_ENFORCEMENT_STRICT.equals(enforcementMode)) {
+      extensionJdkValidator = new StrictExtensionJdkValidator(runningJdkVersion);
+    } else if (JVM_ENFORCEMENT_LOOSE.equals(enforcementMode)) {
+      extensionJdkValidator = new LooseExtensionJdkValidator(runningJdkVersion, LOGGER);
+    } else if (JVM_ENFORCEMENT_DISABLED.equals(enforcementMode)) {
+      extensionJdkValidator = new NullExtensionJdkValidator(runningJdkVersion);
+    } else {
+      throw new IllegalArgumentException("Unsupported " + EXTENSION_JVM_ENFORCEMENT_PROPERTY + "value: " + enforcementMode);
+    }
+  }
+
+  ExtensionJdkValidator getExtensionJdkValidator() {
+    return extensionJdkValidator;
   }
 
   public ReflectionCache getReflectionCache() {

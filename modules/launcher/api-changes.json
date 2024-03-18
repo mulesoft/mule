@@ -1,0 +1,16 @@
+{
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.launcher.api.log4j2.AsyncLoggerExceptionHandler",
+          "package": "org.mule.runtime.module.launcher.api.log4j2",
+          "classSimpleName": "AsyncLoggerExceptionHandler",
+          "elementKind": "class",
+          "justification": "The logging feature was moved to its own module"
+        }
+      ]
+    }
+  }
+}

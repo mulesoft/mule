@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,14 +9,15 @@ package org.mule.functional.junit4;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.emptyArtifact;
-import static org.mule.runtime.ast.internal.serialization.ArtifactAstSerializerFactory.JSON;
+import static org.mule.runtime.ast.internal.serialization.json.JsonArtifactAstSerializerFormat.JSON;
+import static org.mule.runtime.config.api.ArtifactContextFactory.createArtifactContextFactory;
 import static org.mule.runtime.config.api.dsl.ArtifactDeclarationUtils.toArtifactast;
-import static org.mule.runtime.config.internal.ConfigurationPropertiesResolverFactory.createConfigurationPropertiesResolver;
 import static org.mule.runtime.module.artifact.activation.api.ast.ArtifactAstUtils.parseAndBuildAppExtensionModel;
 
 import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
@@ -32,12 +33,13 @@ import org.mule.runtime.ast.api.serialization.ArtifactAstSerializerProvider;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.ArtifactContextFactory;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
+import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.ArtifactAstConfigurationBuilder;
-import org.mule.runtime.config.internal.ComponentBuildingDefinitionRegistryFactoryAware;
-import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactContext;
+import org.mule.runtime.dsl.api.xml.parser.ParsingPropertyResolver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +58,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
  * @since 4.5
  */
 public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurationBuilder
-    implements ComponentBuildingDefinitionRegistryFactoryAware, ArtifactContextFactory {
+    implements ArtifactContextFactory {
 
   public static final String SERIALIZE_DESERIALIZE_AST_PROPERTY = SYSTEM_PROPERTY_PREFIX + "test.serializeDeserializeAst";
 
@@ -84,8 +86,7 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
   private ArtifactType artifactType = APPLICATION;
   private ArtifactContext parentArtifactContext;
 
-  private ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory;
-  private ArtifactAstConfigurationBuilder artifactAstConfigurationBuilder;
+  private ArtifactContextFactory artifactAstConfigurationBuilder;
 
   public ArtifactAstXmlParserConfigurationBuilder(Map<String, String> artifactProperties,
                                                   boolean enableLazyInit,
@@ -145,15 +146,13 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
                                         key -> parseArtifactIntoAst(extensions, muleContext, expressionLanguageMetadataService));
     }
 
-    artifactAstConfigurationBuilder =
-        new ArtifactAstConfigurationBuilder(artifactAst, artifactProperties, resolveArtifactType(), enableLazyInit,
-                                            addToolingObjectsToRegistry);
-    this.serviceConfigurators.forEach(artifactAstConfigurationBuilder::addServiceConfigurator);
-    artifactAstConfigurationBuilder.setComponentBuildingDefinitionRegistryFactory(componentBuildingDefinitionRegistryFactory);
-    if (parentArtifactContext != null) {
-      artifactAstConfigurationBuilder.setParentContext(parentArtifactContext.getMuleContext(),
-                                                       parentArtifactContext.getArtifactAst());
-    }
+    artifactAstConfigurationBuilder = createArtifactContextFactory(artifactAst,
+                                                                   artifactProperties,
+                                                                   resolveArtifactType(),
+                                                                   enableLazyInit,
+                                                                   addToolingObjectsToRegistry,
+                                                                   serviceConfigurators,
+                                                                   ofNullable(parentArtifactContext));
     artifactAstConfigurationBuilder.configure(muleContext);
   }
 
@@ -254,6 +253,14 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
       return builder.build();
     }
 
+    private ParsingPropertyResolver createConfigurationPropertiesResolver(Map<String, String> artifactProperties) {
+      ConfigurationPropertiesResolver resolver = new ConfigurationPropertiesHierarchyBuilder()
+          .withApplicationProperties(artifactProperties)
+          .build();
+
+      return propertyKey -> (String) resolver.resolveValue(propertyKey);
+    }
+
     @Override
     public int hashCode() {
       return Objects.hash(artifactProperties, disableXmlValidations, extensions, artifactType, parentArtifactAst);
@@ -278,11 +285,6 @@ public class ArtifactAstXmlParserConfigurationBuilder extends AbstractConfigurat
           && Objects.equals(parentArtifactAst, other.parentArtifactAst);
     }
 
-  }
-
-  @Override
-  public void setComponentBuildingDefinitionRegistryFactory(ComponentBuildingDefinitionRegistryFactory componentBuildingDefinitionRegistryFactory) {
-    this.componentBuildingDefinitionRegistryFactory = componentBuildingDefinitionRegistryFactory;
   }
 
 }

@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.module.extension.metadata;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,12 +38,14 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.USA_DISPLAY_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.OutputModel;
@@ -52,6 +55,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.ScopePropagationContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -74,11 +79,14 @@ import org.mule.test.module.extension.internal.util.ExtensionsTestUtils;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import io.qameta.allure.Issue;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -264,9 +272,57 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-15158118")
   public void outputMultipleInputWithKeyIdExplicitParameterResolution() throws Exception {
     location = Location.builder().globalName(OUTPUT_AND_MULTIPLE_INPUT_WITH_KEY_ID).addProcessorsPart().addIndexPart(0).build();
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult = metadataService.getOutputMetadata(location, CAR_KEY);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  @Issue("W-15158118")
+  public void outputResolverForScope() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    ScopePropagationContext scopeContext = new ScopePropagationContext() {
+
+      @Override
+      public Supplier<MetadataType> getInnerChainResolver() {
+        return () -> carType;
+      }
+
+      @Override
+      public Supplier<MessageMetadataType> getMessageTypeResolver() {
+        return null;
+      }
+    };
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getScopeOutputMetadata(location, CAR_KEY, scopeContext);
+    assertThat(outputMetadataResult.isSuccess(), is(true));
+    OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
+    assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
+    assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void outputResolverForRouter() throws Exception {
+    location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
+
+      @Override
+      public Map<String, Supplier<MetadataType>> getRouteResolvers() {
+        return singletonMap("metaroute", () -> carType);
+      }
+
+      @Override
+      public Supplier<MessageMetadataType> getMessageTypeResolver() {
+        return null;
+      }
+    };
+    MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerPropagationContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));

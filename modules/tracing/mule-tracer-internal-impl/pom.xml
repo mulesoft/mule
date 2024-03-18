@@ -12,16 +12,16 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-tracing-parent</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-tracer-internal-impl</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <name>Mule Tracer Internal Implementation</name>
     <description>Implementation for the internal tracer</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.internal.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -35,6 +35,11 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-customization-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

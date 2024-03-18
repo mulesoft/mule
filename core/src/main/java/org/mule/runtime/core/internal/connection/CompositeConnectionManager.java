@@ -1,17 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.connection;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+
+import static java.util.Objects.requireNonNull;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -19,10 +22,9 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import org.slf4j.Logger;
@@ -51,8 +53,8 @@ public class CompositeConnectionManager implements ConnectionManager, Connection
    */
   public CompositeConnectionManager(ConnectionManagerAdapter childConnectionManager,
                                     ConnectionManagerAdapter parentConnectionManager) {
-    checkNotNull(childConnectionManager, "'childConnectionManager' can't be null");
-    checkNotNull(parentConnectionManager, "'parentConnectionManager' can't be null");
+    requireNonNull(childConnectionManager, "'childConnectionManager' can't be null");
+    requireNonNull(parentConnectionManager, "'parentConnectionManager' can't be null");
 
     this.childConnectionManager = childConnectionManager;
     this.parentConnectionManager = parentConnectionManager;
@@ -116,6 +118,12 @@ public class CompositeConnectionManager implements ConnectionManager, Connection
     } else {
       return parentConnectionManager.testConnectivity(configurationInstance);
     }
+  }
+
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException {
+    return testConnectivity(configurationInstance);
   }
 
   /**

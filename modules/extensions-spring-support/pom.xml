@@ -5,19 +5,25 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-extensions-spring-support</artifactId>
     <name>Mule Extensions Spring Support</name>
     <packaging>jar</packaging>
     <description>
         Support for extensions to be configured through a mule config file
-        backed by the spring framework
+        backed by the Spring framework
     </description>
 
     <properties>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            ${surefire.test.unit.open.args}
+        </surefire.args>
+
+        <javaModuleName>org.mule.runtime.extensions.spring.support</javaModuleName>
+        <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <jsoup.version>1.15.3</jsoup.version>
         <mule.runtime.version>${project.version}</mule.runtime.version>
     </properties>
 
@@ -41,14 +47,28 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Module layer is created by the tests-runner, don't need surefire to config the boot layer for the JVM -->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>default-test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/mule/test/**</include>
+                            </includes>
+                        </configuration>
                     </execution>
-                </executions>
+                </executions>                
             </plugin>
         </plugins>
     </build>
@@ -59,7 +79,6 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
         </dependency>
 
         <!-- Mule Dependencies -->
@@ -147,21 +166,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>test-components</artifactId>
-            <version>${muleTestComponentsVersion}</version>
-            <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!-- Excluding as it will be resolved with SNAPSHOT version because test-components
-                    is SNAPSHOT to avoid a circular dep within mule and mule-test-artifacts repos -->
-                    <groupId>org.mule.sdk</groupId>
-                    <artifactId>mule-sdk-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
@@ -169,13 +173,6 @@
         <dependency>
             <groupId>com.google.testing.compile</groupId>
             <artifactId>compile-testing</artifactId>
-            <version>0.14</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                </exclusion>
-            </exclusions>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -398,6 +395,12 @@
             <artifactId>mule-service-weave</artifactId>
             <classifier>mule-service</classifier>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
@@ -433,12 +436,6 @@
             <artifactId>mule-tests-component-plugin</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -52,6 +52,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 import static reactor.core.publisher.Mono.from;
 import static reactor.core.publisher.Mono.just;
@@ -92,10 +93,10 @@ import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
-import org.mule.runtime.core.internal.profiling.DummyInitialSpanInfoProvider;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
+import org.mule.runtime.core.internal.routing.result.RoutePathNotFoundException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
@@ -112,6 +113,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -138,6 +140,8 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
+
+  private static final Logger LOGGER = getLogger(FlowRefFactoryBeanTestCase.class);
 
   private static final MockSettings INITIALIZABLE_MESSAGE_PROCESSOR =
       withSettings().extraInterfaces(Component.class, Processor.class, Initialisable.class, Disposable.class,
@@ -393,7 +397,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
             .addPropertyValue(IS_EAGER_INIT, new LazyValue<>(() -> true))
             .setScope(BeanDefinition.SCOPE_PROTOTYPE)
             .getBeanDefinition();
-    beanFactory.registerSingleton(InitialSpanInfoProvider.class.getName(), new DummyInitialSpanInfoProvider());
+    beanFactory.registerSingleton(InitialSpanInfoProvider.class.getName(), new DummyComponentTracerFactory());
     beanFactory.registerBeanDefinition(PARSED_DYNAMIC_REFERENCED_FLOW, subFlowBeanDefinition);
     // Additional flow and processing strategy (needed to generate a concurrent subflow instantiation)
     Flow concurrentCallerFlow = mock(Flow.class, INITIALIZABLE_MESSAGE_PROCESSOR);
@@ -448,6 +452,7 @@ public class FlowRefFactoryBeanTestCase extends AbstractMuleTestCase {
       stopIfNeeded(flowRefProcessor);
       disposeIfNeeded(flowRefProcessor, null);
     } catch (Exception e) {
+      LOGGER.error(e.getMessage(), e);
       throw new RuntimeException("Error sending events to a flowRef", e);
     }
   }

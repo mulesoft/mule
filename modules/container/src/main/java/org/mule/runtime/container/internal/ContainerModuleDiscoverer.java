@@ -1,15 +1,14 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.container.internal.ContainerModulesDiscovererProvider.containerModulesDiscoverer;
 
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,29 +18,32 @@ import java.util.List;
  *
  * @since 4.0
  */
-public class ContainerModuleDiscoverer implements ModuleDiscoverer {
+public final class ContainerModuleDiscoverer implements ModuleDiscoverer {
 
-  private final CompositeModuleDiscoverer moduleDiscoverer;
+  private final List<ModuleDiscoverer> moduleDiscoverers;
 
   /**
    * Creates a new instance.
    *
    * @param containerClassLoader container classloader used to find modules. Non null.
    */
-  public ContainerModuleDiscoverer(ClassLoader containerClassLoader) {
-    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
-    moduleDiscoverer = new CompositeModuleDiscoverer(getModuleDiscoverers(containerClassLoader).toArray(new ModuleDiscoverer[0]));
+  public ContainerModuleDiscoverer() {
+    this.moduleDiscoverers = getModuleDiscoverers();
   }
 
-  protected List<ModuleDiscoverer> getModuleDiscoverers(ClassLoader containerClassLoader) {
+  private List<ModuleDiscoverer> getModuleDiscoverers() {
     List<ModuleDiscoverer> result = new ArrayList<>();
     result.add(new JreModuleDiscoverer());
-    result.add(new ClasspathModuleDiscoverer(containerClassLoader));
+    result.add(containerModulesDiscoverer());
     return result;
   }
 
+  public void addModuleDiscoverer(ModuleDiscoverer moduleDiscoverer) {
+    this.moduleDiscoverers.add(moduleDiscoverer);
+  }
+
   @Override
-  public List<MuleModule> discover() {
-    return moduleDiscoverer.discover();
+  public List<MuleContainerModule> discover() {
+    return new CompositeModuleDiscoverer(this.moduleDiscoverers.toArray(new ModuleDiscoverer[0])).discover();
   }
 }

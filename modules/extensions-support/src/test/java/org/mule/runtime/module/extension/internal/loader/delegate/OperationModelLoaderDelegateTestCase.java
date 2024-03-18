@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -21,6 +21,7 @@ import static org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeReso
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputAndOutputWithAttributesResolverWithKeyResolver.TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestInputOutputSourceResolverWithKeyResolver.TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER;
+import static org.mule.test.metadata.extension.resolver.TestInputResolver.INPUT_RESOLVER_NAME;
 import static org.mule.test.metadata.extension.resolver.TestInputResolverWithoutKeyResolver.TEST_INPUT_RESOLVER_WITHOUT_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolver.TEST_MULTI_LEVEL_KEY_RESOLVER;
 import static org.mule.test.metadata.extension.resolver.TestOutputAnyTypeResolver.METADATA_EXTENSION_RESOLVER;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import io.qameta.allure.Issue;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -145,7 +147,6 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
     assertParamResolverInfo(dynamicContent, "type", empty());
     assertParamResolverInfo(dynamicContent, "content", of(SDK_TEST_INPUT_RESOLVER_WITH_KEY_RESOLVER));
 
-
     OperationDeclaration dynamicOutput = getDeclaration(operations, "outputMetadataWithKeyId");
     assertCategoryInfo(dynamicOutput, METADATA_EXTENSION_RESOLVER);
     assertOutputResolverInfo(dynamicOutput, of(TEST_OUTPUT_RESOLVER_WITH_KEY_RESOLVER));
@@ -187,6 +188,15 @@ public class OperationModelLoaderDelegateTestCase extends AbstractMuleTestCase {
     assertOutputResolverInfo(sourceDynamicAttributes, of(TEST_INPUT_AND_OUTPUT_WITH_ATTRIBUTES_RESOLVER_WITH_KEY_RESOLVER));
     assertAttributesResolverInfo(sourceDynamicAttributes, empty());
     assertKeysResolverInfo(sourceDynamicAttributes, of(TEST_INPUT_OUTPUT_SOURCE_RESOLVER_WITH_KEY_RESOLVER));
+  }
+
+  @Test
+  @Issue("W-12739062")
+  public void inputTypeResolverForParameterInParameterGroup() {
+    List<OperationDeclaration> operations = declaration.getOperations();
+
+    OperationDeclaration operation = getDeclaration(operations, "inputMetadataResolverInParameterInParameterGroup");
+    assertParamResolverInfo(operation, "bear", of(INPUT_RESOLVER_NAME));
   }
 
   private void assertParameterIsMetadataKeyPart(ParameterDeclaration param) {

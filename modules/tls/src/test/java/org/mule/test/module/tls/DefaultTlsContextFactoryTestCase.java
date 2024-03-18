@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -24,8 +24,8 @@ import static org.mule.functional.junit4.matchers.ThrowableCauseMatcher.hasCause
 import static org.mule.functional.junit4.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS_CONFIGURATION;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.DEFAULT_SECURITY_MODEL;
-import static org.mule.runtime.core.privileged.security.tls.TlsConfiguration.PROPERTIES_FILE_PATTERN;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.DEFAULT_SECURITY_MODEL;
+import static org.mule.runtime.module.tls.internal.TlsConfiguration.PROPERTIES_FILE_PATTERN;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -203,17 +203,7 @@ public class DefaultTlsContextFactoryTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void defaultIncludesTls12Ciphers() throws Exception {
-    assumeThat(IS_JAVA_1_8, is(true));
-
-    defaultIncludesDEfaultTlsVersionCiphers("TLSv1.2");
-  }
-
-  @Test
   public void defaultIncludesTls13Ciphers() throws Exception {
-    // For versions greater than 8, the default is TLS 1.3
-    assumeThat(IS_JAVA_1_8, is(false));
-
     defaultIncludesDEfaultTlsVersionCiphers("TLSv1.3");
   }
 

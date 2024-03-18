@@ -1,17 +1,16 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.classification;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.requireNonNull;
 
 import static org.apache.commons.io.FileUtils.toFile;
 
@@ -57,8 +56,8 @@ public class DefaultWorkspaceReader implements WorkspaceReader {
    *                                  {@link Artifact}
    */
   public DefaultWorkspaceReader(List<URL> classPath, WorkspaceLocationResolver workspaceLocationResolver) {
-    checkNotNull(classPath, "classPath cannot be null");
-    checkNotNull(workspaceLocationResolver, "workspaceLocationResolver cannot be null");
+    requireNonNull(classPath, "classPath cannot be null");
+    requireNonNull(workspaceLocationResolver, "workspaceLocationResolver cannot be null");
 
     this.classPath = classPath;
     this.workspaceLocationResolver = workspaceLocationResolver;

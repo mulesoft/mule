@@ -1,21 +1,25 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.loader.java.type.runtime;
 
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
+import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
+import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
+
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isPrivate;
+import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_ONLY;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.READ_WRITE;
-import static org.mule.runtime.module.extension.api.loader.java.type.PropertyElement.Accessibility.WRITE_ONLY;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getPropertyDescriptors;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.MetadataType;
@@ -58,7 +62,7 @@ public class TypeWrapper implements Type {
   private List<TypeGeneric> generics = emptyList();
   private ResolvableType[] resolvableTypeGenerics = new ResolvableType[] {};
   ClassTypeLoader typeLoader;
-  private LazyValue<Boolean> instantiable;
+  private final LazyValue<Boolean> instantiable;
 
   public TypeWrapper(Class<?> aClass, ClassTypeLoader typeLoader) {
     this.aClass = aClass != null ? aClass : Object.class;
@@ -130,10 +134,26 @@ public class TypeWrapper implements Type {
    */
   @Override
   public List<FieldElement> getFields() {
+    // Avoid querying fields that would be filtered out anyway
+    if (aClass.isPrimitive() || aClass.isEnum() || aClass.isArray() || isJdkClass(aClass)) {
+      return emptyList();
+    }
+
     return IntrospectionUtils.getFields(aClass).stream()
-        .filter(field -> !field.getDeclaringClass().getPackage().getName().startsWith("java."))
+        .filter(field -> !isJdkClass(field.getDeclaringClass()))
+        .filter(field -> !isPrivateStaticFinal(field))
+        .filter(field -> !field.isSynthetic())
         .map((Field field) -> new FieldWrapper(field, typeLoader))
         .collect(toList());
+  }
+
+  private static boolean isJdkClass(Class aClass) {
+    return aClass.getPackage().getName().startsWith("java.");
+  }
+
+  private static boolean isPrivateStaticFinal(Field field) {
+    int modifiers = field.getModifiers();
+    return isPrivate(modifiers) && isStatic(modifiers) && isFinal(modifiers);
   }
 
   @Override

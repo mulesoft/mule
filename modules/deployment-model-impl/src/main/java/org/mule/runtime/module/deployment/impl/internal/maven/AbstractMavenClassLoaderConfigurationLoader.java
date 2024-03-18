@@ -1,45 +1,47 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.deployment.impl.internal.maven;
 
+import static org.mule.maven.client.api.VersionUtils.discoverVersionUtils;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
-import static org.mule.runtime.deployment.model.api.application.ApplicationDescriptor.REPOSITORY_FOLDER;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleHome;
 import static org.mule.runtime.module.artifact.activation.internal.plugin.PluginLocalDependenciesDenylist.isDenylisted;
+import static org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor.REPOSITORY_FOLDER;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.INCLUDE_TEST_DEPENDENCIES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.PROVIDED;
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
-import static com.google.common.io.Files.createTempDir;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenReactorResolver;
+import org.mule.maven.client.api.VersionUtils;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants;
-import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -50,12 +52,13 @@ import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderEx
 import org.mule.runtime.module.artifact.internal.util.FileJarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarExplorer;
 import org.mule.runtime.module.artifact.internal.util.JarInfo;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+import org.mule.runtime.module.deployment.impl.internal.plugin.MuleArtifactPatchingModel;
 import org.mule.tools.api.classloader.model.Artifact;
 import org.mule.tools.api.classloader.model.ArtifactCoordinates;
 import org.mule.tools.api.classloader.model.ClassLoaderModel;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -73,10 +76,6 @@ import java.util.function.Supplier;
 import com.google.common.collect.ImmutableSet;
 import com.vdurmont.semver4j.Semver;
 
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.InvalidVersionSpecificationException;
-import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionConstraint;
 import org.slf4j.Logger;
 
 /**
@@ -276,43 +275,32 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     String artifactId = thisArtifactCoordinates.getGroupId() + ":"
         + thisArtifactCoordinates.getArtifactId() + ":" + thisArtifactCoordinates.getVersion();
     try {
-      File muleArtifactPatchesFolder = new File(MuleContainerBootstrapUtils.getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
+      File muleArtifactPatchesFolder = new File(getMuleHome(), MULE_ARTIFACT_PATCHES_LOCATION);
       if (muleArtifactPatchesFolder.exists()) {
+        final VersionUtils versionUtils = discoverVersionUtils(this.getClass().getClassLoader());
+
         String[] jarFiles = muleArtifactPatchesFolder.list((dir, name) -> name != null && name.endsWith(".jar"));
         for (String jarFile : jarFiles) {
           MuleArtifactPatchingModel muleArtifactPatchingModel =
               MuleArtifactPatchingModel.loadModel(new File(muleArtifactPatchesFolder, jarFile));
-          GenericVersionScheme genericVersionScheme = new GenericVersionScheme();
-          Version thisArtifactCoordinatesVersion;
-          try {
-            thisArtifactCoordinatesVersion = genericVersionScheme.parseVersion(thisArtifactCoordinates.getVersion());
-          } catch (Exception e) {
-            LOGGER.warn("Error parsing version %s for artifact %s, patches against this artifact will not be applied",
-                        thisArtifactCoordinates.getVersion(),
-                        thisArtifactCoordinates.getGroupId() + ":" + thisArtifactCoordinates.getArtifactId());
-            return emptyList();
-          }
           ArtifactCoordinates patchedArtifactCoordinates = muleArtifactPatchingModel.getArtifactCoordinates();
           if (patchedArtifactCoordinates.getGroupId().equals(thisArtifactCoordinates.getGroupId()) &&
               patchedArtifactCoordinates.getArtifactId().equals(thisArtifactCoordinates.getArtifactId()) &&
               patchedArtifactCoordinates.getClassifier().equals(thisArtifactCoordinates.getClassifier())) {
-            if (muleArtifactPatchingModel.getAffectedVersions()
-                .stream()
-                .anyMatch(affectedVersion -> {
-                  try {
-                    VersionConstraint versionConstraint = genericVersionScheme.parseVersionConstraint(affectedVersion);
-                    if (versionConstraint.containsVersion(thisArtifactCoordinatesVersion)) {
-                      return true;
-                    }
-                    return false;
-                  } catch (InvalidVersionSpecificationException e) {
-                    throw new MuleRuntimeException(createStaticMessage("Could not parse plugin patch affect version: "
-                        + affectedVersion), e);
-                  }
-                })) {
+
+            boolean versionContained;
+            try {
+              versionContained = versionUtils
+                  .containsVersion(thisArtifactCoordinates.getVersion(), muleArtifactPatchingModel.getAffectedVersions());
+            } catch (IllegalArgumentException e) {
+              LOGGER.warn(e.getMessage() + ", patches against this artifact will not be applied");
+              return emptyList();
+            }
+
+            if (versionContained) {
               try {
                 URL mulePluginPatchUrl =
-                    new File(MuleContainerBootstrapUtils.getMuleHome(),
+                    new File(getMuleHome(),
                              Paths.get(MULE_ARTIFACT_PATCHES_LOCATION, jarFile).toString())
                                  .toURL();
                 patches.add(mulePluginPatchUrl);
@@ -418,7 +406,12 @@ public abstract class AbstractMavenClassLoaderConfigurationLoader implements Cla
     boolean includeProvidedDependencies = includeProvidedDependencies(artifactType);
     Optional<MavenReactorResolver> mavenReactorResolver = ofNullable((MavenReactorResolver) attributes
         .get(CLASSLOADER_MODEL_MAVEN_REACTOR_RESOLVER));
-    Optional<File> temporaryDirectory = of(createTempDir());
+    Optional<File> temporaryDirectory;
+    try {
+      temporaryDirectory = of(createTempDirectory(null).toFile());
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to create directory", e);
+    }
     try {
       List<org.mule.maven.pom.parser.api.model.BundleDependency> dependencies =
           mavenClient.resolveArtifactDependencies(artifactFile, includeTestDependencies(attributes),

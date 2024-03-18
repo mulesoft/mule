@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,9 +12,9 @@ import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 
@@ -26,10 +26,10 @@ import java.util.function.Supplier;
  * A tracer for {@link Event}'s.
  *
  * Once an event is dispatched to a flow, it will hit different components. The processing of an event in each component will
- * represent a {@link InternalSpan}, that is, a unit of work with a start time and an end time that encompasses what each
- * component does (a http request, a batch job, an until successful block, etc.). In each moment of an event processing, the
- * {@link Event} will have a context span, which is the most specific span associated to that event, that is the most specific
- * processing that is being done in a certain moment.
+ * represent a {@link Span}, that is, a unit of work with a start time and an end time that encompasses what each component does
+ * (a http request, a batch job, an until successful block, etc.). In each moment of an event processing, the {@link Event} will
+ * have a context span, which is the most specific span associated to that event, that is the most specific processing that is
+ * being done in a certain moment.
  *
  * Example:
  *
@@ -50,8 +50,7 @@ public interface EventTracer<T extends Event> {
    * @param spanInfo the {@link InitialSpanInfo} used for customizing the span.
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startComponentSpan(T event,
-                                            InitialSpanInfo spanInfo);
+  Optional<Span> startSpan(T event, InitialSpanInfo spanInfo);
 
 
   /**
@@ -63,23 +62,21 @@ public interface EventTracer<T extends Event> {
    *
    * @return the span generated for the context of the {@link Event} when it hits the {@param component} if it could be created.
    */
-  Optional<InternalSpan> startComponentSpan(T event,
-                                            InitialSpanInfo spanInfo,
-                                            Assertion assertion);
+  Optional<Span> startSpan(T event, InitialSpanInfo spanInfo, Assertion assertion);
 
   /**
-   * @param event ends the current context {@link InternalSpan}.
+   * @param event ends the current context {@link Span}.
    */
   void endCurrentSpan(T event);
 
   /**
-   * @param event     ends the current context {@link InternalSpan}.
+   * @param event     ends the current context {@link Span}.
    * @param condition indicates a condition that has to be verified for ending the span.
    */
   void endCurrentSpan(T event, Assertion condition);
 
   /**
-   * Injects a distributedTraceContext in a {@link InternalSpan}
+   * Injects a distributedTraceContext in a {@link Span}
    *
    * @param eventContext                  the {@link EventContext} to inject.
    * @param distributedTraceContextGetter the {@link DistributedTraceContextGetter} to get the distributed trace context.
@@ -87,12 +84,12 @@ public interface EventTracer<T extends Event> {
   void injectDistributedTraceContext(EventContext eventContext, DistributedTraceContextGetter distributedTraceContextGetter);
 
   /**
-   * Records an error as part of the current {@link InternalSpan}.
+   * Records an error as part of the current {@link Span}.
    *
    * @param event                      The event to retrieve the distributed trace context from. Must contain the
    *                                   {@link org.mule.runtime.api.message.Error} to be recorded.
    * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
-   *                                   {@link InternalSpan} containing the error represents.
+   *                                   {@link Span} containing the error represents.
    */
   default void recordErrorAtCurrentSpan(T event, boolean isErrorEscapingCurrentSpan) {
     recordErrorAtCurrentSpan(event, () -> event.getError()
@@ -102,12 +99,12 @@ public interface EventTracer<T extends Event> {
   }
 
   /**
-   * Records an error as part of the current {@link InternalSpan}.
+   * Records an error as part of the current {@link Span}.
    *
    * @param event                      The event to retrieve the distributed trace context from.
    * @param errorSupplier              Supplier of the {@link org.mule.runtime.api.message.Error} that occurred.
    * @param isErrorEscapingCurrentSpan True if the error is not being handled as part of the execution of the work that the
-   *                                   {@link InternalSpan} containing the error represents.
+   *                                   {@link Span} containing the error represents.
    */
   void recordErrorAtCurrentSpan(T event, Supplier<Error> errorSupplier, boolean isErrorEscapingCurrentSpan);
 

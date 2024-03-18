@@ -1,14 +1,16 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.config.internal.dsl.processor;
 
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
+
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
 import org.mule.runtime.dsl.api.component.ComponentFactory;
 
@@ -24,7 +26,7 @@ public class ReconnectionConfigObjectFactory extends AbstractComponentFactory<Re
 
   @Override
   public ReconnectionConfig doGetObject() throws Exception {
-    return new ReconnectionConfig(failsDeployment, retryPolicyTemplate);
+    return defaultReconnectionConfig(failsDeployment, retryPolicyTemplate);
   }
 
   public void setFailsDeployment(boolean failsDeployment) {

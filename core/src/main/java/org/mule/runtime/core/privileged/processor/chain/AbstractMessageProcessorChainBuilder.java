@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,12 +7,14 @@
 package org.mule.runtime.core.privileged.processor.chain;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.event.Event;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.privileged.processor.MessageProcessorBuilder;
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   protected FlowExceptionHandler messagingExceptionHandler;
   protected ComponentLocation location;
   protected MuleContext muleContext;
-  protected InitialSpanInfo chainInitialSpanInfo;
+  protected ComponentTracer<CoreEvent> chainComponentTracer;
 
   // Argument is of type Object because it could be a MessageProcessor or a MessageProcessorBuilder
   protected Processor initializeMessageProcessor(Object processor) {
@@ -65,8 +67,7 @@ public abstract class AbstractMessageProcessorChainBuilder implements MessagePro
   }
 
   @Override
-  public void setChainInitialSpanInfo(
-                                      InitialSpanInfo chainInitialSpanInfo) {
-    this.chainInitialSpanInfo = chainInitialSpanInfo;
+  public void setComponentTracer(ComponentTracer<CoreEvent> chainComponentTracer) {
+    this.chainComponentTracer = chainComponentTracer;
   }
 }

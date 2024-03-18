@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,24 +7,35 @@
 package org.mule.functional.api.component;
 
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.hamcrest.Matchers.hasItem;
 import static org.mule.functional.api.component.StacktraceLogChecker.MethodCall.compatibleWith;
 import static org.mule.runtime.core.api.util.StringUtils.EMPTY;
+
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.regex.Pattern.compile;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.hamcrest.Matchers.hasItem;
 
 import org.mule.runtime.api.component.AbstractComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
 
 public class StacktraceLogChecker extends AbstractLogChecker {
+
+  private static final String MODULE_OR_PACKAGE_NAME_REGEX = "[a-z][a-z0-9_]*(?:\\.[a-z0-9_]+)+[0-9a-z_]";
+  private static final String VERSION_REGEX = "[0-9_]*(?:\\.[0-9_]+)+\\.[0-9]";
+
+  private static final Pattern PACKAGE_WITH_MODULE_PATTERN =
+      compile("^(?:" + MODULE_OR_PACKAGE_NAME_REGEX + "@" + VERSION_REGEX + "\\/)?(" + MODULE_OR_PACKAGE_NAME_REGEX + ")$");
 
   private static final String ANY = "(any)";
 
@@ -149,9 +160,14 @@ public class StacktraceLogChecker extends AbstractLogChecker {
           if (thisCall.clazz != null && otherCall.clazz != null && !thisCall.clazz.equals(otherCall.clazz)) {
             return false;
           }
-          if (thisCall.packageName != null && otherCall.packageName != null
-              && !thisCall.packageName.equals(otherCall.packageName)) {
-            return false;
+          if (thisCall.packageName != null && otherCall.packageName != null) {
+            if (!thisCall.packageName.equals(otherCall.packageName)) {
+              // It may be different because it has module information...
+              final Matcher matcher = PACKAGE_WITH_MODULE_PATTERN.matcher(otherCall.packageName);
+              if (!matcher.matches() || !thisCall.packageName.equals(matcher.group(1))) {
+                return false;
+              }
+            }
           }
           if (thisCall.lineNumber != null && otherCall.lineNumber != null && !thisCall.lineNumber.equals(otherCall.lineNumber)) {
             return false;

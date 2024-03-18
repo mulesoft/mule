@@ -1,16 +1,16 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
+import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
+import org.mule.oauth.client.api.listener.ClientCredentialsListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsState;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
-import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -27,13 +27,14 @@ public class UpdatingClientCredentialsState
   private final ClientCredentialsOAuthDancer dancer;
   private ClientCredentialsState delegate;
   private boolean invalidated = false;
+  private ClientCredentialsListener clientCredentialsListener;
 
   public UpdatingClientCredentialsState(ClientCredentialsOAuthDancer dancer,
                                         ResourceOwnerOAuthContext initialContext,
                                         Consumer<ResourceOwnerOAuthContext> onUpdate) {
     this.dancer = dancer;
     updateDelegate(initialContext);
-    dancer.addListener(new ClientCredentialsListener() {
+    clientCredentialsListener = new ClientCredentialsListener() {
 
       @Override
       public void onTokenRefreshed(ResourceOwnerOAuthContext context) {
@@ -45,7 +46,8 @@ public class UpdatingClientCredentialsState
       public void onTokenInvalidated() {
         invalidated = true;
       }
-    });
+    };
+    dancer.addListener(clientCredentialsListener);
   }
 
   private void updateDelegate(ResourceOwnerOAuthContext initialContext) {
@@ -69,5 +71,9 @@ public class UpdatingClientCredentialsState
   @Override
   public Optional<String> getExpiresIn() {
     return delegate.getExpiresIn();
+  }
+
+  public void deregisterListener() {
+    dancer.removeListener(clientCredentialsListener);
   }
 }

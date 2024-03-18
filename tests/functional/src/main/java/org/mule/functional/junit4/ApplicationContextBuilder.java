@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -65,7 +65,7 @@ public class ApplicationContextBuilder {
    * Controls whether lazy initialization of components is enabled/disabled.
    *
    * @param enableLazyInit whether lazy initialization is enabled.
-   * @since 4.6
+   * @since 4.5
    */
   public ApplicationContextBuilder setEnableLazyInit(boolean enableLazyInit) {
     isEnableLazyInit = enableLazyInit;
@@ -76,7 +76,7 @@ public class ApplicationContextBuilder {
    * Controls whether if XML validations should be done over the configuration file.
    *
    * @param disableXmlValidations whether XML validations are disabled.
-   * @since 4.6
+   * @since 4.5
    */
   public ApplicationContextBuilder setDisableXmlValidations(boolean disableXmlValidations) {
     isDisableXmlValidations = disableXmlValidations;

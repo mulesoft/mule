@@ -1,41 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.el.dataweave;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
-import static java.lang.System.clearProperty;
-import static java.lang.System.setProperty;
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonMap;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.AbstractComponent.ROOT_CONTAINER_NAME_KEY;
 import static org.mule.runtime.api.el.BindingContextUtils.ATTRIBUTES;
@@ -58,14 +28,46 @@ import static org.mule.runtime.api.metadata.DataType.STRING;
 import static org.mule.runtime.api.metadata.DataType.fromType;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_EXPRESSIONS_COMPILATION_FAIL_DEPLOYMENT;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.tck.junit4.matcher.DataTypeCompatibilityMatcher.assignableTo;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.EXPRESSION_LANGUAGE;
 import static org.mule.test.allure.AllureConstants.ExpressionLanguageFeature.ExpressionLanguageStory.SUPPORT_DW;
+
+import static java.io.File.separator;
+import static java.lang.String.format;
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -78,6 +80,7 @@ import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ExpressionLanguage;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -110,14 +113,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.QName;
 
-import org.hamcrest.BaseMatcher;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
+import org.hamcrest.BaseMatcher;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
@@ -146,13 +150,6 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
   @Test
   public void stringExpression() throws Exception {
     TypedValue<?> result = expressionLanguage.evaluate("\"hey\"", testEvent(), BindingContext.builder().build());
-    assertThat(result.getValue(), is("hey"));
-    assertThat(result.getDataType(), is(assignableTo(STRING)));
-  }
-
-  @Test
-  public void withPrefixExpression() throws Exception {
-    TypedValue<?> result = expressionLanguage.evaluate("#[dw:\"hey\"]", testEvent(), BindingContext.builder().build());
     assertThat(result.getValue(), is("hey"));
     assertThat(result.getDataType(), is(assignableTo(STRING)));
   }
@@ -489,54 +486,71 @@ public class DataWeaveExpressionLanguageAdaptorTestCase extends AbstractWeaveExp
 
   @Test
   public void payloadExpressionShouldNotBeEvaluate() throws MuleException {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#[payload]", testEvent(), bindingContext);
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#[payload]", testEvent(), bindingContext);
     verify(genericExpressionLanguage, never()).evaluate(eq("payload"), any(BindingContext.class));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", null, bindingContext);
+  public void evaluateNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event or DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", OBJECT, null, bindingContext);
+  public void evaluateWithDataTypeNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", OBJECT, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, with DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", OBJECT, null, null, bindingContext, false);
+  public void evaluateNoLocationNoEventWithDataTypeDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", OBJECT, null, null, bindingContext, false);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(OBJECT), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location, no DataType), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluate("#['Hello World']", null, null, null, bindingContext);
+  public void evaluateNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluate("#['Hello World']", null, null, null, bindingContext);
     verify(genericExpressionLanguage).evaluate(anyString(), eq(bindingContext));
   }
 
   @Test
   @Description("When calling evaluate with just a BindingContext (no Event, no Location), it is passed to DW. No new context is built based on the contexts of the passed one.")
-  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() {
-    new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
-                                           genericExpressionLanguageService, getFeatureFlaggingService())
-                                               .evaluateLogExpression("#['Hello World']", null, null, bindingContext);
+  public void evaluateLogExpressionNoLocationNoEventDoesntInstantiateExtraBindingContexts() throws InitialisationException {
+    DataWeaveExpressionLanguageAdaptor expressionLanguageAdaptor =
+        new DataWeaveExpressionLanguageAdaptor(mock(MuleContext.class, RETURNS_DEEP_STUBS), registry,
+                                               genericExpressionLanguageService, getFeatureFlaggingService());
+
+    expressionLanguageAdaptor.initialise();
+    expressionLanguageAdaptor.evaluateLogExpression("#['Hello World']", null, null, bindingContext);
     verify(genericExpressionLanguage).evaluateLogExpression(anyString(), eq(bindingContext));
   }
 

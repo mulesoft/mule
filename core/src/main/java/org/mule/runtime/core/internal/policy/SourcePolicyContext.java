@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,10 +14,11 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.policy.SourcePolicyParametersTransformer;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,6 +64,22 @@ public class SourcePolicyContext implements EventInternalContext<SourcePolicyCon
   @Override
   public SourcePolicyContext copy() {
     return this;
+  }
+
+  public SourcePolicyContext childContext() {
+    SourcePolicyContext child = new SourcePolicyContext(pointcutParameters);
+    child.variables.putAll(this.variables);
+    child.parametersTransformer = this.parametersTransformer;
+    if (this.originalFailureResponseParameters != null) {
+      child.originalResponseParameters = new HashMap<>();
+      child.originalResponseParameters.putAll(this.originalFailureResponseParameters);
+    }
+    if (this.originalFailureResponseParameters != null) {
+      child.originalFailureResponseParameters = new HashMap<>();
+      child.originalFailureResponseParameters.putAll(this.originalFailureResponseParameters);
+    }
+    child.originalEvent = this.originalEvent;
+    return child;
   }
 
   public PolicyPointcutParameters getPointcutParameters() {

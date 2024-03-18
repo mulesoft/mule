@@ -1,23 +1,19 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.execution;
 
+import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_ALWAYS_BEGIN;
-import io.qameta.allure.Issue;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
@@ -26,6 +22,15 @@ import org.mule.runtime.core.api.transaction.TransactionFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import io.qameta.allure.Issue;
 
 @RunWith(MockitoJUnitRunner.class)
 @SmallTest
@@ -54,7 +59,7 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
   @Before
   public void before() {
     beginAndResolveTransactionInterceptor =
-        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, null, true, true);
+        new BeginAndResolveTransactionInterceptor(executionInterceptor, transactionConfig, "APP", null, null, true, true, true);
   }
 
   @Test
@@ -64,7 +69,7 @@ public class BeginAndResolveTransactionInterceptorTestCase extends AbstractMuleT
 
     when(transactionConfig.getAction()).thenReturn(ACTION_ALWAYS_BEGIN);
     when(transactionConfig.getFactory()).thenReturn(transactionFactory);
-    when(transactionFactory.beginTransaction(any(), any(), any(), any())).thenReturn(tx);
+    when(transactionFactory.beginTransaction(any(), any(), any())).thenReturn(tx);
     when(executionInterceptor.execute(executionCallback, executionContext)).thenThrow(messagingException);
 
     try {

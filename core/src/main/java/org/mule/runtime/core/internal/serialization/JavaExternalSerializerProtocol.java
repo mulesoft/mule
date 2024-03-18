@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,13 +7,14 @@
 package org.mule.runtime.core.internal.serialization;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import org.mule.runtime.api.streaming.bytes.CursorStream;
-import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
+
+import static java.util.Objects.requireNonNull;
+
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
-import org.mule.runtime.core.internal.util.SerializationUtils;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
+import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,8 +68,8 @@ public class JavaExternalSerializerProtocol extends AbstractSerializationProtoco
    */
   @Override
   protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
-    checkArgument(inputStream != null, "Cannot deserialize a null stream");
-    checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
+    requireNonNull(inputStream, "Cannot deserialize a null stream");
+    requireNonNull(classLoader, "Cannot deserialize with a null classloader");
 
     return (T) SerializationUtils.deserialize(inputStream, classLoader, muleContext);
   }

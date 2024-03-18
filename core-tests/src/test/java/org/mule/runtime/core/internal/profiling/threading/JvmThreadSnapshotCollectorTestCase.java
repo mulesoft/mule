@@ -1,60 +1,73 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.profiling.threading;
 
+import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
+import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
+
 import static java.lang.Thread.sleep;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
-import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.DEFAULT_PROFILING_SERVICE;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshot;
 import org.mule.runtime.api.profiling.threading.ThreadSnapshotCollector;
 import org.mule.runtime.api.util.concurrent.Latch;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 @Feature(PROFILING)
 @Story(DEFAULT_PROFILING_SERVICE)
 public class JvmThreadSnapshotCollectorTestCase {
 
-  private static final ExecutorService executor = newSingleThreadExecutor();
+  private ExecutorService executor;
   private static final long TEST_TIME = 10L;
 
   private final Object theSharedLock = new Object();
   private final ThreadSnapshotCollector threadSnapshotCollector = new JvmThreadSnapshotCollector();
 
+  @Before
+  public void setUp() {
+    executor = newSingleThreadExecutor();
+  }
+
+  @After
+  public void tearDown() {
+    executor.shutdown();
+  }
+
   @Test
   public void threadIsWaitingInSleep() throws InterruptedException {
+    Long previousWaitedTime = threadSnapshotCollector.getCurrentThreadSnapshot().getWaitedTime();
     sleep(TEST_TIME);
-    ThreadSnapshot snapshot = threadSnapshotCollector.getCurrentThreadSnapshot();
-    assertThat(snapshot.getWaitedTime(), is(greaterThanOrEqualTo(TEST_TIME)));
+    assertThat(threadSnapshotCollector.getCurrentThreadSnapshot().getWaitedTime(),
+               is(greaterThanOrEqualTo(TEST_TIME + previousWaitedTime)));
   }
 
   @Test
   public void threadWaitedButItDidNotWasteThatTimeTryingToLock() throws InterruptedException {
+    Long previousBlockedTime = threadSnapshotCollector.getCurrentThreadSnapshot().getBlockedTime();
     synchronized (theSharedLock) {
       sleep(TEST_TIME);
     }
-    ThreadSnapshot snapshot = threadSnapshotCollector.getCurrentThreadSnapshot();
-    assertThat(snapshot.getBlockedTime(), is(lessThan(TEST_TIME)));
+    assertThat(threadSnapshotCollector.getCurrentThreadSnapshot().getBlockedTime(),
+               is(lessThan(TEST_TIME + previousBlockedTime)));
   }
 
   @Test
@@ -88,10 +101,10 @@ public class JvmThreadSnapshotCollectorTestCase {
 
   @Test
   public void cpuTime() {
+    Long previousCpuTime = threadSnapshotCollector.getCurrentThreadSnapshot().getCpuTime();
     for (long l = 0L; l < 100L; ++l) {
       // Just the loop to make the cpu work for some time...
     }
-    ThreadSnapshot snapshot = threadSnapshotCollector.getCurrentThreadSnapshot();
-    assertThat(snapshot.getCpuTime(), is(not(0L)));
+    assertThat(threadSnapshotCollector.getCurrentThreadSnapshot().getCpuTime(), is(greaterThan(previousCpuTime)));
   }
 }

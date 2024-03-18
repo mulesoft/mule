@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -37,7 +37,9 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
@@ -58,13 +60,14 @@ import org.mule.runtime.module.extension.internal.runtime.client.source.DefaultS
 import org.mule.runtime.module.extension.internal.runtime.client.source.SourceClient;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -73,9 +76,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+
 import org.slf4j.Logger;
 
 
@@ -83,7 +88,7 @@ import org.slf4j.Logger;
  * This is the default implementation for a {@link ExtensionsClient}, it uses the {@link ExtensionManager} in the
  * {@link MuleContext} to search for the extension that wants to execute the operation from.
  * <p>
- * The concrete execution of the operation is handled by an {@link OperationMessageProcessor} instance.
+ * The concrete execution of the operation is handled by an {@link OperationClient} instance.
  * <p>
  * This implementation can only execute extensions that were built using the SDK, Smart Connectors operations can't be executed.
  *
@@ -118,21 +123,39 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   private NotificationDispatcher notificationDispatcher;
 
   @Inject
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
+  @Inject
   private MuleContext muleContext;
+
+  @Inject
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
 
   private ExecutorService cacheShutdownExecutor;
   private LoadingCache<OperationKey, OperationClient> operationClientCache;
-  private Set<SourceClient> sourceClients = new HashSet<>();
+  private final Set<SourceClient> sourceClients = new HashSet<>();
 
   @Override
   public <T, A> CompletableFuture<Result<T, A>> execute(String extensionName,
                                                         String operationName,
                                                         Consumer<OperationParameterizer> parameters) {
 
+    ExtensionModel extensionModel = findExtension(extensionName);
+    OperationModel operationModel = findOperationModel(extensionModel, operationName);
+
+    return doExecute(extensionModel, operationModel, parameters);
+  }
+
+  private <T, A> CompletableFuture<Result<T, A>> doExecute(ExtensionModel extensionModel,
+                                                           OperationModel operationModel,
+                                                           Consumer<OperationParameterizer> parameters) {
     DefaultOperationParameterizer parameterizer = new DefaultOperationParameterizer();
     parameters.accept(parameterizer);
 
-    OperationKey key = toOperationKey(extensionName, operationName, parameterizer);
+    OperationKey key = new OperationKey(extensionModel, operationModel, parameterizer.getConfigRef());
 
     return operationClientCache.get(key).execute(key, parameterizer);
   }
@@ -158,7 +181,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                                          reflectionCache,
                                                          expressionManager,
                                                          notificationDispatcher,
-                                                         muleContext.getTransactionFactoryManager(),
                                                          muleContext);
 
     try {
@@ -190,17 +212,6 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     }
   }
 
-  private OperationKey toOperationKey(String extensionName,
-                                      String operationName,
-                                      DefaultOperationParameterizer parameterizer) {
-    return new OperationKey(extensionName,
-                            parameterizer.getConfigRef(),
-                            operationName,
-                            this::findExtension,
-                            this::findOperationModel,
-                            extensionManager);
-  }
-
   private LoadingCache<OperationKey, OperationClient> createOperationClientCache() {
     return Caffeine.newBuilder()
         // Since the removal listener runs asynchronously, force waiting for all cleanup tasks to be complete before proceeding
@@ -221,7 +232,11 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                                   errorTypeRepository,
                                   streamingManager,
                                   reflectionCache,
-                                  muleContext);
+                                  componentTracerFactory,
+                                  muleContext,
+                                  muleConfiguration,
+                                  notificationDispatcher,
+                                  transactionManager.orElse(null));
 
     try {
       initialiseIfNeeded(client);
@@ -270,15 +285,15 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
 
-    return execute(
-                   extensionName,
-                   operationName,
-                   parameterizer -> {
-                     setContextEvent(parameterizer, parameters);
-                     parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
-                     resolveLegacyParameters(parameterizer, parameters);
-                     configureLegacyRepeatableStreaming(parameterizer, operationModel);
-                   });
+    return doExecute(
+                     extensionModel,
+                     operationModel,
+                     parameterizer -> {
+                       setContextEvent(parameterizer, parameters);
+                       parameters.getConfigName().ifPresent(parameterizer::withConfigRef);
+                       resolveLegacyParameters(parameterizer, parameters);
+                       configureLegacyRepeatableStreaming(parameterizer, operationModel);
+                     });
   }
 
   protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {

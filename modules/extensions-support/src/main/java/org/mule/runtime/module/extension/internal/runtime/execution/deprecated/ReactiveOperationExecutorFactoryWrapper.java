@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.execution.deprecated;
 
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRouter;
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -57,7 +58,7 @@ public final class ReactiveOperationExecutorFactoryWrapper<T extends ComponentMo
 
   private boolean isJavaNonBlocking(T componentModel, ComponentExecutor<T> executor) {
     if (componentModel instanceof OperationModel && !((OperationModel) componentModel).isBlocking()) {
-      return executor instanceof ReactiveMethodOperationExecutor;
+      return isRouter(componentModel) || executor instanceof ReactiveMethodOperationExecutor;
     } else {
       return componentModel instanceof ConstructModel;
     }

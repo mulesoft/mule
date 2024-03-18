@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -31,8 +31,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyChain;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
@@ -40,7 +39,6 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.message.StringAttributes;
 
 import java.lang.ref.Reference;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 
@@ -116,35 +114,6 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
     assertEquals(((CoreEvent) from(eventCaptor.getValue()).block()).getMessage(), MESSAGE);
   }
 
-  @Test
-  public void sessionModifiedByNextProcessorIsPropagated() {
-    DefaultMuleSession session = new DefaultMuleSession();
-    CoreEvent modifiedSessionEvent = PrivilegedEvent.builder(initialEvent).session(session).build();
-    mockFlowReturningEvent(modifiedSessionEvent);
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
-            .transform((ReactiveProcessor) ((Reference) ctx.get(POLICY_NEXT_OPERATION)).get())));
-
-    CoreEvent resultEvent = just(initialEvent).transform(policyProcessor).block();
-
-    assertEquals(((PrivilegedEvent) resultEvent).getSession(), session);
-  }
-
-  @Test
-  public void sessionModifiedBeforeNextProcessorIsPropagatedToIt() {
-    DefaultMuleSession session = new DefaultMuleSession();
-    when(policy.getPolicyChain().apply(any()))
-        .thenAnswer(invocation -> deferContextual(ctx -> Mono.<CoreEvent>from(invocation.getArgument(0))
-            .map(e -> PrivilegedEvent.builder(e).session(session).build())
-            .transform((Function<? super Mono<PrivilegedEvent>, ? extends Publisher<Object>>) ((Reference) ctx
-                .get(POLICY_NEXT_OPERATION)).get())));
-
-    just(initialEvent).transform(policyProcessor).block();
-
-    verify(flowProcessor).apply(eventCaptor.capture());
-    assertEquals(((PrivilegedEvent) from(eventCaptor.getValue()).block()).getSession(), session);
-  }
-
   protected void mockFlowReturningEvent(CoreEvent event) {
     when(flowProcessor.apply(any())).thenAnswer(inv -> from(inv.getArgument(0))
         .map(e -> {
@@ -152,9 +121,6 @@ public abstract class AbstractPolicyProcessorTestCase extends AbstractMuleTestCa
               .message(event.getMessage())
               .variables(event.getVariables());
 
-          if (event instanceof PrivilegedEvent) {
-            builder.session(((PrivilegedEvent) event).getSession());
-          }
           return builder.build();
         }));
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -47,7 +47,7 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
     when(sourceConnMgr.getConnectionHandler(conn)).thenReturn(Optional.empty());
     when(sourceCallback.getSourceConnectionManager()).thenReturn(sourceConnMgr);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
     expected.expect(TransactionException.class);
     try {
@@ -74,11 +74,11 @@ public class DefaultSourceCallbackContextTestCase extends AbstractMuleTestCase {
 
     final TransactionSourceBinder binder = mock(TransactionSourceBinder.class);
     when(binder.bindToTransaction(txConfig, sourceCallback.getConfigurationInstance(), sourceCallback.getSourceLocation(),
-                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout()))
+                                  connectionHandler, sourceCallback.getTransactionManager(), sourceCallback.getTimeout(), false))
                                       .thenThrow(TransactionException.class);
     when(sourceCallback.getTransactionSourceBinder()).thenReturn(binder);
 
-    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService);
+    DefaultSourceCallbackContext ctx = new DefaultSourceCallbackContext(sourceCallback, profilingService, false);
 
     expected.expect(TransactionException.class);
     try {

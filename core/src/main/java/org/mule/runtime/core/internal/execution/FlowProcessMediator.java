@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -23,10 +23,10 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Unhand
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.api.util.ExceptionUtils.containsType;
+import static org.mule.runtime.core.internal.exception.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
 import static org.mule.runtime.core.internal.policy.SourcePolicyContext.from;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.internal.util.InternalExceptionUtils.createErrorEvent;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.messageCollection;
 import static org.mule.runtime.core.internal.util.message.MessageUtils.toMessage;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
@@ -71,11 +71,11 @@ import org.mule.runtime.core.api.rx.Exceptions;
 import org.mule.runtime.core.api.source.MessageSource;
 import org.mule.runtime.core.internal.construct.AbstractPipeline;
 import org.mule.runtime.core.internal.construct.FlowBackPressureException;
+import org.mule.runtime.core.internal.event.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent.Builder;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.InterceptorManager;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.core.internal.policy.SourcePolicyFailureResult;
@@ -106,7 +106,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -277,7 +276,7 @@ public class FlowProcessMediator implements Initialisable {
     }
   }
 
-  private void dispatch(@Nonnull CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,
+  private void dispatch(CoreEvent event, SourcePolicy sourcePolicy, Pipeline flowConstruct,
                         DefaultFlowProcessMediatorContext ctx)
       throws Exception {
     try {
@@ -383,6 +382,8 @@ public class FlowProcessMediator implements Initialisable {
         public void complete(Void value) {
           onTerminate(flowConstruct, ctx, right(successResult.getResult()));
           finish(flowConstruct, ctx, null);
+          // At this point the flow has nothing left to schedule or execute, so we end the flow span.
+          coreEventTracer.endCurrentSpan(event);
         }
 
         @Override
@@ -408,8 +409,6 @@ public class FlowProcessMediator implements Initialisable {
       } catch (Exception e) {
         policySuccessError(flowConstruct,
                            new SourceErrorException(successResult.getResult(), sourceResponseGenerateErrorType, e));
-      } finally {
-        coreEventTracer.endCurrentSpan(event);
       }
     };
   }
@@ -483,11 +482,15 @@ public class FlowProcessMediator implements Initialisable {
                             public void complete(Void value) {
                               onTerminate(flow, ctx, left(me));
                               finish(flow, ctx, null);
+                              // At this point the flow has nothing left to schedule or execute, so we end the flow span.
+                              coreEventTracer.endCurrentSpan(event);
                             }
 
                             @Override
                             public void error(Throwable e) {
                               finish(flow, ctx, e);
+                              // At this point the flow has nothing left to schedule or execute, so we end the flow span.
+                              coreEventTracer.endCurrentSpan(event);
                             }
                           });
       }).accept(messagingException);

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.runtime.streaming;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -27,6 +26,7 @@ import org.mule.runtime.api.connection.ConnectionHandler;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.iterator.Producer;
@@ -36,6 +36,7 @@ import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -59,6 +60,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public static final String COULD_NOT_CREATE_A_CONNECTION_SUPPLIER =
       "Could not obtain a connection supplier for the configuration";
   public static final String COULD_NOT_EXECUTE = "Could not execute operation with connection";
+  private final ComponentTracer<CoreEvent> operationConnectionTracer;
   private PagingProvider<Object, T> delegate;
   private final ConfigurationInstance config;
   private final ExtensionConnectionSupplier extensionConnectionSupplier;
@@ -73,15 +75,17 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
-                                ExtensionConnectionSupplier extensionConnectionSupplier) {
-    this(delegate, config, executionContext, extensionConnectionSupplier, false);
+                                ExtensionConnectionSupplier extensionConnectionSupplier,
+                                ComponentTracer<CoreEvent> operationConnectionTracer) {
+    this(delegate, config, executionContext, extensionConnectionSupplier, false, operationConnectionTracer);
   }
 
   public PagingProviderProducer(PagingProvider<Object, T> delegate,
                                 ConfigurationInstance config,
                                 ExecutionContextAdapter executionContext,
                                 ExtensionConnectionSupplier extensionConnectionSupplier,
-                                boolean supportsOAuth) {
+                                boolean supportsOAuth,
+                                ComponentTracer<CoreEvent> operationConnectionTracer) {
     this.delegate = new PagingProviderWrapper(delegate, executionContext.getExtensionModel());
     this.config = config;
     this.executionContext = executionContext;
@@ -90,6 +94,7 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
     retryPolicy = (RetryPolicyTemplate) executionContext.getRetryPolicyTemplate().orElseGet(NoRetryPolicyTemplate::new);
     connectionSupplierFactory = createConnectionSupplierFactory();
     mutableStats = getMutableConfigurationStats(executionContext);
+    this.operationConnectionTracer = operationConnectionTracer;
   }
 
   /**
@@ -247,7 +252,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
     @Override
     public ConnectionSupplier getConnectionSupplier() throws MuleException {
-      return new DefaultConnectionSupplier(extensionConnectionSupplier.getConnection(executionContext));
+      return new DefaultConnectionSupplier(extensionConnectionSupplier.getConnection(executionContext,
+                                                                                     operationConnectionTracer));
     }
 
     @Override
@@ -265,7 +271,8 @@ public final class PagingProviderProducer<T> implements Producer<List<T>> {
 
       @Override
       public ConnectionSupplier getChecked() throws Throwable {
-        StickyConnectionSupplierFactory.this.connectionHandler = extensionConnectionSupplier.getConnection(executionContext);
+        StickyConnectionSupplierFactory.this.connectionHandler =
+            extensionConnectionSupplier.getConnection(executionContext, operationConnectionTracer);
         return new StickyConnectionSupplier(StickyConnectionSupplierFactory.this.connectionHandler);
       }
     });

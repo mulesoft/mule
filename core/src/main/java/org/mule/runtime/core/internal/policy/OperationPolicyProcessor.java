@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -62,7 +63,7 @@ public class OperationPolicyProcessor implements ReactiveProcessor {
         .map(policyEventMapper::onOperationPolicyBegin)
         .doOnNext(event -> policyTraceLogger.logOperationPolicyStart(policy, event))
         .transform(policy.getPolicyChain().onChainError(t -> manageError((MessagingException) t)))
-        .subscriberContext(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessorRef))
+        .contextWrite(ctx -> ctx.put(POLICY_NEXT_OPERATION, nextProcessorRef))
         .doOnNext(event -> policyTraceLogger.logOperationPolicyEnd(policy, event))
         .map(policyChainResult -> policyEventMapper
             .onOperationPolicyFinish(policyChainResult, policy.getPolicyChain().isPropagateMessageTransformations()));

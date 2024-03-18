@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,7 +11,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.assertNotStoppi
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
+
 import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -22,9 +26,9 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.util.HashMap;
@@ -55,7 +59,10 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
   private final RetryPolicyTemplate retryPolicyTemplate;
   private final PoolingProfile defaultPoolingProfile;
   private final ConnectionManagementStrategyFactory managementStrategyFactory;
-  private final ReconnectionConfig defaultReconnectionConfig = ReconnectionConfig.getDefault();
+  private final ReconnectionConfig defaultReconnectionConfig = defaultReconnectionConfig();
+
+  @Inject
+  protected FeatureFlaggingService featureFlaggingService;
 
   /**
    * Creates a new instance
@@ -80,7 +87,8 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     assertNotStopping(muleContext, "Mule is shutting down... cannot bind new connections");
 
     connectionProvider = new DefaultConnectionProviderWrapper<>(connectionProvider, muleContext);
-    ConnectionManagementStrategy<C> managementStrategy = managementStrategyFactory.getStrategy(connectionProvider);
+    ConnectionManagementStrategy<C> managementStrategy =
+        managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService);
 
     ConnectionManagementStrategy<C> previous;
 
@@ -124,7 +132,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
     return doTestConnectivity(() -> {
       try {
         return doTestConnectivity(connectionProvider,
-                                  managementStrategyFactory.getStrategy(connectionProvider)
+                                  managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService)
                                       .getConnectionHandler());
       } catch (ConnectionException e) {
         return failure(e.getMessage(), e.getErrorType().orElse(null), e);
@@ -164,7 +172,7 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
         try {
           connectionHandler = hasBinding(config)
               ? getConnection(config)
-              : managementStrategyFactory.getStrategy(connectionProvider).getConnectionHandler();
+              : managementStrategyFactory.getStrategy(connectionProvider, featureFlaggingService).getConnectionHandler();
         } finally {
           readLock.unlock();
         }
@@ -175,6 +183,12 @@ public final class DefaultConnectionManager implements ConnectionManagerAdapter 
       return doTestConnectivity(connectionProvider, connectionHandler);
     });
 
+  }
+
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException {
+    return testConnectivity(configurationInstance);
   }
 
   private ConnectionValidationResult doTestConnectivity(Callable<ConnectionValidationResult> callable) {

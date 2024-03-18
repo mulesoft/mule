@@ -1,30 +1,33 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.util.store;
 
+import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
+import static org.mule.tck.probe.PollingProber.check;
+
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
-import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
-import static org.mule.tck.probe.PollingProber.check;
 
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.store.ObjectStoreException;
 import org.mule.runtime.api.store.ObjectStoreSettings;
 import org.mule.runtime.core.internal.util.store.MonitoredObjectStoreWrapper.StoredObject;
-import org.mule.tck.core.util.store.InMemoryObjectStore;
+import org.mule.tck.core.util.store.InMemoryExpirableObjectStore;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
@@ -37,6 +40,7 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
+
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 
@@ -192,7 +196,7 @@ public class MonitoredObjectStoreWrapperTestCase extends AbstractMuleTestCase {
     Serializable innerValue = new Serializable() {};
     final PhantomReference<Serializable> phantomReference = new PhantomReference<>(innerValue, new ReferenceQueue<>());
 
-    objectStore = new InMemoryObjectStore() {
+    objectStore = new InMemoryExpirableObjectStore() {
 
       @Override
       public Serializable remove(String key) throws ObjectStoreException {

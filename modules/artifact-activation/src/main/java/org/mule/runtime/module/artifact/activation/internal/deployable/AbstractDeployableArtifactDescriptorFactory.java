@@ -1,15 +1,13 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.artifact.activation.internal.deployable;
 
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getMuleHomeFolder;
 import static org.mule.runtime.module.artifact.activation.internal.ExecutionEnvironment.isMuleFramework;
-import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -19,7 +17,6 @@ import static java.util.Optional.of;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
-import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginModelResolver;
@@ -44,7 +41,6 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +125,8 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
     if (!isMuleFramework()) {
       descriptor.setLogConfigFile(getLogConfigFile(getArtifactModel()));
     }
+
+    descriptor.setSupportedJavaVersions(getArtifactModel().getSupportedJavaVersions());
   }
 
   private File getLogConfigFile(M artifactModel) {
@@ -151,18 +149,6 @@ public abstract class AbstractDeployableArtifactDescriptorFactory<M extends Mule
               .warn(format("Plugin '%s' is declared as 'provided' which means that it will not be added to the artifact's classpath",
                            bundleDescriptor));
         } else {
-          BundleDescriptor pluginDescriptor = deployableProjectModel.getDependencies()
-              .stream()
-              .map(BundleDependency::getDescriptor)
-              .filter(dependencyDescriptor -> MULE_PLUGIN_CLASSIFIER.equals(dependencyDescriptor.getClassifier().orElse(null)))
-              .filter(pluginDependencyDescriptor -> StringUtils
-                  .equals(bundleDescriptor.getArtifactId(), pluginDependencyDescriptor.getArtifactId())
-                  && StringUtils.equals(bundleDescriptor.getGroupId(), pluginDependencyDescriptor.getGroupId())
-                  && StringUtils.equals(bundleDescriptor.getVersion(), pluginDependencyDescriptor.getVersion()))
-              .findFirst()
-              .orElseThrow(() -> new ArtifactActivationException(createStaticMessage(format("Dependency for plugin '%s' not found",
-                                                                                            bundleDescriptor))));
-
           List<BundleDependency> bundleDependencies = bundlePluginDependency.getTransitiveDependenciesList();
           pluginDescriptors
               .add(pluginDescriptorResolver.resolve(emptySet(), bundleDescriptor)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,7 +12,7 @@ import static org.mule.runtime.api.exception.MuleException.INFO_SOURCE_XML_KEY;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.notification.EnrichedNotificationInfo;
-import org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider;
+import org.mule.runtime.core.internal.execution.LocationExecutionContextProvider;
 
 import java.util.HashMap;
 import java.util.Map;

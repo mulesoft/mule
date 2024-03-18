@@ -1,15 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.marvel.ironman;
 
+import static java.lang.String.format;
+import static java.lang.Thread.currentThread;
+import static java.lang.ThreadLocal.withInitial;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.api.meta.model.display.PathModel.Location.EMBEDDED;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
+import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -23,6 +28,7 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.display.Path;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.sdk.api.annotation.param.display.ClassValue;
 import org.mule.test.marvel.model.Missile;
 import org.mule.test.marvel.model.Villain;
@@ -33,6 +39,8 @@ public class IronManOperations implements Initialisable, Disposable {
 
   public static final int MISSILE_TRAVEL_TIME = 200;
   public static final String FLIGHT_PLAN = "Go Straight";
+
+  private static final ThreadLocal<String> taskTokenInThread = withInitial(IronManOperations::generateTaskToken);
 
   private ScheduledExecutorService executorService;
 
@@ -107,5 +115,32 @@ public class IronManOperations implements Initialisable, Disposable {
 
     // building a flight plan requires a lot of computation. Don't block while you kill
     executorService.schedule(launch, MISSILE_TRAVEL_TIME, MILLISECONDS);
+  }
+
+  /**
+   * Verifies that a thread switch on the nested {@code interceptedChain} did occur.
+   *
+   * @param interceptedChain the chain in which a thread switch is expected.
+   * @param callback         the {@link CompletionCallback}.
+   */
+  @MediaType(value = ANY, strict = false)
+  public void assertResponseDifferentTask(Chain interceptedChain, CompletionCallback<Object, Object> callback) {
+    String requestTaskToken = taskTokenInThread.get();
+
+    interceptedChain.process(r -> {
+      String responseTaskToken = taskTokenInThread.get();
+
+      if (requestTaskToken.equals(responseTaskToken)) {
+        final IllegalStateException e = new IllegalStateException(format("Response task (%s) was same as request task (%s)",
+                                                                         responseTaskToken, requestTaskToken));
+        callback.error(e);
+      } else {
+        callback.success(r);
+      }
+    }, (t, r) -> callback.error(t));
+  }
+
+  private static String generateTaskToken() {
+    return currentThread().getName() + " - " + getUUID();
   }
 }

@@ -1,17 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.util;
 
+import static org.apache.commons.lang3.ArrayUtils.EMPTY_STRING_ARRAY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mule.runtime.core.internal.util.ArrayUtils;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -30,11 +31,11 @@ public class StringUtilsTestCase extends AbstractMuleTestCase {
 
     result = StringUtils.splitAndTrim("", ",");
     assertNotNull(result);
-    assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+    assertTrue(Arrays.equals(EMPTY_STRING_ARRAY, result));
 
     result = StringUtils.splitAndTrim(" ", ",");
     assertNotNull(result);
-    assertTrue(Arrays.equals(ArrayUtils.EMPTY_STRING_ARRAY, result));
+    assertTrue(Arrays.equals(EMPTY_STRING_ARRAY, result));
   }
 
   @Test

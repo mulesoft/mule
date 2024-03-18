@@ -1,19 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.profiling;
 
+import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
+
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.exporter.api.SpanExporterFactory;
-
-import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORTER;
 
 /**
  * A noop {@link SpanExporterFactory}.
@@ -23,7 +22,7 @@ import static org.mule.runtime.tracer.api.span.exporter.SpanExporter.NOOP_EXPORT
 public class NoopSpanExporterFactory implements SpanExporterFactory {
 
   @Override
-  public SpanExporter getSpanExporter(InternalSpan internalSpan, InitialSpanInfo initialExportInfo) {
+  public SpanExporter getSpanExporter(Span span, InitialSpanInfo initialSpanInfo) {
     return NOOP_EXPORTER;
   }
 

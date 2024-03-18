@@ -4,6 +4,11 @@
   "version": "1.2.3",
   "vendor": "Extension Producers Inc.",
   "minMuleVersion": "4.5.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "PREMIUM",
   "xmlDsl": {
     "prefix": "fully-param",
@@ -340,12 +345,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "FULLY-PARAM:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "FULLY-PARAM:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
       "handleable": true
     },
@@ -354,12 +359,12 @@
       "handleable": true
     },
     {
-      "error": "FULLY-PARAM:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "FULLY-PARAM:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     }

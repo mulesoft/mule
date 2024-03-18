@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.deployment.impl.internal.plugin;
 
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
@@ -17,13 +16,13 @@ import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDe
 import static org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory.invalidClassLoaderModelIdError;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.CLASSIFIER;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.GROUP_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.TYPE;
-import static org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader.VERSION;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.FileSystemPolicyClassLoaderConfigurationLoader.FILE_SYSTEM_POLICY_MODEL_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.ARTIFACT_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.CLASSIFIER;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.GROUP_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.PROPERTIES_BUNDLE_DESCRIPTOR_LOADER_ID;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.TYPE;
+import static org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader.VERSION;
 import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.ClassloadingIsolationStory.ARTIFACT_DESCRIPTORS;
 
 import static java.util.Collections.emptyMap;
@@ -36,6 +35,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
@@ -50,8 +50,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationL
 import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.LoaderNotFoundException;
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
-import org.mule.runtime.module.deployment.impl.internal.policy.FileSystemPolicyClassLoaderConfigurationLoader;
-import org.mule.runtime.module.deployment.impl.internal.policy.PropertiesBundleDescriptorLoader;
+import org.mule.runtime.module.deployment.impl.internal.policy.loader.FileSystemPolicyClassLoaderConfigurationLoader;
+import org.mule.runtime.module.deployment.impl.internal.policy.loader.PropertiesBundleDescriptorLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.io.File;
@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.qameta.allure.Story;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,20 +84,22 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
   private AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> descriptorFactory;
   private final MavenClientProvider mavenClientProvider =
       MavenClientProvider.discoverProvider(ArtifactPluginDescriptorFactoryTestCase.class.getClassLoader());
+  private MavenClient mavenClient;
 
   @Before
   public void setUp() throws Exception {
     when(classLoaderFilterFactory.create(null, null))
         .thenReturn(NULL_CLASSLOADER_FILTER);
 
+    mavenClient = mavenClientProvider
+        .createMavenClient(newMavenConfigurationBuilder()
+            .localMavenRepositoryLocation(mavenClientProvider
+                .getLocalRepositorySuppliers()
+                .environmentMavenRepositorySupplier()
+                .get())
+            .build());
     when(descriptorLoaderRepository.get(MULE_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
-        .thenReturn(new PluginMavenClassLoaderConfigurationLoader(of(mavenClientProvider
-            .createMavenClient(newMavenConfigurationBuilder()
-                .localMavenRepositoryLocation(mavenClientProvider
-                    .getLocalRepositorySuppliers()
-                    .environmentMavenRepositorySupplier()
-                    .get())
-                .build()))));
+        .thenReturn(new PluginMavenClassLoaderConfigurationLoader(of(mavenClient)));
 
     when(descriptorLoaderRepository.get(FILE_SYSTEM_POLICY_MODEL_LOADER_ID, PLUGIN, ClassLoaderConfigurationLoader.class))
         .thenReturn(new FileSystemPolicyClassLoaderConfigurationLoader());
@@ -111,6 +114,11 @@ public class ArtifactPluginDescriptorFactoryTestCase extends AbstractMuleTestCas
     descriptorFactory =
         artifactDescriptorFactoryProvider()
             .createArtifactPluginDescriptorFactory(descriptorLoaderRepository, ArtifactDescriptorValidatorBuilder.builder());
+  }
+
+  @After
+  public void cleanUp() throws Exception {
+    mavenClient.close();
   }
 
   @Test

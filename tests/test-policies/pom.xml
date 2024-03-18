@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-test-policy</artifactId>
     <packaging>jar</packaging>
@@ -14,8 +14,26 @@
     <description>Provides policies to use on tests</description>
 
     <properties>
+        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+
+        <javaModuleName>org.mule.test.policies</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- These tests have stuff that is expected to be within the mule container, and so they don't work in the modular world -->
+                        <mule.classloader.container.jpmsModuleLayer>false</mule.classloader.container.jpmsModuleLayer>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>                    
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -69,6 +87,13 @@
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.services</groupId>
+            <artifactId>mule-service-weave</artifactId>
+            <classifier>mule-service</classifier>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

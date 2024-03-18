@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -75,7 +75,10 @@ public interface MuleContext extends Lifecycle {
    * Returns the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
    *
    * @return the Jta transaction manager used by this Mule server instance, or null if a transaction manager has not been set
+   * 
+   * @deprecated since 4.6, cannot be used outside the container when running with Java 17+.
    */
+  @Deprecated
   TransactionManager getTransactionManager();
 
   ServerNotificationManager getNotificationManager();
@@ -240,12 +243,6 @@ public interface MuleContext extends Lifecycle {
    *         <on-error-propagate> element.
    */
   FlowExceptionHandler getDefaultErrorHandler(Optional<String> rootContainerName);
-
-  /**
-   * @return single resource transaction factory manager. Used to retrieve a transaction factory for each transactional resource
-   *         (i.e jdbc DataSource, jms Connection)
-   */
-  SingleResourceTransactionFactoryManager getTransactionFactoryManager();
 
   /**
    * @return a non null {@link DataTypeConversionResolver} instance to resolve implicit data type conversions

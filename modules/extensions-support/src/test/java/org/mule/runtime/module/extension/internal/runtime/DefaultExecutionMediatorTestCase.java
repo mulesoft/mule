@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime;
 
 import static org.mule.functional.junit4.matchers.ThrowableRootCauseMatcher.hasRootCause;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.util.rx.ImmediateScheduler.IMMEDIATE_SCHEDULER;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DO_NOT_RETRY;
 import static org.mule.tck.MuleTestUtils.stubComponentExecutor;
@@ -18,6 +19,7 @@ import static org.mule.test.marvel.drstrange.DrStrangeErrorTypeDefinition.CUSTOM
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 import static reactor.core.Exceptions.unwrap;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -31,7 +33,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyVararg;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.clearInvocations;
@@ -45,8 +46,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.junit.MockitoJUnit.rule;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
@@ -57,18 +56,19 @@ import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.error.ImmutableErrorModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.NoRetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate;
 import org.mule.runtime.core.internal.connection.ConnectionManagerAdapter;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.error.ErrorTypeDefinition;
 import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
@@ -85,18 +85,19 @@ import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.
 import org.mule.runtime.module.extension.internal.runtime.operation.DefaultExecutionMediator;
 import org.mule.runtime.module.extension.internal.runtime.operation.ResultTransformer;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionMediator;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.exception.HeisenbergException;
 import org.mule.test.heisenberg.extension.exception.NullExceptionEnricher;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,8 +108,8 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoRule;
 import org.mockito.verification.VerificationMode;
-
-import com.google.common.collect.ImmutableList;
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -120,8 +121,8 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
 
   @Parameterized.Parameters(name = "{0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[] {"With simple retry", new SimpleRetryPolicyTemplate(10, RETRY_COUNT)},
-                         new Object[] {"With no retry", new NoRetryPolicyTemplate()});
+    return asList(new Object[] {"With simple retry", new SimpleRetryPolicyTemplate(10, RETRY_COUNT)},
+                  new Object[] {"With no retry", new NoRetryPolicyTemplate()});
   }
 
   public DefaultExecutionMediatorTestCase(String name, RetryPolicyTemplate retryPolicy) {
@@ -172,10 +173,16 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
   private OperationModel operationModel;
 
   @Mock
+  private NotificationDispatcher notificationDispatcher;
+
+  @Mock
   private ConnectionManagerAdapter connectionManagerAdapter;
 
   @Mock
   private ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
+
+  @Mock
+  private ComponentTracer<CoreEvent> operationExecutionTracer;
 
   private final String name;
   private final Object result = new Object();
@@ -233,12 +240,15 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             null,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
 
     final ReconnectableConnectionProviderWrapper<Object> connectionProviderWrapper =
         new ReconnectableConnectionProviderWrapper<>(null,
-                                                     new ReconnectionConfig(true, retryPolicy));
+                                                     defaultReconnectionConfig(true, retryPolicy));
     initialiseIfNeeded(connectionProviderWrapper, true, muleContext);
     Optional<ConnectionProvider> connectionProvider = of(connectionProviderWrapper);
 
@@ -336,8 +346,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             null,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -352,8 +365,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             null,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -372,8 +388,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -394,8 +413,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -415,8 +437,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -434,8 +459,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             muleContext.getErrorTypeRepository(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
 
     execute();
   }
@@ -457,8 +485,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -479,8 +510,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -500,8 +534,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             errorTypeRepository,
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
   }
 
@@ -518,8 +555,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                               interceptorChain,
                                               muleContext.getErrorTypeRepository(),
                                               muleContext.getExecutionClassLoader(),
+                                              muleContext.getConfiguration(),
+                                              notificationDispatcher,
+                                              muleContext.getTransactionManager(),
                                               failingTransformer,
-                                              threadReleaseDataProducer, true);
+                                              threadReleaseDataProducer, operationExecutionTracer, true);
     execute();
     verify(executorCallback, times(1)).error(moduleException);
   }
@@ -540,8 +580,11 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
                                             interceptorChain,
                                             mockErrorModel(),
                                             muleContext.getExecutionClassLoader(),
+                                            muleContext.getConfiguration(),
+                                            notificationDispatcher,
+                                            muleContext.getTransactionManager(),
                                             failingTransformer,
-                                            threadReleaseDataProducer, true);
+                                            threadReleaseDataProducer, operationExecutionTracer, true);
 
     try {
       execute();
@@ -582,10 +625,10 @@ public class DefaultExecutionMediatorTestCase extends AbstractMuleContextTestCas
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-      verify(interceptor1, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor1, times(expectedRetries)).onError(same(operationContext), any());
       verify(interceptor1, times(expectedRetries)).after(operationContext, null);
 
-      verify(interceptor2, times(expectedRetries)).onError(same(operationContext), anyVararg());
+      verify(interceptor2, times(expectedRetries)).onError(same(operationContext), any());
       verify(interceptor2, times(expectedRetries)).after(operationContext, null);
     });
   }

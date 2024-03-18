@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -45,7 +45,7 @@ import java.util.Optional;
  *
  * @since 4.0
  */
-class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
+public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<ConfigurationProvider>
     implements ObjectFactory<ConfigurationProvider> {
 
   private final ExtensionModel extensionModel;
@@ -56,11 +56,11 @@ class ConfigurationProviderObjectFactory extends AbstractExtensionObjectFactory<
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
   private ConfigurationProvider instance;
   private boolean requiresConnection = false;
-  private LazyValue<String> configName = new LazyValue<>(this::getName);
+  private final LazyValue<String> configName = new LazyValue<>(this::getName);
 
-  ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
-                                     ConfigurationModel configurationModel,
-                                     MuleContext muleContext) {
+  public ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
+                                            ConfigurationModel configurationModel,
+                                            MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;

@@ -1,17 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.functional.junit4;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.event.EventContextFactory.create;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.junit.MockitoJUnit.rule;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.exception.MuleException;
@@ -26,10 +27,13 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.runner.ArtifactClassLoaderRunnerConfig;
+import org.mule.test.runner.RunnerConfigSystemProperty;
 
 import javax.inject.Inject;
 
 import org.junit.Rule;
+
+import org.mockito.junit.MockitoRule;
 
 /**
  * Base class for mule functional test cases that run tests using class loading isolation. This class will set the default values
@@ -46,7 +50,6 @@ import org.junit.Rule;
         "org.mule.runtime:*:*:*:*",
         "org.mule.modules*:*:*:*:*",
         "org.mule.transports:*:*:*:*",
-        "org.mule.mvel:*:*:*:*",
         "org.mule.extensions:*:*:*:*",
         "org.mule.connectors:*:*:*:*",
         "org.mule.tests.plugin:*:*:*:*",
@@ -57,8 +60,31 @@ import org.junit.Rule;
         "*:*:jar:tests:*",
         "*:*:test-jar:*:*"
     },
-    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"})
+    testRunnerExportedRuntimeLibs = {"org.mule.tests:mule-tests-functional"},
+    systemProperties = {
+        @RunnerConfigSystemProperty(
+            key = MuleArtifactFunctionalTestCase.EXTENSION_JVM_ENFORCEMENT_PROPERTY,
+            value = MuleArtifactFunctionalTestCase.JVM_ENFORCEMENT_LOOSE)
+    })
 public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalTestCase {
+
+  /**
+   * System property to set the enforcement policy. Defined here as a decision was made not to expose it as an API yet. For now,
+   * it will be for internal use only.
+   *
+   * @since 4.5.0
+   */
+  static final String EXTENSION_JVM_ENFORCEMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "jvm.version.extension.enforcement";
+  static final String JVM_ENFORCEMENT_LOOSE = "LOOSE";
+
+  // This is needed apart from the setting in {@code @ArtifactClassLoaderRunnerConfig} because tha validation also takes place
+  // during extension registering, not only during its discovery.
+  @Rule
+  public SystemProperty jvmVersionExtensionEnforcementLoose =
+      new SystemProperty(EXTENSION_JVM_ENFORCEMENT_PROPERTY, JVM_ENFORCEMENT_LOOSE);
+
+  @Rule
+  public MockitoRule rule = rule();
 
   @Inject
   protected ConfigurationComponentLocator locator;
@@ -109,13 +135,5 @@ public abstract class MuleArtifactFunctionalTestCase extends ArtifactFunctionalT
       ((BaseEventContext) _testEvent.getContext()).success();
     }
     super.doTearDown();
-
-    if (eventContextService != null && DefaultMuleConfiguration.isFlowTrace()) {
-      new PollingProber(1000, 10).check(new JUnitLambdaProbe(() -> {
-        assertThat(eventContextService.getCurrentlyActiveFlowStacks().toString(),
-                   eventContextService.getCurrentlyActiveFlowStacks(), is(empty()));
-        return true;
-      }));
-    }
   }
 }

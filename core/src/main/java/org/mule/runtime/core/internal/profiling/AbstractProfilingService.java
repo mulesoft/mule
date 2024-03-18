@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.profiling;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_PROFILING_SERVICE;
@@ -144,10 +143,7 @@ public abstract class AbstractProfilingService
     if (!profilingFeaturesSet.getAndSet(true)) {
       FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
       featureFlaggingRegistry.registerFeatureFlag(ENABLE_PROFILING_SERVICE,
-                                                  featureContext -> featureContext.getArtifactMinMuleVersion()
-                                                      .filter(muleVersion -> muleVersion
-                                                          .atLeast(ENABLE_PROFILING_SERVICE.getEnabledByDefaultSince()))
-                                                      .isPresent());
+                                                  featureContext -> false);
       featureFlaggingRegistry.registerFeatureFlag(FORCE_RUNTIME_PROFILING_CONSUMERS_ENABLEMENT,
                                                   featureContext -> false);
     }

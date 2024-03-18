@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,7 +8,6 @@ package org.mule.runtime.module.artifact.activation.internal.deployable;
 
 import static org.mule.maven.pom.parser.api.MavenPomParserProvider.discoverProvider;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.applicationModelResolver;
 import static org.mule.runtime.module.artifact.activation.api.deployable.ArtifactModelResolver.domainModelResolver;
@@ -62,7 +61,6 @@ import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -288,18 +286,6 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
     } else {
       return false;
     }
-  }
-
-  protected String getAttribute(Xpp3Dom tag, String attributeName) {
-    Xpp3Dom attributeDom = tag.getChild(attributeName);
-    checkState(attributeDom != null, format("'%s' element not declared at '%s' in the pom file of the artifact '%s'",
-                                            attributeName, tag.toString(), projectFolder.getName()));
-    String attributeValue = attributeDom.getValue().trim();
-    checkState(!isEmpty(attributeValue),
-               format("'%s' was defined but has an empty value at '%s' declared in the pom file of the artifact %s",
-                      attributeName, tag.toString(), projectFolder.getName()));
-    return attributeValue;
-
   }
 
   protected List<String> getActiveProfiles() {

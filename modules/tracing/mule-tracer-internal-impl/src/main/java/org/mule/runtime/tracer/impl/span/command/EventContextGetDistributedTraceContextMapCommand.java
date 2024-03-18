@@ -1,18 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.impl.span.command;
+
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 
 import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -20,9 +20,8 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 
 /**
- * An {@link AbstractFailsafeUnaryCommand} that gets the current distributed trace context map.
- *
- * The carrier is the {@link org.mule.runtime.api.event.EventContext}
+ * An {@link AbstractFailsafeUnaryCommand} that gets the current distributed trace context map. The carrier is the
+ * {@link org.mule.runtime.api.event.EventContext}
  *
  * @since 4.5.0
  */
@@ -45,7 +44,7 @@ public class EventContextGetDistributedTraceContextMapCommand extends
             ((SpanContextAware) eventContext).getSpanContext();
 
         if (spanContext != null) {
-          return spanContext.getSpan().map(InternalSpan::serializeAsMap).orElse(emptyMap());
+          return spanContext.getSpan().map(span -> getAsInternalSpan(span).serializeAsMap()).orElse(emptyMap());
         }
       }
       return emptyMap();

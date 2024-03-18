@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,9 +7,13 @@
 package org.mule.runtime.module.deployment.impl.internal.util;
 
 import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
-import static org.mule.runtime.core.api.util.FileUtils.newFile;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.failedToCreate;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+
 import static java.io.File.separator;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessage;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,9 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
-
-import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.i18n.I18nMessage;
 
 /**
  * Common logic to create and persist a file containing deployment properties for each app/domain deployed/redeployed.
@@ -81,9 +82,9 @@ public class DeploymentPropertiesUtils {
       return props;
     }
 
-    FileReader reader = new FileReader(configFile);
-
-    props.load(reader);
+    try (FileReader reader = new FileReader(configFile)) {
+      props.load(reader);
+    }
 
     return props;
   }
@@ -118,9 +119,9 @@ public class DeploymentPropertiesUtils {
                                                       String fileName)
       throws IOException {
     File deploymentPropertiesFile = new File(deploymentPropertiesPath, fileName);
-    FileWriter fileWriter = new FileWriter(deploymentPropertiesFile.getAbsolutePath(), false);
-    deploymentProperties.store(fileWriter, "deployment properties");
-    fileWriter.close();
+    try (FileWriter fileWriter = new FileWriter(deploymentPropertiesFile.getAbsolutePath(), false)) {
+      deploymentProperties.store(fileWriter, "deployment properties");
+    }
   }
 
   /**

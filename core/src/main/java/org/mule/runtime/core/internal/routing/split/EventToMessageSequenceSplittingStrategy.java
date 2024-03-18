@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,20 +7,16 @@
 package org.mule.runtime.core.internal.routing.split;
 
 import static java.lang.String.format;
-import static org.mule.runtime.core.internal.el.DefaultExpressionManager.hasMelExpression;
 
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.internal.routing.outbound.CollectionMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.IteratorMessageSequence;
 import org.mule.runtime.core.internal.routing.outbound.NodeListMessageSequence;
-import org.mule.runtime.core.internal.util.Copiable;
 import org.mule.runtime.internal.util.collection.ImmutableEntry;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -74,13 +70,7 @@ public class EventToMessageSequenceSplittingStrategy implements SplittingStrateg
       }
     }
     try {
-      Iterator<TypedValue<?>> valueIterator = expressionSplitterStrategy.split(event);
-      if (hasMelExpression(expressionSplitterStrategy.getExpression())) {
-        List<Object> iteratorCollection = new ArrayList<>();
-        valueIterator.forEachRemaining(iteratorCollection::add);
-        return new CollectionMessageSequence<>(iteratorCollection);
-      }
-      return new IteratorMessageSequence(valueIterator);
+      return new IteratorMessageSequence(expressionSplitterStrategy.split(event));
     } catch (ExpressionRuntimeException e) {
       throw e;
     } catch (Exception e) {

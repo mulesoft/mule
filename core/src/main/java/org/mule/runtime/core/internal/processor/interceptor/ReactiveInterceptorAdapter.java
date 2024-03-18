@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -39,12 +39,12 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.interception.DefaultInterceptionEvent;
-import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.interception.HasParamsAsTemplateProcessor;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
+import org.mule.runtime.core.internal.interception.ReactiveInterceptor;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 
 import java.util.LinkedList;
@@ -135,7 +135,7 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                           })
               .cast(InternalEvent.class)
               .map(doAfter(interceptor, (Component) component, empty()))
-              .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+              .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
               .onErrorStop()));
     } else {
       return next;

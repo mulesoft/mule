@@ -1,15 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
@@ -19,8 +15,20 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toAuthorizationCodeState;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 import static reactor.core.publisher.Mono.from;
 
+import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.AuthorizationCodeRequest;
+import org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext;
+import org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder;
+import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -31,7 +39,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
-import org.mule.runtime.core.internal.util.LazyLookup;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthCodeRequest;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
@@ -40,15 +47,10 @@ import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.server.HttpServer;
 import org.mule.runtime.http.api.server.ServerNotFoundException;
 import org.mule.runtime.module.extension.api.runtime.connectivity.oauth.ImmutableAuthCodeRequest;
+import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.LazyLookup;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
-import org.mule.runtime.oauth.api.AuthorizationCodeRequest;
-import org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext;
-import org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder;
-import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -196,7 +198,9 @@ public class AuthorizationCodeOAuthHandler extends OAuthHandler<AuthorizationCod
         .localAuthorizationUrlPath(callbackConfig.getLocalAuthorizePath())
         .localAuthorizationUrlResourceOwnerId("#[attributes.queryParams.resourceOwnerId]")
         .state("#[attributes.queryParams.state]")
-        .customParameters(config.getCustomParameters())
+        .customParameters(config.getCustomQueryParameters())
+        .customHeaders(config.getCustomHeaders())
+        .customBodyParameters(config.getCustomBodyParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
     dancerBuilder.includeRedirectUriInRefreshTokenRequest(grantType.includeRedirectUriInRefreshTokenRequest());

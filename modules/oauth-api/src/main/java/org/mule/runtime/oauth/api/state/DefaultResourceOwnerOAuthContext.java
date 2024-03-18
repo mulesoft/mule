@@ -1,15 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.oauth.api.state;
 
-import static org.mule.runtime.oauth.api.state.DancerState.HAS_TOKEN;
-import static org.mule.runtime.oauth.api.state.DancerState.NO_TOKEN;
-import static org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContextWithRefreshState.createRefreshOAuthContextLock;
+import static org.mule.oauth.client.api.state.DancerState.HAS_TOKEN;
+import static org.mule.oauth.client.api.state.DancerState.NO_TOKEN;
+import static org.mule.oauth.client.api.state.ResourceOwnerOAuthContextWithRefreshState.createRefreshOAuthContextLock;
 
+import org.mule.oauth.client.api.state.DancerState;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContextWithRefreshState;
 import org.mule.runtime.api.lock.LockFactory;
 
 import java.io.Serializable;
@@ -25,7 +28,8 @@ import java.util.concurrent.locks.Lock;
  * @deprecated Use {@link ResourceOwnerOAuthContextWithRefreshState} instead.
  */
 @Deprecated
-public final class DefaultResourceOwnerOAuthContext implements ResourceOwnerOAuthContext, Serializable {
+public final class DefaultResourceOwnerOAuthContext
+    implements ResourceOwnerOAuthContext, org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext, Serializable {
 
   private static final long serialVersionUID = -4260965520423792113L;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,7 +7,9 @@
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isCompileTime;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.NamedObject;
@@ -22,6 +24,7 @@ import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.TypeGeneric;
@@ -30,6 +33,8 @@ import org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensi
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
@@ -96,15 +101,35 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
         .filter(JavaExtensionModelParserUtils::isCompletionCallbackParameter)
         .findFirst().ifPresent(extensionParameter -> {
           List<TypeGeneric> generics = extensionParameter.getType().getGenerics();
-          if (generics.isEmpty()) {
-            problemsReporter
-                .addError(new Problem(extensionParameter, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
-                                                                 extensionModel.getName(), CompletionCallback.class.getName())));
+          if (!generics.isEmpty()) {
+            validateGenerics(extensionModel, extensionParameter, operationModel, genericToConcreteTypeList(generics),
+                             CompletionCallback.class, problemsReporter);
           } else {
-            validateGenerics(extensionModel, extensionParameter, operationModel, generics, CompletionCallback.class,
-                             problemsReporter);
+            Type executionParameterType = extensionParameter.getType();
+            Optional<List<Type>> superTypeGenerics =
+                routerCallbackParent(executionParameterType).map(executionParameterType::getSuperTypeGenerics);
+            if (superTypeGenerics.isPresent() && !superTypeGenerics.get().isEmpty()) {
+              validateGenerics(extensionModel, extensionParameter, operationModel, superTypeGenerics.get(),
+                               CompletionCallback.class,
+                               problemsReporter);
+            } else {
+              problemsReporter
+                  .addError(new Problem(extensionParameter, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
+                                                                   extensionModel.getName(),
+                                                                   CompletionCallback.class.getName())));
+            }
           }
         });
+  }
+
+  private Optional<Class> routerCallbackParent(Type type) {
+    if (type.isSameType(RouterCompletionCallback.class)) {
+      return of(CompletionCallback.class);
+    } else if (type.isSameType(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class)) {
+      return of(org.mule.sdk.api.runtime.process.CompletionCallback.class);
+    } else {
+      return empty();
+    }
   }
 
   private void validateResultReturnType(Type returnType, ProblemsReporter problemsReporter, OperationModel operationModel,
@@ -115,7 +140,8 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
         problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                                      extensionModel.getName(), Result.class)));
       } else {
-        validateGenerics(extensionModel, operationModel, operationModel, generics, Result.class, problemsReporter);
+        validateGenerics(extensionModel, operationModel, operationModel, genericToConcreteTypeList(generics), Result.class,
+                         problemsReporter);
       }
     }
   }
@@ -132,7 +158,8 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
             problemsReporter.addError(new Problem(operationModel, format(MISSING_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                                          extensionModel.getName(), Result.class)));
           } else {
-            validateGenerics(extensionModel, operationModel, operationModel, concreteTypeGenerics, Result.class,
+            validateGenerics(extensionModel, operationModel, operationModel, genericToConcreteTypeList(concreteTypeGenerics),
+                             Result.class,
                              problemsReporter);
           }
         }
@@ -146,11 +173,14 @@ public class OperationReturnTypeModelValidator implements ExtensionModelValidato
   }
 
   private void validateGenerics(ExtensionModel extensionModel, NamedObject namedObject, OperationModel operationModel,
-                                List<TypeGeneric> generics, Class returnType, ProblemsReporter problemsReporter) {
-    if (generics.get(0).getConcreteType().isSameType(Void.class) &&
-        !generics.get(1).getConcreteType().isSameType(Void.class)) {
+                                List<Type> generics, Class returnType, ProblemsReporter problemsReporter) {
+    if (generics.get(0).isSameType(Void.class) && !generics.get(1).isSameType(Void.class)) {
       problemsReporter.addWarning(new Problem(namedObject, format(INVALID_GENERICS_ERROR_MESSAGE, operationModel.getName(),
                                                                   extensionModel.getName(), returnType.getName())));
     }
+  }
+
+  private List<Type> genericToConcreteTypeList(List<TypeGeneric> generics) {
+    return generics.stream().map(t -> t.getConcreteType()).collect(toList());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,21 +9,18 @@ package org.mule.test.infrastructure.process;
 import java.io.File;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 public class VerifyLogWithMatcher extends TypeSafeMatcher<MuleProcessController> {
 
   private String app;
-  private Matcher<File> fileMatcher;
+  private final Matcher<File> fileMatcher;
 
-  @Factory
   public static Matcher<MuleProcessController> log(Matcher<File> matcher) {
     return new VerifyLogWithMatcher(matcher);
   }
 
-  @Factory
   public static Matcher<MuleProcessController> log(String appName, Matcher<File> matcher) {
     return new VerifyLogWithMatcher(appName, matcher);
   }

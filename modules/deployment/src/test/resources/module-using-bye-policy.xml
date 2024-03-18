@@ -12,7 +12,7 @@
 
             <module-using-bye:adios/>
 
-            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor" />
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor" />
 
             <test-policy:execute-next/>
         </test-policy:operation>

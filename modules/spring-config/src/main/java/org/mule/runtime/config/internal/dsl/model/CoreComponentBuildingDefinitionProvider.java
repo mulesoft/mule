@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.config.internal.dsl.model;
 
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
@@ -13,6 +12,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.SCATTER_GATHER_EL
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.createNewInstance;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getMuleMessageTransformerBaseBuilder;
 import static org.mule.runtime.config.api.dsl.model.ComponentBuildingDefinitionProviderUtils.getTransformerBaseBuilder;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_MULE_CONFIGURATION;
 import static org.mule.runtime.core.api.construct.Flow.INITIAL_STATE_STARTED;
 import static org.mule.runtime.core.api.context.notification.AnySelector.ANY_SELECTOR;
 import static org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair.ANY_SELECTOR_STRING;
@@ -25,8 +25,6 @@ import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fro
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromReferenceObject;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleReferenceParameter;
-import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromTextContent;
-import static org.mule.runtime.dsl.api.component.CommonTypeConverters.stringToClassConverter;
 import static org.mule.runtime.dsl.api.component.KeyAttributeDefinitionPair.newBuilder;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.ExtensionConstants.DEFAULT_BYTES_STREAMING_MAX_BUFFER_SIZE;
@@ -63,7 +61,9 @@ import org.mule.runtime.config.internal.bean.CustomEncryptionStrategyDelegate;
 import org.mule.runtime.config.internal.bean.CustomSecurityProviderDelegate;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
+import org.mule.runtime.config.internal.dsl.processor.AddVariablePropertyConfigurator;
 import org.mule.runtime.config.internal.dsl.processor.EnvironmentPropertyObjectFactory;
+import org.mule.runtime.config.internal.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.config.internal.dsl.processor.ReconnectionConfigObjectFactory;
 import org.mule.runtime.config.internal.dsl.processor.RetryPolicyTemplateObjectFactory;
 import org.mule.runtime.config.internal.factories.AsyncMessageProcessorsFactoryBean;
@@ -85,8 +85,6 @@ import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorIterat
 import org.mule.runtime.config.internal.factories.streaming.InMemoryCursorStreamProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorIteratorProviderObjectFactory;
 import org.mule.runtime.config.internal.factories.streaming.NullCursorStreamProviderObjectFactory;
-import org.mule.runtime.config.privileged.dsl.processor.AddVariablePropertyConfigurator;
-import org.mule.runtime.config.privileged.dsl.processor.MessageProcessorChainFactoryBean;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationExtension;
 import org.mule.runtime.core.api.config.DynamicConfigExpiration;
@@ -97,6 +95,7 @@ import org.mule.runtime.core.api.context.notification.ResourceIdentifierSelector
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.RaiseErrorProcessor;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.RetryNotifier;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.security.EncryptionStrategy;
@@ -111,11 +110,6 @@ import org.mule.runtime.core.api.streaming.bytes.CursorStreamProviderFactory;
 import org.mule.runtime.core.api.streaming.object.CursorIteratorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transformer.AbstractTransformer;
-import org.mule.runtime.core.internal.el.mvel.MVELExpressionLanguage;
-import org.mule.runtime.core.internal.el.mvel.configuration.AliasEntry;
-import org.mule.runtime.core.internal.el.mvel.configuration.ImportEntry;
-import org.mule.runtime.core.internal.el.mvel.configuration.MVELExpressionLanguageObjectFactory;
-import org.mule.runtime.core.internal.el.mvel.configuration.MVELGlobalFunctionsConfig;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.OnErrorContinueHandler;
@@ -128,7 +122,6 @@ import org.mule.runtime.core.internal.processor.simple.AddFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.ParseTemplateProcessor;
 import org.mule.runtime.core.internal.processor.simple.RemoveFlowVariableProcessor;
 import org.mule.runtime.core.internal.processor.simple.SetPayloadMessageProcessor;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.FirstSuccessful;
 import org.mule.runtime.core.internal.routing.Foreach;
@@ -143,13 +136,12 @@ import org.mule.runtime.core.internal.routing.UntilSuccessful;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.security.PasswordBasedEncryptionStrategy;
 import org.mule.runtime.core.internal.security.SecretKeyEncryptionStrategy;
-import org.mule.runtime.core.internal.security.filter.MuleEncryptionEndpointSecurityFilter;
 import org.mule.runtime.core.internal.source.scheduler.DefaultSchedulerMessageSource;
+import org.mule.runtime.core.internal.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler;
 import org.mule.runtime.core.privileged.processor.AnnotatedProcessor;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.core.privileged.processor.simple.AbstractAddVariablePropertyProcessor;
-import org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
@@ -204,6 +196,8 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
   private static final String TX_ACTION = "transactionalAction";
   private static final String TX_TYPE = "transactionType";
   private static final String LOG_EXCEPTION = "logException";
+
+  private static final String ENABLE_NOTIFICATIONS = "enableNotifications";
   private static final String RAISE_ERROR = "raise-error";
   private static final String INHERIT_ITERABLE_REPEATABILITY = "inheritIterableRepeatability";
 
@@ -228,7 +222,9 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
         .withSetterParameterDefinition(MESSAGE_PROCESSORS, messageProcessorListAttributeDefinition)
         .withSetterParameterDefinition(WHEN, fromSimpleParameter(WHEN).build())
         .withSetterParameterDefinition(ERROR_TYPE, fromSimpleParameter(TYPE).build())
-        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build());
+        .withSetterParameterDefinition(LOG_EXCEPTION, fromSimpleParameter(LOG_EXCEPTION).withDefaultValue("true").build())
+        .withSetterParameterDefinition(ENABLE_NOTIFICATIONS,
+                                       fromSimpleParameter(ENABLE_NOTIFICATIONS).withDefaultValue("true").build());
     componentBuildingDefinitions
         .add(baseDefinition.withIdentifier(ON_ERROR).withTypeDefinition(fromType(TemplateOnErrorHandler.class))
             .withObjectFactoryType(OnErrorFactoryBean.class)
@@ -434,6 +430,7 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("configuration")
         .withTypeDefinition(fromType(MuleConfiguration.class))
         .withObjectFactoryType(MuleConfigurationConfigurator.class)
+        .withRegistrationName(OBJECT_MULE_CONFIGURATION)
         .withSetterParameterDefinition("defaultErrorHandlerName",
                                        fromSimpleParameter("defaultErrorHandler-ref").build())
         .withSetterParameterDefinition("defaultResponseTimeout", fromSimpleParameter("defaultResponseTimeout").build())
@@ -515,12 +512,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
             .build())
         .build());
 
-    componentBuildingDefinitions.add(baseDefinition.withIdentifier("encryption-security-filter")
-        .withTypeDefinition(fromType(MuleEncryptionEndpointSecurityFilter.class))
-        .withConstructorParameterDefinition(fromSimpleReferenceParameter("strategy-ref").build())
-        .withIgnoredConfigurationParameter(NAME)
-        .build());
-
     componentBuildingDefinitions.add(baseDefinition.withIdentifier("security-manager")
         .withTypeDefinition(fromType(SecurityManager.class)).withObjectFactoryType(MuleSecurityManagerConfigurator.class)
         .withSetterParameterDefinition("muleContext", fromReferenceObject(MuleContext.class).build())
@@ -583,8 +574,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
                                                                                        .build())
         .build());
 
-    componentBuildingDefinitions.addAll(getMvelBuildingDefinitions());
-
     componentBuildingDefinitions.addAll(getTransformersBuildingDefinitions());
 
     componentBuildingDefinitions
@@ -643,40 +632,6 @@ public class CoreComponentBuildingDefinitionProvider implements ComponentBuildin
 
     return definitions;
   }
-
-  private List<ComponentBuildingDefinition> getMvelBuildingDefinitions() {
-    List<ComponentBuildingDefinition> mvelComponentBuildingDefinitions = new ArrayList<>();
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("expression-language")
-        .withTypeDefinition(fromType(MVELExpressionLanguage.class))
-        .withObjectFactoryType(MVELExpressionLanguageObjectFactory.class)
-        .withSetterParameterDefinition("autoResolveVariables", fromSimpleParameter("autoResolveVariables").build())
-        .withSetterParameterDefinition("globalFunctions", fromChildConfiguration(MVELGlobalFunctionsConfig.class).build())
-        .withSetterParameterDefinition("imports", fromChildCollectionConfiguration(ImportEntry.class).build())
-        .withSetterParameterDefinition("aliases", fromChildCollectionConfiguration(AliasEntry.class).build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("import")
-        .withTypeDefinition(fromType(ImportEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("class", stringToClassConverter()).build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("alias")
-        .withTypeDefinition(fromType(AliasEntry.class))
-        .withSetterParameterDefinition("key", fromSimpleParameter("name").build())
-        .withSetterParameterDefinition("value", fromSimpleParameter("expression").build())
-        .build());
-
-    mvelComponentBuildingDefinitions.add(baseDefinition.withIdentifier("global-functions")
-        .withTypeDefinition(fromType(MVELGlobalFunctionsConfig.class))
-        .withSetterParameterDefinition("file", fromSimpleParameter("file").build())
-        .withSetterParameterDefinition("inlineScript", fromTextContent().build())
-        .build());
-
-    return mvelComponentBuildingDefinitions;
-  }
-
 
   @SuppressWarnings("unchecked")
   private List<ComponentBuildingDefinition> getTransformersBuildingDefinitions() {

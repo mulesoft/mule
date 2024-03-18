@@ -1,22 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.api.span.info;
+
+import static java.util.Collections.emptySet;
 
 import org.mule.runtime.api.event.Event;
 
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
-
 /**
  * The export information when starting a {@link org.mule.runtime.tracer.api.span.InternalSpan}.
  *
- * @see org.mule.runtime.tracer.api.EventTracer#startComponentSpan(Event, InitialSpanInfo)
+ * @see org.mule.runtime.tracer.api.EventTracer#startSpan(Event, InitialSpanInfo)
  *
  * @since 4.5.0
  */
@@ -58,4 +57,11 @@ public interface InitialExportInfo {
   default Set<String> noExportUntil() {
     return emptySet();
   }
+
+  /**
+   * Propagates the export information from its parent's InitialExportInfo.
+   *
+   * @param initialExportInfo is the parent's InitialExportInfo.
+   */
+  default void propagateInitialExportInfo(InitialExportInfo initialExportInfo) {}
 }

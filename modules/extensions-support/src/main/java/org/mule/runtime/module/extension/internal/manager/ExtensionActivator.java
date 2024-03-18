@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,8 +11,9 @@ import static org.mule.runtime.api.metadata.DataType.fromFunction;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
+import static org.mule.runtime.core.internal.util.BeanUtils.getName;
 import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
-import static org.mule.runtime.core.privileged.util.BeanUtils.getName;
+import static org.mule.runtime.module.extension.internal.lifecycle.ExtensionOnMuleContextDisposedNotificationListener.registerLifecycleListenerForOnContextDisposed;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getParameterClasses;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getSubtypeClasses;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -62,6 +63,9 @@ public final class ExtensionActivator implements Startable, Stoppable {
   void activateExtension(ExtensionModel extensionModel) {
     registerEnumTransformers(extensionModel);
     registerAsModuleDefinition(extensionModel);
+    registerLifecycleListenerForOnContextDisposed(muleContext.getNotificationManager(),
+                                                  muleContext.getExecutionClassLoader(),
+                                                  extensionModel);
   }
 
   private void registerEnumTransformers(ExtensionModel extensionModel) {

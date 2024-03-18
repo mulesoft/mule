@@ -1,12 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.utils;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.util.Reference;
@@ -28,19 +28,20 @@ import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.management.MBeanServer;
-import javax.xml.bind.DatatypeConverter;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
+
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,13 +115,19 @@ public class TroubleshootingUtils {
 
   public static Path getPathOfFileContaining(Path pluginJsonUrl, String substring) {
     Path auxPath = pluginJsonUrl;
-    while (auxPath != null && !auxPath.getFileName().toString().contains(substring)) {
-      auxPath = auxPath.getParent();
+    try {
+      while (auxPath != null && !auxPath.getFileName().toString().contains(substring)) {
+        auxPath = auxPath.getParent();
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(format("Could not find the substring '%s' in path '%s'", substring,
+                                        pluginJsonUrl.toAbsolutePath()),
+                                 e);
     }
 
     if (pluginJsonUrl != null && auxPath == null) {
-      throw new RuntimeException(String.format("Could not find the substring '%s' in path '%s'", substring,
-                                               pluginJsonUrl.toAbsolutePath()));
+      throw new RuntimeException(format("Could not find the substring '%s' in path '%s'", substring,
+                                        pluginJsonUrl.toAbsolutePath()));
     }
 
     return auxPath;
@@ -133,8 +140,7 @@ public class TroubleshootingUtils {
       MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(Files.readAllBytes(filePath));
       byte[] digest = md.digest();
-      md5Checksum = DatatypeConverter
-          .printHexBinary(digest).toLowerCase();
+      md5Checksum = Hex.encodeHexString(digest);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     } catch (NoSuchAlgorithmException e) {
@@ -289,7 +295,7 @@ public class TroubleshootingUtils {
     }
 
     String getOsProcessesCommand = GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY);
-    processesList.add(String.format("OS: '%s' - Command: '%s'", OS_NAME, getOsProcessesCommand));
+    processesList.add(format("OS: '%s' - Command: '%s'", OS_NAME, getOsProcessesCommand));
 
     try {
       Process runningProcessesResult = Runtime.getRuntime().exec(GET_OS_PROCESSES_COMMANDS.get(OS_NAME_FAMILY));

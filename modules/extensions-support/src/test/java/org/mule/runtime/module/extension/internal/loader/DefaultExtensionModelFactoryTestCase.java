@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,6 +13,7 @@ import static org.mule.runtime.api.meta.model.operation.ExecutionType.BLOCKING;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_INTENSIVE;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.ExtensionConstants.BACK_PRESSURE_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
@@ -22,6 +23,10 @@ import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.FAI
 import static org.mule.runtime.extension.api.runtime.source.BackPressureMode.WAIT;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.OBJECT_STORE;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.loadExtension;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.JAVA_VERSIONS_IN_EXTENSION_MODEL;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_CLASS_NAME;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_DESCRIPTION;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG_LIB_FILE_NAME;
@@ -42,6 +47,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -81,6 +87,7 @@ import org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuil
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.property.BackPressureStrategyModelProperty;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 import org.mule.sdk.api.annotation.error.ErrorTypes;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -110,12 +117,17 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.hamcrest.Matcher;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+
 @SmallTest
+@Feature(SDK)
 public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
 
   private final ClassTypeLoader typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader();
@@ -148,8 +160,10 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   public void blockingExecutionTypes() {
     final List<String> nonBlockingOperations = Arrays.asList("killMany", "executeAnything", "alwaysFailsWrapper", "getChain",
                                                              "exceptionOnCallbacks", "neverFailsWrapper", "payloadModifier",
-                                                             "blockingNonBlocking", "callGusFringNonBlocking", "tapPhones",
-                                                             "sdkExecuteForeingOrders");
+                                                             "blockingNonBlocking", "nonBlocking", "callGusFringNonBlocking",
+                                                             "tapPhones", "sdkExecuteForeingOrders", "concurrentRouteExecutor",
+                                                             "simpleRouter", "spy", "stereotypedRoutes", "twoRoutesRouter",
+                                                             "sdkVoidRouter", "voidRouter");
 
     Reference<Boolean> cpuIntensive = new Reference<>(false);
     Reference<Boolean> blocking = new Reference<>(false);
@@ -341,6 +355,19 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
     assertThat(typeImport.isPresent(), is(true));
   }
 
+  @Test
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  public void defaultJavaVersionSupport() {
+    assertThat(heisenbergExtension.getSupportedJavaVersions(), equalTo(ALL_SUPPORTED_JAVA_VERSIONS));
+  }
+
+  @Test
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  public void customJavaVersionSupport() {
+    ExtensionModel model = loadExtension(TestJavaSupportExtension.class);
+    assertThat(model.getSupportedJavaVersions(), contains(JAVA_8.version(), JAVA_17.version()));
+  }
+
   private void assertStreamingStrategy(ParameterModel streamingParameter) {
     assertThat(streamingParameter.getType(), equalTo(new StreamingStrategyTypeBuilder().getByteStreamingStrategyType()));
     assertThat(streamingParameter.isRequired(), is(false));
@@ -419,6 +446,12 @@ public class DefaultExtensionModelFactoryTestCase extends AbstractMuleTestCase {
   @MediaType(TEXT_PLAIN)
   @BackPressure(defaultMode = FAIL, supportedModes = {DROP, WAIT})
   public static class IllegalBackPressureSource extends HeisenbergSource {
+
+  }
+
+  @Extension(name = "DefaultJavaSupport")
+  @JavaVersionSupport({JAVA_8, JAVA_17})
+  public static class TestJavaSupportExtension {
 
   }
 }

@@ -1,26 +1,25 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.processor.simple;
 
-import static java.lang.System.getProperty;
-import static java.nio.charset.Charset.forName;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.MediaType.BINARY;
 import static org.mule.runtime.api.metadata.MediaType.create;
 import static org.mule.runtime.api.metadata.MediaType.parse;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
-import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
 import static org.mule.runtime.core.api.util.IOUtils.getResourceAsStream;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.compile;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
+
+import static java.nio.charset.Charset.forName;
 
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -47,7 +46,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
 
   private static final MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
   private static final Boolean KEEP_TYPE_TARGET_AND_TARGET_VAR =
-      new Boolean(getProperty(SYSTEM_PROPERTY_PREFIX + "parse.template.keep.target.var.type", "true"));
+      true;
 
   private ExtendedExpressionManager expressionManager;
 
@@ -113,7 +112,7 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
   }
 
   private void evaluateCorrectArguments() {
-    if (!isSanitizedPayload(sanitize(targetValue)) && target == null) {
+    if (target == null && !isSanitizedPayload(sanitize(targetValue))) {
       throw new IllegalArgumentException("Can't define a targetValue with no target");
     }
   }
@@ -143,16 +142,8 @@ public class ParseTemplateProcessor extends SimpleMessageProcessor implements Ha
     if (target == null) {
       return CoreEvent.builder(event).message(resultMessage).build();
     } else {
-      if (KEEP_TYPE_TARGET_AND_TARGET_VAR) {
-        CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
-        return outputToTarget(event, resultEvent, target, targetValueExpression, expressionManager);
-      } else {
-        return CoreEvent.builder(event).addVariable(target,
-                                                    expressionManager
-                                                        .evaluate(targetValue, CoreEvent.builder(event)
-                                                            .message(resultMessage).build()))
-            .build();
-      }
+      CoreEvent resultEvent = CoreEvent.builder(event).message(resultMessage).build();
+      return outputToTarget(event, resultEvent, target, targetValueExpression, expressionManager);
     }
   }
 

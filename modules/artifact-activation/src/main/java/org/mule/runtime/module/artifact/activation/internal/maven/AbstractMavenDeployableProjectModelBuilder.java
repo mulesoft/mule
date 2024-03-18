@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,6 +9,7 @@ package org.mule.runtime.module.artifact.activation.internal.maven;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
@@ -35,10 +36,11 @@ import org.mule.maven.client.api.MavenClientProvider;
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.pom.parser.api.MavenPomParserProvider;
-import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.MavenPomParser;
+import org.mule.maven.pom.parser.api.MavenPomParserProvider;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
@@ -59,8 +61,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
@@ -114,13 +114,15 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
 
-    MavenClient mavenClient = createMavenClient(mavenConfiguration);
+    try (MavenClient mavenClient = createMavenClient(mavenConfiguration)) {
+      resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
 
-    resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
+      resolveDeployablePluginsData(deployableMavenBundleDependencies);
 
-    resolveDeployablePluginsData(deployableMavenBundleDependencies);
-
-    resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
+      resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
+    }
 
     return doBuild(parser, deployableArtifactCoordinates);
   }
@@ -292,7 +294,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private void resolveAdditionalPluginDependencies(MavenClient mavenClient, MavenPomParser parser,
                                                    Map<ArtifactCoordinates, List<Artifact>> pluginsDependencies) {
     // Parse additional plugin dependencies
-    Map<Pair<String, String>, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
+    Map<org.mule.maven.pom.parser.api.model.ArtifactCoordinates, AdditionalPluginDependencies> initialAdditionalPluginDependencies =
         parser.getPomAdditionalPluginDependenciesForArtifacts();
 
     AdditionalPluginDependenciesResolver additionalPluginDependenciesResolver =

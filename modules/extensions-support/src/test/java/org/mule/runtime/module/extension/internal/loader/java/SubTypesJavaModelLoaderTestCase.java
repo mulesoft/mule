@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,7 +11,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -44,11 +43,12 @@ import org.mule.tck.size.SmallTest;
 import java.util.stream.Stream;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
+import java.util.List;
+import java.util.stream.Stream;
 
 @SmallTest
 public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
@@ -68,7 +68,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
   public void before() {
     pluginDeclarer = spy(new ExtensionDeclarer());
 
-    ExtensionElement extensionElement = mock(ExtensionElement.class, RETURNS_DEEP_STUBS);
+    ExtensionElement extensionElement = mock(ExtensionElement.class, withSettings().extraInterfaces(List.class));
     when(extensionElement.getName()).thenReturn("LoaderTest");
     ConfigurationElement configurationElement = mock(ConfigurationElement.class);
     when(configurationElement.getTypeName()).thenReturn("java.");
@@ -120,7 +120,6 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
     verify(pluginDeclarer, never()).withImportedType(any());
   }
 
-  @Ignore("W-12625688")
   @Test
   @Issue("MULE-18581")
   @Description("Simulate the scenario of a plugins declaring subtypes from another plugin "
@@ -128,7 +127,7 @@ public class SubTypesJavaModelLoaderTestCase extends AbstractMuleTestCase {
   public void importForSubtypesFromOtherPlugin() throws ClassNotFoundException {
     final Type baseAType = createType(baseMetadataType, BaseType.class);
     final Type subAType = createType(subMetadataType, SubType.class);
-    when(pluginCtx.getExtensionClassLoader()).thenReturn(mock(ClassLoader.class));
+    when(pluginCtx.getExtensionClassLoader()).thenReturn(spy(ClassLoader.class));
 
     when(typeMapping.getClassValue(any())).thenReturn(baseAType);
     when(typeMapping.getClassArrayValue(any())).thenReturn(asList(subAType));

@@ -1,20 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.artifact.api.serializer.protocol;
 
-import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
 import org.mule.api.annotation.NoInstantiate;
+import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.internal.serialization.AbstractSerializationProtocol;
-import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderRepository;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectInputStream;
 import org.mule.runtime.module.artifact.api.serializer.ArtifactClassLoaderObjectOutputStream;
@@ -44,7 +45,7 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
    *
    */
   public CustomJavaSerializationProtocol(ClassLoaderRepository classLoaderRepository) {
-    checkArgument(classLoaderRepository != null, "artifactClassLoaderRepository cannot be null");
+    requireNonNull(classLoaderRepository, "artifactClassLoaderRepository cannot be null");
     this.classLoaderRepository = classLoaderRepository;
   }
 
@@ -77,8 +78,8 @@ public class CustomJavaSerializationProtocol extends AbstractSerializationProtoc
    */
   @Override
   protected <T> T doDeserialize(InputStream inputStream, ClassLoader classLoader) throws Exception {
-    checkArgument(inputStream != null, "Cannot deserialize a null stream");
-    checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
+    requireNonNull(inputStream, "Cannot deserialize a null stream");
+    requireNonNull(classLoader, "Cannot deserialize with a null classloader");
 
     try (ObjectInputStream in = new ArtifactClassLoaderObjectInputStream(classLoaderRepository, inputStream)) {
       Object obj = in.readObject();

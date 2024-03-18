@@ -1,14 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.exception;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.getCurrentEvent;
 import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -59,7 +60,9 @@ public abstract class AbstractSystemExceptionStrategy extends AbstractExceptionL
   private void doHandleException(Exception ex, RollbackSourceCallback rollbackMethod, ComponentLocation componentLocation) {
     fireNotification(ex, getCurrentEvent(), componentLocation);
 
-    resolveAndLogException(ex);
+    if ((ex instanceof MessagingException) && !(((MessagingException) ex).getExceptionInfo().isAlreadyLogged())) {
+      resolveAndLogException(ex);
+    }
 
     logger.debug("Rolling back transaction");
     rollback(ex, rollbackMethod);

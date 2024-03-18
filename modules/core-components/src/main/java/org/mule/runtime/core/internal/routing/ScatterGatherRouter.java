@@ -1,21 +1,23 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.routing;
 
 import static java.util.Collections.emptyList;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotCopyStreamPayload;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static reactor.core.publisher.Flux.fromIterable;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectMapForkJoinStrategyFactory;
 import org.mule.runtime.core.privileged.processor.Router;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
@@ -23,8 +25,8 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.mule.runtime.core.privileged.profiling.tracing.InitialSpanInfoAware;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.core.privileged.profiling.tracing.ComponentTracerAware;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import javax.inject.Inject;
 
@@ -49,7 +51,10 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   private List<MessageProcessorChain> routes = emptyList();
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   @Override
   protected Consumer<CoreEvent> onEvent() {
@@ -58,7 +63,16 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
 
   @Override
   protected Publisher<ForkJoinStrategy.RoutingPair> getRoutingPairs(CoreEvent event) {
-    return fromIterable(routes).map(route -> of(event, route));
+    return fromIterable(routes).map(route -> of(eventForRoute(event), route));
+  }
+
+  private CoreEvent eventForRoute(CoreEvent event) {
+    if (!(event instanceof InternalEvent)) {
+      return event;
+    }
+    InternalEvent copy = (InternalEvent) CoreEvent.builder(event).message(event.getMessage()).build();
+    setSourcePolicyChildContext(copy, featureFlaggingService);
+    return copy;
   }
 
   @Override
@@ -69,9 +83,9 @@ public class ScatterGatherRouter extends AbstractForkJoinRouter implements Route
   public void setRoutes(List<MessageProcessorChain> routes) {
     this.routes = routes;
     for (MessageProcessorChain route : routes) {
-      if (route instanceof InitialSpanInfoAware) {
-        ((InitialSpanInfoAware) route)
-            .setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX));
+      if (route instanceof ComponentTracerAware) {
+        ((ComponentTracerAware) route)
+            .setComponentTracer(componentTracerFactory.fromComponent(this, SCATTER_GATHER_ROUTE_SPAN_NAME_SUFFIX));
       }
     }
   }

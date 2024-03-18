@@ -1,11 +1,14 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.deployment.impl.internal.artifact;
+
+import static org.mule.runtime.core.api.config.bootstrap.RegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
+
+import static java.util.Collections.enumeration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -13,10 +16,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.internal.config.bootstrap.ClassLoaderRegistryBootstrapDiscoverer.BOOTSTRAP_PROPERTIES;
 
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -74,7 +75,8 @@ public class ArtifactBootstrapRegistryConfigurationBuilderTestCase extends Abstr
       final List<URL> urls = new ArrayList<>();
       urls.add(this.getClass().getResource("/plugin1-bootstrap.properties"));
       urls.add(this.getClass().getResource("/plugin2-bootstrap.properties"));
-      when(pluginClassLoader1.findResources(BOOTSTRAP_PROPERTIES)).thenReturn(new EnumerationAdapter<>(urls));
+      when(pluginClassLoader1.findResources(BOOTSTRAP_PROPERTIES))
+          .thenReturn(enumeration(urls));
       return new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins);
     } catch (IOException e) {
       throw new RuntimeException(e);

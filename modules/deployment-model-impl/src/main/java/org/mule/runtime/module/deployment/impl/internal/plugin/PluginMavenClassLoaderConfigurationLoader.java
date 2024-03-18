@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,11 +16,11 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleScope.SYSTEM
 import static org.mule.tools.api.classloader.ClassLoaderModelJsonSerializer.deserialize;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
-import static com.google.common.io.Files.createTempDir;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 import org.mule.maven.client.api.MavenClient;
@@ -39,6 +39,7 @@ import org.mule.runtime.module.deployment.impl.internal.maven.HeavyweightClassLo
 import org.mule.runtime.module.deployment.impl.internal.maven.LightweightClassLoaderConfigurationBuilder;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -223,7 +224,7 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
 
   private class MuleSystemPluginMavenReactorResolver implements MavenReactorResolver, AutoCloseable {
 
-    private final File temporaryFolder = createTempDir();
+    private final File temporaryFolder;
 
     private final MavenPomModel effectiveModel;
 
@@ -231,10 +232,19 @@ public class PluginMavenClassLoaderConfigurationLoader extends AbstractMavenClas
     private final File artifactFile;
 
     public MuleSystemPluginMavenReactorResolver(File artifactFile, MavenClient mavenClient) {
+      this.temporaryFolder = getTempDir();
       this.effectiveModel = mavenClient.getEffectiveModel(artifactFile, of(temporaryFolder));
 
       this.pomFile = effectiveModel.getPomFile().get();
       this.artifactFile = artifactFile;
+    }
+
+    private File getTempDir() {
+      try {
+        return createTempDirectory(null).toFile();
+      } catch (IOException e) {
+        throw new IllegalStateException("Failed to create directory", e);
+      }
     }
 
     public MavenPomModel getEffectiveModel() {

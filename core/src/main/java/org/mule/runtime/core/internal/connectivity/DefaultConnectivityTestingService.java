@@ -1,14 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.connectivity;
 
-import static java.lang.Thread.currentThread;
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
@@ -21,10 +22,11 @@ import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
+import org.mule.runtime.internal.connectivity.ConnectivityTestingStrategyUtils;
 
 import java.util.Collection;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -38,12 +40,13 @@ import javax.inject.Inject;
  */
 public class DefaultConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
-  private ServiceRegistry serviceRegistry = new SpiServiceRegistry();
+  private Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry =
+      ConnectivityTestingStrategyUtils::lookupConnectivityTestingStrategies;
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
   private MuleContext muleContext;
   private ConfigurationComponentLocator locator;
 
-  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+  protected void setServiceRegistry(Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
@@ -59,16 +62,14 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
 
   @Override
   public void initialise() throws InitialisationException {
-    connectivityTestingStrategies =
-        serviceRegistry.lookupProviders(ConnectivityTestingStrategy.class, currentThread().getContextClassLoader());
+    connectivityTestingStrategies = serviceRegistry.get().collect(toList());
 
     for (ConnectivityTestingStrategy connectivityTestingStrategy : connectivityTestingStrategies) {
       try {
         muleContext.getInjector().inject(connectivityTestingStrategy);
       } catch (MuleException e) {
-        throw new InitialisationException(createStaticMessage(
-                                                              "Could not initialise connectivity testing strategy of type "
-                                                                  + connectivityTestingStrategy.getClass().getName()),
+        throw new InitialisationException(createStaticMessage("Could not initialise connectivity testing strategy of type "
+            + connectivityTestingStrategy.getClass().getName()),
                                           e,
                                           this);
       }
@@ -91,8 +92,7 @@ public class DefaultConnectivityTestingService implements ConnectivityTestingSer
         }
       }
     }
-    throw new UnsupportedConnectivityTestingObjectException(
-                                                            createStaticMessage("Could not do connectivity testing over object of type "
-                                                                + connectivityTestingObject.getClass().getName()));
+    throw new UnsupportedConnectivityTestingObjectException(createStaticMessage("Could not do connectivity testing over object of type "
+        + connectivityTestingObject.getClass().getName()));
   }
 }

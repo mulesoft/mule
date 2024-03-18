@@ -1,15 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.infrastructure.process;
+
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class UnixController extends AbstractOSController {
 
   @Override
   public int getProcessId() {
-    Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+    Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);
@@ -57,7 +57,7 @@ public class UnixController extends AbstractOSController {
 
   @Override
   public MuleProcessStatus getProcessesStatus() {
-    Map<Object, Object> newEnv = this.copyEnvironmentVariables();
+    Map<String, String> newEnv = this.copyEnvironmentVariables();
     DefaultExecutor executor = new DefaultExecutor();
     ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
     executor.setWatchdog(watchdog);

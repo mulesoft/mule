@@ -1,10 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.tck.junit4;
+
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
+import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
+import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
+import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 
 import static java.lang.Boolean.valueOf;
 import static java.lang.String.format;
@@ -13,30 +24,20 @@ import static java.lang.Thread.getAllStackTraces;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.sort;
 import static java.util.Optional.empty;
+
 import static org.junit.Assume.assumeThat;
 import static org.junit.rules.Timeout.millis;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STREAMING_STATISTICS;
-import static org.mule.runtime.api.util.MuleSystemProperties.TESTING_MODE_PROPERTY_NAME;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
-import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.core.api.util.SystemUtils.parsePropertyDefinitions;
-import static org.mule.runtime.core.privileged.event.PrivilegedEvent.setCurrentEvent;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
-import static org.mule.tck.util.MuleContextUtils.eventBuilder;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.api.artifact.ArtifactCoordinates;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -51,8 +52,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -62,7 +63,9 @@ import org.junit.rules.DisableOnDebug;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestName;
 import org.junit.rules.TestRule;
-import org.slf4j.Logger;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
 /**
  * <code>AbstractMuleTestCase</code> is a base class for Mule test cases. This implementation provides services to test code for
@@ -178,7 +181,7 @@ public abstract class AbstractMuleTestCase {
 
   public boolean isOffline(String method) {
     if (offline) {
-      LOGGER.warn(getBoilerPlate("Working offline cannot run test: " + method, '=', 80));
+      LOGGER.warn("Working offline cannot run test: " + method);
     }
 
     return offline;
@@ -210,7 +213,7 @@ public abstract class AbstractMuleTestCase {
 
   private void printTestHeader() {
     if (verbose) {
-      System.out.println(getBoilerPlate(getTestHeader(), '=', 80));
+      System.out.println(" => " + getTestHeader());
     }
   }
 

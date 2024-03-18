@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -39,8 +39,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.internal.matchers.ThrowableCauseMatcher.hasCause;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
@@ -69,11 +69,11 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.DefaultFlowBuilder.DefaultFlow;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.policy.DefaultPolicyInstance;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -284,7 +284,7 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
     final CoreEvent result = from(MessageProcessors.process(input,
                                                             pub -> Flux
                                                                 .from(applyWithChildContext(pub, eventPub -> Flux.from(eventPub)
-                                                                    .subscriberContext(ctx -> subscriberContextRecognizesChildContext(ctx)),
+                                                                    .contextWrite(ctx -> subscriberContextRecognizesChildContext(ctx)),
                                                                                             Optional.empty()))))
                                                                                                 .block();
 
@@ -665,19 +665,20 @@ public class MessageProcessorsTestCase extends AbstractMuleContextTestCase {
                                                  BiConsumer<Throwable, Object> innerErrorConsumer) {
     final NullPointerException expected = new NullPointerException();
 
+    Mono<CoreEvent> eventMono = from(processWithChildContext(input,
+                                                             pub -> Flux.from(pub)
+                                                                 .flatMap(event -> processWithChildContextDontComplete(event,
+                                                                                                                       innerChain(innerErrorConsumer,
+                                                                                                                                  expected),
+                                                                                                                       Optional
+                                                                                                                           .empty()))
+                                                                 .onErrorContinue(outerErrorConsumer),
+                                                             newChildContext(input, Optional.empty())));
+
     if (exceptionExpected) {
       thrown.expect(hasRootCause(sameInstance(expected)));
     }
-
-    from(processWithChildContext(input,
-                                 pub -> Flux.from(pub)
-                                     .flatMap(event -> processWithChildContextDontComplete(event,
-                                                                                           innerChain(innerErrorConsumer,
-                                                                                                      expected),
-                                                                                           Optional.empty()))
-                                     .onErrorContinue(outerErrorConsumer),
-                                 newChildContext(input, Optional.empty())))
-                                     .block();
+    eventMono.block();
   }
 
   private ReactiveProcessor innerChain(BiConsumer<Throwable, Object> innerErrorConsumer, final NullPointerException expected) {

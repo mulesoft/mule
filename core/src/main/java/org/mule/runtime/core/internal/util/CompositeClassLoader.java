@@ -1,21 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.util;
 
-import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import org.mule.runtime.core.api.util.CompoundEnumeration;
 
-import com.github.benmanes.caffeine.cache.Cache;
+import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
+
+import org.mule.runtime.core.api.util.CompoundEnumeration;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import com.github.benmanes.caffeine.cache.Cache;
+
 /**
  * Classloader implementation that, given a set of classloaders, will first search for a resource/class in the first one. If it is
  * not found, it will try the next and so on until the resource/class is found or all classloaders have been tried.
@@ -31,7 +33,10 @@ import java.util.List;
  * For {@link #getResources(String)}, all the classloaders will be queried to get the union of all found resources.
  *
  * @since 1.0
+ * 
+ * @deprecated Use {@link MultiParentClassLoaderUtils} instead.
  */
+@Deprecated
 public class CompositeClassLoader extends ClassLoader {
 
   static {

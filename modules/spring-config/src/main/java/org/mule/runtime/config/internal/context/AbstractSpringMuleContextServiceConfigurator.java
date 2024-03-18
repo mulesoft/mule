@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,10 +18,8 @@ import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.internal.factories.ConstantFactoryBean;
-import org.mule.runtime.config.internal.factories.FixedTypeConstantFactoryBean;
 import org.mule.runtime.core.internal.config.CustomService;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
-import org.mule.runtime.core.internal.util.TypeSupplier;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.module.service.internal.manager.LazyServiceProxy;
 
 import java.lang.reflect.InvocationHandler;
@@ -38,14 +36,14 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
  */
 abstract class AbstractSpringMuleContextServiceConfigurator {
 
-  private final CustomServiceRegistry customServiceRegistry;
+  private final InternalCustomizationService customizationService;
   private final BeanDefinitionRegistry beanDefinitionRegistry;
   private final Registry serviceLocator;
 
-  protected AbstractSpringMuleContextServiceConfigurator(CustomServiceRegistry customServiceRegistry,
+  protected AbstractSpringMuleContextServiceConfigurator(InternalCustomizationService customizationService,
                                                          BeanDefinitionRegistry beanDefinitionRegistry,
                                                          Registry serviceLocator) {
-    this.customServiceRegistry = customServiceRegistry;
+    this.customizationService = customizationService;
     this.beanDefinitionRegistry = beanDefinitionRegistry;
     this.serviceLocator = serviceLocator;
   }
@@ -59,16 +57,16 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
   }
 
   protected void registerBeanDefinition(String serviceId, BeanDefinition beanDefinition) {
-    beanDefinition = customServiceRegistry.getOverriddenService(serviceId)
+    beanDefinition = customizationService.getOverriddenService(serviceId)
         .map(customService -> getCustomServiceBeanDefinition(customService, serviceId))
         .orElse(beanDefinition);
 
     beanDefinitionRegistry.registerBeanDefinition(serviceId, beanDefinition);
   }
 
-  protected boolean isServiceRuntimeProvided(final CustomService customService) {
+  protected boolean isServiceRuntimeProvided(final CustomService<?> customService) {
     return customService.getServiceImpl().map(impl -> impl instanceof Service).orElse(false)
-        || customService.getServiceClass().map(cls -> Service.class.isAssignableFrom(cls)).orElse(false);
+        || customService.getServiceClass().map(Service.class::isAssignableFrom).orElse(false);
   }
 
   /**
@@ -97,10 +95,7 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
                 .forApplication(new InjectParamsFromContextServiceMethodInvoker(serviceLocator));
           }
 
-          beanDefinition = servImpl instanceof TypeSupplier
-              ? getFixedTypeConstantObjectBeanDefinition(servImpl, (Class<?>) ((TypeSupplier) servImpl).getType())
-              : getConstantObjectBeanDefinition(servImpl);
-
+          beanDefinition = getConstantObjectBeanDefinition(servImpl);
         } else {
           beanDefinition =
               getConstantObjectBeanDefinition(createInjectProviderParamsServiceProxy((Service) servImpl, serviceLocator));
@@ -123,13 +118,6 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     return getBeanDefinitionBuilder(ConstantFactoryBean.class).addConstructorArgValue(impl).getBeanDefinition();
   }
 
-  protected static BeanDefinition getFixedTypeConstantObjectBeanDefinition(Object object, Class<?> type) {
-    return getBeanDefinitionBuilder(FixedTypeConstantFactoryBean.class)
-        .addConstructorArgValue(object)
-        .addConstructorArgValue(type)
-        .getBeanDefinition();
-  }
-
   protected static BeanDefinitionBuilder getBeanDefinitionBuilder(Class<?> beanType) {
     return genericBeanDefinition(beanType);
   }
@@ -138,8 +126,8 @@ abstract class AbstractSpringMuleContextServiceConfigurator {
     return beanDefinitionRegistry.containsBeanDefinition(beanName);
   }
 
-  protected CustomServiceRegistry getCustomServiceRegistry() {
-    return customServiceRegistry;
+  protected InternalCustomizationService getCustomizationService() {
+    return customizationService;
   }
 
   protected BeanDefinitionRegistry getBeanDefinitionRegistry() {

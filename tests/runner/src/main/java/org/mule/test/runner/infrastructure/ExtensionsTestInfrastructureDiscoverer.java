@@ -1,27 +1,28 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.infrastructure;
 
-import static com.google.common.collect.ImmutableList.copyOf;
-import static java.lang.String.format;
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.singleton;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader.VERSION;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
+import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
+import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
+
+import static java.lang.String.format;
+import static java.util.Collections.singleton;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.config.MuleManifest;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.FileUtils;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.DslResourceFactory;
 import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
@@ -56,7 +57,6 @@ import java.util.jar.Manifest;
  */
 public class ExtensionsTestInfrastructureDiscoverer {
 
-  private final ServiceRegistry serviceRegistry = new SpiServiceRegistry();
   private final ExtensionManager extensionManager;
 
   /**
@@ -79,10 +79,14 @@ public class ExtensionsTestInfrastructureDiscoverer {
    * @throws IllegalStateException if no extensions can be described
    */
   public ExtensionModel discoverExtension(Class<?> annotatedClass, ExtensionModelLoader loader) {
+    return discoverExtension(annotatedClass, loader, getDefault(singleton(MuleExtensionModelProvider.getExtensionModel())));
+  }
+
+  public ExtensionModel discoverExtension(Class<?> annotatedClass, ExtensionModelLoader loader,
+                                          DslResolvingContext dslResolvingContext) {
     Map<String, Object> params = new HashMap<>();
     params.put(TYPE_PROPERTY_NAME, annotatedClass.getName());
     params.put(VERSION, getProductVersion());
-    DslResolvingContext dslResolvingContext = getDefault(singleton(MuleExtensionModelProvider.getExtensionModel()));
     ExtensionModel model = loader.loadExtensionModel(annotatedClass.getClassLoader(), dslResolvingContext, params);
     extensionManager.registerExtension(model);
     return model;
@@ -135,16 +139,15 @@ public class ExtensionsTestInfrastructureDiscoverer {
   }
 
   private List<GeneratedResourceFactory> getResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(GeneratedResourceFactory.class, currentThread().getContextClassLoader()));
+    return loadGeneratedResourceFactories().collect(toList());
   }
 
   private ExtensionSchemaGenerator getSchemaGenerator() {
-    return copyOf(serviceRegistry.lookupProviders(ExtensionSchemaGenerator.class, currentThread().getContextClassLoader()))
-        .get(0);
+    return loadExtensionSchemaGenerators().findFirst().get();
   }
 
   private List<DslResourceFactory> getDslResourceFactories() {
-    return copyOf(serviceRegistry.lookupProviders(DslResourceFactory.class, currentThread().getContextClassLoader()));
+    return loadDslResourceFactories().collect(toList());
   }
 
   private File createManifestFileIfNecessary(File targetDirectory) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -39,7 +39,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.transaction.Transaction;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.message.InternalMessage;
 import org.mule.runtime.core.privileged.exception.AbstractDeclaredExceptionListener;
 import org.mule.runtime.core.privileged.exception.DefaultExceptionListener;
@@ -142,9 +141,9 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
   @Test
   public void handleExceptionWithMessageProcessorsChangingEvent() throws Exception {
-    CoreEvent lastEventCreated = InternalEvent.builder(context).message(of("")).build();
+    CoreEvent lastEventCreated = CoreEvent.builder(context).message(of("")).build();
     onErrorContinueHandler
-        .setMessageProcessors(asList(createChagingEventMessageProcessor(InternalEvent.builder(context).message(of(""))
+        .setMessageProcessors(asList(createChagingEventMessageProcessor(CoreEvent.builder(context).message(of(""))
             .build()),
                                      createChagingEventMessageProcessor(lastEventCreated)));
     onErrorContinueHandler.setAnnotations(getAppleFlowComponentLocationAnnotations());
@@ -190,7 +189,8 @@ public class OnErrorContinueHandlerTestCase extends AbstractErrorHandlerTestCase
 
     AtomicReference<CoreEvent> resultRef = new AtomicReference<>();
     final Consumer<Exception> router = onErrorContinueHandler
-        .router(pub -> Flux.from(pub).subscriberContext(contextPropagationChecker.contextPropagationFlag()),
+        .router(pub -> Flux.from(pub)
+            .contextWrite(contextPropagationChecker.contextPropagationFlag()),
                 e -> resultRef.set(e),
                 t -> {
                   throw new MuleRuntimeException(t);

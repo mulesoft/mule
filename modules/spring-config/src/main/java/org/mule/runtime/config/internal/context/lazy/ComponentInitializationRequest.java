@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -52,28 +52,33 @@ class ComponentInitializationRequest {
    */
   public static class Builder {
 
-    private final ArtifactAstDependencyGraph graph;
+    // postProcessedGraph is used when we get locations and initialize some components
+    // while baseGraph is used when we validate Ast during lazy-init.
+    private final ArtifactAstDependencyGraph postProcessedGraph;
     private final ComponentInitializationState componentInitializationState;
     private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
     private final boolean applyStartPhase;
     private final boolean keepPrevious;
+    private final ArtifactAstDependencyGraph baseGraph;
 
     /**
      * Creates a request builder from the given required parameters.
      *
-     * @param graph                           The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a
+     * @param postProcessedGraph              The {@link ArtifactAstDependencyGraph} to use for extracting the minimal AST from a
      *                                        predicate.
      * @param componentInitializationState    The current {@link ComponentInitializationState}.
      * @param alwaysEnabledComponentPredicate A {@link Predicate} to determine if a component must always be initialized.
      * @param applyStartPhase                 Whether to also apply the start lifecycle phase to the requested components.
      * @param keepPrevious                    Whether previously initialized components should be kept unchanged.
      */
-    public Builder(ArtifactAstDependencyGraph graph,
+    public Builder(ArtifactAstDependencyGraph postProcessedGraph,
+                   ArtifactAstDependencyGraph baseGraph,
                    ComponentInitializationState componentInitializationState,
                    Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                    boolean applyStartPhase,
                    boolean keepPrevious) {
-      this.graph = graph;
+      this.postProcessedGraph = postProcessedGraph;
+      this.baseGraph = baseGraph;
       this.componentInitializationState = componentInitializationState;
       this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
       this.applyStartPhase = applyStartPhase;
@@ -85,7 +90,8 @@ class ComponentInitializationRequest {
      * @return A {@link ComponentInitializationRequest} for the given {@code location}.
      */
     public ComponentInitializationRequest build(Location location) {
-      return new ComponentInitializationRequest(graph,
+      return new ComponentInitializationRequest(postProcessedGraph,
+                                                baseGraph,
                                                 componentInitializationState,
                                                 alwaysEnabledComponentPredicate,
                                                 buildFilterFromLocation(location),
@@ -99,7 +105,8 @@ class ComponentInitializationRequest {
      * @return A {@link ComponentInitializationRequest} for the given {@code componentFilter}.
      */
     public ComponentInitializationRequest build(Predicate<ComponentAst> componentFilter) {
-      return new ComponentInitializationRequest(graph,
+      return new ComponentInitializationRequest(postProcessedGraph,
+                                                baseGraph,
                                                 componentInitializationState,
                                                 alwaysEnabledComponentPredicate,
                                                 componentFilter,
@@ -118,7 +125,10 @@ class ComponentInitializationRequest {
     }
   }
 
-  private final ArtifactAstDependencyGraph graph;
+  // postProcessedGraph is used when we get locations and initialize some components
+  // while baseGraph is used when we validate Ast during lazy-init.
+  private final ArtifactAstDependencyGraph postProcessedGraph;
+  private final ArtifactAstDependencyGraph baseGraph;
   private final ComponentInitializationState componentInitializationState;
   private final Predicate<ComponentAst> alwaysEnabledComponentPredicate;
   private final Optional<Location> location;
@@ -127,18 +137,22 @@ class ComponentInitializationRequest {
   private final boolean isKeepPrevious;
 
   // Cached results to avoid multiple computations.
-  private ArtifactAst minimalArtifactAst;
+  private ArtifactAst postProcessedMinimalArtifactAst;
+  // baseMinimalArtifactAst is minimalArtifactAst without macro expansion.
+  private ArtifactAst baseMinimalArtifactAst;
   private ArtifactAst artifactAstToInitialize;
   private Set<String> requestedLocations;
 
-  private ComponentInitializationRequest(ArtifactAstDependencyGraph graph,
+  private ComponentInitializationRequest(ArtifactAstDependencyGraph postProcessedGraph,
+                                         ArtifactAstDependencyGraph baseGraph,
                                          ComponentInitializationState componentInitializationState,
                                          Predicate<ComponentAst> alwaysEnabledComponentPredicate,
                                          Predicate<ComponentAst> componentFilter,
                                          Optional<Location> location,
                                          boolean applyStartPhase,
                                          boolean keepPrevious) {
-    this.graph = graph;
+    this.postProcessedGraph = postProcessedGraph;
+    this.baseGraph = baseGraph;
     this.componentInitializationState = componentInitializationState;
     this.alwaysEnabledComponentPredicate = alwaysEnabledComponentPredicate;
     this.location = location;
@@ -174,7 +188,7 @@ class ComponentInitializationRequest {
    */
   public Set<String> getRequestedLocations() {
     if (requestedLocations == null) {
-      requestedLocations = doGetRequestedLocations(getMinimalAst());
+      requestedLocations = doGetRequestedLocations(getPostProcessedMinimalArtifactAst());
     }
     return requestedLocations;
   }
@@ -187,7 +201,15 @@ class ComponentInitializationRequest {
    * @throws ConfigurationException If the validation fails.
    */
   public void validateRequestedAst(ArtifactAstValidator astValidator) throws ConfigurationException {
-    astValidator.validate(getMinimalAst());
+    astValidator.validate(getBaseMinimalArtifactAst());
+  }
+
+  private ArtifactAst getBaseMinimalArtifactAst() {
+    if (baseMinimalArtifactAst == null) {
+      Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
+      return baseGraph.minimalArtifactFor(minimalApplicationFilter);
+    }
+    return baseMinimalArtifactAst;
   }
 
   /**
@@ -201,7 +223,7 @@ class ComponentInitializationRequest {
    */
   public ArtifactAst getFilteredAstToInitialize() {
     if (artifactAstToInitialize == null) {
-      artifactAstToInitialize = doGetFilteredAstToInitialize(getMinimalAst());
+      artifactAstToInitialize = doGetFilteredAstToInitialize(getPostProcessedMinimalArtifactAst());
     }
     return artifactAstToInitialize;
   }
@@ -220,16 +242,16 @@ class ComponentInitializationRequest {
         && comp.getLocation().getLocation().equals(location.toString());
   }
 
-  private ArtifactAst getMinimalAst() {
-    if (minimalArtifactAst == null) {
-      minimalArtifactAst = doGetMinimalAst();
+  private ArtifactAst getPostProcessedMinimalArtifactAst() {
+    if (postProcessedMinimalArtifactAst == null) {
+      postProcessedMinimalArtifactAst = doGetPostProcessedMinimalArtifactAst();
     }
-    return minimalArtifactAst;
+    return postProcessedMinimalArtifactAst;
   }
 
-  private ArtifactAst doGetMinimalAst() {
+  private ArtifactAst doGetPostProcessedMinimalArtifactAst() {
     Predicate<ComponentAst> minimalApplicationFilter = getFilterForMinimalArtifactAst();
-    return graph.minimalArtifactFor(minimalApplicationFilter);
+    return postProcessedGraph.minimalArtifactFor(minimalApplicationFilter);
   }
 
   private Predicate<ComponentAst> getFilterForMinimalArtifactAst() {

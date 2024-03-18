@@ -1,13 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.source;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toSet;
 import static org.mule.runtime.api.metadata.MediaType.parseDefinedInApp;
 import static org.mule.runtime.api.metadata.MediaTypeUtils.parseCharset;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
@@ -18,6 +16,9 @@ import static org.mule.runtime.module.extension.internal.runtime.source.poll.Pol
 import static org.mule.runtime.module.extension.internal.util.MediaTypeUtils.getDefaultMediaType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.returnsListOfMessages;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
+
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -27,16 +28,15 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.util.Preconditions;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.util.func.Once;
 import org.mule.runtime.core.api.util.func.Once.RunOnce;
 import org.mule.runtime.core.internal.execution.ExceptionCallback;
-import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.core.internal.execution.MessageProcessContext;
 import org.mule.runtime.core.internal.execution.MessageProcessingManager;
+import org.mule.runtime.core.internal.execution.PollItemInformation;
 import org.mule.runtime.core.internal.execution.SourceResultAdapter;
 import org.mule.runtime.core.internal.util.mediatype.PayloadMediaTypeResolver;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
@@ -106,8 +106,15 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
-    public Builder<T, A> setMuleContext(MuleContext muleContext) {
-      product.muleContext = muleContext;
+    public Builder<T, A> setDefaultEncoding(Charset defaultEncoding) {
+      product.defaultEncoding = defaultEncoding;
+
+      return this;
+    }
+
+    public Builder<T, A> setTransactionManager(TransactionManager transactionManager) {
+      product.transactionManager = transactionManager;
+
       return this;
     }
 
@@ -118,11 +125,6 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
 
     public Builder<T, A> setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {
       product.notificationDispatcher = notificationDispatcher;
-      return this;
-    }
-
-    public Builder<T, A> setTransactionFactoryManager(SingleResourceTransactionFactoryManager transactionFactoryManager) {
-      product.transactionFactoryManager = transactionFactoryManager;
       return this;
     }
 
@@ -156,6 +158,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       return this;
     }
 
+    public Builder<T, A> setErrorAfterTimeout(boolean errorAfterTimeout) {
+      product.errorAfterTimeout = errorAfterTimeout;
+      return this;
+    }
+
     public org.mule.sdk.api.runtime.source.SourceCallback<T, A> build() {
       checkArgument(product.listener, "listener");
       checkArgument(product.exceptionCallback, "exceptionCallback");
@@ -167,11 +174,10 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
       checkArgument(product.messageSource, "messageSource");
       checkArgument(product.applicationName, "applicationName");
       checkArgument(product.notificationDispatcher, "notificationDispatcher");
-      checkArgument(product.transactionFactoryManager, "transactionFactoryManager");
 
       product.transactionSourceBinder =
           new TransactionSourceBinder(product.messageSource.getExtensionModel(), product.sourceModel, product.applicationName,
-                                      product.notificationDispatcher, product.transactionFactoryManager);
+                                      product.notificationDispatcher);
 
       return product;
     }
@@ -193,10 +199,11 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private Set<String> notificationModelNames;
   private ConfigurationInstance configurationInstance;
   private Processor listener;
-  private MuleContext muleContext;
+  private Charset defaultEncoding;
+  private TransactionManager transactionManager;
+
   private String applicationName;
   private NotificationDispatcher notificationDispatcher;
-  private SingleResourceTransactionFactoryManager transactionFactoryManager;
   private ExtensionMessageSource messageSource;
   private ExceptionCallback<ConnectionException> exceptionCallback;
   private MessageProcessingManager messageProcessingManager;
@@ -209,18 +216,15 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
   private TransactionSourceBinder transactionSourceBinder;
   private final ProfilingService profilingService;
 
-  private Charset defaultEncoding;
-
   private MediaType mimeTypeInitParam;
   private Charset encodingParam;
+  private boolean errorAfterTimeout;
 
   private DefaultSourceCallback(ProfilingService profilingService) {
     this.profilingService = profilingService;
   }
 
   private final RunOnce resolveInitializationParams = Once.of(() -> {
-    defaultEncoding = getDefaultEncoding(muleContext);
-
     Map<String, Object> initialisationParameters = messageSource.getInitialisationParameters();
 
     String encoding = (String) initialisationParameters.get(ENCODING_PARAMETER_NAME);
@@ -256,7 +260,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
     SourceCallbackContextAdapter contextAdapter = (SourceCallbackContextAdapter) context;
     validateNotifications(contextAdapter);
     MediaType mediaType = resolveMediaType(result);
-    PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(getDefaultEncoding(muleContext),
+    PayloadMediaTypeResolver payloadMediaTypeResolver = new PayloadMediaTypeResolver(defaultEncoding,
                                                                                      defaultMediaType,
                                                                                      encodingParam,
                                                                                      mimeTypeInitParam);
@@ -334,7 +338,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public SourceCallbackContext createContext() {
-    return new DefaultSourceCallbackContext(this, profilingService);
+    return new DefaultSourceCallbackContext(this, profilingService, errorAfterTimeout);
   }
 
   /**
@@ -398,7 +402,7 @@ class DefaultSourceCallback<T, A> implements SourceCallbackAdapter<T, A> {
    */
   @Override
   public TransactionManager getTransactionManager() {
-    return muleContext.getTransactionManager();
+    return transactionManager;
   }
 
   /**

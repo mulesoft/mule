@@ -8,21 +8,21 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <groupId>org.mule.tests</groupId>
     <artifactId>test-reusable-app</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <packaging>mule-application</packaging>
 
     <name>Mule Reusable App Test Extension</name>
     <description>A Mule extension for testing</description>
 
     <properties>
-        <commonsLangVersion>3.8.1</commonsLangVersion>
-        <mule.maven.plugin.version>3.3.5</mule.maven.plugin.version>
+        <javaModuleName>org.mule.test.extension.reusable.app</javaModuleName>
+        <mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
+        <skipMuleModuleMojos>true</skipMuleModuleMojos>
     </properties>
 
     <build>
@@ -52,7 +52,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commonsLangVersion}</version>
         </dependency>
     </dependencies>
 </project>

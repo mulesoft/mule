@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +11,8 @@ import static org.mule.runtime.api.el.ValidationResult.failure;
 import static org.mule.runtime.api.el.ValidationResult.success;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.isInstance;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
 
@@ -28,6 +30,8 @@ import org.mule.runtime.api.el.ExpressionCompilationException;
 import org.mule.runtime.api.el.ExpressionExecutionException;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -40,9 +44,8 @@ import org.mule.runtime.core.api.event.CoreEvent.Builder;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transformer.TransformerException;
-import org.mule.runtime.core.internal.util.OneTimeWarning;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
-import org.mule.runtime.core.privileged.util.TemplateParser;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
+import org.mule.runtime.core.internal.util.log.OneTimeWarning;
 
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,12 +54,8 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-public class DefaultExpressionManager implements ExtendedExpressionManager {
+public class DefaultExpressionManager implements ExtendedExpressionManager, Initialisable {
 
-  public static final String DW_PREFIX = "dw";
-  public static final String MEL_PREFIX = "mel";
-  public static final String PREFIX_EXPR_SEPARATOR = ":";
-  public static final int DW_PREFIX_LENGTH = (DW_PREFIX + PREFIX_EXPR_SEPARATOR).length();
   private static final Logger LOGGER = getLogger(DefaultExpressionManager.class);
 
   private final OneTimeWarning parseWarning = new OneTimeWarning(LOGGER,
@@ -68,7 +67,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
   private final TemplateParser parser = TemplateParser.createMuleStyleParser();
-  private boolean melDefault;
 
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
@@ -219,10 +217,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
       throws ExpressionRuntimeException {
     Builder eventBuilder = CoreEvent.builder(event);
 
-    if ((!hasDwExpression(expression) && !hasMelExpression(expression) && melDefault) || hasMelExpression(expression)) {
-      parseWarning.warn();
-      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), expression);
-    } else if (isExpression(expression)) {
+    if (isExpression(expression)) {
       TypedValue evaluation = evaluate(expression, event, eventBuilder, componentLocation);
       try {
         return (String) transform(evaluation, evaluation.getDataType(), STRING).getValue();
@@ -257,36 +252,22 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
                                  BindingContext bindingContext)
       throws ExpressionRuntimeException {
 
-    if ((!hasDwExpression(template) && !hasMelExpression(template) && melDefault) || hasMelExpression(template)) {
-      Builder eventBuilder = CoreEvent.builder(event);
-      return parser.parse(token -> melParseEvaluation(event, componentLocation, eventBuilder, token), template);
-    } else {
-      return parser.parse(token -> {
-        TypedValue<?> evaluation = expressionLanguage.evaluateLogExpression(token, event, componentLocation, bindingContext);
-        if (evaluation.getValue() instanceof Message) {
-          // Do not apply transformation to Message since payload will be considered then
-          return evaluation.getValue();
-        }
-        try {
-          return transform(evaluation, evaluation.getDataType(), STRING).getValue();
-        } catch (TransformerException e) {
-          throw new ExpressionRuntimeException(
-                                               createStaticMessage(format("Failed to transform %s to %s.",
-                                                                          evaluation.getDataType(),
-                                                                          STRING)),
-                                               e);
-        }
-      }, template);
-    }
-  }
-
-  private Object melParseEvaluation(CoreEvent event, ComponentLocation componentLocation, Builder eventBuilder, String token) {
-    Object result = evaluate(token, event, eventBuilder, componentLocation).getValue();
-    if (result instanceof Message) {
-      return ((Message) result).getPayload().getValue();
-    } else {
-      return result;
-    }
+    return parser.parse(token -> {
+      TypedValue<?> evaluation = expressionLanguage.evaluateLogExpression(token, event, componentLocation, bindingContext);
+      if (evaluation.getValue() instanceof Message) {
+        // Do not apply transformation to Message since payload will be considered then
+        return evaluation.getValue();
+      }
+      try {
+        return transform(evaluation, evaluation.getDataType(), STRING).getValue();
+      } catch (TransformerException e) {
+        throw new ExpressionRuntimeException(
+                                             createStaticMessage(format("Failed to transform %s to %s.",
+                                                                        evaluation.getDataType(),
+                                                                        STRING)),
+                                             e);
+      }
+    }, template);
   }
 
   @Override
@@ -308,26 +289,25 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
       return new DefaultValidationResult(true, null);
     }
     final StringBuilder message = new StringBuilder();
-    try {
-      parser.validate(expression);
-      final AtomicBoolean valid = new AtomicBoolean(true);
-      if (expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
-        parser.parse(token -> {
-          if (valid.get()) {
-            ValidationResult result = expressionLanguage.validate(token);
-            if (!result.isSuccess()) {
-              valid.compareAndSet(true, false);
-              message.append(token).append(" is invalid\n");
-              message.append(result.errorMessage().orElse(""));
-            }
+    if (!parser.isValid(expression)) {
+      return failure("Invalid Expression", expression);
+    }
+
+    final AtomicBoolean valid = new AtomicBoolean(true);
+    if (expression.contains(DEFAULT_EXPRESSION_PREFIX)) {
+      parser.parse(token -> {
+        if (valid.get()) {
+          ValidationResult result = expressionLanguage.validate(token);
+          if (!result.isSuccess()) {
+            valid.compareAndSet(true, false);
+            message.append(token).append(" is invalid\n");
+            message.append(result.errorMessage().orElse(""));
           }
-          return null;
-        }, expression);
-      } else {
-        return expressionLanguage.validate(expression);
-      }
-    } catch (IllegalArgumentException e) {
-      return failure(e.getMessage(), expression);
+        }
+        return null;
+      }, expression);
+    } else {
+      return expressionLanguage.validate(expression);
     }
 
     if (message.length() > 0) {
@@ -339,26 +319,6 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
   @Override
   public Iterator<TypedValue<?>> split(String expression, BindingContext context) {
     return expressionLanguage.split(expression, null, context);
-  }
-
-  /**
-   * Checks if an expression has MEL prefix.
-   *
-   * @param expression the expression to check to see if is a MEL expression.
-   * @return true if the expression is a MEL expression
-   */
-  public static boolean hasMelExpression(String expression) {
-    return expression.contains(DEFAULT_EXPRESSION_PREFIX + MEL_PREFIX + PREFIX_EXPR_SEPARATOR);
-  }
-
-  /**
-   * Checks if an expression has DW prefix.
-   *
-   * @param expression the expression to check to see if is a DW expression.
-   * @return true if the expression is a MEL expression
-   */
-  public static boolean hasDwExpression(String expression) {
-    return expression.contains(DEFAULT_EXPRESSION_PREFIX + DW_PREFIX + PREFIX_EXPR_SEPARATOR);
   }
 
   @Override
@@ -392,12 +352,19 @@ public class DefaultExpressionManager implements ExtendedExpressionManager {
     this.expressionLanguage = expressionLanguage;
   }
 
-  public void setMelDefault(boolean melDefault) {
-    this.melDefault = melDefault;
-  }
-
   @Override
   public String toString() {
     return this.getClass().getName() + "[" + (expressionLanguage != null ? expressionLanguage.toString() : "null") + "]";
   }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    initialiseIfNeeded(expressionLanguage);
+  }
+
+  @Override
+  public void dispose() {
+    disposeIfNeeded(expressionLanguage, LOGGER);
+  }
+
 }

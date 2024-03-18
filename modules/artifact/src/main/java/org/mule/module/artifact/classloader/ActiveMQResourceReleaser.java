@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,6 +13,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ResourceReleaser;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +23,11 @@ import org.slf4j.Logger;
 
 /**
  * A utility class to release all resources associated to Active MQ driver on un-deployment to prevent classloader leaks
+ *
+ * @deprecated Since 4.5.0, this releaser has been deprecated in favor of an {@link ArtifactLifecycleListener} in the extensions
+ *             that are using the Active MQ driver. We still keep it to support legacy extensions.
  */
+@Deprecated
 public class ActiveMQResourceReleaser implements ResourceReleaser {
 
   public static final String ACTIVEMQ_DRIVER_TIMER_THREAD_CLASS_NAME = "TimerThread";

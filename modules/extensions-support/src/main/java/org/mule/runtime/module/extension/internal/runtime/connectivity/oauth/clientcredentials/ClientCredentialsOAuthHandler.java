@@ -1,29 +1,29 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials;
 
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils.toCredentialsLocation;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+
+import org.mule.oauth.client.api.ClientCredentialsOAuthDancer;
+import org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder;
+import org.mule.oauth.client.api.listener.ClientCredentialsListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.connectivity.oauth.ClientCredentialsGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthHandler;
-import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.store.LazyObjectStoreToMapAdapter;
-import org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer;
-import org.mule.runtime.oauth.api.listener.ClientCredentialsListener;
-import org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 
 import java.util.List;
 import java.util.Objects;
@@ -145,8 +145,9 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
     }
 
     dancerBuilder
-        .customParameters(config.getCustomParameters())
+        .customParameters(config.getCustomQueryParameters())
         .customHeaders(config.getCustomHeaders())
+        .customBodyParameters(config.getCustomBodyParameters())
         .customParametersExtractorsExprs(getParameterExtractors(config));
 
     listeners.forEach(dancerBuilder::addListener);
@@ -162,6 +163,6 @@ public class ClientCredentialsOAuthHandler extends OAuthHandler<ClientCredential
 
   private Integer generateId(ClientCredentialsConfig config) {
     return Objects.hash(config.getOwnerConfigName(), config.getClientId(), config.getClientSecret(), config.getTokenUrl(),
-                        config.getScope(), config.getCustomParameters(), config.getCustomHeaders());
+                        config.getScope(), config.getCustomQueryParameters(), config.getCustomHeaders());
   }
 }

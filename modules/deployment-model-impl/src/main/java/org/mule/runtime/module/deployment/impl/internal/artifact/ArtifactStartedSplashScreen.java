@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public abstract class ArtifactStartedSplashScreen<D extends ArtifactDescriptor> extends SplashScreen {
 
-  protected abstract void createMessage(D descriptor);
+  public abstract void createMessage(D descriptor);
 
   protected List<String> getLibraries(File artifactLibFolder) {
     if (artifactLibFolder.exists()) {

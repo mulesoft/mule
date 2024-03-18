@@ -1,12 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
+
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -18,9 +21,9 @@ import com.google.common.collect.ImmutableSet;
 /**
  * Creates a container class loader without adding a filter to it.
  *
- * @since 4.6
+ * @since 4.5
  */
-public interface PreFilteredContainerClassLoaderCreator extends AutoCloseable {
+public interface PreFilteredContainerClassLoaderCreator {
 
   /**
    * Boot packages define all the prefixes that must be loaded from the container classLoader without being filtered
@@ -32,13 +35,20 @@ public interface PreFilteredContainerClassLoaderCreator extends AutoCloseable {
   /**
    * @return the list of {@link MuleModule}s to be used for defining the filter
    */
-  List<MuleModule> getMuleModules();
+  List<MuleContainerModule> getMuleModules();
 
   /**
    * @return a {@link Set} of packages that define all the prefixes that must be loaded from the container classLoader without
    *         being filtered
    */
   Set<String> getBootPackages();
+
+  /**
+   * @return a {@link Set} of directories of resources that should be additionally exported.
+   */
+  default Set<String> getAdditionalExportedResourceDirectories() {
+    return emptySet();
+  }
 
   /**
    * @param artifactDescriptor descriptor for the artifact owning the created class loader instance.

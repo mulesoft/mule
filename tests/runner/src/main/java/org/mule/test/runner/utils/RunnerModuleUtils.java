@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.utils;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
@@ -14,13 +13,12 @@ import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.util.ReflectionUtils.findMethod;
 
 import org.mule.test.runner.api.DependencyResolver;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.HashMap;
@@ -74,16 +72,39 @@ public final class RunnerModuleUtils {
   public static final String EXTRA_BOOT_PACKAGES = "extraBoot.packages";
   public static final String JAR_EXTENSION = "jar";
 
+  public static final String RUNNER_PROPERTIES_MULE_VERSION;
+  private static final String RUNNER_PROPERTIES_MULE_SDK_API_VERSION;
+  private static final String RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION;
+
+  static {
+    try (final InputStream resourceAsStream = RunnerModuleUtils.class.getResourceAsStream("/runner.properties")) {
+      Properties properties = new Properties();
+      properties.load(resourceAsStream);
+      RUNNER_PROPERTIES_MULE_VERSION = properties.getProperty("mule.version");
+      RUNNER_PROPERTIES_MULE_SDK_API_VERSION = properties.getProperty("mule.sdk.api.version");
+      RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION = properties.getProperty("mule.sdk.compatibility.api.version");
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
+  }
+
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String DEFAULT_TEST_SDK_API_VERSION_PROPERTY = SYSTEM_PROPERTY_PREFIX + "testSdkApiVersion";
+  private static String DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY =
+      SYSTEM_PROPERTY_PREFIX + "testSdkCompatibilityApiVersion";
   private static final String SDK_API_GROUP_ID = "org.mule.sdk";
   private static final String SDK_API_ARTIFACT_ID = "mule-sdk-api";
+  private static final String SDK_COMPATIBILITY_API_ARTIFACT_ID = "mule-sdk-compatibility-api";
   private static final String DEFAULT_SDK_API_VERSION = getDefaultSdkApiVersionForTest();
+  private static final String DEFAULT_SDK_COMPATIBILITY_API_VERSION = getDefaultSdkCompatibilityApiVersionForTest();
   private static final Artifact DEFAULT_SDK_API_ARTIFACT = new DefaultArtifact(SDK_API_GROUP_ID,
                                                                                SDK_API_ARTIFACT_ID,
                                                                                JAR_EXTENSION,
                                                                                DEFAULT_SDK_API_VERSION);
-
+  private static final Artifact DEFAULT_SDK_COMPATIBILITY_API_ARTIFACT = new DefaultArtifact(SDK_API_GROUP_ID,
+                                                                                             SDK_COMPATIBILITY_API_ARTIFACT_ID,
+                                                                                             JAR_EXTENSION,
+                                                                                             DEFAULT_SDK_COMPATIBILITY_API_VERSION);
 
   private RunnerModuleUtils() {}
 
@@ -110,6 +131,13 @@ public final class RunnerModuleUtils {
   }
 
   /**
+   * @return an {@link Artifact} pointing to the default mule-sdk-api.
+   */
+  public static Artifact getDefaultSdkCompatibilityApiArtifact() {
+    return DEFAULT_SDK_COMPATIBILITY_API_ARTIFACT;
+  }
+
+  /**
    * Tests the {@code extensionClassLoader} for the presence of the {@code mule-sdk-api} classpath and forces it to load it if
    * missing
    *
@@ -130,16 +158,6 @@ public final class RunnerModuleUtils {
             .resolveArtifact(getDefaultSdkApiArtifact(), repositories)
             .getArtifact()
             .getFile().getAbsoluteFile().toURL();
-
-        Method method = findMethod(extensionClassLoader.getClass(), "addURL", URL.class);
-
-        // Until Java8, this will be the path taken.
-        if (method != null) {
-          method.setAccessible(true);
-          method.invoke(extensionClassLoader, sdkApiUrl);
-          return;
-        }
-
 
         // For Java 9+ Use bytebuddy to add dynamically all classes from the Jar
         addSdkApiClassesDynamically(extensionClassLoader, sdkApiUrl);
@@ -671,7 +689,16 @@ public final class RunnerModuleUtils {
    */
   // TODO: MULE-19762 remove once forward compatibility is finished
   private static String getDefaultSdkApiVersionForTest() {
-    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, "0.4.0");
+    return getProperty(DEFAULT_TEST_SDK_API_VERSION_PROPERTY, RUNNER_PROPERTIES_MULE_SDK_API_VERSION);
+  }
+
+  /**
+   * @return resolves the default version of {@code mule-sdk-compatibility-api} to add into the container classpath
+   * @sine 4.5.0
+   */
+  // TODO: MULE-19762 remove once forward compatibility is finished
+  private static String getDefaultSdkCompatibilityApiVersionForTest() {
+    return getProperty(DEFAULT_TEST_SDK_COMPATIBILITY_API_VERSION_PROPERTY, RUNNER_PROPERTIES_MULE_SDK_COMP_API_VERSION);
   }
 
 }

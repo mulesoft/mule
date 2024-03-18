@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,7 @@ package org.mule.test.infrastructure.process.rules;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.apache.commons.io.FileUtils.moveDirectory;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -21,11 +22,12 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is a JUnit rule to install Mule Runtime during tests. Usage:
@@ -54,8 +56,9 @@ public class MuleInstallation extends ExternalResource {
   private static final String DELETE_ON_EXIT = getProperty("mule.test.deleteOnExit");
   private static final String zippedDistributionFromProperty = getProperty(DISTRIBUTION_PROPERTY);
   private static Logger logger = LoggerFactory.getLogger(MuleInstallation.class);
+  private final String locationSuffix;
   protected String location;
-  private File distribution;
+  private final File distribution;
   private File muleHome;
 
   public MuleInstallation() {
@@ -63,6 +66,10 @@ public class MuleInstallation extends ExternalResource {
   }
 
   public MuleInstallation(String distribution) {
+    this(zippedDistributionFromProperty, "");
+  }
+
+  public MuleInstallation(String distribution, String locationSuffix) {
     if (StringUtils.isEmpty(distribution)) {
       logger.error("You must configure the location for Mule distribution in the system property: " + DISTRIBUTION_PROPERTY);
     }
@@ -70,6 +77,8 @@ public class MuleInstallation extends ExternalResource {
     if (!this.distribution.exists()) {
       throw new IllegalArgumentException("Distribution not found: " + this.distribution);
     }
+
+    this.locationSuffix = locationSuffix;
   }
 
   public String getMuleHome() {
@@ -78,7 +87,7 @@ public class MuleInstallation extends ExternalResource {
 
   @Override
   public Statement apply(final Statement base, final Description description) {
-    location = description.getTestClass().getSimpleName();
+    location = description.getTestClass().getSimpleName() + locationSuffix;
     return super.apply(base, description);
   }
 

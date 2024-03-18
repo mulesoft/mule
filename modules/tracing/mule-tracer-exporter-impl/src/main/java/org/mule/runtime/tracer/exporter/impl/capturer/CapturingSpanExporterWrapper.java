@@ -1,13 +1,13 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.exporter.impl.capturer;
 
 
+import static java.lang.String.format;
 import static java.lang.String.valueOf;
 
 import static io.opentelemetry.api.trace.StatusCode.ERROR;
@@ -138,7 +138,7 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       public List<CapturedEventData> getEvents() {
         return spanData.getEvents().stream().map(
-                                                 OpenTelemetryEventDataWrapper::new)
+                                                 OpenTelemetryCapturedEventDataWrapper::new)
             .collect(Collectors.toList());
       }
 
@@ -154,8 +154,8 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
 
       @Override
       public String toString() {
-        return String.format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
-                             getParentSpanId());
+        return format("a span with name: [%s], ID: [%s] and parent Span ID: [%s]", getName(), getSpanId(),
+                      getParentSpanId());
       }
 
       @Override
@@ -177,16 +177,21 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       public long getEndSpanEpochNanos() {
         return spanData.getEndEpochNanos();
       }
+
+      @Override
+      public Map<String, String> getTraceState() {
+        return spanData.getSpanContext().getTraceState().asMap();
+      }
     }
 
     /**
      * Allows capturing the Open Telemetry Span events.
      */
-    private static final class OpenTelemetryEventDataWrapper implements CapturedEventData {
+    private static final class OpenTelemetryCapturedEventDataWrapper implements CapturedEventData {
 
       private final EventData eventData;
 
-      public OpenTelemetryEventDataWrapper(EventData eventData) {
+      public OpenTelemetryCapturedEventDataWrapper(EventData eventData) {
         this.eventData = eventData;
       }
 
@@ -198,9 +203,19 @@ public class CapturingSpanExporterWrapper implements SpanExporter {
       @Override
       public Map<String, Object> getAttributes() {
         Map<String, Object> events = new HashMap<>();
+        // Support for extra value types (int, double, bool...) can be added if needed.
         eventData.getAttributes().asMap()
             .forEach((attributeKey, attributeValue) -> events.put(attributeKey.getKey(), valueOf(attributeValue)));
         return events;
+      }
+
+      @Override
+      public String toString() {
+        String attributes = eventData.getAttributes().asMap().entrySet().stream()
+            .map(attributeKeyObjectEntry -> format(", %s:\"%s\"", attributeKeyObjectEntry.getKey(),
+                                                   attributeKeyObjectEntry.getValue()))
+            .reduce("", String::concat);
+        return format("event: {name: \"%s\"%s}", eventData.getName(), attributes);
       }
     }
   }

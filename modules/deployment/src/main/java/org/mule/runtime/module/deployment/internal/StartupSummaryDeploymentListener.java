@@ -1,33 +1,33 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.deployment.internal;
 
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
-import org.mule.runtime.core.internal.logging.LogUtil;
+import static java.lang.String.format;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.core.internal.util.splash.SimpleLoggingTable;
-import org.mule.runtime.core.internal.util.splash.SplashScreen;
+import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.api.StartupListener;
-import org.mule.runtime.deployment.model.api.application.Application;
+
+import java.util.Map;
 
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Prints application status summary table on Mule startup.
  */
 public class StartupSummaryDeploymentListener implements StartupListener {
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private static final String APPLICATION_LABEL = "APPLICATION";
   private static final String DOMAIN_OWNER_LABEL = "DOMAIN";
@@ -47,6 +47,7 @@ public class StartupSummaryDeploymentListener implements StartupListener {
     this.deploymentService = deploymentService;
   }
 
+  @Override
   public void onAfterStartup() {
     Multimap<String, String> applicationsPerDomain = LinkedListMultimap.create();
 
@@ -89,11 +90,11 @@ public class StartupSummaryDeploymentListener implements StartupListener {
         }
       }
 
-      message = String.format("%n%s%n%s", domainTable, applicationTable);
+      message = format("%n%s%n%s", domainTable, applicationTable);
     } else {
-      message = String.format("%n%s", domainTable);
+      message = format("%n%s", domainTable);
     }
 
-    log(message);
+    SPLASH_LOGGER.info(message);
   }
 }

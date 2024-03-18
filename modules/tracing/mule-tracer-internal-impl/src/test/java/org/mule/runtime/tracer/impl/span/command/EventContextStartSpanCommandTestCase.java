@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -20,9 +20,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.SpanContextAware;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
@@ -51,11 +52,12 @@ public class EventContextStartSpanCommandTestCase {
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom(mock(Logger.class),
                                                                                     TEST_ERROR_MESSAGE,
                                                                                     true,
-                                                                                    eventContextFactory);
+                                                                                    eventContextFactory,
+                                                                                    true);
 
-    Optional<InternalSpan> internalSpan = startCommand.execute(eventContext, initialSpanInfo, assertion);
+    Optional<Span> span = startCommand.execute(eventContext, initialSpanInfo, assertion);
 
-    assertThat(internalSpan.isPresent(), equalTo(FALSE));
+    assertThat(span.isPresent(), equalTo(FALSE));
   }
 
   @Test
@@ -76,14 +78,15 @@ public class EventContextStartSpanCommandTestCase {
     EventContextStartSpanCommand startCommand = getEventContextStartSpanCommandFrom(mock(Logger.class),
                                                                                     TEST_ERROR_MESSAGE,
                                                                                     true,
-                                                                                    eventContextFactory);
+                                                                                    eventContextFactory,
+                                                                                    true);
 
-    Optional<InternalSpan> internalSpan = startCommand.execute((EventContext) eventContext, initialSpanInfo, assertion);
+    Optional<Span> span = startCommand.execute((EventContext) eventContext, initialSpanInfo, assertion);
 
-    if (!internalSpan.isPresent()) {
+    if (!span.isPresent()) {
       fail("No span present");
     }
 
-    assertThat(internalSpan.get(), equalTo(expectedSpan));
+    assertThat(span.get(), equalTo(expectedSpan));
   }
 }

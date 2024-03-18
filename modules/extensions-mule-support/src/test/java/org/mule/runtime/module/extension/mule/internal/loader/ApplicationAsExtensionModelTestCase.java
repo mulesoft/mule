@@ -1,18 +1,25 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.mule.internal.loader;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.util.FileUtils.stringToFile;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
+import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
+
+import static java.lang.Boolean.getBoolean;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
-import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.APPLICATION_EXTENSION_MODEL;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.mule.functional.junit4.MuleArtifactFunctionalTestCase;
 import org.mule.runtime.api.meta.NamedObject;
@@ -33,14 +40,19 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.persistence.ExtensionModelJsonSerializer;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
+import org.skyscreamer.jsonassert.JSONAssert;
+
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 @Feature(REUSE)
 @Story(APPLICATION_EXTENSION_MODEL)
@@ -49,7 +61,10 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
   @Inject
   private ExtensionManager extensionManager;
 
-  private ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer();
+  private final ExtensionModelJsonSerializer serializer = new ExtensionModelJsonSerializer(true);
+
+  private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionModelJson.updateExpectedFilesOnError");
 
   @Override
   protected String getConfigFile() {
@@ -59,13 +74,18 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
   @Test
   public void loadApplicationExtensionModel() throws Exception {
     ExtensionModel extensionModel = getAppExtensionModel();
-    String json = serializer.serialize(extensionModel);
-    String expected = getResource("/models/app-as-mule-extension.json");
+    String actual = serializer.serialize(extensionModel);
+    final String expectedSerializedPath = "models/app-as-mule-extension.json";
+    String expected = getResourceAsString(expectedSerializedPath, getClass());
     try {
-      JSONAssert.assertEquals(expected, json, true);
+      JSONAssert.assertEquals(expected, actual, true);
     } catch (AssertionError e) {
-      System.out.println(json);
-      throw e;
+      if (shouldUpdateExpectedFilesOnError()) {
+        updateExpectedJson(expectedSerializedPath, actual);
+      } else {
+        LOGGER.error(actual);
+        throw e;
+      }
     }
   }
 
@@ -120,5 +140,26 @@ public class ApplicationAsExtensionModelTestCase extends MuleArtifactFunctionalT
     checkArgument(in != null, "Resource not found: " + path);
 
     return IOUtils.toString(in);
+  }
+
+  /**
+   * Utility to batch fix input files when severe model changes are introduced. Use carefully, not a mechanism to get away with
+   * anything. First check why the generated json is different and make sure you're not introducing any bugs. This should NEVER be
+   * committed as true
+   *
+   * @return whether the "expected" test files should be updated when comparison fails
+   */
+  private boolean shouldUpdateExpectedFilesOnError() {
+    return UPDATE_EXPECTED_FILES_ON_ERROR;
+  }
+
+  private void updateExpectedJson(String expectedJsonPath, String json) throws URISyntaxException, IOException {
+    File root = new File(getResourceAsUrl(expectedJsonPath, getClass()).toURI()).getParentFile()
+        .getParentFile().getParentFile().getParentFile();
+    File testDir = new File(root, "src/test/resources/");
+    File target = new File(testDir, expectedJsonPath);
+    stringToFile(target.getAbsolutePath(), json);
+
+    LOGGER.info(target.getAbsolutePath() + " was fixed");
   }
 }

@@ -1,18 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.runner;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Thread.currentThread;
-import static java.util.Optional.of;
+import static java.util.Collections.emptyMap;
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
-import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_FAIL;
-import static org.mule.maven.client.api.model.RepositoryPolicy.CHECKSUM_POLICY_WARN;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.test.runner.RunnerConfiguration.readConfiguration;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
@@ -21,12 +18,17 @@ import static org.mule.test.runner.utils.RunnerModuleUtils.EXCLUDED_PROPERTIES_F
 import static org.mule.test.runner.utils.RunnerModuleUtils.EXTRA_BOOT_PACKAGES;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getExcludedProperties;
 
+import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
+import static java.lang.System.setProperty;
+import static java.lang.Thread.currentThread;
+import static java.util.Optional.of;
+
+import static com.google.common.collect.Lists.newArrayList;
+
 import org.mule.maven.client.api.MavenClientProvider;
-import org.mule.maven.client.api.SettingsSupplierFactory;
 import org.mule.maven.client.api.model.MavenConfiguration;
-import org.mule.maven.client.internal.MavenCommandLineParser;
-import org.mule.maven.client.internal.MavenCommandLineParser.MavenArguments;
-import org.mule.maven.client.internal.MavenEnvironmentVariables;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.api.AetherClassPathClassifier;
 import org.mule.test.runner.api.ArtifactClassLoaderHolder;
@@ -44,15 +46,21 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.internal.builders.AnnotatedBuilder;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -64,8 +72,6 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
 import org.junit.runners.model.TestClass;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link org.junit.runner.Runner} that mimics the class loading model used in a Mule Standalone distribution. In order to
@@ -132,52 +138,80 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     if (errorCreatingClassLoaderTestRunner != null) {
       throw errorCreatingClassLoaderTestRunner;
     }
-
-    if (artifactClassLoaderHolder == null) {
-      try {
-        runnerConfiguration = readConfiguration(clazz);
-        artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
-      } catch (Exception e) {
-        errorCreatingClassLoaderTestRunner = e;
-        throw e;
-      }
-    } else {
-      checkConfiguration(clazz);
-    }
-
-    final Class<?> isolatedTestClass = getTestClass(clazz);
-    ClassLoader testRunnerClassLoader = artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader();
-    ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+    Map<String, String> originalSystemPropertiesValues = emptyMap();
     try {
-      currentThread().setContextClassLoader(testRunnerClassLoader);
-      final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
-          .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
+      if (artifactClassLoaderHolder == null) {
+        try {
+          runnerConfiguration = readConfiguration(clazz);
+          originalSystemPropertiesValues = configureSystemPropertyValues();
 
-      delegate = new AnnotatedBuilder(builder)
-          .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
-    } finally {
-      currentThread().setContextClassLoader(contextClassLoader);
-    }
-
-    if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
-      throw Throwables.propagate(errorWhileSettingClassLoaders);
-    }
-    withContextClassLoader(testRunnerClassLoader, () -> {
-      try {
-        if (!staticFieldsInjected) {
-
-          injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
-          injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
-          injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          artifactClassLoaderHolder = createClassLoaderTestRunner(clazz, runnerConfiguration);
+        } catch (Exception e) {
+          errorCreatingClassLoaderTestRunner = e;
+          throw e;
         }
-      } catch (Throwable t) {
-        errorWhileSettingClassLoaders = t;
-        throw Throwables.propagate(t);
-      } finally {
-        staticFieldsInjected = true;
+      } else {
+        checkConfiguration(clazz);
       }
-    });
+
+      final Class<?> isolatedTestClass = getTestClass(clazz);
+      ClassLoader testRunnerClassLoader = artifactClassLoaderHolder.getTestRunnerPluginClassLoader().getClassLoader();
+      ClassLoader contextClassLoader = currentThread().getContextClassLoader();
+      try {
+        currentThread().setContextClassLoader(testRunnerClassLoader);
+        final Class<? extends Annotation> runnerDelegateToClass = (Class<? extends Annotation>) artifactClassLoaderHolder
+            .loadClassWithATestRunnerClassLoader(RunnerDelegateTo.class.getName());
+
+        delegate = new AnnotatedBuilder(builder)
+            .buildRunner(getAnnotationAttributeFrom(isolatedTestClass, runnerDelegateToClass, "value"), isolatedTestClass);
+      } finally {
+        currentThread().setContextClassLoader(contextClassLoader);
+      }
+
+      if (staticFieldsInjected && errorWhileSettingClassLoaders != null) {
+        throw Throwables.propagate(errorWhileSettingClassLoaders);
+      }
+      withContextClassLoader(testRunnerClassLoader, () -> {
+        try {
+          if (!staticFieldsInjected) {
+
+            injectPluginsClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+            injectServicesClassLoaders(artifactClassLoaderHolder, isolatedTestClass);
+            injectContainerClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+            injectApplicationClassLoader(artifactClassLoaderHolder, isolatedTestClass);
+          }
+        } catch (Throwable t) {
+          errorWhileSettingClassLoaders = t;
+          throw Throwables.propagate(t);
+        } finally {
+          staticFieldsInjected = true;
+        }
+      });
+    } finally {
+      restoreSystemPropertyValues(originalSystemPropertiesValues);
+    }
+  }
+
+  private static Map<String, String> configureSystemPropertyValues() {
+    Map<String, String> originalSystemPropertyValues = new HashMap<>();
+    runnerConfiguration.getSystemProperties().entrySet()
+        .forEach(sp -> {
+          originalSystemPropertyValues.put(sp.getKey(), getProperty(sp.getKey()));
+          setProperty(sp.getKey(), sp.getValue());
+        });
+    return originalSystemPropertyValues;
+  }
+
+  private static void restoreSystemPropertyValues(Map<String, String> originalSystemPropertiesValues) {
+    // Restore system properties to original values
+    originalSystemPropertiesValues.entrySet()
+        .forEach(sp -> {
+          if (sp.getValue() != null) {
+            setProperty(sp.getKey(), sp.getValue());
+          } else {
+            clearProperty(sp.getKey());
+          }
+        });
   }
 
   private void checkConfiguration(Class<?> klass) {
@@ -242,43 +276,10 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
     final Supplier<File> localMavenRepository =
         mavenClientProvider.getLocalRepositorySuppliers().environmentMavenRepositorySupplier();
 
-    final SettingsSupplierFactory settingsSupplierFactory = mavenClientProvider.getSettingsSupplierFactory();
-
-    final Optional<File> globalSettings = settingsSupplierFactory.environmentGlobalSettingsSupplier();
-    final Optional<File> userSettings = settingsSupplierFactory.environmentUserSettingsSupplier();
-    final Optional<File> settingsSecurity = settingsSupplierFactory.environmentSettingsSecuritySupplier();
-
     final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
         .forcePolicyUpdateNever(true)
         .localMavenRepositoryLocation(localMavenRepository.get());
-
-    if (globalSettings.isPresent()) {
-      mavenConfigurationBuilder.globalSettingsLocation(globalSettings.get());
-    } else {
-      LOGGER
-          .info("Maven global settings couldn't be found, M2_HOME environment variable has to be set in order to use global settings (if needed)");
-    }
-
-    if (userSettings.isPresent()) {
-      mavenConfigurationBuilder.userSettingsLocation(userSettings.get());
-    } else {
-      LOGGER.info("Maven user settings couldn't be found, this could cause a wrong resolution for dependencies");
-    }
-
-    if (settingsSecurity.isPresent()) {
-      mavenConfigurationBuilder.settingsSecurityLocation(settingsSecurity.get());
-    } else {
-      LOGGER.info("Maven settings security couldn't be found");
-    }
-
-    MavenArguments mavenArguments = MavenCommandLineParser.parseMavenArguments(new MavenEnvironmentVariables());
-    if (mavenArguments.isStrictChecksums()) {
-      mavenConfigurationBuilder.globalChecksumPolicy(CHECKSUM_POLICY_FAIL);
-    }
-
-    if (mavenArguments.isLaxChecksums()) {
-      mavenConfigurationBuilder.globalChecksumPolicy(CHECKSUM_POLICY_WARN);
-    }
+    mavenClientProvider.getSettingsSupplierFactory().addToMavenConfig(mavenConfigurationBuilder);
 
     final MavenConfiguration mavenConfiguration = mavenConfigurationBuilder.build();
     if (LOGGER.isDebugEnabled()) {
@@ -287,11 +288,15 @@ public class ArtifactClassLoaderRunner extends Runner implements Filterable {
 
     final DependencyResolver dependencyResolver =
         new DependencyResolver(mavenConfiguration, of(new DefaultWorkspaceReader(classPath, workspaceLocationResolver)));
-    builder.setClassPathClassifier(new AetherClassPathClassifier(dependencyResolver,
-                                                                 new ArtifactClassificationTypeResolver(
-                                                                                                        dependencyResolver)));
+    try (AetherClassPathClassifier classPathClassifier = new AetherClassPathClassifier(dependencyResolver,
+                                                                                       new ArtifactClassificationTypeResolver(
+                                                                                                                              dependencyResolver))) {
+      builder.setClassPathClassifier(classPathClassifier);
 
-    return builder.build();
+      return builder.build();
+    } catch (Exception e) {
+      throw new MuleRuntimeException(createStaticMessage("Error while building the 'ArtifactClassLoaderHolder'"), e);
+    }
   }
 
   /**

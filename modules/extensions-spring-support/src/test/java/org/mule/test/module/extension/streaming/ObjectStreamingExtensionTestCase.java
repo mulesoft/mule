@@ -1,27 +1,34 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.module.extension.streaming;
 
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_ENABLE_STATISTICS;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.STREAMING;
 import static org.mule.test.allure.AllureConstants.StreamingFeature.StreamingStory.OBJECT_STREAMING;
 
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.rules.ExpectedException.none;
+
 import org.mule.functional.api.flow.FlowRunner;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.streaming.object.CursorIteratorProvider;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.iterator.ConsumerStreamingIterator;
 import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.probe.JUnitLambdaProbe;
@@ -183,6 +190,24 @@ public class ObjectStreamingExtensionTestCase extends AbstractStreamingExtension
   private void assertStreamMatchesData(String flowName) throws Exception {
     List<String> actual = consumeObjectStream(flowName, true);
     assertThat(actual, equalTo(data));
+  }
+
+  public static class AssertPayloadIsStreamProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue().getClass().getName(), containsString("CursorIteratorProvider"));
+      return event;
+    }
+  }
+
+  public static class AssertPayloadIsNotStreamProvider implements Processor {
+
+    @Override
+    public CoreEvent process(CoreEvent event) throws MuleException {
+      assertThat(event.getMessage().getPayload().getValue().getClass().getName(), not(containsString("CursorIteratorProvider")));
+      return event;
+    }
   }
 
 }

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.container.internal;
 
 import static java.util.Collections.emptySet;
@@ -15,6 +14,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ExportedService;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
 
   protected static final String JRE_MODULE_NAME = "jre";
 
-  private static final Supplier<List<MuleModule>> jreModulesSupplier = new LazyValue<>(() -> {
+  private static final Supplier<List<MuleContainerModule>> jreModulesSupplier = new LazyValue<>(() -> {
     Set<String> packages = new HashSet<>(1024);
     Set<String> resources = new HashSet<>(1024);
     List<ExportedService> services = new ArrayList<>(128);
@@ -49,13 +49,13 @@ public class JreModuleDiscoverer implements ModuleDiscoverer {
                    services.stream().map(p -> p.getServiceInterface() + ":" + p.getResource().toString()).collect(toList()));
     }
 
-    MuleModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
+    MuleContainerModule jdkModule = new MuleModule(JRE_MODULE_NAME, packages, resources, emptySet(), emptySet(), services);
 
     return singletonList(jdkModule);
   });
 
   @Override
-  public List<MuleModule> discover() {
+  public List<MuleContainerModule> discover() {
     return jreModulesSupplier.get();
   }
 }

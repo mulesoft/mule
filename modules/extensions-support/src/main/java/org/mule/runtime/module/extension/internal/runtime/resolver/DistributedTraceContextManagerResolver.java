@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -21,15 +21,15 @@ import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
  */
 public class DistributedTraceContextManagerResolver implements ArgumentResolver<DistributedTraceContextManager> {
 
-  private final EventTracer<CoreEvent> coreEventTracer;
+  private final EventTracer<CoreEvent> coreEventEventTracer;
 
-  public DistributedTraceContextManagerResolver(EventTracer<CoreEvent> coreEventTracer) {
-    this.coreEventTracer = coreEventTracer;
+  public DistributedTraceContextManagerResolver(EventTracer<CoreEvent> coreEventEventTracer) {
+    this.coreEventEventTracer = coreEventEventTracer;
   }
 
   @Override
   public DistributedTraceContextManager resolve(ExecutionContext executionContext) {
     return new PropagateAllDistributedTraceContextManager(((ExecutionContextAdapter<?>) executionContext)
-        .getEvent(), coreEventTracer);
+        .getEvent(), coreEventEventTracer);
   }
 }

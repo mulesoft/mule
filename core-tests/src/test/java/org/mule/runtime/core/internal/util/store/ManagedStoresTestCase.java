@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.util.store;
 
 import static org.junit.Assert.assertEquals;
@@ -35,10 +34,7 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
-import org.junit.Ignore;
 import org.junit.Test;
-
-import io.qameta.allure.Issue;
 
 public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
 
@@ -113,19 +109,16 @@ public class ManagedStoresTestCase extends AbstractMuleContextTestCase {
         .build());
   }
 
-  @Ignore("MULE-6926")
-  @Issue("MULE-6926")
   @Test
-  public void testPartitionablePersistenceStore() throws ObjectStoreException, RegistrationException, InterruptedException {
-    PartitionedPersistentObjectStore<String> partitionedStore = new PartitionedPersistentObjectStore<>(muleContext);
+  public void testPartitionablePersistenceStore() throws ObjectStoreException, InterruptedException {
+    PartitionedPersistentObjectStore<String> partitionedStore = getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY);
     partitionedStore.open();
-    getRegistry().registerObject(BASE_PERSISTENT_OBJECT_STORE_KEY, partitionedStore);
     ObjectStoreManager manager = getRegistry().lookupObject(OBJECT_STORE_MANAGER);
     ObjectStore<String> store = manager.createObjectStore("persistencePart2", unmanagedPersistent());
     assertTrue(store instanceof ObjectStorePartition);
     ObjectStore<String> baseStore = ((ObjectStorePartition<String>) store).getBaseStore();
     assertTrue(baseStore instanceof PartitionedPersistentObjectStore);
-    assertSame(baseStore, getRegistry().lookupObject(BASE_PERSISTENT_OBJECT_STORE_KEY));
+    assertSame(baseStore, partitionedStore);
     testObjectStore(store);
     testObjectStoreExpiry(manager, "persistenceExpPart2", ObjectStoreSettings.builder()
         .persistent(true)

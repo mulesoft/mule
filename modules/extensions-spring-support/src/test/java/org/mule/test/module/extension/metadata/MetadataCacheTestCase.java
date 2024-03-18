@@ -1,24 +1,25 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.module.extension.metadata;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.fail;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_STORE_MANAGER;
-import static org.mule.runtime.metadata.internal.cache.DefaultPersistentMetadataCacheManager.PERSISTENT_METADATA_SERVICE_CACHE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.AGE;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.BRAND;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.NAME;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.AGE_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.BRAND_VALUE;
 import static org.mule.test.metadata.extension.resolver.TestResolverWithCache.NAME_VALUE;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.fail;
+
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
@@ -35,6 +36,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class MetadataCacheTestCase extends AbstractMetadataOperationTestCase {
+
+  public static final String PERSISTENT_METADATA_SERVICE_CACHE = "_mulePersistentMetadataService";
 
   private static final String OUTPUT_AND_METADATA_KEY_CACHE_ID = "1874947571-1840879217-380895431-1745289126-135479212676912086";
   private static final String OUTPUT_METADATA_WITHOUT_KEY_CACHE_ID =

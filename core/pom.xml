@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-core</artifactId>
     <packaging>jar</packaging>
@@ -14,7 +14,12 @@
     <description>Mule server and core classes</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.core</javaModuleName>
         <skipExportTests>false</skipExportTests>
+        <!-- because this module requires transitive jakarta.jms.api -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
+        <!-- TODO W-15237254 reenable the check -->
+        <skipRevapiCheck>true</skipRevapiCheck>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -104,7 +109,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -124,6 +129,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metrics-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
@@ -137,8 +147,12 @@
             <artifactId>uuid</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -147,10 +161,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
         </dependency>
 
         <dependency>
@@ -175,11 +185,6 @@
         </dependency>
 
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
@@ -191,7 +196,6 @@
         <dependency>
             <groupId>net.jodah</groupId>
             <artifactId>failsafe</artifactId>
-            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.vibur</groupId>
@@ -203,9 +207,9 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
-            <!-- javax.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
-            <groupId>javax.jms</groupId>
-            <artifactId>javax.jms-api</artifactId>
+            <!-- jakarta.jms is included to provide the same user experience on CE/EE when JMS connector is used -->
+            <groupId>jakarta.jms</groupId>
+            <artifactId>jakarta.jms-api</artifactId>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>

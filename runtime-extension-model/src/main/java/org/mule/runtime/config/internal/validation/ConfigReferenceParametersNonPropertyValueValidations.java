@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +11,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static java.lang.String.format;
 
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.function.Predicate;
@@ -19,7 +20,9 @@ public class ConfigReferenceParametersNonPropertyValueValidations extends Abstra
 
   private final boolean enabled;
 
-  public ConfigReferenceParametersNonPropertyValueValidations(boolean enabled) {
+  public ConfigReferenceParametersNonPropertyValueValidations(boolean enabled,
+                                                              ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    super(artifactAstDependencyGraphProvider);
     this.enabled = enabled;
   }
 

@@ -5,18 +5,19 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mule.runtime</groupId>
     <artifactId>mule-module-global-config</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <name>Mule Global Configuration Module</name>
     <description>This module handles the global configuration of the Mule Runtime</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.global.config</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+        <!-- because this module requires transitive org.mule.runtime.maven.client.api -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>
 
     <dependencies>
@@ -38,14 +39,8 @@
             <artifactId>mule-maven-client-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-validator</groupId>
-                    <artifactId>commons-validator</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.github.erosb</groupId>
+            <artifactId>everit-json-schema</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>

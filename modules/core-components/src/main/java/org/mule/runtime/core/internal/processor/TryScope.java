@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.processor;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_COMMIT;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_CONTINUE;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_START;
@@ -40,13 +41,16 @@ import static reactor.core.publisher.Flux.deferContextual;
 import static reactor.core.publisher.Flux.from;
 import static reactor.core.publisher.Mono.just;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -58,14 +62,16 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.ErrorHandler;
 import org.mule.runtime.core.internal.exception.GlobalErrorHandler;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.core.privileged.processor.Scope;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -87,10 +93,22 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
   private List<Processor> processors;
 
   @Inject
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
+
+  @Inject
   private ProfilingService profilingService;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> continueProducer;
   private ProfilingDataProducer<TransactionProfilingEventContext, Object> startProducer;
@@ -109,7 +127,10 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
           .transform(nestedChain);
     }
 
-    ExecutionTemplate<CoreEvent> executionTemplate = createScopeTransactionalExecutionTemplate(muleContext, transactionConfig);
+    boolean errorAfterTimeout = featureFlaggingService.isEnabled(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT);
+    ExecutionTemplate<CoreEvent> executionTemplate =
+        createScopeTransactionalExecutionTemplate(muleConfiguration, notificationDispatcher, transactionManager.orElse(null),
+                                                  transactionConfig, errorAfterTimeout);
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
     return deferContextual(ctx -> from(publisher)
@@ -231,8 +252,8 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     }
     this.nestedChain = buildNewChainWithListOfProcessors(getProcessingStrategy(locator, this), processors,
                                                          messagingExceptionHandler, getLocation().getLocation(),
-                                                         initialSpanInfoProvider
-                                                             .getInitialSpanInfo(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
+                                                         componentTracerFactory
+                                                             .fromComponent(this, TRY_SCOPE_INNER_CHAIN_SPAN_NAME, ""));
     initialiseIfNeeded(messagingExceptionHandler, true, muleContext);
     transactionConfig.setMuleContext(muleContext);
     continueProducer = profilingService.getProfilingDataProducer(TX_CONTINUE);
@@ -278,5 +299,25 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     } else {
       return ProcessingType.CPU_LITE;
     }
+  }
+
+  void setComponentTracerFactory(ComponentTracerFactory componentTracerFactory) {
+    this.componentTracerFactory = componentTracerFactory;
+  }
+
+  void setProfilingService(ProfilingService profilingService) {
+    this.profilingService = profilingService;
+  }
+
+  void setMuleConfiguration(MuleConfiguration configuration) {
+    this.muleConfiguration = configuration;
+  }
+
+  void setTransactionManager(TransactionManager transactionManager) {
+    this.transactionManager = of(transactionManager);
+  }
+
+  void setNotificationDispatcher(NotificationDispatcher notificationDispatcher) {
+    this.notificationDispatcher = notificationDispatcher;
   }
 }

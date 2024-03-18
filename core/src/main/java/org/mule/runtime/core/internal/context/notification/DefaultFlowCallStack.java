@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -27,6 +27,8 @@ import java.util.function.Function;
  * Keeps context information about the executing flows and its callers in order to provide augmented troubleshooting information
  * for an application developer.
  */
+// This is the previous implementaion (< 4.6). This is still here so any existing serialized instances can still be
+// deserialized.
 public class DefaultFlowCallStack implements FlowCallStack {
 
   private static final long serialVersionUID = -8683711977929802819L;
@@ -37,7 +39,12 @@ public class DefaultFlowCallStack implements FlowCallStack {
 
   private final Deque<FlowStackElement> innerStack;
 
-  public DefaultFlowCallStack() {
+  // The no-arg constructor is made public to prevent an issue with Kryo generated access classes and the module system.
+  public static DefaultFlowCallStack newDefaultFlowCallStack() {
+    return new DefaultFlowCallStack();
+  }
+
+  private DefaultFlowCallStack() {
     this.innerStack = new ArrayDeque<>(4);
   }
 
@@ -97,6 +104,7 @@ public class DefaultFlowCallStack implements FlowCallStack {
    *
    * @return the top-most element of this stack, or null if this stack is empty.
    */
+  @Override
   public FlowStackElement peek() {
     synchronized (innerStack) {
       return innerStack.peek();

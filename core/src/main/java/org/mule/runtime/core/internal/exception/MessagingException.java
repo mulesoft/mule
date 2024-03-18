@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.exception;
 
 import static java.lang.String.format;
@@ -109,17 +108,6 @@ public class MessagingException extends EventProcessingException {
         } else {
           if (payload != null) {
             addInfo(PAYLOAD_TYPE_INFO_KEY, muleMessage.getPayload().getDataType().getType().getName());
-            if (muleContext != null) {
-              // TODO MULE-10266 review how the transformationService is obtained when building an exception.
-              try {
-                addInfo(PAYLOAD_INFO_KEY,
-                        muleContext.getTransformationService().transform(muleMessage, DataType.STRING).getPayload()
-                            .getValue());
-              } catch (Exception e) {
-                addInfo(PAYLOAD_INFO_KEY, format("%s while getting payload: %s", e.getClass().getName(), e.getMessage()));
-              }
-              addInfo(PAYLOAD_INFO_KEY, muleMessage.toString());
-            }
           } else {
             addInfo(PAYLOAD_TYPE_INFO_KEY, Objects.toString(null));
             addInfo(PAYLOAD_INFO_KEY, Objects.toString(null));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,6 +17,7 @@ import org.mule.runtime.ast.api.validation.ArtifactValidation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
 import org.mule.runtime.ast.graph.api.ComponentAstDependency;
 
 import java.util.List;
@@ -24,9 +25,15 @@ import java.util.function.Predicate;
 
 public abstract class AbstractReferenceParametersStereotypesValidations implements ArtifactValidation {
 
+  private final ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider;
+
+  public AbstractReferenceParametersStereotypesValidations(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    this.artifactAstDependencyGraphProvider = artifactAstDependencyGraphProvider;
+  }
+
   @Override
   public List<ValidationResultItem> validateMany(ArtifactAst artifact) {
-    ArtifactAstDependencyGraph dependencyGraph = ArtifactAstDependencyGraphFactory.generateFor(artifact);
+    ArtifactAstDependencyGraph dependencyGraph = artifactAstDependencyGraphProvider.get(artifact);
     return dependencyGraph.getMissingDependencies()
         .stream()
         .filter(filterArtifact(artifact))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -41,9 +41,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion.FIRST_MULE_VERSION;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.slf4j.Logger;
 
 /**
  * Utils class to create {@link ResolvedMinMuleVersion}s from {@link Type}s.
@@ -51,6 +57,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.util
  * @since 4.5
  */
 public final class MinMuleVersionUtils {
+
+  private static final Logger LOGGER = getLogger(MinMuleVersionUtils.class);
 
   private static final MuleVersion SDK_EXTENSION_ANNOTATION_MIN_MULE_VERSION =
       new MuleVersion(Extension.class.getAnnotation(MinMuleVersion.class).value());
@@ -506,7 +514,12 @@ public final class MinMuleVersionUtils {
     if (belongsToSdkPackages(methodParameter.getType().getTypeName())) {
       parameterTypeMMV = getEnforcedMinMuleVersion(methodParameter.getType());
     } else { // The parameter is of custom type
-      parameterTypeMMV = calculateParameterTypeMinMuleVersion(methodParameter.getType(), new HashSet<>());
+      if (methodParameter.getAnnotations()
+          .noneMatch(a -> a.isSameType(Connection.class) || a.isSameType(org.mule.sdk.api.annotation.param.Connection.class))) {
+        parameterTypeMMV = calculateParameterTypeMinMuleVersion(methodParameter.getType(), new HashSet<>());
+      } else {
+        parameterTypeMMV = resolveToDefaultMMV("Type", methodParameter.getType().getName());
+      }
     }
     methodParameterMMV.updateIfHigherMMV(parameterTypeMMV,
                                          getReasonType("Parameter", methodParameter.getName(), parameterTypeMMV));
@@ -522,9 +535,23 @@ public final class MinMuleVersionUtils {
       return new ResolvedMinMuleVersion(parameterType.getName(), minMuleVersionAnnotation.get(), reason);
     }
     ResolvedMinMuleVersion parameterMMV = resolveToDefaultMMV("Type", parameterType.getName());
-    Optional<ResolvedMinMuleVersion> fieldMMV = parameterType.getFields().stream()
-        .filter(MinMuleVersionUtils::isAnnotatedWithParameterOrParameterGroup)
-        .map(f -> calculateFieldMinMuleVersion(f, seenTypesForRecursionControl)).reduce(MinMuleVersionUtils::max);
+
+    Optional<ResolvedMinMuleVersion> fieldMMV = empty();
+    // TODO W-14749120 - properly handle provided types that are missing
+    try {
+      fieldMMV = parameterType.getFields().stream()
+          .filter(MinMuleVersionUtils::isAnnotatedWithParameterOrParameterGroup)
+          .map(f -> calculateFieldMinMuleVersion(f, seenTypesForRecursionControl)).reduce(MinMuleVersionUtils::max);
+    } catch (Throwable t) {
+      if (isLinkageError(t)) {
+        LOGGER
+            .warn(format("Skipping MMV calculation for fields of type '%s', at least one of the fields' types couldn't be loaded",
+                         parameterType.getName()));
+      } else {
+        throw t;
+      }
+    }
+
     fieldMMV.ifPresent(resolvedMMV -> parameterMMV
         .updateIfHigherMMV(resolvedMMV, getReasonField("Type", parameterType.getName(), resolvedMMV)));
     Optional<ResolvedMinMuleVersion> annotationMMV =
@@ -533,6 +560,19 @@ public final class MinMuleVersionUtils {
     annotationMMV.ifPresent(resolvedMMV -> parameterMMV
         .updateIfHigherMMV(resolvedMMV, getReasonAnnotated("Type", parameterType.getName(), resolvedMMV)));
     return parameterMMV;
+  }
+
+  private static boolean isLinkageError(Throwable t) {
+    Set<Throwable> seen = new HashSet<>();
+    while (t != null && seen.add(t)) {
+      if (t instanceof LinkageError) {
+        return true;
+      }
+
+      t = t.getCause();
+    }
+
+    return false;
   }
 
   private static ResolvedMinMuleVersion getEnforcedMinMuleVersion(Type type) {

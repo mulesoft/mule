@@ -4,6 +4,11 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.4.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "sample-data",
@@ -14436,8 +14441,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "SAMPLE-DATA:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
@@ -14446,17 +14455,13 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "SAMPLE-DATA:CONNECTIVITY",
       "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "SAMPLE-DATA:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

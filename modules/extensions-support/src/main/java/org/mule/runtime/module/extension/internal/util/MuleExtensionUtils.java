@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -28,9 +28,11 @@ import static org.mule.runtime.module.extension.internal.loader.java.AbstractJav
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -64,16 +66,19 @@ import org.mule.runtime.api.meta.model.source.HasSourceModels;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.api.meta.model.util.IdempotentExtensionWalker;
+import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.exception.IllegalConfigurationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
+import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalSourceModelDefinitionException;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
@@ -115,10 +120,14 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 import org.mule.sdk.api.tx.SourceTransactionalAction;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -718,14 +727,16 @@ public class MuleExtensionUtils {
    * @param operationModel              the {@link OperationModel}
    * @param extensionConnectionSupplier the connection supplier
    * @param supportsOAuth               whether the given operation supports OAuth authentication
+   * @param operationConnectionTracer   The {@link ComponentTracer} that will be used to trace the connection obtaining.
    * @return an {@link Optional} {@link ResultTransformer}
    * @since 4.5.0
    */
   public static Optional<ResultTransformer> getPagingResultTransformer(OperationModel operationModel,
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
-                                                                       boolean supportsOAuth) {
+                                                                       boolean supportsOAuth,
+                                                                       ComponentTracer<CoreEvent> operationConnectionTracer) {
     return operationModel.getModelProperty(PagedOperationModelProperty.class)
-        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth));
+        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,
@@ -800,7 +811,7 @@ public class MuleExtensionUtils {
    * @param extensionModel an {@link ExtensionModel}
    * @param sourceName     the name of the target source
    * @return optionally an {@link SourceModel}
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static Optional<SourceModel> findSource(ExtensionModel extensionModel, String sourceName) {
     Reference<SourceModel> source = new Reference<>();
@@ -834,5 +845,79 @@ public class MuleExtensionUtils {
 
   public static <T extends NamedObject> T getNamedObject(List<T> elemenets, String name) {
     return elemenets.stream().filter(elem -> elem.getName().equals(name)).findFirst().get();
+  }
+
+  /**
+   * Returns the version of Java that are supported by <b>ALL</b> the {@code extensionModels}.
+   *
+   * @param extensionModels the {@link ExtensionModel} instances to evaluate
+   * @return a {@link Set} of Java versions or an empty one if the extensions have none in common
+   * @see {@link JavaConstants}
+   * @since 4.5.0
+   */
+  public static Set<String> getJavaVersionsIntersection(Collection<ExtensionModel> extensionModels) {
+    List<ExtensionModel> models = extensionModels instanceof List
+        ? (List<ExtensionModel>) extensionModels
+        : new ArrayList<>(extensionModels);
+
+    Set<String> intersection = new LinkedHashSet<>();
+
+    // to avoid cartesian product
+    Set<String> processedVersions = new HashSet<>();
+
+    for (int i = 0; i < models.size(); i++) {
+      for (String version : models.get(i).getSupportedJavaVersions()) {
+        if (!processedVersions.add(version)) {
+          continue;
+        }
+
+        boolean isCommon = true;
+        for (int j = 0; j < models.size(); j++) {
+          if (j == i) {
+            continue;
+          }
+
+          if (!models.get(j).getSupportedJavaVersions().contains(version)) {
+            isCommon = false;
+            break;
+          }
+        }
+
+        if (isCommon) {
+          intersection.add(version);
+        }
+      }
+    }
+
+    return intersection;
+  }
+
+  /**
+   * Similar to {@link #getJavaVersionsIntersection(Collection)} only that an empty set will never be returned.
+   * <p>
+   * An {@link IllegalModelDefinitionException} is thrown if no common Java version is found.
+   *
+   * @param extensionName The name of the Extension, used to build the exception message
+   * @param extensionType the type of exception (e.g: Module, Extension, etc), used to build the exception message
+   * @param extensions    the {@link ExtensionModel} instances to evaluate
+   * @return the common set of supported Java versions
+   * @throws IllegalModelDefinitionException if no common Java version is found
+   * @see {@link JavaConstants}
+   * @since 4.5.0
+   */
+  public static Set<String> getValidatedJavaVersionsIntersection(String extensionName,
+                                                                 String extensionType,
+                                                                 Collection<ExtensionModel> extensions) {
+    final Set<String> intersection = unmodifiableSet(getJavaVersionsIntersection(extensions));
+    if (intersection.isEmpty()) {
+      String summary = extensions.stream()
+          .map(em -> em.getName() + ": " + em.getSupportedJavaVersions())
+          .collect(joining("\n"));
+      throw new IllegalModelDefinitionException(format("%s '%s' depends on Extensions that don't share any common Java "
+          + "version support. Dependencies supported Java versions are:\n%s",
+                                                       extensionType, extensionName, summary));
+    }
+
+    return intersection;
   }
 }

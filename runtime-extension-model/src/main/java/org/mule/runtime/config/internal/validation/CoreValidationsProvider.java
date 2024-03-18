@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -15,6 +15,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.ExpressionLanguage;
@@ -23,6 +24,8 @@ import org.mule.runtime.ast.api.validation.ArtifactValidation;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.Validation.Level;
 import org.mule.runtime.ast.api.validation.ValidationsProvider;
+import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphProvider;
+import org.mule.runtime.config.internal.validation.ast.ArtifactAstGraphDependencyProviderAware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,14 +34,17 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-public class CoreValidationsProvider implements ValidationsProvider {
+public class CoreValidationsProvider implements ValidationsProvider, ArtifactAstGraphDependencyProviderAware {
 
   private ClassLoader artifactRegionClassLoader;
 
   private boolean ignoreParamsWithProperties;
 
   @Inject
-  private final Optional<FeatureFlaggingService> featureFlaggingService = empty();
+  private Optional<ArtifactAstDependencyGraphProvider> artifactAstDependencyGraphProvider = empty();
+
+  @Inject
+  private Optional<FeatureFlaggingService> featureFlaggingService = empty();
 
   @Inject
   private ExpressionLanguage expressionLanguage;
@@ -64,7 +70,6 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new SourceErrorMappingAnyNotRepeated(),
                                                           new SourceErrorMappingAnyLast(),
                                                           new SourceErrorMappingTypeNotRepeated(),
-                                                          new ErrorHandlerRefOrOnErrorExclusiveness(),
                                                           new ErrorHandlerOnErrorHasTypeOrWhen(),
                                                           new RaiseErrorTypeReferencesPresent(featureFlaggingService),
                                                           new RaiseErrorReferenceDoNotUseExtensionNamespaces(featureFlaggingService),
@@ -86,6 +91,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
                                                           new RequiredParametersPresent(),
                                                           new ParameterGroupExclusiveness(),
+                                                          new NumberParameterWithinRange(),
                                                           new OperationErrorHandlersDoNotReferGlobalErrorHandlers(),
                                                           new ExpressionsInRequiredExpressionsParamsNonPropertyValue(ignoreParamsWithProperties),
                                                           new ExpressionsInRequiredExpressionsParams(featureFlaggingService,
@@ -108,6 +114,7 @@ public class CoreValidationsProvider implements ValidationsProvider {
                                                           new OperationDoesNotHaveApikitConsole(),
                                                           new InsecureTLSValidation()));
 
+    validations.add(new ExpressionParametersNotUsingMel());
     // Do not fail if the expressionLanguage was not provided, skip these validations.
     if (expressionLanguage != null) {
       validations.add(new ExpressionParametersSyntacticallyValid(expressionLanguage,
@@ -140,10 +147,18 @@ public class CoreValidationsProvider implements ValidationsProvider {
 
   @Override
   public List<ArtifactValidation> getArtifactValidations() {
+    // TODO W-13931931: Create a context for dependencies needed to be injected in deployment
+    // When this is done the artifactAstDependencyGraphProvider will probably be mandatory.
+    ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProviderForValidator =
+        artifactAstDependencyGraphProvider.orElse(new DefaultArtifactAstDependencyGraphProvider());
+
     return asList(new ImportValidTarget(),
-                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties),
-                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties),
-                  new ReferenceParametersStereotypesValidations());
+                  new ConfigReferenceParametersNonPropertyValueValidations(ignoreParamsWithProperties,
+                                                                           artifactAstDependencyGraphProviderForValidator),
+                  new ConfigReferenceParametersStereotypesValidations(featureFlaggingService, ignoreParamsWithProperties,
+                                                                      artifactAstDependencyGraphProviderForValidator),
+                  new ReferenceParametersStereotypesValidations(artifactAstDependencyGraphProviderForValidator),
+                  new MelNotEnabled(isCompatibilityInstalled()));
   }
 
   @Override
@@ -154,5 +169,13 @@ public class CoreValidationsProvider implements ValidationsProvider {
   @Override
   public void setIgnoreParamsWithProperties(boolean ignoreParamsWithProperties) {
     this.ignoreParamsWithProperties = ignoreParamsWithProperties;
+  }
+
+  @Override
+  public void setArtifactAstDependencyGraphProvider(ArtifactAstDependencyGraphProvider artifactAstDependencyGraphProvider) {
+    // TODO W-13931931: Create a context for dependencies needed to be injected in deployment
+    // This setter and the implementation of the interface will not be needed after that.
+    // We cannot add an inject here because in the muleContext there is no provider.
+    this.artifactAstDependencyGraphProvider = of(artifactAstDependencyGraphProvider);
   }
 }

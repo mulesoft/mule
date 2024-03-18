@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -19,6 +19,7 @@ import org.mule.runtime.container.api.MuleCoreExtension;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.core.api.event.EventContextService;
+import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.deployment.api.ArtifactDeploymentListener;
 import org.mule.runtime.module.deployment.api.DeploymentListener;
@@ -55,6 +56,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
 
   private List<MuleCoreExtension> initializedCoreExtensions = new ArrayList<>();
   private List<MuleCoreExtension> startedCoreExtensions = new ArrayList<>();
+  private ServerLockFactory serverLockFactory;
 
   public DefaultMuleCoreExtensionManagerServer(MuleCoreExtensionDiscoverer coreExtensionDiscoverer,
                                                MuleCoreExtensionDependencyResolver coreExtensionDependencyResolver) {
@@ -195,6 +197,7 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
         .withArtifactClassLoaderManager(artifactClassLoaderManager)
         .withEventContextService(eventContextService)
         .withToolingService(toolingService)
+        .withServerLockFactory(serverLockFactory)
         .build();
   }
 
@@ -231,6 +234,11 @@ public class DefaultMuleCoreExtensionManagerServer implements MuleCoreExtensionM
   @Override
   public void setTroubleshootingService(TroubleshootingService troubleshootingService) {
     this.troubleshootingService = troubleshootingService;
+  }
+
+  @Override
+  public void setServerLockFactory(ServerLockFactory serverLockFactory) {
+    this.serverLockFactory = serverLockFactory;
   }
 
   /**

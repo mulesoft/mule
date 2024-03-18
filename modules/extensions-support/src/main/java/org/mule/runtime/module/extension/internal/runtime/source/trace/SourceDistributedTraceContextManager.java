@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.extension.internal.runtime.source.trace;
+
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
 
 import static java.util.Collections.emptyMap;
 
@@ -46,14 +47,14 @@ public class SourceDistributedTraceContextManager implements DistributedTraceCon
   @Override
   public void addCurrentSpanAttribute(String key, String value) {
     if (spanContext != null) {
-      spanContext.getSpan().ifPresent(span -> span.addAttribute(key, value));
+      spanContext.getSpan().ifPresent(span -> getAsInternalSpan(span).addAttribute(key, value));
     }
     attributes.put(key, value);
   }
 
   @Override
   public void addCurrentSpanAttributes(Map<String, String> attributes) {
-    attributes.putAll(attributes);
+    attributes.forEach(this::addCurrentSpanAttribute);
   }
 
   public Map<String, String> getSpanRootAttributes() {

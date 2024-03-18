@@ -1,18 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
+
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
@@ -33,7 +33,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
  *
  * @since 4.0
  */
-public class ArtifactClassificationTypeResolver {
+public class ArtifactClassificationTypeResolver implements AutoCloseable {
 
   private static final String MULE_EXTENSION_CLASSIFIER = "mule-extension";
   private static final String MULE_MODULE_PROPERTIES = "META-INF/mule-module.properties";
@@ -48,7 +48,7 @@ public class ArtifactClassificationTypeResolver {
    * @param dependencyResolver {@link DependencyResolver} to get artifact output. Non null.
    */
   public ArtifactClassificationTypeResolver(DependencyResolver dependencyResolver) {
-    checkNotNull(dependencyResolver, "dependencyResolver cannot be null");
+    requireNonNull(dependencyResolver, "dependencyResolver cannot be null");
 
     this.dependencyResolver = dependencyResolver;
   }
@@ -138,5 +138,10 @@ public class ArtifactClassificationTypeResolver {
     } catch (MalformedURLException e) {
       throw new IllegalStateException("Couldn't generate the URL for artifact: " + artifact);
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    dependencyResolver.close();
   }
 }

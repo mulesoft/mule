@@ -1,22 +1,34 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.infrastructure.process;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
 import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 
+import static java.lang.Boolean.getBoolean;
+import static java.lang.System.getProperties;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Stream.concat;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
 
 public class MuleProcessController {
+
+  public static final String MULE_PARAM_PROPERTY_PREFIX = SYSTEM_PROPERTY_PREFIX + "test.muleParam.";
+  private static final String DEBUG_WRAPER_PROPERTY = SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug";
+
+  private static final Logger LOGGER_WRAPPER = getLogger(MuleProcessController.class.getName() + ".wrapper");
 
   private static final int DEFAULT_TIMEOUT = 60000;
 
@@ -47,16 +59,28 @@ public class MuleProcessController {
     return getController().isRunning();
   }
 
-  public void start(String... args) {
-    if (Boolean.getBoolean(SYSTEM_PROPERTY_PREFIX + "test.wrapperDebug")) {
-      final List<String> debugArgs = new ArrayList<>();
-      debugArgs.add("wrapperDebug");
-      debugArgs.addAll(asList(args));
+  public void start(String... baseArgs) {
+    String[] args = baseArgs;
 
-      getController().start(debugArgs.toArray(new String[args.length + 1]));
-    } else {
-      getController().start(args);
+    final Map<String, String> additionalMuleParamsProperties = getProperties().entrySet()
+        .stream()
+        .filter(e -> e.getKey().toString().startsWith(MULE_PARAM_PROPERTY_PREFIX))
+        .collect(toMap(e -> e.getKey().toString().substring(MULE_PARAM_PROPERTY_PREFIX.length()),
+                       e -> e.getValue().toString()));
+
+    if (LOGGER_WRAPPER.isDebugEnabled() || getBoolean(DEBUG_WRAPER_PROPERTY)) {
+      additionalMuleParamsProperties.put("wrapperDebug", "");
     }
+
+    if (!additionalMuleParamsProperties.isEmpty()) {
+      args = concat(Stream.of(args),
+                    additionalMuleParamsProperties.entrySet()
+                        .stream()
+                        .map(e -> e.getKey() + (isEmpty(e.getValue()) ? "" : "=" + e.getValue())))
+                            .toArray(String[]::new);
+    }
+
+    getController().start(args);
   }
 
   public void stop(String... args) {
@@ -170,6 +194,6 @@ public class MuleProcessController {
    * @param testEnvVars map of environment variables and their values
    */
   public void setTestEnvVars(Map<String, String> testEnvVars) {
-    controller.setTestEnvVars(testEnvVars);
+    getController().setTestEnvVars(testEnvVars);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,7 +16,9 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_TLS_SCHEMA_LOCATION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -44,6 +46,7 @@ class TlsExtensionModelDeclarer {
         .describedAs("Mule Runtime and Integration Platform: TLS components")
         .onVersion(MULE_VERSION)
         .fromVendor(MULESOFT_VENDOR)
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withCategory(COMMUNITY)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
@@ -58,7 +61,8 @@ class TlsExtensionModelDeclarer {
         .describedAs("Reusable configuration element for TLS. A TLS context optionally defines a key store and a trust store.\n" +
             "The key store contains the private and public keys of this server/client. The trust store contains\n" +
             "certificates of the trusted servers/clients.")
-        .allowingTopLevelDefinition();
+        .allowingTopLevelDefinition()
+        .withStereotype(CONFIG);
 
     ParameterGroupDeclarer contextParams = context.onDefaultParameterGroup();
     stringParam(contextParams, "name",

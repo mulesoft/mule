@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,7 @@ package org.mule.runtime.module.deployment.impl.internal.application;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleAppsDir;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.PLUGIN_CLASSLOADER_IDENTIFIER;
 import static org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory.getArtifactPluginId;
 
@@ -50,7 +51,6 @@ import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyInst
 import org.mule.runtime.module.deployment.impl.internal.policy.DefaultPolicyTemplateFactory;
 import org.mule.runtime.module.deployment.impl.internal.policy.PolicyTemplateClassLoaderBuilderFactory;
 import org.mule.runtime.module.license.api.LicenseValidator;
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 /**
  * Creates default mule applications
@@ -75,6 +76,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
   private final PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory;
   private final PluginDependenciesResolver pluginDependenciesResolver;
   private final LicenseValidator licenseValidator;
+  private final Consumer<ClassLoader> actionOnMuleArtifactDeployment;
 
   public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
                                    DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
@@ -88,6 +90,27 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    LockFactory runtimeLockFactory,
                                    MemoryManagementService memoryManagementService,
                                    ArtifactConfigurationProcessor artifactConfigurationProcessor) {
+    this(applicationClassLoaderBuilderFactory, deployableArtifactDescriptorFactory, domainRepository, serviceRepository,
+         extensionModelLoaderRepository, classLoaderRepository, policyTemplateClassLoaderBuilderFactory,
+         pluginDependenciesResolver, licenseValidator, runtimeLockFactory, memoryManagementService,
+         artifactConfigurationProcessor, cl -> {
+         });
+
+  }
+
+  public DefaultApplicationFactory(ApplicationClassLoaderBuilderFactory applicationClassLoaderBuilderFactory,
+                                   DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory,
+                                   DomainRepository domainRepository,
+                                   ServiceRepository serviceRepository,
+                                   ExtensionModelLoaderRepository extensionModelLoaderRepository,
+                                   ClassLoaderRepository classLoaderRepository,
+                                   PolicyTemplateClassLoaderBuilderFactory policyTemplateClassLoaderBuilderFactory,
+                                   PluginDependenciesResolver pluginDependenciesResolver,
+                                   LicenseValidator licenseValidator,
+                                   LockFactory runtimeLockFactory,
+                                   MemoryManagementService memoryManagementService,
+                                   ArtifactConfigurationProcessor artifactConfigurationProcessor,
+                                   Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
     super(licenseValidator, runtimeLockFactory, memoryManagementService, artifactConfigurationProcessor);
     checkArgument(applicationClassLoaderBuilderFactory != null, "Application classloader builder factory cannot be null");
     checkArgument(deployableArtifactDescriptorFactory != null, "Deployable artifact descriptor factory cannot be null");
@@ -99,6 +122,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     checkArgument(pluginDependenciesResolver != null, "pluginDependenciesResolver cannot be null");
     checkArgument(memoryManagementService != null, "memoryManagementService cannot be null");
     checkArgument(artifactConfigurationProcessor != null, "artifactConfigurationProcessor cannot be null");
+    checkArgument(actionOnMuleArtifactDeployment != null, "actionOnMuleArtifactDeployment cannot be null");
 
     this.classLoaderRepository = classLoaderRepository;
     this.applicationClassLoaderBuilderFactory = applicationClassLoaderBuilderFactory;
@@ -109,6 +133,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
     this.policyTemplateClassLoaderBuilderFactory = policyTemplateClassLoaderBuilderFactory;
     this.pluginDependenciesResolver = pluginDependenciesResolver;
     this.licenseValidator = licenseValidator;
+    this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
   }
 
   @Override
@@ -124,7 +149,7 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
 
   @Override
   public File getArtifactDir() {
-    return MuleContainerBootstrapUtils.getMuleAppsDir();
+    return getMuleAppsDir();
   }
 
   @Override
@@ -187,7 +212,8 @@ public class DefaultApplicationFactory extends AbstractDeployableArtifactFactory
                                    serviceRepository, extensionModelLoaderRepository, descriptor.getArtifactLocation(),
                                    classLoaderRepository, applicationPolicyProvider, getRuntimeLockFactory(),
                                    new ArtifactMemoryManagementService(getMemoryManagementService()),
-                                   getArtifactConfigurationProcessor());
+                                   getArtifactConfigurationProcessor(),
+                                   actionOnMuleArtifactDeployment);
 
     applicationPolicyProvider.setApplication(delegate);
     return new ApplicationWrapper(delegate);

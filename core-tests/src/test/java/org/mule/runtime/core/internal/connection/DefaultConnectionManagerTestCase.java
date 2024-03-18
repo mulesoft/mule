@@ -1,10 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.connection;
+
+import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
+import static org.mule.test.allure.AllureConstants.DeploymentConfiguration.LazyConnectionsStory.LAZY_CONNECTIONS;
+import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ConnectivityTestingStory.CONNECTIVITY_TEST;
+
+import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -16,9 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
-import static org.mule.runtime.api.connection.ConnectionValidationResult.success;
-import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONNECTION_MANAGER;
 
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -27,28 +34,44 @@ import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.testmodels.fruit.Apple;
 import org.mule.tck.testmodels.fruit.Banana;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import java.util.Properties;
 
-@RunWith(MockitoJUnitRunner.class)
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
+@Feature(JAVA_SDK)
+@Story(CONNECTIVITY_TEST)
 public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
 
   private static final String CONNECTION_CREATION_FAILURE_MESSAGE = "Invalid credentials! Connection failed to create";
 
-  private Apple config = new Apple();
+  private final Apple config = new Apple();
 
-  private Banana connection = new Banana();
+  private final Banana connection = new Banana();
 
   private CachedConnectionProvider<Banana> connectionProvider;
 
   private ConnectionProvider<Banana> testeableConnectionProvider;
+
+  @Mock
+  public ConfigurationInstance configurationInstance;
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock(answer = RETURNS_DEEP_STUBS)
   private MuleContextWithRegistry muleContext;
@@ -191,6 +214,42 @@ public class DefaultConnectionManagerTestCase extends AbstractMuleTestCase {
     verify(testeableConnectionProvider).connect();
     verify(testeableConnectionProvider, never()).validate(connection);
     verify(testeableConnectionProvider, never()).disconnect(connection);
+  }
+
+  @Test
+  @Issue("W-14379073")
+  @Story(LAZY_CONNECTIONS)
+  public void forceConnectivityTestOnLazyConnections() throws Exception {
+    final Properties deploymentProperties = new Properties();
+    deploymentProperties.put(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "true");
+    when(muleContext.getDeploymentProperties()).thenReturn(deploymentProperties);
+
+    final DelegateConnectionManagerAdapter lazyConnectionManagerAdapter = new DelegateConnectionManagerAdapter(muleContext);
+
+    when(testeableConnectionProvider.connect())
+        .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
+    ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance, true);
+
+    assertThat(result.isValid(), is(false));
+    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result.getException(), instanceOf(ConnectionException.class));
+  }
+
+  @Test
+  @Issue("W-14379073")
+  @Story(LAZY_CONNECTIONS)
+  public void forceConnectivityTestOnEagerConnections() throws Exception {
+    final DelegateConnectionManagerAdapter lazyConnectionManagerAdapter = new DelegateConnectionManagerAdapter(muleContext);
+
+    when(testeableConnectionProvider.connect())
+        .thenThrow(new ConnectionException(CONNECTION_CREATION_FAILURE_MESSAGE));
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(testeableConnectionProvider));
+    ConnectionValidationResult result = lazyConnectionManagerAdapter.testConnectivity(configurationInstance);
+
+    assertThat(result.isValid(), is(false));
+    assertThat(result.getMessage(), is(CONNECTION_CREATION_FAILURE_MESSAGE));
+    assertThat(result.getException(), instanceOf(ConnectionException.class));
   }
 
 }

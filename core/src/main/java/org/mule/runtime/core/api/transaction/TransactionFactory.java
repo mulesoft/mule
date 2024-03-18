@@ -1,15 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.transaction;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.internal.context.notification.DefaultNotificationDispatcher;
 
 import javax.transaction.TransactionManager;
@@ -17,6 +17,7 @@ import javax.transaction.TransactionManager;
 /**
  * <code>TransactionFactory</code> creates a transaction.
  */
+@NoImplement
 public interface TransactionFactory {
 
   /**
@@ -26,9 +27,7 @@ public interface TransactionFactory {
    * @throws TransactionException if the transaction cannot be created or begun
    * @param muleContext
    *
-   * @deprecated since 4.3.0. Use
-   *             {@link #beginTransaction(String, NotificationDispatcher, SingleResourceTransactionFactoryManager, TransactionManager)}
-   *             instead
+   * @deprecated since 4.3.0. Use {@link #beginTransaction(String, NotificationDispatcher, TransactionManager)} instead
    */
   @Deprecated
   Transaction beginTransaction(MuleContext muleContext) throws TransactionException;
@@ -42,7 +41,6 @@ public interface TransactionFactory {
    * @param notificationDispatcher allows the Mule container to fire notifications
    */
   default Transaction beginTransaction(String applicationName, NotificationDispatcher notificationDispatcher,
-                                       SingleResourceTransactionFactoryManager transactionFactoryManager,
                                        TransactionManager transactionManager)
       throws TransactionException {
     Transaction transaction = beginTransaction(((DefaultNotificationDispatcher) notificationDispatcher).getContext());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -32,7 +32,7 @@ import org.reactivestreams.Publisher;
  * A {@link RetryNotifier} may be set in order to take action upon each retry attempt.
  */
 @NoImplement
-public interface RetryPolicyTemplate {
+public interface RetryPolicyTemplate extends org.mule.runtime.api.retry.policy.RetryPolicyTemplate {
 
   RetryPolicy createRetryInstance();
 
@@ -74,6 +74,7 @@ public interface RetryPolicyTemplate {
    * @return Whether {@code this} policy is enabled or not
    * @since 4.3.0
    */
+  @Override
   default boolean isEnabled() {
     return true;
   }
@@ -134,6 +135,7 @@ public interface RetryPolicyTemplate {
     return createRetryInstance().applyPolicy(publisher, shouldRetry, onExhausted, errorFunction, retryScheduler);
   }
 
+  @Override
   default <T> CompletableFuture<T> applyPolicy(Supplier<CompletableFuture<T>> futureSupplier,
                                                Predicate<Throwable> shouldRetry,
                                                Consumer<Throwable> onRetry,

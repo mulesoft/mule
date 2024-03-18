@@ -1,32 +1,28 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.event;
 
-import static java.lang.System.lineSeparator;
-import static java.util.Objects.requireNonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.addEventBindings;
 import static org.mule.runtime.api.util.collection.SmallMap.copy;
 import static org.mule.runtime.api.util.collection.SmallMap.unmodifiable;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsBytes;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.cannotReadPayloadAsString;
-import static org.mule.runtime.core.api.config.i18n.CoreMessages.objectIsNull;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.basedOn;
 import static org.mule.runtime.core.api.util.CaseInsensitiveHashMap.emptyCaseInsensitiveMap;
-import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.message.EventInternalContext.copyOf;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.toGroupCorrelation;
 
+import static java.lang.System.lineSeparator;
+import static java.util.Objects.requireNonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.event.EventContext;
-import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ItemSequenceInfo;
@@ -41,23 +37,18 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.message.GroupCorrelation;
-import org.mule.runtime.core.api.transformer.MessageTransformerException;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
+import org.mule.runtime.core.internal.event.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.EventInternalContext;
-import org.mule.runtime.core.internal.message.InternalEvent;
-import org.mule.runtime.core.internal.message.InternalEvent.Builder;
 import org.mule.runtime.core.internal.message.InternalMessage;
-import org.mule.runtime.core.privileged.connector.ReplyToHandler;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
-import org.mule.runtime.core.privileged.event.DefaultMuleSession;
 import org.mule.runtime.core.privileged.event.MuleSession;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -75,7 +66,7 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private boolean varsModified = false;
 
   private CaseInsensitiveHashMap<String, TypedValue<?>> parameters;
-  private CaseInsensitiveHashMap<String, TypedValue<?>> originalParameters;
+  private final CaseInsensitiveHashMap<String, TypedValue<?>> originalParameters;
   private boolean parametersModified = false;
 
   private CaseInsensitiveHashMap<String, String> loggingVariables;
@@ -84,7 +75,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   private Error error;
   private Optional<ItemSequenceInfo> itemSequenceInfo = empty();
   private String legacyCorrelationId;
-  private MuleSession session;
   private SecurityContext securityContext;
   private FlowProcessMediatorContext flowProcessMediatorContext;
   private EventInternalContext sdkInternalContext;
@@ -98,7 +88,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
 
   public DefaultEventBuilder(BaseEventContext messageContext) {
     this.context = messageContext;
-    this.session = new DefaultMuleSession();
     this.originalVars = emptyCaseInsensitiveMap();
     this.originalParameters = emptyCaseInsensitiveMap();
     this.internalParameters = new SmallMap<>();
@@ -112,7 +101,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     this.itemSequenceInfo = event.getItemSequenceInfo();
     this.legacyCorrelationId = event.getLegacyCorrelationId();
     this.securityContext = event.getSecurityContext();
-    this.session = event.getSession();
     this.error = event.getError().orElse(null);
     this.notificationsEnabled = event.isNotificationsEnabled();
 
@@ -345,23 +333,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
   }
 
   @Override
-  public DefaultEventBuilder replyToHandler(ReplyToHandler replyToHandler) {
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder replyToDestination(Object replyToDestination) {
-    return this;
-  }
-
-  @Override
-  public DefaultEventBuilder session(MuleSession session) {
-    this.session = session;
-    this.modified = true;
-    return this;
-  }
-
-  @Override
   public DefaultEventBuilder securityContext(SecurityContext securityContext) {
     SecurityContext originalValue = this.securityContext;
     this.securityContext = securityContext;
@@ -387,7 +358,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                              parametersModified ? parameters : originalParameters,
                                              loggingVariables,
                                              internalParameters,
-                                             session,
                                              securityContext,
                                              itemSequenceInfo,
                                              flowProcessMediatorContext,
@@ -446,7 +416,8 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     private final BaseEventContext context;
     // TODO MULE-10013 make this final
     private Message message;
-    private final MuleSession session;
+    // This is here just for backwards compatibility of preexisting serialized objects.
+    private final MuleSession session = null;
     private final SecurityContext securityContext;
 
     private final boolean notificationsEnabled;
@@ -472,7 +443,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     // Needed for deserialization with kryo
     private InternalEventImplementation() {
       this.context = null;
-      this.session = null;
       this.securityContext = null;
       this.notificationsEnabled = false;
       this.variables = null;
@@ -496,7 +466,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         CaseInsensitiveHashMap<String, TypedValue<?>> parameters,
                                         CaseInsensitiveHashMap<String, String> loggingVariables,
                                         Map<String, ?> internalParameters,
-                                        MuleSession session,
                                         SecurityContext securityContext,
                                         Optional<ItemSequenceInfo> itemSequenceInfo,
                                         FlowProcessMediatorContext flowProcessMediatorContext,
@@ -509,7 +478,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
                                         boolean notificationsEnabled) {
       this.context = context;
       this.loggingVariables = loggingVariables;
-      this.session = session;
       this.securityContext = securityContext;
       this.message = message;
       this.variables = variables.toImmutableCaseInsensitiveMap();
@@ -558,59 +526,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
     }
 
     @Override
-    public byte[] getMessageAsBytes(MuleContext muleContext) throws MuleException {
-      try {
-        return (byte[]) transformMessage(DataType.BYTE_ARRAY, muleContext);
-      } catch (Exception e) {
-        throw new DefaultMuleException(cannotReadPayloadAsBytes(message.getPayload().getValue()
-            .getClass()
-            .getName()), e);
-      }
-    }
-
-    @Override
-    public Object transformMessage(DataType outputType, MuleContext muleContext) throws MessageTransformerException {
-      if (outputType == null) {
-        throw new MessageTransformerException(objectIsNull("outputType"), null, message);
-      }
-
-      Message transformedMessage = muleContext.getTransformationService().transform(message, outputType);
-      if (message.getPayload().getDataType().isStreamType()) {
-        setMessage(transformedMessage);
-      }
-      return transformedMessage.getPayload().getValue();
-    }
-
-    @Override
-    public String getMessageAsString(MuleContext muleContext) throws MuleException {
-      return getMessageAsString(getMessage().getPayload().getDataType().getMediaType().getCharset()
-          .orElse(getDefaultEncoding(muleContext)), muleContext);
-    }
-
-    /**
-     * Returns the message contents for logging
-     *
-     * @param encoding    the encoding to use when converting bytes to a string, if necessary
-     * @param muleContext the Mule node.
-     * @return the message contents as a string
-     * @throws MuleException if the message cannot be converted into a string
-     */
-    @Override
-    public String getMessageAsString(Charset encoding, MuleContext muleContext) throws MuleException {
-      try {
-        Message transformedMessage = muleContext.getTransformationService()
-            .transform(message, DataType.builder().type(String.class).charset(encoding).build());
-        if (message.getPayload().getDataType().isStreamType()) {
-          setMessage(transformedMessage);
-        }
-
-        return (String) transformedMessage.getPayload().getValue();
-      } catch (Exception e) {
-        throw new DefaultMuleException(cannotReadPayloadAsString(message.getClass().getName()), e);
-      }
-    }
-
-    @Override
     public String toString() {
       return "DefaultMuleEvent{" + lineSeparator() +
           "  context=" + context + lineSeparator() +
@@ -618,11 +533,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
           "  variables=" + variables + lineSeparator() +
           "  error=" + error + lineSeparator() +
           '}';
-    }
-
-    @Override
-    public MuleSession getSession() {
-      return session;
     }
 
     /**
@@ -643,16 +553,6 @@ public class DefaultEventBuilder implements InternalEvent.Builder {
       if (context instanceof DefaultEventContext) {
         ((DefaultEventContext) context).createStreamingState();
       }
-    }
-
-    @Override
-    public ReplyToHandler getReplyToHandler() {
-      return null;
-    }
-
-    @Override
-    public Object getReplyToDestination() {
-      return null;
     }
 
     @Override

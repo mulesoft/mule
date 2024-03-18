@@ -1,21 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.api;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.rules.ExpectedException.none;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.api.metadata.MediaType.APPLICATION_XML;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.tck.junit4.matcher.DataTypeMatcher.like;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.message.Message;
@@ -24,7 +24,6 @@ import org.mule.runtime.api.metadata.MediaType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.event.CoreEvent.Builder;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
@@ -57,7 +56,7 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
   public void before() throws Exception {
     flow = getTestFlow(muleContext);
     messageContext = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = InternalEvent.builder(messageContext).message(muleMessage).build();
+    muleEvent = PrivilegedEvent.builder(messageContext).message(muleMessage).build();
   }
 
   @After
@@ -80,24 +79,6 @@ public class DefaultMuleEventTestCase extends AbstractMuleContextTestCase {
     muleEvent = (PrivilegedEvent) CoreEvent.builder(muleEvent).addVariable(PROPERTY_NAME, PROPERTY_VALUE, dataType).build();
 
     DataType actualDataType = muleEvent.getVariables().get(PROPERTY_NAME).getDataType();
-    assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
-  }
-
-  @Test
-  public void setSessionVariableDefaultDataType() throws Exception {
-    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE);
-
-    DataType dataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
-    assertThat(dataType, like(String.class, MediaType.ANY, null));
-  }
-
-  @Test
-  public void setSessionVariableCustomDataType() throws Exception {
-    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
-
-    muleEvent.getSession().setProperty(PROPERTY_NAME, PROPERTY_VALUE, dataType);
-
-    DataType actualDataType = muleEvent.getSession().getPropertyDataType(PROPERTY_NAME);
     assertThat(actualDataType, like(String.class, APPLICATION_XML, CUSTOM_ENCODING));
   }
 

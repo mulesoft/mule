@@ -7,17 +7,17 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-test-oauth-extension</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Mule OAuth Test Extension</name>
     <description>A Mule extension for testing the OAuth support</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.oauth</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -27,6 +27,10 @@
             <artifactId>mule-values-extension</artifactId>
             <version>${project.version}</version>
             <classifier>mule-plugin</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,20 +11,23 @@ import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
+import static org.mule.tck.util.MuleContextUtils.verifyRegistration;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Optional.empty;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_MOCKS;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
@@ -33,23 +36,25 @@ import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
 import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
+import org.mule.tck.util.MuleContextUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.qameta.allure.Issue;
 import org.junit.Test;
+
 import org.mockito.ArgumentCaptor;
+
+import io.qameta.allure.Issue;
 
 @SmallTest
 public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
@@ -69,7 +74,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
 
     ExtensionModel extensionModel =
         new DefaultJavaExtensionModelLoader().loadExtensionModel(HeisenbergExtension.class.getClassLoader(),
-                                                                 new DefaultDslResolvingContext(Collections.emptySet()),
+                                                                 new DefaultDslResolvingContext(emptySet()),
                                                                  attributes);
 
     ExtensionActivator extensionActivator = new ExtensionActivator(mockMuleContext());
@@ -93,9 +98,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
     ExtensionModel extensionModel = extensionWithTypes(singleton(mockType));
 
     // Given a mule context
-    MuleContextWithRegistry muleContext = mockMuleContext();
-    MuleRegistry spiedRegistry = spy(muleContext.getRegistry());
-    when(muleContext.getRegistry()).thenReturn(spiedRegistry);
+    MuleContext muleContext = mockMuleContext();
 
     // When the extension activator activates that extension model
     ExtensionActivator extensionActivator = new ExtensionActivator(muleContext);
@@ -104,7 +107,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
     // Then a global binding context is registered in the mule context registry, and it contains the type
     ArgumentCaptor<GlobalBindingContextProvider> bcProviderCaptor = forClass(GlobalBindingContextProvider.class);
     String registryKey = MOCK_EXTENSION_NAME + "GlobalBindingContextProvider";
-    verify(spiedRegistry).registerObject(eq(registryKey), bcProviderCaptor.capture());
+    verifyRegistration(muleContext, registryKey, bcProviderCaptor);
     BindingContext bindingContext = bcProviderCaptor.getValue().getBindingContext();
 
     assertThat(bindingContext.modules().size(), is(1));
@@ -113,11 +116,12 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
   }
 
   private static ExtensionModel extensionWithTypes(Set<ObjectType> metadataTypes) {
-    ExtensionModel mockExtensionModel = mock(ExtensionModel.class);
+    ExtensionModel mockExtensionModel = mock(ExtensionModel.class, RETURNS_MOCKS);
     XmlDslModel dslModel = XmlDslModel.builder().setPrefix(MOCK_EXTENSION_PREFIX).build();
     when(mockExtensionModel.getXmlDslModel()).thenReturn(dslModel);
     when(mockExtensionModel.getName()).thenReturn(MOCK_EXTENSION_NAME);
     when(mockExtensionModel.getTypes()).thenReturn(metadataTypes);
+    when(mockExtensionModel.getModelProperty(any())).thenReturn(empty());
     return mockExtensionModel;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,6 +12,7 @@ import static org.mule.runtime.api.meta.Category.SELECT;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.ANY_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -19,8 +20,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
+import org.mule.runtime.core.internal.extension.CustomLocationPartModelProperty;
 import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.module.extension.api.loader.java.property.CustomLocationPartModelProperty;
 
 /**
  * An {@link ExtensionDeclarer} for test Policy components
@@ -36,6 +37,7 @@ class TestPolicyExtensionModelDeclarer {
         .onVersion(MULE_VERSION)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(SELECT)
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .withModelProperty(new CustomBuildingDefinitionProviderModelProperty())
         .withXmlDsl(XmlDslModel.builder()
             .setPrefix(TEST_POLICY_PREFIX)

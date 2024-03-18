@@ -1,21 +1,23 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.api.span.exporter;
+
+import static org.mule.runtime.api.profiling.tracing.SpanIdentifier.INVALID_SPAN_IDENTIFIER;
 
 import static java.util.Collections.emptyMap;
 
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.api.profiling.tracing.Span;
+import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 
 import java.util.Map;
 
 /**
- * An exporter for {@link InternalSpan}.
+ * An exporter for {@link Span}.
  *
  * @since 4.5.0
  */
@@ -39,13 +41,18 @@ public interface SpanExporter {
     }
 
     @Override
-    public InternalSpan getInternalSpan() {
+    public Span getSpan() {
       return null;
+    }
+
+    @Override
+    public SpanIdentifier getSpanIdentifier() {
+      return INVALID_SPAN_IDENTIFIER;
     }
   };
 
   /**
-   * Exports the {@link InternalSpan}.
+   * Exports the {@link Span}.
    */
   void export();
 
@@ -62,16 +69,16 @@ public interface SpanExporter {
   Map<String, String> exportedSpanAsMap();
 
   /**
-   * Updates the exporter of a child {@link InternalSpan}.
+   * Updates the exporter of a child {@link Span}.
    *
-   * @param childSpanExporter the child {@link InternalSpan} exporter.
+   * @param childSpanExporter the child {@link Span} exporter.
    */
   default void updateChildSpanExporter(SpanExporter childSpanExporter) {}
 
   /**
-   * @return the {@link InternalSpan} to export.
+   * @return the {@link Span} to export.
    */
-  InternalSpan getInternalSpan();
+  Span getSpan();
 
   /**
    * Sets a root attribute in the local trace for the exporter. This is useful in case a root element sets an attribute for the
@@ -113,4 +120,9 @@ public interface SpanExporter {
    * @param spanSerializedAsMap the serialization map that represents the span in W3C format.
    */
   default void updateParentSpanFrom(Map<String, String> spanSerializedAsMap) {}
+
+  /**
+   * @return a {@link SpanIdentifier} based on the export.
+   */
+  SpanIdentifier getSpanIdentifier();
 }

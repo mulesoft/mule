@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -24,9 +24,9 @@ import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.management.stats.RouterStatistics;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.runtime.core.internal.routing.result.RouterStatisticsRecorder;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +55,11 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private RouterStatistics routerStatistics;
   private MuleContext muleContext;
   private ExpressionManager expressionManager;
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
-  public ChoiceRouter(InitialSpanInfoProvider initialSpanInfoProvider) {
+  public ChoiceRouter(ComponentTracerFactory componentTracerFactory) {
     routerStatistics = new RouterStatistics(TYPE_OUTBOUND);
-    this.initialSpanInfoProvider = initialSpanInfoProvider;
+    this.componentTracerFactory = componentTracerFactory;
   }
 
   @Override
@@ -77,10 +77,10 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
     if (defaultProcessor == null) {
       defaultProcessor = event -> event;
     }
-    routes.add(new ProcessorRoute(defaultProcessor, initialSpanInfoProvider));
+    routes.add(new ProcessorRoute(defaultProcessor, componentTracerFactory));
 
     for (ProcessorRoute route : routes) {
-      route.setInitialSpanInfo(initialSpanInfoProvider.getInitialSpanInfo(this, ROUTE_SPAN_NAME_SUFFIX));
+      route.setComponentTracer(componentTracerFactory.fromComponent(this, ROUTE_SPAN_NAME_SUFFIX));
       initialiseIfNeeded(route, muleContext);
     }
   }
@@ -111,7 +111,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   }
 
   public void addRoute(final String expression, final Processor processor) {
-    routes.add(new ProcessorExpressionRoute(expression, processor, initialSpanInfoProvider));
+    routes.add(new ProcessorExpressionRoute(expression, processor, componentTracerFactory));
   }
 
   public void setDefaultRoute(final Processor processor) {
@@ -151,7 +151,7 @@ public class ChoiceRouter extends AbstractComponent implements Router, RouterSta
   private class SinkRouter extends AbstractSinkRouter {
 
     SinkRouter(Publisher<CoreEvent> publisher, List<ProcessorRoute> routes) {
-      super(publisher, routes, initialSpanInfoProvider);
+      super(publisher, routes, componentTracerFactory);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 
 import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Mono.fromFuture;
 import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.component.Component;
@@ -42,7 +43,6 @@ import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategySupplier;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
 import org.mule.runtime.core.internal.event.EventContextDeepNestingException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.TransactionAwareProactorStreamEmitterProcessingStrategyFactory;
@@ -53,8 +53,10 @@ import org.mule.runtime.core.internal.rx.MonoSinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.rx.SinkRecorderToReactorSinkAdapter;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -64,13 +66,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import reactor.core.publisher.Sinks.One;
 
 /**
  * Some convenience methods for message processors.
@@ -102,11 +105,11 @@ public class MessageProcessors {
   }
 
   public static MessageProcessorChain newChain(Optional<ProcessingStrategy> processingStrategy, List<Processor> processors,
-                                               InitialSpanInfo initialSpanInfo) {
+                                               ComponentTracer<CoreEvent> componentTracer) {
     if (processors.size() == 1 && processors.get(0) instanceof MessageProcessorChain) {
       return (MessageProcessorChain) processors.get(0);
     } else {
-      return buildNewChainWithListOfProcessors(processingStrategy, processors, initialSpanInfo);
+      return buildNewChainWithListOfProcessors(processingStrategy, processors, componentTracer);
     }
   }
 
@@ -134,32 +137,32 @@ public class MessageProcessors {
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
                                                                         String name,
-                                                                        InitialSpanInfo chainInitialSpanInfo) {
+                                                                        ComponentTracer<CoreEvent> chainComponentTracer) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
     defaultMessageProcessorChainBuilder.setName(name);
-    defaultMessageProcessorChainBuilder.setChainInitialSpanInfo(chainInitialSpanInfo);
+    defaultMessageProcessorChainBuilder.setComponentTracer(chainComponentTracer);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
-                                                                        InitialSpanInfo chainInitialSpanInfo) {
+                                                                        ComponentTracer<CoreEvent> chainComponentTracer) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
-    defaultMessageProcessorChainBuilder.setInitialSpanInfo(chainInitialSpanInfo);
+    defaultMessageProcessorChainBuilder.setComponentTracer(chainComponentTracer);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
   public static MessageProcessorChain buildNewChainWithListOfProcessors(Optional<ProcessingStrategy> processingStrategy,
                                                                         List<Processor> processors,
                                                                         FlowExceptionHandler messagingExceptionHandler,
-                                                                        InitialSpanInfo initialSpanInfo) {
+                                                                        ComponentTracer<CoreEvent> chainComponentTracer) {
     DefaultMessageProcessorChainBuilder defaultMessageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder();
     processingStrategy.ifPresent(defaultMessageProcessorChainBuilder::setProcessingStrategy);
     defaultMessageProcessorChainBuilder.setMessagingExceptionHandler(messagingExceptionHandler);
-    defaultMessageProcessorChainBuilder.setInitialSpanInfo(initialSpanInfo);
+    defaultMessageProcessorChainBuilder.setComponentTracer(chainComponentTracer);
     return defaultMessageProcessorChainBuilder.chain(processors).build();
   }
 
@@ -493,23 +496,28 @@ public class MessageProcessors {
   private static Publisher<CoreEvent> internalProcessWithChildContext(CoreEvent eventChildCtx,
                                                                       ReactiveProcessor processor,
                                                                       boolean completeParentIfEmpty, boolean propagateErrors) {
+    // Prepare the error propagation...
     MonoSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new MonoSinkRecorder<>();
+    childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
+                                completeParentIfEmpty, propagateErrors);
+    final Mono<? extends CoreEvent> errorPropagateMono =
+        Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
+            .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
 
-    return Mono.<CoreEvent>create(sink -> {
-      childContextResponseHandler(eventChildCtx, new MonoSinkRecorderToReactorSinkAdapter<>(errorSwitchSinkSinkRef),
-                                  completeParentIfEmpty, propagateErrors);
-
-      sink.success(eventChildCtx);
-    })
-        .toProcessor()
+    final One<CoreEvent> oneSink = Sinks.one();
+    final Mono<CoreEvent> oneMono = oneSink.asMono()
         .transform(processor)
         .doOnNext(completeSuccessIfNeeded())
-        .switchIfEmpty(Mono.<Either<MessagingException, CoreEvent>>create(errorSwitchSinkSinkRef)
-            .map(RxUtils.<MessagingException>propagateErrorResponseMapper())
-            .toProcessor())
+        // use a Future to force the subscription to errorPropagateMono
+        .switchIfEmpty(fromFuture(errorPropagateMono.toFuture()))
         .map(MessageProcessors::toParentContext)
-        .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
-            .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
+        .contextWrite(ctx -> ctx
+            .put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
+            .put(WITHIN_PROCESS_TO_APPLY, true)
+            .put(REACTOR_RECREATE_ROUTER, true));
+
+    oneSink.tryEmitValue(eventChildCtx);
+    return oneMono;
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,

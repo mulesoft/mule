@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -84,21 +84,6 @@ public abstract class AbstractRemoveVariablePropertyProcessorTestCase extends Ab
     removeVariableProcessor.setIdentifier(NULL_EXPRESSION);
     removeVariableProcessor.initialise();
     event = removeVariableProcessor.process(event);
-  }
-
-  @Test
-  @Ignore
-  public void testRemoveVariableWithRegexExpression() throws MuleException {
-    addMockedPropeerties(event, new HashSet<>(asList("MULE_ID", "MULE_CORRELATION_ID", "SomeVar", "MULE_GROUP_ID")));
-
-    removeVariableProcessor.setIdentifier("MULE_(.*)");
-    removeVariableProcessor.initialise();
-    event = removeVariableProcessor.process(event);
-
-    verifyRemoved(event, "MULE_ID");
-    verifyRemoved(event, "MULE_CORRELATION_ID");
-    verifyRemoved(event, "MULE_GROUP_ID");
-    verifyNotRemoved(event, "SomeVar");
   }
 
   protected abstract void addMockedPropeerties(CoreEvent event, Set<String> properties);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,13 +7,13 @@
 package org.mule.runtime.soap.api.message.dispatcher;
 
 
+import static org.mule.runtime.http.api.HttpConstants.Method.POST;
+
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
-import static org.mule.runtime.http.api.HttpConstants.Method.POST;
 
 import org.mule.runtime.api.util.MultiMap;
-import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.extension.api.soap.message.DispatchingRequest;
 import org.mule.runtime.extension.api.soap.message.DispatchingResponse;
 import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
@@ -23,14 +23,15 @@ import org.mule.runtime.http.api.domain.message.request.HttpRequest;
 import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.mule.runtime.soap.api.exception.DispatchingException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -79,7 +80,12 @@ public final class DefaultHttpMessageDispatcher implements MessageDispatcher {
    */
   private InputStream logIfNeeded(String title, InputStream content) {
     if (LOGGER.isDebugEnabled()) {
-      String c = IOUtils.toString(content);
+      String c;
+      try {
+        c = IOUtils.toString(content);
+      } catch (IOException iox) {
+        throw new RuntimeException(iox);
+      }
       LOGGER.debug("Logging " + title);
       LOGGER.debug("-----------------------------------");
       LOGGER.debug(c);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -30,6 +30,8 @@ import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.util.message.stream.UnclosableCursorStream;
+import org.mule.runtime.extension.api.declaration.type.annotation.LayoutTypeAnnotation;
+import org.mule.runtime.extension.api.declaration.type.annotation.LiteralTypeAnnotation;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.parameter.PropagateAllDistributedTraceContextManager;
 import org.mule.runtime.tracer.api.EventTracer;
@@ -277,11 +279,15 @@ public class ResolverUtils {
         valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
         resolver = valueResolver;
       } else if (muleContext.getExpressionManager().isExpression(expression)) {
-        TypeSafeExpressionValueResolver<Object> valueResolver =
-            new TypeSafeExpressionValueResolver<>(expression, getType(type), toDataType(type));
-        valueResolver.setTransformationService(muleContext.getTransformationService());
-        valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
-        resolver = valueResolver;
+        if (type.getAnnotation(LiteralTypeAnnotation.class).isPresent()) {
+          resolver = new StaticLiteralValueResolver<Object>(expression, getType(type));
+        } else {
+          TypeSafeExpressionValueResolver<Object> valueResolver =
+              new TypeSafeExpressionValueResolver<>(expression, getType(type), toDataType(type));
+          valueResolver.setTransformationService(muleContext.getTransformationService());
+          valueResolver.setExtendedExpressionManager(muleContext.getExpressionManager());
+          resolver = valueResolver;
+        }
       } else {
         TypeSafeValueResolverWrapper typeSafeValueResolverWrapper =
             new TypeSafeValueResolverWrapper<>(new StaticValueResolver<>(expression), getType(type));

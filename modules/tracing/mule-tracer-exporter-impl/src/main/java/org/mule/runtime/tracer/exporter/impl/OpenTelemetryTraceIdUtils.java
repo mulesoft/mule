@@ -1,22 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.exporter.impl;
+
+import static org.mule.runtime.tracer.exporter.impl.MutableMuleTraceState.TRACE_STATE_KEY;
 
 import static java.util.Collections.emptyMap;
 
-import io.opentelemetry.api.internal.OtelEncodingUtils;
-import io.opentelemetry.api.trace.SpanContext;
-import io.opentelemetry.api.trace.SpanId;
-import io.opentelemetry.api.trace.TraceFlags;
-import io.opentelemetry.api.trace.TraceId;
-import io.opentelemetry.api.trace.TraceState;
-import org.mule.runtime.tracer.api.span.InternalSpan;
-import org.mule.runtime.tracer.api.span.exporter.SpanExporter;
+import static io.opentelemetry.api.trace.propagation.internal.W3CTraceContextEncoding.encodeTraceState;
+
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +21,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
+
+import io.opentelemetry.api.internal.OtelEncodingUtils;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.SpanId;
+import io.opentelemetry.api.trace.TraceFlags;
+import io.opentelemetry.api.trace.TraceId;
+import io.opentelemetry.api.trace.TraceState;
 
 /**
  * Utils for generating Open Telemetry Trace Ids
@@ -139,33 +142,30 @@ public class OpenTelemetryTraceIdUtils {
     return fromLong(id);
   }
 
-  public static String generateTraceId(InternalSpan parentInternalSpan) {
-    if (parentInternalSpan != null && parentInternalSpan.getSpanExporter() instanceof OpenTelemetrySpanExporter
-        && !parentSpanContextIsValid(parentInternalSpan)) {
-      return ((OpenTelemetrySpanExporter) parentInternalSpan.getSpanExporter()).getTraceId();
+  public static String generateTraceId(InternalSpan parentSpan) {
+    if (parentSpan != null && parentSpan.getIdentifier().isValid()) {
+      return parentSpan.getIdentifier().getTraceId();
+    } else {
+      Random random = randomSupplier.get();
+      long idHi = random.nextLong();
+      long idLo;
+      do {
+        idLo = random.nextLong();
+      } while (idLo == INVALID_ID);
+      return fromLongs(idHi, idLo);
     }
-
-    Random random = randomSupplier.get();
-    long idHi = random.nextLong();
-    long idLo;
-    do {
-      idLo = random.nextLong();
-    } while (idLo == INVALID_ID);
-    return fromLongs(idHi, idLo);
   }
 
-  private static boolean parentSpanContextIsValid(InternalSpan parentInternalSpan) {
-    SpanExporter spanExporter = parentInternalSpan.getSpanExporter();
-
-    if (spanExporter instanceof OpenTelemetrySpanExporter) {
-      return ((OpenTelemetrySpanExporter) spanExporter).getSpanContext().getSpanId()
-          .equals(getInvalid());
-    }
-
-    return false;
-  }
-
-  public static Map<String, String> getContext(OpenTelemetrySpanExporter openTelemetrySpanExporter) {
+  /**
+   * Gets a map to propagate a trace context for open telemetry.
+   *
+   * @param openTelemetrySpanExporter the {@link OpenTelemetrySpanExporter}
+   * @param isAddMuleAncestorSpanId   whether it has to add the mule ancestor.
+   *
+   * @return the map with that represents the distributed trace context.
+   */
+  public static Map<String, String> getDistributedTraceContext(OpenTelemetrySpanExporter openTelemetrySpanExporter,
+                                                               boolean isAddMuleAncestorSpanId) {
     Map<String, String> context = new HashMap<>();
     if (openTelemetrySpanExporter.getSpanId().equals(INVALID)) {
       return emptyMap();
@@ -188,6 +188,14 @@ public class OpenTelemetryTraceIdUtils {
     chars[TRACE_OPTION_OFFSET] = '0';
     chars[TRACE_OPTION_OFFSET + 1] = '1';
     context.put(TRACE_PARENT, new String(chars, 0, TRACEPARENT_HEADER_SIZE));
+    if (isAddMuleAncestorSpanId) {
+      context.put(TRACE_STATE_KEY,
+                  encodeTraceState(openTelemetrySpanExporter.getTraceState()
+                      .withAncestor(openTelemetrySpanExporter.getSpanId())));
+    } else {
+      context.put(TRACE_STATE_KEY,
+                  encodeTraceState(openTelemetrySpanExporter.getTraceState()));
+    }
 
     return context;
   }

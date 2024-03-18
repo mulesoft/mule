@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -22,6 +22,7 @@ public final class HttpRequestOptionsBuilder {
   private boolean followsRedirect = true;
   private HttpAuthentication authentication;
   private ProxyConfig proxyConfig;
+  private boolean sendBodyAlways = true;
 
   HttpRequestOptionsBuilder() {}
 
@@ -30,6 +31,7 @@ public final class HttpRequestOptionsBuilder {
     this.followsRedirect = options.isFollowsRedirect();
     this.authentication = options.getAuthentication().orElse(null);
     this.proxyConfig = options.getProxyConfig().orElse(null);
+    this.sendBodyAlways = options.shouldSendBodyAlways();
   }
 
   public HttpRequestOptionsBuilder responseTimeout(int responseTimeout) {
@@ -52,8 +54,13 @@ public final class HttpRequestOptionsBuilder {
     return this;
   }
 
+  public HttpRequestOptionsBuilder sendBodyAlways(boolean sendBodyAlways) {
+    this.sendBodyAlways = sendBodyAlways;
+    return this;
+  }
+
   public HttpRequestOptions build() {
-    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, proxyConfig);
+    return new DefaultHttpRequestOptions(responseTimeout, followsRedirect, authentication, proxyConfig, sendBodyAlways);
   }
 
 }

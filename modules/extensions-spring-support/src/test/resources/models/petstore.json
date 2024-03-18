@@ -4,6 +4,11 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "petstore",
@@ -27174,6 +27179,7 @@
       "notifications": [],
       "nestedComponents": [
         {
+          "executionOccurrence": "UNKNOWN",
           "isRequired": true,
           "allowedStereotypes": [
             {
@@ -39668,8 +39674,7 @@
   "notifications": [],
   "errors": [
     {
-      "error": "PETSTORE:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -39678,22 +39683,23 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
-      "error": "PETSTORE:PET_STORE_CONNECTIVITY",
-      "parent": "PETSTORE:CONNECTIVITY",
-      "handleable": true
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
+      "error": "PETSTORE:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
+    },
+    {
       "error": "PETSTORE:PET_ERROR",
       "parent": "MULE:ANY",
+      "handleable": true
+    },
+    {
+      "error": "PETSTORE:PET_STORE_CONNECTIVITY",
+      "parent": "PETSTORE:CONNECTIVITY",
       "handleable": true
     },
     {

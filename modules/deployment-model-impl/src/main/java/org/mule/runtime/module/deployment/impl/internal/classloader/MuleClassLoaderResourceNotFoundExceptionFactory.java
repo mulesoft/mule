@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,6 +14,7 @@ import static org.mule.runtime.deployment.model.internal.artifact.CompositeClass
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static java.lang.System.lineSeparator;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.container.internal.FilteringContainerClassLoader;
@@ -23,10 +24,12 @@ import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleApplicationClassLoader;
 import org.mule.runtime.module.artifact.activation.internal.classloader.MuleSharedDomainClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.ModuleLayerInformationSupplier;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -92,6 +95,9 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
     if (contextClassLoader instanceof CompositeClassLoader) {
       contextClassLoader = findClassLoader((CompositeClassLoader) contextClassLoader);
     }
+
+    String moduleLayerInfo = getModuleLayerInfo(contextClassLoader)
+        .map(info -> lineSeparator() + "Module Layer Information:" + lineSeparator() + info).orElse("");
     if (contextClassLoader instanceof ArtifactClassLoader) {
       ArtifactClassLoader artifactClassLoader = (ArtifactClassLoader) contextClassLoader;
       ClassLoaderNode classLoaderNode = createClassLoaderNode(artifactClassLoader);
@@ -111,13 +117,13 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
                    exportMsg);
       }
       return detailedExceptionProviderFunction
-          .apply(format("%s " + lineSeparator() + " %s " + lineSeparator() + " %s " + lineSeparator() + " %s",
+          .apply(format("%s " + lineSeparator() + " %s " + lineSeparator() + " %s " + lineSeparator() + " %s%s",
                         genericMsgProviderFunction.apply(resource),
-                        classLoaderNode.toString(),
+                        classLoaderNode,
                         format("Current classloader in context is (%s)",
                                currentContextClassLoaderNode
                                    .getId()),
-                        possibleResourceOwnersMessage),
+                        possibleResourceOwnersMessage, moduleLayerInfo),
                  classLoaderNode);
     } else {
       return genericExceptionProviderFunction.apply(resource, classLoader);
@@ -199,5 +205,17 @@ public class MuleClassLoaderResourceNotFoundExceptionFactory implements ClassLoa
         .withId(DOMAIN_CLASS_LOADER_ID)
         .withParent(createClassLoaderNode((ArtifactClassLoader) domainArtifactClassLoader.getParent()))
         .build();
+  }
+
+  public static Optional<String> getModuleLayerInfo(ClassLoader classLoader) {
+    if (classLoader == null) {
+      return empty();
+    } else if (classLoader instanceof ArtifactClassLoader) {
+      Optional<String> info = ((ArtifactClassLoader) classLoader).getModuleLayerInformation()
+          .map(ModuleLayerInformationSupplier::retrieveRepresentation);
+      return info.isPresent() ? info : getModuleLayerInfo(classLoader.getParent());
+    } else {
+      return getModuleLayerInfo(classLoader.getParent());
+    }
   }
 }

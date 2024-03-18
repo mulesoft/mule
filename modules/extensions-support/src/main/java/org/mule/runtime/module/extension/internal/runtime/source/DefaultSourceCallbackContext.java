@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -65,14 +65,18 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
   private DistributedTraceContextManager sourceDistributedTraceContext = new SourceDistributedTraceContextManager();
   private final ProfilingService profilingService;
 
+  private final boolean errorAfterTimeout;
+
   /**
    * Creates a new instance
    *
    * @param sourceCallback the owning {@link SourceCallbackAdapter}
    */
-  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, ProfilingService profilingService) {
+  DefaultSourceCallbackContext(SourceCallbackAdapter sourceCallback, ProfilingService profilingService,
+                               boolean errorAfterTimeout) {
     this.sourceCallback = sourceCallback;
     this.profilingService = profilingService;
+    this.errorAfterTimeout = errorAfterTimeout;
   }
 
   /**
@@ -96,7 +100,7 @@ class DefaultSourceCallbackContext implements SourceCallbackContextAdapter {
                                                                       sourceCallback.getConfigurationInstance(),
                                                                       sourceCallback.getSourceLocation(),
                                                                       connectionHandler, sourceCallback.getTransactionManager(),
-                                                                      sourceCallback.getTimeout());
+                                                                      sourceCallback.getTimeout(), errorAfterTimeout);
         if (sourceCallback.getTransactionConfig().isTransacted()) {
           initialiseProfilingDataProducerIfNeeded();
           profileTransactionAction(startProducer, TX_START, sourceCallback.getSourceLocation());

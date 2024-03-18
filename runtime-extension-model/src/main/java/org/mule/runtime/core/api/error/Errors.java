@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -31,6 +31,7 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_RESPONSE
 import static org.mule.runtime.core.api.error.Errors.Identifiers.SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.TIMEOUT_ERROR_IDENTIFIER;
+import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSACTION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
@@ -171,6 +172,11 @@ public abstract class Errors {
     public static final String SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER = "SOURCE_ERROR_RESPONSE_GENERATE";
 
     /**
+     * Indicates that an error occurred related to transactions commit or rollback (e.g. transaction timeout).
+     */
+    public static final String TRANSACTION_ERROR_IDENTIFIER = "TRANSACTION";
+
+    /**
      * Indicates that an unknown and unexpected error occurred. Cannot be handled directly, only through ANY.
      */
     public static final String UNKNOWN_ERROR_IDENTIFIER = "UNKNOWN";
@@ -249,6 +255,9 @@ public abstract class Errors {
           builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
           builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
+
+      public static final ComponentIdentifier TRANSACTION =
+          builder().namespace(CORE_NAMESPACE_NAME).name(TRANSACTION_ERROR_IDENTIFIER).build();
 
     }
 

@@ -4,6 +4,11 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "fn",
@@ -151,7 +156,7 @@
         }
       ],
       "externalLibraryModels": [],
-      "minMuleVersion": "4.1.1",
+      "minMuleVersion": "4.5.0",
       "operations": [],
       "connectionProviders": [],
       "messageSources": [],
@@ -1666,12 +1671,12 @@
   "notifications": [],
   "errors": [
     {
-      "error": "FN:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "FN:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
       "handleable": true
     },
     {
-      "error": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
       "parent": "MULE:ANY",
       "handleable": true
     },
@@ -1680,12 +1685,12 @@
       "handleable": true
     },
     {
-      "error": "FN:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "FN:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
+      "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     }

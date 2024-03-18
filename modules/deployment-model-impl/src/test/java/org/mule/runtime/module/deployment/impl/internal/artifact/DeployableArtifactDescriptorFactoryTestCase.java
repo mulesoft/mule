@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
 import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
@@ -20,13 +19,16 @@ import static org.mule.tck.MavenTestUtils.installArtifact;
 
 import static java.io.File.separator;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 
+import static org.apache.commons.io.FileUtils.copyFileToDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -41,20 +43,20 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.meta.MuleVersion;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
-import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.globalconfig.api.GlobalConfigLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
 import org.mule.runtime.module.artifact.api.descriptor.BundleScope;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
+import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactoryTestCase;
 import org.mule.runtime.module.deployment.impl.internal.builder.DeployableFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
@@ -63,14 +65,23 @@ import org.mule.tck.junit4.rule.SystemProperty;
 import org.mule.tck.junit4.rule.SystemPropertyTemporaryFolder;
 import org.mule.tck.util.CompilerUtils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -128,9 +139,19 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Rule
   public ExpectedException expectedException = none();
 
+  private List<File> installedArtifactFiles;
+
   @Before
   public void setUp() throws Exception {
     GlobalConfigLoader.reset();
+    installedArtifactFiles = new ArrayList<>();
+  }
+
+  @After
+  public void tearDown() {
+    installedArtifactFiles
+        .forEach(f -> f.delete());
+    installedArtifactFiles.clear();
   }
 
   @Test
@@ -287,8 +308,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyWithTransitiveDependency() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependency"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependency");
 
@@ -312,11 +333,11 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyWithMultipleTransitiveDependenciesLevels() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-2.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependencies"));
+    installArtifactInRepo(getArtifact("dependencies/library-with-dependency-a-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-with-dependency-b-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
+    installArtifactInRepo(getArtifact("dependencies/library-2.0.0.pom"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-transitive-dependencies");
 
@@ -356,7 +377,77 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesLightweightUseLocalRepository()
       throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-lightweight-local-repository");
+    replacePlaceholderInClassloaderModel();
+    final String location = "/plugin-dependency-with-additional-dependencies-lightweight-local-repository";
+    populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "local-repository"));
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
+  }
+
+  private void replacePlaceholderInClassloaderModel() throws IOException {
+    String root = getRoot();
+
+    String content =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json"));
+
+    String content2 =
+        readFile(getClass()
+            .getResourceAsStream(root
+                + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json"));
+
+    System.setProperty("outputDirectory",
+                       getClass().getProtectionDomain().getCodeSource().getLocation().toString());
+
+    String replacedContent = replacePlaceholderWithSystemProperty(content, "outputDirectory");
+    String replacedContent2 = replacePlaceholderWithSystemProperty(content2, "outputDirectory");
+
+
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/classloader-model.json")
+        .getPath(),
+              replacedContent);
+    writeFile(getClass()
+        .getResource(root
+            + "/plugin-dependency-with-additional-dependencies-lightweight-local-repository/META-INF/mule-artifact/org/mule/tests/test-dependant-plugin/4.2.0-SNAPSHOT/classloader-model.json")
+        .getPath(),
+              replacedContent2);
+  }
+
+  protected String getRoot() {
+    return "/apps";
+  }
+
+  private static String readFile(InputStream inputStream) throws IOException {
+    StringBuilder content = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        content.append(line).append(System.lineSeparator());
+      }
+    }
+    return content.toString();
+  }
+
+  private static void writeFile(String filePath, String content) throws IOException {
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+      writer.write(content);
+    }
+  }
+
+  private static String replacePlaceholderWithSystemProperty(String content, String placeholder) {
+    // Replace ${placeholder} with the system property value
+    String placeholderString = "${" + placeholder + "}";
+    String replacement = System.getProperty(placeholder);
+
+    if (replacement != null) {
+      content = content.replace(placeholderString, replacement);
+    } else {
+      fail("System property not set for " + placeholderString);
+    }
+
+    return content;
   }
 
   @Test
@@ -367,13 +458,43 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-heavyweight");
+    final String location = "/plugin-dependency-with-additional-dependencies-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
   }
 
   @Test
   @Issue("MULE-19282")
   public void classLoaderConfigurationWithPluginDependencyAndAdditionalDependenciesInProfileHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies("/plugin-dependency-with-additional-dependencies-in-profile-heavyweight");
+    final String location = "/plugin-dependency-with-additional-dependencies-in-profile-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(location);
+  }
+
+  private void populateRepositoryDependencies(String location) throws Exception {
+    populateRepositoryDependencies(new File(getArtifact(getArtifactRootFolder() + location), "repository"));
+  }
+
+  private void populateRepositoryDependencies(final File targetRepository) throws IOException {
+    final Path commonsCollectionsJarLoc = Paths.get(getProperty("commons-collections4"));
+    final File commonsCollectionsInRepo =
+        new File(targetRepository,
+                 Paths.get(getProperty("local-repo"))
+                     .relativize(commonsCollectionsJarLoc.getParent()).toString());
+    commonsCollectionsInRepo.mkdirs();
+    for (File repoFile : commonsCollectionsJarLoc.toFile().getParentFile().listFiles()) {
+      copyFileToDirectory(repoFile, commonsCollectionsInRepo);
+    }
+
+    final Path commonsIoJarLoc = Paths.get(getProperty("commons-io"));
+    final File commonsIoInRepo =
+        new File(targetRepository,
+                 Paths.get(getProperty("local-repo"))
+                     .relativize(commonsIoJarLoc.getParent()).toString());
+    commonsIoInRepo.mkdirs();
+    for (File repoFile : commonsIoJarLoc.toFile().getParentFile().listFiles()) {
+      copyFileToDirectory(repoFile, commonsIoInRepo);
+    }
   }
 
   private void assertClassLoaderConfigurationWithPluginDependencyAndAdditionalDependencies(String location) throws Exception {
@@ -397,20 +518,22 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
         .collect(toList()),
                everyItem(exists()));
 
-    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls()).map(url -> FileUtils.toFile(url).getName())
+    assertThat(of(testEmptyPluginDescriptor.getClassLoaderConfiguration().getUrls())
+        .map(url -> FileUtils.toFile(url).getName())
         .collect(toList()),
-               hasItems(startsWith("test-empty-plugin-"), equalTo("commons-io-2.6.jar"),
-                        equalTo("commons-collections-3.2.1.jar")));
+               hasItems(startsWith("test-empty-plugin-"),
+                        allOf(startsWith("commons-io-2."), endsWith(".jar")),
+                        allOf(startsWith("commons-collections4-4."), endsWith(".jar"))));
     // additional dependencies declared by the deployable artifact for a plugin are not seen as dependencies, they just go to the
     // urls
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(0));
 
-    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(19));
+    assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(), hasSize(35));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalPackages(),
-               hasItems("org.apache.commons.collections",
+               hasItems("org.apache.commons.collections4",
                         "org.apache.commons.io"));
     assertThat(testEmptyPluginDescriptor.getClassLoaderConfiguration().getLocalResources(),
-               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+               hasItems("META-INF/maven/org.apache.commons/commons-collections4/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     ArtifactPluginDescriptor dependantPluginDescriptor = desc.getPlugins().stream()
@@ -432,13 +555,17 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-heavyweight");
+    final String location = "/plugin-dependency-with-shared-libraries-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(location);
   }
 
   @Test
   @Issue("MULE-19282")
   public void classLoaderConfigurationWithPluginDependencyAndSharedLibrariesInProfileHeavyweight() throws Exception {
-    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries("/plugin-dependency-with-shared-libraries-in-profile-heavyweight");
+    final String location = "/plugin-dependency-with-shared-libraries-in-profile-heavyweight";
+    populateRepositoryDependencies(location);
+    assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(location);
   }
 
   private void assertClassLoaderConfigurationWithPluginDependencyAndSharedLibraries(String location) throws Exception {
@@ -452,16 +579,16 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
     assertThat(classLoaderConfiguration.getUrls().length, is(3));
 
     assertThat(classLoaderConfiguration.getDependencies().stream()
-        .filter(dep -> "commons-collections".equals(dep.getDescriptor().getArtifactId()))
+        .filter(dep -> "commons-collections4".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
     assertThat(classLoaderConfiguration.getDependencies().stream()
         .filter(dep -> "commons-io".equals(dep.getDescriptor().getArtifactId()))
         .findFirst().isPresent(), is(true));
 
-    assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections",
+    assertThat(classLoaderConfiguration.getExportedPackages(), hasItems("org.apache.commons.collections4",
                                                                         "org.apache.commons.io"));
     assertThat(classLoaderConfiguration.getExportedResources(),
-               hasItems("META-INF/maven/commons-collections/commons-collections/pom.xml",
+               hasItems("META-INF/maven/org.apache.commons/commons-collections4/pom.xml",
                         "META-INF/maven/commons-io/commons-io/pom.xml"));
 
     assertThat(desc.getPlugins(), hasSize(2));
@@ -489,8 +616,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginAsSystemDependencyIsResolved() throws Exception {
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependency"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-1.0.0.pom"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependency"));
+    installArtifactInRepo(getArtifact("dependencies/library-1.0.0.pom"));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-as-system");
 
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
@@ -551,8 +678,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithSameDependencyWithDifferentClassifier() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/same-dep-diff-classifier");
 
     ClassLoaderConfiguration classLoaderConfiguration = desc.getClassLoaderConfiguration();
@@ -570,10 +697,9 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginWithSameDependencyWithDifferentClassifier() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/plugin-with-transitive-dependencies-different-classifier"),
-                    new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
+    installArtifactInRepo(getArtifact("dependencies/plugin-with-transitive-dependencies-different-classifier"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier");
 
@@ -593,8 +719,8 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
 
   @Test
   public void appWithPluginWithSameDependencyWithDifferentClassifierAsAdditionalDependencies() throws Exception {
-    installArtifact(getArtifact("dependencies/library"), new File(repositoryLocation.getValue()));
-    installArtifact(getArtifact("dependencies/library-test-jar"), new File(repositoryLocation.getValue()));
+    installArtifactInRepo(getArtifact("dependencies/library"));
+    installArtifactInRepo(getArtifact("dependencies/library-test-jar"));
 
     D desc = createArtifactDescriptor(getArtifactRootFolder() + "/plugin-dependency-with-same-dep-diff-classifier-as-additional");
 
@@ -608,6 +734,10 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
                         containsString("test-empty-plugin"),
                         containsString("library-1.0.0.jar"),
                         containsString("library-1.0.0-test-jar.jar")));
+  }
+
+  private void installArtifactInRepo(File artifact) throws IOException {
+    installedArtifactFiles.addAll(installArtifact(artifact, new File(repositoryLocation.getValue())));
   }
 
   private void requiredProductValidationExpectedException(String appName) {
@@ -634,7 +764,7 @@ public abstract class DeployableArtifactDescriptorFactoryTestCase<D extends Depl
   protected abstract <T extends DeployableArtifactDescriptor> AbstractDeployableDescriptorFactory createDeployableDescriptorFactory();
 
   protected ServiceRegistryDescriptorLoaderRepository createDescriptorLoaderRepository() {
-    return new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+    return new ServiceRegistryDescriptorLoaderRepository();
   }
 
   private Matcher<BundleDependency> commonsCollectionDependencyMatcher() {

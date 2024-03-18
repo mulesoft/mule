@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -37,7 +37,7 @@ public class MuleManifest {
 
   public static String getProductVersion() {
     final String version = getManifestProperty("Implementation-Version");
-    return version == null ? "4.6.0" : version;
+    return version == null ? "4.7.0" : version;
   }
 
   public static String getVendorName() {
@@ -84,7 +84,18 @@ public class MuleManifest {
     return getManifestProperty("Supported-Jdks");
   }
 
+  /**
+   * @deprecated use {@link #getRecommendedJdks()} instead.
+   */
+  @Deprecated
   public static String getRecommndedJdks() {
+    return getManifestProperty("Recommended-Jdks");
+  }
+
+  /**
+   * @since 4.6
+   */
+  public static String getRecommendedJdks() {
     return getManifestProperty("Recommended-Jdks");
   }
 
@@ -144,7 +155,6 @@ public class MuleManifest {
         URL url = e.nextElement();
         if ((url.toExternalForm().contains("mule-core")
             && !url.toExternalForm().contains("tests.jar")
-            && !url.toExternalForm().contains("mule-core-mvel")
             && !url.toExternalForm().contains("mule-core-components"))
             || url.toExternalForm().contains("mule-runtime-extension-model")
             || url.toExternalForm().contains("mule-runtime-ee-extension-model")

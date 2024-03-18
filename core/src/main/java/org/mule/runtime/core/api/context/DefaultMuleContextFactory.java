@@ -1,10 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.context;
+
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -179,6 +181,7 @@ public final class DefaultMuleContextFactory implements MuleContextFactory {
         try {
           muleContext.dispose();
         } catch (Exception e1) {
+          e.addSuppressed(e1);
           logger.warn("Can not dispose context. {}", getMessage(e1));
           if (logger.isDebugEnabled()) {
             logger.debug("Can not dispose context. {}", getStackTrace(e1));

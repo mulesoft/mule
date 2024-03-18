@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -22,7 +22,7 @@ import org.mule.runtime.api.notification.FlowConstructNotification;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.lifecycle.LifecycleCallback;
-import org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager;
+import org.mule.runtime.core.internal.lifecycle.SimpleLifecycleManager;
 
 import org.slf4j.Logger;
 

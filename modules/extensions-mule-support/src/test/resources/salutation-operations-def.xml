@@ -2,13 +2,13 @@
 <mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:operation="http://www.mulesoft.org/schema/mule/operation"
       xmlns:this="http://www.mulesoft.org/schema/mule/this"
-      xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
       xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel"
+      xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd
         http://www.mulesoft.org/schema/mule/marvel http://www.mulesoft.org/schema/mule/marvel/current/mule-marvel.xsd
         http://www.mulesoft.org/schema/mule/operation http://www.mulesoft.org/schema/mule/operation/current/mule-operation.xsd
+        http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd
         http://www.mulesoft.org/schema/mule/this http://www.mulesoft.org/schema/mule/this/current/mule-this.xsd">
 
     <operation:def name="helloWorld" displayName="Hello World operation" summary="Returns a polite greeting">
@@ -33,7 +33,7 @@
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
-            <test-components:intercept-value ref="helloWorld" value="#[params]"/>
+            <marvel:intercept-comm issuer="helloWorld" comm="#[params]"/>
 
             <choice>
                 <when expression="#[payload != null or attributes != null]">
@@ -59,7 +59,7 @@
             <operation:attributes-type type="string"/>
         </operation:output>
         <operation:body>
-            <test-components:intercept-value ref="introduceMyself" value="#[params]"/>
+            <marvel:intercept-comm issuer="introduceMyself" comm="#[params]"/>
 
             <choice>
                 <when expression="#[sizeOf(vars) > 0]">
@@ -165,13 +165,13 @@
             <!-- This is for testing that processors are picked up when inside other components -->
             <choice>
                 <when expression="#[true]">
-                    <test-components:non-blocking/>
+                    <heisenberg:non-blocking/>
                 </when>
             </choice>
 
-            <test-components:non-blocking>
-                <test-components:content>#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']</test-components:content>
-            </test-components:non-blocking>
+            <heisenberg:non-blocking>
+                <heisenberg:content>#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']</heisenberg:content>
+            </heisenberg:non-blocking>
         </operation:body>
     </operation:def>
 
@@ -197,7 +197,7 @@
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
-            <test-components:non-blocking/>
+            <heisenberg:non-blocking/>
 
             <!-- This is for testing that processors are picked up when inside other components -->
             <choice>
@@ -206,9 +206,9 @@
                 </when>
             </choice>
 
-            <test-components:non-blocking>
-                <test-components:content>#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']</test-components:content>
-            </test-components:non-blocking>
+            <heisenberg:non-blocking>
+                <heisenberg:content>#['$(params.greeting) $(params.prefix) $(params.receiver) $(if(params.suffix == null) '' else params.suffix)']</heisenberg:content>
+            </heisenberg:non-blocking>
         </operation:body>
     </operation:def>
 
@@ -252,9 +252,9 @@
                                       prefix="#[params.prefix]"
                                       suffix="#[params.suffix]"/>
 
-                    <test-components:non-blocking>
-                        <test-components:content>#[payload ++ if(vars.recursionOutput != null) vars.recursionOutput else '']</test-components:content>
-                    </test-components:non-blocking>
+                    <heisenberg:non-blocking>
+                        <heisenberg:content>#[payload ++ if(vars.recursionOutput != null) vars.recursionOutput else '']</heisenberg:content>
+                    </heisenberg:non-blocking>
                 </when>
             </choice>
         </operation:body>
@@ -305,7 +305,9 @@
             <operation:payload-type type="string"/>
         </operation:output>
         <operation:body>
-            <test-components:fire-notification integer="52" />
+            <heisenberg:knock>
+                <heisenberg:knocked-door victim="Inline Skyler" address="308 Negra Arroyo Lane"/>
+            </heisenberg:knock>
             <set-payload value="Notification fired" />
         </operation:body>
     </operation:def>

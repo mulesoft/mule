@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,6 +13,7 @@ import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.disablePlugins;
 import static org.mule.tck.mockito.plugins.ConfigurableMockitoPluginSwitch.enablePlugins;
 
+import static java.io.File.pathSeparator;
 import static java.lang.System.getProperty;
 import static java.lang.Thread.currentThread;
 import static java.nio.charset.Charset.forName;
@@ -34,11 +35,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
@@ -61,28 +63,21 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
 
+import io.qameta.allure.Description;
+import io.qameta.allure.Issue;
 import org.apache.commons.lang3.StringUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-
+import org.mockito.MockedStatic;
 import org.mockito.internal.creation.bytebuddy.InlineByteBuddyMockMaker;
-
-import io.qameta.allure.Description;
-import io.qameta.allure.Issue;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SmallTest
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtils.class)
-@PowerMockIgnore("javax.management.*")
 public class IOUtilsTestCase extends AbstractMuleTestCase {
 
   private static final List<String> POWER_MOCK_PLUGINS = asList("mock-maker-inline", InlineByteBuddyMockMaker.class.getName());
@@ -163,9 +158,9 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
       String classPath = getProperty("java.class.path");
       String modulePath = getProperty("jdk.module.path");
       List<String> classPathEntries = (modulePath != null
-          ? concat(Stream.of(classPath.split(":")),
-                   Stream.of(modulePath.split(":")))
-          : Stream.of(classPath.split(":")))
+          ? concat(Stream.of(classPath.split(pathSeparator)),
+                   Stream.of(modulePath.split(pathSeparator)))
+          : Stream.of(classPath.split(pathSeparator)))
               .filter(StringUtils::isNotBlank)
               .collect(toList());
 
@@ -206,22 +201,27 @@ public class IOUtilsTestCase extends AbstractMuleTestCase {
   }
 
   private URLConnection mockURLConnection(URL url) throws Exception {
-    PowerMockito.spy(IOUtils.class);
-    AtomicReference<URLConnection> connection = new AtomicReference<>();
+    try (MockedStatic<IOUtils> utilities = mockStatic(IOUtils.class)) {
+      AtomicReference<URLConnection> connection = new AtomicReference<>();
 
-    url = spy(url);
-    when(IOUtils.class, "getResourceAsUrl", anyString(), any(Class.class), anyBoolean(), anyBoolean())
-        .thenReturn(url);
+      final URL mockedURL = spy(url);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class)))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> getResourceAsStream(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(InvocationOnMock::callRealMethod);
+      utilities.when(() -> IOUtils.getResourceAsUrl(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+          .then(invocationOnMock -> mockedURL);
 
-    when(url.openConnection()).then(a -> {
-      URLConnection conn = spy((URLConnection) a.callRealMethod());
-      connection.set(conn);
-      return conn;
-    });
+      when(mockedURL.openConnection()).thenAnswer(a -> {
+        URLConnection conn = spy((URLConnection) a.callRealMethod());
+        connection.set(conn);
+        return conn;
+      });
 
-    getResourceAsStream(RESOURCE_NAME, getClass());
+      getResourceAsStream(RESOURCE_NAME, getClass());
 
-    return connection.get();
+      return connection.get();
+    }
   }
 
   private void assertInputStream(URLConnection connection) throws Exception {

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-tests-runner</artifactId>
     <packaging>jar</packaging>
@@ -12,6 +12,20 @@
     <description>Test Runner for Mule Integration Tests</description>
 
     <properties>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-opens=org.mule.test.runner/org.mule.test.runner.api=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.classification=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.classloader=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.maven=junit
+            --add-opens=org.mule.test.runner/org.mule.test.runner.utils=junit
+            ${surefire.args.base}
+        </surefire.args>
+
+        <javaModuleName>org.mule.test.runner</javaModuleName>
+        
+        <javassist.version>3.28.0-GA</javassist.version>
+         
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -22,27 +36,23 @@
                 <filtering>true</filtering>        
             </resource>
         </resources>
-    
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${shade.plugin.version}</version>
-                <configuration>
-                    <minimizeJar>true</minimizeJar>
-                    <artifactSet>
-                        <includes>
-                            <!-- Shade spring so it doesn't end as libraries in the APP for testing -->
-                            <include>org.springframework:*</include>
-                        </includes>
-                    </artifactSet>
-                </configuration>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <version>2.1.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>initialize</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>execute</goal>
                         </goals>
+                        <configuration>
+                            <source>
+                                for (art in project.getArtifacts())
+                                    project.properties['resolvedVersion.' + art.getArtifactId()] = art.getVersion()
+                            </source>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -93,22 +103,40 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-deployment-model</artifactId>
+            <artifactId>mule-module-artifact-activation</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.mule.runtime</groupId>
+            <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-logging</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 
+        <!-- TODO: MULE-19762 remove once forward compatibility is finished -->
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TODO: MULE-19762 remove once forward compatibility is finished -->
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-compatibility-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- 3rd party dependencies -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
         </dependency>
 
         <dependency>
@@ -119,23 +147,14 @@
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
+            <artifactId>mule-tests-allure</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-unit</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

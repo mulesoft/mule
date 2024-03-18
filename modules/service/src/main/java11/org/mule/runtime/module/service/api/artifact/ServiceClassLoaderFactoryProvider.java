@@ -1,21 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.service.api.artifact;
 
-import static org.mule.runtime.api.util.MuleSystemProperties.CLASSLOADER_SERVICE_JPMS_MODULE_LAYER;
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.System.getProperty;
-
-import static org.apache.commons.lang3.JavaVersion.JAVA_17;
-import static org.apache.commons.lang3.SystemUtils.IS_JAVA_1_8;
-import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
-
-import org.mule.runtime.api.util.MuleSystemProperties;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,23 +20,33 @@ import org.slf4j.LoggerFactory;
  * This overrides the default class when running in a JVM that supports JPMS (9+), but has a fallback mechanism to provide the
  * previous implementation.
  * 
- * @since 4.6
+ * @since 4.5
  */
 public class ServiceClassLoaderFactoryProvider {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ServiceClassLoaderFactoryProvider.class);
 
+  public static ClassLoaderConfigurationLoader serviceClassLoaderConfigurationLoader() {
+    return new LibFolderClassLoaderConfigurationLoader();
+  }
+
+  private static boolean withinModularizedContainer = ServiceClassLoaderFactoryProvider.class.getModule().isNamed();
+
   public static ServiceClassLoaderFactory serviceClassLoaderFactory() {
-    if (useModuleLayer()) {
+    if (classloaderContainerJpmsModuleLayer()
+        // Only if the container is modularized it makes sense to load services as module layers
+        && withinModularizedContainer) {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceModuleLayerFactory'...");
-      return new ServiceModuleLayerFactory();
+      final ServiceModuleLayerFactory serviceModuleLayerFactory = new ServiceModuleLayerFactory();
+      serviceModuleLayerFactory.setParentLayerFrom(ServiceClassLoaderFactoryProvider.class);
+      return serviceModuleLayerFactory;
     } else {
       LOGGER.debug("MRJAR 'ServiceClassLoaderFactoryProvider' implementation, using 'ServiceClassLoaderFactory'...");
       return new ServiceClassLoaderFactory();
     }
   }
 
-  private static boolean useModuleLayer() {
-    return parseBoolean(getProperty(CLASSLOADER_SERVICE_JPMS_MODULE_LAYER, "" + isJavaVersionAtLeast(JAVA_17)));
+  public static void setWithinModularizedContainer(boolean withinModularizedContainer) {
+    ServiceClassLoaderFactoryProvider.withinModularizedContainer = withinModularizedContainer;
   }
 }

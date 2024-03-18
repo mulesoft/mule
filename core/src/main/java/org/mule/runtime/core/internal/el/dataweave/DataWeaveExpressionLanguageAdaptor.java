@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -34,6 +34,8 @@ import org.mule.runtime.api.el.ExpressionLanguageSession;
 import org.mule.runtime.api.el.ValidationResult;
 import org.mule.runtime.api.el.validation.ScopePhaseValidationMessages;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.MuleContext;
@@ -43,35 +45,59 @@ import org.mule.runtime.core.internal.el.DefaultBindingContextBuilder;
 import org.mule.runtime.core.internal.el.ExpressionLanguageSessionAdaptor;
 import org.mule.runtime.core.internal.el.ExtendedExpressionLanguageAdaptor;
 import org.mule.runtime.core.internal.el.IllegalCompiledExpression;
-import org.mule.runtime.core.internal.el.context.MuleInstanceContext;
-import org.mule.runtime.core.internal.el.context.ServerContext;
+import org.mule.runtime.core.privileged.el.DataWeaveArtifactContext;
+import org.mule.runtime.core.privileged.el.MuleInstanceContext;
+import org.mule.runtime.core.privileged.el.ServerContext;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 import javax.inject.Inject;
 
-public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Disposable {
+public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLanguageAdaptor, Initialisable, Disposable {
 
   public static final String SERVER = "server";
   public static final String MULE = "mule";
   public static final String APP = "app";
 
-  private final ExpressionLanguage expressionExecutor;
+  private ExpressionLanguage expressionExecutor;
   private final MuleContext muleContext;
+  private final Registry registry;
+  private final DefaultExpressionLanguageFactoryService service;
+  private final FeatureFlaggingService featureFlaggingService;
+  private List<BindingContext> globalBindings = new LinkedList<>();
+  private volatile boolean initialised = false;
 
   @Inject
   public DataWeaveExpressionLanguageAdaptor(MuleContext muleContext, Registry registry,
                                             DefaultExpressionLanguageFactoryService service,
                                             FeatureFlaggingService featureFlaggingService) {
-    this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
-        .defaultEncoding(getDefaultEncoding(muleContext))
-        .featureFlaggingService(featureFlaggingService)
-        .appId(muleContext.getConfiguration().getId())
-        .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
-        .build());
     this.muleContext = muleContext;
-    registerGlobalBindings(registry);
+    this.registry = registry;
+    this.service = service;
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
+  @Override
+  public void initialise() throws InitialisationException {
+    if (!initialised) {
+      synchronized (this) {
+        if (!initialised) {
+          this.expressionExecutor = service.create(ExpressionLanguageConfiguration.builder()
+              .defaultEncoding(getDefaultEncoding(muleContext))
+              .featureFlaggingService(featureFlaggingService)
+              .appId(muleContext.getConfiguration().getId())
+              .minMuleVersion(muleContext.getConfiguration().getMinMuleVersion())
+              .build());
+
+          initialised = true;
+
+          registerGlobalBindings(registry);
+        }
+      }
+    }
   }
 
   private void registerGlobalBindings(Registry registry) {
@@ -88,6 +114,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
     addGlobalBindings(contextBuilder instanceof DefaultBindingContextBuilder
         ? ((DefaultBindingContextBuilder) contextBuilder).flattenAndBuild()
         : contextBuilder.build());
+
+    globalBindings.forEach(this::addGlobalBindings);
+    globalBindings = null;
   }
 
 
@@ -98,7 +127,17 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
    */
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
-    expressionExecutor.addGlobalBindings(bindingContext);
+    if (initialised) {
+      expressionExecutor.addGlobalBindings(bindingContext);
+    } else {
+      synchronized (this) {
+        if (initialised) {
+          expressionExecutor.addGlobalBindings(bindingContext);
+        } else {
+          globalBindings.add(bindingContext);
+        }
+      }
+    }
   }
 
   @Override
@@ -251,7 +290,9 @@ public class DataWeaveExpressionLanguageAdaptor implements ExtendedExpressionLan
 
   @Override
   public void dispose() {
-    expressionExecutor.dispose();
+    if (expressionExecutor != null) {
+      expressionExecutor.dispose();
+    }
   }
 
   @Override

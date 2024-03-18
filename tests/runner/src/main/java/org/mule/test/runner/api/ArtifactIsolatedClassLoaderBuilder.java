@@ -1,16 +1,17 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.emptySet;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
 import static org.mule.test.runner.maven.ArtifactFactory.createFromPomFile;
+
+import static java.util.Collections.emptySet;
+import static java.util.Objects.requireNonNull;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.test.runner.classloader.IsolatedClassLoaderFactory;
@@ -49,7 +50,7 @@ public class ArtifactIsolatedClassLoaderBuilder {
   private ClassPathClassifier classPathClassifier;
   private ClassPathUrlProvider classPathUrlProvider;
 
-  private IsolatedClassLoaderFactory isolatedClassLoaderFactory = new IsolatedClassLoaderFactory();
+  private final IsolatedClassLoaderFactory isolatedClassLoaderFactory = new IsolatedClassLoaderFactory();
 
   private Artifact rootArtifact;
   private File pluginResourcesFolder;
@@ -273,9 +274,9 @@ public class ArtifactIsolatedClassLoaderBuilder {
    * @throws {@link NullPointerException} if any of the required attributes is not set to this builder
    */
   public ArtifactClassLoaderHolder build() {
-    checkNotNull(rootArtifact, "rootArtifact has to be set");
-    checkNotNull(classPathUrlProvider, "classPathUrlProvider has to be set");
-    checkNotNull(classPathClassifier, "classPathClassifier has to be set");
+    requireNonNull(rootArtifact, "rootArtifact has to be set");
+    requireNonNull(classPathUrlProvider, "classPathUrlProvider has to be set");
+    requireNonNull(classPathClassifier, "classPathClassifier has to be set");
 
     ClassPathClassifierContext context;
     try {

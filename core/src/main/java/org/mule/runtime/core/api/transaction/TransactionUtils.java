@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,7 +10,9 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_
 import static org.mule.runtime.api.tx.TransactionType.LOCAL;
 import static org.mule.runtime.api.tx.TransactionType.XA;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
+
 import static java.lang.System.currentTimeMillis;
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
@@ -19,7 +21,7 @@ import org.mule.runtime.api.profiling.type.TransactionProfilingEventType;
 import org.mule.runtime.api.profiling.type.context.TransactionProfilingEventContext;
 import org.mule.runtime.api.tx.TransactionType;
 import org.mule.runtime.core.internal.profiling.context.DefaultTransactionProfilingEventContext;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 public final class TransactionUtils {
 
@@ -37,10 +39,14 @@ public final class TransactionUtils {
     if (!isTransactionActive() && !type.equals(TX_START)) {
       return;
     }
-    TransactionAdapter tx = (TransactionAdapter) TransactionCoordination.getInstance().getTransaction();
+    Transaction tx = TransactionCoordination.getInstance().getTransaction();
     TransactionType txType = tx.isXA() ? XA : LOCAL;
-    dataProducer.triggerProfilingEvent(new DefaultTransactionProfilingEventContext(tx.getComponentLocation(), location, txType,
-                                                                                   currentTimeMillis()));
+    dataProducer.triggerProfilingEvent(new DefaultTransactionProfilingEventContext(
+                                                                                   tx instanceof TransactionAdapter
+                                                                                       ? ((TransactionAdapter) tx)
+                                                                                           .getComponentLocation()
+                                                                                       : empty(),
+                                                                                   location, txType, currentTimeMillis()));
   }
 
 }

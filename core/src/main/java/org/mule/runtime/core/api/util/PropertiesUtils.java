@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.util;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 
@@ -110,7 +111,12 @@ public final class PropertiesUtils {
       throw new IOException(error.toString());
     }
 
-    return loadProperties(is);
+    try {
+      return loadProperties(is);
+    } catch (IOException e) {
+      throw new MuleRuntimeException(createStaticMessage("Failed to load resource from fileName: " + fileName + "; callingClass: "
+          + callingClass), e);
+    }
   }
 
   public static Properties loadProperties(URL url) throws IOException {
@@ -119,7 +125,11 @@ public final class PropertiesUtils {
       throw new IOException(error.toString());
     }
 
-    return loadProperties(url.openStream());
+    try {
+      return loadProperties(url.openStream());
+    } catch (IOException e) {
+      throw new MuleRuntimeException(createStaticMessage("Failed to load resource from url: " + url), e);
+    }
   }
 
   /**
@@ -146,7 +156,7 @@ public final class PropertiesUtils {
         in.close();
       }
     } catch (IOException e) {
-      throw new MuleRuntimeException(CoreMessages.createStaticMessage("Failed to load resource: " + fileName), e);
+      throw new MuleRuntimeException(createStaticMessage("Failed to load resource: " + fileName), e);
     }
     return p;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,8 +12,7 @@ import static org.mule.runtime.api.component.Component.Annotations.SOURCE_ELEMEN
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_EAGER_INIT;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_PROTOTYPE;
 import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.IS_SINGLETON;
-import static org.mule.runtime.config.internal.dsl.spring.ObjectFactoryClassRepository.OBJECT_TYPE_CLASS;
-import static org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider.maskPasswords;
+import static org.mule.runtime.core.internal.execution.LocationExecutionContextProvider.maskPasswords;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -45,13 +44,11 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
 
   private final ObjectFactoryClassRepository objectFactoryClassRepository;
   private final boolean disableTrimWhitespaces;
-  private final boolean enableByteBuddy;
 
   public CommonBeanBaseDefinitionCreator(ObjectFactoryClassRepository objectFactoryClassRepository,
-                                         boolean disableTrimWhitespaces, boolean enableByteBuddy) {
+                                         boolean disableTrimWhitespaces) {
     this.objectFactoryClassRepository = objectFactoryClassRepository;
     this.disableTrimWhitespaces = disableTrimWhitespaces;
-    this.enableByteBuddy = enableByteBuddy;
   }
 
   @Override
@@ -125,13 +122,6 @@ abstract class CommonBeanBaseDefinitionCreator<R extends CreateBeanDefinitionReq
   private BeanDefinitionBuilder createBeanDefinitionBuilderFromObjectFactory(final SpringComponentModel componentModel,
                                                                              final ComponentBuildingDefinition componentBuildingDefinition) {
     Class<?> objectFactoryType = componentBuildingDefinition.getObjectFactoryType();
-
-    if (!enableByteBuddy) {
-      return rootBeanDefinition(objectFactoryClassRepository
-          .getObjectFactoryDynamicClass(componentBuildingDefinition,
-                                        objectFactoryType, componentModel.getType(),
-                                        new LazyValue<>(() -> componentModel.getBeanDefinition().isLazyInit())));
-    }
 
     return rootBeanDefinition(objectFactoryClassRepository
         .getObjectFactoryClass(objectFactoryType, componentModel.getType()))

@@ -4,13 +4,14 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-properties-config</artifactId>
     <packaging>jar</packaging>
     <name>Properties Config</name>
     
     <properties>
+        <javaModuleName>org.mule.runtime.properties.config</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 

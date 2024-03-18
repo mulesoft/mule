@@ -1,29 +1,37 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.repository.internal;
 
-import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
+import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
+import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigurationBuilder;
+import static org.mule.maven.client.api.model.RemoteRepository.newRemoteRepositoryBuilder;
+import static org.mule.runtime.core.internal.util.MuleContainerUtils.getMuleLibDir;
+
+import org.mule.maven.client.api.MavenClient;
+import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.maven.client.api.model.RemoteRepository;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.repository.api.RepositoryService;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RepositoryServiceFactory {
 
   /**
-   * System property key to specify a custom repository folder. By default the container will use $MULE_HOME/lib/repository
+   * System property key to specify a custom repository folder. By default, the container will use
+   * {@code $MULE_HOME/lib/repository}
    */
   public static final String MULE_REPOSITORY_FOLDER_PROPERTY = "mule.repository.folder";
 
@@ -36,18 +44,27 @@ public class RepositoryServiceFactory {
   public static final String MULE_REMOTE_REPOSITORIES_PROPERTY = "mule.repository.repositories";
 
   private static final String REPOSITORY_FOLDER = "repository";
-  private static final String DEFAULT_REPOSITORY_TYPE = "default";
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultRepositoryService.class);
+  private static final Logger logger = LoggerFactory.getLogger(RepositoryServiceFactory.class);
 
   public RepositoryService createRepositoryService() {
-    RepositorySystem repositorySystem = new SpiRepositorySystemFactory().createRepositorySystem();
     File repositoryFolder = createRepositoryFolderIfDoesNotExists();
     List<RemoteRepository> remoteRepositories = collectRemoteRepositories();
-    DefaultRepositorySystemSession repositorySystemSession = new DefaultRepositorySystemSession();
-    repositorySystemSession.setLocalRepositoryManager(repositorySystem
-        .newLocalRepositoryManager(repositorySystemSession, new LocalRepository(repositoryFolder)));
-    return new DefaultRepositoryService(repositorySystem, repositorySystemSession, remoteRepositories);
+
+    MavenClientProvider mavenClientProvider = discoverProvider(RepositoryServiceFactory.class.getClassLoader());
+    MavenClient mavenClient = mavenClientProvider
+        .createMavenClient(getMavenConfiguration(repositoryFolder, remoteRepositories));
+
+    return new DefaultRepositoryService(mavenClient);
+  }
+
+  private MavenConfiguration getMavenConfiguration(File localRepositoryFolder, List<RemoteRepository> remoteRepositories) {
+    final MavenConfiguration.MavenConfigurationBuilder mavenConfigurationBuilder = newMavenConfigurationBuilder()
+        .localMavenRepositoryLocation(localRepositoryFolder);
+
+    remoteRepositories.forEach(mavenConfigurationBuilder::remoteRepository);
+
+    return mavenConfigurationBuilder.build();
   }
 
   private List<RemoteRepository> collectRemoteRepositories() {
@@ -55,8 +72,12 @@ public class RepositoryServiceFactory {
     List<RemoteRepository> remoteRepositories = new ArrayList<>();
     for (String remoteRepository : remoteRepositoriesArray) {
       if (!remoteRepository.trim().equals("")) {
-        remoteRepositories
-            .add(new RemoteRepository.Builder(remoteRepository, DEFAULT_REPOSITORY_TYPE, remoteRepository.trim()).build());
+        try {
+          remoteRepositories
+              .add(newRemoteRepositoryBuilder().id(remoteRepository).url(new URL(remoteRepository.trim())).build());
+        } catch (MalformedURLException e) {
+          throw new MuleRuntimeException(e);
+        }
       }
     }
     return remoteRepositories;
@@ -80,7 +101,7 @@ public class RepositoryServiceFactory {
     if (userDefinedDependenciesFolder != null) {
       repositoryFolder = new File(userDefinedDependenciesFolder);
     } else {
-      repositoryFolder = new File(MuleContainerBootstrapUtils.getMuleLibDir(), REPOSITORY_FOLDER);
+      repositoryFolder = new File(getMuleLibDir(), REPOSITORY_FOLDER);
     }
     if (logger.isDebugEnabled()) {
       logger.debug("Using dependencies folder " + repositoryFolder.getAbsolutePath());

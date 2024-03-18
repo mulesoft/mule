@@ -1,24 +1,24 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.config.internal.context.service;
 
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
 import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.deepEquals;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.service.Service;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
-import org.mule.runtime.core.internal.config.preferred.PreferredObjectSelector;
-import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
-import org.mule.runtime.core.internal.util.MethodInvoker;
+import org.mule.runtime.module.service.internal.manager.DefaultMethodInvoker;
+import org.mule.runtime.module.service.internal.manager.MethodInvoker;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -96,7 +96,7 @@ public class InjectParamsFromContextServiceMethodInvoker extends DefaultMethodIn
                                                                               target.toString())));
       } else {
         final Collection<?> lookupObjects = lookupAllByTypeCache.get(parameter.getType());
-        arg = new PreferredObjectSelector().select(lookupObjects.iterator());
+        arg = lookupObjects.iterator().next();
       }
       augmentedArgs.add(arg);
     }

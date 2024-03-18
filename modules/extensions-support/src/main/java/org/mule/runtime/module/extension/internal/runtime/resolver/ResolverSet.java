@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult.newBuilder;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.ResolverUtils.resolveRecursively;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Initialisable;
@@ -101,13 +102,30 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
    */
   @Override
   public ResolverSetResult resolve(ValueResolvingContext context) throws MuleException {
-    ResolverSetResult.Builder builder = getResolverSetBuilder();
+    ResolverSetResult.Builder builder = newBuilder();
 
+    final boolean acceptsNullValues = context.acceptsNullValues();
     for (Map.Entry<String, ValueResolver<?>> entry : resolvers.entrySet()) {
-      builder.add(entry.getKey(), resolveRecursively(entry.getValue(), context));
+      Object value = resolve(entry, context);
+      if (value != null || acceptsNullValues) {
+        builder.add(entry.getKey(), value);
+      }
     }
 
     return builder.build();
+  }
+
+  /**
+   * Resolves the value for one of the {@link ValueResolver} entries of this {@link ResolverSet}.
+   * 
+   * @param entry                 A {@link ValueResolver} entry.
+   * @param valueResolvingContext {@link ValueResolvingContext} that will be used to resolve the value.
+   * @return The resolved value.
+   * @throws MuleException If the resolution fails.
+   */
+  protected Object resolve(Map.Entry<String, ValueResolver<?>> entry, ValueResolvingContext valueResolvingContext)
+      throws MuleException {
+    return resolveRecursively(entry.getValue(), valueResolvingContext);
   }
 
   /**
@@ -134,9 +152,4 @@ public class ResolverSet implements ValueResolver<ResolverSetResult>, Initialisa
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(resolvers.values(), muleContext);
   }
-
-  ResolverSetResult.Builder getResolverSetBuilder() {
-    return ResolverSetResult.newBuilder();
-  }
-
 }

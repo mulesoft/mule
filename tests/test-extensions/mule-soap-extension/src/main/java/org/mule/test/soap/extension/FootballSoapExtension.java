@@ -1,12 +1,17 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.soap.extension;
 
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_11;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_17;
+import static org.mule.sdk.api.meta.JavaVersion.JAVA_8;
+
 import static java.util.Collections.emptyList;
+
 import org.mule.runtime.extension.api.annotation.Alias;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.param.Optional;
@@ -15,6 +20,7 @@ import org.mule.runtime.extension.api.connectivity.NoConnectivityTest;
 import org.mule.runtime.extension.api.soap.SoapServiceProvider;
 import org.mule.runtime.extension.api.soap.WebServiceDefinition;
 import org.mule.runtime.extension.api.soap.annotation.Soap;
+import org.mule.sdk.api.annotation.JavaVersionSupport;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +28,7 @@ import java.util.List;
 @Alias("base")
 @Soap({LaLigaServiceProvider.class, CalcioServiceProvider.class})
 @Extension(name = "soap")
+@JavaVersionSupport({JAVA_8, JAVA_11, JAVA_17})
 public class FootballSoapExtension implements SoapServiceProvider, NoConnectivityTest {
 
   public static final String LEAGUES_ID = "leagues";

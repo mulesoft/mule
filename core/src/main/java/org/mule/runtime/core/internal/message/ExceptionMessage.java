@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -39,9 +39,9 @@ public final class ExceptionMessage implements Serializable {
   private transient Throwable exception;
 
   protected Map<String, Object> properties;
-  private String componentName;
+  private final String componentName;
   private String connectorName;
-  private Date timeStamp;
+  private final Date timeStamp;
 
   public ExceptionMessage(CoreEvent event, Throwable exception, String componentName, String connectorName) {
     this.payload = event.getMessage().getPayload().getValue();
@@ -51,11 +51,6 @@ public final class ExceptionMessage implements Serializable {
     this.componentName = componentName;
     if (connectorName != null) {
       this.connectorName = connectorName.toString();
-    }
-
-    for (Object element : ((InternalMessage) event.getMessage()).getOutboundPropertyNames()) {
-      String propertyKey = (String) element;
-      setProperty(propertyKey, ((InternalMessage) event.getMessage()).getOutboundProperty(propertyKey));
     }
   }
 
@@ -115,23 +110,6 @@ public final class ExceptionMessage implements Serializable {
    */
   public void clearProperties() {
     properties.clear();
-  }
-
-  /**
-   * Returns a map of all properties on this message
-   *
-   * @return a map of all properties on this message
-   */
-  public Map getProperties() {
-    return properties;
-  }
-
-  public void setProperty(String key, Object value) {
-    properties.put(key, value);
-  }
-
-  public Object getProperty(String key) {
-    return properties.get(key);
   }
 
   public String getComponentName() {

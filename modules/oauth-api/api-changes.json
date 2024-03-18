@@ -1,4 +1,536 @@
 {
+  "4.5.0": {
+    "revapi": {
+      "_comment": "TODO W-13186030 Review these changes",
+      "ignore": [
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.AuthorizationCodeOAuthDancer",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.AuthorizationCodeOAuthDancer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.AuthorizationCodeRequest",
+          "classSimpleName": "AuthorizationCodeRequest",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.AuthorizationCodeRequest",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.ClientCredentialsOAuthDancer",
+          "classSimpleName": "ClientCredentialsOAuthDancer",
+          "package": "org.mule.oauth.client.api",
+          "classQualifiedName": "org.mule.oauth.client.api.ClientCredentialsOAuthDancer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext",
+          "classSimpleName": "AuthorizationCodeDanceCallbackContext",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "enum org.mule.oauth.client.api.builder.ClientCredentialsLocation",
+          "classSimpleName": "ClientCredentialsLocation",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.ClientCredentialsLocation",
+          "elementKind": "enum",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder",
+          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthClientCredentialsDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.builder.OAuthDancerBuilder<D>",
+          "classSimpleName": "OAuthDancerBuilder",
+          "package": "org.mule.oauth.client.api.builder",
+          "classQualifiedName": "org.mule.oauth.client.api.builder.OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.oauth.client.api.exception.RequestAuthenticationException",
+          "classSimpleName": "RequestAuthenticationException",
+          "package": "org.mule.oauth.client.api.exception",
+          "classQualifiedName": "org.mule.oauth.client.api.exception.RequestAuthenticationException",
+          "elementKind": "class",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "package": "org.mule.oauth.client.api.listener",
+          "classQualifiedName": "org.mule.oauth.client.api.listener.AuthorizationCodeListener",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.listener.ClientCredentialsListener",
+          "classSimpleName": "ClientCredentialsListener",
+          "package": "org.mule.oauth.client.api.listener",
+          "classQualifiedName": "org.mule.oauth.client.api.listener.ClientCredentialsListener",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "enum org.mule.oauth.client.api.state.DancerState",
+          "classSimpleName": "DancerState",
+          "package": "org.mule.oauth.client.api.state",
+          "classQualifiedName": "org.mule.oauth.client.api.state.DancerState",
+          "elementKind": "enum",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "package": "org.mule.oauth.client.api.state",
+          "classQualifiedName": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classQualifiedName": "org.mule.runtime.oauth.api.builder.OAuthDancerBuilder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.AuthorizationCodeListener::onAuthorizationCompleted(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.oauth.client.api.listener.AuthorizationCodeListener::onAuthorizationCompleted(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===) @ org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classQualifiedName": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "methodName": "onAuthorizationCompleted",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.AuthorizationCodeListener::onTokenRefreshed(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.oauth.client.api.listener.AuthorizationCodeListener::onTokenRefreshed(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===) @ org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classQualifiedName": "org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "methodName": "onTokenRefreshed",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext::setDancerState(===org.mule.runtime.oauth.api.state.DancerState===)",
+          "new": "parameter void org.mule.oauth.client.api.state.ResourceOwnerOAuthContext::setDancerState(===org.mule.oauth.client.api.state.DancerState===) @ org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "parameterIndex": "0",
+          "oldType": "org.mule.runtime.oauth.api.state.DancerState",
+          "newType": "org.mule.oauth.client.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classQualifiedName": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "methodName": "setDancerState",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer",
+          "classSimpleName": "AuthorizationCodeOAuthDancer",
+          "exampleUseChainInNewApi": "interface org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer is part of the API",
+          "package": "org.mule.runtime.oauth.api",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer",
+          "classSimpleName": "ClientCredentialsOAuthDancer",
+          "exampleUseChainInNewApi": "interface org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer is part of the API",
+          "package": "org.mule.runtime.oauth.api",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext org.mule.runtime.oauth.api.PlatformManagedOAuthDancer::getContext()",
+          "new": "method org.mule.oauth.client.api.state.ResourceOwnerOAuthContext org.mule.runtime.oauth.api.PlatformManagedOAuthDancer::getContext()",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api",
+          "classSimpleName": "PlatformManagedOAuthDancer",
+          "methodName": "getContext",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.oauth.api.builder.AuthorizationCodeListener",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "AuthorizationCodeListener",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.oauth.api.builder.ClientCredentialsListener",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "ClientCredentialsListener",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "enum org.mule.runtime.oauth.api.builder.ClientCredentialsLocation",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "ClientCredentialsLocation",
+          "elementKind": "enum",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::afterDanceCallback(===java.util.function.BiConsumer<org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext, org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext>===)",
+          "new": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::afterDanceCallback(===java.util.function.BiConsumer<org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext, org.mule.oauth.client.api.state.ResourceOwnerOAuthContext>===)",
+          "oldType": "java.util.function.BiConsumer<org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext, org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext>",
+          "newType": "java.util.function.BiConsumer<org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext, org.mule.oauth.client.api.state.ResourceOwnerOAuthContext>",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "afterDanceCallback",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::beforeDanceCallback(===java.util.function.Function<org.mule.runtime.oauth.api.AuthorizationCodeRequest, org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext>===)",
+          "new": "parameter org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::beforeDanceCallback(===java.util.function.Function<org.mule.oauth.client.api.AuthorizationCodeRequest, org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext>===)",
+          "oldType": "java.util.function.Function<org.mule.runtime.oauth.api.AuthorizationCodeRequest, org.mule.runtime.oauth.api.builder.AuthorizationCodeDanceCallbackContext>",
+          "newType": "java.util.function.Function<org.mule.oauth.client.api.AuthorizationCodeRequest, org.mule.oauth.client.api.builder.AuthorizationCodeDanceCallbackContext>",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "beforeDanceCallback",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "encodeClientCredentialsInBody",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder::encodeClientCredentialsInBody(boolean)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "methodName": "encodeClientCredentialsInBody",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthAuthorizationCodeDancerBuilder",
+          "interface": "org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer>",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthAuthorizationCodeDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthClientCredentialsDancerBuilder",
+          "interface": "org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.runtime.oauth.api.ClientCredentialsOAuthDancer>",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthClientCredentialsDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::name(java.lang.String)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::name(java.lang.String)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "name",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::name(java.lang.String)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::name(java.lang.String)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "name",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.api.tls.TlsContextFactory, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.api.tls.TlsContextFactory, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "tokenUrl",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.api.tls.TlsContextFactory, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.api.tls.TlsContextFactory, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "tokenUrl",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "tokenUrl",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::tokenUrl(java.lang.String, org.mule.runtime.http.api.client.proxy.ProxyConfig)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "tokenUrl",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(===org.mule.runtime.oauth.api.builder.ClientCredentialsLocation===)",
+          "new": "parameter org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(===org.mule.oauth.client.api.builder.ClientCredentialsLocation===)",
+          "oldType": "org.mule.runtime.oauth.api.builder.ClientCredentialsLocation",
+          "newType": "org.mule.oauth.client.api.builder.ClientCredentialsLocation",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "withClientCredentialsIn",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.noLongerDefault",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(org.mule.runtime.oauth.api.builder.ClientCredentialsLocation)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(org.mule.oauth.client.api.builder.ClientCredentialsLocation)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "withClientCredentialsIn",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.nowAbstract",
+          "old": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(org.mule.runtime.oauth.api.builder.ClientCredentialsLocation)",
+          "new": "method org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D> org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D>::withClientCredentialsIn(org.mule.oauth.client.api.builder.ClientCredentialsLocation)",
+          "oldModifiers": "public default",
+          "newModifiers": "public abstract",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "methodName": "withClientCredentialsIn",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthPlatformManagedDancerBuilder",
+          "interface": "org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<org.mule.runtime.oauth.api.PlatformManagedOAuthDancer>",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthPlatformManagedDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "new": "interface org.mule.runtime.oauth.api.listener.AuthorizationCodeListener",
+          "interface": "org.mule.runtime.oauth.api.listener.OAuthStateListener",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classSimpleName": "AuthorizationCodeListener",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method void org.mule.runtime.oauth.api.listener.ClientCredentialsListener::onTokenRefreshed(org.mule.oauth.client.api.state.ResourceOwnerOAuthContext)",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classSimpleName": "ClientCredentialsListener",
+          "methodName": "onTokenRefreshed",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener::onAccessToken(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener::onAccessToken(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===)",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classSimpleName": "PlatformManagedOAuthStateListener",
+          "methodName": "onAccessToken",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener::onTokenRefreshed(===org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext===)",
+          "new": "parameter void org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener::onTokenRefreshed(===org.mule.oauth.client.api.state.ResourceOwnerOAuthContext===)",
+          "oldType": "org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "newType": "org.mule.oauth.client.api.state.ResourceOwnerOAuthContext",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classSimpleName": "PlatformManagedOAuthStateListener",
+          "methodName": "onTokenRefreshed",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.noLongerImplementsInterface",
+          "old": "interface org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener",
+          "new": "interface org.mule.runtime.oauth.api.listener.PlatformManagedOAuthStateListener",
+          "interface": "org.mule.runtime.oauth.api.listener.OAuthStateListener",
+          "package": "org.mule.runtime.oauth.api.listener",
+          "classSimpleName": "PlatformManagedOAuthStateListener",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "enum org.mule.runtime.oauth.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DancerState",
+          "elementKind": "enum",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.oauth.api.state.DancerState org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::getDancerState()",
+          "new": "method org.mule.oauth.client.api.state.DancerState org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::getDancerState()",
+          "oldType": "org.mule.runtime.oauth.api.state.DancerState",
+          "newType": "org.mule.oauth.client.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DefaultResourceOwnerOAuthContext",
+          "methodName": "getDancerState",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.parameterTypeChanged",
+          "old": "parameter void org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::setDancerState(===org.mule.runtime.oauth.api.state.DancerState===)",
+          "new": "parameter void org.mule.runtime.oauth.api.state.DefaultResourceOwnerOAuthContext::setDancerState(===org.mule.oauth.client.api.state.DancerState===)",
+          "oldType": "org.mule.runtime.oauth.api.state.DancerState",
+          "newType": "org.mule.oauth.client.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "DefaultResourceOwnerOAuthContext",
+          "methodName": "setDancerState",
+          "parameterIndex": "0",
+          "elementKind": "parameter",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.method.returnTypeChanged",
+          "old": "method org.mule.runtime.oauth.api.state.DancerState org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext::getDancerState()",
+          "new": "method org.mule.oauth.client.api.state.DancerState org.mule.oauth.client.api.state.ResourceOwnerOAuthContext::getDancerState() @ org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext",
+          "oldType": "org.mule.runtime.oauth.api.state.DancerState",
+          "newType": "org.mule.oauth.client.api.state.DancerState",
+          "package": "org.mule.runtime.oauth.api.state",
+          "classSimpleName": "ResourceOwnerOAuthContext",
+          "methodName": "getDancerState",
+          "elementKind": "method",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        },
+        {
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D extends java.lang.Object>",
+          "new": "interface org.mule.runtime.oauth.api.builder.OAuthDancerBuilder<D extends java.lang.Object>",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.runtime.oauth.api.builder",
+          "classSimpleName": "OAuthDancerBuilder",
+          "elementKind": "interface",
+          "justification": "W-13167592: Fixed split package betwen service and client"
+        }
+      ]
+    }
+  },
   "4.3.0": {
     "revapi": {
       "ignore": [

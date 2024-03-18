@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,7 +9,7 @@ package org.mule.runtime.core.internal.profiling.consumer;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.SCHEDULING_TASK_EXECUTION;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.STARTING_TASK_EXECUTION;
@@ -166,7 +166,7 @@ public class TaskSchedulingLoggerDataConsumerTestCase extends AbstractMuleContex
     ProfilingDataProducer<TaskSchedulingProfilingEventContext, ?> dataProducer =
         profilingService.getProfilingDataProducer(profilingEventType);
     dataProducer.triggerProfilingEvent(profilingEventContext);
-    verifyZeroInteractions(logger);
+    verifyNoInteractions(logger);
   }
 
   private String jsonToLog(ProfilingEventType<TaskSchedulingProfilingEventContext> profilingEventType,

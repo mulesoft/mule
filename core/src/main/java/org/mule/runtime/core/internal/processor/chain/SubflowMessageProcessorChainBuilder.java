@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -24,12 +24,10 @@ import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.NullExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
-
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +49,7 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   private final Object rootContainerLocationInitLock = new Object();
   private volatile Location rootContainerLocation;
 
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   @Override
   public Object getAnnotation(QName qName) {
@@ -92,11 +90,11 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
   @Override
   protected MessageProcessorChain createSimpleChain(List<Processor> processors,
                                                     Optional<ProcessingStrategy> processingStrategyOptional) {
-    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, initialSpanInfoProvider);
+    return new SubFlowMessageProcessorChain(name, processors, processingStrategyOptional, componentTracerFactory, this);
   }
 
-  public void withInitialSpanInfoProvider(InitialSpanInfoProvider initialSpanInfoProvider) {
-    this.initialSpanInfoProvider = initialSpanInfoProvider;
+  public void withComponentTracerFactory(ComponentTracerFactory componentTracerFactory) {
+    this.componentTracerFactory = componentTracerFactory;
   }
 
   /**
@@ -111,12 +109,13 @@ public class SubflowMessageProcessorChainBuilder extends DefaultMessageProcessor
 
     SubFlowMessageProcessorChain(String name, List<Processor> processors,
                                  Optional<ProcessingStrategy> processingStrategyOptional,
-                                 InitialSpanInfoProvider initialSpanInfoProvider) {
+                                 ComponentTracerFactory componentTracerFactory,
+                                 SubflowMessageProcessorChainBuilder builder) {
       super(name, processingStrategyOptional, processors,
             NullExceptionHandler.getInstance());
       this.subFlowName = name;
-      this.setInitialSpanInfo(initialSpanInfoProvider
-          .getInitialSpanInfo(this, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
+
+      this.setComponentTracer(componentTracerFactory.fromComponent(builder, SUB_FLOW_MESSAGE_PROCESSOR_SPAN_NAME, ""));
     }
 
     private void pushSubFlowFlowStackElement(CoreEvent event) {

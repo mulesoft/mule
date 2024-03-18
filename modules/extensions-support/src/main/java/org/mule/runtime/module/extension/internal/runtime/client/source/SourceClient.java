@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -33,7 +33,6 @@ import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -41,7 +40,7 @@ import org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.util.MessagingExceptionResolver;
+import org.mule.runtime.core.internal.exception.MessagingExceptionResolver;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.client.ExtensionsClient;
@@ -64,7 +63,7 @@ import org.slf4j.Logger;
 /**
  * {@link ExtensionsClient} delegate class for creating and operating message sources
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class SourceClient<T, A> implements Lifecycle {
 
@@ -80,7 +79,6 @@ public class SourceClient<T, A> implements Lifecycle {
   private final ReflectionCache reflectionCache;
   private final ExpressionManager expressionManager;
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final MuleContext muleContext;
   private final ClassLoader extensionClassloader;
 
@@ -98,7 +96,6 @@ public class SourceClient<T, A> implements Lifecycle {
                       ReflectionCache reflectionCache,
                       ExpressionManager expressionManager,
                       NotificationDispatcher notificationDispatcher,
-                      SingleResourceTransactionFactoryManager transactionFactoryManager,
                       MuleContext muleContext) {
     this.extensionModel = extensionModel;
     this.sourceModel = sourceModel;
@@ -110,7 +107,6 @@ public class SourceClient<T, A> implements Lifecycle {
     this.reflectionCache = reflectionCache;
     this.expressionManager = expressionManager;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.muleContext = muleContext;
 
     extensionClassloader = getClassLoader(extensionModel);
@@ -138,7 +134,6 @@ public class SourceClient<T, A> implements Lifecycle {
                                         backPressureStrategy,
                                         extensionManager,
                                         notificationDispatcher,
-                                        transactionFactoryManager,
                                         "");
 
     source.setAnnotations(SmallMap.of(LOCATION_KEY, DefaultComponentLocation.from(sourceModel.getName())));

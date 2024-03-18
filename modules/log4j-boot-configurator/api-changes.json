@@ -1,0 +1,100 @@
+{
+  "4.7.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "class org.apache.logging.log4j.Level",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.LogBuilder",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.Logger",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.Marker",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.message.EntryMessage",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.message.ExitMessage",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.message.FlowMessageFactory",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.message.Message",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.message.MessageFactory",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.spi.ExtendedLogger",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.spi.LoggerContext",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "class org.apache.logging.log4j.spi.LoggerRegistry<T extends org.apache.logging.log4j.spi.ExtendedLogger>",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "enum org.apache.logging.log4j.spi.StandardLevel",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.util.MessageSupplier",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.apache.logging.log4j.util.Supplier<T>",
+	        "justification": "W-13829806: log4j is an API bor configuring the logging infrastructure"
+	      }
+	    ]
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,9 +10,11 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getAppDataFolder;
 import static org.mule.runtime.core.api.config.FeatureFlaggingRegistry.getInstance;
+import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_CONTAINER_FEATURE_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.MULE_MEMORY_MANAGEMENT_SERVICE;
 import static org.mule.runtime.core.api.config.MuleProperties.SERVER_NOTIFICATION_MANAGER;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider.artifactDescriptorFactoryProvider;
 import static org.mule.runtime.deployment.model.api.builder.DeployableArtifactClassLoaderFactoryProvider.domainClassLoaderFactory;
@@ -23,6 +25,7 @@ import static org.mule.runtime.module.license.api.LicenseValidatorProvider.disco
 import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderFactory;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
@@ -33,12 +36,10 @@ import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.artifact.activation.internal.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.container.api.ModuleRepository;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lock.ServerLockFactory;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
@@ -53,7 +54,6 @@ import org.mule.runtime.deployment.model.api.builder.RegionPluginClassLoadersFac
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
 import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.deployment.model.internal.DefaultRegionPluginClassLoadersFactory;
-import org.mule.runtime.deployment.model.internal.artifact.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.deployment.model.internal.policy.PolicyTemplateClassLoaderFactory;
 import org.mule.runtime.internal.memory.management.ArtifactMemoryManagementService;
 import org.mule.runtime.internal.memory.management.DefaultMemoryManagementService;
@@ -73,12 +73,16 @@ import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorValidatorBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationLoader;
+import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepository;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
+import org.mule.runtime.module.artifact.internal.util.ServiceRegistryDescriptorLoaderRepository;
 import org.mule.runtime.module.deployment.impl.internal.application.ApplicationDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.AbstractDeployableDescriptorFactory;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultArtifactDescriptorFactoryProvider;
 import org.mule.runtime.module.deployment.impl.internal.artifact.DefaultClassLoaderManager;
+import org.mule.runtime.module.deployment.impl.internal.classloader.TrackingArtifactClassLoaderResolverDecorator;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainManager;
 import org.mule.runtime.module.deployment.impl.internal.domain.DomainDescriptorFactory;
@@ -93,6 +97,10 @@ import org.mule.runtime.module.service.internal.discoverer.DefaultServiceDiscove
 import org.mule.runtime.module.service.internal.discoverer.FileSystemServiceProviderDiscoverer;
 import org.mule.runtime.module.service.internal.discoverer.ReflectionServiceResolver;
 import org.mule.runtime.module.service.internal.manager.DefaultServiceRegistry;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Registry of mule artifact resources required to construct new artifacts.
@@ -123,6 +131,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private ProfiledMemoryManagementService memoryManagementService = DefaultMemoryManagementService.getInstance();
   private final ProfilingService containerProfilingService;
   private final ServerNotificationManager serverNotificationManager;
+  private final LicenseValidator licenseValidator;
 
 
   /**
@@ -133,6 +142,10 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     private ModuleRepository moduleRepository;
     private ArtifactConfigurationProcessor artifactConfigurationProcessor;
     private ProfiledMemoryManagementService memoryManagementService;
+    private final Set<String> bootPackages = new HashSet<>();
+    private final Set<String> additionalResourceDirectories = new HashSet<>();
+    private Consumer<ClassLoader> actionOnMuleArtifactDeployment = cl -> {
+    };
 
     /**
      * Configures the {@link ModuleRepository} to use
@@ -175,6 +188,31 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       return this;
     }
 
+    public Builder withBootPackage(String pkg) {
+      this.bootPackages.add(pkg);
+      return this;
+    }
+
+    public Builder withAdditionalResourceDirectory(String resourceDirectory) {
+      this.additionalResourceDirectories.add(resourceDirectory);
+      return this;
+    }
+
+    /**
+     * An action to perform on the classloader when the artifact is deployed.
+     *
+     * @since 4.7.0
+     *
+     * @param actionOnMuleArtifactDeployment the action to be performed.
+     * @return the current builder.
+     * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
+     */
+    public Builder withActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+      requireNonNull(actionOnMuleArtifactDeployment);
+      this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
+      return this;
+    }
+
     /**
      * Builds the desired instance
      *
@@ -185,17 +223,25 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
       if (moduleRepository == null) {
         moduleRepository = MODULE_REPOSITORY;
         containerClassLoader = CONTAINER_CLASS_LOADER;
-      } else {
+      } else if (bootPackages.isEmpty() && additionalResourceDirectories.isEmpty()) {
         containerClassLoader = createContainerClassLoader(moduleRepository);
+      } else {
+        containerClassLoader = createContainerClassLoader(moduleRepository, bootPackages, additionalResourceDirectories);
       }
 
       try {
         return new MuleArtifactResourcesRegistry(containerClassLoader, moduleRepository, artifactConfigurationProcessor,
-                                                 memoryManagementService);
+                                                 memoryManagementService, actionOnMuleArtifactDeployment);
       } catch (RegistrationException e) {
         throw new MuleRuntimeException(e);
       }
     }
+  }
+
+  @Override
+  protected void doDispose() {
+    disposeIfNeeded(licenseValidator, logger);
+    super.doDispose();
   }
 
   /**
@@ -204,10 +250,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
   private MuleArtifactResourcesRegistry(ArtifactClassLoader containerClassLoader,
                                         ModuleRepository moduleRepository,
                                         ArtifactConfigurationProcessor artifactConfigurationProcessor,
-                                        ProfiledMemoryManagementService memoryManagementService)
+                                        ProfiledMemoryManagementService memoryManagementService,
+                                        Consumer<ClassLoader> actionOnMuleArtifactDeployment)
       throws RegistrationException {
     // Creates a registry to be used as an injector.
-    super(null, null);
+    super(null);
 
     // A "container level" notification server is created and registered in order to be injectable
     serverNotificationManager = ServerNotificationManager
@@ -234,7 +281,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
 
     this.containerClassLoader = containerClassLoader;
     artifactClassLoaderManager = new DefaultClassLoaderManager();
-    LicenseValidator licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
+    licenseValidator = discoverLicenseValidator(currentThread().getContextClassLoader());
 
     domainManager = new DefaultDomainManager();
     this.domainClassLoaderFactory =
@@ -245,18 +292,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
             .createArtifactPluginDescriptorFactory(new DescriptorLoaderRepositoryFactory().createDescriptorLoaderRepository(),
                                                    ArtifactDescriptorValidatorBuilder.builder());
     artifactPluginDescriptorLoader = new ArtifactPluginDescriptorLoader(artifactPluginDescriptorFactory);
-    descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository(new SpiServiceRegistry());
+    descriptorLoaderRepository = new ServiceRegistryDescriptorLoaderRepository();
 
     ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder = ArtifactDescriptorValidatorBuilder.builder();
 
     domainDescriptorFactory = new DomainDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                                           artifactDescriptorValidatorBuilder);
-    ApplicationDescriptorFactory applicationDescriptorFactory =
-        new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
-                                         artifactDescriptorValidatorBuilder);
     DeployableArtifactDescriptorFactory deployableArtifactDescriptorFactory =
         DeployableArtifactDescriptorFactory.defaultArtifactDescriptorFactory();
-
 
     ArtifactClassLoaderResolver artifactClassLoaderResolver =
         new TrackingArtifactClassLoaderResolverDecorator(artifactClassLoaderManager,
@@ -276,9 +319,11 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                                                                    trackArtifactClassLoaderFactory(serviceClassLoaderFactory),
                                                                                                    descriptorLoaderRepository,
                                                                                                    artifactDescriptorValidatorBuilder),
-                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(), this)));
+                                                           new ReflectionServiceResolver(new DefaultServiceRegistry(),
+                                                                                         this,
+                                                                                         (service, assembly) -> service)));
 
-    extensionModelLoaderRepository = getExtensionModelLoaderManager(containerClassLoader.getClassLoader());
+    extensionModelLoaderRepository = getExtensionModelLoaderManager();
 
     pluginDependenciesResolver =
         new DefaultArtifactDescriptorFactoryProvider().createBundlePluginDependenciesResolver(artifactPluginDescriptorFactory);
@@ -304,7 +349,8 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
                                                        licenseValidator,
                                                        runtimeLockFactory,
                                                        this.memoryManagementService,
-                                                       artifactConfigurationProcessor);
+                                                       artifactConfigurationProcessor,
+                                                       actionOnMuleArtifactDeployment);
     toolingApplicationDescriptorFactory =
         new ApplicationDescriptorFactory(artifactPluginDescriptorLoader, descriptorLoaderRepository,
                                          artifactDescriptorValidatorBuilder);
@@ -316,7 +362,7 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
     configureEnableProfilingService();
 
     return new FeatureFlaggingServiceBuilder()
-        .withContext(new FeatureContext(new MuleVersion("4.6.0-SNAPSHOT"), CONTAINER_FEATURE_CONTEXT_NAME))
+        .withContext(new FeatureContext(new MuleVersion(getProductVersion()), CONTAINER_FEATURE_CONTEXT_NAME))
         .withMuleContextFlags(ffRegistry.getFeatureConfigurations())
         .withFeatureContextFlags(ffRegistry.getFeatureFlagConfigurations())
         .build();
@@ -441,6 +487,14 @@ public class MuleArtifactResourcesRegistry extends SimpleRegistry {
    */
   public ProfilingService getContainerProfilingService() {
     return containerProfilingService;
+  }
+
+  /**
+   * @return a {@link DescriptorLoaderRepository} that detects available implementations of
+   *         {@link ClassLoaderConfigurationLoader}.
+   */
+  public DescriptorLoaderRepository getDescriptorLoaderRepository() {
+    return descriptorLoaderRepository;
   }
 
   private SchedulerService getSchedulerService() {

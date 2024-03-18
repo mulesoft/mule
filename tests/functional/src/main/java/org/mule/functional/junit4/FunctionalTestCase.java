@@ -1,20 +1,22 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.functional.junit4;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singleton;
-import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.util.MuleSystemProperties.PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY;
 import static org.mule.runtime.container.api.ContainerClassLoaderProvider.createContainerClassLoader;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.internal.retry.ReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
+import static org.mule.runtime.core.internal.retry.DefaultReconnectionConfig.DISABLE_ASYNC_RETRY_POLICY_ON_SOURCES;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.createDefaultExtensionManager;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
+
+import static org.mockito.Mockito.mock;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.functional.api.flow.FlowRunner;
 import org.mule.runtime.api.artifact.Registry;
@@ -47,6 +49,8 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+
 import org.junit.After;
 import org.junit.Rule;
 
@@ -58,14 +62,15 @@ import org.junit.Rule;
  */
 public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
 
+  // Initialize this here statically so that the first initalization of the logging system does not count in the time alloted for
+  // the tests to run.
+  public static final Logger LOGGER = getLogger(FunctionalTestCase.class);
+
   /**
    * The executionClassLoader used to run this test. It will be created per class or per method depending on
    * {@link #disposeContextPerClass}.
    */
   private static ArtifactClassLoader executionClassLoader;
-
-  @Rule
-  public SystemProperty parallelExtensionModelLoading = new SystemProperty(PARALLEL_EXTENSION_MODEL_LOADING_PROPERTY, "true");
 
   @Inject
   protected Registry registry;
@@ -310,6 +315,7 @@ public abstract class FunctionalTestCase extends AbstractMuleContextTestCase {
     super.addBuilders(builders);
   }
 
+  @Override
   protected Set<ExtensionModel> getExtensionModels() {
     return singleton(getExtensionModel());
   }

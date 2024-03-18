@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,7 +12,7 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.List;
 
@@ -27,11 +27,10 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
   protected MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  ComponentTracerFactory componentTracerFactory;
 
   protected List processors;
   protected String name;
-
 
   public void setMessageProcessors(List processors) {
     this.processors = processors;
@@ -53,7 +52,7 @@ public class SubflowMessageProcessorChainFactoryBean extends AbstractComponentFa
 
   protected SubflowMessageProcessorChainBuilder getBuilderInstance() {
     SubflowMessageProcessorChainBuilder builder = new SubflowMessageProcessorChainBuilder();
-    builder.withInitialSpanInfoProvider(initialSpanInfoProvider);
+    builder.withComponentTracerFactory(componentTracerFactory);
     builder.setName(name);
     return builder;
   }

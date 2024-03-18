@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,14 +12,17 @@ import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
+import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionInterceptor;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 
 /**
  * Utilities related with the creation of interception chains.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class InterceptorChainUtils {
 
@@ -32,17 +35,19 @@ public class InterceptorChainUtils {
    * @param componentModel     the {@link ComponentModel}
    * @param connectionSupplier the connection supplier
    * @param reflectionCache    a {@link ReflectionCache}
+   * @param initialSpanInfo    a {@link InitialSpanInfo} for the span representing the get-connection.
    * @return a new {@link InterceptorChain}
-   * @since 4.6.0
+   * @since 4.5.0
    */
   public static InterceptorChain createConnectionInterceptorsChain(ExtensionModel extensionModel,
                                                                    ComponentModel componentModel,
                                                                    ExtensionConnectionSupplier connectionSupplier,
-                                                                   ReflectionCache reflectionCache) {
+                                                                   ReflectionCache reflectionCache,
+                                                                   ComponentTracer<CoreEvent> connectionComponentTracer) {
     InterceptorChain.Builder chainBuilder = InterceptorChain.builder();
 
     if (requiresConnectionInterceptors(extensionModel, componentModel)) {
-      addConnectionInterceptors(chainBuilder, connectionSupplier);
+      addConnectionInterceptors(chainBuilder, connectionSupplier, connectionComponentTracer);
     }
 
     addCursorResetInterceptorsIfRequired(chainBuilder, extensionModel, componentModel, reflectionCache);
@@ -61,7 +66,8 @@ public class InterceptorChainUtils {
   }
 
   private static void addConnectionInterceptors(InterceptorChain.Builder chainBuilder,
-                                                ExtensionConnectionSupplier connectionSupplier) {
-    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier));
+                                                ExtensionConnectionSupplier connectionSupplier,
+                                                ComponentTracer<CoreEvent> connectionComponentTracer) {
+    chainBuilder.addInterceptor(new ConnectionInterceptor(connectionSupplier, connectionComponentTracer));
   }
 }

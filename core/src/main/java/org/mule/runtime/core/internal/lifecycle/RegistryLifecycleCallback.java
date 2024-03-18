@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -53,7 +53,12 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
   @Override
   public void onTransition(String phaseName, T object) throws MuleException {
     try {
-      registryLifecycleManager.muleContext.withLifecycleLock((CheckedRunnable) () -> doOnTransition(phaseName, object));
+      final CheckedRunnable transitionCommand = (CheckedRunnable) () -> doOnTransition(phaseName, object);
+
+      registryLifecycleManager.getMuleContext()
+          .map(muleContext -> (CheckedRunnable) () -> muleContext.withLifecycleLock(transitionCommand))
+          .orElse(transitionCommand)
+          .run();
     } catch (RuntimeException e) {
       MuleException muleException = extractOfType(e, MuleException.class).orElse(null);
       if (muleException != null) {
@@ -66,7 +71,7 @@ public class RegistryLifecycleCallback<T> implements LifecycleCallback<T>, HasLi
 
   private void doOnTransition(String phaseName, T object) throws MuleException {
 
-    LifecyclePhase phase = registryLifecycleManager.phases.get(phaseName);
+    LifecyclePhase phase = registryLifecycleManager.getPhase(phaseName);
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Applying lifecycle phase: {} for registry: {}", phase, object.getClass().getSimpleName());

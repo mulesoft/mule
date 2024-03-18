@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -19,29 +20,28 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.util.MultiMap.emptyMultiMap;
 
+import org.mule.oauth.client.api.AuthorizationCodeOAuthDancer;
+import org.mule.oauth.client.api.listener.AuthorizationCodeListener;
+import org.mule.oauth.client.api.state.ResourceOwnerOAuthContext;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.connectivity.oauth.AuthorizationCodeGrantType;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.OAuthCallbackConfig;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.UpdatingAuthorizationCodeState;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.exception.TokenInvalidatedException;
-import org.mule.runtime.oauth.api.AuthorizationCodeOAuthDancer;
-import org.mule.runtime.oauth.api.listener.AuthorizationCodeListener;
-import org.mule.runtime.oauth.api.state.ResourceOwnerOAuthContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase {
 
   private static final String ACCESS_TOKEN = "myToken";
@@ -49,6 +49,9 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   private static final String NEW_TOKEN = "newToken";
   private static final String NEW_REFRESH_TOKEN = "newRefresh";
   private static final String RESOURCE_OWNER_ID = "id";
+
+  @Rule
+  public MockitoRule mockitorule = MockitoJUnit.rule();
 
   private AuthorizationCodeConfig oAuthConfig;
 
@@ -65,8 +68,7 @@ public class UpdatingAuthorizationCodeStateTestCase extends AbstractMuleTestCase
   public void before() {
     oAuthConfig = new AuthorizationCodeConfig("configName",
                                               empty(),
-                                              emptyMultiMap(),
-                                              emptyMultiMap(),
+                                              new CustomOAuthParameters(),
                                               emptyMap(),
                                               new AuthorizationCodeGrantType("url", "url", "#[s]", "reg", "#[x]", "sd"),
                                               mock(OAuthCallbackConfig.class),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,9 +7,12 @@
 package org.mule.runtime.core.api.util;
 
 import static java.lang.System.lineSeparator;
+
 import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -72,7 +75,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(test);
-    assertTrue(result.endsWith("[..]}"));
+    assertThat(result, endsWith("[..]}"));
     assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
   }
 
@@ -93,31 +96,15 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
   @Test
   public void toStringOnListLargerThanMaximumOutputLengthShouldReturnAbbreviatedStringRepresentation() {
     // create a Collection that is too long to be printed
-    List<Integer> list = new ArrayList<Integer>(100);
+    List<Integer> list = new ArrayList<>(100);
     for (int i = 0; i < 100; i++) {
-      list.add(new Integer(i));
+      list.add(Integer.valueOf(i));
     }
 
     // the String will contain not more than exactly MAX_ARRAY_LENGTH elements
     String result = StringMessageUtils.toString(list);
-    assertTrue(result.endsWith("[..]]"));
+    assertThat(result, endsWith("[..]]"));
     assertEquals(StringMessageUtils.MAX_ELEMENTS - 1, countMatches(result, ","));
-  }
-
-  @Test
-  public void testFormattedString() throws Exception {
-    String result;
-    String msg1 = "There is not substitution here";
-
-    result = StringMessageUtils.getFormattedMessage(msg1, null);
-    assertEquals(msg1, result);
-
-    result = StringMessageUtils.getFormattedMessage(msg1, new Object[] {});
-    assertEquals(msg1, result);
-
-    String msg2 = "There should be a variable {0}, {1} and {2}";
-    result = StringMessageUtils.getFormattedMessage(msg2, new Object[] {"here", "there", "everywhere"});
-    assertEquals("There should be a variable here, there and everywhere", result);
   }
 
   @Test
@@ -129,7 +116,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testBoilerPlate() throws Exception {
-    List<String> msgs = new ArrayList<String>();
+    List<String> msgs = new ArrayList<>();
     msgs.add("This");
     msgs.add("is a");
     msgs.add("Boiler Plate");
@@ -143,7 +130,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testBoilerPlate2() throws Exception {
-    List<String> msgs = new ArrayList<String>();
+    List<String> msgs = new ArrayList<>();
     msgs.add("This");
     msgs.add("is a");
     msgs.add("Boiler Plate Message that should get wrapped to the next line if it is working properly");
@@ -173,7 +160,7 @@ public class StringMessageUtilsTestCase extends AbstractMuleTestCase {
 
   private class TestObject {
 
-    private String myName;
+    private final String myName;
 
     public TestObject(String name) {
       this.myName = name;

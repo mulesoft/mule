@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +13,6 @@ import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.transformation.TransformationService;
-import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.transformer.Transformer;
 
 import java.io.InputStream;
@@ -38,9 +37,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   @Inject
   private TransformationService transformationService;
-
-  @Inject
-  private MuleContext muleContext;
 
   public TypeSafeValueResolverWrapper(ValueResolver valueResolverDelegate, Class<T> expectedType) {
     this.expectedType = expectedType;
@@ -74,10 +70,6 @@ public class TypeSafeValueResolverWrapper<T> implements ValueResolver<T>, Initia
 
   public void setTransformationService(TransformationService transformationService) {
     this.transformationService = transformationService;
-  }
-
-  public void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
   }
 
   @FunctionalInterface

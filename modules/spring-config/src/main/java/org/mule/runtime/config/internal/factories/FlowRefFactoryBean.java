@@ -1,18 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.config.internal.factories;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.joining;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.metadata.DataType.STRING;
@@ -28,6 +21,15 @@ import static org.mule.runtime.core.internal.util.rx.Operators.outputToTarget;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.WITHIN_PROCESS_TO_APPLY;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContextDontPropagateErrors;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
+
+import static java.lang.Thread.currentThread;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
+
 import static org.slf4j.LoggerFactory.getLogger;
 import static reactor.core.Exceptions.propagate;
 import static reactor.core.publisher.Flux.error;
@@ -49,16 +51,16 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.DeepSubFlowNestingFlowRefException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.exception.RecursiveFlowRefException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.processor.chain.SubflowMessageProcessorChainBuilder;
+import org.mule.runtime.core.internal.routing.result.RoutePathNotFoundException;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.core.privileged.routing.RoutePathNotFoundException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +73,11 @@ import java.util.function.Function;
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
@@ -82,11 +89,6 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -117,7 +119,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
   private ConfigurationComponentLocator locator;
 
   @Inject
-  private InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   public void setName(String name) {
     this.refName = name;
@@ -167,11 +169,11 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
                                            flowRefMessageProcessor);
     }
 
-    // for subflows, we create a new one so it must be initialised manually
+    // for subflows, we create a new one, so it must be initialised manually
     if (!(referencedFlow instanceof Flow)) {
       if (referencedFlow instanceof SubflowMessageProcessorChainBuilder) {
         SubflowMessageProcessorChainBuilder chainBuilder = (SubflowMessageProcessorChainBuilder) referencedFlow;
-        chainBuilder.withInitialSpanInfoProvider(initialSpanInfoProvider);
+        chainBuilder.withComponentTracerFactory(componentTracerFactory);
         locator.find(flowRefMessageProcessor.getRootContainerLocation()).filter(c -> c instanceof Flow).map(c -> (Flow) c)
             .ifPresent(f -> {
               ProcessingStrategy callerFlowPs = f.getProcessingStrategy();
@@ -320,7 +322,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
       final ReactiveProcessor resolvedReferencedProcessor = resolvedReferencedProcessorSupplier.get();
 
       Flux<CoreEvent> pub = from(publisher)
-          .subscriberContext(clearCurrentFlowRefFromCycleDetection());
+          .contextWrite(clearCurrentFlowRefFromCycleDetection());
 
       if (target != null) {
         pub = pub.map(event -> quickCopy(event, singletonMap(originalEventKey(event), event)))
@@ -384,7 +386,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
      */
     private Publisher<CoreEvent> decoratePublisher(Flux<CoreEvent> pub) {
       pub = pub
-          .subscriberContext(checkAndMarkCurrentFlowRefForCycleDetection());
+          .contextWrite(checkAndMarkCurrentFlowRefForCycleDetection());
       return (target != null)
           ? pub.map(eventAfter -> outputToTarget(((InternalEvent) eventAfter)
               .getInternalParameter(originalEventKey(eventAfter)), target, targetValue,
@@ -537,7 +539,7 @@ public class FlowRefFactoryBean extends AbstractComponentFactory<Processor> impl
         // If the resolved target is not a flow, it should be a subflow
         return Mono.just(event).transform(resolvedTarget)
             // This is needed for all cases because of the way that flow-ref invokes flows dynamically
-            .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true));
+            .contextWrite(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true));
       }
     }
 

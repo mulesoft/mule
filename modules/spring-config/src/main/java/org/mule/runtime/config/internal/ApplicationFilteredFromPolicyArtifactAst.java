@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,11 +7,9 @@
 package org.mule.runtime.config.internal;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.util.MuleSystemProperties.SHARE_ERROR_TYPE_REPOSITORY_PROPERTY;
 import static org.mule.runtime.ast.api.ArtifactType.APPLICATION;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 
-import static java.lang.Boolean.getBoolean;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -100,15 +98,11 @@ public final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifact
 
   @Override
   public ErrorTypeRepository getErrorTypeRepository() {
-    if (shareErrorTypeRepository()) {
-      return parentArtifactAst.getErrorTypeRepository();
-    } else {
-      // Since there is already a workaround to allow polices to use http connector without declaring the dependency
-      // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
-      // well.
-      return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(),
-                                             new HashSet<>(asList("HTTP", CORE_NAMESPACE_NAME)));
-    }
+    // Since there is already a workaround to allow polices to use http connector without declaring the dependency
+    // and relying on it provided by the app, this case has to be accounted for here when handling error codes as
+    // well.
+    return new FilteredErrorTypeRepository(parentArtifactAst.getErrorTypeRepository(),
+                                           new HashSet<>(asList("HTTP", CORE_NAMESPACE_NAME)));
   }
 
   @Override
@@ -122,16 +116,7 @@ public final class ApplicationFilteredFromPolicyArtifactAst extends BaseArtifact
 
   public static ArtifactAst applicationFilteredFromPolicyArtifactAst(ArtifactAst parentArtifactAst,
                                                                      FeatureFlaggingService featureFlaggingService) {
-    if (shareErrorTypeRepository() && featureFlaggingService.isEnabled(ENABLE_POLICY_ISOLATION)) {
-      // Because MULE-18196 breaks backwards, we need this feature flag to allow legacy behavior
-      return parentArtifactAst;
-    } else {
-      return new ApplicationFilteredFromPolicyArtifactAst(parentArtifactAst, featureFlaggingService);
-    }
-  }
-
-  private static boolean shareErrorTypeRepository() {
-    return getBoolean(SHARE_ERROR_TYPE_REPOSITORY_PROPERTY);
+    return new ApplicationFilteredFromPolicyArtifactAst(parentArtifactAst, featureFlaggingService);
   }
 
 }

@@ -1,18 +1,14 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.currentThread;
-import static java.util.function.Function.identity;
 import static org.mule.runtime.core.api.execution.TransactionalExecutionTemplate.createTransactionalExecutionTemplate;
 import static org.mule.runtime.core.api.rx.Exceptions.wrapFatal;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
-import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactId;
 import static org.mule.runtime.core.internal.processor.strategy.util.ProfilingUtils.getArtifactType;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.module.artifact.api.classloader.RegionClassLoader.getNearestRegion;
@@ -21,6 +17,12 @@ import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isConnectedStreamingOperation;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.NULL_THROWABLE_CONSUMER;
 import static org.mule.runtime.module.extension.internal.util.ReconnectionUtils.shouldRetry;
+
+import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.currentThread;
+import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -28,8 +30,10 @@ import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.profiling.ProfilingDataProducer;
 import org.mule.runtime.api.profiling.type.context.ComponentThreadingProfilingEventContext;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.execution.ExecutionTemplate;
@@ -45,9 +49,12 @@ import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigur
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.exception.ModuleExceptionHandler;
 import org.mule.runtime.module.extension.internal.runtime.execution.interceptor.InterceptorChain;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
 
@@ -72,10 +79,14 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private final InterceptorChain interceptorChain;
   private final ExecutionTemplate<?> defaultExecutionTemplate = callback -> callback.process();
   private final ModuleExceptionHandler moduleExceptionHandler;
+  private final MuleConfiguration muleConfiguration;
+  private final NotificationDispatcher notificationDispatcher;
+  private final TransactionManager transactionManager;
   private final ResultTransformer resultTransformer;
   private final ClassLoader executionClassLoader;
   private final ComponentModel operationModel;
   private final ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer;
+  private final ComponentTracer<CoreEvent> operationComponentTracer;
 
   private static final Logger LOGGER = getLogger(DefaultExecutionMediator.class);
 
@@ -84,12 +95,19 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
                                   InterceptorChain interceptorChain,
                                   ErrorTypeRepository typeRepository,
                                   ClassLoader executionClassLoader,
+                                  MuleConfiguration muleConfiguration,
+                                  NotificationDispatcher notificationDispatcher,
+                                  TransactionManager transactionManager,
                                   ResultTransformer resultTransformer,
                                   ProfilingDataProducer<ComponentThreadingProfilingEventContext, CoreEvent> threadReleaseDataProducer,
+                                  ComponentTracer<CoreEvent> operationExecutionTracer,
                                   boolean suppressErrors) {
     this.interceptorChain = interceptorChain;
     this.exceptionEnricherManager = new ExceptionHandlerManager(extensionModel, operationModel, typeRepository);
     this.moduleExceptionHandler = new ModuleExceptionHandler(operationModel, extensionModel, typeRepository, suppressErrors);
+    this.muleConfiguration = requireNonNull(muleConfiguration);
+    this.notificationDispatcher = notificationDispatcher;
+    this.transactionManager = transactionManager;
     this.resultTransformer = resultTransformer;
     this.operationModel = operationModel;
 
@@ -105,6 +123,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
     }
 
     this.threadReleaseDataProducer = threadReleaseDataProducer;
+    this.operationComponentTracer = operationExecutionTracer;
   }
 
   /**
@@ -193,7 +212,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       return future;
     },
                             e -> shouldRetry(e, context),
-                            e -> interceptorChain.onError(context, e),
+                            e -> {
+                              interceptorChain.onError(context, e);
+                            },
                             NULL_THROWABLE_CONSUMER,
                             identity(),
                             context.getCurrentScheduler())
@@ -229,7 +250,8 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       final ClassLoader currentClassLoader = currentThread.getContextClassLoader();
       setContextClassLoader(currentThread, currentClassLoader, executionClassLoader);
       try {
-        executor.execute(context, callback);
+        operationComponentTracer.startSpan(context.getEvent());
+        executor.execute(context, new TracedOperationExecutionCallback(context, operationComponentTracer, callback));
       } finally {
         profileThreadRelease(context);
         setContextClassLoader(currentThread, executionClassLoader, currentClassLoader);
@@ -239,7 +261,7 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
 
   private void profileThreadRelease(ExecutionContextAdapter<M> context) {
     String threadName = currentThread().getName();
-    String artifactId = getArtifactId(context.getMuleContext());
+    String artifactId = muleConfiguration.getId();
     String artifactType = getArtifactType(context.getMuleContext());
     threadReleaseDataProducer.triggerProfilingEvent(context
         .getEvent(), event -> new DefaultComponentThreadingProfilingEventContext(event, context
@@ -303,7 +325,9 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
   private <T> T withExecutionTemplate(ExecutionContextAdapter<ComponentModel> context, ExecutionCallback<T> callback)
       throws Exception {
     if (context.getTransactionConfig().isPresent()) {
-      return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(context.getMuleContext(),
+      return ((ExecutionTemplate<T>) createTransactionalExecutionTemplate(muleConfiguration,
+                                                                          notificationDispatcher,
+                                                                          transactionManager,
                                                                           context.getTransactionConfig().get()))
                                                                               .execute(callback);
     } else {
@@ -340,4 +364,5 @@ public final class DefaultExecutionMediator<M extends ComponentModel> implements
       delegate.error(e);
     }
   }
+
 }

@@ -1,7 +1,172 @@
 {
+  "4.6.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider",
+          "new": "interface org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorFactoryProvider",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "justification": "W-14357577: Provide an API for the GW to obtain a PolicyTemplateDescriptorFactory"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel() @ org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "getClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel) @ org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "setClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>===)",
+          "new": "parameter void org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>===) @ org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "parameterIndex": "0",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor",
+          "classSimpleName": "DeployableArtifactDescriptor",
+          "methodName": "setPlugins",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel() @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "classSimpleName": "ApplicationDescriptor",
+          "methodName": "getClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor> org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::getPlugins() @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor> org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getPlugins() @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "classSimpleName": "ApplicationDescriptor",
+          "methodName": "getPlugins",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel) @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "classSimpleName": "ApplicationDescriptor",
+          "methodName": "setClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>===) @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "new": "parameter void org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>===) @ org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "parameterIndex": "0",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.application",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.application.ApplicationDescriptor",
+          "classSimpleName": "ApplicationDescriptor",
+          "methodName": "setPlugins",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel() @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "classSimpleName": "DomainDescriptor",
+          "methodName": "getClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor> org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::getPlugins() @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "new": "method java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor> org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::getPlugins() @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "classSimpleName": "DomainDescriptor",
+          "methodName": "getPlugins",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method void org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::setClassLoaderModel(org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel) @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "classSimpleName": "DomainDescriptor",
+          "methodName": "setClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.parameterTypeParameterChanged",
+          "old": "parameter void org.mule.runtime.deployment.model.api.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>===) @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "new": "parameter void org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor::setPlugins(===java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>===) @ org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "parameterIndex": "0",
+          "oldType": "java.util.Set<org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor>",
+          "newType": "java.util.Set<org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor>",
+          "package": "org.mule.runtime.deployment.model.api.domain",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.domain.DomainDescriptor",
+          "classSimpleName": "DomainDescriptor",
+          "methodName": "setPlugins",
+          "elementKind": "parameter",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.returnTypeTypeParametersChanged",
+          "old": "method D org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getDescriptor() @ org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "new": "method D org.mule.runtime.module.artifact.api.Artifact<D extends org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor>::getDescriptor() @ org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "oldType": "org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",
+          "newType": "org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.plugin",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.plugin.ArtifactPlugin",
+          "classSimpleName": "ArtifactPlugin",
+          "methodName": "getDescriptor",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.removed",
+          "old": "method org.mule.runtime.module.artifact.api.descriptor.ClassLoaderModel org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor::getClassLoaderModel() @ org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor",
+          "package": "org.mule.runtime.deployment.model.api.policy",
+          "classQualifiedName": "org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor",
+          "classSimpleName": "PolicyTemplateDescriptor",
+          "methodName": "getClassLoaderModel",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
         {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.deployment.model.api.plugin.ArtifactPluginDescriptor",

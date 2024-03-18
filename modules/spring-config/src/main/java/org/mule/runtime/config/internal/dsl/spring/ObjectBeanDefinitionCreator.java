@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,7 +12,7 @@ import static org.mule.runtime.config.internal.dsl.spring.CommonComponentBeanDef
 import static org.mule.runtime.config.internal.model.ApplicationModel.OBJECT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.PROPERTY_ELEMENT;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
 
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
@@ -21,9 +21,9 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
+import org.mule.runtime.config.internal.dsl.BeanDefinitionPostProcessor;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.model.config.RuntimeConfigurationException;
-import org.mule.runtime.config.privileged.dsl.BeanDefinitionPostProcessor;
+import org.mule.runtime.config.internal.model.dsl.config.RuntimeConfigurationException;
 
 import java.util.List;
 import java.util.Map;
@@ -79,7 +79,13 @@ class ObjectBeanDefinitionCreator extends BeanDefinitionCreator<CreateComponentB
         throw new RuntimeConfigurationException(createStaticMessage(e.getMessage()), e);
       }
 
-      beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
+      try {
+        beanDefinitionBuilder = rootBeanDefinition(addAnnotationsToClass(classParameter));
+      } catch (LinkageError e) {
+        throw new RuntimeConfigurationException(createStaticMessage(format("Exception adding annotations to class '%s'",
+                                                                           classParameter.getName())),
+                                                e);
+      }
       processMuleProperties(component, beanDefinitionBuilder, null);
       createBeanDefinitionRequest.getSpringComponentModel().setBeanDefinition(beanDefinitionBuilder.getBeanDefinition());
     }

@@ -28,12 +28,27 @@
         <xs:extension base="mule:abstractConnectionProviderType">
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="target-realm">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel" base="marvel:org.mule.test.marvel.drstrange.Realm"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="optional" name="multipleConfig"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="targetRealm"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
+  <xs:complexType name="org.mule.test.marvel.drstrange.Realm">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="required" name="realmConfig"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="pooling-mystic-connection">
     <xs:complexType>
       <xs:complexContent>
@@ -41,8 +56,16 @@
           <xs:sequence minOccurs="0" maxOccurs="1">
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
             <xs:element minOccurs="0" maxOccurs="1" ref="mule:pooling-profile"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="target-realm">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:marvel="http://www.mulesoft.org/schema/mule/marvel" base="marvel:org.mule.test.marvel.drstrange.Realm"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
           <xs:attribute type="mule:expressionString" use="optional" name="multipleConfig"></xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="targetRealm"></xs:attribute>
         </xs:extension>
       </xs:complexContent>
     </xs:complexType>
@@ -557,6 +580,56 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AssertResponseDifferentTaskType" substitutionGroup="mule:abstract-operator" name="assert-response-different-task"></xs:element>
+  <xs:complexType name="AssertResponseDifferentTaskType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="1" maxOccurs="1">
+          <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:group minOccurs="1" ref="mule:messageProcessorOrMixedContentMessageProcessor"></xs:group>
+          </xs:choice>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputMimeType">
+          <xs:annotation>
+            <xs:documentation>The mime type of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="outputEncoding">
+          <xs:annotation>
+            <xs:documentation>The encoding of the payload that this operation outputs.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DisplayInterceptedCommsType" substitutionGroup="mule:abstract-operator" name="display-intercepted-comms"></xs:element>
+  <xs:complexType name="DisplayInterceptedCommsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="FindInstructionsType" substitutionGroup="mule:abstract-operator" name="find-instructions"></xs:element>
   <xs:complexType name="FindInstructionsType">
     <xs:complexContent>
@@ -604,6 +677,16 @@
         <xs:sequence minOccurs="0" maxOccurs="1">
           <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="items"></xs:element>
         </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/marvel" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="InterceptCommType" substitutionGroup="mule:abstract-operator" name="intercept-comm"></xs:element>
+  <xs:complexType name="InterceptCommType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="issuer"></xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="comm"></xs:attribute>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

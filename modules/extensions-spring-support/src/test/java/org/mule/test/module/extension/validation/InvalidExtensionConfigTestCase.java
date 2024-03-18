@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -23,7 +23,6 @@ import org.mule.test.heisenberg.extension.HeisenbergExtension;
 import org.mule.test.implicit.config.extension.extension.api.ImplicitConfigExtension;
 import org.mule.test.petstore.extension.PetStoreConnector;
 import org.mule.test.vegan.extension.VeganExtension;
-import org.mule.tests.api.TestComponentsExtension;
 
 import java.util.ArrayList;
 import java.util.List;

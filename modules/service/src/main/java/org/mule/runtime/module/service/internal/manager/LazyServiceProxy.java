@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,7 +9,6 @@ package org.mule.runtime.module.service.internal.manager;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 
 import static java.lang.String.format;
 import static java.lang.reflect.Proxy.getInvocationHandler;
@@ -29,9 +28,6 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
-import org.mule.runtime.core.internal.util.DefaultMethodInvoker;
-import org.mule.runtime.core.internal.util.MethodInvoker;
-import org.mule.runtime.core.internal.util.TypeSupplier;
 import org.mule.runtime.module.artifact.api.classloader.DisposableClassLoader;
 import org.mule.runtime.module.service.api.discoverer.ServiceAssembly;
 import org.mule.runtime.module.service.api.discoverer.ServiceResolutionError;
@@ -57,6 +53,7 @@ import org.slf4j.Logger;
 public class LazyServiceProxy implements ServiceProxyInvocationHandler {
 
   private static final Logger LOGGER = getLogger(LazyServiceProxy.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ServiceAssembly assembly;
   private final DefaultServiceRegistry serviceRegistry;
@@ -80,7 +77,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
   private static Service proxy(ServiceAssembly assembly, InvocationHandler handler) {
     final Class<? extends Service> contract = assembly.getServiceContract();
     return (Service) newProxyInstance(contract.getClassLoader(),
-                                      new Class[] {contract, Startable.class, Stoppable.class, TypeSupplier.class},
+                                      new Class[] {contract, Startable.class, Stoppable.class},
                                       handler);
   }
 
@@ -121,8 +118,6 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
       return handleStart();
     } else if (methodClass == Stoppable.class) {
       return handleStop();
-    } else if (methodClass == TypeSupplier.class) {
-      return assembly.getServiceContract();
     } else {
       return methodInvoker.invoke(getService(), method, args);
     }
@@ -175,7 +170,7 @@ public class LazyServiceProxy implements ServiceProxyInvocationHandler {
       startIfNeeded(service);
       String splash = service.getSplashMessage();
       if (isNotEmpty(splash)) {
-        log(new ServiceSplashScreen(service.toString(), splash).toString());
+        SPLASH_LOGGER.info(new ServiceSplashScreen(service.toString(), splash).toString());
       }
     });
   }

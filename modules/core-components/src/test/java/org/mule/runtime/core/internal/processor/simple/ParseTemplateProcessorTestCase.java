@@ -1,10 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.processor.simple;
+
+import static org.mule.runtime.api.el.BindingContextUtils.MESSAGE;
+import static org.mule.runtime.api.metadata.MediaType.ANY;
+import static org.mule.runtime.api.metadata.MediaType.create;
+import static org.mule.runtime.api.metadata.TypedValue.of;
+import static org.mule.runtime.core.api.util.FileUtils.newFile;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
+import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
+import static org.mule.runtime.core.internal.test.util.TestFileUtils.isFileOpen;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
+import static org.mule.test.allure.AllureConstants.ComponentsFeature.ParseTemplateStory.PARSE_TEMPLATE;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -15,15 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.api.metadata.MediaType.ANY;
-import static org.mule.runtime.api.metadata.MediaType.create;
-import static org.mule.runtime.api.metadata.TypedValue.of;
-import static org.mule.runtime.core.api.util.FileUtils.newFile;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
-import static org.mule.runtime.core.api.util.IOUtils.getResourceAsUrl;
-import static org.mule.runtime.core.internal.util.TestFileUtils.isFileOpen;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.CORE_COMPONENTS;
-import static org.mule.test.allure.AllureConstants.ComponentsFeature.ParseTemplateStory.PARSE_TEMPLATE;
 
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.exception.MuleException;
@@ -49,6 +51,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 
 @Feature(CORE_COMPONENTS)
@@ -114,10 +117,23 @@ public class ParseTemplateProcessorTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-13588449")
+  public void parseTemplateLegacyDefaultTargetValue() throws InitialisationException, IOException {
+    parseTemplateProcessor.setTargetValue("#[" + MESSAGE + "]");
+    addMockComponentLocation(parseTemplateProcessor);
+    parseTemplateProcessor.setLocation(LOCATION);
+    String expectedExpression = getResourceAsString(LOCATION, this.getClass());
+    when(mockExpressionManager.parseLogTemplate(eq(expectedExpression), eq(event), any(), any())).thenReturn("Parsed");
+    parseTemplateProcessor.initialise();
+    expectedException.expect(IllegalArgumentException.class);
+    CoreEvent response = parseTemplateProcessor.process(event);
+    assertEquals("Parsed", response.getMessage().getPayload().getValue());
+  }
+
+  @Test
   public void parseTemplateFromLocation() throws InitialisationException, IOException {
     parseTemplateProcessor.setLocation(LOCATION);
     parseTemplateProcessor.initialise();
-    when(mockMuleMessage.getInboundProperty("errorMessage")).thenReturn("ERROR!!!");
     String expectedExpression = getResourceAsString(LOCATION, this.getClass());
 
     when(mockMuleMessage.getPayload()).thenReturn(of("Parsed"));

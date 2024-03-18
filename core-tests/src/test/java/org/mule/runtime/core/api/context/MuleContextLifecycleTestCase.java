@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.context.notification.MuleContextNotifica
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STARTING;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
 import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPING;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.validateJdk;
 import static org.mule.tck.MuleAssert.assertTrue;
 
 import static org.junit.Assert.assertEquals;
@@ -32,12 +33,10 @@ import org.mule.runtime.api.lifecycle.LifecycleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.api.notification.NotificationListenerRegistry;
-import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.notification.MuleContextListener;
 import org.mule.runtime.core.api.context.notification.MuleContextNotification;
 import org.mule.runtime.core.api.context.notification.MuleContextNotificationListener;
-import org.mule.runtime.core.api.security.SecurityManager;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.core.api.util.queue.QueueManager;
 import org.mule.runtime.core.internal.config.builders.MinimalConfigurationBuilder;
@@ -47,7 +46,6 @@ import org.mule.runtime.core.internal.context.notification.DefaultNotificationLi
 import org.mule.runtime.core.internal.lifecycle.MuleContextLifecycleManager;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.tck.config.TestServicesConfigurationBuilder;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -488,7 +486,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
   @Test(expected = InitialisationException.class)
   public void testIsInValidJdk() throws InitialisationException {
     try {
-      JdkVersionUtils.validateJdk();
+      validateJdk();
     } catch (RuntimeException e) {
       fail("Jdk version or vendor is invalid. Update the valid versions");
     }
@@ -496,7 +494,7 @@ public class MuleContextLifecycleTestCase extends AbstractMuleTestCase {
     String javaVersion = System.setProperty("java.version", "1.5.0_12");
     try {
       try {
-        JdkVersionUtils.validateJdk();
+        validateJdk();
         fail("Test is invalid because the Jdk version or vendor is supposed to now be invalid");
       } catch (RuntimeException e) {
         // expected

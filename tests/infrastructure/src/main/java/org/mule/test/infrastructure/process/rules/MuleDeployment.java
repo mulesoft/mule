@@ -1,29 +1,31 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.infrastructure.process.rules;
 
-import static com.jayway.awaitility.Awaitility.await;
+import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
+import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
+
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.apache.commons.io.FilenameUtils.removeExtension;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.mule.runtime.module.repository.internal.RepositoryServiceFactory.MULE_REMOTE_REPOSITORIES_PROPERTY;
-import static org.mule.test.infrastructure.process.MuleStatusProbe.isNotRunning;
+import static org.awaitility.Awaitility.await;
 
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategyFactory;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory;
-import org.mule.runtime.core.privileged.util.MapUtils;
 import org.mule.tck.probe.JUnitProbe;
 import org.mule.tck.probe.PollingProber;
 import org.mule.test.infrastructure.process.MuleProcessController;
+import org.mule.test.infrastructure.process.MuleProcessControllerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,12 +37,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import io.qameta.allure.Attachment;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
+import io.qameta.allure.Attachment;
 
 /**
  * JUnit rule to deploy a Mule application for testing in a local Mule server. Usage:
@@ -101,14 +105,15 @@ public class MuleDeployment extends MuleInstallation {
   private static PollingProber prober;
   private String locationSuffix = "";
   private int deploymentTimeout = parseInt(getProperty("mule.test.deployment.timeout", DEFAULT_DEPLOYMENT_TIMEOUT));
-  private List<String> applications = new ArrayList<>();
-  private List<String> domains = new ArrayList<>();
-  private List<String> domainBundles = new ArrayList<>();
-  private List<String> libraries = new ArrayList<>();
+  private final List<String> applications = new ArrayList<>();
+  private final List<String> domains = new ArrayList<>();
+  private final List<String> domainBundles = new ArrayList<>();
+  private final List<String> libraries = new ArrayList<>();
+  private MuleProcessControllerFactory muleProcessControllerFactory = new MuleProcessControllerFactory();
   private MuleProcessController mule;
-  private Map<String, String> properties = new HashMap<>();
-  private Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
-  private List<String> parameters = new ArrayList<>();
+  private final Map<String, String> properties = new HashMap<>();
+  private final Map<String, Supplier<String>> propertiesUsingLambdas = new HashMap<>();
+  private final List<String> parameters = new ArrayList<>();
 
   private final Thread shutdownHookThread = new Thread(this::after);
 
@@ -123,6 +128,10 @@ public class MuleDeployment extends MuleInstallation {
 
     Builder(String zippedDistribution) {
       deployment = new MuleDeployment(zippedDistribution);
+    }
+
+    Builder(MuleDeployment deployment) {
+      this.deployment = deployment;
     }
 
     /**
@@ -270,6 +279,11 @@ public class MuleDeployment extends MuleInstallation {
       return this;
     }
 
+    public Builder withMuleProcessControllerFactory(MuleProcessControllerFactory muleProcessControllerFactory) {
+      deployment.muleProcessControllerFactory = muleProcessControllerFactory;
+      return this;
+    }
+
   }
 
   public static MuleDeployment.Builder builder() {
@@ -280,6 +294,9 @@ public class MuleDeployment extends MuleInstallation {
     return new Builder(zippedDistribution);
   }
 
+  public static MuleDeployment.Builder builder(MuleDeployment deployment) {
+    return new Builder(deployment);
+  }
 
   protected MuleDeployment() {
     super();
@@ -316,13 +333,14 @@ public class MuleDeployment extends MuleInstallation {
     };
   }
 
+  @Override
   protected void before() throws Throwable {
     super.before();
     prober = new PollingProber(deploymentTimeout, POLL_DELAY_MILLIS);
     if (locationSuffix != null && !locationSuffix.isEmpty()) {
-      mule = new MuleProcessController(getMuleHome(), locationSuffix);
+      mule = muleProcessControllerFactory.create(getMuleHome(), locationSuffix);
     } else {
-      mule = new MuleProcessController(getMuleHome());
+      mule = muleProcessControllerFactory.create(getMuleHome());
     }
     addShutdownHooks();
     try {
@@ -434,6 +452,7 @@ public class MuleDeployment extends MuleInstallation {
     });
   }
 
+  @Override
   protected void after() {
     if (STOP_ON_EXIT) {
       stopMule();
@@ -477,7 +496,7 @@ public class MuleDeployment extends MuleInstallation {
    */
   @Attachment(value = "Properties")
   public String attachProperties() {
-    return MapUtils.toString(properties, true).replaceAll("(?<=\\.password=)(.*)", "****");
+    return properties.toString().replaceAll("(?<=\\.password=)(.*)", "****");
   }
 
   /***

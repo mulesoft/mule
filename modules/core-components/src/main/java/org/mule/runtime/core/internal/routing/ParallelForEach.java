@@ -1,15 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
 import static org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory.DEFAULT_MAX_CONCURRENCY;
 import static org.mule.runtime.core.api.util.StreamingUtils.updateTypedValueForStreaming;
+import static org.mule.runtime.core.internal.routing.RoutingUtils.setSourcePolicyChildContext;
 import static org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy.DEFAULT_SPLIT_EXPRESSION;
 import static org.mule.runtime.core.internal.routing.ForeachUtils.manageTypedValueForStreaming;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
@@ -28,10 +28,11 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.routing.forkjoin.CollectListForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.split.SplittingStrategy;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.core.internal.routing.split.ExpressionSplittingStrategy;
 
 import java.util.Iterator;
@@ -68,7 +69,7 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   protected FeatureFlaggingService featureFlaggingService;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private String collectionExpression = DEFAULT_SPLIT_EXPRESSION;
   private SplittingStrategy<CoreEvent, Iterator<TypedValue<?>>> splittingStrategy;
@@ -80,8 +81,8 @@ public class ParallelForEach extends AbstractForkJoinRouter {
   public void initialise() throws InitialisationException {
     nestedChain =
         buildNewChainWithListOfProcessors(of(resolveProcessingStrategy()), messageProcessors,
-                                          initialSpanInfoProvider
-                                              .getInitialSpanInfo(this, PARALLEL_FOREACH_ITERATION_SPAN_NAME_SUFFIX));
+                                          componentTracerFactory.fromComponent(this,
+                                                                               PARALLEL_FOREACH_ITERATION_SPAN_NAME_SUFFIX));
     splittingStrategy = new ExpressionSplittingStrategy(expressionManager, collectionExpression);
     super.initialise();
   }
@@ -92,6 +93,8 @@ public class ParallelForEach extends AbstractForkJoinRouter {
         .map(partTypedValue -> CoreEvent.builder(event)
             .message(createMessage(partTypedValue, event))
             .build())
+        .cast(InternalEvent.class)
+        .doOnNext(evt -> setSourcePolicyChildContext(evt, featureFlaggingService))
         .map(partEvent -> of(partEvent, nestedChain));
   }
 

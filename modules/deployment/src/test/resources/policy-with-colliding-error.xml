@@ -11,7 +11,7 @@
                 <raise-error type="COLLIDING_NS:POLICY_ERROR"/>
                 <error-handler>
                     <on-error-continue type="COLLIDING_NS:POLICY_ERROR">
-                        <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                        <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
             
                         <test-policy:execute-next/>
                     </on-error-continue>

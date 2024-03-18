@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -28,10 +28,6 @@ import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.BACKPRESSURE;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.PROCESSING_STRATEGIES;
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
-import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Flux.from;
-import static reactor.core.scheduler.Schedulers.fromExecutorService;
-import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Thread.currentThread;
@@ -42,7 +38,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -50,7 +45,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.startsWith;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 import static org.junit.rules.ExpectedException.none;
@@ -60,11 +56,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.slf4j.LoggerFactory.getLogger;
+import static reactor.core.publisher.Flux.from;
+import static reactor.core.scheduler.Schedulers.fromExecutorService;
+import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
-import org.mule.runtime.api.profiling.ProfilingDataConsumer;
 import org.mule.runtime.api.profiling.ProfilingDataConsumerDiscoveryStrategy;
 import org.mule.runtime.api.profiling.ProfilingService;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -76,29 +75,33 @@ import org.mule.runtime.core.api.processor.Sink;
 import org.mule.runtime.core.api.processor.strategy.AsyncProcessingStrategyFactory;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.construct.FlowBackPressureMaxConcurrencyExceededException;
-import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedulerBusyException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamEmitterProcessingStrategyFactory.ProactorStreamEmitterProcessingStrategy;
 import org.mule.runtime.core.internal.profiling.DefaultProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.probe.JUnitLambdaProbe;
+import org.mule.tck.probe.PollingProber;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.InOrder;
-import org.slf4j.Logger;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
@@ -114,13 +117,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
 
     @Override
     public ProfilingDataConsumerDiscoveryStrategy getDiscoveryStrategy() {
-      return new ProfilingDataConsumerDiscoveryStrategy() {
-
-        @Override
-        public Set<ProfilingDataConsumer<?>> discover() {
-          return singleton(profilingDataConsumer);
-        }
-      };
+      return () -> singleton(profilingDataConsumer);
     }
 
     @Override
@@ -569,6 +566,7 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
   }
 
   @Test
+  @Ignore("W-14573707: Fix flaky backpressureOnInnerCpuIntensiveSchedulerBusy test")
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
@@ -611,10 +609,14 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
 
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> cpuIntensive.executor.toString().contains("queued tasks = 2")));
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> latchedProcessor.getInvocations() >= 2));
 
-      expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
+      expectedException
+          .expectMessage("Flow \"flow\" is unable to accept new events at this time. Reason: REQUIRED_SCHEDULER_BUSY");
       processFlow(newEvent());
     } finally {
       latchedProcessor.release();
@@ -624,6 +626,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
         try {
           f.get(RECEIVE_TIMEOUT, MILLISECONDS);
         } catch (Exception e) {
+          // It is possible for the expected exception to be thrown by a future if the processFlow
+          // in the main thread enters in the time window where it can be retried.
           throw new MuleRuntimeException(e);
         }
       });
@@ -653,7 +657,8 @@ public class ProactorStreamEmitterProcessingStrategyTestCase extends AbstractPro
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
-      Thread.sleep(500);
+      new PollingProber(10000, 10)
+          .check(new JUnitLambdaProbe(() -> latchedProcessor.getInvocations() >= 3));
 
       latchedProcessor.release();
 

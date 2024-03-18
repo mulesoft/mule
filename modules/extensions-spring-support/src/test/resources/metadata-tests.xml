@@ -15,7 +15,7 @@
         <metadata:connection/>
     </metadata:config>
 
-    <metadata:config name="dynamic-config" data="#[mel:'dynamic']">
+    <metadata:config name="dynamic-config" data="#['dynamic']">
         <metadata:connection/>
     </metadata:config>
 
@@ -181,9 +181,9 @@
     </flow>
 
     <flow name="typeWithDeclaredSubtypesMetadata">
-        <metadata:type-with-declared-subtypes-metadata plainShape="#[mel:new org.mule.test.metadata.extension.model.shapes.Circle()]"
-                                                       rectangleSubtype="#[mel:new org.mule.test.metadata.extension.model.shapes.Rectangle()]"
-                                                       animal="#[mel:new org.mule.test.metadata.extension.model.animals.Bear()]"/>
+        <metadata:type-with-declared-subtypes-metadata plainShape="#[java!org::mule::test::metadata::extension::model::shapes::Circle::new()]"
+                                                       rectangleSubtype="#[java!org::mule::test::metadata::extension::model::shapes::Rectangle::new()]"
+                                                       animal="#[java!org::mule::test::metadata::extension::model::animals::Bear::new()]"/>
     </flow>
 
     <flow name="resolverWithDynamicConfig">
@@ -204,7 +204,7 @@
 
     <flow name="pagedOperationMetadata">
         <metadata:paged-operation-metadata config-ref="config"
-                                           animal="#[mel:new org.mule.test.metadata.extension.model.animals.Bear()]"/>
+                                           animal="#[java!org::mule::test::metadata::extension::model::animals::Bear::new()]"/>
     </flow>
 
     <flow name="pagedOperationMetadataResult">
@@ -298,6 +298,20 @@
             <metadata:location continent="AMERICA"/>
         </metadata:metadata-source-with-partial-multi-level-show-in-dsl>
         <logger/>
+    </flow>
+
+    <flow name="scopeWithOutputResolver">
+        <metadata:scope-with-metadata-resolver>
+            <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+        </metadata:scope-with-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithOutputResolver">
+        <metadata:router-with-metadata-resolver>
+            <metadata:metaroute>
+                <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+            </metadata:metaroute>
+        </metadata:router-with-metadata-resolver>
     </flow>
 
 </mule>

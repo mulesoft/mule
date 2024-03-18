@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,7 +9,6 @@ package org.mule.runtime.config.internal.context;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.BOTTOM_UP;
@@ -44,18 +43,20 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.springframework.beans.CachedIntrospectionResults.clearClassLoader;
 import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.ioc.ConfigurableObjectProvider;
 import org.mule.runtime.api.ioc.ObjectProvider;
@@ -88,21 +89,22 @@ import org.mule.runtime.ast.api.validation.ValidationResult;
 import org.mule.runtime.config.internal.bean.NotificationConfig;
 import org.mule.runtime.config.internal.bean.NotificationConfig.EnabledNotificationConfig;
 import org.mule.runtime.config.internal.bean.ServerNotificationManagerConfigurator;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.dsl.model.SpringComponentModel;
-import org.mule.runtime.config.internal.dsl.model.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory;
 import org.mule.runtime.config.internal.editors.MulePropertyEditorRegistrar;
 import org.mule.runtime.config.internal.factories.MuleConfigurationConfigurator;
 import org.mule.runtime.config.internal.model.ApplicationModel;
 import org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor;
 import org.mule.runtime.config.internal.model.ComponentBuildingDefinitionRegistryFactory;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 import org.mule.runtime.config.internal.processor.ComponentLocatorCreatePostProcessor;
 import org.mule.runtime.config.internal.processor.DiscardedOptionalBeanPostProcessor;
 import org.mule.runtime.config.internal.processor.LifecycleStatePostProcessor;
 import org.mule.runtime.config.internal.processor.MuleInjectorProcessor;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
 import org.mule.runtime.config.internal.util.LaxInstantiationStrategyWrapper;
+import org.mule.runtime.config.internal.validation.ast.ReusableArtifactAstDependencyGraphProvider;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
@@ -111,6 +113,7 @@ import org.mule.runtime.core.api.context.notification.MuleContextNotificationLis
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.transaction.TransactionManagerFactory;
 import org.mule.runtime.core.api.transformer.Converter;
+import org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
@@ -118,9 +121,13 @@ import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.TransformerResolver;
-import org.mule.runtime.core.internal.util.DefaultResourceLocator;
+import org.mule.runtime.core.internal.config.DefaultResourceLocator;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
+import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
+import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.WithAttachedClassLoaders;
 import org.mule.runtime.module.extension.internal.manager.CompositeArtifactExtensionManager;
+import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -135,6 +142,7 @@ import java.util.function.Predicate;
 import com.google.common.collect.ImmutableList;
 
 import org.slf4j.Logger;
+import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -244,8 +252,7 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         new BeanDefinitionFactory(muleContext.getConfiguration().getId(),
                                   componentBuildingDefinitionRegistryFactory.create(artifactAst.dependencies()),
                                   featureFlaggingService.isEnabled(DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING),
-                                  featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING),
-                                  featureFlaggingService.isEnabled(ENABLE_BYTE_BUDDY_OBJECT_CREATION));
+                                  featureFlaggingService.isEnabled(DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING));
 
     // TODO W-10855416: remove this
     this.validateAppModelWithRegionClassloader =
@@ -271,7 +278,6 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
     }
     registerErrors(applicationModel);
     registerApplicationExtensionModel();
-
   }
 
   protected MuleRegistry getMuleRegistry() {
@@ -286,13 +292,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
       throws ConfigurationException {
 
     final ValidationResult validation = validatorBuilder()
-        .withValidationEnricher(v -> {
-          try {
-            muleContext.getInjector().inject(v);
-          } catch (MuleException e) {
-            throw new MuleRuntimeException(e);
-          }
-        })
+        .withValidationEnricher(new RuntimeValidationEnricher(new ReusableArtifactAstDependencyGraphProvider(appModel),
+                                                              muleContext))
         .withValidationsFilter(validationsFilter)
         // get the region classloader from the artifact one
         .withArtifactRegionClassLoader(getValidationClassloader())
@@ -365,7 +366,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
 
   protected void doRegisterErrors(final ArtifactAst artifactAst) {
     final ErrorTypeRepository errorTypeRepository = artifactAst.getErrorTypeRepository();
-    final ErrorTypeLocator errorTypeLocator = createDefaultErrorTypeLocator(errorTypeRepository);
+    final ErrorTypeLocator errorTypeLocator =
+        createDefaultErrorTypeLocator(errorTypeRepository, ofNullable(featureFlaggingService));
 
     final Set<ExtensionModel> dependencies = artifactAst.dependencies();
     registerErrorMappings(errorTypeRepository, errorTypeLocator, dependencies);
@@ -378,7 +380,8 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
   }
 
   public void initialize() {
-    applicationModel = prepareAstForRuntime(applicationModel, applicationModel.dependencies());
+    applicationModel =
+        prepareAstForRuntime(applicationModel, applicationModel.dependencies(), ofNullable(featureFlaggingService));
   }
 
   @Override
@@ -469,6 +472,42 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
         throw new MuleRuntimeException(e);
       }
       disposeIfNeeded(configurationProperties.getConfigurationPropertiesResolver(), LOGGER);
+
+      resetCommonCaches();
+      IntrospectionUtils.resetCommonCaches();
+      clearSpringSoftReferencesCachesForDynamicClassLoaders();
+    }
+  }
+
+  /**
+   * We use ByteBuddy to enhance classes defined with the Java SDK, in order to make them implement the {@link Component}
+   * interface. The classloader used to load such dynamic classes is being hold by a cache in Spring, and that cache can be
+   * cleared by calling {@link CachedIntrospectionResults#clearClassLoader}. Notice that this method can be called with the
+   * classloader of the class itself, or any of the parents in its hierarchy.
+   * 
+   * @see AnnotatedObjectInvocationHandler#addAnnotationsToClass
+   * @see CachedIntrospectionResults#clearClassLoader
+   */
+  private void clearSpringSoftReferencesCachesForDynamicClassLoaders() {
+    ClassLoader regionClassLoader = getRegionClassLoader();
+    if (!(regionClassLoader instanceof RegionClassLoader)) {
+      // The method #getRegionClassLoader() should always return the corresponding RegionClassLoader. However, in the
+      // integration tests (which is an ArtifactFunctionalTestCase), the classloader here is an instance of
+      // TestRegionClassLoader. That class extends RegionClassLoader, but it's loaded with a different classloader, and
+      // then we would be getting a ClassCastException here. That's the only reason for this early-return.
+      LOGGER.debug("Got an instance of '{}' as region classloader. We can't clean the spring soft-references caches.",
+                   regionClassLoader.getClass().getCanonicalName());
+      return;
+    }
+    RegionClassLoader region = (RegionClassLoader) regionClassLoader;
+    clearClassLoader(region.getClassLoader());
+    for (ArtifactClassLoader pluginClassLoader : region.getArtifactPluginClassLoaders()) {
+      if (pluginClassLoader instanceof WithAttachedClassLoaders) {
+        WithAttachedClassLoaders withAttachedClassLoaders = (WithAttachedClassLoaders) pluginClassLoader;
+        for (ClassLoader dynamicClassLoader : withAttachedClassLoaders.getAttachedClassLoaders()) {
+          clearClassLoader(dynamicClassLoader);
+        }
+      }
     }
   }
 
@@ -607,10 +646,9 @@ public class MuleArtifactContext extends AbstractRefreshableConfigApplicationCon
                                       Set<String> alwaysEnabledGeneratedTopLevelComponentsName,
                                       List<Pair<String, ComponentAst>> createdComponentModels,
                                       SpringComponentModel resolvedComponentModel) {
-    String nameAttribute = resolvedComponentModel.getComponent().getComponentId().orElse(null);
-    if (resolvedComponentModel.getComponent().getIdentifier().equals(CONFIGURATION_IDENTIFIER)) {
-      nameAttribute = OBJECT_MULE_CONFIGURATION;
-    } else if (nameAttribute == null) {
+    String nameAttribute = resolvedComponentModel.getComponent().getComponentId()
+        .orElse(resolvedComponentModel.getComponentName());
+    if (nameAttribute == null) {
       // This may be a configuration that does not requires a name.
       nameAttribute = uniqueValue(resolvedComponentModel.getBeanDefinition().getBeanClassName());
 

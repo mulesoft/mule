@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-spring-config</artifactId>
     <packaging>jar</packaging>
@@ -14,6 +14,38 @@
     </description>
     
     <properties>
+        <!-- Add visibility required by the tests exclusively -->
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --module-path=${org.yaml:snakeyaml:jar}
+            --add-modules=net.bytebuddy.agent,org.yaml.snakeyaml
+            --add-reads=org.mule.runtime.spring.config=org.yaml.snakeyaml
+            --add-reads=org.mule.runtime.spring.config=org.apache.commons.io
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.api.processor=ALL-UNNAMED
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.component=ALL-UNNAMED
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.exception=ALL-UNNAMED
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor.chain=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.config.builders=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.context=ALL-UNNAMED
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.internal.exception=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.interception=ALL-UNNAMED
+              --add-opens=org.mule.runtime.core/org.mule.runtime.core.privileged.processor=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.profiling=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.registry=ALL-UNNAMED
+            --add-exports=org.mule.runtime.core/org.mule.runtime.core.internal.serialization=ALL-UNNAMED
+            --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.error=ALL-UNNAMED
+              --add-opens=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation=ALL-UNNAMED
+              --add-opens=org.mule.runtime.artifact.ast.xmlParser/org.mule.runtime.ast.api.xml=org.mule.runtime.spring.config
+            --add-exports=org.mule.runtime.spring.config/org.mule.runtime.config.utils=org.mule.runtime.core,org.mule.runtime.service,org.mule.runtime.container
+              --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.dsl.spring=net.bytebuddy
+              --add-opens=org.mule.runtime.core.components/org.mule.runtime.core.internal.processor=ALL-UNNAMED
+              --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.internal.registry=org.mule.runtime.core
+            ${surefire.test.unit.open.args}
+        </surefire.args>
+
+        <javaModuleName>org.mule.runtime.spring.config</javaModuleName>
+        <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -21,11 +53,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-mvel</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -65,6 +92,16 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metrics-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-metrics-exporter-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-customization-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -81,6 +118,11 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-exporter-configuration-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-service-http-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -112,12 +154,6 @@
             <artifactId>mule-sdk-compatibility-api</artifactId>
         </dependency>
         
-        <!-- Add logging libraries required by spring -->
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-logging</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-dsl-api</artifactId>
@@ -162,15 +198,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-service-http-api</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mule.services</groupId>
             <artifactId>mule-service-weave</artifactId>
-            <classifier>mule-service</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -184,48 +213,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-            <scope>test</scope>
-            <!-- see http://jira.codehaus.org/browse/MNG-3007
-                 depending on whether jaxen is resolved via dist.codehaus.org
-                 or the central repo we get transitive dependencies that we
-                 don't want here
-                 -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.ibm.icu</groupId>
-                    <artifactId>icu4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-                <!-- no !"?$ XML parsers whatsoever -->
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xercesImpl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xerces</groupId>
-                    <artifactId>xmlParserAPIs</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>xom</groupId>
-                    <artifactId>xom</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jdom</artifactId>
-                    <groupId>jdom</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>xmlunit</groupId>
             <artifactId>xmlunit</artifactId>
             <scope>test</scope>
@@ -237,41 +224,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <version>${powermockVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <version>${powermockVersion}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermockVersion}</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    
     <profiles>
         <profile>
             <id>ast-serialization-test</id>

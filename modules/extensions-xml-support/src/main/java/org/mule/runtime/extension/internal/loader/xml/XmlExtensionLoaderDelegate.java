@@ -1,13 +1,35 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.extension.internal.loader.xml;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Sets.newHashSet;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
+import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
+import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
+import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
+import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
+import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
+import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
+import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
+import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
+
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
@@ -23,26 +45,10 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Sets.newHashSet;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
-import static org.mule.metadata.api.model.MetadataFormat.JAVA;
-import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
-import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
-import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
-import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
-import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
-import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
-import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
-import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
@@ -80,9 +86,9 @@ import org.mule.runtime.ast.api.util.BaseComponentAstDecorator;
 import org.mule.runtime.ast.api.xml.AstXmlParser;
 import org.mule.runtime.ast.api.xml.AstXmlParser.Builder;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesHierarchyBuilder;
-import org.mule.runtime.config.internal.dsl.model.ClassLoaderResourceProvider;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalParameterModelDefinitionException;
@@ -91,17 +97,22 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.xml.declaration.DeclarationOperation;
 import org.mule.runtime.extension.api.model.operation.ImmutableOperationModel;
 import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
+import org.mule.runtime.extension.api.runtime.connectivity.ConnectionProviderFactory;
 import org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel;
 import org.mule.runtime.extension.internal.ast.property.GlobalElementComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.OperationComponentModelModelProperty;
 import org.mule.runtime.extension.internal.ast.property.PrivateOperationsModelProperty;
 import org.mule.runtime.extension.internal.ast.property.TestConnectionGlobalElementModelProperty;
-import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
+import org.mule.runtime.extension.internal.factories.XmlSdkConfigurationFactory;
+import org.mule.runtime.extension.internal.factories.XmlSdkConnectionProviderFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
+import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
+import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;
@@ -114,6 +125,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.xml.namespace.QName;
@@ -123,6 +135,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import com.google.common.collect.ImmutableMap;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jgrapht.Graph;
@@ -468,8 +481,10 @@ public final class XmlExtensionLoaderDelegate {
     resourcesPaths.stream().forEach(declarer::withResource);
 
     fillDeclarer(declarer, name, version, category, vendor, xmlDslModel, description);
-    declarer.withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel));
-    declarer.withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK));
+    declarer
+        .withModelProperty(getXmlExtensionModelProperty(artifactAst, xmlDslModel))
+        .withModelProperty(new DevelopmentFrameworkModelProperty(XML_SDK))
+        .supportingJavaVersions(getValidatedJavaVersionsIntersection(name, "Module", artifactAst.dependencies()));
 
     Graph<String, DefaultEdge> directedGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
     // loading public operations
@@ -723,11 +738,19 @@ public final class XmlExtensionLoaderDelegate {
     List<ComponentAst> connectionProperties = extractConnectionProperties(moduleAst);
     validateProperties(configurationProperties, connectionProperties);
 
-    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty()) {
+    Optional<ComponentAst> tlsEnabledComponent = getTlsEnabledComponent(moduleAst);
+
+    if (!configurationProperties.isEmpty() || !connectionProperties.isEmpty() || tlsEnabledComponent.isPresent()) {
       declarer.withModelProperty(new NoReconnectionStrategyModelProperty());
       ConfigurationDeclarer configurationDeclarer = declarer.withConfig(CONFIG_NAME);
+      tlsEnabledComponent.ifPresent(comp -> addTlsContextParameter(configurationDeclarer.onDefaultParameterGroup(), comp));
       configurationProperties.forEach(param -> extractProperty(configurationDeclarer, param));
-      addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel);
+      final XmlSdkConfigurationFactory configurationFactory = new XmlSdkConfigurationFactory(configurationDeclarer
+          .getDeclaration()
+          .getAllParameters());
+      addConnectionProvider(configurationDeclarer, connectionProperties, globalElementsComponentModel, configurationFactory);
+
+      configurationDeclarer.withModelProperty(new ConfigurationFactoryModelProperty(configurationFactory));
       return of(configurationDeclarer);
     }
     return empty();
@@ -794,10 +817,12 @@ public final class XmlExtensionLoaderDelegate {
    * @param globalElementsComponentModel collection of global elements where through
    *                                     {@link #getTestConnectionGlobalElement(ConfigurationDeclarer, List, Set)} will look for
    *                                     one that supports test connectivity.
+   * @param configurationFactory         the factory of the config.
    */
   private void addConnectionProvider(ConfigurationDeclarer configurationDeclarer,
                                      List<ComponentAst> connectionProperties,
-                                     List<ComponentAst> globalElementsComponentModel) {
+                                     List<ComponentAst> globalElementsComponentModel,
+                                     XmlSdkConfigurationFactory configurationFactory) {
     final Optional<ComponentAst> testConnectionGlobalElementOptional =
         getTestConnectionGlobalElement(configurationDeclarer, globalElementsComponentModel);
 
@@ -808,6 +833,10 @@ public final class XmlExtensionLoaderDelegate {
           .withConnectionManagementType(ConnectionManagementType.NONE);
       connectionProperties.stream().forEach(param -> extractProperty(connectionProviderDeclarer, param));
 
+      delegateConnectionProviderFactory(testConnectionGlobalElementOptional,
+                                        configurationDeclarer,
+                                        connectionProviderDeclarer,
+                                        configurationFactory);
 
       testConnectionGlobalElementOptional
           .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement
@@ -819,32 +848,96 @@ public final class XmlExtensionLoaderDelegate {
 
   }
 
-  private Optional<ComponentAst> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
-                                                                List<ComponentAst> globalElementsComponentModel) {
-    final List<ComponentAst> markedAsTestConnectionGlobalElements =
-        globalElementsComponentModel.stream()
-            .filter(globalElementComponentModel -> {
-              Object connection =
-                  globalElementComponentModel.getAnnotations().get(MODULE_CONNECTION_MARKER_ANNOTATION_QNAME.toString());
-              if (connection == null) {
-                return false;
-              }
+  /**
+   * Make the connectionProviderFactory for the XML SDK extension be just a delegate to the connectionProviderFactory of its used
+   * connection provider.
+   * 
+   * @param testConnectionGlobalElementOptional the connection from the XML SDK extension to use for connectivity testing.
+   * @param configurationDeclarer               the declarer to get the config parameters from.
+   * @param connectionProviderDeclarer          the declarer to enrich with the {@link ConnectionProviderFactory}, if any.
+   * @param configurationFactory                the factory of the config.
+   */
+  private void delegateConnectionProviderFactory(final Optional<ComponentAst> testConnectionGlobalElementOptional,
+                                                 final ConfigurationDeclarer configurationDeclarer,
+                                                 final ConnectionProviderDeclarer connectionProviderDeclarer,
+                                                 XmlSdkConfigurationFactory configurationFactory) {
+    Optional<ComponentAst> connectionProvider = testConnectionGlobalElementOptional
+        .flatMap(testConnectionGlobalElement -> testConnectionGlobalElement.directChildrenStream()
+            .filter(child -> child.getModel(ConnectionProviderModel.class).isPresent())
+            .findFirst());
 
-              return parseBoolean(connection.toString());
-            })
-            .collect(toList());
+    connectionProvider
+        .flatMap(connectionProviderComponent -> connectionProviderComponent.getModel(ConnectionProviderModel.class)
+            .flatMap(connectionProviderModel -> connectionProviderModel
+                .getModelProperty(ConnectionProviderFactoryModelProperty.class)
+                .map(connectionProviderFactoryModelProperty -> new XmlSdkConnectionProviderFactory(connectionProviderComponent,
+                                                                                                   configurationDeclarer
+                                                                                                       .getDeclaration()
+                                                                                                       .getAllParameters(),
+                                                                                                   connectionProviderDeclarer
+                                                                                                       .getDeclaration()
+                                                                                                       .getAllParameters(),
+                                                                                                   configurationFactory))))
+        .ifPresent(xmlSdkConnectionProviderFactory -> connectionProviderDeclarer
+            .withModelProperty(new ConnectionProviderFactoryModelProperty(xmlSdkConnectionProviderFactory)));
+  }
 
-    if (markedAsTestConnectionGlobalElements.size() > 1) {
-      throw new MuleRuntimeException(createStaticMessage(format("It can only be one global element marked as test connectivity [%s] but found [%d], offended global elements are: [%s]",
-                                                                MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE,
-                                                                markedAsTestConnectionGlobalElements.size(),
-                                                                markedAsTestConnectionGlobalElements.stream()
-                                                                    .map(ComponentAst::getComponentId)
-                                                                    .filter(Optional::isPresent)
-                                                                    .map(Optional::get)
+  private String getComponentIdForErrorMessage(ComponentAst componentAst) {
+    return componentAst.getComponentId().orElse("unnamed@" + componentAst.getLocation().getLocation());
+  }
+
+  private boolean isEnabledBooleanAnnotation(ComponentAst componentAst, QName annotationName) {
+    Object annotation = componentAst.getAnnotations().get(annotationName.toString());
+    if (annotation == null) {
+      return false;
+    }
+
+    return parseBoolean(annotation.toString());
+  }
+
+  private Predicate<ComponentAst> withEnabledBooleanAnnotation(QName annotationName) {
+    return componentAst -> isEnabledBooleanAnnotation(componentAst, annotationName);
+  }
+
+  private Optional<ComponentAst> findAnnotatedElement(Stream<ComponentAst> elements, QName annotationQName) {
+
+    final List<ComponentAst> annotatedElements = elements
+        .filter(withEnabledBooleanAnnotation(annotationQName))
+        .collect(toList());
+    if (annotatedElements.size() > 1) {
+      throw new MuleRuntimeException(createStaticMessage(format("There can only be one global element marked with [%s:%s] but found [%d], offending global elements are: [%s]",
+                                                                annotationQName.getPrefix(),
+                                                                annotationQName.getLocalPart(),
+                                                                annotatedElements.size(),
+                                                                annotatedElements.stream()
+                                                                    .map(this::getComponentIdForErrorMessage)
                                                                     .collect(joining(", ")))));
     }
-    Optional<ComponentAst> testConnectionGlobalElement = markedAsTestConnectionGlobalElements.stream().findFirst();
+
+    return annotatedElements.stream().findFirst();
+  }
+
+  private void validateIsTlsConfigurationSupported(ComponentAst componentAst) {
+    if (!isTlsConfigurationSupported(componentAst)) {
+      throw new MuleRuntimeException(createStaticMessage(format("The annotated element [%s] with [%s:%s] is not valid to be configured for TLS (the component [%s] does not support it)",
+                                                                getComponentIdForErrorMessage(componentAst),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getPrefix(),
+                                                                MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME.getLocalPart(),
+                                                                componentAst.getIdentifier())));
+    }
+  }
+
+  private Optional<ComponentAst> getTlsEnabledComponent(ComponentAst moduleAst) {
+    Optional<ComponentAst> tlsEnabledElement =
+        findAnnotatedElement(moduleAst.recursiveStream(), MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME);
+    tlsEnabledElement.ifPresent(this::validateIsTlsConfigurationSupported);
+    return tlsEnabledElement;
+  }
+
+  private Optional<ComponentAst> getTestConnectionGlobalElement(ConfigurationDeclarer configurationDeclarer,
+                                                                List<ComponentAst> globalElementsComponentModel) {
+    Optional<ComponentAst> testConnectionGlobalElement = findAnnotatedElement(globalElementsComponentModel.stream(),
+                                                                              MODULE_CONNECTION_MARKER_ANNOTATION_QNAME);
     if (!testConnectionGlobalElement.isPresent()) {
       testConnectionGlobalElement = findTestConnectionGlobalElementFrom(globalElementsComponentModel);
     } else {

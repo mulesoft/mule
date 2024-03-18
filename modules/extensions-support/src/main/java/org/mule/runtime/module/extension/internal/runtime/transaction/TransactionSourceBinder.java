@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -17,10 +17,9 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.privileged.transaction.TransactionAdapter;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.sdk.api.connectivity.TransactionalConnection;
 
@@ -39,17 +38,14 @@ public class TransactionSourceBinder {
   private final ComponentModel componentModel;
   private final String applicationName;
   private final NotificationDispatcher notificationDispatcher;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final TransactionBindingDelegate transactionBindingDelegate;
 
   public TransactionSourceBinder(ExtensionModel extensionModel, ComponentModel componentModel, String applicationName,
-                                 NotificationDispatcher notificationDispatcher,
-                                 SingleResourceTransactionFactoryManager transactionFactoryManager) {
+                                 NotificationDispatcher notificationDispatcher) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     transactionBindingDelegate = new TransactionBindingDelegate(extensionModel, componentModel);
   }
 
@@ -58,7 +54,8 @@ public class TransactionSourceBinder {
                                                                                               ComponentLocation sourceLocation,
                                                                                               ConnectionHandler connectionHandler,
                                                                                               TransactionManager transactionManager,
-                                                                                              int timeout)
+                                                                                              int timeout,
+                                                                                              boolean errorAfterTimeout)
       throws ConnectionException, TransactionException {
 
     if (!transactionConfig.isTransacted()) {
@@ -66,10 +63,11 @@ public class TransactionSourceBinder {
     }
 
     Transaction tx =
-        transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
+        transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher,
                                                         transactionManager);
     tx.setTimeout(timeout);
     ((TransactionAdapter) tx).setComponentLocation(sourceLocation);
+    ((TransactionAdapter) tx).setRollbackIfTimeout(errorAfterTimeout);
 
     ConfigurationInstance configuration = ofNullable(configurationInstance)
         .orElseThrow(() -> new IllegalStateException(format(

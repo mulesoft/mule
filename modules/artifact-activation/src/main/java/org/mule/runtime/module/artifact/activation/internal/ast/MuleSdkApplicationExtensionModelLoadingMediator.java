@@ -1,21 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.artifact.activation.internal.ast;
 
-import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils.getOptionalLoaderById;
-import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_APPLICATION_LOADER_ID;
+import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXTENSION_NAME_PROPERTY_NAME;
+import static org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils.getOptionalLoaderById;
 
 import static java.util.Collections.singleton;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
+import org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType;
 import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -52,7 +52,7 @@ public class MuleSdkApplicationExtensionModelLoadingMediator extends AbstractMul
 
   @Override
   protected ExtensionModelLoader getLoader() throws ConfigurationException {
-    return getOptionalLoaderById(this.getClass().getClassLoader(), MULE_SDK_APPLICATION_LOADER_ID)
+    return getOptionalLoaderById(MULE_SDK_APPLICATION_LOADER_ID)
         .orElseThrow(() -> new ConfigurationException(buildErrorMessage("Mule ExtensionModelLoader not found", artifactId)));
   }
 

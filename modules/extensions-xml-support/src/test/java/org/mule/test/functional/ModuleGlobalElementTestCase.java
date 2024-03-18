@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,13 +7,15 @@
 package org.mule.test.functional;
 
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import org.mule.test.petstore.extension.PetStoreClient;
 import org.mule.test.runner.RunnerDelegateTo;
@@ -85,13 +87,6 @@ public class ModuleGlobalElementTestCase extends AbstractCeXmlExtensionMuleArtif
         .run().getMessage().getPayload().getValue();
     assertThat(client.getUsername(), is("john"));
     assertThat(client.getPassword(), is("notDoe"));
-  }
-
-  @Override
-  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
-    // returns true because not same extensions are loaded by all tests.
-    // returning false will fails while creating application context on some tests.
-    return true;
   }
 
 }

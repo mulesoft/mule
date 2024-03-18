@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,15 +14,19 @@ import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
+import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.sdk.api.artifact.lifecycle.ArtifactLifecycleListener;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Parses the syntactic definition of an {@link ExtensionModel} so that the semantics reflected in it can be extracted in a
@@ -145,7 +149,7 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   /**
    * The extension's subtype mappings.
    *
-   * @return a {@link Map} wihich keys represent the base types and each value represents the list of known subtypes
+   * @return a {@link Map} which keys represent the base types and each value represents the list of known subtypes
    */
   Map<MetadataType, List<MetadataType>> getSubTypes();
 
@@ -168,7 +172,22 @@ public interface ExtensionModelParser extends AdditionalPropertiesModelParser {
   /**
    * @return the {@link ExtensionDevelopmentFramework} used to develop the extension being parsed.
    *
-   * @since 4.6.0
+   * @since 4.5.0
    */
   ExtensionDevelopmentFramework getDevelopmentFramework();
+
+  /**
+   * @return an {@link Optional} {@link ArtifactLifecycleListenerModelProperty} if an {@link ArtifactLifecycleListener} was
+   *         defined at the extension level.
+   *
+   * @since 4.5.0
+   */
+  Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty();
+
+  /**
+   * @return The versions of Java that the extension supports
+   * @since 4.5.0
+   * @see {@link JavaConstants}
+   */
+  Set<String> getSupportedJavaVersions();
 }

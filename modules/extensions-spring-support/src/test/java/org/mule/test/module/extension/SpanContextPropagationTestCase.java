@@ -1,19 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.module.extension;
 
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER;
 import static org.mule.tck.probe.PollingProber.check;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EventContextStory.DISTRIBUTED_TRACE_CONTEXT;
 
+import static java.lang.Boolean.TRUE;
+
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.collection.IsMapWithSize.aMapWithSize;
-
 import static org.junit.Assert.assertThat;
 
 import org.mule.runtime.api.component.AbstractComponent;
@@ -21,10 +23,12 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.LinkedList;
@@ -34,6 +38,12 @@ import java.util.Map;
 @Feature(EVENT_CONTEXT)
 @Story(DISTRIBUTED_TRACE_CONTEXT)
 public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalTestCase {
+
+  @Rule
+  public SystemProperty enableTracing = new SystemProperty(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, TRUE.toString());
+
+  @Rule
+  public SystemProperty enableSniffing = new SystemProperty(USE_MULE_OPEN_TELEMETRY_EXPORTER_SNIFFER, TRUE.toString());
 
   private static final List<CoreEvent> EVENTS = new LinkedList<>();
 
@@ -51,6 +61,9 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
   private static final long PROBER_TIMEOUT = 15000;
   private static final long PROBER_FREQUENCY = 1000;
   public static final String W3C_TRACE_PARENT_HEADER = "traceparent";
+
+  public static final String W3C_TRACE_STATE_HEADER = "tracestate";
+
 
   @Override
   protected String getConfigFile() {
@@ -121,10 +134,11 @@ public class SpanContextPropagationTestCase extends AbstractExtensionFunctionalT
     for (CoreEvent event : events) {
       Map<String, String> distributedTraceContext =
           (Map<String, String>) event.getMessage().getPayload().getValue();
-      assertThat(distributedTraceContext, aMapWithSize(1));
+      assertThat(distributedTraceContext, aMapWithSize(2));
       // This test was fixed with W-12336322. Only the distributed trace context
       // of the operation should be propagated.
       assertThat(distributedTraceContext, hasKey(W3C_TRACE_PARENT_HEADER));
+      assertThat(distributedTraceContext, hasKey(W3C_TRACE_STATE_HEADER));
     }
   }
 

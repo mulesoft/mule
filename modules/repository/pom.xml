@@ -7,22 +7,18 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-module-repository</artifactId>
     <name>Bundle repository</name>
     <description>Mule repository module. Provides access to external dependencies required by the runtime.</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.repository</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-reboot</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
@@ -30,12 +26,19 @@
         </dependency>
         <dependency>
             <groupId>org.mule</groupId>
-            <artifactId>mule-maven-client-impl</artifactId>
+            <artifactId>mule-maven-client-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.resolver</groupId>
-            <artifactId>maven-resolver-transport-http</artifactId>
+            <groupId>org.mule</groupId>
+            <artifactId>mule-maven-client-impl</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mule.tests</groupId>
             <artifactId>mule-tests-unit</artifactId>

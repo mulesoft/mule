@@ -1,16 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.management.stats;
 
+import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTIFACT_ID_ATTRIBUTE;
+
 import static java.lang.System.currentTimeMillis;
 
+import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
 import org.mule.runtime.core.api.management.stats.ResetOnQueryCounter;
+import org.mule.runtime.metrics.api.meter.Meter;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -19,6 +23,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   private static final long serialVersionUID = 5337576392583767442L;
+  public static final String FLOW_CONSTRUCT_STATISTICS_NAME = "flow.construct.statistics";
+  public static final String FLOW_CONSTRUCT_STATISTICS_DESCRIPTION = "Flow Construct Statistics";
+  public static final String RECEIVED_EVENTS_NAME = "received.events";
+  public static final String RECEIVED_EVENTS_DESCRIPTION = "Received Events";
+  public static final String DISPATCHED_MESSAGES_NAME = "dispatched.messages";
+  public static final String DISPATCHED_MESSAGES_DESCRIPTION = "Dispatched Messages";
+  public static final String EXECUTION_ERRORS_NAME = "execution.errors";
+  public static final String EXECUTION_ERRORS_DESCRIPTION = "Execution Errors";
+  public static final String FATAL_ERRORS_NAME = "fatal.errors";
+  public static final String FATAL_ERRORS_DESCRIPTION = "Fatal Errors";
 
   protected final String flowConstructType;
   protected String name;
@@ -230,5 +244,41 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     fatalErrorsCounters.add(counter);
     counter.add(getFatalErrors());
     return counter;
+  }
+
+  @Override
+  public void trackUsingMeterProvider(ArtifactMeterProvider meterProvider) {
+    String artifactId = getName() + "-" + meterProvider.getArtifactId();
+    Meter meter = meterProvider.getMeterBuilder(FLOW_CONSTRUCT_STATISTICS_NAME)
+        .withDescription(FLOW_CONSTRUCT_STATISTICS_DESCRIPTION)
+        .withMeterAttribute(MULE_METER_ARTIFACT_ID_ATTRIBUTE, artifactId).build();
+
+    // Register the declared private flows.
+    meter.counterBuilder(RECEIVED_EVENTS_NAME)
+        .withValueSupplier(receivedEvents::get)
+        .withConsumerForAddOperation(receivedEvents::addAndGet)
+        .withSupplierForIncrementAndGetOperation(receivedEvents::incrementAndGet)
+        .withDescription(RECEIVED_EVENTS_DESCRIPTION).build();
+
+    // Register the dispatched messages counter
+    meter.counterBuilder(DISPATCHED_MESSAGES_NAME)
+        .withValueSupplier(dispatchedMessages::get)
+        .withConsumerForAddOperation(dispatchedMessages::addAndGet)
+        .withSupplierForIncrementAndGetOperation(dispatchedMessages::incrementAndGet)
+        .withDescription(DISPATCHED_MESSAGES_DESCRIPTION).build();
+
+    // Register the execution errors counter
+    meter.counterBuilder(EXECUTION_ERRORS_NAME)
+        .withValueSupplier(executionError::get)
+        .withConsumerForAddOperation(executionError::addAndGet)
+        .withSupplierForIncrementAndGetOperation(executionError::incrementAndGet)
+        .withDescription(EXECUTION_ERRORS_DESCRIPTION).build();
+
+    // Register the fatal errors counter
+    meter.counterBuilder(FATAL_ERRORS_NAME)
+        .withValueSupplier(fatalError::get)
+        .withConsumerForAddOperation(fatalError::addAndGet)
+        .withSupplierForIncrementAndGetOperation(fatalError::incrementAndGet)
+        .withDescription(FATAL_ERRORS_DESCRIPTION).build();
   }
 }

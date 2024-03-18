@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -403,14 +403,14 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
           if (filtered.contains(componentAst) || ignoreCondition.test(componentAstWithHierarchy)) {
             return Stream.empty();
+          } else if (filterCondition.test(componentAstWithHierarchy)) {
+            recursiveAddToFiltered(componentAst, filtered);
+            return Stream.empty();
           }
           Optional<OperationModel> operationModel = componentAst.getModel(OperationModel.class);
           if (operationModel.isPresent()) {
             // It's an operation ast, with an operation model.
             return Stream.of(componentAstWithHierarchy);
-          } else if (filterCondition.test(componentAstWithHierarchy)) {
-            recursiveAddToFiltered(componentAst, filtered);
-            return Stream.empty();
           } else if (componentAst.getComponentType().equals(UNKNOWN)) {
             return expandOperationWithoutModel(operationModelParsersByName, visitedOperations, componentAstWithHierarchy,
                                                filterCondition, ignoreCondition);

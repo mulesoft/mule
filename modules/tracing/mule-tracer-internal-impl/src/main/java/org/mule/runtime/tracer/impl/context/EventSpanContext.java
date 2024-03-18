@@ -1,25 +1,25 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.tracer.impl.context;
+
+import static org.mule.runtime.tracer.impl.span.InternalSpan.getAsInternalSpan;
+import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
 
 import static java.util.Optional.ofNullable;
 
-import static org.mule.runtime.tracer.api.span.InternalSpan.getAsInternalSpan;
-import static org.mule.runtime.tracer.impl.span.DeserializedSpan.getDeserializedRootSpan;
-
-import java.util.Optional;
-
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.tracer.api.context.SpanContext;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
-import org.mule.runtime.tracer.api.span.InternalSpan;
+import org.mule.runtime.tracer.impl.span.InternalSpan;
 import org.mule.runtime.tracer.api.span.error.InternalSpanError;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
 import org.mule.runtime.tracer.api.span.validation.AssertionFailedException;
+
+import java.util.Optional;
 
 /**
  * A {@link SpanContext} associated to an event. A {@link org.mule.runtime.core.api.event.CoreEvent} is the component that travels
@@ -50,6 +50,7 @@ public class EventSpanContext implements SpanContext {
 
   @Override
   public void endSpan(Assertion assertion) {
+    assertion.assertOnSpan(currentSpan);
     currentSpan.end();
     currentSpan = resolveParentAsInternalSpan();
   }
@@ -64,13 +65,13 @@ public class EventSpanContext implements SpanContext {
   }
 
   @Override
-  public void setSpan(InternalSpan span, Assertion assertion) throws AssertionFailedException {
+  public void setSpan(Span span, Assertion assertion) throws AssertionFailedException {
     assertion.assertOnSpan(currentSpan);
-    this.currentSpan = currentSpan.updateChildSpanExporter(span);
+    this.currentSpan = getAsInternalSpan(span);
   }
 
   @Override
-  public Optional<InternalSpan> getSpan() {
+  public Optional<Span> getSpan() {
     return ofNullable(currentSpan);
   }
 
@@ -91,7 +92,6 @@ public class EventSpanContext implements SpanContext {
       this.distributedTraceContextMapGetter = distributedTraceContextMapGetter;
       return this;
     }
-
 
     public EventSpanContextBuilder withPropagateTracingExceptions(boolean propagateTracingExceptions) {
       this.propagateTracingExceptions = propagateTracingExceptions;

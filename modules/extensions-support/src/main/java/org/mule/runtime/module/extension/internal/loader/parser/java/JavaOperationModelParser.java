@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -84,6 +84,9 @@ import org.mule.runtime.module.extension.internal.runtime.execution.CompletableO
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
 
+import java.lang.reflect.Executable;
+import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -102,7 +105,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
                                                                                RouterCompletionCallback.class,
                                                                                org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
                                                                                VoidCompletionCallback.class,
-                                                                               org.mule.sdk.api.runtime.process.VoidCompletionCallback.class);
+                                                                               org.mule.sdk.api.runtime.process.VoidCompletionCallback.class,
+                                                                               CompletionCallback.class,
+                                                                               org.mule.sdk.api.runtime.process.CompletionCallback.class);
 
   private final JavaExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
@@ -117,6 +122,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private boolean blocking = false;
   private boolean scope = false;
   private boolean router = false;
+  private boolean hasDeprecatedRouterCompletion = false;
   private boolean autoPaging = false;
   private List<ExtensionParameter> routes = emptyList();
 
@@ -264,6 +270,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       throw new IllegalOperationModelDefinitionException(format(
                                                                 "Router '%s' is not declared in a void method.", getName()));
     }
+    hasDeprecatedRouterCompletion =
+        operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
   }
 
   private boolean isRouterCallback(ExtensionParameter p) {
@@ -473,7 +481,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
   @Override
   public List<InputResolverModelParser> getInputResolverModelParsers() {
-    return parseInputResolversModelParser(operationElement);
+    return parseInputResolversModelParser(getParameterGroupModelParsers());
   }
 
   @Override
@@ -515,8 +523,13 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   private void collectAdditionalModelProperties() {
-    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement));
+    additionalModelProperties.add(new ExtensionOperationDescriptorModelProperty(operationElement, hasDeprecatedRouterCompletion));
     operationElement.getMethod().ifPresent(method -> additionalModelProperties.add(new ImplementingMethodModelProperty(method)));
+  }
+
+  private boolean parameterOfRouterCompletionCallbackType(ExtensionParameter param) {
+    return param.getType().isSameType(RouterCompletionCallback.class)
+        || param.getType().isSameType(org.mule.sdk.api.runtime.process.RouterCompletionCallback.class);
   }
 
   @Override
@@ -524,7 +537,7 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     if (isScope()) {
       return "Scope";
     } else if (isRouter()) {
-      return "Construct";
+      return "Router";
     }
     return "Operation";
   }

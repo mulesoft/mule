@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -25,10 +25,13 @@ import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.Query;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
+import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
+import org.mule.test.metadata.extension.model.animals.AnimalShelter;
 import org.mule.test.metadata.extension.model.animals.Bear;
 import org.mule.test.metadata.extension.model.attribute.AbstractOutputAttributes;
 import org.mule.test.metadata.extension.model.shapes.Rectangle;
@@ -39,6 +42,8 @@ import org.mule.test.metadata.extension.query.MetadataExtensionEntityResolver;
 import org.mule.test.metadata.extension.query.MetadataExtensionQueryTranslator;
 import org.mule.test.metadata.extension.query.NativeQueryOutputResolver;
 import org.mule.test.metadata.extension.resolver.AnyJsonTypeStaticResolver;
+import org.mule.test.metadata.extension.resolver.RouterTestResolver;
+import org.mule.test.metadata.extension.resolver.ScopeTestResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestInputResolverWithKeyResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAnyTypeResolver;
 import org.mule.test.metadata.extension.resolver.SdkTestOutputAttributesResolverWithKeyResolver;
@@ -370,5 +375,24 @@ public class MetadataOperations {
                                                    @MetadataKeyId(TestOutputResolverWithKeyResolverUsingConfig.class) String type,
                                                    @Optional @Content Object content) {
     return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  public Object inputMetadataResolverInParameterInParameterGroup(@ParameterGroup(
+      name = "Animal shelter") AnimalShelter animalShelter) {
+    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = ScopeTestResolver.class)
+  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Object, Void> cb) {
+    chain.process(cb::success, (t, e) -> cb.error(t));
+    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = RouterTestResolver.class)
+  public void routerWithMetadataResolver(MetadataRoute metaroute, CompletionCallback<Object, Void> cb) {
+    metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
   }
 }

@@ -1,15 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.runtime.config;
 
-import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.api.retry.ReconnectionConfig.defaultReconnectionConfig;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.getInjectionTarget;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getConnectionProviderFactory;
+
+import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -19,7 +22,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.SdkConnectionProviderAdapter;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
@@ -70,7 +73,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
     super(prototypeClass, providerModel, resolverSet, expressionManager, muleContext);
     this.providerModel = providerModel;
     this.poolingProfile = poolingProfile;
-    this.extensionModel = extensionModel;
+    this.extensionModel = requireNonNull(extensionModel);
     this.muleContext = muleContext;
     this.reconnectionConfig = computeReconnectionConfig(reconnectionConfig);
   }
@@ -87,7 +90,7 @@ public abstract class ConnectionProviderObjectBuilder<C>
   }
 
   private ReconnectionConfig computeReconnectionConfig(ReconnectionConfig reconnectionConfig) {
-    return reconnectionConfig != null ? reconnectionConfig : ReconnectionConfig.getDefault();
+    return reconnectionConfig != null ? reconnectionConfig : defaultReconnectionConfig();
   }
 
   public ConnectionProviderObjectBuilder(ConnectionProviderModel providerModel,
@@ -109,8 +112,9 @@ public abstract class ConnectionProviderObjectBuilder<C>
   /**
    * {@inheritDoc}
    */
+  @Override
   protected Pair<ConnectionProvider<C>, ResolverSetResult> instantiateObject() {
-    return new Pair<>((ConnectionProvider<C>) getConnectionProviderFactory(providerModel).newInstance(), null);
+    return new Pair<>(getConnectionProviderFactory(providerModel).newInstance(), null);
   }
 
   @Override

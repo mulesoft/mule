@@ -1,17 +1,15 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.config.internal.util;
+
+import static org.mule.runtime.dsl.internal.component.config.ComponentBuildingDefinitionProviderUtils.lookupComponentBuildingDefinitionProviders;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.config.internal.context.MuleArtifactContext;
-import org.mule.runtime.core.api.registry.ServiceRegistry;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider;
 import org.mule.runtime.module.extension.internal.config.ExtensionBuildingDefinitionProvider;
@@ -25,8 +23,6 @@ import java.util.Set;
  */
 public final class ComponentBuildingDefinitionUtils {
 
-  private static final ServiceRegistry SERVICE_REGISTRY = new SpiServiceRegistry();
-
   private static ComponentBuildingDefinitionProvider runtimeComponentBuildingDefinitions;
 
   /**
@@ -37,9 +33,8 @@ public final class ComponentBuildingDefinitionUtils {
   public static ComponentBuildingDefinitionProvider getRuntimeComponentBuildingDefinitionProvider() {
     if (runtimeComponentBuildingDefinitions == null) {
       List<ComponentBuildingDefinition> allDefinitions = new ArrayList<>();
-      new SpiServiceRegistry()
-          .lookupProviders(ComponentBuildingDefinitionProvider.class,
-                           MuleArtifactContext.class.getClassLoader())
+
+      lookupComponentBuildingDefinitionProviders()
           .forEach(componentBuildingDefinitionProvider -> {
             componentBuildingDefinitionProvider.init();
 
@@ -69,7 +64,7 @@ public final class ComponentBuildingDefinitionUtils {
   public static List<ComponentBuildingDefinition> getExtensionModelsComponentBuildingDefinitions(Set<ExtensionModel> extensionModels,
                                                                                                  DslResolvingContext dslResolvingContext) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    SERVICE_REGISTRY.lookupProviders(ComponentBuildingDefinitionProvider.class, MuleArtifactContext.class.getClassLoader())
+    lookupComponentBuildingDefinitionProviders()
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider instanceof ExtensionBuildingDefinitionProvider) {
             ExtensionBuildingDefinitionProvider extensionBuildingDefinitionProvider =
@@ -95,7 +90,7 @@ public final class ComponentBuildingDefinitionUtils {
    */
   public static List<ComponentBuildingDefinition> getArtifactComponentBuildingDefinitions(ClassLoader classLoader) {
     List<ComponentBuildingDefinition> componentBuildingDefinitions = new ArrayList<>();
-    SERVICE_REGISTRY.lookupProviders(ComponentBuildingDefinitionProvider.class, classLoader)
+    lookupComponentBuildingDefinitionProviders(classLoader)
         .forEach(componentBuildingDefinitionProvider -> {
           if (componentBuildingDefinitionProvider.getClass().getClassLoader().equals(classLoader)) {
             componentBuildingDefinitionProvider.init();

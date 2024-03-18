@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -100,7 +100,7 @@ public class JavaOAuthConnectionProviderModelValidator implements ExtensionModel
                                          Field field,
                                          ProblemsReporter problemsReporter) {
     if (getExpressionSupport(field)
-        .filter(expression -> expression == NOT_SUPPORTED)
+        .filter(expression -> expression != NOT_SUPPORTED)
         .isPresent()) {
       problemsReporter.addError(new Problem(parameter, format(
                                                               "Parameter '%s' in Connection Provider '%s' is marked as supporting expressions. Expressions are not supported "

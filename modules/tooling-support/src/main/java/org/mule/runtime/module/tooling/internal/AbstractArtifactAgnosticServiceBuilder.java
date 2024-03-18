@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.tooling.internal;
 
+import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 import static org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider.discoverProvider;
 import static org.mule.runtime.api.deployment.meta.Product.MULE;
 import static org.mule.runtime.api.util.Preconditions.checkState;
@@ -13,7 +14,6 @@ import static org.mule.runtime.container.api.MuleFoldersUtil.getExecutionFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.META_INF;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
-import static org.mule.maven.pom.parser.api.model.BundleScope.valueOf;
 
 import static java.nio.file.Files.createDirectories;
 import static java.util.Collections.emptyMap;
@@ -24,8 +24,11 @@ import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.apache.commons.io.IOUtils.copy;
 
+import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.MavenClientProvider;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
 import org.mule.maven.pom.parser.api.model.MavenModelBuilderProvider;
@@ -51,7 +54,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactAgnosticServiceBuilder, S>
     implements ArtifactAgnosticServiceBuilder<T, S> {
@@ -122,7 +124,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
             .setOptional(dependency.getOptional())
             .setSystemPath(dependency.getSystemPath())
             .setExclusions(dependency.getExclusions().stream()
-                .map(exclusion -> Pair.of(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
+                .map(exclusion -> new ArtifactCoordinates(exclusion.getGroupId(), exclusion.getArtifactId())).collect(toList()))
             .build();
 
 
@@ -137,7 +139,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private void addMavenModelDependency(BundleDependency bundleDependency) {
     org.mule.maven.pom.parser.api.model.BundleDescriptor descriptor = bundleDependency.getDescriptor();
-    if (descriptor.getClassifier().isPresent() && !MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().get())) {
+    if (!MULE_PLUGIN_CLASSIFIER.equals(descriptor.getClassifier().orElse(null))) {
       model.addSharedLibraryDependency(descriptor.getGroupId(), descriptor.getArtifactId());
     }
     model.addDependency(bundleDependency);
@@ -158,12 +160,18 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
       MavenClientProvider mavenClientProvider =
           MavenClientProvider.discoverProvider(AbstractArtifactAgnosticServiceBuilder.class.getClassLoader());
-      ClassLoaderConfiguration classLoaderConfiguration =
-          new DeployableMavenClassLoaderConfigurationLoader(of(mavenClientProvider
-              .createMavenClient(GlobalConfigLoader.getMavenConfig())))
-                  .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
-                                                        createTempBundleDescriptor()),
-                        ArtifactType.APP);
+      ClassLoaderConfiguration classLoaderConfiguration;
+      try (MavenClient mavenClient = mavenClientProvider.createMavenClient(GlobalConfigLoader.getMavenConfig())) {
+        classLoaderConfiguration =
+            new DeployableMavenClassLoaderConfigurationLoader(of(mavenClient))
+                .load(applicationFolder, singletonMap(BundleDescriptor.class.getName(),
+                                                      createTempBundleDescriptor()),
+                      ArtifactType.APP);
+      }
+
+      for (String config : configs) {
+        copy(this.getClass().getClassLoader().getResource(config), new File(applicationFolder, config));
+      }
 
       File destinationFolder =
           applicationFolder.toPath().resolve(META_INF).resolve(MULE_ARTIFACT).toFile();
@@ -174,6 +182,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
           new MuleApplicationModelJsonSerializer().serialize(serializeModel(applicationName, classLoaderConfiguration,
                                                                             configs,
                                                                             muleVersion.toCompleteNumericVersion()));
+
       try (FileWriter fileWriter = new FileWriter(new File(destinationFolder, "mule-artifact.json"))) {
         fileWriter.write(artifactJson);
       }
@@ -226,6 +235,16 @@ public abstract class AbstractArtifactAgnosticServiceBuilder<T extends ArtifactA
 
   private T getThis() {
     return (T) this;
+  }
+
+  // Used in test cases
+  MavenModelBuilder getModel() {
+    return model;
+  }
+
+  // Used in test cases
+  void setModel(MavenModelBuilder model) {
+    this.model = model;
   }
 
 }

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.artifact.activation.api.extension.discovery;
 
 import org.mule.api.annotation.NoImplement;
@@ -30,7 +29,7 @@ public interface ExtensionModelLoaderRepository {
    * @since 4.5
    */
   static ExtensionModelLoaderRepository getExtensionModelLoaderManager() {
-    return new DefaultExtensionModelLoaderRepository(ExtensionModelLoaderRepository.class.getClassLoader());
+    return new DefaultExtensionModelLoaderRepository();
   }
 
   /**
@@ -38,19 +37,8 @@ public interface ExtensionModelLoaderRepository {
    *         {@link ExtensionModelLoaderRepository}.
    * @since 4.5
    */
-  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ClassLoader containerClassLoader) {
-    return new DefaultExtensionModelLoaderRepository(containerClassLoader);
-  }
-
-  /**
-   * @return a repository that manages the lifecycle of the {@link ExtensionModelLoader} available in the
-   *         {@link ExtensionModelLoaderRepository}.
-   * @since 4.5
-   */
-  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(ClassLoader containerClassLoader,
-                                                                       Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
-    DefaultExtensionModelLoaderRepository muleExtensionModelLoaderManager =
-        new DefaultExtensionModelLoaderRepository(containerClassLoader);
+  static ExtensionModelLoaderRepository getExtensionModelLoaderManager(Supplier<Collection<ExtensionModelLoader>> extModelLoadersLookup) {
+    DefaultExtensionModelLoaderRepository muleExtensionModelLoaderManager = new DefaultExtensionModelLoaderRepository();
     muleExtensionModelLoaderManager.setExtensionModelLoadersLookup(extModelLoadersLookup);
     return muleExtensionModelLoaderManager;
   }

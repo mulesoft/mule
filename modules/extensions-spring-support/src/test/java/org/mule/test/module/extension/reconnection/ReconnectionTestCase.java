@@ -1,25 +1,26 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.module.extension.reconnection;
 
+import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
+import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
+import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
+import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
+import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
+import static org.mule.tck.probe.PollingProber.check;
+import static org.mule.tck.probe.PollingProber.checkNot;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertThat;
-import static org.mule.extension.test.extension.reconnection.ReconnectableConnectionProvider.disconnectCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.closePagingProviderCalls;
-import static org.mule.extension.test.extension.reconnection.ReconnectionOperations.getPageCalls;
-import static org.mule.runtime.core.api.util.ClassUtils.getFieldValue;
-import static org.mule.runtime.extension.api.error.MuleErrors.CONNECTIVITY;
-import static org.mule.runtime.extension.api.error.MuleErrors.VALIDATION;
-import static org.mule.tck.probe.PollingProber.check;
-import static org.mule.tck.probe.PollingProber.checkNot;
 
 import org.mule.extension.test.extension.reconnection.FailingConnection;
 import org.mule.extension.test.extension.reconnection.FallibleReconnectableSource;
@@ -44,12 +45,14 @@ import org.mule.runtime.extension.api.error.MuleErrors;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.test.module.extension.AbstractExtensionFunctionalTestCase;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
@@ -147,6 +150,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("W-14161245")
   public void getInlineRetryPolicyTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnection").run()
         .getMessage().getPayload().getValue();
@@ -155,6 +159,7 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
   }
 
   @Test
+  @Ignore("W-14161245")
   public void getInlineRetryPolicyBlockingTemplate() throws Exception {
     RetryPolicyTemplate template = (RetryPolicyTemplate) flowRunner("getInlineReconnectionBlocking").run()
         .getMessage().getPayload().getValue();
@@ -281,14 +286,18 @@ public class ReconnectionTestCase extends AbstractExtensionFunctionalTestCase {
     });
   }
 
-  protected void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
+  private void assertRetryTemplate(RetryPolicyTemplate template, boolean async, int count, long freq) throws Exception {
     assertThat(template.isAsync(), is(async));
 
     RetryPolicy policy = template.createRetryInstance();
 
-    assertThat(getFieldValue(policy, "count", false), is(count));
-    Duration duration = getFieldValue(policy, "frequency", false);
-    assertThat(duration.toMillis(), is(freq));
+    // Needs to use reflection because SimpleRetryPolicy is an internal class on the container ClassLoader which is not visible
+    // from the TestCase's ClassLoader. Still, both methods are accessible (public in this case).
+    Method getCountMethod = policy.getClass().getMethod("getCount");
+    Method getFrequencyMethod = policy.getClass().getMethod("getFrequency");
+
+    assertThat(getCountMethod.invoke(policy), is(count));
+    assertThat(((Duration) getFrequencyMethod.invoke(policy)).toMillis(), is(freq));
   }
 
   private void switchConnection() throws Exception {

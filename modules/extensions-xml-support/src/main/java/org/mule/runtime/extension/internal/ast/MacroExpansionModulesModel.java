@@ -1,24 +1,27 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.extension.internal.ast;
 
-import static java.lang.String.format;
-import static java.lang.System.lineSeparator;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.repeat;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
 import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
+import static java.lang.String.format;
+import static java.lang.System.lineSeparator;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
+
+import static org.apache.commons.lang3.StringUtils.repeat;
+
 import org.mule.runtime.api.component.ComponentIdentifier;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -28,6 +31,7 @@ import org.mule.runtime.extension.api.property.XmlExtensionModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -63,6 +67,7 @@ public class MacroExpansionModulesModel {
 
   private ArtifactAst applicationModel;
   private final List<ExtensionModel> sortedExtensions;
+  private final Optional<FeatureFlaggingService> featureFlaggingService;
 
   /**
    * From a mutable {@code applicationModel}, it will store it to apply changes when the {@link #expand()} method is executed.
@@ -73,9 +78,11 @@ public class MacroExpansionModulesModel {
    *                         up only those that are coming from an XML context through the {@link XmlExtensionModelProperty}
    *                         property.
    */
-  public MacroExpansionModulesModel(ArtifactAst applicationModel, Set<ExtensionModel> extensions) {
+  public MacroExpansionModulesModel(ArtifactAst applicationModel, Set<ExtensionModel> extensions,
+                                    Optional<FeatureFlaggingService> featureFlaggingService) {
     this.applicationModel = applicationModel;
     this.sortedExtensions = calculateExtensionByTopologicalOrder(extensions);
+    this.featureFlaggingService = featureFlaggingService;
   }
 
   /**
@@ -95,7 +102,7 @@ public class MacroExpansionModulesModel {
                               extensionModel.getXmlDslModel().getPrefix(),
                               extensionModel.getXmlDslModel().getNamespace()));
         }
-        applicationModel = new MacroExpansionModuleModel(applicationModel, extensionModel).expand();
+        applicationModel = new MacroExpansionModuleModel(applicationModel, extensionModel, featureFlaggingService).expand();
       }
     }
 

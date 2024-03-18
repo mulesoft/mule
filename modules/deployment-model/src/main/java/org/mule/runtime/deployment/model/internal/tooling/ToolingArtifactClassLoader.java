@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,9 +12,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
+import org.mule.runtime.module.artifact.api.classloader.ModuleLayerInformationSupplier;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ShutdownListener;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
@@ -106,6 +108,16 @@ public class ToolingArtifactClassLoader implements ArtifactClassLoader {
   @Override
   public void addShutdownListener(ShutdownListener listener) {
     delegateArtifactClassLoader.addShutdownListener(listener);
+  }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    delegateArtifactClassLoader.setModuleLayerInformationSupplier(moduleLayerInformationSupplier);
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return delegateArtifactClassLoader.getModuleLayerInformation();
   }
 
   @Override

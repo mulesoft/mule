@@ -5,16 +5,18 @@
     <parent>
         <artifactId>mule-test-extensions-parent</artifactId>
         <groupId>org.mule.tests</groupId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>test-config-properties-extension-deprecated-complex</artifactId>
+    <packaging>jar</packaging>
 
     <name>Mule Test Config Properties Extension Complex (deprecated)</name>
     <description>A Mule extension with complex elements for testing deprecated Configuration Properties provider</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.config.properties.deprecated.complex</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>

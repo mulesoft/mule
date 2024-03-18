@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +13,6 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -82,7 +81,7 @@ public class TypeSafeExpressionValueResolverTestCase extends AbstractMuleContext
 
     ExpressionManager expressionManager = mock(ExpressionManager.class);
     ExpressionManagerSession session = mock(ExpressionManagerSession.class);
-    when(expressionManager.openSession(anyObject(), anyObject(), anyObject())).thenReturn(session);
+    when(expressionManager.openSession(any(), any(), any())).thenReturn(session);
 
     ValueResolvingContext ctx = ValueResolvingContext.builder(eventBuilder(muleContext).message(of(HELLO_WORLD)).build())
         .withExpressionManager(expressionManager)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -20,6 +20,7 @@ import org.mule.runtime.api.config.MuleRuntimeFeature;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.internal.management.stats.ApplicationStatistics;
 import org.mule.runtime.core.internal.management.stats.DefaultFlowsSummaryStatistics;
+import org.mule.runtime.metrics.api.MeterProvider;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class AllStatistics {
   private final FlowsSummaryStatistics flowSummaryStatistics;
   private final Map<String, FlowConstructStatistics> flowConstructStats = new HashMap<>();
   private final Map<String, PayloadStatistics> payloadStatistics = emptyMap();
+  private ArtifactMeterProvider meterProvider;
 
   /**
    *
@@ -96,6 +98,9 @@ public class AllStatistics {
   public synchronized void add(FlowConstructStatistics stat) {
     if (stat != null) {
       stat.setEnabled(isStatisticsEnabled);
+      if (meterProvider != null) {
+        stat.trackUsingMeterProvider(meterProvider);
+      }
       flowConstructStats.put(stat.getName(), stat);
     }
   }
@@ -180,5 +185,18 @@ public class AllStatistics {
     featureFlaggingRegistry.registerFeatureFlag(COMPUTE_CONNECTION_ERRORS_IN_STATS,
                                                 featureContext -> featureContext.getArtifactMinMuleVersion()
                                                     .filter(muleVersion -> muleVersion.atLeast("4.4.0")).isPresent());
+  }
+
+  /**
+   * Tracks the statistics using the provided {@link MeterProvider} with the corresponding artifact id.
+   *
+   * @param meterProvider the {@link MeterProvider} to track the statistics
+   * @param artifactId    the artifact id.
+   */
+  public void trackUsingMeterProvider(MeterProvider meterProvider, String artifactId) {
+    this.meterProvider = new ArtifactMeterProvider(meterProvider, artifactId);
+    this.flowSummaryStatistics.trackUsingMeterProvider(this.meterProvider);
+    this.flowConstructStats.values()
+        .forEach(flowConstructStatsValue -> flowConstructStatsValue.trackUsingMeterProvider(this.meterProvider));
   }
 }

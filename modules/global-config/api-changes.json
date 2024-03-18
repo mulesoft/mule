@@ -1,7 +1,126 @@
 {
-  "4.6.0": {
+  "4.7.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.LocalRepositorySupplierFactory",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.MavenClient",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.MavenClientProvider",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.MavenReactorResolver",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.PomFileSupplierFactory",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.SettingsSupplierFactory",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.client.api.VersionRangeResult",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "class org.mule.maven.pom.parser.api.model.ArtifactCoordinates",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "class org.mule.maven.pom.parser.api.model.BundleDependency",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "class org.mule.maven.pom.parser.api.model.BundleDescriptor",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "enum org.mule.maven.pom.parser.api.model.BundleScope",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.pom.parser.api.model.MavenPomModel",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      },
+	      {
+	        "ignore": true,
+	        "code": "java.class.externalClassExposedInAPI",
+	        "new": "interface org.mule.maven.pom.parser.api.model.PomParentCoordinates",
+	        "justification": "W-13829806: maven-client is an API owned by the same mule team"
+	      }
+	    ]
+      }
+    }
+  },
+  "4.5.0": {
     "revapi": {
       "ignore": [
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.Authentication",
+          "new": "interface org.mule.maven.client.api.model.Authentication",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "Authentication",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.MavenConfiguration",
+          "new": "interface org.mule.maven.client.api.model.MavenConfiguration",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "MavenConfiguration",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
+        {
+          "code": "java.annotation.removed",
+          "old": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "new": "interface org.mule.maven.client.api.model.RemoteRepository",
+          "annotationType": "org.mule.api.annotation.NoImplement",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "package": "org.mule.maven.client.api.model",
+          "classSimpleName": "RemoteRepository",
+          "elementKind": "interface",
+          "justification": "Removed mule runtime annotations from independant library"
+        },
         {
           "code": "java.class.removed",
           "old": "class org.mule.maven.client.api.model.BundleDependency",
@@ -25,13 +144,7 @@
           "classSimpleName": "BundleScope",
           "elementKind": "enum",
           "justification": "W-12514052: moved to the new pom parser api"
-        }
-      ]
-    }
-  },
-  "4.5.0": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "code": "java.class.externalClassExposedInAPI",
           "new": "class org.mule.maven.client.api.model.BundleDependency",

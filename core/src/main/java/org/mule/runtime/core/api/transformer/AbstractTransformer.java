@@ -1,18 +1,19 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.transformer;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Objects.hash;
 import static org.mule.runtime.api.metadata.DataType.builder;
 import static org.mule.runtime.core.api.config.i18n.CoreMessages.transformOnObjectUnsupportedTypeOfEndpoint;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
-import static org.mule.runtime.core.privileged.transformer.TransformerUtils.checkTransformerReturnClass;
+import static org.mule.runtime.core.internal.transformer.TransformerUtils.checkTransformerReturnClass;
+
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Objects.hash;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.exception.MuleException;
@@ -25,8 +26,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringMessageUtils;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.transformer.TransformerUtils;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.TransformerUtils;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.inject.Inject;
 import javax.xml.transform.stream.StreamSource;
 
 import org.slf4j.Logger;
@@ -234,7 +236,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
       sourceType = ((TypedValue) src).getDataType();
     } else if (src instanceof Message) {
       Message message = (Message) src;
-      if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true) && !(this instanceof AbstractMessageTransformer))) {
+      if ((!isSourceDataTypeSupported(DataType.MULE_MESSAGE, true))) {
         payload = message.getPayload().getValue();
         sourceType = message.getPayload().getDataType();
       } else {
@@ -327,6 +329,7 @@ public abstract class AbstractTransformer extends AbstractComponent implements T
   }
 
   @Override
+  @Inject
   public void setMuleContext(MuleContext context) {
     this.muleContext = context;
   }

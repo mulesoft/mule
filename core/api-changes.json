@@ -1,7 +1,1570 @@
 {
+  "4.7.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.api.util.StringMessageUtils::getFormattedMessage(java.lang.String, java.lang.Object[])",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.AttributeEvaluator",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.BeanUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.CollectionUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.EventUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.MapUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.NumberUtils",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.ObjectNameHelper",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.TemplateParser",
+            "justification": "W-15188084: Encapsulate org.mule.runtime.core.privileged.util"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.visibilityReduced",
+            "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.privileged.transformer.TransformersRegistry) throws java.io.IOException",
+            "new": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation.SerializedDataHandler::<init>(java.lang.String, javax.activation.DataHandler, org.mule.runtime.core.internal.transformer.TransformersRegistry) throws java.io.IOException",
+            "oldVisibility": "public",
+            "newVisibility": "private",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.store.DeserializationPostInitialisable",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.CompositeConverter",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.ExtendedTransformationService",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.TransformerUtils",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transformer.TransformersRegistry",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+            "justification": "W-15227787: Encapsulate org.mule.runtime.core.privileged.transformer"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removed",
+            "old": "field org.mule.runtime.core.api.config.DefaultMuleConfiguration.flowTrace",
+            "justification": "W-14572236: Remove killswitches"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.SingleResourceTransactionFactoryManager org.mule.runtime.core.api.MuleContext::getTransactionFactoryManager()",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.SingleResourceTransactionFactoryManager",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T> org.mule.runtime.core.api.execution.TransactionalExecutionTemplate<T>::createCompatibilityExecutionTemplate(org.mule.runtime.core.api.MuleContext, org.mule.runtime.core.api.transaction.TransactionConfig)",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.api.transaction.Transaction org.mule.runtime.core.api.transaction.TransactionFactory::beginTransaction(java.lang.String, org.mule.runtime.api.notification.NotificationDispatcher, org.mule.runtime.core.api.SingleResourceTransactionFactoryManager, javax.transaction.TransactionManager) throws org.mule.runtime.api.tx.TransactionException",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transaction.AbstractSingleResourceTransaction",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transaction.AbstractTransaction",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transaction.TransactionAdapter",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transaction.XaTransaction",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transaction.xa.IllegalTransactionStateException",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transaction.xa.XaResourceFactoryHolder",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transaction.xa.XaTransactionFactory",
+            "justification": "W-15197505: Encapsulate org.mule.runtime.core.privileged.transaction"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.component.Component",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.api.processor.InterceptingMessageProcessor",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessor",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.processor.AbstractInterceptingMessageProcessorBase",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.processor.AbstractRedeliveryPolicy",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.processor.IdempotentRedeliveryPolicy",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.CompositeRoutingException",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.CouldNotRouteOutboundMessageException",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.DefaultRouterResultsHandler",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.Matchable",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.MatchableMessageProcessor",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.MatchableRouter",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.OutboundRouter",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.ResponseTimeoutException",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.RoutePathNotFoundException",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.RouterResultsHandler",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.routing.RouterStatisticsRecorder",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.RoutingException",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.RoutingResult",
+            "justification": "W-15213089: Encapsulate org.mule.runtime.core.privileged.routing"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.component.AbstractExecutableComponent",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerInheritsFromClass",
+            "old": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "new": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.nonFinalClassInheritsFromNewClass",
+            "old": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "new": "class org.mule.runtime.core.privileged.processor.CompositeProcessorChainRouter",
+            "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerInheritsFromClass",
+            "old": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+            "new": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.nonFinalClassInheritsFromNewClass",
+            "old": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+            "new": "class org.mule.runtime.core.privileged.processor.ProcessorChainRouter",
+            "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerInheritsFromClass",
+            "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.nonFinalClassInheritsFromNewClass",
+            "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
+            "superClass": "org.mule.runtime.core.privileged.processor.AbstractExecutableComponent",
+            "justification": "W-15187351: Encapsulate org.mule.runtime.core.privileged.component"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.internal.message.InternalEvent",
+            "justification": "W-15184345: Encapsulate org.mule.runtime.core.internal.message.InternalEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.execution.LocationExecutionContextProvider",
+            "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.lifecycle.AbstractLifecycleManager<O>",
+            "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.lifecycle.SimpleLifecycleManager<O>",
+            "justification": "W-15183178: Encapsulate privileged lifecycle/execution packages"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.internal.message.InternalEvent",
+            "justification": "W-15184345: Encapsulate org.mule.runtime.core.internal.message.InternalEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.event.context.FlowProcessMediatorContext",
+            "justification": "W-15184345: Encapsulate org.mule.runtime.core.internal.message.InternalEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method byte[] org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsBytes(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+            "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsString(java.nio.charset.Charset, org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+            "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.String org.mule.runtime.core.privileged.event.PrivilegedEvent::getMessageAsString(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+            "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.PrivilegedEvent::transformMessage(org.mule.runtime.api.metadata.DataType, org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.core.api.transformer.MessageTransformerException",
+            "justification": "W-15158818: Remove deprecated transformation methods from PrivilegedEvent"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.security.RevocationCheck",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.security.TlsDirectKeyStore",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.security.TlsDirectTrustStore",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.security.TlsIndirectKeyStore",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.security.TlsIndirectTrustStore",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.security.tls.TlsConfiguration",
+            "justification": "W-15162005: Move tls specific code from core to tls module"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.object.AbstractObjectFactory",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.api.transformer.AbstractMessageTransformer",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.TransformerChain",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.transformer.TransformerTemplate",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.client.MuleClientFlowConstruct",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.context.notification.OptimisedNotificationHandler",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.object.PrototypeObjectFactory",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.object.SingletonObjectFactory",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transport.LegacyConnector",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.transport.LegacyInboundEndpoint",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.annotation.AnnotationMetaData",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.annotation.AnnotationUtils",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.util.monitor.Expirable",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.monitor.ExpiryMonitor",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.util.queue.QueueManagerUtils",
+            "justification": "W-15149969: Remove endpoint, muleClient and associated code"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.connector.DispatchException",
+            "justification": "W-14989528: Remove AbstractOutboundRouter and associated code, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "class org.mule.runtime.core.privileged.routing.outbound.AbstractOutboundRouter",
+            "justification": "W-14989528: Remove AbstractOutboundRouter and associated code, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::<init>(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::clearProperties()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Map<java.lang.String, org.mule.runtime.api.metadata.TypedValue> org.mule.runtime.core.privileged.event.DefaultMuleSession::getExtendedProperties()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.core.privileged.event.DefaultMuleSession::getProperties()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.DefaultMuleSession::getProperty(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.privileged.event.DefaultMuleSession::getPropertyDataType(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.privileged.event.DefaultMuleSession::getPropertyNamesAsSet()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::merge(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::removeNonSerializableProperties()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.DefaultMuleSession::removeProperty(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.lang.Object)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.DefaultMuleSession::setProperty(java.lang.String, java.lang.Object, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::clearProperties()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.MuleSession::getProperty(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.privileged.event.MuleSession::getPropertyDataType(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.privileged.event.MuleSession::getPropertyNamesAsSet()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::merge(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.MuleSession::removeProperty(java.lang.String)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.lang.Object)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.privileged.event.MuleSession::setProperty(java.lang.String, java.lang.Object, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_REQUESTOR_PROPERTY",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_REPLY_TO_STOP_PROPERTY",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_SESSION_PROPERTY",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::replyToDestination(java.lang.Object)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::replyToHandler(org.mule.runtime.core.privileged.connector.ReplyToHandler)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalEvent.Builder org.mule.runtime.core.internal.message.InternalEvent.Builder::session(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.privileged.connector.ReplyToHandler",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::replyToDestination(java.lang.Object)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::replyToHandler(org.mule.runtime.core.privileged.connector.ReplyToHandler)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder org.mule.runtime.core.privileged.event.PrivilegedEvent.Builder::session(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.privileged.event.PrivilegedEvent::getReplyToDestination()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.connector.ReplyToHandler org.mule.runtime.core.privileged.event.PrivilegedEvent::getReplyToHandler()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.event.MuleSession org.mule.runtime.core.privileged.event.PrivilegedEvent::getSession()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.event.MuleSession org.mule.runtime.core.privileged.interception.InternalInterceptionEvent::getSession()",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.privileged.interception.InternalInterceptionEvent org.mule.runtime.core.privileged.interception.InternalInterceptionEvent::session(org.mule.runtime.core.privileged.event.MuleSession)",
+            "justification": "W-14989524: Remove MuleSession and ReplyToHandler, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method javax.activation.DataHandler org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundAttachmentNames()",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.io.Serializable org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T extends java.io.Serializable> T org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundProperty(java.lang.String, T)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundPropertyDataType(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getInboundPropertyNames()",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method javax.activation.DataHandler org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundAttachmentNames()",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.io.Serializable org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method <T extends java.io.Serializable> T org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundProperty(java.lang.String, T)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.api.metadata.DataType org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundPropertyDataType(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Set<java.lang.String> org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::getOutboundPropertyNames()",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::headersToStringBuilder(org.mule.runtime.core.internal.message.InternalMessage, java.lang.StringBuilder)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation::initAfterDeserialisation(org.mule.runtime.core.api.MuleContext) throws org.mule.runtime.api.exception.MuleException",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "interface": "org.mule.runtime.core.internal.message.MessageProperties",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "interface": "org.mule.runtime.core.internal.message.MessageAttachments",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "new": "class org.mule.runtime.core.internal.message.DefaultMessageBuilder.MessageImplementation",
+            "interface": "org.mule.runtime.core.privileged.store.DeserializationPostInitialisable",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeInboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.DefaultMessageBuilder::removeOutboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.util.Map org.mule.runtime.core.internal.message.ExceptionMessage::getProperties()",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method java.lang.Object org.mule.runtime.core.internal.message.ExceptionMessage::getProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method void org.mule.runtime.core.internal.message.ExceptionMessage::setProperty(java.lang.String, java.lang.Object)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeInboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.Builder org.mule.runtime.core.internal.message.InternalMessage.Builder::removeOutboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addInboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundAttachment(java.lang.String, javax.activation.DataHandler)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.DataType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::addOutboundProperty(java.lang.String, java.io.Serializable, org.mule.runtime.api.metadata.MediaType)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::inboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundAttachments(java.util.Map<java.lang.String, javax.activation.DataHandler>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::outboundProperties(java.util.Map<java.lang.String, java.io.Serializable>)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeInboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundAttachment(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder org.mule.runtime.core.internal.message.InternalMessage.CollectionBuilder::removeOutboundProperty(java.lang.String)",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.internal.message.InternalMessage",
+            "new": "interface org.mule.runtime.core.internal.message.InternalMessage",
+            "interface": "org.mule.runtime.core.internal.message.MessageProperties",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.noLongerImplementsInterface",
+            "old": "interface org.mule.runtime.core.internal.message.InternalMessage",
+            "new": "interface org.mule.runtime.core.internal.message.InternalMessage",
+            "interface": "org.mule.runtime.core.internal.message.MessageAttachments",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.internal.message.MessageAttachments",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+            "code": "java.class.removed",
+            "old": "interface org.mule.runtime.core.internal.message.MessageProperties",
+            "justification": "W-14990525: Remove message properties/attachments, part of Remove compatibility-plugin support"
+          },
+          {
+            "ignore": true,
+             "code": "java.field.removedWithConstant",
+            "old": "field org.mule.runtime.core.api.config.MuleProperties.MULE_MEL_AS_DEFAULT",
+            "justification": "W-14572221: MVEL is removed"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.removed",
+            "old": "method boolean org.mule.runtime.core.api.config.MuleProperties::isMelDefault()",
+            "justification": "W-14572221: MVEL is removed"
+          }
+        ]
+      }
+    }
+  },
   "4.6.0": {
     "revapi": {
       "ignore": [
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "new": "interface org.mule.runtime.core.api.transaction.TransactionFactory",
+          "annotation": "@org.mule.api.annotation.NoImplement",
+          "justification": "W-14348898: Deprecate SingleResourceTransactionFactoryManager"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext)",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.api.util.compression.AbstractCompressionTransformer",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.ByteArrayToSerializable",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        },
+        {
+          "ignore": true,
+          "code": "java.annotation.added",
+          "old": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "new": "method void org.mule.runtime.core.api.transformer.AbstractTransformer::setMuleContext(org.mule.runtime.core.api.MuleContext) @ org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray",
+          "annotation": "@javax.inject.Inject",
+          "justification": "W-10781591: Migrate uses of MuleContextAware to @Inject"
+        }
+      ]
+    }
+  },
+  "4.5.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "code": "java.method.visibilityIncreased",
+          "old": "method void org.mule.runtime.core.api.util.SystemUtils::<init>()",
+          "new": "method void org.mule.runtime.core.api.util.SystemUtils::<init>()",
+          "oldVisibility": "private",
+          "newVisibility": "protected",
+          "package": "org.mule.runtime.core.api.util",
+          "classQualifiedName": "org.mule.runtime.core.api.util.SystemUtils",
+          "classSimpleName": "SystemUtils",
+          "methodName": "<init>",
+          "elementKind": "constructor",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.method.visibilityIncreased",
+          "old": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.Location)",
+          "new": "method void org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler::setFlowLocation(org.mule.runtime.api.component.location.ComponentLocation)",
+          "oldVisibility": "protected",
+          "newVisibility": "public",
+          "package": "org.mule.runtime.core.privileged.exception",
+          "classQualifiedName": "org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler",
+          "classSimpleName": "TemplateOnErrorHandler",
+          "methodName": "setFlowLocation",
+          "elementKind": "method",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.MeterProvider",
+          "classSimpleName": "MeterProvider",
+          "package": "org.mule.runtime.metrics.api",
+          "classQualifiedName": "org.mule.runtime.metrics.api.MeterProvider",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.Instrument",
+          "classSimpleName": "Instrument",
+          "package": "org.mule.runtime.metrics.api.instrument",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.Instrument",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder<T extends org.mule.runtime.metrics.api.instrument.Instrument>",
+          "classSimpleName": "InstrumentBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder",
+          "classSimpleName": "LongCounterBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder",
+          "classSimpleName": "LongUpDownCounterBuilder",
+          "package": "org.mule.runtime.metrics.api.instrument.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.meter.Meter",
+          "classSimpleName": "Meter",
+          "package": "org.mule.runtime.metrics.api.meter",
+          "classQualifiedName": "org.mule.runtime.metrics.api.meter.Meter",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.metrics.api.meter.builder.MeterBuilder",
+          "classSimpleName": "MeterBuilder",
+          "package": "org.mule.runtime.metrics.api.meter.builder",
+          "classQualifiedName": "org.mule.runtime.metrics.api.meter.builder.MeterBuilder",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter",
+          "classSimpleName": "DistributedTraceContextGetter",
+          "package": "org.mule.runtime.tracer.api.context.getter",
+          "classQualifiedName": "org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.CapturedEventData",
+          "classSimpleName": "CapturedEventData",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.CapturedEventData is used as a type parameter or type variable bound on method java.util.List<org.mule.runtime.tracer.api.sniffer.CapturedEventData> org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan::getEvents() <- org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan is used as a type parameter or type variable bound on method java.util.Collection<org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan> org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer::getExportedSpans() <- org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.CapturedEventData",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan",
+          "classSimpleName": "CapturedExportedSpan",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan is used as a type parameter or type variable bound on method java.util.Collection<org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan> org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer::getExportedSpans() <- org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.CapturedExportedSpan",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer",
+          "classSimpleName": "ExportedSpanSniffer",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer is returned from method org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer org.mule.runtime.tracer.api.sniffer.SpanSnifferManager::getExportedSpanSniffer() <- org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.ExportedSpanSniffer",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.sniffer.SpanSnifferManager",
+          "classSimpleName": "SpanSnifferManager",
+          "exampleUseChainInNewApi": "org.mule.runtime.tracer.api.sniffer.SpanSnifferManager is returned from method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() (method org.mule.runtime.tracer.api.sniffer.SpanSnifferManager org.mule.runtime.core.privileged.profiling.PrivilegedProfilingService::getSpanExportManager() is part of the API)",
+          "package": "org.mule.runtime.tracer.api.sniffer",
+          "classQualifiedName": "org.mule.runtime.tracer.api.sniffer.SpanSnifferManager",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.info.InitialExportInfo",
+          "classSimpleName": "InitialExportInfo",
+          "package": "org.mule.runtime.tracer.api.span.info",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.info.InitialExportInfo",
+          "elementKind": "interface",
+          "justification": "W-13742675: Upgrade revapi version"
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.component.ComponentTracer<T extends org.mule.runtime.api.event.Event>",
+          "classSimpleName": "ComponentTracer",
+          "package": "org.mule.runtime.tracer.api.component",
+          "classQualifiedName": "org.mule.runtime.tracer.api.component.ComponentTracer",
+          "elementKind": "interface",
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "interface org.mule.runtime.tracer.api.span.validation.Assertion",
+          "classSimpleName": "Assertion",
+          "package": "org.mule.runtime.tracer.api.span.validation",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.validation.Assertion",
+          "elementKind": "interface",
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.externalClassExposedInAPI",
+          "new": "class org.mule.runtime.tracer.api.span.validation.AssertionFailedException",
+          "classSimpleName": "AssertionFailedException",
+          "package": "org.mule.runtime.tracer.api.span.validation",
+          "classQualifiedName": "org.mule.runtime.tracer.api.span.validation.AssertionFailedException",
+          "elementKind": "class",
+          "justification": "W-13057253: Both APIs are own by the Mule Runtime Team."
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.privileged.el.context.AbstractMapContext<V>",
+          "package": "org.mule.runtime.core.privileged.el.context",
+          "classSimpleName": "AbstractMapContext",
+          "elementKind": "class",
+          "justification": "Moved to mvel-core"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.core.api.util.boot.ExtensionLoaderUtils",
+          "package": "org.mule.runtime.core.api.util.boot",
+          "classSimpleName": "ExtensionLoaderUtils",
+          "elementKind": "class",
+          "justification": "W-13312344: Moved to org.mule.runtime.module.artifact.activation.api.extension.discovery.boot.ExtensionLoaderUtils in mule-module-artifact-activation"
+        },
+        {
+          "code": "java.method.addedToInterface",
+          "new": "method org.mule.runtime.api.profiling.tracing.SpanIdentifier org.mule.runtime.tracer.api.span.exporter.SpanExporter::getSpanIdentifierBasedOnExport()",
+          "package": "org.mule.runtime.tracer.api.span.exporter",
+          "classSimpleName": "SpanExporter",
+          "methodName": "getSpanIdentifierBasedOnExport",
+          "elementKind": "method",
+          "justification": "Added a method to retrieve the identifier"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class javax.resource.spi.work.ExecutionContext",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "ExecutionContext",
+          "elementKind": "class",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface javax.resource.spi.work.Work",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "Work",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class javax.resource.spi.work.WorkEvent",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "WorkEvent",
+          "elementKind": "class",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface javax.resource.spi.work.WorkListener",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "WorkListener",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "class javax.resource.spi.work.WorkException",
+          "package": "javax.resource.spi.work",
+          "classSimpleName": "WorkException",
+          "elementKind": "class",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.context.WorkManager",
+          "package": "org.mule.runtime.core.api.context",
+          "classSimpleName": "WorkManager",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
+        {
+          "code": "java.class.removed",
+          "old": "interface org.mule.runtime.core.api.context.WorkManagerSource",
+          "package": "org.mule.runtime.core.api.context",
+          "classSimpleName": "WorkManagerSource",
+          "elementKind": "interface",
+          "justification": "W-13097247: Removed dependency"
+        },
         {
           "code": "java.class.removed",
           "old": "class org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo",
@@ -148,264 +1711,6 @@
           "justification": "new method for testing"
         },
         {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.ComponentEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.field.removedWithConstant",
-          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.CORRELATION_ID_KEY",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "fieldName": "CORRELATION_ID_KEY",
-          "elementKind": "field",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.field.removedWithConstant",
-          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.THREAD_START_ID_KEY",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "fieldName": "THREAD_START_ID_KEY",
-          "elementKind": "field",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.field.removedWithConstant",
-          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.THREAD_START_NAME_KEY",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "fieldName": "THREAD_START_NAME_KEY",
-          "elementKind": "field",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.field.removed",
-          "old": "field org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo.coreEvent",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "fieldName": "coreEvent",
-          "elementKind": "field",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, ===org.mule.runtime.core.api.event.CoreEvent===)",
-          "new": "parameter void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, ===java.lang.String===)",
-          "oldType": "org.mule.runtime.core.api.event.CoreEvent",
-          "newType": "java.lang.String",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "methodName": "<init>",
-          "parameterIndex": "1",
-          "elementKind": "parameter",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.numberOfParametersChanged",
-          "old": "method void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent, java.lang.String)",
-          "new": "method void org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "methodName": "<init>",
-          "elementKind": "constructor",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method java.lang.String org.mule.runtime.core.api.tracing.customization.ComponentExecutionInitialSpanInfo::getLocationAsString(org.mule.runtime.core.api.event.CoreEvent)",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "ComponentExecutionInitialSpanInfo",
-          "methodName": "getLocationAsString",
-          "elementKind": "method",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "EventBasedInitialSpanInfoProvider",
-          "elementKind": "interface",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.FixedNameComponentEventInitialSpanSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "FixedNameComponentEventInitialSpanSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.FixedNameEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "FixedNameEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportComponentEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "NoExportComponentEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.numberOfParametersChanged",
-          "old": "method void org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent)",
-          "new": "method void org.mule.runtime.core.api.tracing.customization.NoExportComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "NoExportComponentExecutionInitialSpanInfo",
-          "methodName": "<init>",
-          "elementKind": "constructor",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportFixedNameEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "NoExportFixedNameEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "NoExportTillExecuteNextComponentEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.numberOfParametersChanged",
-          "old": "method void org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component, org.mule.runtime.core.api.event.CoreEvent)",
-          "new": "method void org.mule.runtime.core.api.tracing.customization.NoExportTillExecuteNextComponentExecutionInitialSpanInfo::<init>(org.mule.runtime.api.component.Component)",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "NoExportTillExecuteNextComponentExecutionInitialSpanInfo",
-          "methodName": "<init>",
-          "elementKind": "constructor",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "class org.mule.runtime.core.api.tracing.customization.SuffixComponentEventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.api.tracing.customization",
-          "classSimpleName": "SuffixComponentEventBasedInitialSpanInfoProvider",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, java.lang.String, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
-          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, java.lang.String, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
-          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
-          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
-          "package": "org.mule.runtime.core.privileged.processor",
-          "classSimpleName": "MessageProcessors",
-          "methodName": "buildNewChainWithListOfProcessors",
-          "parameterIndex": "4",
-          "elementKind": "parameter",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
-          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, org.mule.runtime.core.api.exception.FlowExceptionHandler, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
-          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
-          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
-          "package": "org.mule.runtime.core.privileged.processor",
-          "classSimpleName": "MessageProcessors",
-          "methodName": "buildNewChainWithListOfProcessors",
-          "parameterIndex": "3",
-          "elementKind": "parameter",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
-          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::buildNewChainWithListOfProcessors(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
-          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
-          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
-          "package": "org.mule.runtime.core.privileged.processor",
-          "classSimpleName": "MessageProcessors",
-          "methodName": "buildNewChainWithListOfProcessors",
-          "parameterIndex": "2",
-          "elementKind": "parameter",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.parameterTypeChanged",
-          "old": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::newChain(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider===)",
-          "new": "parameter org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain org.mule.runtime.core.privileged.processor.MessageProcessors::newChain(java.util.Optional<org.mule.runtime.core.api.processor.strategy.ProcessingStrategy>, java.util.List<org.mule.runtime.core.api.processor.Processor>, ===org.mule.runtime.tracer.api.span.info.InitialSpanInfo===)",
-          "oldType": "org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider",
-          "newType": "org.mule.runtime.tracer.api.span.info.InitialSpanInfo",
-          "package": "org.mule.runtime.core.privileged.processor",
-          "classSimpleName": "MessageProcessors",
-          "methodName": "newChain",
-          "parameterIndex": "2",
-          "elementKind": "parameter",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.field.removed",
-          "old": "field org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder.eventBasedInitialSpanInfoProvider",
-          "package": "org.mule.runtime.core.privileged.processor.chain",
-          "classSimpleName": "AbstractMessageProcessorChainBuilder",
-          "fieldName": "eventBasedInitialSpanInfoProvider",
-          "elementKind": "field",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method void org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChainBuilder::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider)",
-          "package": "org.mule.runtime.core.privileged.processor.chain",
-          "classSimpleName": "AbstractMessageProcessorChainBuilder",
-          "methodName": "setEventBasedInitialSpanInfoProvider",
-          "elementKind": "method",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method void org.mule.runtime.core.privileged.processor.chain.AbstractMessageProcessorChain::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider) @ org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder.DefaultMessageProcessorChain",
-          "package": "org.mule.runtime.core.privileged.processor.chain",
-          "classSimpleName": "DefaultMessageProcessorChain",
-          "methodName": "setEventBasedInitialSpanInfoProvider",
-          "elementKind": "method",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.noLongerImplementsInterface",
-          "old": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
-          "new": "class org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder",
-          "interface": "org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware",
-          "package": "org.mule.runtime.core.privileged.processor.chain",
-          "classSimpleName": "DefaultMessageProcessorChainBuilder",
-          "elementKind": "class",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.method.removed",
-          "old": "method void org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder::setEventBasedInitialSpanInfoProvider(org.mule.runtime.core.api.tracing.customization.EventBasedInitialSpanInfoProvider)",
-          "package": "org.mule.runtime.core.privileged.processor.chain",
-          "classSimpleName": "MessageProcessorChainBuilder",
-          "methodName": "setEventBasedInitialSpanInfoProvider",
-          "elementKind": "method",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
-          "code": "java.class.removed",
-          "old": "interface org.mule.runtime.core.privileged.profiling.tracing.EventBasedInitialSpanInfoProviderAware",
-          "package": "org.mule.runtime.core.privileged.profiling.tracing",
-          "classSimpleName": "EventBasedInitialSpanInfoProviderAware",
-          "elementKind": "interface",
-          "justification": "To remove once cherry-picked in 4.5.x"
-        },
-        {
           "code": "java.field.removed",
           "old": "field org.mule.runtime.core.privileged.exception.TemplateOnErrorHandler.reuseGlobalErrorHandler",
           "package": "org.mule.runtime.core.privileged.exception",
@@ -470,13 +1775,7 @@
           "methodName": "createErrorType",
           "elementKind": "method",
           "justification": "W-12405425: Move ErrorTypeMatchers to Mule API"
-        }
-      ]
-    }
-  },
-  "4.5.0": {
-    "revapi": {
-      "ignore": [
+        },
         {
           "code": "java.method.removed",
           "old": "method java.util.Map<java.lang.String, java.lang.Object> org.mule.runtime.core.api.util.SystemUtils::getCommandLineOptions(java.lang.String[], java.lang.String[][]) throws org.mule.runtime.api.exception.MuleException",

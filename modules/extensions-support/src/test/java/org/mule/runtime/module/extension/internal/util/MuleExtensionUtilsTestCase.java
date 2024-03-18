@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,22 +7,30 @@
 package org.mule.runtime.module.extension.internal.util;
 
 
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
+import static org.mule.test.allure.AllureConstants.Sdk.SDK;
+import static org.mule.test.allure.AllureConstants.Sdk.SupportedJavaVersions.JAVA_VERSIONS_IN_EXTENSION_MODEL;
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.checkParameterGroupExclusiveness;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.extractExpression;
-import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getDefaultValue;
-import static org.mule.test.allure.AllureConstants.ArtifactAst.ARTIFACT_AST;
-import static org.mule.test.allure.AllureConstants.ArtifactAst.ParameterAst.PARAMETER_AST;
 
+import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ExclusiveParametersModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
@@ -37,20 +45,21 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-@Feature(ARTIFACT_AST)
-@Story(PARAMETER_AST)
+@Feature(SDK)
 public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
 
   private static final String PAYLOAD_EXPRESSION = "#[payload]";
@@ -192,7 +201,8 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
   public void moreThanOneParameterSetInGroup() throws ConfigurationException, ValueResolvingException {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("In operation 'null', the following parameters cannot be set at the same time: [someParameter, complexParameter]");
+        .expectMessage(
+                       "In operation 'null', the following parameters cannot be set at the same time: [someParameter, complexParameter]");
     Map<String, StaticValueResolver> parameters = new HashMap<>();
     parameters.put("someParameter", mock(StaticValueResolver.class));
     parameters.put("complexParameter", mock(StaticValueResolver.class));
@@ -204,7 +214,8 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
   public void noParametersSetInGroup() throws ConfigurationException, ValueResolvingException {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("Parameter group 'null' requires that one of its optional parameters should be set but all of them are missing. One of the following should be set: [someParameter, repeatedNameParameter, complexParameter]");
+        .expectMessage(
+                       "Parameter group 'null' requires that one of its optional parameters should be set but all of them are missing. One of the following should be set: [someParameter, repeatedNameParameter, complexParameter]");
     checkParameterGroupExclusiveness(Optional.of(mock(OperationModel.class)), getParameterGroupModels(false), emptyMap(),
                                      emptyMap());
   }
@@ -240,7 +251,8 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
       throws ConfigurationException, ValueResolvingException {
     expectedException.expect(ConfigurationException.class);
     expectedException
-        .expectMessage("In operation 'null', the following parameters cannot be set at the same time: [some-parameter-alias, complex-parameter-alias]");
+        .expectMessage(
+                       "In operation 'null', the following parameters cannot be set at the same time: [some-parameter-alias, complex-parameter-alias]");
     Map<String, ValueResolver<?>> pojoParameterResolvers = new HashMap<>();
     pojoParameterResolvers.put("repeatedNameParameter", mock(StaticValueResolver.class));
     pojoParameterResolvers.put("anotherParameter", mock(StaticValueResolver.class));
@@ -253,6 +265,64 @@ public class MuleExtensionUtilsTestCase extends AbstractMuleTestCase {
                                      getParameterGroupModelsWithAlias(false), parameters,
                                      getAliasedParameters());
   }
+
+  @Test
+  @Story(JAVA_VERSIONS_IN_EXTENSION_MODEL)
+  public void getJavaVersionsIntersection() {
+    assertJavaVersions(new String[][] {
+        {"1.8", "11", "17"},
+        {"1.8", "11"},
+        {"1.8", "11"},
+    }, "1.8", "11");
+
+    assertJavaVersions(new String[][] {
+        {"1.8", "11", "17"},
+        {"1.8", "11", "17"},
+    }, "1.8", "11", "17");
+
+    assertJavaVersions(new String[][] {
+        {"1.8", "11", "17"},
+        {"1.8"},
+        {"1.8", "11", "17"},
+    }, "1.8");
+
+    assertJavaVersions(new String[][] {
+        {"1.8", "11", "17"},
+    }, "1.8", "11", "17");
+
+    assertJavaVersions(new String[][] {
+        {"1.8"},
+        {"11"},
+        {"17"},
+    }, null);
+
+    assertJavaVersions(new String[][] {
+        {"1.8", "11"},
+        {"1.8", "11", "17"},
+        {"17"},
+    }, null);
+  }
+
+  private void assertJavaVersions(String[][] input, String... expected) {
+    Set<String> resolved = MuleExtensionUtils.getJavaVersionsIntersection(mockExtensionModelsWithSupportedJavaVersions(input));
+    if (expected != null) {
+      assertThat(resolved.size(), equalTo(expected.length));
+      assertThat(resolved, contains(expected));
+    } else {
+      assertThat(resolved, hasSize(0));
+    }
+  }
+
+  private List<ExtensionModel> mockExtensionModelsWithSupportedJavaVersions(String[][] versions) {
+    return Stream.of(versions)
+        .map(v -> {
+          ExtensionModel model = mock(ExtensionModel.class);
+          when(model.getSupportedJavaVersions()).thenReturn(Stream.of(v).collect(toCollection(LinkedHashSet::new)));
+
+          return model;
+        }).collect(toList());
+  }
+
 
   private void assertOptional(Optional<String> defaultValue) {
     assertThat(defaultValue.isPresent(), is(true));

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.mule.runtime</groupId>
+        <artifactId>mule-modules</artifactId>
+        <version>4.7.0-SNAPSHOT</version>
+    </parent>
+    <groupId>org.mule.runtime.boot</groupId>
+    <artifactId>mule-module-log4j-boot-configurator</artifactId>
+    <packaging>jar</packaging>
+    <name>Mule Log4j Boot Configurator Module</name>
+    <description>Mule Log4j Boot Configurator Module</description>
+
+    <properties>
+        <javaModuleName>org.mule.runtime.boot.log4j</javaModuleName>
+        <skipExportTests>false</skipExportTests>
+        <!-- because this module requires transitive org.apache.logging.log4j -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
+        <mule.module.maven.plugin.fillOptionalPackages>true</mule.module.maven.plugin.fillOptionalPackages>
+        <formatterConfigPath>../../formatter.xml</formatterConfigPath>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mule.runtime.boot</groupId>
+            <artifactId>mule-module-logging</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>api-annotations</artifactId>
+            <version>${muleAnnotationsApiVersion}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-unit</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.tests</groupId>
+            <artifactId>mule-tests-allure</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

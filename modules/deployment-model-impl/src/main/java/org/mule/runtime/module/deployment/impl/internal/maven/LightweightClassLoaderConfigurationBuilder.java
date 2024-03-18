@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -21,6 +21,7 @@ import static org.apache.commons.io.FileUtils.toFile;
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
+import org.mule.maven.pom.parser.api.model.ArtifactCoordinates;
 import org.mule.maven.pom.parser.api.model.MavenPomModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -128,10 +129,10 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
   }
 
   @Override
-  protected Map<Pair<String, String>, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
-    Map<Pair<String, String>, AdditionalPluginDependencies> deployableArtifactAdditionalLibrariesMap =
+  protected Map<ArtifactCoordinates, AdditionalPluginDependencies> doProcessAdditionalPluginLibraries(MavenPomParser parser) {
+    Map<ArtifactCoordinates, AdditionalPluginDependencies> deployableArtifactAdditionalLibrariesMap =
         super.doProcessAdditionalPluginLibraries(parser);
-    Map<Pair<String, String>, AdditionalPluginDependencies> effectivePluginsAdditionalLibrariesMap =
+    Map<ArtifactCoordinates, AdditionalPluginDependencies> effectivePluginsAdditionalLibrariesMap =
         new HashMap<>(deployableArtifactAdditionalLibrariesMap);
     nonProvidedDependencies.stream()
         .filter(bundleDependency -> MULE_PLUGIN.equals(bundleDependency.getDescriptor().getClassifier().orElse(null)))
@@ -147,7 +148,7 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
           if (effectiveModel.getPomFile().isPresent()) {
             MavenPomParser parserForPlugin = discoverProvider()
                 .createMavenPomParserClient(effectiveModel.getPomFile().get().toPath(), getActiveProfiles());
-            Map<Pair<String, String>, AdditionalPluginDependencies> pomAdditionalPluginDependenciesForArtifact =
+            Map<ArtifactCoordinates, AdditionalPluginDependencies> pomAdditionalPluginDependenciesForArtifact =
                 parserForPlugin.getPomAdditionalPluginDependenciesForArtifacts();
             pomAdditionalPluginDependenciesForArtifact.forEach((artifact, additionalDependenciesForArtifact) -> {
               if (deployableArtifactAdditionalLibrariesMap.containsKey(artifact)) {
@@ -189,8 +190,8 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
     return effectivePluginsAdditionalLibrariesMap;
   }
 
-  private boolean existsInLibrariesMap(Map<Pair<String, String>, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
-                                       Pair<String, String> plugin,
+  private boolean existsInLibrariesMap(Map<ArtifactCoordinates, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
+                                       ArtifactCoordinates plugin,
                                        org.mule.maven.pom.parser.api.model.BundleDescriptor additionalLibrary) {
     List<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraries =
         additionalLibrariesPerPluginMap.get(plugin).getAdditionalDependencies();
@@ -200,8 +201,8 @@ public class LightweightClassLoaderConfigurationBuilder extends ArtifactClassLoa
     return additionalLibraries.contains(additionalLibrary);
   }
 
-  private Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<Pair<String, String>, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
-                                                                                                             Pair<String, String> plugin,
+  private Optional<org.mule.maven.pom.parser.api.model.BundleDescriptor> findLibraryInAdditionalLibrariesMap(Map<ArtifactCoordinates, AdditionalPluginDependencies> additionalLibrariesPerPluginMap,
+                                                                                                             ArtifactCoordinates plugin,
                                                                                                              org.mule.maven.pom.parser.api.model.BundleDescriptor additionalLibrary) {
     List<org.mule.maven.pom.parser.api.model.BundleDescriptor> additionalLibraries =
         additionalLibrariesPerPluginMap.get(plugin).getAdditionalDependencies();

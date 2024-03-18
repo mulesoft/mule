@@ -1,19 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.test.functional;
 
+import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
+import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
+
 import static java.util.Arrays.asList;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
-import static org.mule.test.allure.AllureConstants.XmlSdk.XML_SDK;
 
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -225,9 +227,4 @@ public class ModuleSimpleTestCase extends AbstractCeXmlExtensionMuleArtifactFunc
     assertThat(event.getMessage().getPayload().getValue(), is("hardcoded value"));
   }
 
-  @Override
-  public boolean mustRegenerateComponentBuildingDefinitionRegistryFactory() {
-    // returns true because not same extensions are loaded by all tests.
-    return true;
-  }
 }

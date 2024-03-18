@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -32,7 +32,7 @@ import java.util.Set;
  * bindings provided by one of them. This class is used to merge two instances of {@link ExpressionModule}, and it's intended to
  * be used in the default {@link BindingContext} implementation.
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 class CompositeExpressionModule implements ExpressionModule {
 

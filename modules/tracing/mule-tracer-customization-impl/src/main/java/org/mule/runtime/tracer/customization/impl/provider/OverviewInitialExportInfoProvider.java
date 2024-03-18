@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,7 +9,7 @@ package org.mule.runtime.tracer.customization.impl.provider;
 import org.mule.runtime.tracer.api.span.info.InitialExportInfo;
 import org.mule.runtime.tracer.customization.api.InternalSpanNames;
 import org.mule.runtime.tracer.customization.impl.export.AbstractInitialExportInfoProvider;
-import org.mule.runtime.tracer.customization.impl.export.InitialExportInfoProvider;
+import org.mule.runtime.tracer.customization.api.InitialExportInfoProvider;
 import org.mule.runtime.tracer.customization.impl.export.NoExportTillSpanWithNameInitialExportInfo;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 
@@ -32,7 +32,7 @@ import static org.mule.runtime.tracer.customization.impl.info.SpanInitialInfoUti
 /**
  * An {@link InitialExportInfoProvider} corresponding to the {@link TracingLevel#OVERVIEW}
  *
- * @since 4.6.0
+ * @since 4.5.0
  */
 public class OverviewInitialExportInfoProvider extends AbstractInitialExportInfoProvider {
 

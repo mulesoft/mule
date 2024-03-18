@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -7,6 +7,7 @@
 package org.mule.runtime.config.internal.validation;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
+import static org.mule.runtime.api.util.IOUtils.getResourceAsUrl;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equalsIdentifier;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
@@ -82,7 +83,7 @@ public class ParseTemplateResourceExist implements Validation {
     ComponentParameterAst locationParam = component.getParameter(DEFAULT_GROUP_NAME, LOCATION_PARAM);
     String location = (String) locationParam.getValue().getRight();
 
-    if (artifactRegionClassLoader.getResource(location) == null) {
+    if (getResourceAsUrl(location, getClass()) == null) {
       return of(create(component, locationParam, this, "Template location: '" + location + "' not found"));
     }
 

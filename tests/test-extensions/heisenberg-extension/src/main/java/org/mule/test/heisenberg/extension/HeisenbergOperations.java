@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,6 +12,7 @@ import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
 import static org.mule.runtime.extension.api.client.DefaultOperationParameters.builder;
+import static org.mule.sdk.api.annotation.route.ChainExecutionOccurrence.ONCE;
 import static org.mule.sdk.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.test.heisenberg.extension.HeisenbergExtension.HEISENBERG;
 import static org.mule.test.heisenberg.extension.HeisenbergNotificationAction.KNOCKED_DOOR;
@@ -62,6 +63,7 @@ import org.mule.sdk.api.annotation.deprecated.Deprecated;
 import org.mule.sdk.api.annotation.error.Throws;
 import org.mule.sdk.api.annotation.param.display.Example;
 import org.mule.sdk.api.annotation.param.display.Summary;
+import org.mule.sdk.api.annotation.route.ExecutionOccurrence;
 import org.mule.sdk.api.client.OperationParameterizer;
 import org.mule.sdk.api.future.SecretSdkFutureFeature;
 import org.mule.test.heisenberg.extension.exception.CureCancerExceptionEnricher;
@@ -390,7 +392,7 @@ public class HeisenbergOperations implements Disposable {
   }
 
   @MediaType(ANY)
-  public void tapPhones(Chain operations, CompletionCallback<Object, Object> callback) {
+  public void tapPhones(@ExecutionOccurrence(ONCE) Chain operations, CompletionCallback<Object, Object> callback) {
     System.out.println("Started tapping phone");
 
     operations.process(result -> {
@@ -656,6 +658,16 @@ public class HeisenbergOperations implements Disposable {
   }
 
   public void blockingNonBlocking(CompletionCallback<Void, Void> completionCallback) {}
+
+  @MediaType(value = ANY, strict = false)
+  public void nonBlocking(@Content(primary = true) @Optional(defaultValue = "#[payload]") TypedValue<Object> content,
+                          CompletionCallback<Object, Object> callback) {
+    final Runnable command = () -> {
+      callback.success(Result.builder().output(content.getValue()).build());
+    };
+
+    executor.get().execute(command);
+  }
 
   @OutputResolver(output = HeisenbergOutputResolver.class)
   public Map<String, Object> getInjectedObjects(@Optional Object object, @Optional Serializable serializable) {

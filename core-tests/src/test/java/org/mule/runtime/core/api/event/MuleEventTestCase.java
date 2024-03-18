@@ -1,12 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.event;
 
+import static org.mule.runtime.api.message.Message.of;
+import static org.mule.runtime.api.metadata.DataType.STRING;
+import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
+import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
+
 import static java.util.Collections.singletonMap;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -17,10 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.runtime.api.message.Message.of;
-import static org.mule.runtime.api.metadata.DataType.STRING;
-import static org.mule.runtime.core.internal.context.DefaultMuleContext.currentMuleContext;
-import static org.mule.test.allure.AllureConstants.MuleEvent.MULE_EVENT;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Message;
@@ -34,11 +36,10 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.security.DefaultSecurityContextFactory;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
+import org.mule.runtime.core.internal.transformer.simple.ByteArrayToObject;
+import org.mule.runtime.core.internal.transformer.simple.SerializableToByteArray;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
-import org.mule.runtime.core.privileged.transformer.simple.ByteArrayToObject;
-import org.mule.runtime.core.privileged.transformer.simple.SerializableToByteArray;
-import org.mule.runtime.tracer.api.context.SpanContextAware;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -49,14 +50,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.qameta.allure.Description;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
 
 
 @Feature(MULE_EVENT)
@@ -87,9 +89,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
-
-    // Assert that deserialized event has session with same id
-    assertNotNull(deserialized.getSession());
   }
 
   private Transformer createSerializableToByteArrayTransformer() {
@@ -123,9 +122,6 @@ public class MuleEventTestCase extends AbstractMuleContextTestCase {
 
     // Assert that deserialized event is not null
     assertNotNull(deserialized);
-
-    // Assert that deserialized event has session with same id
-    assertNotNull(deserialized.getSession());
   }
 
   private CoreEvent createEventToSerialize() throws Exception {

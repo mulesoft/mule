@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -84,6 +84,12 @@ public interface AllureConstants {
 
     }
 
+    interface DeploymentServiceBuilderStory {
+
+      String DEPLOYMENT_SERVICE_BUILDER = "Deployment Service Builder";
+
+    }
+
     interface DeploymentFailureStory {
 
       String DEPLOYMENT_FAILURE = "Deployment Failure";
@@ -95,6 +101,22 @@ public interface AllureConstants {
       String UNDEPLOYMENT = "Undeployment";
 
     }
+
+    interface SingleAppDeploymentStory {
+
+      String SINGLE_APP_DEPLOYMENT = "Single App Deployment";
+
+    }
+
+    interface SupportedJavaVersions {
+
+      String JAVA_VERSIONS_IN_DEPLOYABLE_ARTIFACT =
+          "Supported Java Versions are reflected in the ApplicationModel or DomainModel";
+
+      String ENFORCE_DEPLOYABLE_ARTIFACT_JAVA_VERSION =
+          "Validate that a deployable artifact supports the Java version Mule is running on";
+    }
+
   }
 
   interface DeploymentTypeFeature {
@@ -115,6 +137,11 @@ public interface AllureConstants {
       String APPLICATION_PATCHING = "Application Patching";
 
     }
+  }
+
+  interface JpmsFeature {
+
+    String JPMS_FEATURE = "Java Platform Module System";
   }
 
   interface ClassloadingIsolationFeature {
@@ -238,8 +265,6 @@ public interface AllureConstants {
 
       String SUPPORT_DW = "Support DW";
       String SUPPORT_FUNCTIONS = "Support Functions";
-      String SUPPORT_MVEL_DW = "Support both MVEL and DW";
-      String SUPPORT_MVEL_COMPATIBILITY = "Support MVEL compatibility mode";
       String SUPPORT_EXPRESSION_BINDINGS = "Support expression bindings";
     }
   }
@@ -580,6 +605,7 @@ public interface AllureConstants {
 
       String BACKPRESSURE = "Backpressure";
       String REACTOR = "Reactor";
+      String MAX_CONCURRENCY = "Max concurrency";
     }
 
   }
@@ -981,6 +1007,20 @@ public interface AllureConstants {
 
     }
 
+    interface SupportedJavaVersions {
+
+      String JAVA_VERSIONS_IN_EXTENSION_MODEL = "Supported Java Versions are reflected in the ExtensionModel";
+
+      String ENFORCE_EXTENSION_JAVA_VERSION =
+          "Validate that all registered extensions support the Java version Mule is running on";
+    }
+
+    interface MinMuleVersion {
+
+      String MIN_MULE_VERSION = "Min Mule Version calculation";
+
+    }
+
   }
 
   interface JavaSdk {
@@ -991,6 +1031,17 @@ public interface AllureConstants {
 
       String PARAMETERS = "Parameters definitions in Java SDK";
 
+    }
+
+    interface ArtifactLifecycleListener {
+
+      String ARTIFACT_LIFECYCLE_LISTENER = "Listeners for Artifact lifecycle events";
+
+    }
+
+    interface ConnectivityTestingStory {
+
+      String CONNECTIVITY_TEST = "Connectivity test";
     }
 
   }
@@ -1076,11 +1127,17 @@ public interface AllureConstants {
 
       String DEFAULT_CORE_EVENT_TRACER = "Default Core Event Tracer";
 
+      String DEFAULT_METRICS_PROVIDER = "Default Metrics Provider";
+
       String TRACING_CUSTOMIZATION = "Tracing Customization";
 
       String OPEN_TELEMETRY_EXPORTER = "Open Telemetry Exporter";
 
       String TRACING_CONFIGURATION = "Tracing Configuration";
+
+      String METRICS_EXPORTER = "Metrics Exporter";
+
+      String METRICS_IMPLEMENTATION = "Metrics Implementation";
     }
   }
 
@@ -1196,6 +1253,54 @@ public interface AllureConstants {
     interface JdkVersionStory {
 
       String JDK_VERSION = "JDK version";
+      String JDK_ENVIRONMENT_CONFIGURATION = "JDK environment configuration";
     }
+  }
+
+  interface WrapperlessBootstrapFeature {
+
+    String WRAPPERLESS_BOOTSTRAP = "Wrapper-less bootstrapping";
+
+    interface WrapperlessBootstrapStory {
+
+      String WRAPPERLESS_CONTAINER_MANAGEMENT = "Managing a container bootstrapped in wrapper-less mode";
+      String WRAPPERLESS_PARAMETERS_RESOLUTION = "Resolution of parameters to use in a wrapper-less bootstrapping";
+    }
+  }
+
+  interface CoreExtensionsFeature {
+
+    String CORE_EXTENSIONS = "Core Extensions";
+
+    interface CoreExtensionsStory {
+
+      String CORE_EXTENSIONS_DEPENDENCY_INJECTION = "Dependency injection for core extensions";
+
+    }
+  }
+
+  interface LockFactoryFeature {
+
+    String LOCK_FACTORY = "Lock factory";
+
+    interface LockFactoryStory {
+
+      String SERVER_LOCK_FACTORY = "Container level lock factory";
+    }
+  }
+
+  interface MuleContextFeature {
+
+    String MULE_CONTEXT = "Mule Context";
+
+    interface MuleContextCreationStory {
+
+      String MULE_CONTEXT_CREATION = "Mule Context creation";
+    }
+  }
+
+  interface CustomizationServiceFeature {
+
+    String CUSTOMIZATION_SERVICE = "Customization Service";
   }
 }

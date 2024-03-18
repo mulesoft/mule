@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,10 +13,10 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.CONFIGURATION_PROPERTIES;
 import static org.mule.test.allure.AllureConstants.ConfigurationProperties.ComponentConfigurationAttributesStory.CONFIGURATION_PROPERTIES_RESOLVER_STORY;
 
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationPropertiesProvider;
-import org.mule.runtime.config.api.dsl.model.properties.ConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
+import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import com.google.common.collect.ImmutableList;
@@ -58,7 +58,8 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
               .build();
 
           @Override
-          public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+          public Optional<? extends ConfigurationProperty> provide(
+                                                                   String configurationAttributeKey) {
             return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
           }
 
@@ -79,7 +80,7 @@ public class PropertiesResolverConfigurationPropertiesResolverTestCase extends A
           .build();
 
       @Override
-      public Optional<ConfigurationProperty> getConfigurationProperty(String configurationAttributeKey) {
+      public Optional<? extends ConfigurationProperty> provide(String configurationAttributeKey) {
         return attributes.stream().filter(cf -> cf.getKey().equals(configurationAttributeKey)).findFirst();
       }
 

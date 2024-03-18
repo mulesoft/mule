@@ -1,50 +1,48 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.config.internal.context.service;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
+import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
+import static org.mule.runtime.config.utils.Utils.augmentedParam;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+
 import org.mule.runtime.api.artifact.Registry;
-import org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker;
 import org.mule.runtime.config.utils.Utils.AmbiguousAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedSubclassMethodService;
 import org.mule.runtime.config.utils.Utils.AugmentedSubclassOverridesMethodService;
-import org.mule.runtime.config.utils.Utils.AugmentedWithPreferredMethodService;
 import org.mule.runtime.config.utils.Utils.BaseOverloadedService;
 import org.mule.runtime.config.utils.Utils.BaseService;
 import org.mule.runtime.config.utils.Utils.BasicService;
 import org.mule.runtime.config.utils.Utils.HiddenAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.InvalidAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.InvalidNamedAugmentedMethodService;
-import org.mule.runtime.config.utils.Utils.MyBean;
-import org.mule.runtime.config.utils.Utils.MyPreferredBean;
 import org.mule.runtime.config.utils.Utils.NamedAugmentedMethodService;
 import org.mule.runtime.config.utils.Utils.OverloadedAugmentedMethodService;
 import org.mule.runtime.core.api.registry.IllegalDependencyInjectionException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import javax.inject.Inject;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import javax.inject.Inject;
 
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.MANY_CANDIDATES_ERROR_MSG_TEMPLATE;
-import static org.mule.runtime.config.internal.context.service.InjectParamsFromContextServiceMethodInvoker.NO_OBJECT_FOUND_FOR_PARAM;
-import static org.mule.runtime.config.utils.Utils.augmentedParam;
-import static org.mule.runtime.core.privileged.registry.LegacyRegistryUtils.registerObject;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class InjectParamsFromContextServiceMethodInvokerTestCase extends AbstractMuleContextTestCase {
 
@@ -102,19 +100,6 @@ public class InjectParamsFromContextServiceMethodInvokerTestCase extends Abstrac
     injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
 
     assertThat(augmentedParam, is(true));
-  }
-
-  @Test
-  public void augmentedWithPreferredInvocation() throws Throwable {
-    registerObject(muleContext, "myBean", new MyBean());
-    final MyPreferredBean preferredBean = new MyPreferredBean();
-    registerObject(muleContext, "myPreferredBean", preferredBean);
-
-    BaseService service = new AugmentedWithPreferredMethodService();
-
-    injectParamsFromContextServiceMethodInvoker.invoke(service, method, null);
-
-    assertThat(augmentedParam, sameInstance(preferredBean));
   }
 
   @Test

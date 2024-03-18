@@ -12,16 +12,16 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-module-tracing-parent</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>mule-tracer-customization-impl</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <name>Mule Tracer Customization Impl</name>
     <description>Implementation for setting configuration for tracing levels and overrides</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.tracer.customization.impl</javaModuleName>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -29,6 +29,11 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-tracer-customization-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-tracer-configuration-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -54,13 +59,9 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core</artifactId>
+            <artifactId>mule-tracer-internal-impl</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-tracer-configuration-api</artifactId>
-            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

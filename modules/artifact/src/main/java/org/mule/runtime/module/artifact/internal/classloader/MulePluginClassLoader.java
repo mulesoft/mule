@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,16 +11,20 @@ import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Implementation of the ArtifactClassLoader interface for {@code mule-plugin}s, that manages shutdown listeners and has resource
  * releasers.
  */
-public class MulePluginClassLoader extends MuleArtifactClassLoader {
+public class MulePluginClassLoader extends MuleArtifactClassLoader implements WithAttachedClassLoaders {
 
   static {
     registerAsParallelCapable();
   }
+
+  private final Set<ClassLoader> attachedClassLoaders = new HashSet<>();
 
   /**
    * Constructs a new {@link MulePluginClassLoader} for the given URLs
@@ -36,4 +40,13 @@ public class MulePluginClassLoader extends MuleArtifactClassLoader {
     super(artifactId, artifactDescriptor, urls, parent, lookupPolicy);
   }
 
+  @Override
+  public void attachClassLoader(ClassLoader classLoader) {
+    attachedClassLoaders.add(classLoader);
+  }
+
+  @Override
+  public Set<ClassLoader> getAttachedClassLoaders() {
+    return attachedClassLoaders;
+  }
 }

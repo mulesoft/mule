@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.infrastructure.maven;
 
 import static java.io.File.separator;
@@ -13,7 +12,9 @@ import static java.lang.System.getProperty;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.ofNullable;
 import static java.util.regex.Matcher.quoteReplacement;
+
 import static org.apache.maven.shared.invoker.InvokerLogger.INFO;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 
@@ -33,13 +34,15 @@ import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.InvokerLogger;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.maven.shared.invoker.SystemOutLogger;
+import org.slf4j.Logger;
 
 /**
  * Provides Maven related utilities for testing purposes
  */
 public class MavenTestUtils {
 
-  private static final InvokerLogger LOGGER = new SystemOutLogger();
+  private static final Logger LOGGER = getLogger(MavenTestUtils.class);
+  private static final InvokerLogger MVN_LOGGER = new SystemOutLogger();
 
   private static final String M_2_REPO = "/.m2/repository";
   private static final String USER_HOME = "user.home";
@@ -54,6 +57,7 @@ public class MavenTestUtils {
         }
       });
 
+  private static final List<String> EFFECTIVE_POM_GOALS = singletonList("help:effective-pom");
   private static final List<String> INSTALL_GOALS = singletonList("install");
   private static final List<String> CLEAN_GOALS = singletonList("clean");
 
@@ -64,8 +68,12 @@ public class MavenTestUtils {
   static {
     INVOKER = new DefaultInvoker();
     INVOKER.setLocalRepositoryDirectory(getMavenLocalRepository());
-    INVOKER.setLogger(LOGGER);
-    LOGGER.setThreshold(INFO);
+    INVOKER.setLogger(MVN_LOGGER);
+    if (LOGGER.isDebugEnabled()) {
+      MVN_LOGGER.setThreshold(InvokerLogger.DEBUG);
+    } else {
+      MVN_LOGGER.setThreshold(INFO);
+    }
   }
 
   private MavenTestUtils() {}
@@ -92,6 +100,9 @@ public class MavenTestUtils {
    * @return the installed artifact on the Maven repository.
    */
   public static File installMavenArtifact(String baseDirectory, BundleDescriptor descriptor, Properties props) {
+    if (LOGGER.isDebugEnabled()) {
+      runMavenGoal(EFFECTIVE_POM_GOALS, baseDirectory, props);
+    }
     runMavenGoal(INSTALL_GOALS, baseDirectory, props);
     runMavenGoal(CLEAN_GOALS, baseDirectory, props);
     return findMavenArtifact(descriptor);
@@ -154,6 +165,9 @@ public class MavenTestUtils {
     request.setBaseDirectory(mavenArtifactsAndBaseDirectory);
     request.setPomFile(new File(mavenArtifactsAndBaseDirectory, "pom.xml"));
     request.setShowErrors(true);
+    if (LOGGER.isDebugEnabled()) {
+      request.setDebug(true);
+    }
     request.setUserSettingsFile(MAVEN_SETTINGS);
     try {
       InvocationResult result = INVOKER.execute(request);

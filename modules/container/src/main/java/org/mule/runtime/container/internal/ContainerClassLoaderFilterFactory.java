@@ -1,16 +1,16 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.container.internal;
 
+import static java.util.Collections.emptySet;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
-import org.mule.runtime.container.api.MuleModule;
+import org.mule.runtime.jpms.api.MuleContainerModule;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
@@ -31,27 +31,33 @@ public class ContainerClassLoaderFilterFactory {
   private static final String EMPTY_PACKAGE = "";
   private static final char RESOURCE_SEPARATOR = '/';
 
-  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleModule> muleModules) {
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules) {
+    return create(bootPackages, muleModules, emptySet());
+  }
+
+  public ClassLoaderFilter create(Set<String> bootPackages, List<MuleContainerModule> muleModules,
+                                  Set<String> additionalResources) {
     final Set<String> resources = getExportedResourcePaths(muleModules);
+    resources.addAll(additionalResources);
     final Set<String> packages = getModuleExportedPackages(muleModules);
     final ArtifactClassLoaderFilter artifactClassLoaderFilter = new DefaultArtifactClassLoaderFilter(packages, resources);
 
     return new ContainerClassLoaderFilter(artifactClassLoaderFilter, bootPackages);
   }
 
-  private Set<String> getExportedResourcePaths(List<MuleModule> muleModules) {
+  private Set<String> getExportedResourcePaths(List<MuleContainerModule> muleModules) {
     Set<String> resources = new HashSet<>();
 
-    for (MuleModule muleModule : muleModules) {
+    for (MuleContainerModule muleModule : muleModules) {
       resources.addAll(muleModule.getExportedPaths());
     }
 
     return resources;
   }
 
-  private Set<String> getModuleExportedPackages(List<MuleModule> muleModules) {
+  private Set<String> getModuleExportedPackages(List<MuleContainerModule> muleModules) {
     Set<String> packages = new HashSet<>();
-    for (MuleModule muleModule : muleModules) {
+    for (MuleContainerModule muleModule : muleModules) {
       packages.addAll(muleModule.getExportedPackages());
     }
 
@@ -75,7 +81,7 @@ public class ContainerClassLoaderFilterFactory {
       boolean exported = moduleClassLoaderFilter.exportsClass(name);
 
       if (!exported) {
-        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+        exported = isExportedBootPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
       }
       return exported;
     }
@@ -85,7 +91,7 @@ public class ContainerClassLoaderFilterFactory {
       boolean exported = moduleClassLoaderFilter.exportsPackage(name);
 
       if (!exported) {
-        exported = isExportedBooPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
+        exported = isExportedBootPackage(name, CLASS_PACKAGE_SPLIT_REGEX);
       }
       return exported;
     }
@@ -98,7 +104,7 @@ public class ContainerClassLoaderFilterFactory {
         final String resourceFolder = getResourceFolder(name);
         exported = moduleClassLoaderFilter.exportsResource(resourceFolder);
         if (!exported) {
-          exported = isExportedBooPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
+          exported = isExportedBootPackage(name, RESOURCE_PACKAGE_SPLIT_REGEX);
         }
       }
 
@@ -115,7 +121,7 @@ public class ContainerClassLoaderFilterFactory {
       return resourceFolder;
     }
 
-    private boolean isExportedBooPackage(String name, String splitRegex) {
+    private boolean isExportedBootPackage(String name, String splitRegex) {
       boolean exported = false;
       final String[] splitName = name.split(splitRegex);
       final String[] packages = Arrays.copyOf(splitName, splitName.length - 1);

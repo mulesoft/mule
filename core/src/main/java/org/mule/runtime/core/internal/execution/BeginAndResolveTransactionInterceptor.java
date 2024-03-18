@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,12 +8,12 @@ package org.mule.runtime.core.internal.execution;
 
 import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.tx.TransactionException;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.execution.ExecutionCallback;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.transaction.TransactionAdapter;
 
 import javax.transaction.TransactionManager;
 
@@ -26,25 +26,25 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
   private final ExecutionInterceptor<T> next;
   private final TransactionConfig transactionConfig;
   private final String applicationName;
-  private final SingleResourceTransactionFactoryManager transactionFactoryManager;
   private final TransactionManager transactionManager;
   private final NotificationDispatcher notificationDispatcher;
   private final boolean processOnException;
   private final boolean mustResolveAnyTransaction;
+  private final boolean errorAtTimeout;
 
   public BeginAndResolveTransactionInterceptor(ExecutionInterceptor<T> next, TransactionConfig transactionConfig,
                                                String applicationName, NotificationDispatcher notificationDispatcher,
-                                               SingleResourceTransactionFactoryManager transactionFactoryManager,
                                                TransactionManager transactionManager,
-                                               boolean processOnException, boolean mustResolveAnyTransaction) {
+                                               boolean processOnException, boolean mustResolveAnyTransaction,
+                                               boolean errorAtTimeout) {
     this.next = next;
     this.transactionConfig = transactionConfig;
     this.applicationName = applicationName;
     this.notificationDispatcher = notificationDispatcher;
-    this.transactionFactoryManager = transactionFactoryManager;
     this.transactionManager = transactionManager;
     this.processOnException = processOnException;
     this.mustResolveAnyTransaction = mustResolveAnyTransaction;
+    this.errorAtTimeout = errorAtTimeout;
   }
 
   @Override
@@ -62,9 +62,13 @@ public class BeginAndResolveTransactionInterceptor<T> implements ExecutionInterc
 
       // Timeout is a traversal attribute of all Transaction implementations.
       // Setting it up here for all of them rather than in every implementation.
-      tx = transactionConfig.getFactory().beginTransaction(applicationName, notificationDispatcher, transactionFactoryManager,
+      tx = transactionConfig.getFactory().beginTransaction(applicationName,
+                                                           notificationDispatcher,
                                                            transactionManager);
       tx.setTimeout(timeout);
+      if (tx instanceof TransactionAdapter) {
+        ((TransactionAdapter) tx).setRollbackIfTimeout(errorAtTimeout);
+      }
       resolveStartedTransaction = true;
       if (logger.isDebugEnabled()) {
         logger.debug("Transaction successfully started: " + tx);

@@ -18,7 +18,7 @@
                     <on-error-continue type="MULE:ANY">
                         <test-policy:execute-next/>
                         <test-policy:custom-processor
-                                class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+                                class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
                     </on-error-continue>
                 </error-handler>
             </try>

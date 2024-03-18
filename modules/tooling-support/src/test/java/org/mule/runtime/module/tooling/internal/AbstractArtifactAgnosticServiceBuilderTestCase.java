@@ -1,27 +1,34 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.tooling.internal;
 
-import static org.mule.runtime.core.internal.config.RuntimeLockFactoryUtil.getRuntimeLockFactory;
+import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.runtime.module.license.api.LicenseValidatorProvider.discoverLicenseValidator;
 import static org.mule.test.allure.AllureConstants.ToolingSupport.TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.ToolingSupport.ServiceBuilderStory.SERVICE_BUILDER;
 
 import static java.util.Collections.singletonMap;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
+import org.mule.maven.pom.parser.api.model.MavenModelBuilder;
+import org.mule.runtime.api.lock.LockFactory;
 import org.mule.runtime.api.memory.management.MemoryManagementService;
 import org.mule.runtime.api.service.ServiceRepository;
 import org.mule.runtime.app.declaration.api.ArtifactDeclaration;
@@ -41,10 +48,11 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(TOOLING_SUPPORT)
 @Story(SERVICE_BUILDER)
@@ -59,7 +67,7 @@ public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends Abs
                                         mock(ClassLoaderRepository.class), mock(PolicyTemplateClassLoaderBuilderFactory.class),
                                         mock(PluginDependenciesResolver.class),
                                         discoverLicenseValidator(getClass().getClassLoader()),
-                                        getRuntimeLockFactory(),
+                                        mock(LockFactory.class),
                                         mock(MemoryManagementService.class),
                                         mock(ArtifactConfigurationProcessor.class)));
 
@@ -86,6 +94,27 @@ public abstract class AbstractArtifactAgnosticServiceBuilderTestCase extends Abs
     assertThat(applicationDescriptor.get().getArtifactDeclaration(), is(artifactDeclaration));
     assertThat(applicationDescriptor.get().getAppProperties(), aMapWithSize(1));
     assertThat(applicationDescriptor.get().getAppProperties(), hasEntry(is(testKey), is(testValue)));
+  }
+
+  @Test
+  @Issue("W-14398600")
+  public void addSharedLibraryDependency() {
+    AbstractArtifactAgnosticServiceBuilder builder =
+        (AbstractArtifactAgnosticServiceBuilder) getArtifactAgnosticServiceBuilder(applicationFactory);
+    final MavenModelBuilder model = mock(MavenModelBuilder.class);
+    builder.setModel(model);
+
+    builder.addDependency("org.mule.test", "test-artifact", "0.0.1", null, "jar");
+    builder.addDependency("org.mule.test", "test-not-plugin", "0.0.1", "notAPlugin", "jar");
+    builder.addDependency("org.mule.test", "test-mule-plugin", "0.0.1", MULE_PLUGIN_CLASSIFIER, "jar");
+
+    verify(model, times(3)).addDependency(any());
+    // only two invocations...
+    verify(model, times(2)).addSharedLibraryDependency(any(), any());
+    // ..and those invocations with the expected parameters
+    verify(model).addSharedLibraryDependency("org.mule.test", "test-artifact");
+    verify(model).addSharedLibraryDependency("org.mule.test", "test-not-plugin");
+    verify(model, never()).addSharedLibraryDependency(anyString(), eq("test-mule-plugin"));
   }
 
   protected abstract ArtifactAgnosticServiceBuilder getArtifactAgnosticServiceBuilder(DefaultApplicationFactory applicationFactory);

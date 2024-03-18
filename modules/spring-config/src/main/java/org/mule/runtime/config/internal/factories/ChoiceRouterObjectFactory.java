@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -14,6 +14,7 @@ import org.mule.runtime.core.internal.routing.ChoiceRouter;
 import org.mule.runtime.core.internal.routing.ProcessorExpressionRoute;
 import org.mule.runtime.core.internal.routing.ProcessorRoute;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
 
 import java.util.Collection;
@@ -26,7 +27,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
+  private ComponentTracerFactory componentTracerFactory;
 
   private Processor defaultProcessor;
   private Collection<ProcessorExpressionRoute> conditionalMessageProcessors = emptyList();
@@ -49,7 +50,7 @@ public class ChoiceRouterObjectFactory extends AbstractComponentFactory<ChoiceRo
 
   @Override
   public ChoiceRouter doGetObject() throws Exception {
-    final ChoiceRouter router = new ChoiceRouter(initialSpanInfoProvider);
+    final ChoiceRouter router = new ChoiceRouter(componentTracerFactory);
     router.setAnnotations(getAnnotations());
     router.setDefaultRoute(defaultProcessor);
     router.setMuleContext(muleContext);

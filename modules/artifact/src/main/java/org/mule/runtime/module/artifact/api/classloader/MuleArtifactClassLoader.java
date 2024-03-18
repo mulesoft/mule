@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,24 +8,31 @@ package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+import static org.mule.runtime.module.artifact.api.classloader.jar.CachingURLStreamHandlerFactory.getCachingURLStreamHandlerFactory;
 
 import static java.lang.Integer.toHexString;
 import static java.lang.String.format;
 import static java.lang.System.identityHashCode;
 import static java.lang.reflect.Modifier.isAbstract;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import static org.apache.commons.io.FilenameUtils.normalize;
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.module.artifact.classloader.ActiveMQResourceReleaser;
+import org.mule.module.artifact.classloader.AwsIdleConnectionReaperResourceReleaser;
 import org.mule.module.artifact.classloader.ClassLoaderResourceReleaser;
+import org.mule.module.artifact.classloader.GroovyResourceReleaser;
 import org.mule.module.artifact.classloader.IBMMQResourceReleaser;
-import org.mule.module.artifact.classloader.MvelClassLoaderReleaser;
 import org.mule.module.artifact.classloader.ScalaClassValueReleaser;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
+import org.mule.runtime.module.artifact.internal.classloader.ResourceReleaserExecutor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +101,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
                                                                             + "-?" + NO_SPACES + "?"
                                                                             // type
                                                                             + "\\." + NO_SPACES);
+  private static final boolean IS_JAVA_VERSION_AT_MOST_11 = isJavaVersionAtMost(JAVA_11);
 
   protected List<ShutdownListener> shutdownListeners = new ArrayList<>();
 
@@ -101,16 +109,16 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   private final Object localResourceLocatorLock = new Object();
   private volatile LocalResourceLocator localResourceLocator;
   private String dbResourceReleaserClassLocation = DB_RESOURCE_RELEASER_CLASS_LOCATION;
-  private final ResourceReleaser classLoaderReferenceReleaser;
   private volatile boolean shouldReleaseJdbcReferences = false;
   private volatile boolean shouldReleaseIbmMQResources = false;
   private volatile boolean shouldReleaseActiveMQReferences = false;
+  private volatile boolean shouldReleaseGroovyReferences = false;
   private ResourceReleaser jdbcResourceReleaserInstance;
-  private final ResourceReleaser scalaClassValueReleaserInstance;
-  private final ResourceReleaser mvelClassLoaderReleaserInstance;
   private final ArtifactDescriptor artifactDescriptor;
   private final Object descriptorMappingLock = new Object();
   private final Map<BundleDescriptor, URLClassLoader> descriptorMapping = new HashMap<>();
+  private final ResourceReleaserExecutor resourceReleaserExecutor = new ResourceReleaserExecutor(this::reportPossibleLeak);
+  private Optional<ModuleLayerInformationSupplier> moduleLayerInformation = empty();
 
   /**
    * Constructs a new {@link MuleArtifactClassLoader} for the given URLs
@@ -128,9 +136,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     checkArgument(artifactDescriptor != null, "artifactDescriptor cannot be null");
     this.artifactId = artifactId;
     this.artifactDescriptor = artifactDescriptor;
-    this.classLoaderReferenceReleaser = new ClassLoaderResourceReleaser(this);
-    this.scalaClassValueReleaserInstance = new ScalaClassValueReleaser();
-    this.mvelClassLoaderReleaserInstance = new MvelClassLoaderReleaser(this);
+    this.resourceReleaserExecutor.addResourceReleaser(() -> new ClassLoaderResourceReleaser(this));
   }
 
   @Override
@@ -197,7 +203,8 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
             // We don't want class loaders in limbo
             synchronized (descriptorMappingLock) {
               if (descriptorMapping.get(matchDescriptor) == null) {
-                URLClassLoader urlClassLoader = new URLClassLoader(new URL[] {url});
+                URLClassLoader urlClassLoader =
+                    new URLClassLoader(new URL[] {url}, getSystemClassLoader(), getCachingURLStreamHandlerFactory());;
                 descriptorMapping.put(matchDescriptor, urlClassLoader);
               }
             }
@@ -274,6 +281,10 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     if (!shouldReleaseActiveMQReferences && name.startsWith("org.apache.activemq")) {
       shouldReleaseActiveMQReferences = true;
     }
+
+    if (!shouldReleaseGroovyReferences && name.startsWith("org.codehaus.groovy")) {
+      shouldReleaseGroovyReferences = true;
+    }
     return clazz;
   }
 
@@ -307,53 +318,42 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
     });
     descriptorMapping.clear();
 
-    try {
-      clearReferences();
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
+    // When running on Java versions greater than 11, the resource releaser logic from the Mule Runtime will not be used.
+    // The resource releasing responsibility will be delegated to each extension instead.
+    if (IS_JAVA_VERSION_AT_MOST_11) {
+      addLegacyExtensionsResourceReleasers();
     }
-
-    try {
-      if (shouldReleaseJdbcReferences) {
-        createResourceReleaserInstance().release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
+    if (shouldReleaseGroovyReferences) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new GroovyResourceReleaser(this));
     }
-
-    try {
-      if (shouldReleaseIbmMQResources) {
-        new IBMMQResourceReleaser(this).release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
-
-    try {
-      if (shouldReleaseActiveMQReferences) {
-        new ActiveMQResourceReleaser(this).release();
-      }
-    } catch (Throwable t) {
-      reportPossibleLeak(t, artifactId);
-    }
+    resourceReleaserExecutor.executeResourceReleasers();
 
     super.dispose();
     shutdownListeners();
   }
 
-  private void clearReferences() {
-    classLoaderReferenceReleaser.release();
-    scalaClassValueReleaserInstance.release();
-    mvelClassLoaderReleaserInstance.release();
+  @Deprecated
+  private void addLegacyExtensionsResourceReleasers() {
+    resourceReleaserExecutor.addResourceReleaser(() -> new AwsIdleConnectionReaperResourceReleaser(this));
+    resourceReleaserExecutor.addResourceReleaser(ScalaClassValueReleaser::new);
+
+    if (shouldReleaseJdbcReferences) {
+      resourceReleaserExecutor.addResourceReleaser(this::createResourceReleaserInstance);
+    }
+    if (shouldReleaseIbmMQResources) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new IBMMQResourceReleaser(this));
+    }
+    if (shouldReleaseActiveMQReferences) {
+      resourceReleaserExecutor.addResourceReleaser(() -> new ActiveMQResourceReleaser(this));
+    }
   }
 
-  void reportPossibleLeak(Throwable t, String artifactId) {
-    final String message = "Error disposing classloader for '{}'. This can cause a memory leak";
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug(message, artifactId, t);
-    } else {
-      LOGGER.error(message, artifactId);
-    }
+  private void reportPossibleLeak(Throwable t) {
+    reportPossibleLeak(t, artifactId);
+  }
+
+  protected void reportPossibleLeak(Throwable t, String artifactId) {
+    LOGGER.error(format("Error disposing classloader for '%s'. This can cause a memory leak", artifactId), t);
   }
 
   private void shutdownListeners() {
@@ -426,4 +426,15 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
   public String toString() {
     return format("%s[%s]@%s", getClass().getName(), getArtifactId(), toHexString(identityHashCode(this)));
   }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = of(moduleLayerInformationSupplier);
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return moduleLayerInformation;
+  }
+
 }

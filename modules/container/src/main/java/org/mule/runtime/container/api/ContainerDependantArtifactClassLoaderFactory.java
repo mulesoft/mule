@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +13,7 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 /**
  * Creates {@link ClassLoader} instances for artifacts that depend directly on the container.
  *
- * @since 4.6
+ * @since 4.5
  */
 @NoImplement
 public interface ContainerDependantArtifactClassLoaderFactory<T extends ArtifactDescriptor> {
@@ -27,4 +27,15 @@ public interface ContainerDependantArtifactClassLoaderFactory<T extends Artifact
    * @return a new class loader for described artifact.
    */
   ArtifactClassLoader create(String artifactId, T descriptor, MuleContainerClassLoaderWrapper containerClassLoader);
+
+  /**
+   * When using a Java version with JPMS support, will put the {@link ModuleLayer} where the given class is found as a parent of
+   * the {@link ModuleLayer} from where the target {@link ClassLoader} will be obtained from.
+   * <p>
+   * If the Java version being used does not support JPMS, this does nothing.
+   * 
+   * @param clazz the class to get the module layer from.
+   */
+  void setParentLayerFrom(Class clazz);
+
 }

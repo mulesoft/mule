@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -29,7 +29,7 @@ public class EventStreamingState {
 
   private final static Logger LOGGER = getLogger(EventStreamingState.class);
 
-  private final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
+  protected final Cache<Integer, WeakReference<ManagedCursorProvider>> providers = Caffeine.newBuilder().build();
 
   /**
    * Registers the given {@code provider} as one associated to the owning event.
@@ -71,7 +71,7 @@ public class EventStreamingState {
         LOGGER.info("Added ManagedCursorProvider: {} for delegate: {} opened by: {}", k, identityHashCode(innerDelegate),
                     originatingLocation.map(ComponentLocation::getLocation).orElse("unknown"));
       }
-      return ghostBuster.track(provider);
+      return ghostBuster.track(provider, () -> providers.invalidate(id));
     }).get();
   }
 

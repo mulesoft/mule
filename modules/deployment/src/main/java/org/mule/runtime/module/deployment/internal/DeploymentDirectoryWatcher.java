@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,18 +8,19 @@ package org.mule.runtime.module.deployment.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
 import static org.mule.runtime.container.api.MuleFoldersUtil.getDomainsFolder;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.JAR_FILE_SUFFIX;
 import static org.mule.runtime.module.deployment.internal.DefaultArchiveDeployer.ZIP_FILE_SUFFIX;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.deployExplodedDomains;
+import static org.mule.runtime.module.deployment.internal.DeploymentUtils.listFiles;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.lang.Thread.MIN_PRIORITY;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.sort;
 import static java.util.Arrays.stream;
 import static java.util.Optional.empty;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
@@ -28,7 +29,10 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
 import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.api.scheduler.SchedulerConfig;
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.deployment.model.api.DeployableArtifact;
 import org.mule.runtime.deployment.model.api.DeploymentException;
@@ -47,7 +51,6 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +58,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -64,7 +66,6 @@ import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * It's in charge of the whole deployment process.
@@ -84,7 +85,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   protected static final int DEFAULT_CHANGES_CHECK_INTERVAL_MS = 5000;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = getLogger(DeploymentDirectoryWatcher.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final ReentrantLock deploymentLock;
   private final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer;
@@ -97,7 +99,8 @@ public class DeploymentDirectoryWatcher implements Runnable {
   private final DomainBundleArchiveDeployer domainBundleDeployer;
   private final File appsDir;
   private final File domainsDir;
-  private ScheduledExecutorService artifactDirMonitorTimer;
+  private final boolean disposeArtifactsOnStop;
+  private Scheduler artifactDirMonitorScheduler;
 
   protected volatile boolean dirty;
 
@@ -107,6 +110,18 @@ public class DeploymentDirectoryWatcher implements Runnable {
                                     ObservableList<Domain> domains,
                                     ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
                                     final ReentrantLock deploymentLock) {
+    this(domainBundleDeployer, domainArchiveDeployer, applicationArchiveDeployer, domains, applications, schedulerServiceSupplier,
+         deploymentLock, true);
+  }
+
+  public DeploymentDirectoryWatcher(DomainBundleArchiveDeployer domainBundleDeployer,
+                                    final ArchiveDeployer<DomainDescriptor, Domain> domainArchiveDeployer,
+                                    final ArchiveDeployer<ApplicationDescriptor, Application> applicationArchiveDeployer,
+                                    ObservableList<Domain> domains,
+                                    ObservableList<Application> applications, Supplier<SchedulerService> schedulerServiceSupplier,
+                                    final ReentrantLock deploymentLock,
+                                    boolean disposeArtifactsOnStop) {
+    this.disposeArtifactsOnStop = disposeArtifactsOnStop;
     this.domainBundleDeployer = domainBundleDeployer;
     this.appsDir = applicationArchiveDeployer.getDeploymentDirectory();
     this.domainsDir = domainArchiveDeployer.getDeploymentDirectory();
@@ -160,7 +175,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         String[] packagedDomains = listFiles(domainsDir, JAR_ARTIFACT_FILTER);
 
         deployPackedDomains(packagedDomains);
-        deployExplodedDomains(explodedDomains);
+        deployExplodedDomains(domainArchiveDeployer, explodedDomains);
         String[] apps = appString.split(":");
         apps = removeDuplicateAppNames(apps);
 
@@ -169,9 +184,11 @@ public class DeploymentDirectoryWatcher implements Runnable {
             File applicationFile = new File(appsDir, app + JAR_FILE_SUFFIX);
 
             if (applicationFile.exists() && applicationFile.isFile()) {
+              // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
               applicationArchiveDeployer.deployPackagedArtifact(app + JAR_FILE_SUFFIX, empty());
             } else {
               if (applicationArchiveDeployer.isUpdatedZombieArtifact(app)) {
+                // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
                 applicationArchiveDeployer.deployExplodedArtifact(app, empty());
               }
             }
@@ -179,7 +196,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
             // Ignore and continue
           }
         }
-        log(miniSplash("Mule is up and running in a fixed app set mode"));
+        SPLASH_LOGGER.info(miniSplash("Mule is up and running in a fixed app set mode"));
       }
     } finally {
       if (deploymentLock.isHeldByCurrentThread()) {
@@ -194,13 +211,15 @@ public class DeploymentDirectoryWatcher implements Runnable {
   public void stop() {
     stopAppDirMonitorTimer();
 
-    deploymentLock.lock();
-    try {
-      notifyStopListeners();
-      stopArtifacts(applications);
-      stopArtifacts(domains);
-    } finally {
-      deploymentLock.unlock();
+    if (disposeArtifactsOnStop) {
+      deploymentLock.lock();
+      try {
+        setDoNotPersistStopStatusOfArtifacts();
+        stopArtifacts(applications);
+        stopArtifacts(domains);
+      } finally {
+        deploymentLock.unlock();
+      }
     }
   }
 
@@ -228,17 +247,21 @@ public class DeploymentDirectoryWatcher implements Runnable {
 
   private void scheduleChangeMonitor() {
     final int reloadIntervalMs = getChangesCheckIntervalMs();
-    // TODO MULE-12337 migrate this to an scheduler
-    artifactDirMonitorTimer = newSingleThreadScheduledExecutor(new ArtifactDeployerMonitorThreadFactory());
+    SchedulerConfig schedulerConfig = SchedulerConfig.config()
+        .withName("Mule.app.deployer.monitor")
+        .withPriority(MIN_PRIORITY)
+        .withMaxConcurrentTasks(1);
 
-    artifactDirMonitorTimer.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
+    artifactDirMonitorScheduler = schedulerServiceSupplier.get().customScheduler(schedulerConfig);
+    artifactDirMonitorScheduler.scheduleWithFixedDelay(this, reloadIntervalMs, reloadIntervalMs, MILLISECONDS);
 
-    log(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
+    SPLASH_LOGGER.info(miniSplash(format("Mule is up and kicking (every %dms)", reloadIntervalMs)));
   }
 
   protected void deployPackedApps(String[] zips) {
     for (String zip : zips) {
       try {
+        // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
         applicationArchiveDeployer.deployPackagedArtifact(zip, empty());
       } catch (Exception e) {
         // Ignore and continue
@@ -249,6 +272,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
   protected void deployExplodedApps(String[] apps) {
     for (String addedApp : apps) {
       try {
+        // [SingleApp] Avoid filesystem polling and unify the watcher to directly invoke the deployment service.
         applicationArchiveDeployer.deployExplodedArtifact(addedApp, empty());
       } catch (DeploymentException e) {
         // Ignore and continue
@@ -300,7 +324,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
         domains = listFiles(domainsDir, DIRECTORY);
       }
 
-      deployExplodedDomains(domains);
+      deployExplodedDomains(domainArchiveDeployer, domains);
 
       redeployModifiedApplications();
 
@@ -344,16 +368,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
         // Ignore and continue
       }
     }
-  }
-
-  private String[] listFiles(File directory, FilenameFilter filter) {
-    String[] files = directory.list(filter);
-    if (files == null) {
-      throw new IllegalStateException(format("We got a null while listing the contents of director '%s'. Some common " +
-          "causes for this is a lack of permissions to the directory or that it's being deleted concurrently",
-                                             directory.getName()));
-    }
-    return files;
   }
 
   public <D extends DeployableArtifactDescriptor, T extends Artifact<D>> T findArtifact(String artifactName,
@@ -428,18 +442,6 @@ public class DeploymentDirectoryWatcher implements Runnable {
     return anchors;
   }
 
-  private void deployExplodedDomains(String[] domains) {
-    for (String addedDomain : domains) {
-      try {
-        if (domainArchiveDeployer.isUpdatedZombieArtifact(addedDomain)) {
-          domainArchiveDeployer.deployExplodedArtifact(addedDomain, empty());
-        }
-      } catch (DeploymentException e) {
-        logger.error("Error deploying domain '{}'", addedDomain, e);
-      }
-    }
-  }
-
   private void deployPackedDomains(String[] zips) {
     for (String zip : zips) {
       try {
@@ -509,10 +511,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
   }
 
   private void stopAppDirMonitorTimer() {
-    if (artifactDirMonitorTimer != null) {
-      artifactDirMonitorTimer.shutdown();
+    if (artifactDirMonitorScheduler != null) {
+      artifactDirMonitorScheduler.shutdown();
       try {
-        artifactDirMonitorTimer.awaitTermination(getChangesCheckIntervalMs(), MILLISECONDS);
+        artifactDirMonitorScheduler.awaitTermination(getChangesCheckIntervalMs(), MILLISECONDS);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -531,7 +533,7 @@ public class DeploymentDirectoryWatcher implements Runnable {
     public void propertyChange(PropertyChangeEvent event) {
       if (event instanceof ElementAddedEvent) {
         Artifact artifactAdded = (T) event.getNewValue();
-        artifactConfigResourcesTimestaps.put(artifactAdded.getArtifactName(), new ArtifactResourcesTimestamp<T>(artifactAdded));
+        artifactConfigResourcesTimestaps.put(artifactAdded.getArtifactName(), new ArtifactResourcesTimestamp<>(artifactAdded));
       } else if (event instanceof ElementRemovedEvent) {
         Artifact artifactRemoved = (T) event.getNewValue();
         artifactConfigResourcesTimestaps.remove(artifactRemoved.getArtifactName());
@@ -575,7 +577,10 @@ public class DeploymentDirectoryWatcher implements Runnable {
     }
   }
 
-  private void notifyStopListeners() {
+  /**
+   * Makes the artifacts not persist the stop status.
+   */
+  private void setDoNotPersistStopStatusOfArtifacts() {
     for (Application application : applications) {
       applicationArchiveDeployer.doNotPersistArtifactStop(application);
     }

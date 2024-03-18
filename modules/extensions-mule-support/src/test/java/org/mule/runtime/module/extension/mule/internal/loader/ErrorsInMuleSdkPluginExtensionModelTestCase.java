@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -45,7 +45,7 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
   public static void setUp() {
     expectedErrors.put("raiseCustom", singleton("ERRORS:CUSTOM"));
     expectedErrors.put("raiseOther", singleton("ERRORS:OTHER"));
-    expectedErrors.put("silencingOneAndRaisingOther", singleton("ERRORS:OTHER"));
+    expectedErrors.put("silencingOneAndRaisingOther", asSet("ERRORS:OTHER", "MULE:TRANSACTION"));
 
     // TODO (W-11471782): should be "ERRORS:HEISENBERG_HEALTH" and "ERRORS:HEISENBERG_OAUTH2"
     expectedErrors.put("heisenbergCureCancer", asSet("HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));
@@ -64,7 +64,8 @@ public class ErrorsInMuleSdkPluginExtensionModelTestCase extends AbstractMuleSdk
     Set<String> errorsAsString = getRaisedErrors(extensionModel);
     MatcherAssert.assertThat(errorsAsString,
                              containsInAnyOrder("MULE:ANY", "MULE:RETRY_EXHAUSTED", "ERRORS:CUSTOM", "ERRORS:CONNECTIVITY",
-                                                "ERRORS:RETRY_EXHAUSTED", "MULE:CONNECTIVITY", "ERRORS:ONE", "ERRORS:OTHER",
+                                                "ERRORS:RETRY_EXHAUSTED", "MULE:CONNECTIVITY", "MULE:TRANSACTION", "ERRORS:ONE",
+                                                "ERRORS:OTHER",
                                                 // TODO (W-11471782): should be "ERRORS:HEISENBERG_HEALTH" and
                                                 // "ERRORS:HEISENBERG_OAUTH2"
                                                 "HEISENBERG:HEALTH", "HEISENBERG:OAUTH2"));

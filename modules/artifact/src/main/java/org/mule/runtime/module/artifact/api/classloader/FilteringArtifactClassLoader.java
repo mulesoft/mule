@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.artifact.api.classloader;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
@@ -17,9 +16,11 @@ import static java.lang.System.getProperty;
 import static java.lang.System.identityHashCode;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.enumeration;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.api.annotation.NoInstantiate;
-import org.mule.runtime.core.internal.util.EnumerationAdapter;
 import org.mule.runtime.module.artifact.api.classloader.exception.NotExportedClassException;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 
@@ -49,11 +50,12 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
   }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FilteringArtifactClassLoader.class);
+  private static final String SERVICE_PREFIX = "META-INF/services/";
 
   private final ArtifactClassLoader artifactClassLoader;
   private final ClassLoaderFilter filter;
   private final List<ExportedService> exportedServices;
-  private static final String SERVICE_PREFIX = "META-INF/services/";
+  private Optional<ModuleLayerInformationSupplier> moduleLayerInformation = empty();
 
   private final boolean verboseLogging;
 
@@ -154,7 +156,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
                                       exportedServiceProviders));
         }
       }
-      return new EnumerationAdapter<>(exportedServiceProviders);
+      return enumeration(exportedServiceProviders);
     } else if (filter.exportsResource(name)) {
       return getResourcesFromDelegate(artifactClassLoader, name);
     } else {
@@ -162,7 +164,7 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
         logClassloadingTrace(format("Resources '%s' not found in classloader for '%s'.", name, getArtifactId()));
         logClassloadingTrace(format("Filter applied for resources '%s': %s", name, getArtifactId()));
       }
-      return new EnumerationAdapter<>(emptyList());
+      return enumeration(emptyList());
     }
   }
 
@@ -270,5 +272,15 @@ public class FilteringArtifactClassLoader extends ClassLoader implements Artifac
 
   public ArtifactClassLoader getArtifactClassLoader() {
     return artifactClassLoader;
+  }
+
+  @Override
+  public void setModuleLayerInformationSupplier(ModuleLayerInformationSupplier moduleLayerInformationSupplier) {
+    this.moduleLayerInformation = of(moduleLayerInformationSupplier);
+  }
+
+  @Override
+  public Optional<ModuleLayerInformationSupplier> getModuleLayerInformation() {
+    return moduleLayerInformation;
   }
 }

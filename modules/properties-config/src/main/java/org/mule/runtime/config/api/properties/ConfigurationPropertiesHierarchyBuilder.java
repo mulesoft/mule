@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -10,22 +10,24 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
-import org.mule.runtime.config.internal.dsl.model.config.CompositeConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationPropertiesResolver;
-import org.mule.runtime.config.internal.dsl.model.config.DefaultConfigurationProperty;
-import org.mule.runtime.config.internal.dsl.model.config.EnvironmentPropertiesConfigurationProvider;
-import org.mule.runtime.config.internal.dsl.model.config.FileConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.GlobalPropertyConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.MapConfigurationPropertiesProvider;
-import org.mule.runtime.config.internal.dsl.model.config.SystemPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.model.dsl.config.CompositeConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
+import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
+import org.mule.runtime.config.internal.model.dsl.config.EnvironmentPropertiesConfigurationProvider;
+import org.mule.runtime.config.internal.model.dsl.config.FileConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.GlobalPropertyConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.MapConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.PropertyNotFoundException;
+import org.mule.runtime.config.internal.model.dsl.config.StaticConfigurationPropertiesProvider;
+import org.mule.runtime.config.internal.model.dsl.config.SystemPropertiesConfigurationProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 import org.mule.runtime.properties.api.ResourceProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -55,7 +57,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
   private Optional<ConfigurationPropertiesProvider> environmentProperties = empty();
   private Optional<ConfigurationPropertiesProvider> fileProperties = empty();
   private Optional<ConfigurationPropertiesProvider> domainResolver = empty();
-  private List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
+  private final List<ConfigurationPropertiesProvider> appProperties = new ArrayList<>();
   private Supplier<Map<String, ConfigurationProperty>> globalPropertiesSupplier = HashMap::new;
   private boolean failuresIfNotPresent = true;
 
@@ -114,6 +116,17 @@ public class ConfigurationPropertiesHierarchyBuilder {
   }
 
   /**
+   * Creates and sets a {@link ConfigurationPropertiesProvider} to use as application property.
+   * 
+   * @param artifactProperties the properties to add to the hierarchy as Application Properties.
+   * @return this builder.
+   */
+  public ConfigurationPropertiesHierarchyBuilder withApplicationProperties(Map<String, String> artifactProperties) {
+    this.appProperties.add(new StaticConfigurationPropertiesProvider(artifactProperties));
+    return this;
+  }
+
+  /**
    * Sets a supplier to retrieve the Global Properties from.
    * 
    * @param globalPropertiesSupplier a {@link Supplier} of a {@link Map} of properties, to be used as Global/Default properties.
@@ -151,8 +164,7 @@ public class ConfigurationPropertiesHierarchyBuilder {
 
   /**
    * Set that the {@link ConfigurationPropertiesResolver} to be built won't fail in case of resolving a property doesn't exist.
-   * Instead of throwing a {@link org.mule.runtime.config.internal.dsl.model.config.PropertyNotFoundException}, it will return
-   * null.
+   * Instead of throwing a {@link PropertyNotFoundException}, it will return null.
    * 
    * @return this builder.
    */
@@ -208,6 +220,8 @@ public class ConfigurationPropertiesHierarchyBuilder {
     environmentProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
     systemProperties.ifPresent(provider -> addToHierarchy(hierarchy, provider));
 
-    return hierarchy.peek();
+    DefaultConfigurationPropertiesResolver lastResolver = hierarchy.peek();
+    lastResolver.setAsRootResolver();
+    return lastResolver;
   }
 }

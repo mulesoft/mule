@@ -1,24 +1,27 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner;
 
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import static org.mule.test.runner.utils.AnnotationUtils.findConfiguredClass;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFrom;
 import static org.mule.test.runner.utils.AnnotationUtils.getAnnotationAttributeFromHierarchy;
+
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.mule.test.runner.utils.AnnotationUtils;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -49,8 +52,9 @@ public class RunnerConfiguration {
   private Set<String> applicationRuntimeLibs;
   private Set<String> testRunnerExportedRuntimeLibs;
   private Set<String> extraPrivilegedArtifacts;
+  private Map<String, String> systemProperties;
 
-  private String loadedFromTestClass;
+  private final String loadedFromTestClass;
 
   private RunnerConfiguration(Class loadedFromTestClass) {
     this.loadedFromTestClass = loadedFromTestClass.getName();
@@ -88,6 +92,10 @@ public class RunnerConfiguration {
     return extraPrivilegedArtifacts;
   }
 
+  public Map<String, String> getSystemProperties() {
+    return systemProperties;
+  }
+
   /**
    * Creates an instance of the the configuration by reading the class annotated with {@link ArtifactClassLoaderRunnerConfig}.
    * <p/>
@@ -121,6 +129,10 @@ public class RunnerConfiguration {
     runnerConfiguration.testRunnerExportedRuntimeLibs =
         new HashSet<>(readAttributeFromClass(TEST_RUNNER_EXPORTED_RUNTIME_LIBS, configuredClass));
     runnerConfiguration.testRunnerExportedRuntimeLibs.add(TEST_UNIT_ARTIFACT_ID);
+
+    final List<RunnerConfigSystemProperty> systemProperties = readAttributeFromHierarchy("systemProperties", testClass);
+    runnerConfiguration.systemProperties = systemProperties.stream()
+        .collect(toMap(RunnerConfigSystemProperty::key, RunnerConfigSystemProperty::value));
 
     return runnerConfiguration;
   }

@@ -1,12 +1,20 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.component;
 
+import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
+import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
+import static org.mule.runtime.core.internal.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
+import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
+
 import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -15,11 +23,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
-import static org.mule.runtime.core.api.util.IOUtils.toByteArray;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.addAnnotationsToClass;
-import static org.mule.runtime.core.privileged.component.AnnotatedObjectInvocationHandler.removeDynamicAnnotations;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.fromSingleComponent;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.Component;
@@ -27,12 +30,8 @@ import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.internal.util.CompositeClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-
-import io.qameta.allure.Issue;
-import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,6 +43,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
+
+import org.junit.Test;
+
+import io.qameta.allure.Issue;
+
+import net.bytebuddy.dynamic.loading.MultipleParentClassLoader;
 
 @SmallTest
 public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
@@ -59,6 +64,14 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
 
     assertThat(removeDynamicAnnotations(annotated), instanceOf(NotAnnotated.class));
     assertThat(removeDynamicAnnotations(annotated), not(instanceOf(Component.class)));
+  }
+
+  @Test
+  public void notAnnotatedWithConstructor() throws Exception {
+    NotAnnotatedWithConstructor annotated =
+        (NotAnnotatedWithConstructor) addAnnotationsToClass(NotAnnotatedWithConstructor.class).newInstance();
+
+    assertThat(annotated.getSomething(), equalTo("something"));
   }
 
   @Test
@@ -117,8 +130,8 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     ClassLoader childCl = createDelegatorClassLoader();
 
     Class<Component> annotatedClass = addAnnotationsToClass(childCl.loadClass(Delegator.class.getName()));
-    // ByteBuddy creates the class in an own class loader, which is child of the defined class loader
-    assertThat(annotatedClass.getClassLoader().getParent(), instanceOf(CompositeClassLoader.class));
+    // ByteBuddy creates the class in an own class loader
+    assertThat(annotatedClass.getClassLoader(), instanceOf(MultipleParentClassLoader.class));
   }
 
   @Test
@@ -145,17 +158,23 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
   private ClassLoader createDelegatorClassLoader() {
     ClassLoader testClassLoader = new ClassLoader(this.getClass().getClassLoader()) {
 
+      private Class<?> delegatorClassDefined = null;
+
       @Override
       public Class<?> loadClass(String name) throws ClassNotFoundException {
         if (Delegator.class.getName().equals(name)) {
-          byte[] classBytes;
-          try {
-            classBytes =
-                toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/core/internal/component/Delegator.class"));
-            return this.defineClass(null, classBytes, 0, classBytes.length);
-          } catch (Exception e) {
-            return super.loadClass(name);
+          if (delegatorClassDefined == null) {
+            byte[] classBytes;
+            try {
+              classBytes =
+                  toByteArray(this.getClass().getResourceAsStream("/org/mule/runtime/core/internal/component/Delegator.class"));
+              delegatorClassDefined = this.defineClass(null, classBytes, 0, classBytes.length);
+            } catch (Exception e) {
+              return super.loadClass(name);
+            }
           }
+
+          return delegatorClassDefined;
         } else {
           return super.loadClass(name);
         }
@@ -171,6 +190,20 @@ public class ComponentInvocationHandlerTestCase extends AbstractMuleTestCase {
     @Inject
     public void setSomething(Object something) {
       this.something = something;
+    }
+
+    public Object getSomething() {
+      return something;
+    }
+
+  }
+
+  public static class NotAnnotatedWithConstructor {
+
+    private final Object something;
+
+    public NotAnnotatedWithConstructor() {
+      this.something = "something";
     }
 
     public Object getSomething() {

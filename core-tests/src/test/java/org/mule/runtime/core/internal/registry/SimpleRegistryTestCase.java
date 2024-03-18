@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,6 +11,8 @@ import static org.mule.runtime.api.config.FeatureFlaggingService.FEATURE_FLAGGIN
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.collection.IsEmptyIterable.emptyIterable;
+import static org.hamcrest.core.IsIterableContaining.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -31,9 +33,13 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 import org.junit.Test;
-import org.slf4j.Logger;
+
+import io.qameta.allure.Issue;
 
 public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
 
@@ -229,6 +235,26 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     }
   }
 
+  @Test
+  @Issue("W-14547712")
+  public void lifecycleCallbackOnRegistryWithoutMuleContext() throws Exception {
+    final SimpleRegistry registry = new SimpleRegistry(null);
+
+    final InterfaceBasedTracker lifecycleTracker = new InterfaceBasedTracker();
+    registry.registerObject("_testLifecycle", lifecycleTracker);
+
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("not in lifecycle"));
+    assertThat(lifecycleTracker.getTracker(), emptyIterable());
+
+    registry.initialise();
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("initialise"));
+    assertThat(lifecycleTracker.getTracker(), hasItems("initialise"));
+
+    registry.dispose();
+    assertThat(registry.getLifecycleManager().getCurrentPhase(), is("dispose"));
+    assertThat(lifecycleTracker.getTracker(), hasItems("initialise", "dispose"));
+  }
+
   private MuleRegistry getRegistry() {
     return ((MuleContextWithRegistry) muleContext).getRegistry();
   }
@@ -246,6 +272,7 @@ public class SimpleRegistryTestCase extends AbstractMuleContextTestCase {
     }
 
     @Override
+    @Inject
     public void setMuleContext(MuleContext context) {
       tracker.add("setMuleContext");
     }

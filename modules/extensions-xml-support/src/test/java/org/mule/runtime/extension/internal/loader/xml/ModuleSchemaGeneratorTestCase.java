@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -16,18 +16,20 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
-import org.mule.runtime.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
-import org.mule.runtime.module.extension.internal.capability.xml.schema.DefaultExtensionSchemaGenerator;
+import org.mule.runtime.extension.api.dsl.syntax.resources.spi.ExtensionSchemaGenerator;
+import org.mule.runtime.module.extension.internal.util.MuleExtensionUtils;
+import org.mule.test.module.extension.internal.FileGenerationParameterizedExtensionModelTestCase;
+import org.mule.test.petstore.extension.PetStoreConnector;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.junit.runner.RunWith;
@@ -44,8 +46,10 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   private static final String EXPECTED_FILES_DIR = "modules/schema/";
   private static final boolean UPDATE_EXPECTED_FILES_ON_ERROR =
       getBoolean(SYSTEM_PROPERTY_PREFIX + "extensionSchemas.updateExpectedFilesOnError");
+  private static final ExtensionModel PET_STORE_EXTENSION_MODEL = MuleExtensionUtils.loadExtension(PetStoreConnector.class);
 
-  private final DefaultExtensionSchemaGenerator extensionSchemaFactory = new DefaultExtensionSchemaGenerator();
+  private final ExtensionSchemaGenerator extensionSchemaFactory =
+      ServiceLoader.load(ExtensionSchemaGenerator.class).iterator().next();
 
   @Parameterized.Parameters(name = "{index}: Validating xsd for {1}")
   public static Collection<Object[]> data() {
@@ -59,7 +63,8 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
                                            "module-properties-types",
                                            "module-single-op-with-property",
                                            "module-single-operation",
-                                           "module-single-operation-camelized");
+                                           "module-single-operation-camelized",
+                                           "module-tls-config");
 
     return extensions.stream().map(moduleName -> {
       String modulePath = EXPECTED_FILES_DIR + moduleName + ".xml";
@@ -77,7 +82,10 @@ public class ModuleSchemaGeneratorTestCase extends FileGenerationParameterizedEx
   }
 
   private static Set<ExtensionModel> getDependencies() {
-    return singleton(getExtensionModel());
+    Set<ExtensionModel> dependencies = new HashSet<>();
+    dependencies.add(getExtensionModel());
+    dependencies.add(PET_STORE_EXTENSION_MODEL);
+    return dependencies;
   }
 
   @Override

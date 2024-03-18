@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,7 +18,7 @@ import org.mule.runtime.core.api.context.MuleContextAware;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.privileged.processor.Router;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,16 +40,15 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   private MuleContext muleContext;
 
   @Inject
-  InitialSpanInfoProvider initialSpanInfoProvider;
-
+  private ComponentTracerFactory componentTracerFactory;
 
   @Override
   public void initialise() throws InitialisationException {
     Long routeNumber = 1L;
     for (ProcessorRoute route : routes) {
       route.setMessagingExceptionHandler(null);
-      route.setInitialSpanInfo(initialSpanInfoProvider
-          .getInitialSpanInfo(this, FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX + routeNumber));
+      route.setComponentTracer(componentTracerFactory.fromComponent(this,
+                                                                    FIRST_SUCCESSFUL_ATTEMPT_SPAN_NAME_SUFFIX + routeNumber));
       initialiseIfNeeded(route, muleContext);
       routeNumber++;
     }
@@ -87,7 +86,7 @@ public class FirstSuccessful extends AbstractComponent implements Router, Lifecy
   }
 
   public void addRoute(final Processor processor) {
-    routes.add(new ProcessorRoute(processor, initialSpanInfoProvider));
+    routes.add(new ProcessorRoute(processor, componentTracerFactory));
   }
 
   public void setRoutes(Collection<Processor> routes) {

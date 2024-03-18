@@ -1,26 +1,30 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.context;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.BATCH_FIXED_AGGREGATOR_TRANSACTION_RECORD_BUFFER;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DEFAULT_ERROR_HANDLER_NOT_ROLLBACK_IF_NOT_CORRESPONDING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_APPLY_OBJECT_PROCESSOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_PARAMETER_WHITESPACE_TRIMMING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_BYTE_BUDDY_OBJECT_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
-import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_REQUIRED_EXPRESSION_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENTITY_RESOLVER_FAIL_ON_FIRST_ERROR;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.FOREACH_ROUTER_REJECTS_MAP_EXPRESSIONS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HANDLE_SPLITTER_EXCEPTION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_ERROR_MAPPINGS_WHEN_POLICY_APPLIED_ON_OPERATION;
@@ -28,6 +32,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_INSECURE_TLS
 import static org.mule.runtime.api.config.MuleRuntimeFeature.HONOUR_RESERVED_PROPERTIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.MULE_PRINT_DETAILED_COMPOSITE_EXCEPTION_LOG;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.PARALLEL_FOREACH_FLATTEN_MESSAGE;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_IN_IDEMPOTENT_MESSAGE_VALIDATOR;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
@@ -37,6 +42,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATIO
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.serialization.ObjectSerializer.DEFAULT_OBJECT_SERIALIZER_NAME;
 import static org.mule.runtime.core.api.config.MuleProperties.LOCAL_OBJECT_STORE_MANAGER;
+import static org.mule.runtime.core.api.config.MuleProperties.MULE_METER_PROVIDER_KEY;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CLUSTER_CONFIGURATION;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_COMPONENT_INITIAL_STATE_MANAGER;
 import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONVERTER_RESOLVER;
@@ -68,11 +74,11 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.management.stats.AllStatistics.configureComputeConnectionErrorsInStats;
 import static org.mule.runtime.core.api.util.UUID.getClusterUUID;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.profiling.AbstractProfilingService.configureEnableProfilingService;
 import static org.mule.runtime.core.internal.transformer.simple.ObjectToString.configureToStringTransformerTransformIteratorElements;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.safely;
-import static org.mule.runtime.core.internal.util.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.getSupportedJdks;
+import static org.mule.runtime.core.internal.util.version.JdkVersionUtils.validateJdk;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -111,7 +117,6 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.api.util.concurrent.Latch;
 import org.mule.runtime.core.api.Injector;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.SingleResourceTransactionFactoryManager;
 import org.mule.runtime.core.api.config.FeatureContext;
 import org.mule.runtime.core.api.config.FeatureFlaggingRegistry;
 import org.mule.runtime.core.api.config.MuleConfiguration;
@@ -155,7 +160,6 @@ import org.mule.runtime.core.internal.lifecycle.MuleLifecycleInterceptor;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.internal.registry.MuleRegistryHelper;
 import org.mule.runtime.core.internal.registry.Registry;
-import org.mule.runtime.core.internal.util.JdkVersionUtils;
 import org.mule.runtime.core.internal.util.splash.ArtifactShutdownSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ArtifactStartupSplashScreen;
 import org.mule.runtime.core.internal.util.splash.ServerShutdownSplashScreen;
@@ -166,6 +170,7 @@ import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.DefaultLocationPart;
+import org.mule.runtime.metrics.api.MeterProvider;
 
 import java.util.Collection;
 import java.util.List;
@@ -180,6 +185,7 @@ import java.util.function.Predicate;
 import javax.transaction.TransactionManager;
 
 import org.slf4j.Logger;
+
 import reactor.core.publisher.Hooks;
 
 public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMuleContext {
@@ -196,7 +202,8 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   /**
    * logger used by this class
    */
-  private static Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger LOGGER = getLogger(DefaultMuleContext.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final CustomizationService customizationService = new DefaultCustomizationService();
 
@@ -249,9 +256,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private ClusterConfiguration clusterConfiguration = new NullClusterConfiguration();
   private String clusterNodeIdPrefix = "";
-
-  private final SingleResourceTransactionFactoryManager singleResourceTransactionFactoryManager =
-      new SingleResourceTransactionFactoryManager();
 
   private LockFactory lockFactory;
 
@@ -338,7 +342,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureParallelForeachFlattenMessage();
       configureDisableRegistryBootstrapOptionalEntries();
       configureDisableApplyObjectProcessor();
-      configureEnableByteBuddyObjectCreation();
       configureValidateAppModelWithRegionClassloader();
       configurePrintDetailedCompositeExceptionLog();
       configureHonourErrorMappingsWhenPolicyAppliedOnOperation();
@@ -347,7 +350,13 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureForeachRouterRejectsMapExpressionFeatureFlag();
       configureHonourInsecureTlsConfiguration();
       configureUseTransactionSinkIndex();
-      configureEnableTracerConfigurationAtApplicationLevel();
+      configurePutTraceIdAndSpanIdInMdc();
+      configureAddMuleSpecificTracingInformationInTraceState();
+      configureCreateChildPolicyContextForParallelScopes();
+      configureCommonsPool2DisableJmx();
+      configureDisableSchedulerLogging();
+      configureErrorAndRollbackTxWhenTimeout();
+      configureDisableXmlSdkImplicitConfigurationCreation();
     }
   }
 
@@ -361,7 +370,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       }
 
       try {
-        JdkVersionUtils.validateJdk();
+        validateJdk();
       } catch (RuntimeException e) {
         throw new InitialisationException(invalidJdk(JAVA_VERSION, getSupportedJdks()), this);
       }
@@ -387,6 +396,10 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
             .filter(generator -> generator instanceof ExpressionCorrelationIdGenerator)
             .ifPresent(generator -> ((ExpressionCorrelationIdGenerator) generator).initializeGenerator());
 
+        MeterProvider meterProvider = muleRegistryHelper.lookupObject(MULE_METER_PROVIDER_KEY);
+        if (meterProvider != null) {
+          stats.trackUsingMeterProvider(meterProvider, this.getConfiguration().getId());
+        }
       } catch (InitialisationException e) {
         dispose();
         throw e;
@@ -441,9 +454,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       startLatch.release();
 
-      if (LOGGER.isInfoEnabled()) {
+      if (SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen startupScreen = buildStartupSplash();
-        log(startupScreen.toString());
+        SPLASH_LOGGER.info(startupScreen.toString());
       }
     }
   }
@@ -535,9 +548,9 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
       disposeManagers();
 
-      if ((getStartDate() > 0) && LOGGER.isInfoEnabled()) {
+      if ((getStartDate() > 0) && SPLASH_LOGGER.isInfoEnabled()) {
         SplashScreen shutdownScreen = buildShutdownSplash();
-        log(shutdownScreen.toString());
+        SPLASH_LOGGER.info(shutdownScreen.toString());
       }
 
       setExecutionClassLoader(null);
@@ -976,11 +989,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
                                                        OptionalInt.empty(),
                                                        OptionalInt.empty());
     return new DefaultComponentLocation(of(name), singletonList(part));
-  }
-
-  @Override
-  public SingleResourceTransactionFactoryManager getTransactionFactoryManager() {
-    return this.singleResourceTransactionFactoryManager;
   }
 
   @Override
@@ -1437,17 +1445,6 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableApplyObjectProcessor() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_APPLY_OBJECT_PROCESSOR,
-                                                minMuleVersion("4.7.0"));
-  }
-
-  /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_BYTE_BUDDY_OBJECT_CREATION} feature flag.
-   *
-   * @since 4.3.0-202203
-   */
-  private static void configureEnableByteBuddyObjectCreation() {
-    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_BYTE_BUDDY_OBJECT_CREATION,
                                                 minMuleVersion("4.6.0"));
   }
 
@@ -1518,14 +1515,24 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   }
 
   /**
-   * Configures the {@link MuleRuntimeFeature#ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL} feature flag.
+   * Configures the {@link MuleRuntimeFeature#ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE} feature flag.
    *
    * @since 4.5.0
    */
-  private static void configureEnableTracerConfigurationAtApplicationLevel() {
+  private static void configureAddMuleSpecificTracingInformationInTraceState() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_TRACER_CONFIGURATION_AT_APPLICATION_LEVEL,
-                                                featureContext -> true);
+    featureFlaggingRegistry.registerFeatureFlag(ADD_MULE_SPECIFIC_TRACING_INFORMATION_IN_TRACE_STATE,
+                                                featureContext -> false);
+  }
+
+  /**
+   * Configures the {@link MuleRuntimeFeature#CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES} feature flag.
+   *
+   * @since 4.5.0, 4.4.0-202406
+   */
+  private static void configureCreateChildPolicyContextForParallelScopes() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(CREATE_CHILD_POLICY_CONTEXT_FOR_PARALLEL_SCOPES, minMuleVersion("4.5.0"));
   }
 
 
@@ -1547,6 +1554,31 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureUseTransactionSinkIndex() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(USE_TRANSACTION_SINK_INDEX, featureContext -> true);
+  }
+
+  private static void configurePutTraceIdAndSpanIdInMdc() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC, featureContext -> false);
+  }
+
+  private static void configureCommonsPool2DisableJmx() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_JMX_FOR_COMMONS_POOL2, minMuleVersion("4.6.0"));
+  }
+
+  private static void configureDisableSchedulerLogging() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_SCHEDULER_LOGGING, minMuleVersion("4.6.0"));
+  }
+
+  private static void configureErrorAndRollbackTxWhenTimeout() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
+  }
+
+  private static void configureDisableXmlSdkImplicitConfigurationCreation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, minMuleVersion("4.7.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {

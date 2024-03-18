@@ -5,7 +5,7 @@
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
                http://www.mulesoft.org/schema/mule/test-policy http://www.mulesoft.org/schema/mule/test-policy/current/mule-test-policy.xsd">
 
-    <object name="a-security-provider" class="org.mule.runtime.module.deployment.internal.ApplicationPolicyDeploymentTestCase$TestSecurityProvider" />
+    <object name="a-security-provider" class="org.mule.runtime.module.deployment.test.internal.ApplicationPolicyDeploymentTestCase$TestSecurityProvider" />
 
     <security-manager name="a-security-manager" >
         <custom-security-provider name="security-provider" provider-ref="a-security-provider" />
@@ -15,7 +15,7 @@
         <test-policy:operation>
             <logger level="INFO" message="#[java!org::foo::EchoTest::new()]"/>
 
-            <test-policy:custom-processor class="org.mule.runtime.module.deployment.internal.TestPolicyProcessor"/>
+            <test-policy:custom-processor class="org.mule.runtime.module.deployment.test.internal.TestPolicyProcessor"/>
 
             <test-policy:execute-next/>
         </test-policy:operation>

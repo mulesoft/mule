@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -24,6 +24,7 @@ import static org.mule.runtime.module.deployment.impl.internal.artifact.Artifact
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.artifact.ArtifactCoordinates;
@@ -75,6 +76,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 /**
  * Builder for creating an {@link ArtifactContext}. This is the preferred mechanism to create a {@code ArtifactContext} and a
@@ -96,6 +98,8 @@ public class ArtifactContextBuilder {
   protected static final String CLASS_LOADER_REPOSITORY_CANNOT_BE_NULL = "classLoaderRepository cannot be null";
   protected static final String CLASS_LOADER_REPOSITORY_WAS_NOT_SET = "classLoaderRepository was not set";
   protected static final String SERVICE_CONFIGURATOR_CANNOT_BE_NULL = "serviceConfigurator cannot be null";
+
+  protected static final String ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL = "actionOnMuleArtifactDeployment cannot be null";
 
   private List<ArtifactPlugin> artifactPlugins = new ArrayList<>();
   private ArtifactType artifactType = APP;
@@ -126,6 +130,8 @@ public class ArtifactContextBuilder {
   private MemoryManagementService memoryManagementService;
   private ExpressionLanguageMetadataService expressionLanguageMetadataService;
   private ArtifactCoordinates artifactCoordinates;
+  private Consumer<ClassLoader> actionOnMuleArtifactDeployment = cl -> {
+  };
 
   private ArtifactContextBuilder() {}
 
@@ -435,6 +441,7 @@ public class ArtifactContextBuilder {
                ONLY_APPLICATIONS_OR_POLICIES_ARE_ALLOWED_TO_HAVE_A_PARENT_ARTIFACT);
     try {
       return withContextClassLoader(executionClassLoader, () -> {
+        actionOnMuleArtifactDeployment.accept(executionClassLoader);
         List<ConfigurationBuilder> builders = new LinkedList<>(additionalBuilders);
         builders.add(new ArtifactBootstrapServiceDiscovererConfigurationBuilder(artifactPlugins));
         boolean hasEmptyParentDomain = isConfigLess(parentArtifact);
@@ -573,6 +580,19 @@ public class ArtifactContextBuilder {
 
   public ArtifactContextBuilder setExpressionLanguageMetadataService(ExpressionLanguageMetadataService expressionLanguageMetadataService) {
     this.expressionLanguageMetadataService = expressionLanguageMetadataService;
+    return this;
+  }
+
+  /**
+   * An action to be performed on the artifact deployment.
+   *
+   * @param actionOnMuleArtifactDeployment the {@link ClassLoader} used in the deployment process.
+   * @return this builder.
+   * @throws NullPointerException if {@param actionOnMuleArtifactDeployment} is null.
+   */
+  public ArtifactContextBuilder setActionOnMuleArtifactDeployment(Consumer<ClassLoader> actionOnMuleArtifactDeployment) {
+    requireNonNull(actionOnMuleArtifactDeployment, ACTION_ON_MULE_ARTIFACT_DEPLOYMENT_NULL);
+    this.actionOnMuleArtifactDeployment = actionOnMuleArtifactDeployment;
     return this;
   }
 }

@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.config.internal.lazy;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
@@ -14,6 +13,7 @@ import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider.CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY;
 import static org.mule.tck.util.MuleContextUtils.mockContextWithServices;
+import static org.mule.tck.util.MuleContextUtils.registerIntoMockContext;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.CONFIGURATION_COMPONENT_LOCATOR;
 import static org.mule.test.allure.AllureConstants.ConfigurationComponentLocatorFeature.ComponentLifeCycle.COMPONENT_LIFE_CYCLE;
 import static org.mule.test.allure.AllureConstants.LazyInitializationFeature.LAZY_INITIALIZATION;
@@ -52,15 +52,14 @@ import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocato
 import org.mule.runtime.config.internal.context.ObjectProviderAwareBeanFactory;
 import org.mule.runtime.config.internal.context.lazy.LazyMuleArtifactContext;
 import org.mule.runtime.config.internal.registry.OptionalObjectsController;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.processor.Processor;
-import org.mule.runtime.core.internal.config.CustomServiceRegistry;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.config.InternalCustomizationService;
 import org.mule.runtime.core.internal.el.function.MuleFunctionsBindingContextProvider;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeLocator;
 import org.mule.runtime.core.internal.exception.ContributedErrorTypeRepository;
 import org.mule.runtime.core.internal.registry.DefaultRegistry;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.processor.chain.DefaultMessageProcessorChainBuilder;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChainBuilder;
 import org.mule.runtime.extension.api.model.ImmutableExtensionModel;
@@ -69,14 +68,18 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Features;
-import io.qameta.allure.Story;
+
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+
 import org.mockito.Mock;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Features;
+import io.qameta.allure.Story;
 
 @Features({@Feature(LAZY_INITIALIZATION), @Feature(CONFIGURATION_COMPONENT_LOCATOR)})
 @Story(COMPONENT_LIFE_CYCLE)
@@ -96,7 +99,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
   private ExtensionManager extensionManager;
 
   @Mock
-  private CustomServiceRegistry customizationService;
+  private InternalCustomizationService customizationService;
 
   @Mock
   private OptionalObjectsController optionalObjectsController;
@@ -108,27 +111,23 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
 
   @Before
   public void setup() throws Exception {
-    MuleContextWithRegistry muleContext = mockContextWithServices();
+    MuleContext muleContext = mockContextWithServices();
     Set<ExtensionModel> extensions = ImmutableSet.<ExtensionModel>builder()
         .add(getExtensionModel())
         .add(mockExtension)
         .build();
-
-
-    MuleRegistry mockedRegistry = muleContext.getRegistry();
 
     when(extensionManager.getExtensions()).thenReturn(extensions);
     when(muleContext.getExecutionClassLoader()).thenReturn(currentThread().getContextClassLoader());
     when(muleContext.getExtensionManager()).thenReturn(extensionManager);
     when(muleContext.getCustomizationService()).thenReturn(customizationService);
 
-    when(mockedRegistry.get(OBJECT_REGISTRY)).thenReturn(new DefaultRegistry(muleContext));
-    when(mockedRegistry.get(CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY)).thenReturn(mock(MuleFunctionsBindingContextProvider.class));
+    registerIntoMockContext(muleContext, OBJECT_REGISTRY, new DefaultRegistry(muleContext));
+    registerIntoMockContext(muleContext, CORE_FUNCTIONS_PROVIDER_REGISTRY_KEY, mock(MuleFunctionsBindingContextProvider.class));
 
     lazyMuleArtifactContext = createLazyMuleArtifactContextStub(muleContext);
 
-    MessageProcessorChainBuilder messageProcessorChainBuilder = new DefaultMessageProcessorChainBuilder().chain(targetProcessor);
-    when(mockedRegistry.lookupObject(MY_FLOW)).thenReturn(messageProcessorChainBuilder);
+    registerIntoMockContext(muleContext, MY_FLOW, new DefaultMessageProcessorChainBuilder().chain(targetProcessor));
 
     doAnswer(a -> {
       onProcessorInitialization();
@@ -181,7 +180,7 @@ public abstract class AbstractLazyMuleArtifactContextTestCase extends AbstractDs
                                        emptySet());
   }
 
-  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContextWithRegistry muleContext) {
+  private LazyMuleArtifactContext createLazyMuleArtifactContextStub(MuleContext muleContext) {
     LazyMuleArtifactContext muleArtifactContext =
         new LazyMuleArtifactContext(muleContext,
                                     toArtifactast(getArtifactDeclaration(), getExtensions(muleContext.getExtensionManager())),

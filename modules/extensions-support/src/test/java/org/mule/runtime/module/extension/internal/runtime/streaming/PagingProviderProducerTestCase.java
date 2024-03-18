@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -32,6 +32,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ExtensionConnectionSupplier;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.tck.size.SmallTest;
 
 import java.util.List;
@@ -56,7 +58,8 @@ public class PagingProviderProducerTestCase {
   private PagingProviderProducer<String> producer;
 
   private PagingProviderProducer<String> createProducer() {
-    return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier);
+    return new PagingProviderProducer<>(delegate, config, executionContext, extensionConnectionSupplier,
+                                        mock(ComponentTracer.class));
   }
 
   @Before
@@ -71,20 +74,20 @@ public class PagingProviderProducerTestCase {
 
     ConnectionHandler handler = mock(ConnectionHandler.class);
     when(handler.getConnection()).thenReturn(new Object());
-    when(extensionConnectionSupplier.getConnection(executionContext)).thenReturn(handler);
+    when(extensionConnectionSupplier.getConnection(eq(executionContext), any())).thenReturn(handler);
   }
 
   @Test
   public void produce() throws Exception {
     List<String> page = asList("bleh");
-    when(delegate.getPage(anyObject())).thenReturn(page);
+    when(delegate.getPage(any())).thenReturn(page);
     assertThat(page, sameInstance(producer.produce()));
   }
 
   @Test
   public void produceWithDifferentConnections() throws Exception {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     produce();
     produce();
@@ -99,7 +102,7 @@ public class PagingProviderProducerTestCase {
     producer = createProducer();
 
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     produce();
     produce();
@@ -114,14 +117,14 @@ public class PagingProviderProducerTestCase {
   @Test
   public void totalAvailable() {
     final int total = 10;
-    when(delegate.getTotalResults(anyObject())).thenReturn(of(total));
+    when(delegate.getTotalResults(any())).thenReturn(of(total));
     assertThat(total, is(producer.getSize()));
   }
 
   @Test
   public void closeQuietly() throws Exception {
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     producer.close();
     verify(delegate).close(any());
@@ -138,7 +141,7 @@ public class PagingProviderProducerTestCase {
   public void connectionIsInvalidatedOnConnectionExceptionInProduce() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new RuntimeException(new ConnectionException("Invalid Connection"))).when(delegate).getPage(any());
 
     try {
@@ -154,7 +157,7 @@ public class PagingProviderProducerTestCase {
   public void connectionIsReleasedOnExceptionInProduce() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
 
     try {
@@ -170,7 +173,7 @@ public class PagingProviderProducerTestCase {
   public void pagingProviderDelegateIsClosedQuietlyOnExceptionInProduceFirstPage() throws Exception {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
     doThrow(new IllegalArgumentException("Invalid arguments")).when(delegate).getPage(any());
     doThrow(new DefaultMuleException("Error while closing delegate")).when(delegate).close(any());
 
@@ -188,7 +191,7 @@ public class PagingProviderProducerTestCase {
     producer = createProducer();
     ConnectionHandler connectionHandler = mock(ConnectionHandler.class);
     doThrow(new IllegalArgumentException("There was a problem releasing the connection")).when(connectionHandler).release();
-    when(extensionConnectionSupplier.getConnection(any())).thenReturn(connectionHandler);
+    when(extensionConnectionSupplier.getConnection(any(), any())).thenReturn(connectionHandler);
 
     producer.close();
     verify(delegate, times(1)).close(any());

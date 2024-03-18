@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -39,10 +39,10 @@ import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.api.util.StringUtils;
 import org.mule.runtime.core.internal.config.FeatureFlaggingServiceBuilder;
 import org.mule.runtime.core.internal.lifecycle.LifecycleInterceptor;
+import org.mule.runtime.core.internal.lifecycle.NullLifecycleInterceptor;
 import org.mule.runtime.core.internal.lifecycle.phases.NotInLifecyclePhase;
 import org.mule.runtime.core.internal.registry.map.RegistryMap;
 import org.mule.runtime.core.privileged.PrivilegedMuleContext;
-import org.mule.runtime.core.privileged.endpoint.LegacyImmutableEndpoint;
 import org.mule.runtime.core.privileged.registry.InjectProcessor;
 import org.mule.runtime.core.privileged.registry.PreInitProcessor;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
@@ -76,6 +76,10 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
 
   private final boolean disableApplyObjectProcessor;
   private final RegistryMap registryMap = new RegistryMap(logger);
+
+  public SimpleRegistry(MuleContext muleContext) {
+    this(muleContext, new NullLifecycleInterceptor());
+  }
 
   public SimpleRegistry(MuleContext muleContext, LifecycleInterceptor lifecycleInterceptor) {
     this(muleContext, lifecycleInterceptor, muleContext != null ? of(createFeatureFlaggingService(muleContext)) : empty());
@@ -138,7 +142,6 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
   protected void doInitialise() throws InitialisationException {
     injectFieldDependencies();
     applyProcessors(lookupObjects(Transformer.class), null);
-    applyProcessors(lookupObjects(LegacyImmutableEndpoint.class), null);
     applyProcessors(lookupObjects(Object.class), null);
   }
 
@@ -215,6 +218,11 @@ public class SimpleRegistry extends AbstractRegistry implements Injector {
       registryMap.lockForReading();
 
       for (Map.Entry<String, Object> entry : registryMap.entrySet()) {
+        if (entry.getValue() == null) {
+          throw new NullPointerException("SimpleRegistry - null value for entry with key '" + entry.getKey() + "' of type '"
+              + type + "'");
+        }
+
         final Class<?> clazz = entry.getValue().getClass();
         if (type.isAssignableFrom(clazz)) {
           results.put(entry.getKey(), (T) entry.getValue());

@@ -4,6 +4,11 @@
   "version": "1.0.0",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.5.0",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "this",
@@ -46,7 +51,9 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -993,8 +1000,8 @@
       "requiresConnection": false,
       "supportsStreaming": false,
       "notifications": [
-        "TEST-COMPONENTS:INTEGER_NOTIFICATION",
-        "TEST-COMPONENTS:STRING_NOTIFICATION"
+        "HEISENBERG:KNOCKING_DOOR",
+        "HEISENBERG:KNOCKED_DOOR"
       ],
       "nestedComponents": [],
       "errors": [],
@@ -1260,6 +1267,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -1743,6 +1751,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2133,6 +2142,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2550,6 +2560,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -2897,7 +2908,9 @@
       "supportsStreaming": false,
       "notifications": [],
       "nestedComponents": [],
-      "errors": [],
+      "errors": [
+        "MULE:ROUTING"
+      ],
       "semanticTerms": [],
       "visibility": "PUBLIC",
       "stereotype": {
@@ -3546,6 +3559,7 @@
       "notifications": [],
       "nestedComponents": [],
       "errors": [
+        "MULE:ROUTING",
         "THIS:CUSTOM"
       ],
       "semanticTerms": [],
@@ -4317,8 +4331,7 @@
   "notifications": [],
   "errors": [
     {
-      "error": "THIS:CONNECTIVITY",
-      "parent": "MULE:CONNECTIVITY",
+      "error": "MULE:ANY",
       "handleable": true
     },
     {
@@ -4327,17 +4340,23 @@
       "handleable": true
     },
     {
-      "error": "MULE:ANY",
-      "handleable": true
-    },
-    {
       "error": "MULE:RETRY_EXHAUSTED",
       "parent": "MULE:ANY",
       "handleable": true
     },
     {
+      "error": "THIS:CONNECTIVITY",
+      "parent": "MULE:CONNECTIVITY",
+      "handleable": true
+    },
+    {
       "error": "THIS:RETRY_EXHAUSTED",
       "parent": "MULE:RETRY_EXHAUSTED",
+      "handleable": true
+    },
+    {
+      "error": "MULE:ROUTING",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {

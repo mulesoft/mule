@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -13,7 +13,6 @@ import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.value.ValueProviderService.VALUE_PROVIDER_SERVICE_KEY;
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.core.internal.logging.LogUtil.log;
 import static org.mule.runtime.core.internal.util.splash.SplashScreen.miniSplash;
 import static org.mule.runtime.module.deployment.impl.internal.artifact.ArtifactContextBuilder.newBuilder;
 import static org.mule.runtime.module.deployment.impl.internal.util.DeploymentPropertiesUtils.resolveDeploymentProperties;
@@ -23,6 +22,7 @@ import static java.util.Optional.ofNullable;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.artifact.Registry;
 import org.mule.runtime.api.connectivity.ConnectivityTestingService;
@@ -55,11 +55,11 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescriptor> implements Domain {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(DefaultMuleDomain.class);
+  private static final Logger LOGGER = getLogger(DefaultMuleDomain.class);
+  private static final Logger SPLASH_LOGGER = getLogger("org.mule.runtime.core.internal.logging");
 
   private final DomainDescriptor descriptor;
   private final ServiceRepository serviceRepository;
@@ -136,8 +136,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   @Override
   public void install() {
     withContextClassLoader(null, () -> {
-      if (LOGGER.isInfoEnabled()) {
-        log(miniSplash(format("New domain '%s'", getArtifactName())));
+      if (SPLASH_LOGGER.isInfoEnabled()) {
+        SPLASH_LOGGER.info(miniSplash(format("New domain '%s'", getArtifactName())));
       }
     });
 
@@ -182,8 +182,8 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
   public void doInit(boolean lazy, boolean disableXmlValidations, boolean addToolingObjectsToRegistry)
       throws DeploymentInitException {
     withContextClassLoader(null, () -> {
-      if (LOGGER.isInfoEnabled()) {
-        log(miniSplash(format("Initializing domain '%s'", getArtifactName())));
+      if (SPLASH_LOGGER.isInfoEnabled()) {
+        SPLASH_LOGGER.info(miniSplash(format("Initializing domain '%s'", getArtifactName())));
       }
     });
     try {
@@ -253,7 +253,7 @@ public class DefaultMuleDomain extends AbstractDeployableArtifact<DomainDescript
       withContextClassLoader(null, () -> {
         DomainStartedSplashScreen splashScreen = new DomainStartedSplashScreen();
         splashScreen.createMessage(descriptor);
-        log(splashScreen.toString());
+        SPLASH_LOGGER.info(splashScreen.toString());
       });
     } catch (Exception e) {
       throw new DeploymentStartException(createStaticMessage("Failure trying to start domain " + getArtifactName()), e);

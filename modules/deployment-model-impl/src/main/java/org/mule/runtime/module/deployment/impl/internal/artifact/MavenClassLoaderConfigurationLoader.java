@@ -1,19 +1,24 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.deployment.impl.internal.artifact;
 
-import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
+import static org.mule.runtime.module.service.api.artifact.ServiceClassLoaderFactoryProvider.serviceClassLoaderConfigurationLoader;
+
+import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.maven.client.api.MavenClient;
 import org.mule.maven.client.api.model.MavenConfiguration;
+import org.mule.runtime.api.lifecycle.Disposable;
 import org.mule.runtime.core.api.config.bootstrap.ArtifactType;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfiguration;
@@ -21,12 +26,12 @@ import org.mule.runtime.module.artifact.api.descriptor.ClassLoaderConfigurationL
 import org.mule.runtime.module.artifact.api.descriptor.InvalidDescriptorLoaderException;
 import org.mule.runtime.module.deployment.impl.internal.application.DeployableMavenClassLoaderConfigurationLoader;
 import org.mule.runtime.module.deployment.impl.internal.plugin.PluginMavenClassLoaderConfigurationLoader;
-import org.mule.runtime.module.service.internal.artifact.LibFolderClassLoaderConfigurationLoader;
 
 import java.io.File;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.locks.StampedLock;
+
+import org.slf4j.Logger;
 
 /**
  * This class is responsible of returning the {@link BundleDescriptor} of a given plugin's location and also creating a
@@ -35,12 +40,15 @@ import java.util.concurrent.locks.StampedLock;
  * @since 4.0
  */
 // TODO MULE-11878 - consolidate with other aether usages in mule.
-public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader {
+public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigurationLoader, Disposable {
+
+  protected static final Logger LOGGER = getLogger(MavenClassLoaderConfigurationLoader.class);
 
   private DeployableMavenClassLoaderConfigurationLoader deployableMavenClassLoaderConfigurationLoader;
   private PluginMavenClassLoaderConfigurationLoader pluginMavenClassLoaderConfigurationLoader;
-  private LibFolderClassLoaderConfigurationLoader libFolderClassLoaderConfigurationLoader;
+  private ClassLoaderConfigurationLoader libFolderClassLoaderConfigurationLoader;
   private volatile MavenConfiguration mavenRuntimeConfig;
+  private volatile MavenClient mavenClient;
 
   private final StampedLock lock = new StampedLock();
 
@@ -67,12 +75,15 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
   }
 
   private void createClassLoaderConfigurationLoaders() {
-    Optional<MavenClient> mavenClient = ofNullable(createMavenClient(mavenRuntimeConfig));
+    // This method might be invoked more than once if the Maven configuration changes, so the previous mavenClient instance (if
+    // any) must be disposed
+    closeMavenClient();
+    mavenClient = createMavenClient(mavenRuntimeConfig);
 
-    deployableMavenClassLoaderConfigurationLoader = new DeployableMavenClassLoaderConfigurationLoader(mavenClient);
-    pluginMavenClassLoaderConfigurationLoader = new PluginMavenClassLoaderConfigurationLoader(mavenClient);
+    deployableMavenClassLoaderConfigurationLoader = new DeployableMavenClassLoaderConfigurationLoader(ofNullable(mavenClient));
+    pluginMavenClassLoaderConfigurationLoader = new PluginMavenClassLoaderConfigurationLoader(ofNullable(mavenClient));
 
-    libFolderClassLoaderConfigurationLoader = new LibFolderClassLoaderConfigurationLoader();
+    libFolderClassLoaderConfigurationLoader = serviceClassLoaderConfigurationLoader();
   }
 
   @Override
@@ -105,4 +116,18 @@ public class MavenClassLoaderConfigurationLoader implements ClassLoaderConfigura
         || libFolderClassLoaderConfigurationLoader.supportsArtifactType(artifactType);
   }
 
+  @Override
+  public void dispose() {
+    closeMavenClient();
+  }
+
+  private void closeMavenClient() {
+    if (mavenClient != null) {
+      try {
+        mavenClient.close();
+      } catch (Exception e) {
+        LOGGER.error("Error while disposing 'mavenClient'", e);
+      }
+    }
+  }
 }

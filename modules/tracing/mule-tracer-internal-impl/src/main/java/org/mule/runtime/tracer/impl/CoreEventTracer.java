@@ -1,11 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.tracer.impl;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.PUT_TRACE_ID_AND_SPAN_ID_IN_MDC;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_PROPAGATION_OF_EXCEPTIONS_IN_TRACING;
 import static org.mule.runtime.tracer.api.span.validation.Assertion.SUCCESSFUL_ASSERTION;
 import static org.mule.runtime.tracer.impl.SpanInfoUtils.enrichInitialSpanInfo;
@@ -22,18 +23,18 @@ import static java.lang.Boolean.getBoolean;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.event.EventContext;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
+import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.tracer.api.sniffer.SpanSnifferManager;
 import org.mule.runtime.tracer.api.context.getter.DistributedTraceContextGetter;
 import org.mule.runtime.tracer.api.EventTracer;
 import org.mule.runtime.tracer.api.span.info.InitialSpanInfo;
 import org.mule.runtime.tracer.api.span.validation.Assertion;
-import org.mule.runtime.tracer.api.span.InternalSpan;
 import org.mule.runtime.tracer.impl.span.command.EventContextAddAttributeCommand;
 import org.mule.runtime.tracer.impl.span.command.EventContextAddAttributesCommand;
 import org.mule.runtime.tracer.impl.span.command.EventContextEndSpanCommand;
@@ -47,8 +48,6 @@ import org.mule.runtime.tracer.impl.span.factory.EventSpanFactory;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
@@ -78,9 +77,8 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
       "Error on executing core event set current span command";
   public static final String ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE =
       "Error on executing core event get distributed context span command";
-
-  @Inject
-  private EventSpanFactory eventSpanFactory;
+  private final FeatureFlaggingService featureFlaggingService;
+  private final EventSpanFactory eventSpanFactory;
 
   private EventContextStartSpanCommand startCommand;
 
@@ -94,19 +92,23 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   private EventContextAddAttributeCommand eventContextAddSpanAttributeCommand;
 
-  private EventContextSetCurrentSpanNameCommand eventContextSetCurrentSpanCommand;
+  private EventContextSetCurrentSpanNameCommand eventContextSetCurrentSpanNameCommand;
 
   private EventContextGetDistributedTraceContextMapCommand eventContextGetDistributedTraceContextMap;
 
+  public CoreEventTracer(FeatureFlaggingService featureFlaggingService, EventSpanFactory eventSpanFactory) {
+    this.featureFlaggingService = featureFlaggingService;
+    this.eventSpanFactory = eventSpanFactory;
+  }
+
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo spanCustomizationInfo) {
-    return startComponentSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
+  public Optional<Span> startSpan(CoreEvent coreEvent, InitialSpanInfo spanCustomizationInfo) {
+    return startSpan(coreEvent, spanCustomizationInfo, SUCCESSFUL_ASSERTION);
   }
 
   @Override
-  public Optional<InternalSpan> startComponentSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo,
-                                                   Assertion assertion) {
+  public Optional<Span> startSpan(CoreEvent coreEvent, InitialSpanInfo initialSpanInfo, Assertion assertion) {
     return startCommand.execute(coreEvent.getContext(), enrichInitialSpanInfo(initialSpanInfo, coreEvent), assertion);
   }
 
@@ -117,7 +119,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void endCurrentSpan(CoreEvent coreEvent, Assertion condition) {
-    endCommand.execute(coreEvent.getContext(), SUCCESSFUL_ASSERTION);
+    endCommand.execute(coreEvent.getContext(), condition);
   }
 
   @Override
@@ -135,7 +137,7 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void setCurrentSpanName(CoreEvent coreEvent, String name) {
-    eventContextSetCurrentSpanCommand.execute(coreEvent.getContext(), name);
+    eventContextSetCurrentSpanNameCommand.execute(coreEvent.getContext(), name);
   }
 
   @Override
@@ -160,10 +162,12 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
 
   @Override
   public void initialise() throws InitialisationException {
+    boolean enablePutTraceIdAndSpanIdInMdc = featureFlaggingService.isEnabled(PUT_TRACE_ID_AND_SPAN_ID_IN_MDC);
     startCommand = getEventContextStartSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_START_COMMAND_MESSAGE,
-                                                       propagateTracingExceptions, eventSpanFactory);
+                                                       propagateTracingExceptions, eventSpanFactory,
+                                                       enablePutTraceIdAndSpanIdInMdc);
     endCommand = getEventContextEndSpanCommandFrom(LOGGER, ERROR_ON_EXECUTING_CORE_EVENT_TRACER_END_COMMAND_MESSAGE,
-                                                   propagateTracingExceptions);
+                                                   propagateTracingExceptions, enablePutTraceIdAndSpanIdInMdc);
     injectDistributedTraceContextCommand = getEventContextInjectDistributedTraceContextCommand(LOGGER,
                                                                                                ERROR_ON_EXECUTING_CORE_EVENT_TRACER_INJECT_DISTRIBUTED_TRACE_CONTEXT_COMMAND_MESSAGE,
                                                                                                false);
@@ -176,9 +180,9 @@ public class CoreEventTracer implements EventTracer<CoreEvent>, Initialisable {
     eventContextAddSpanAttributeCommand = getEventContextAddAttributeCommand(LOGGER,
                                                                              ERROR_ON_EXECUTING_CORE_EVENT_TRACER_ADD_ATTRIBUTE_COMMAND_MESSAGE,
                                                                              propagateTracingExceptions);
-    eventContextSetCurrentSpanCommand = getEventContextSetCurrentSpanNameCommand(LOGGER,
-                                                                                 ERROR_ON_EXECUTING_CORE_EVENT_SET_CURRENT_SPAN_COMMAND_MESSAGE,
-                                                                                 propagateTracingExceptions);
+    eventContextSetCurrentSpanNameCommand = getEventContextSetCurrentSpanNameCommand(LOGGER,
+                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_SET_CURRENT_SPAN_COMMAND_MESSAGE,
+                                                                                     propagateTracingExceptions);
     eventContextGetDistributedTraceContextMap = getEventContextGetDistributedTraceContextMapCommand(LOGGER,
                                                                                                     ERROR_ON_EXECUTING_CORE_EVENT_GET_DISTRIBUTED_CONTEXT_SPAN_COMMAND_MESSAGE,
                                                                                                     propagateTracingExceptions);

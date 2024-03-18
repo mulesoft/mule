@@ -1,16 +1,13 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.api;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.io.File.pathSeparator;
-
-import com.google.common.collect.Lists;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,6 +17,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ public class ClassPathUrlProvider {
    * @param urls {@link URL}s to be added to the ones already in classpath, not null or empty.
    */
   public ClassPathUrlProvider(List<URL> urls) {
-    checkNotNull(urls, "urls cannot be null");
+    requireNonNull(urls, "urls cannot be null");
 
     this.urls = readUrlsFromSystemProperties();
     this.urls.addAll(urls);
@@ -60,6 +59,7 @@ public class ClassPathUrlProvider {
    */
   private List<URL> readUrlsFromSystemProperties() {
     final Set<URL> urls = new LinkedHashSet<>();
+    addUrlsFromSystemProperty(urls, "jdk.module.path");
     addUrlsFromSystemProperty(urls, "java.class.path");
     addUrlsFromSystemProperty(urls, "sun.boot.class.path");
     addUrlsFromSystemProperty(urls, "surefire.test.class.path");

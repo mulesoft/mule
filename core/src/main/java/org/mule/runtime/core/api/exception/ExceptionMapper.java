@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -51,10 +51,12 @@ public final class ExceptionMapper {
    * @return optional created with the found error type, if any, or an empty optional.
    */
   public Optional<ErrorType> resolveErrorType(Class<? extends Throwable> exceptionType) {
-    return exceptionMappings.stream()
-        .filter(exceptionMapping -> exceptionMapping.matches(exceptionType))
-        .findFirst()
-        .map(ExceptionMapping::getErrorType);
+    for (ExceptionMapping exceptionMapping : exceptionMappings) {
+      if (exceptionMapping.matches(exceptionType)) {
+        return Optional.ofNullable(exceptionMapping.getErrorType());
+      }
+    }
+    return Optional.empty();
   }
 
   /**

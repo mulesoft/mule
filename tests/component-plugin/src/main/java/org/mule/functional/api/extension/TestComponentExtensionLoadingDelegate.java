@@ -1,12 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.functional.api.extension;
 
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
@@ -22,8 +21,11 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.NUMBER_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
+import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ERROR_HANDLER;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
+
+import static java.util.Collections.singletonList;
 
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.runtime.api.meta.model.ParameterDslConfiguration;
@@ -61,6 +63,7 @@ public class TestComponentExtensionLoadingDelegate implements ExtensionLoadingDe
         .named("Test Component Plugin")
         .describedAs("Test component for performing assertions")
         .onVersion(MULE_VERSION)
+        .supportingJavaVersions(ALL_SUPPORTED_JAVA_VERSIONS)
         .fromVendor("MuleSoft, Inc.")
         .withCategory(COMMUNITY)
         .withXmlDsl(XmlDslModel.builder()

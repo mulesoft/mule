@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -37,12 +37,13 @@ import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.transaction.Transaction;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionCoordination;
-import org.mule.runtime.core.privileged.transaction.XaTransaction;
+import org.mule.runtime.core.internal.transaction.XaTransaction;
 import org.mule.runtime.extension.api.connectivity.XATransactionalConnection;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ExecutionContextConfigurationDecorator;
 import org.mule.runtime.module.extension.internal.runtime.transaction.XAExtensionTransactionalResource;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.Collection;
@@ -221,7 +222,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     connectionManager.bind(config, connectionProvider);
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
-    adapter.getConnection(operationContext);
+    adapter.getConnection(operationContext, mock(ComponentTracer.class));
     verify(transaction, never()).bindResource(any(), any(XAExtensionTransactionalResource.class));
   }
 
@@ -242,7 +243,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
     try {
       connectionManager.bind(config, connectionProvider);
       TransactionCoordination.getInstance().bindTransaction(transaction);
-      adapter.getConnection(operationContext);
+      adapter.getConnection(operationContext, mock(ComponentTracer.class));
     } finally {
       verify(transaction).bindResource(any(), any(XAExtensionTransactionalResource.class));
       verify(connectionProvider).disconnect(any(XATransactionalConnection.class));
@@ -254,7 +255,7 @@ public class ExtensionConnectionSupplierTestCase extends AbstractMuleContextTest
 
     TransactionCoordination.getInstance().bindTransaction(transaction);
 
-    final ConnectionHandler connection = adapter.getConnection(operationContext);
+    final ConnectionHandler connection = adapter.getConnection(operationContext, mock(ComponentTracer.class));
     if (lazyConnections) {
       connection.getConnection();
     }

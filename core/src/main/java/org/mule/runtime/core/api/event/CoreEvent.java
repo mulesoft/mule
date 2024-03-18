@@ -1,10 +1,12 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.event;
+
+import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.event.Event;
@@ -18,7 +20,7 @@ import org.mule.runtime.api.security.SecurityContext;
 import org.mule.runtime.core.api.context.notification.FlowCallStack;
 import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
-import org.mule.runtime.core.internal.message.InternalEvent;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 
 import java.io.Serializable;
@@ -38,6 +40,13 @@ import java.util.function.Function;
  */
 @NoImplement
 public interface CoreEvent extends Serializable, Event {
+
+  /**
+   * @return a dummy event with no context and no values.
+   */
+  static CoreEvent nullEvent() {
+    return getNullEvent();
+  }
 
   /**
    * The security context for this session. If not null outbound, inbound and/or method invocations will be authenticated using

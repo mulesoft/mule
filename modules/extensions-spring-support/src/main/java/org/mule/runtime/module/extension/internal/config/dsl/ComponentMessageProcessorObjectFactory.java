@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.config.dsl;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.newChain;
 import static org.mule.runtime.core.privileged.processor.chain.UnnamedComponent.getUnnamedComponent;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
+import static org.mule.runtime.module.extension.api.runtime.privileged.ChildContextChain.CHAIN_OWNER_LOCATION_KEY;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.MESSAGE_PROCESSORS_SPAN_NAME;
 
 import static java.util.Optional.empty;
@@ -16,6 +17,7 @@ import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import org.mule.runtime.api.artifact.Registry;
+import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedChainModel;
@@ -24,8 +26,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.core.privileged.processor.chain.UnnamedComponent;
-import org.mule.runtime.tracer.customization.api.InitialSpanInfoProvider;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -34,7 +36,10 @@ import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMes
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
 
+import javax.xml.namespace.QName;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
@@ -73,8 +78,8 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
 
     if (nestedProcessors != null) {
       nestedChain = newChain(empty(), nestedProcessors,
-                             registry.lookupByType(InitialSpanInfoProvider.class).get()
-                                 .getInitialSpanInfo(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
+                             registry.lookupByType(ComponentTracerFactory.class).get()
+                                 .fromComponent(getUnnamedComponent(), MESSAGE_PROCESSORS_SPAN_NAME, ""));
       componentModel.getNestedComponents().stream()
           .filter(component -> component instanceof NestedChainModel)
           .findFirst()
@@ -83,7 +88,14 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
                                                                              nestedChain)));
 
       // For MULE-18771 we need access to the chain's location to create a new event and sdk context
-      nestedChain.setAnnotations(this.getAnnotations());
+      // Update for W-15158118: since the scope and the chain were having the same location, the chain was overriding the
+      // registration of the scope in the ComponentLocator. To avoid such issues, we are not adding the location as the location
+      // key but as another annotation.
+      Map<QName, Object> annotations = new HashMap<>(this.getAnnotations());
+      ComponentLocation chainLocation = this.getLocation();
+      annotations.put(LOCATION_KEY, ((DefaultComponentLocation) chainLocation).appendProcessorsPart());
+      annotations.put(CHAIN_OWNER_LOCATION_KEY, chainLocation);
+      nestedChain.setAnnotations(annotations);
     } else {
       nestedChain = null;
     }

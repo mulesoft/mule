@@ -1,22 +1,26 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.tck.util;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.ZipUtils.compress;
 
-import static java.io.File.pathSeparator;
+import static java.lang.System.getProperty;
 import static java.nio.file.Files.createTempDirectory;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
 
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.TrueFileFilter.TRUE;
+import static org.apache.commons.lang3.JavaVersion.JAVA_11;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.core.api.util.ClassUtils;
 import org.mule.runtime.core.api.util.StringUtils;
@@ -29,11 +33,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -53,7 +58,23 @@ public class CompilerUtils {
   // Class used to compile extension annotations. This class must be in the classpath only when
   // a jar is compiled as an extension.
   private static final String EXTENSION_ANNOTATION_PROCESSOR_CLASSNAME =
-      "org.mule.runtime.module.extension.internal.resources.ExtensionResourcesGeneratorAnnotationProcessor";
+      "org.mule.runtime.module.extension.api.resources.ExtensionResourcesGeneratorAnnotationProcessor";
+
+  private static final List<String> CLASS_PATH_ENTRIES;
+  private static final String PATH_SEPARATOR;
+
+  static {
+    String classPath = getProperty("java.class.path");
+    String modulePath = getProperty("jdk.module.path");
+    PATH_SEPARATOR = getProperty("path.separator");
+
+    CLASS_PATH_ENTRIES = (modulePath != null
+        ? concat(Stream.of(classPath.split(PATH_SEPARATOR)),
+                 Stream.of(modulePath.split(PATH_SEPARATOR)))
+        : Stream.of(classPath.split(PATH_SEPARATOR)))
+            .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+            .collect(toList());
+  }
 
   /**
    * Base class to create compiler utilities.
@@ -62,6 +83,7 @@ public class CompilerUtils {
    */
   private static abstract class AbstractCompiler<T extends AbstractCompiler> {
 
+    private int targetJavaVersion = 8;
     protected File[] requiredJars = {};
     protected File[] sources = {};
     protected Path javaPackage;
@@ -70,6 +92,12 @@ public class CompilerUtils {
      * @return current instance. Used just to avoid compilation warnings.
      */
     protected abstract T getThis();
+
+    public T targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return getThis();
+    }
 
     /**
      * Adds jar files to the classpath used during the compilation.
@@ -108,7 +136,9 @@ public class CompilerUtils {
       File targetPackage = Optional.ofNullable(javaPackage)
           .map(javaPackage -> targetFolder.toPath().resolve(javaPackage).toFile()).orElse(targetFolder);
       targetPackage.mkdirs();
-      CompilerTask compilerTask = new CompilerTaskBuilder().compiling(sources)
+      CompilerTask compilerTask = new CompilerTaskBuilder()
+          .targetJavaVersion(targetJavaVersion)
+          .compiling(sources)
           .dependingOn(requiredJars).toTarget(targetPackage)
           .build();
       compilerTask.compile();
@@ -197,7 +227,23 @@ public class CompilerUtils {
      */
     public T compiling(File... sources) {
       checkArgument(sources != null && sources.length > 0, "sources cannot be empty");
-      this.sources = sources;
+      this.sources = concat(Stream.of(this.sources), Stream.of(sources)).toArray(File[]::new);
+
+      return getThis();
+    }
+
+    /**
+     * Indicates which source file must be compiled. <b> does nothing if {@code condition} is {@code false}. This method is useful
+     * to keep the fluent use of the api.
+     *
+     * @param condition whether to compile the given sources or not
+     * @param sources   source files. Non empty.
+     * @return the same compiler instance
+     */
+    public T compilingConditionally(boolean condition, File... sources) {
+      if (condition) {
+        return compiling(sources);
+      }
 
       return getThis();
     }
@@ -239,7 +285,7 @@ public class CompilerUtils {
      * @return
      */
     protected File compressGeneratedFiles(File targetFolder, String jarName) {
-      checkArgument(targetFolder != null, "targetFolder cannot be byll");
+      checkArgument(targetFolder != null, "targetFolder cannot be null");
       checkArgument(!StringUtils.isEmpty(jarName), "jar name cannot be empty");
 
       Collection<File> files = listFiles(targetFolder, TRUE, TRUE);
@@ -353,12 +399,19 @@ public class CompilerUtils {
 
   private static class CompilerTaskBuilder {
 
+    private int targetJavaVersion = 8;
     private File target;
     private File[] sources = {};
     private File[] jarFiles = {};
     private String annotationProcessorClassName;
     private String processorPath;
     private final List<String> processProperties = new ArrayList<>();
+
+    public CompilerTaskBuilder targetJavaVersion(int targetJavaVersion) {
+      this.targetJavaVersion = targetJavaVersion;
+
+      return this;
+    }
 
     public CompilerTaskBuilder toTarget(File target) {
       this.target = target;
@@ -438,24 +491,43 @@ public class CompilerUtils {
         options.add(target.getAbsolutePath());
       }
 
+      Predicate<String> classpathEntryPredicate;
+      final String xmlApisLib = System.getProperty("xmlApisLib");
+      if (xmlApisLib == null) {
+        classpathEntryPredicate = cpe -> true;
+      } else {
+        classpathEntryPredicate = cpe -> !cpe.equals(xmlApisLib);
+      }
+      // Adds same classpath as the one used on the runner
+      String fullClassPath;
       if (jarFiles.length > 0) {
-        // Adds same classpath as the one used on the runner
-        String classPath = System.getProperty("java.class.path");
+
         // Adds extra jars files required to compile the source classes
-        for (File jarFile : jarFiles) {
-          classPath = classPath + pathSeparator + jarFile.getAbsolutePath();
+        fullClassPath = concat(CLASS_PATH_ENTRIES
+            .stream()
+            .filter(classpathEntryPredicate),
+                               Stream.of(jarFiles)
+                                   .map(File::getAbsolutePath))
+                                       .collect(joining(PATH_SEPARATOR));
+      } else {
+        fullClassPath = CLASS_PATH_ENTRIES.stream()
+            .filter(classpathEntryPredicate)
+            .collect(joining(PATH_SEPARATOR));
+      }
+
+      if (targetJavaVersion <= 8) {
+        options.addAll(asList("-classpath", fullClassPath));
+        if (isJavaVersionAtLeast(JAVA_11)) {
+          // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing
+          // what happens when deploying.
+          options.addAll(asList("--release", "8"));
         }
-        options.addAll(Arrays.asList("-classpath", classPath));
+      } else {
+        options.addAll(asList("--module-path", fullClassPath));
       }
 
       options.addAll(processProperties);
 
-
-      if (!System.getProperty("java.version").startsWith("1.")) {
-        // This is necessary to avoid compiling issues with java 9 features. It doesn't lower coverage because we are testing what
-        // happens when deploying.
-        options.addAll(Arrays.asList("--release", "8"));
-      }
 
       return options;
     }

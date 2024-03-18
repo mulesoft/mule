@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.api.construct;
 
 import static org.mule.runtime.api.deployment.management.ComponentInitialStateManager.SERVICE_ID;
@@ -12,6 +11,8 @@ import static org.mule.runtime.api.deployment.management.ComponentInitialStateMa
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.execution.ExecutableComponent;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.api.lifecycle.Startable;
+import org.mule.runtime.api.lifecycle.Stoppable;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.Processor;
@@ -47,6 +48,18 @@ public interface Flow extends ExecutableComponent, Lifecycle, Pipeline, Processo
    * @return initial state of the flow, which can be {@value INITIAL_STATE_STARTED} or {@value INITIAL_STATE_STOPPED}
    */
   String getInitialState();
+
+  /**
+   * @return whether this flow is started (ref: {@link Startable}).
+   * @since 4.6 pushed up to the API interface.
+   */
+  boolean isStarted();
+
+  /**
+   * @return whether this flow is stopped (ref: {@link Stoppable}).
+   * @since 4.6 pushed up to the API interface.
+   */
+  boolean isStopped();
 
   /**
    * Decorates the common flow {@link ReactiveProcessor} application by avoiding the emission of an error downstream in the

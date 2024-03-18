@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,8 +9,9 @@ package org.mule.runtime.core.internal.util.store;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.tck.core.util.store.InMemoryObjectStore;
+import org.mule.tck.core.util.store.InMemoryExpirableObjectStore;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.util.concurrent.CountDownLatch;
@@ -21,7 +22,7 @@ import org.junit.Test;
 
 public class InMemoryStoreTestCase extends AbstractMuleContextTestCase {
 
-  private InMemoryObjectStore<String> store = null;
+  private InMemoryExpirableObjectStore<String> store = null;
 
   @After
   public void disposeStore() {
@@ -152,7 +153,7 @@ public class InMemoryStoreTestCase extends AbstractMuleContextTestCase {
     int expireInterval = 1000;
     assertTrue("objects' time to live must be greater than the expire interval", timeToLive > expireInterval);
 
-    store = new InMemoryObjectStore<>();
+    store = new InMemoryExpirableObjectStore<>();
     store.setMuleContext(muleContext);
     store.setName("timed");
     store.setMaxEntries(3);
@@ -185,9 +186,9 @@ public class InMemoryStoreTestCase extends AbstractMuleContextTestCase {
    * their execution. This implementation waits for the first run of the expire method in initialize and only then continues with
    * the execution of the current thread.
    */
-  private static class NonExpiringInMemoryObjectStore extends InMemoryObjectStore<String> {
+  private static class NonExpiringInMemoryObjectStore extends InMemoryExpirableObjectStore<String> {
 
-    private CountDownLatch expireLatch;
+    private final CountDownLatch expireLatch;
 
     NonExpiringInMemoryObjectStore() {
       super();

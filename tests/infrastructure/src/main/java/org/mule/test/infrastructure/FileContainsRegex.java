@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.infrastructure;
 
 import static java.nio.file.Files.readAllBytes;
@@ -15,9 +14,8 @@ import java.io.IOException;
 import java.util.regex.Pattern;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
-import org.junit.internal.matchers.TypeSafeMatcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matcher that allows to validate if a regex matches the content of a file.
@@ -26,7 +24,6 @@ public class FileContainsRegex extends TypeSafeMatcher<File> {
 
   private final Pattern pattern;
 
-  @Factory
   public static Matcher<File> matchesRegex(String fileLocation) {
     return new FileContainsRegex(fileLocation);
   }

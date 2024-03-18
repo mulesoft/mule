@@ -4,6 +4,11 @@
   "version": "4.0.0",
   "vendor": "MuleSoft",
   "category": "COMMUNITY",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "xmlDsl": {
     "prefix": "module-global-element",
     "namespace": "http://www.mulesoft.org/schema/mule/module-global-element",

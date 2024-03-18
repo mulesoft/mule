@@ -1,14 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.api.config;
 
-
-import static java.lang.Boolean.valueOf;
-import static java.lang.System.getProperty;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.runtime.api.deployment.management.ComponentInitialStateManager;
@@ -48,15 +45,7 @@ public class MuleProperties {
   public static final String MULE_ERROR_CODE_PROPERTY = PROPERTY_PREFIX + "ERROR_CODE";
   public static final String MULE_REPLY_TO_PROPERTY = PROPERTY_PREFIX + "REPLYTO";
 
-  /**
-   * Prevents processing of the ReplyTo property by the Service. This is useful if you're component routed the message somewhere
-   * else which processed the ReplyTo.
-   */
-  public static final String MULE_REPLY_TO_STOP_PROPERTY = PROPERTY_PREFIX + "REPLYTO_STOP";
   public static final String MULE_USER_PROPERTY = PROPERTY_PREFIX + "USER";
-  public static final String MULE_REPLY_TO_REQUESTOR_PROPERTY = PROPERTY_PREFIX + "REPLYTO_REQUESTOR";
-  @Deprecated // TODO MULE-9072
-  public static final String MULE_SESSION_PROPERTY = PROPERTY_PREFIX + "SESSION";
   public static final String MULE_MESSAGE_ID_PROPERTY = PROPERTY_PREFIX + "MESSAGE_ID";
   public static final String MULE_CORRELATION_ID_PROPERTY = PROPERTY_PREFIX + "CORRELATION_ID";
   public static final String MULE_CORRELATION_GROUP_SIZE_PROPERTY = PROPERTY_PREFIX + "CORRELATION_GROUP_SIZE";
@@ -243,6 +232,10 @@ public class MuleProperties {
   public static final String COMPATIBILITY_PLUGIN_INSTALLED = "_compatibilityPluginInstalled";
   public static final String MULE_PROFILING_SERVICE_KEY = "_muleProfilingService";
   public static final String MULE_CORE_EVENT_TRACER_KEY = "_muleCoreEventTracer";
+  public static final String MULE_CORE_COMPONENT_TRACER_FACTORY_KEY = "_muleCoreComponentTracerFactory";
+  public static final String MULE_METER_PROVIDER_KEY = "_muleMeterProvider";
+  public static final String MULE_METER_EXPORTER_CONFIGURATION_KEY = "_muleMeterExporterConfiguration";
+  public static final String MULE_METER_EXPORTER_FACTORY_KEY = "_muleMeterExporterFactory";
   public static final String MULE_TRACING_LEVEL_CONFIGURATION_KEY = "_muleTracingLevelConfiguration";
   public static final String MULE_TRACER_INITIAL_SPAN_INFO_PROVIDER_KEY = "_muleTracerInitialSpanInfoProvider";
   public static final String MULE_CORE_SPAN_FACTORY_KEY = "_muleCoreSpanFactory";
@@ -250,6 +243,7 @@ public class MuleProperties {
   public static final String MULE_CORE_EXPORTER_FACTORY_KEY = "_muleCoreExporterFactory";
   public static final String SERVER_NOTIFICATION_MANAGER = "_serverNotificationManager";
   public static final String OBJECT_ARTIFACT_TYPE_LOADER = "_artifactTypeLoader";
+  public static final String INTERCEPTOR_MANAGER_REGISTRY_KEY = "_muleInterceptorManager";
 
   // Not currently used as these need to be instance variables of the MuleContext.
   public static final String OBJECT_NOTIFICATION_MANAGER = "_muleNotificationManager";
@@ -366,28 +360,10 @@ public class MuleProperties {
   public static final String MULE_LOG_VERBOSE_CLASSLOADING = MuleSystemProperties.MULE_LOG_VERBOSE_CLASSLOADING;
 
   /**
-   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_MEL_AS_DEFAULT} instead
-   */
-  @Deprecated
-  public static final String MULE_MEL_AS_DEFAULT = MuleSystemProperties.MULE_MEL_AS_DEFAULT;
-
-  /**
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_DISABLE_RESPONSE_TIMEOUT} instead
    */
   @Deprecated
   public static final String MULE_DISABLE_RESPONSE_TIMEOUT = MuleSystemProperties.MULE_DISABLE_RESPONSE_TIMEOUT;
-
-  /**
-   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_ALLOW_JRE_EXTENSION} instead
-   */
-  @Deprecated
-  public static final String MULE_ALLOW_JRE_EXTENSION = MuleSystemProperties.MULE_ALLOW_JRE_EXTENSION;
-
-  /**
-   * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_JRE_EXTENSION_PACKAGES} instead
-   */
-  @Deprecated
-  public static final String MULE_JRE_EXTENSION_PACKAGES = MuleSystemProperties.MULE_JRE_EXTENSION_PACKAGES;
 
   /**
    * @deprecated since 4.2.0. Use {@link MuleSystemProperties#MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT} instead
@@ -395,14 +371,6 @@ public class MuleProperties {
   @Deprecated
   public static final String MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT =
       MuleSystemProperties.MULE_LOGGING_INTERVAL_SCHEDULERS_LATENCY_REPORT;
-
-  /**
-   * @return Whether MEL is set as the default EL according to {@link #MULE_MEL_AS_DEFAULT}
-   * @since 4.2.0
-   */
-  public static boolean isMelDefault() {
-    return valueOf(getProperty(MULE_MEL_AS_DEFAULT, "false"));
-  }
 
   private MuleProperties() {}
 }

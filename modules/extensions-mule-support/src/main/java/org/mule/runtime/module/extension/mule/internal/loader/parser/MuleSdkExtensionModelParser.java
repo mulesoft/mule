@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.OPERATION_DEF;
 import static org.mule.runtime.extension.api.dsl.syntax.DslSyntaxUtils.getSanitizedElementName;
+import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -24,6 +25,7 @@ import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ConfigurationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ConnectionProviderModelParser;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -49,16 +52,15 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   private final TypeLoader typeLoader;
   private List<OperationModelParser> operationModelParsers;
   private final ExtensionModelHelper extensionModelHelper;
+  private Set<String> supportedJavaVersions;
 
-  public MuleSdkExtensionModelParser(ArtifactAst ast,
-                                     TypeLoader typeLoader,
-                                     ExtensionModelHelper extensionModelHelper) {
+  public MuleSdkExtensionModelParser(TypeLoader typeLoader, ExtensionModelHelper extensionModelHelper) {
     this.typeLoader = typeLoader;
     this.extensionModelHelper = extensionModelHelper;
-    init(ast);
   }
 
   protected void init(ArtifactAst ast) {
+    supportedJavaVersions = getValidatedJavaVersionsIntersection(getName(), "Extension", ast.dependencies());
     operationModelParsers = computeOperationModelParsers(ast);
   }
 
@@ -145,6 +147,16 @@ public abstract class MuleSdkExtensionModelParser extends BaseMuleSdkExtensionMo
   @Override
   public List<NotificationModel> getNotificationModels() {
     return emptyList();
+  }
+
+  @Override
+  public Optional<ArtifactLifecycleListenerModelProperty> getArtifactLifecycleListenerModelProperty() {
+    return empty();
+  }
+
+  @Override
+  public Set<String> getSupportedJavaVersions() {
+    return supportedJavaVersions;
   }
 
   /**

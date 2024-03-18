@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mule-modules</artifactId>
         <groupId>org.mule.runtime</groupId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-module-deployment-model</artifactId>
@@ -15,6 +15,14 @@
     <description>Provides descriptors and class loaders for deployment artifacts</description>
 
     <properties>
+        <javaModuleName>org.mule.runtime.deployment.model</javaModuleName>
+        <surefire.args>
+            -XX:+IgnoreUnrecognizedVMOptions
+            --add-reads=org.mule.runtime.deployment.model=org.apache.commons.io
+            --add-opens=org.mule.runtime.deployment.model/org.mule.runtime.deployment.model.internal.domain.test=ALL-UNNAMED
+            ${surefire.args.base}
+        </surefire.args>
+        <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -22,11 +30,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-module-reboot</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -51,12 +54,6 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-core-mvel</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-module-artifact</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -74,22 +71,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -99,13 +80,18 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>default-test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>org/mule/runtime/deployment/model/internal/domain/test/**</include>
+                            </includes>
+                        </configuration>
                     </execution>
-                </executions>
+                </executions>                
             </plugin>
         </plugins>
     </build>
-
 </project>

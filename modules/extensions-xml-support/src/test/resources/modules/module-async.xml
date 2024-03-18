@@ -2,18 +2,14 @@
 <module name="module-async"
         xmlns="http://www.mulesoft.org/schema/mule/module"
         xmlns:mule="http://www.mulesoft.org/schema/mule/core"
-        xmlns:test-components="http://www.mulesoft.org/schema/mule/test-components"
+        xmlns:test-components="http://www.mulesoft.org/schema/mule/test"
+        xmlns:heisenberg="http://www.mulesoft.org/schema/mule/heisenberg"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="
            http://www.mulesoft.org/schema/mule/module http://www.mulesoft.org/schema/mule/module/current/mule-module.xsd
            http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-           http://www.mulesoft.org/schema/mule/test-components http://www.mulesoft.org/schema/mule/test-components/current/mule-test-components.xsd">
-
-    <test-components:non-blocking-config name="nb"/>
-
-    <test-components:queue-config name="asyncResponseQueue">
-        <test-components:connection />
-    </test-components:queue-config>
+           http://www.mulesoft.org/schema/mule/test http://www.mulesoft.org/schema/mule/test/current/mule-test.xsd
+           http://www.mulesoft.org/schema/mule/heisenberg http://www.mulesoft.org/schema/mule/heisenberg/current/mule-heisenberg.xsd">
 
     <operation name="async-non-blocking">
         <parameters>
@@ -21,8 +17,8 @@
         </parameters>
         <body>
             <mule:async>
-                <test-components:non-blocking delayMillis="200"/>
-                <test-components:queue-push config-ref="asyncResponseQueue"/>
+                <heisenberg:non-blocking/>
+                <test-components:queue name="asyncResponseQueue"/>
             </mule:async>
         </body>
         <output type="string"/>

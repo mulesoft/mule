@@ -4,6 +4,11 @@
   "version": "@mule.runtime.version@",
   "vendor": "Mulesoft",
   "minMuleVersion": "4.1.1",
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ],
   "category": "COMMUNITY",
   "xmlDsl": {
     "prefix": "reconnection",
@@ -307,7 +312,9 @@
                   "isInstantiable": false,
                   "isAbstract": true,
                   "isFinal": false,
-                  "implementedInterfaces": [],
+                  "implementedInterfaces": [
+                    "org.mule.runtime.api.retry.policy.RetryPolicyTemplate"
+                  ],
                   "parent": "",
                   "genericTypes": [],
                   "isMap": false
@@ -6314,8 +6321,8 @@
       "handleable": true
     },
     {
-      "error": "RECONNECTION:RETRY_EXHAUSTED",
-      "parent": "MULE:RETRY_EXHAUSTED",
+      "error": "MULE:CONNECTIVITY",
+      "parent": "MULE:ANY",
       "handleable": true
     },
     {
@@ -6329,8 +6336,8 @@
       "handleable": true
     },
     {
-      "error": "MULE:CONNECTIVITY",
-      "parent": "MULE:ANY",
+      "error": "RECONNECTION:RETRY_EXHAUSTED",
+      "parent": "MULE:RETRY_EXHAUSTED",
       "handleable": true
     }
   ],

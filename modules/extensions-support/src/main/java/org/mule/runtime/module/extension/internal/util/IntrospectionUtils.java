@@ -1,25 +1,11 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal.util;
 
-import static java.lang.String.format;
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
-import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static javax.lang.model.element.ElementKind.METHOD;
-import static javax.lang.model.element.Modifier.PUBLIC;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
@@ -35,8 +21,24 @@ import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.isIg
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getImplementingType;
 import static org.mule.runtime.module.extension.internal.util.ParameterGroupUtils.hasParameterGroupAnnotation;
+
+import static java.lang.String.format;
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
+import static javax.lang.model.element.ElementKind.METHOD;
+import static javax.lang.model.element.Modifier.PUBLIC;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.reflections.ReflectionUtils.getAllFields;
-import static org.reflections.ReflectionUtils.withAnnotation;
+import static org.reflections.util.ReflectionUtilsPredicates.withAnnotation;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.core.ResolvableType.NONE;
 import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
@@ -162,10 +164,12 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 /**
@@ -190,6 +194,9 @@ public final class IntrospectionUtils {
    * Set caches in spring so that they are weakly (and not softly) referenced by default.
    * <p>
    * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
+   * <p>
+   * This hack is also present in the {@code deployment} module. It's because this module shades the spring dependencies and
+   * changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
    */
   private static void setWeakHashCaches() {
     try {
@@ -944,9 +951,10 @@ public final class IntrospectionUtils {
   private static Stream<Method> getMethodsStream(Class<?> declaringClass, boolean superClasses) {
     Stream<Method> methodStream;
     if (superClasses) {
-      methodStream = ReflectionUtils.getAllSuperTypes(declaringClass).stream()
-          .filter(type -> !type.isInterface())
-          .flatMap(type -> Stream.of(type.getDeclaredMethods()));
+      methodStream = Stream.concat(Stream.of(declaringClass.getDeclaredMethods()),
+                                   ReflectionUtils.getAllSuperTypes(declaringClass).stream()
+                                       .filter(type -> !type.isInterface())
+                                       .flatMap(type -> Stream.of(type.getDeclaredMethods())));
     } else {
       methodStream = Stream.of(declaringClass.getDeclaredMethods());
     }
@@ -1031,7 +1039,15 @@ public final class IntrospectionUtils {
 
   private static Stream<Field> getFieldsStream(Class<?> clazz) {
     try {
-      return getDescendingHierarchy(clazz).stream().flatMap(type -> stream(type.getDeclaredFields()));
+      return getDescendingHierarchy(clazz).stream().flatMap(type -> {
+        Field[] declaredFields;
+        try {
+          declaredFields = type.getDeclaredFields();
+        } catch (LinkageError e) {
+          throw new IllegalStateException("Exception getting declaredFields of type '" + clazz.getName() + "'", e);
+        }
+        return stream(declaredFields);
+      });
     } catch (Throwable e) {
       throw new RuntimeException(e);
     }
@@ -1851,4 +1867,13 @@ public final class IntrospectionUtils {
     return of(fields.iterator().next());
   }
 
+  /**
+   * We already do it in {@code spring-config} module, but we need to do this here too because we're shading springcore and then
+   * the classes (and their caches) are created twice.
+   */
+  public static void resetCommonCaches() {
+    org.springframework.util.ReflectionUtils.clearCache();
+    AnnotationUtils.clearCache();
+    ResolvableType.clearCache();
+  }
 }

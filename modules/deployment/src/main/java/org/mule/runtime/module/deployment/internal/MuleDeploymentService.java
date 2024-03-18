@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -27,6 +27,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.springframework.util.ConcurrentReferenceHashMap.ReferenceType.WEAK;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.scheduler.Scheduler;
@@ -53,6 +54,8 @@ import org.mule.runtime.module.deployment.internal.util.ObservableList;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collection;
@@ -69,8 +72,11 @@ import org.apache.commons.io.filefilter.AndFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ResolvableType;
+import org.springframework.util.ConcurrentReferenceHashMap;
 
 public class MuleDeploymentService implements DeploymentService {
 
@@ -80,7 +86,7 @@ public class MuleDeploymentService implements DeploymentService {
   public static final String PARALLEL_DEPLOYMENT_PROPERTY = SYSTEM_PROPERTY_PREFIX + "deployment.parallel";
   private static final int MAX_QUEUED_STARTING_ARTIFACTS = 256;
 
-  protected transient final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(MuleDeploymentService.class);
   // fair lock
   private final ReentrantLock deploymentLock = new DebuggableReentrantLock(true);
   private final LazyValue<Scheduler> artifactStartExecutor;
@@ -99,6 +105,32 @@ public class MuleDeploymentService implements DeploymentService {
   private final DeploymentDirectoryWatcher deploymentDirectoryWatcher;
   private final DefaultArchiveDeployer<ApplicationDescriptor, Application> applicationDeployer;
   private final DomainBundleArchiveDeployer domainBundleDeployer;
+
+  static {
+    setWeakHashCaches();
+  }
+
+  /**
+   * Set caches in spring so that they are weakly (and not softly) referenced by default.
+   * <p>
+   * For example, {@link ResolvableType} or {@link CachedIntrospectionResults} may retain classloaders when introspection is used.
+   * <p>
+   * This hack is also present in the {@code extensions-support} module. It's because that module shades the spring dependencies
+   * and changes the package, and then {@link ConcurrentReferenceHashMap} is loaded twice, with the two packages.
+   */
+  private static void setWeakHashCaches() {
+    try {
+      Field field = FieldUtils.getField(ConcurrentReferenceHashMap.class, "DEFAULT_REFERENCE_TYPE", true);
+      Field modifiersField = Field.class.getDeclaredField("modifiers");
+      modifiersField.setAccessible(true);
+      modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+      field.set(null, WEAK);
+    } catch (Exception e) {
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Unable to set spring concurrent maps to WEAK default scopes.", e);
+      }
+    }
+  }
 
   public MuleDeploymentService(DefaultDomainFactory domainFactory, DefaultApplicationFactory applicationFactory,
                                Supplier<SchedulerService> artifactStartExecutorSupplier) {
@@ -129,7 +161,7 @@ public class MuleDeploymentService implements DeploymentService {
         throw new IllegalArgumentException(format("Deployment parameters '%s' and '%s' cannot be used together",
                                                   DEPLOYMENT_APPLICATION_PROPERTY, PARALLEL_DEPLOYMENT_PROPERTY));
       }
-      logger.info("Using parallel deployment");
+      LOGGER.info("Using parallel deployment");
       this.deploymentDirectoryWatcher =
           new ParallelDeploymentDirectoryWatcher(domainBundleDeployer, this.domainDeployer, applicationDeployer, domains,
                                                  applications,
@@ -160,7 +192,7 @@ public class MuleDeploymentService implements DeploymentService {
    *
    * @param startDirectoryWatcher whether to start the directory watcher or not.
    */
-  void start(boolean startDirectoryWatcher) {
+  public void start(boolean startDirectoryWatcher) {
     DeploymentStatusTracker deploymentStatusTracker = new DeploymentStatusTracker();
     addDeploymentListener(deploymentStatusTracker.getApplicationDeploymentStatusTracker());
     addDomainDeploymentListener(deploymentStatusTracker.getDomainDeploymentStatusTracker());
@@ -180,7 +212,7 @@ public class MuleDeploymentService implements DeploymentService {
    * Triggers one pass of the directory watcher once in the current thread. It takes the lock in order to avoid the option of
    * "waiting to the next poll" present in the run implementation.
    */
-  void triggerDirectoryWatcher() {
+  public void triggerDirectoryWatcher() {
     deploymentLock.lock();
     try {
       deploymentDirectoryWatcher.run();
@@ -189,12 +221,12 @@ public class MuleDeploymentService implements DeploymentService {
     }
   }
 
-  protected void notifyStartupListeners() {
+  public void notifyStartupListeners() {
     for (StartupListener listener : startupListeners) {
       try {
         listener.onAfterStartup();
       } catch (Throwable t) {
-        logger.error("Error executing startup listener {}", listener, t);
+        LOGGER.error("Error executing startup listener {}", listener, t);
       }
     }
   }
@@ -237,11 +269,11 @@ public class MuleDeploymentService implements DeploymentService {
   /**
    * @return URL/lastModified of apps which previously failed to deploy
    */
-  Map<String, Map<URI, Long>> getZombieApplications() {
+  public Map<String, Map<URI, Long>> getZombieApplications() {
     return applicationDeployer.getArtifactsZombieMap();
   }
 
-  Map<String, Map<URI, Long>> getZombieDomains() {
+  public Map<String, Map<URI, Long>> getZombieDomains() {
     return domainDeployer.getArtifactsZombieMap();
   }
 
@@ -365,11 +397,11 @@ public class MuleDeploymentService implements DeploymentService {
     this.domainDeployer.setArtifactFactory(domainFactory);
   }
 
-  void undeploy(Application app) {
+  public void undeploy(Application app) {
     applicationDeployer.undeployArtifact(app.getArtifactName());
   }
 
-  void undeploy(Domain domain) {
+  public void undeploy(Domain domain) {
     domainDeployer.undeployArtifact(domain.getArtifactName());
   }
 
@@ -409,8 +441,8 @@ public class MuleDeploymentService implements DeploymentService {
   private void executeSynchronized(SynchronizedDeploymentAction deploymentAction) {
     try {
       if (!deploymentLock.tryLock(0, SECONDS)) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Another deployment operation in progress, will skip this cycle. Owner thread: " +
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Another deployment operation in progress, will skip this cycle. Owner thread: " +
               (deploymentLock instanceof DebuggableReentrantLock ? ((DebuggableReentrantLock) deploymentLock).getOwner()
                   : "Unknown"));
         }
@@ -445,8 +477,8 @@ public class MuleDeploymentService implements DeploymentService {
       try {
         applicationDeployer.redeploy(artifactName, deploymentProperties);
       } catch (DeploymentException e) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Failure while redeploying application: " + artifactName, e);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("Failure while redeploying application: " + artifactName, e);
         }
       }
     });

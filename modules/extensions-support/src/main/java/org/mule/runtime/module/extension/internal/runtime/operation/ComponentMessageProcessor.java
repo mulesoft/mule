@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -18,6 +18,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType.CPU_LITE;
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
+import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.isSanitizedPayload;
 import static org.mule.runtime.core.internal.el.ExpressionLanguageUtils.sanitize;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
@@ -47,7 +48,10 @@ import static org.mule.runtime.module.extension.internal.util.InterceptorChainUt
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getOperationExecutorFactory;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toActionCode;
-import static org.mule.runtime.oauth.internal.util.ClassLoaderUtils.setContextClassLoader;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERATION_EXECUTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
+import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
@@ -73,8 +77,9 @@ import org.mule.runtime.api.meta.model.ConnectableComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.nested.NestedComponentModel;
 import org.mule.runtime.api.meta.model.nested.NestedRouteModel;
-import org.mule.runtime.api.profiling.ProfilingService;
+import org.mule.runtime.api.notification.NotificationDispatcher;
 import org.mule.runtime.api.scheduler.Scheduler;
+import org.mule.runtime.core.api.config.MuleConfiguration;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.execution.ExceptionContextProvider;
 import org.mule.runtime.core.api.extension.ExtensionManager;
@@ -85,19 +90,21 @@ import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.transaction.MuleTransactionConfig;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
-import org.mule.runtime.core.internal.context.notification.DefaultFlowCallStack;
+import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
+import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
+import org.mule.runtime.core.internal.profiling.InternalProfilingService;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.FluxSinkSupplier;
 import org.mule.runtime.core.internal.util.rx.RxUtils;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.exception.ErrorTypeLocator;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
@@ -131,11 +138,15 @@ import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.TargetReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.VoidReturnDelegate;
+import org.mule.runtime.module.extension.internal.runtime.tracing.TracedResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.tracer.api.component.ComponentTracer;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 import org.mule.sdk.api.tx.OperationTransactionalAction;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -146,11 +157,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
+import javax.transaction.TransactionManager;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
-import org.togglz.core.user.FeatureUser;
 import reactor.core.publisher.Flux;
 import reactor.util.context.ContextView;
 
@@ -185,7 +196,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
   protected final ExtensionModel extensionModel;
-  protected final ResolverSet resolverSet;
+  protected ResolverSet resolverSet;
   protected final String target;
   protected final String targetValue;
   protected final RetryPolicyTemplate retryPolicyTemplate;
@@ -195,7 +206,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private final ResultTransformer resultTransformer;
   private final boolean hasNestedChain;
   private final long outerFluxTerminationTimeout;
-  private final Object fluxSupplierDisposeLock = new Object();
+  private final Object fluxSupplierLock = new Object();
 
   private final AtomicInteger activeOuterPublishersCount = new AtomicInteger(0);
 
@@ -216,10 +227,21 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private ExtensionConnectionSupplier extensionConnectionSupplier;
 
   @Inject
-  private ProfilingService profilingService;
+  private InternalProfilingService profilingService;
+
+  @Inject
+  private ComponentTracerFactory<CoreEvent> componentTracerFactory;
 
   @Inject
   private FeatureFlaggingService featureFlaggingService;
+
+  private MuleConfiguration muleConfiguration;
+
+  @Inject
+  private NotificationDispatcher notificationDispatcher;
+
+  @Inject
+  private Optional<TransactionManager> transactionManager;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -227,7 +249,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private ProcessingStrategy processingStrategy;
   private boolean ownedProcessingStrategy = false;
-  private FluxSinkSupplier<CoreEvent> fluxSupplier;
+  private volatile FluxSinkSupplier<CoreEvent> fluxSupplier;
 
   private Scheduler outerFluxCompletionScheduler;
 
@@ -242,7 +264,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
    */
   private ReturnDelegate valueReturnDelegate;
   private String processorPath = null;
-  private FeatureUser featureUser;
+  private ComponentTracer<CoreEvent> operationParametersResolutionTracer =
+      DummyComponentTracerFactory.DUMMY_COMPONENT_TRACER_INSTANCE;
 
   public ComponentMessageProcessor(ExtensionModel extensionModel,
                                    T componentModel,
@@ -491,7 +514,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
             operationContext = operationExecutionParams.getExecutionContextAdapter();
             operationContext.changeEvent(event);
           } else {
-            // there was an error propagated before <execute-next> and the operation execution parameters don't exists yet.
+            // There was an error propagated before <execute-next> and the operation execution parameters don't exist yet.
             operationContext = createExecutionContext(event);
           }
 
@@ -526,15 +549,15 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     };
   }
 
-  // TODO MULE-18482: decouple policies and operation logic
+  // TODO MULE-18482: Decouple policies and operation logic
   private boolean isTargetWithPolicies(CoreEvent event) {
     return !from(event).isNoPolicyOperation(getLocation(), event.getContext().getId()) && !isBlank(target);
   }
 
   private Optional<ConfigurationInstance> resolveConfiguration(CoreEvent event) {
     if (shouldUsePrecalculatedContext(event)) {
-      // If the event already contains an execution context, use that one.
-      // Only for interceptable components!
+      // Intercepted components optimization: If the event already contains an execution context, use that one.
+      // (the context is already calculated as part of the interception)
       return getPrecalculatedContext(event).getConfiguration();
     } else {
       // Otherwise, generate the context as usual.
@@ -596,6 +619,12 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
       initProcessingStrategy();
 
+      // Since the tracing feature is Component aware at all levels, we cannot do this wrapping earlier (for example, at component
+      // building time)
+      operationParametersResolutionTracer = componentTracerFactory.fromComponent(this, PARAMETERS_RESOLUTION_SPAN_NAME, "");
+      resolverSet = new TracedResolverSet(muleContext,
+                                          componentTracerFactory.fromComponent(this, VALUE_RESOLUTION_SPAN_NAME, ""))
+                                              .addAll(resolverSet.getResolvers());
       initialised = true;
     }
   }
@@ -616,8 +645,22 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void startInnerFlux() {
+    if (fluxSupplier == null) {
+      synchronized (fluxSupplierLock) {
+        startInnerFluxUnsafe();
+      }
+    }
+  }
+
+  private void startInnerFluxUnsafe() {
+    if (fluxSupplier != null) {
+      LOGGER.debug("Skipping creation of inner flux supplier for processor '{}' because it is already created.",
+                   this.getLocation());
+      return;
+    }
+
     // Create and register an internal flux, which will be the one to really use the processing strategy for this operation.
-    // This is a round robin so it can handle concurrent events, and its lifecycle is tied to the lifecycle of the main flux.
+    // This is a round-robin, so it can handle concurrent events and its lifecycle is tied to the lifecycle of the main flux.
     fluxSupplier = createRoundRobinFluxSupplier(p -> {
       final ComponentInnerProcessor innerProcessor = new ComponentInnerProcessor() {
 
@@ -980,18 +1023,31 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private void outerPublisherSubscribedTo() {
-    activeOuterPublishersCount.getAndIncrement();
+    // We don't want a potentially concurrent publisher termination to stop the fluxes after we start them
+    // that is why an AtomicInteger is not enough, we need to hold the lock of the counter while we restart the inner flux
+    // that way we ensure the inner flux is available if and only if there are active publishers...
+    // ...unless ComponentMessageProcessor#stop is called, which is a different story
+    synchronized (activeOuterPublishersCount) {
+      // This doesn't need to be an AtomicInteger as long as it happens inside a synchronized block, but it is preferred for
+      // readability.
+      if (activeOuterPublishersCount.getAndIncrement() == 0) {
+        startInnerFlux();
+      }
+    }
   }
 
   private void outerPublisherTerminated() {
-    if (activeOuterPublishersCount.decrementAndGet() == 0) {
-      stopInnerFlux();
+    // See the comment in #outerPublisherSubscribedTo
+    synchronized (activeOuterPublishersCount) {
+      if (activeOuterPublishersCount.decrementAndGet() == 0) {
+        stopInnerFlux();
+      }
     }
   }
 
   private void stopInnerFlux() {
     if (fluxSupplier != null) {
-      synchronized (fluxSupplierDisposeLock) {
+      synchronized (fluxSupplierLock) {
         if (fluxSupplier != null) {
           fluxSupplier.dispose();
           fluxSupplier = null;
@@ -1021,11 +1077,17 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return new DefaultExecutionMediator(extensionModel,
                                         componentModel,
                                         createConnectionInterceptorsChain(extensionModel, componentModel,
-                                                                          extensionConnectionSupplier, reflectionCache),
+                                                                          extensionConnectionSupplier, reflectionCache,
+                                                                          componentTracerFactory
+                                                                              .fromComponent(this, GET_CONNECTION_SPAN_NAME, "")),
                                         errorTypeRepository,
                                         muleContext.getExecutionClassLoader(),
+                                        muleConfiguration,
+                                        notificationDispatcher,
+                                        transactionManager.orElse(null),
                                         resultTransformer,
                                         profilingService.getProfilingDataProducer(OPERATION_THREAD_RELEASE),
+                                        componentTracerFactory.fromComponent(this, OPERATION_EXECUTION_SPAN_NAME, ""),
                                         featureFlaggingService.isEnabled(SUPPRESS_ERRORS));
   }
 
@@ -1062,22 +1124,28 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   public void resolveParameters(CoreEvent.Builder eventBuilder,
                                 BiConsumer<Map<String, Supplier<Object>>, ExecutionContext> afterConfigurer)
       throws MuleException {
-    if (componentExecutor instanceof OperationArgumentResolverFactory) {
-      ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
-      PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
+    ExecutionContextAdapter<T> delegateExecutionContext = createExecutionContext(eventBuilder.build());
+    PrecalculatedExecutionContextAdapter executionContext = new PrecalculatedExecutionContextAdapter(delegateExecutionContext);
 
-      final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
-      Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
-      if (throwable == null) {
-        final Map<String, Supplier<Object>> resolvedArguments = ((OperationArgumentResolverFactory<T>) componentExecutor)
-            .createArgumentResolver(componentModel)
-            .apply(executionContext);
-        afterConfigurer.accept(resolvedArguments, executionContext);
-        executionContext.changeEvent(eventBuilder.build());
-      } else {
-        throw new DefaultMuleException("Interception execution for operation not ok", throwable);
-      }
+    final DefaultExecutionMediator mediator = (DefaultExecutionMediator) executionMediator;
+    Throwable throwable = mediator.applyBeforeInterceptors(executionContext);
+    if (throwable == null) {
+      final Map<String, Supplier<Object>> resolvedArguments = getArgumentResolver()
+          .apply(executionContext);
+      afterConfigurer.accept(resolvedArguments, executionContext);
+      executionContext.changeEvent(eventBuilder.build());
+    } else {
+      throw new DefaultMuleException("Interception execution for operation not ok", throwable);
     }
+  }
+
+  private Function<ExecutionContext<T>, Map<String, Object>> getArgumentResolver() {
+    if (componentExecutor instanceof OperationArgumentResolverFactory) {
+      return ((OperationArgumentResolverFactory<T>) componentExecutor)
+          .createArgumentResolver(componentModel);
+    }
+
+    return ec -> Collections.emptyMap();
   }
 
   @Override
@@ -1092,10 +1160,13 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   private Map<String, Object> getResolutionResult(CoreEvent event, Optional<ConfigurationInstance> configuration)
       throws MuleException {
+    operationParametersResolutionTracer.startSpan(event);
     try (ValueResolvingContext context = ValueResolvingContext.builder(event, expressionManager)
         .withConfig(configuration)
         .withLocation(getLocation()).build()) {
       return resolverSet.resolve(context).asMap();
+    } finally {
+      operationParametersResolutionTracer.endCurrentSpan(event);
     }
   }
 
@@ -1157,4 +1228,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     return location != null ? location.getLocation() : super.toString();
   }
 
+  @Inject
+  public void setMuleConfiguration(MuleConfiguration muleConfiguration) {
+    this.muleConfiguration = muleConfiguration;
+  }
 }

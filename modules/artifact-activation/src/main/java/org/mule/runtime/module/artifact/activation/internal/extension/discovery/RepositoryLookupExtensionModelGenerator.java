@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -59,7 +59,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                 artifactPluginDescriptor.getName(),
                                                                 additionalAttributes,
                                                                 artifactPluginDescriptor,
-                                                                discoveryRequest.isOCSEnabled()))
+                                                                discoveryRequest.isOCSEnabled(),
+                                                                discoveryRequest.isForceExtensionValidation()))
         .orElse(null);
   }
 
@@ -86,7 +87,8 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
                                                                String artifactName,
                                                                Map<String, Object> additionalAttributes,
                                                                ArtifactPluginDescriptor artifactPluginDescriptor,
-                                                               boolean ocsEnabled) {
+                                                               boolean ocsEnabled,
+                                                               boolean forceExtensionValidation) {
     ExtensionModelLoader loader = extensionModelLoaderRepository.getExtensionModelLoader(loaderDescriber)
         .orElseThrow(() -> new IllegalArgumentException(format("The identifier '%s' does not match with the describers available "
             + "to generate an ExtensionModel (working with the plugin '%s')", loaderDescriber.getId(), artifactName)));
@@ -96,6 +98,7 @@ public class RepositoryLookupExtensionModelGenerator implements ExtensionModelGe
     return loader.loadExtensionModel(builder(artifactClassloader.get(), getDefault(dependencies))
         .addParameters(attributes)
         .setOCSEnabled(ocsEnabled)
+        .setForceExtensionValidation(forceExtensionValidation)
         .setArtifactCoordinates(artifactPluginDescriptor.getBundleDescriptor())
         .build());
   }

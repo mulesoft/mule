@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -21,8 +21,8 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.runtime.core.internal.transformer.simple.ObjectToByteArray;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import java.io.ByteArrayInputStream;
@@ -57,11 +57,10 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
 
   @Test
   public void testSerializablePayload() throws Exception {
-    final Message message = InternalMessage.builder().value(TEST_MESSAGE).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(TEST_MESSAGE).build();
     Message deserializedMessage = serializationRoundtrip(message);
 
     assertEquals(TEST_MESSAGE, deserializedMessage.getPayload().getValue());
-    assertEquals("bar", ((InternalMessage) deserializedMessage).getOutboundProperty("foo"));
   }
 
   @Test
@@ -71,7 +70,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
     ((MuleContextWithRegistry) muleContext).getRegistry().lookupObject(TransformersRegistry.class)
         .registerTransformer(new NonSerializableToByteArray());
 
-    final Message message = InternalMessage.builder().value(new NonSerializable()).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(new NonSerializable()).build();
 
     InternalMessage deserializedMessage = serializationRoundtrip(message);
 
@@ -82,7 +81,7 @@ public class DefaultMuleMessageSerializationTestCase extends AbstractMuleContext
   @Test
   public void testStreamPayloadSerialization() throws Exception {
     InputStream stream = new ByteArrayInputStream(TEST_MESSAGE.getBytes());
-    final Message message = InternalMessage.builder().value(stream).addOutboundProperty("foo", "bar").build();
+    final Message message = InternalMessage.builder().value(stream).build();
 
     InternalMessage deserializedMessage = serializationRoundtrip(message);
     assertEquals(byte[].class, deserializedMessage.getPayload().getDataType().getType());

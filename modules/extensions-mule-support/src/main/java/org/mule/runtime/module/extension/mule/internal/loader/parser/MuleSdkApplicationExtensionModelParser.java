@@ -1,18 +1,18 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_NAMESPACE;
 import static org.mule.runtime.internal.dsl.DslConstants.THIS_PREFIX;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
+import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -48,8 +48,9 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
                                                 ArtifactAst ast,
                                                 TypeLoader typeLoader,
                                                 ExtensionModelHelper extensionModelHelper) {
-    super(ast, typeLoader, extensionModelHelper);
+    super(typeLoader, extensionModelHelper);
     this.extensionName = extensionName;
+    init(ast);
   }
 
   @Override

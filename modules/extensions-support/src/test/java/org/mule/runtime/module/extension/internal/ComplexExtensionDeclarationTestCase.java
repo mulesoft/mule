@@ -1,35 +1,37 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.module.extension.internal;
 
-import static java.util.Collections.emptySet;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_DESCRIPTION;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.LISTENER_CONFIG_DESCRIPTION;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.LISTENER_CONFIG_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.LISTEN_MESSAGE_SOURCE;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.PATH;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.PORT;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_CONFIG_DESCRIPTION;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_CONFIG_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_PROVIDER;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.REQUEST_OPERATION_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.STATIC_RESOURCE_OPERATION_NAME;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VENDOR;
-import static org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer.VERSION;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_DESCRIPTION;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.EXTENSION_NAME;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.LISTENER_CONFIG_DESCRIPTION;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.LISTENER_CONFIG_NAME;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.LISTEN_MESSAGE_SOURCE;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.PATH;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.PORT;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_CONFIG_DESCRIPTION;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_CONFIG_NAME;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.REQUESTER_PROVIDER;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.REQUEST_OPERATION_NAME;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.STATIC_RESOURCE_OPERATION_NAME;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.VENDOR;
+import static org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer.VERSION;
 import static org.mule.runtime.extension.api.ExtensionConstants.STREAMING_STRATEGY_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
+
+import static java.util.Collections.emptySet;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertThat;
 
 import org.mule.metadata.api.model.BinaryType;
 import org.mule.metadata.api.model.NumberType;
@@ -42,7 +44,7 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
-import org.mule.runtime.api.meta.model.tck.TestHttpConnectorDeclarer;
+import org.mule.runtime.api.test.meta.model.tck.TestHttpConnectorDeclarer;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionDeclarationTestCase;

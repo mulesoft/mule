@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanReference;
  */
 public class SpringComponentModel {
 
+  private String componentName;
   private ComponentIdentifier componentIdentifier;
   private ComponentAst component;
   private ConfigurableObjectProvider objectInstance;
@@ -30,6 +31,14 @@ public class SpringComponentModel {
   private MapEntryType mapEntryType;
   private BeanReference beanReference;
   private BeanDefinition beanDefinition;
+
+  public void setComponentName(String componentName) {
+    this.componentName = componentName;
+  }
+
+  public String getComponentName() {
+    return componentName;
+  }
 
   public void setComponentIdentifier(ComponentIdentifier componentIdentifier) {
     this.componentIdentifier = componentIdentifier;

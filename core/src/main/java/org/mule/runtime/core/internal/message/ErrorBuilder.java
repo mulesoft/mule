@@ -1,17 +1,19 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.message;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.util.Preconditions.checkState;
+
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
-import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.exception.ComposedErrorException;
@@ -389,7 +391,8 @@ public final class ErrorBuilder {
   /**
    * Default and only non-deprecated implementation of {@link Error}.
    */
-  static final class DeserializableErrorImplementation implements PrivilegedError {
+  // This is public so that DataWeave can get and invoke its methods and not fallback to change the accessibility of its fields
+  public static final class DeserializableErrorImplementation implements PrivilegedError {
 
     private static final long serialVersionUID = 6703483143042822990L;
 
@@ -401,6 +404,7 @@ public final class ErrorBuilder {
     private final Message muleMessage;
     private final List<Error> errors;
     private final List<Error> suppressedErrors;
+    private final String dslSource;
 
     private DeserializableErrorImplementation(Throwable exception, String description, String detailedDescription,
                                               Component failingComponent, ErrorType errorType,
@@ -413,6 +417,15 @@ public final class ErrorBuilder {
       this.muleMessage = errorMessage;
       this.errors = unmodifiableList(errors);
       this.suppressedErrors = unmodifiableList(suppressedErrors);
+      this.dslSource = failingComponent != null ? failingComponent.getDslSource() : null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDslSource() {
+      return dslSource;
     }
 
     /**
@@ -449,6 +462,10 @@ public final class ErrorBuilder {
      */
     @Override
     public Throwable getCause() {
+      return exception;
+    }
+
+    public Throwable getException() {
       return exception;
     }
 

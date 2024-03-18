@@ -1,17 +1,19 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.util.splash;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
+import static org.mule.runtime.core.api.util.StringMessageUtils.getBoilerPlate;
+
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
-import static org.mule.runtime.core.api.config.MuleProperties.SYSTEM_PROPERTY_PREFIX;
 
-import com.google.common.collect.ImmutableList;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.util.StringMessageUtils;
 
@@ -44,7 +46,7 @@ public abstract class SplashScreen {
   public static final String RUNTIME_VERBOSE = SYSTEM_PROPERTY_PREFIX + "runtime.verbose";
   public static final String CUSTOM_NAMES = SYSTEM_PROPERTY_PREFIX + "splash.masked.properties";
 
-  private static final List<String> CREDENTIAL_NAMES = ImmutableList.of("key", "password", "pswd");
+  private static final List<String> CREDENTIAL_NAMES = asList("key", "password", "pswd");
   private static final Set<String> CUSTOM_CREDENTIAL_NAMES = new HashSet<>(asList(getProperty(CUSTOM_NAMES, "").split(",")));
   public static final String CREDENTIAL_MASK = "*****";
   /**
@@ -97,7 +99,7 @@ public abstract class SplashScreen {
     if (!items.isEmpty()) {
       doBody(description);
       for (String item : items) {
-        doBody(String.format(VALUE_FORMAT, item));
+        doBody(format(VALUE_FORMAT, item));
       }
     }
   }
@@ -119,16 +121,17 @@ public abstract class SplashScreen {
       doBody(description);
       for (String key : map.keySet()) {
         String value = isCredentialItem(key) ? CREDENTIAL_MASK : map.get(key);
-        doBody(String.format(KEY_VALUE_FORMAT, key, value));
+        doBody(format(KEY_VALUE_FORMAT, key, value));
       }
     }
   }
 
+  @Override
   public String toString() {
     List<String> boilerPlate = new ArrayList<>(header);
     boilerPlate.addAll(body);
     boilerPlate.addAll(footer);
-    return StringMessageUtils.getBoilerPlate(boilerPlate, '*', 70);
+    return getBoilerPlate(boilerPlate, '*', 70);
   }
 
   protected SplashScreen() {

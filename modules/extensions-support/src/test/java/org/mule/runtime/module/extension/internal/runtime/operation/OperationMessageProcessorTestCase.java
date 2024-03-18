@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -42,9 +42,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.util.SystemUtils.getDefaultEncoding;
 import static org.mule.runtime.core.internal.event.EventQuickCopy.quickCopy;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
-import static org.mule.runtime.core.internal.streaming.CursorUtils.unwrap;
-import static org.mule.runtime.core.privileged.util.EventUtils.getRoot;
-import static org.mule.runtime.dsl.api.component.config.DefaultComponentLocation.from;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.operation.Result.builder;
@@ -69,7 +66,7 @@ import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MapDataType;
 import org.mule.runtime.api.metadata.MediaType;
-import org.mule.runtime.api.streaming.CursorProvider;
+import org.mule.runtime.api.streaming.bytes.CursorStream;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.el.ExpressionManager;
@@ -99,9 +96,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver
 import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;
-import org.mule.weave.v2.el.WeaveDefaultExpressionLanguageFactoryService;
+import org.mule.weave.v2.el.provider.WeaveDefaultExpressionLanguageFactoryService;
 
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -146,6 +142,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                           muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
+    operationMessageProcessor.setMuleConfiguration(muleContext.getConfiguration());
 
     return operationMessageProcessor;
   }
@@ -505,17 +502,15 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
   @Test
   public void cursorStreamProvidersAreManaged() throws Exception {
     CursorStreamProvider provider = mock(CursorStreamProvider.class);
-    final InputStream inputStream = mock(InputStream.class);
+    when(provider.isManaged()).thenReturn(false);
+    final CursorStream cursorProvider = mock(CursorStream.class);
+    when(cursorProvider.getProvider()).thenReturn(provider);
 
-    doReturn(provider).when(cursorStreamProviderFactory).of(getRoot(event.getContext()), inputStream, from(FLOW_NAME));
-
-    stubComponentExecutor(operationExecutor, inputStream);
+    stubComponentExecutor(operationExecutor, cursorProvider);
 
     messageProcessor.process(event);
-    ArgumentCaptor<CursorProvider> providerCaptor = forClass(CursorProvider.class);
-    verify(streamingManager).manage(providerCaptor.capture(), any(EventContext.class));
 
-    assertThat(unwrap(providerCaptor.getValue()), is(sameInstance(provider)));
+    verify(streamingManager).manage(eq(provider), any(EventContext.class));
   }
 
   private void assertProcessingType(ExecutionType executionType, ProcessingType expectedProcessingType) {

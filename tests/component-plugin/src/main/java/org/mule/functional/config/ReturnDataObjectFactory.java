@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -11,12 +11,11 @@ import static org.mule.runtime.core.api.util.IOUtils.getResourceAsString;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.dsl.api.component.AbstractComponentFactory;
-import org.mule.runtime.dsl.api.component.ObjectFactory;
 
 import java.io.IOException;
 
 /**
- * {@link ObjectFactory} for test:component return-data element.
+ * {@link AbstractComponentFactory} for test:component return-data element.
  *
  * @since 4.0
  */

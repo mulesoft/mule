@@ -1,20 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.serialization;
 
-import static java.lang.String.format;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.core.api.util.IOUtils.closeQuietly;
+
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import org.mule.runtime.api.serialization.SerializationException;
 import org.mule.runtime.api.serialization.SerializationProtocol;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.context.MuleContextAware;
-import org.mule.runtime.core.privileged.store.DeserializationPostInitialisable;
+import org.mule.runtime.core.internal.store.DeserializationPostInitialisable;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -95,7 +96,7 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
    */
   @Override
   public <T> T deserialize(byte[] bytes, ClassLoader classLoader) throws SerializationException {
-    checkArgument(bytes != null, "The byte[] must not be null");
+    requireNonNull(bytes, "The byte[] must not be null");
     return deserialize(new ByteArrayInputStream(bytes), classLoader);
   }
 
@@ -113,8 +114,8 @@ public abstract class AbstractSerializationProtocol implements SerializationProt
    */
   @Override
   public <T> T deserialize(InputStream inputStream, ClassLoader classLoader) throws SerializationException {
-    checkArgument(inputStream != null, "Cannot deserialize a null stream");
-    checkArgument(classLoader != null, "Cannot deserialize with a null classloader");
+    requireNonNull(inputStream, "Cannot deserialize a null stream");
+    requireNonNull(classLoader, "Cannot deserialize with a null classloader");
     try {
       return (T) postInitialize(doDeserialize(inputStream, classLoader));
     } catch (Exception e) {

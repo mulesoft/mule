@@ -1,24 +1,26 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.tck.junit4;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonMap;
-import static java.util.Optional.empty;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.setMuleContextIfNeeded;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processToApply;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.BLOCKING;
 import static org.mule.tck.junit4.AbstractReactiveProcessorTestCase.Mode.NON_BLOCKING;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonMap;
+import static java.util.Optional.empty;
+
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -28,14 +30,14 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.message.InternalEvent;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.reactivestreams.Publisher;
 
 import java.util.Collection;
 import java.util.Map;
+
+import org.reactivestreams.Publisher;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import reactor.core.publisher.Mono;
 
@@ -53,7 +55,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
   protected Mode mode;
 
   protected ConfigurationComponentLocator configurationComponentLocator =
-      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS.get());
+      mock(ConfigurationComponentLocator.class, RETURNS_DEEP_STUBS);
 
   public AbstractReactiveProcessorTestCase(Mode mode) {
     this.mode = mode;
@@ -118,7 +120,7 @@ public abstract class AbstractReactiveProcessorTestCase extends AbstractMuleCont
 
   public enum Mode {
     /**
-     * Test using {@link Processor#process(InternalEvent)} blocking API.
+     * Test using {@link Processor#process(CoreEvent)} blocking API.
      */
     BLOCKING,
     /**

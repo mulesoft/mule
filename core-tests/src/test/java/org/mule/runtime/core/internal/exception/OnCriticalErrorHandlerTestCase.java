@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,14 +9,13 @@ package org.mule.runtime.core.internal.exception;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.CRITICAL_ERROR_TYPE;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
-import static org.mule.tck.MuleTestUtils.getTestFlow;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
 import static java.util.Arrays.asList;
 import static java.util.function.Function.identity;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -32,14 +31,12 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
-import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import org.mule.tck.junit4.rule.VerboseExceptions;
 
 import java.util.Collection;
 import java.util.function.Consumer;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,13 +85,13 @@ public class OnCriticalErrorHandlerTestCase extends AbstractMuleContextTestCase 
     flow = getTestFlow(muleContext);
 
     context = create(flow, TEST_CONNECTOR_LOCATION);
-    muleEvent = InternalEvent.builder(context).message(of("")).build();
+    muleEvent = CoreEvent.builder(context).message(of("")).build();
 
     when(mockException.getExceptionInfo()).thenReturn(new MuleExceptionInfo());
 
     error = mock(Error.class, RETURNS_DEEP_STUBS);
 
-    muleEvent = InternalEvent.builder(muleEvent).error(error).build();
+    muleEvent = CoreEvent.builder(muleEvent).error(error).build();
   }
 
   @Test

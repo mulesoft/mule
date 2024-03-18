@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-tests</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-http-resource-service</artifactId>
     <name>Resource HTTP Service Implementation</name>
@@ -13,6 +13,7 @@
     <description>HTTP service implementation used for testing purposes which features resource usage</description>
 
     <properties>
+        <javaModuleName>org.mule.test.http.resource.services</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -53,7 +54,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.8</version>
         </dependency>
     </dependencies>
 </project>

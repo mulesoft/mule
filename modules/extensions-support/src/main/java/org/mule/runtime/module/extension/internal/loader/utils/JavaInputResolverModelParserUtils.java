@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -9,16 +9,15 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
+
 import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataTypeResolverUtils.isStaticResolver;
 
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceCallbackDeclaration;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
-import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
-import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaInputResolverModelParser;
 import org.mule.sdk.api.annotation.metadata.TypeResolver;
 
@@ -28,33 +27,14 @@ import java.util.Optional;
 /**
  * Helper class for introspecting input metadata.
  *
- * @since 4.6
+ * @since 4.5
  */
 public class JavaInputResolverModelParserUtils {
 
-  public static List<InputResolverModelParser> parseInputResolversModelParser(MethodElement<?> methodElement) {
-
-    List<InputResolverModelParser> parameterInputResolvers = methodElement.getParameters().stream()
-        .map(JavaInputResolverModelParserUtils::getResolverParser)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
-
-    List<InputResolverModelParser> parameterGroupInputResolvers = methodElement.getParameterGroups().stream()
-        .map(JavaInputResolverModelParserUtils::getResolverParser)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .collect(toList());
-
-    return concat(parameterInputResolvers.stream(), parameterGroupInputResolvers.stream()).collect(toList());
-  }
-
-  public static List<InputResolverModelParser> parseInputResolversModelParser(SourceCallbackDeclaration sourceCallbackDeclaration) {
-    return sourceCallbackDeclaration.getAllParameters().stream()
-        .map(param -> param.getModelProperty(ExtensionParameterDescriptorModelProperty.class))
-        .filter(Optional::isPresent)
-        .map(modelProperty -> modelProperty.get().getExtensionParameter())
-        .map(JavaInputResolverModelParserUtils::getResolverParser)
+  public static List<InputResolverModelParser> parseInputResolversModelParser(List<ParameterGroupModelParser> parameterGroupModelParsers) {
+    return parameterGroupModelParsers.stream()
+        .flatMap(parameterGroup -> parameterGroup.getParameterParsers().stream())
+        .map(ParameterModelParser::getInputResolverModelParser)
         .filter(Optional::isPresent)
         .map(Optional::get)
         .collect(toList());

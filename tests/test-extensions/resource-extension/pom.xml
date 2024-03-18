@@ -7,17 +7,17 @@
     <parent>
         <groupId>org.mule.tests</groupId>
         <artifactId>mule-test-extensions-parent</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mule-resource-extension</artifactId>
-    <version>4.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Mule Resource Extension</name>
     <description>A Mule extension for testing that uses the Resource HTTP Service and ResourceLocator</description>
 
     <properties>
+        <javaModuleName>org.mule.test.extension.resource</javaModuleName>
         <testExtensionModelLoaderId>java</testExtensionModelLoaderId>
         <formatterConfigPath>../../../formatter.xml</formatterConfigPath>
     </properties>
@@ -26,13 +26,12 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-service-http-api</artifactId>
-            <version>4.6.0-SNAPSHOT</version>
+            <version>4.7.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.4</version>
         </dependency>
     </dependencies>
 </project>

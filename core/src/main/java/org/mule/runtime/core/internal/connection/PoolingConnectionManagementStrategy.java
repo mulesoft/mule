@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,6 +8,8 @@ package org.mule.runtime.core.internal.connection;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.min;
+
+import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_JMX_FOR_COMMONS_POOL2;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ALL;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_NONE;
 import static org.mule.runtime.api.config.PoolingProfile.INITIALISE_ONE;
@@ -15,6 +17,7 @@ import static org.mule.runtime.api.config.PoolingProfile.WHEN_EXHAUSTED_GROW;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.internal.connection.ConnectionUtils.logPoolStatus;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -28,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.apache.commons.pool2.BasePooledObjectFactory;
-import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -53,19 +55,21 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
 
   /**
    * Creates a new instance
-   *
-   * @param connectionProvider the {@link ConnectionProvider} used to manage the connections
-   * @param poolingProfile     the {@link PoolingProfile} which configures the {@link #pool}
-   * @param poolingListener    a {@link PoolingListener}
-   * @param muleContext        the application's {@link MuleContext}
+   * 
+   * @param connectionProvider     the {@link ConnectionProvider} used to manage the connections
+   * @param poolingProfile         the {@link PoolingProfile} which configures the {@link #pool}
+   * @param poolingListener        a {@link PoolingListener}
+   * @param muleContext            the application's {@link MuleContext}
+   * @param featureFlaggingService the {@link FeatureFlaggingService}
    */
   PoolingConnectionManagementStrategy(ConnectionProvider<C> connectionProvider, PoolingProfile poolingProfile,
-                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName) {
+                                      PoolingListener<C> poolingListener, MuleContext muleContext, String ownerConfigName,
+                                      FeatureFlaggingService featureFlaggingService) {
     super(connectionProvider, muleContext);
     this.poolingProfile = poolingProfile;
     this.poolingListener = poolingListener;
     this.poolId = ownerConfigName.concat("-").concat(generateId());
-    this.pool = createPool(ownerConfigName);
+    this.pool = createPool(ownerConfigName, featureFlaggingService);
   }
 
   /**
@@ -118,10 +122,14 @@ final class PoolingConnectionManagementStrategy<C> extends ConnectionManagementS
     }
   }
 
-  private GenericObjectPool<C> createPool(String ownerConfigName) {
+  private GenericObjectPool<C> createPool(String ownerConfigName,
+                                          FeatureFlaggingService featureFlaggingService) {
     GenericObjectPoolConfig<C> config = new GenericObjectPoolConfig<>();
 
     config.setMaxIdle(poolingProfile.getMaxIdle());
+    if (featureFlaggingService != null && featureFlaggingService.isEnabled(DISABLE_JMX_FOR_COMMONS_POOL2)) {
+      config.setJmxEnabled(false);
+    }
 
     switch (poolingProfile.getExhaustedAction()) {
       case WHEN_EXHAUSTED_GROW:

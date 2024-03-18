@@ -32,7 +32,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner">
+  <xs:complexType name="org.mule.test.module.extension.internal.util.extension.connectivity.basic.ExtensibleOwner">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
         <xs:attribute type="mule:expressionString" use="required" name="requiredFieldDefault"></xs:attribute>
@@ -46,12 +46,12 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" type="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-extensible-owner"></xs:element>
-  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" type="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner" abstract="true" name="abstract-extensible-owner"></xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" type="global-pojo:org.mule.test.module.extension.internal.util.extension.connectivity.basic.ExtensibleOwner" substitutionGroup="mule:abstract-shared-extension" abstract="true" name="global-abstract-extensible-owner"></xs:element>
+  <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" type="global-pojo:org.mule.test.module.extension.internal.util.extension.connectivity.basic.ExtensibleOwner" abstract="true" name="abstract-extensible-owner"></xs:element>
   <xs:element xmlns:global-pojo="http://www.mulesoft.org/schema/mule/global-pojo" substitutionGroup="global-pojo:abstract-extensible-owner" name="extensible-owner">
     <xs:complexType>
       <xs:complexContent>
-        <xs:extension base="global-pojo:org.mule.runtime.module.extension.internal.runtime.connectivity.basic.ExtensibleOwner"></xs:extension>
+        <xs:extension base="global-pojo:org.mule.test.module.extension.internal.util.extension.connectivity.basic.ExtensibleOwner"></xs:extension>
       </xs:complexContent>
     </xs:complexType>
   </xs:element>

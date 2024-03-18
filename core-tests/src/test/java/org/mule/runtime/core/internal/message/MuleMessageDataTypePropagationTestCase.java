@@ -1,10 +1,9 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.core.internal.message;
 
 import static org.mule.runtime.api.message.Message.of;
@@ -21,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,12 +27,11 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.MediaType;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.Transformer;
-import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
-import org.mule.runtime.core.privileged.event.PrivilegedEvent;
-import org.mule.runtime.core.privileged.transformer.ExtendedTransformationService;
-import org.mule.runtime.core.privileged.transformer.TransformersRegistry;
+import org.mule.runtime.core.internal.transformer.ExtendedTransformationService;
+import org.mule.runtime.core.internal.transformer.TransformersRegistry;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -53,7 +50,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
   public static final MediaType APPLICATION_XML_DEFAULT = APPLICATION_XML.withCharset(DEFAULT_ENCODING);
   public static final MediaType APPLICATION_XML_CUSTOM = APPLICATION_XML.withCharset(CUSTOM_ENCODING);
 
-  private final MuleContextWithRegistry muleContext = mock(MuleContextWithRegistry.class, RETURNS_DEEP_STUBS);
+  private final MuleContext muleContext = mock(MuleContext.class, RETURNS_DEEP_STUBS);
   private ExtendedTransformationService transformationService;
 
   @Before
@@ -122,7 +119,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
     DataType outputDataType = DataType.builder().type(Integer.class).mediaType(ANY).charset(DEFAULT_ENCODING).build();
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
-    when(transformer.transform(anyObject())).thenReturn(1);
+    when(transformer.transform(any())).thenReturn(1);
 
     CoreEvent muleEvent = mock(CoreEvent.class);
 
@@ -139,7 +136,7 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     when(transformer.isSourceDataTypeSupported(any())).thenReturn(true);
     DataType outputDataType = DataType.builder().type(Integer.class).charset(CUSTOM_ENCODING).build();
     when(transformer.getReturnDataType()).thenReturn(outputDataType);
-    when(transformer.transform(anyObject())).thenReturn(Integer.valueOf(1));
+    when(transformer.transform(any())).thenReturn(Integer.valueOf(1));
 
     CoreEvent muleEvent = mock(CoreEvent.class);
 
@@ -189,67 +186,12 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
 
     TransformersRegistry transformersRegistry = mock(TransformersRegistry.class);
     Transformer transformer = mock(Transformer.class);
-    when(transformer.transform(anyObject(), anyObject())).thenReturn(TEST_PAYLOAD);
+    when(transformer.transform(any(), any())).thenReturn(TEST_PAYLOAD);
     when(transformersRegistry.lookupTransformer(any(), any())).thenReturn(transformer);
 
     assertThat(message.getPayload().getDataType().getMediaType().getPrimaryType(), equalTo(APPLICATION_XML.getPrimaryType()));
     assertThat(message.getPayload().getDataType().getMediaType().getSubType(), equalTo(APPLICATION_XML.getSubType()));
     assertThat(message.getPayload().getDataType().getMediaType().getCharset().get(), equalTo(CUSTOM_ENCODING));
-  }
-
-  @Test
-  public void setsDefaultOutboundPropertyDataType() throws Exception {
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
-            .build();
-
-    assertDefaultOutboundPropertyDataType(message);
-  }
-
-  @Test
-  public void setsCustomOutboundPropertyDataType() throws Exception {
-    MediaType mediaType = APPLICATION_XML_CUSTOM;
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD)
-            .addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
-
-    assertOutboundPropertyDataType(message, DataType.builder().type(String.class).mediaType(mediaType).build());
-  }
-
-  @Test
-  public void setsDefaultOutboundScopePropertyDataType() throws Exception {
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD).addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD)
-            .build();
-
-    assertDefaultOutboundPropertyDataType(message);
-  }
-
-  @Test
-  public void setsDefaultInboundPropertyDataType() throws Exception {
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
-
-    assertDefaultInboundPropertyDataType(message);
-  }
-
-  @Test
-  public void setsCustomInboundPropertyDataType() throws Exception {
-    MediaType mediaType = APPLICATION_XML_CUSTOM;
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD)
-            .addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
-    assertInboundPropertyDataType(message, DataType.builder().type(String.class).mediaType(mediaType).build());
-  }
-
-  // TODO
-
-  @Test
-  public void setsDefaultInboundScopePropertyDataType() throws Exception {
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD).addInboundProperty(TEST_PROPERTY, TEST_PAYLOAD).build();
-
-    assertDefaultInboundPropertyDataType(message);
   }
 
   @Test
@@ -268,32 +210,6 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     assertVariableDataType(muleEvent, dataType);
   }
 
-  @Test
-  public void setsDefaultSessionVariableDataType() throws Exception {
-    ((PrivilegedEvent) testEvent()).getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD);
-
-    assertSessionVariableDataType(testEvent(), STRING);
-  }
-
-  @Test
-  public void setsCustomSessionVariableDataType() throws Exception {
-    DataType dataType = DataType.builder().type(String.class).mediaType(APPLICATION_XML).charset(CUSTOM_ENCODING).build();
-
-    ((PrivilegedEvent) testEvent()).getSession().setProperty(TEST_PROPERTY, TEST_PAYLOAD, dataType);
-
-    assertSessionVariableDataType(testEvent(), dataType);
-  }
-
-  @Test
-  public void setsCustomPropertyDataType() throws Exception {
-    MediaType mediaType = APPLICATION_XML_CUSTOM;
-    InternalMessage message =
-        InternalMessage.builder().value(TEST_PAYLOAD)
-            .addOutboundProperty(TEST_PROPERTY, TEST_PAYLOAD, mediaType).build();
-
-    assertOutboundPropertyDataType(message, DataType.builder(STRING).mediaType(mediaType).build());
-  }
-
   private void assertEmptyDataType(Message muleMessage) {
     assertThat(muleMessage.getPayload().getDataType().getMediaType().getCharset().isPresent(), is(false));
   }
@@ -310,31 +226,8 @@ public class MuleMessageDataTypePropagationTestCase extends AbstractMuleTestCase
     assertThat(muleMessage.getPayload().getDataType(), like(dataType));
   }
 
-  private void assertDefaultInboundPropertyDataType(InternalMessage muleMessage) {
-    assertInboundPropertyDataType(muleMessage, STRING);
-  }
-
-  private void assertDefaultOutboundPropertyDataType(InternalMessage muleMessage) {
-    assertOutboundPropertyDataType(muleMessage, STRING);
-  }
-
-  private void assertInboundPropertyDataType(InternalMessage muleMessage, DataType dataType) {
-    DataType actualDataType = muleMessage.getInboundPropertyDataType(TEST_PROPERTY);
-    assertThat(actualDataType, like(dataType));
-  }
-
-  private void assertOutboundPropertyDataType(InternalMessage muleMessage, DataType dataType) {
-    DataType actualDataType = muleMessage.getOutboundPropertyDataType(TEST_PROPERTY);
-    assertThat(actualDataType, like(dataType));
-  }
-
   private void assertVariableDataType(CoreEvent event, DataType dataType) {
     DataType actualDataType = event.getVariables().get(TEST_PROPERTY).getDataType();
-    assertThat(actualDataType, like(dataType));
-  }
-
-  private void assertSessionVariableDataType(CoreEvent event, DataType dataType) {
-    DataType actualDataType = ((PrivilegedEvent) event).getSession().getPropertyDataType(TEST_PROPERTY);
     assertThat(actualDataType, like(dataType));
   }
 }

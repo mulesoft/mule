@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,10 +8,13 @@ package org.mule.runtime.deployment.model.api.artifact;
 
 import static java.util.ServiceLoader.load;
 
+import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
+import org.mule.runtime.api.deployment.meta.MulePolicyModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.deployment.model.api.plugin.resolver.PluginDependenciesResolver;
+import org.mule.runtime.deployment.model.api.policy.PolicyTemplateDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.AbstractArtifactDescriptorFactory;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorFactory;
@@ -26,6 +29,7 @@ import org.mule.runtime.module.artifact.api.descriptor.DescriptorLoaderRepositor
  * 
  * @since 4.5
  */
+@NoImplement
 public interface ArtifactDescriptorFactoryProvider {
 
   LazyValue<ArtifactDescriptorFactoryProvider> INSTANCE =
@@ -70,4 +74,13 @@ public interface ArtifactDescriptorFactoryProvider {
    */
   AbstractArtifactDescriptorFactory<MulePluginModel, ArtifactPluginDescriptor> createArtifactPluginDescriptorFactory(DescriptorLoaderRepository descriptorLoaderRepository,
                                                                                                                      ArtifactDescriptorValidatorBuilder artifactDescriptorValidatorBuilder);
+
+  /**
+   * Creates a factory of descriptors for describing mule policy templates.
+   * 
+   * @return a factory to create {@link PolicyTemplateDescriptor}s.
+   * 
+   * @since 4.6
+   */
+  AbstractArtifactDescriptorFactory<MulePolicyModel, PolicyTemplateDescriptor> createPolicyTemplateDescriptorFactory();
 }

@@ -1,14 +1,17 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.runtime.core.internal.connection;
 
+import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.reflect.Proxy.newProxyInstance;
-import static org.mule.runtime.core.api.config.MuleDeploymentProperties.MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY;
+
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionHandler;
@@ -18,8 +21,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
+import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
-import org.mule.runtime.core.internal.retry.ReconnectionConfig;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 
 import java.lang.reflect.InvocationHandler;
@@ -34,11 +37,13 @@ import javax.inject.Inject;
  */
 public final class DelegateConnectionManagerAdapter implements ConnectionManagerAdapter {
 
-  private ConnectionManagerAdapter delegate;
+  private final MuleContext muleContext;
+  private final ConnectionManagerAdapter delegate;
   private ConnectionManagerAdapter connectionManagerAdapterStrategy;
 
   @Inject
   public DelegateConnectionManagerAdapter(MuleContext muleContext) {
+    this.muleContext = muleContext;
     delegate = new DefaultConnectionManager(muleContext);
     if (parseBoolean(muleContext.getDeploymentProperties().getProperty(MULE_LAZY_CONNECTIONS_DEPLOYMENT_PROPERTY, "false"))) {
       connectionManagerAdapterStrategy = new LazyConnectionManagerAdapter();
@@ -96,6 +101,12 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
   public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance)
       throws IllegalArgumentException {
     return connectionManagerAdapterStrategy.testConnectivity(configurationInstance);
+  }
+
+  @Override
+  public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+      throws IllegalArgumentException {
+    return connectionManagerAdapterStrategy.testConnectivity(configurationInstance, force);
   }
 
   @Override
@@ -177,8 +188,14 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
+    public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+        throws IllegalArgumentException {
+      return delegate.testConnectivity(configurationInstance, force);
+    }
+
+    @Override
     public void initialise() throws InitialisationException {
-      delegate.initialise();
+      initialiseIfNeeded(delegate, true, muleContext);
     }
 
     @Override
@@ -238,6 +255,16 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
     }
 
     @Override
+    public ConnectionValidationResult testConnectivity(ConfigurationInstance configurationInstance, boolean force)
+        throws IllegalArgumentException {
+      if (force) {
+        return delegate.testConnectivity(configurationInstance, force);
+      } else {
+        return ConnectionValidationResult.success();
+      }
+    }
+
+    @Override
     public boolean hasBinding(Object config) {
       return delegate.hasBinding(config);
     }
@@ -268,7 +295,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
     @Override
     public void initialise() throws InitialisationException {
-      delegate.initialise();
+      initialiseIfNeeded(delegate, true, muleContext);
     }
 
     @Override
@@ -284,7 +311,7 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
 
   class LazyInvocationHandler implements InvocationHandler {
 
-    private Object config;
+    private final Object config;
     private ConnectionHandler<Object> connection;
 
     public LazyInvocationHandler(Object config) {
@@ -299,7 +326,14 @@ public final class DelegateConnectionManagerAdapter implements ConnectionManager
         }
         return connection.getConnection();
       }
-      return method.invoke(connection, args);
+
+      // Avoid NPE when doing release or invalidate if connection wasn't obtained (for instance, because of an exception on
+      // delegate.getConnection())
+      if (connection != null) {
+        return method.invoke(connection, args);
+      } else {
+        return null;
+      }
     }
   }
 

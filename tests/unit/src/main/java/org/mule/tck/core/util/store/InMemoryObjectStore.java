@@ -1,19 +1,19 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
 package org.mule.tck.core.util.store;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.store.ObjectAlreadyExistsException;
 import org.mule.runtime.api.store.ObjectDoesNotExistException;
 import org.mule.runtime.api.store.ObjectStoreException;
+import org.mule.runtime.api.store.TemplateObjectStore;
 import org.mule.runtime.core.api.config.i18n.CoreMessages;
-import org.mule.runtime.core.internal.util.store.AbstractMonitoredObjectStore;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
  * entries. The bounded size is a <i>soft</i> limit and only enforced periodically by the expiry process; this means that the
  * store may temporarily exceed its maximum size between expiry runs, but will eventually shrink to its configured size.
  */
-public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitoredObjectStore<T> {
+public class InMemoryObjectStore<T extends Serializable> extends TemplateObjectStore<T> {
 
   protected final ConcurrentSkipListMap<Long, StoredObject<T>> store;
 
@@ -41,7 +41,7 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
   @Override
   protected boolean doContains(String key) throws ObjectStoreException {
     synchronized (store) {
-      return store.values().contains(new StoredObject<T>(key, null));
+      return store.values().contains(new StoredObject<>(key, null));
     }
   }
 
@@ -133,82 +133,82 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
     return store.values().stream().collect(toMap(StoredObject::getId, StoredObject::getItem));
   }
 
-  private int expireAndCount() {
-    // first we trim the store according to max size
-    int expiredEntries = 0;
-
-    final long now = System.nanoTime();
-
-    Map.Entry<?, ?> oldestEntry;
-
-    purge: while ((oldestEntry = store.firstEntry()) != null) {
-      Long oldestKey = (Long) oldestEntry.getKey();
-      long oldestKeyValue = oldestKey.longValue();
-
-      if (NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL) {
-        store.remove(oldestKey);
-        expiredEntries++;
-      } else {
-        break purge;
-      }
-    }
-
-    return expiredEntries;
-  }
-
-  private boolean isTrimNeeded(int currentSize) {
-    return currentSize > maxEntries;
-  }
-
-  private boolean isExpirationNeeded() {
-    // this is not guaranteed to be precise, but we don't mind
-    int currentSize = store.size();
-
-    // should expire further if entry TTLs are enabled
-    return entryTTL > 0 && currentSize != 0;
-  }
-
-  private int doTrimAndExpire() {
-    int expiredEntries = 0;
-
-    if (isTrimNeeded(store.size())) {
-      expiredEntries += trimToMaxSize(store.size());
-    }
-
-    if (isExpirationNeeded()) {
-      expiredEntries = trimToMaxSize(store.size());
-      expiredEntries += this.expireAndCount();
-    }
-    return expiredEntries;
-  }
-
-  @Override
-  public void expire() {
-    int expiredEntries = doTrimAndExpire();
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("Expired " + expiredEntries + " old entries");
-    }
-  }
-
-  private int trimToMaxSize(int currentSize) {
-    if (maxEntries < 0) {
-      return currentSize;
-    }
-
-    int excess = (currentSize - maxEntries);
-    if (excess > 0) {
-      while (currentSize > maxEntries) {
-        store.pollFirstEntry();
-        currentSize--;
-      }
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("Expired " + excess + " excess entries");
-      }
-    }
-    return excess;
-  }
+  // private int expireAndCount() {
+  // // first we trim the store according to max size
+  // int expiredEntries = 0;
+  //
+  // final long now = System.nanoTime();
+  //
+  // Map.Entry<?, ?> oldestEntry;
+  //
+  // purge: while ((oldestEntry = store.firstEntry()) != null) {
+  // Long oldestKey = (Long) oldestEntry.getKey();
+  // long oldestKeyValue = oldestKey.longValue();
+  //
+  // if (NANOSECONDS.toMillis(now - oldestKeyValue) >= entryTTL) {
+  // store.remove(oldestKey);
+  // expiredEntries++;
+  // } else {
+  // break purge;
+  // }
+  // }
+  //
+  // return expiredEntries;
+  // }
+  //
+  // private boolean isTrimNeeded(int currentSize) {
+  // return currentSize > maxEntries;
+  // }
+  //
+  // private boolean isExpirationNeeded() {
+  // // this is not guaranteed to be precise, but we don't mind
+  // int currentSize = store.size();
+  //
+  // // should expire further if entry TTLs are enabled
+  // return entryTTL > 0 && currentSize != 0;
+  // }
+  //
+  // private int doTrimAndExpire() {
+  // int expiredEntries = 0;
+  //
+  // if (isTrimNeeded(store.size())) {
+  // expiredEntries += trimToMaxSize(store.size());
+  // }
+  //
+  // if (isExpirationNeeded()) {
+  // expiredEntries = trimToMaxSize(store.size());
+  // expiredEntries += this.expireAndCount();
+  // }
+  // return expiredEntries;
+  // }
+  //
+  // @Override
+  // public void expire() {
+  // int expiredEntries = doTrimAndExpire();
+  //
+  // if (logger.isDebugEnabled()) {
+  // logger.debug("Expired " + expiredEntries + " old entries");
+  // }
+  // }
+  //
+  // private int trimToMaxSize(int currentSize) {
+  // if (maxEntries < 0) {
+  // return currentSize;
+  // }
+  //
+  // int excess = (currentSize - maxEntries);
+  // if (excess > 0) {
+  // while (currentSize > maxEntries) {
+  // store.pollFirstEntry();
+  // currentSize--;
+  // }
+  //
+  // if (logger.isDebugEnabled()) {
+  // logger.debug("Expired " + excess + " excess entries");
+  // }
+  // }
+  // return excess;
+  // }
 
   @Override
   public String toString() {
@@ -220,8 +220,8 @@ public class InMemoryObjectStore<T extends Serializable> extends AbstractMonitor
    */
   protected static class StoredObject<T> {
 
-    private String id;
-    private T item;
+    private final String id;
+    private final T item;
 
     StoredObject(String id, T item) {
       this.id = id;

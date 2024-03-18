@@ -1,41 +1,38 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.api;
 
-import static java.lang.Thread.currentThread;
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider.discoverRuntimeExtensionModels;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
+import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_DESCRIPTIONS_ENRICHMENT;
+
+import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.extension.ExtensionManager;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 import org.mule.runtime.core.api.util.func.CheckedRunnable;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.extension.api.manager.DefaultExtensionManagerFactory;
 import org.mule.runtime.module.extension.api.manager.ExtensionManagerFactory;
 
-import com.google.common.collect.ImmutableSet;
-
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+
+import com.google.common.collect.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,9 +130,11 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
               Map<String, Object> attributes = new HashMap<>();
               attributes.putAll(finder.getParams());
               attributes.putAll(extensionLoadingContextParameters);
+              attributes.put(DISABLE_DESCRIPTIONS_ENRICHMENT, Boolean.TRUE);
               ExtensionModel extension =
-                  finder.getLoader().loadExtensionModel(classLoader, getDefault(ImmutableSet.copyOf(extensionModels)),
-                                                        attributes);
+                  finder.getLoader().loadExtensionModel(builder(classLoader, getDefault(ImmutableSet.copyOf(extensionModels)))
+                      .addParameters(attributes)
+                      .build());
               extensionModels.add(extension);
             } else {
               LOGGER
@@ -154,11 +153,6 @@ public class IsolatedClassLoaderExtensionsManagerConfigurationBuilder extends Ab
   }
 
   private List<ExtensionModel> loadRuntimeExtensionModels() {
-    return new SpiServiceRegistry()
-        .lookupProviders(RuntimeExtensionModelProvider.class, currentThread().getContextClassLoader())
-        .stream()
-        .map(RuntimeExtensionModelProvider::createExtensionModel)
-        .filter(Objects::nonNull)
-        .collect(toList());
+    return new ArrayList<>(discoverRuntimeExtensionModels());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -26,6 +26,7 @@ import org.mule.runtime.extension.internal.loader.xml.enricher.StereotypesDiscov
 import org.mule.runtime.extension.internal.loader.xml.validator.CorrectPrefixesValidator;
 import org.mule.runtime.extension.internal.loader.xml.validator.ForbiddenConfigurationPropertiesValidator;
 import org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator;
+import org.mule.runtime.extension.internal.loader.xml.validator.InnerConnectionParametersAsConnectionParameters;
 import org.mule.runtime.extension.internal.loader.xml.validator.TestConnectionValidator;
 
 import java.util.List;
@@ -45,7 +46,8 @@ public class XmlExtensionModelLoader extends ExtensionModelLoader {
   private final List<ExtensionModelValidator> customValidators = unmodifiableList(asList(new CorrectPrefixesValidator(),
                                                                                          new GlobalElementNamesValidator(),
                                                                                          new ForbiddenConfigurationPropertiesValidator(),
-                                                                                         new TestConnectionValidator()));
+                                                                                         new TestConnectionValidator(),
+                                                                                         new InnerConnectionParametersAsConnectionParameters()));
 
   /**
    * Attribute to look for in the parametrized attributes picked up from the descriptor.

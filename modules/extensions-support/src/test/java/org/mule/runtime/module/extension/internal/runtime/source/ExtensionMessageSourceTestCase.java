@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -8,16 +8,15 @@ package org.mule.runtime.module.extension.internal.runtime.source;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.COMPUTE_CONNECTION_ERRORS_IN_STATS_PROPERTY;
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.FAIL;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogMessage;
-import static org.mule.runtime.core.privileged.util.LoggingTestUtils.verifyLogRegex;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogMessage;
+import static org.mule.runtime.core.internal.logger.LoggingTestUtils.verifyLogRegex;
 import static org.mule.tck.probe.PollingProber.checkNot;
 import static org.mule.test.heisenberg.extension.exception.HeisenbergConnectionExceptionEnricher.ENRICHED_MESSAGE;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.mockExceptionEnricher;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.of;
 import static java.util.concurrent.TimeUnit.SECONDS;
-
-import javax.resource.spi.work.Work;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getThrowables;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
@@ -46,6 +45,7 @@ import static org.slf4j.event.Level.ERROR;
 import static org.slf4j.event.Level.INFO;
 
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Disposable;
@@ -65,6 +65,7 @@ import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
 import org.mule.runtime.core.internal.logger.CustomLogger;
 import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
+import org.mule.sdk.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.sdk.api.runtime.exception.ExceptionHandler;
 import org.mule.sdk.api.runtime.source.Source;
 import org.mule.sdk.api.runtime.source.SourceCallback;
@@ -78,16 +79,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+
 import org.mockito.InOrder;
-import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 @RunWith(Parameterized.class)
 public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSourceTestCase {
@@ -147,7 +150,7 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     }).when(source).onStart(sourceCallback);
 
     doAnswer(invocation -> {
-      ((Work) invocation.getArguments()[0]).run();
+      ((Runnable) invocation.getArguments()[0]).run();
       return null;
     }).when(cpuLightScheduler).execute(any());
 
@@ -321,6 +324,20 @@ public class ExtensionMessageSourceTestCase extends AbstractExtensionMessageSour
     messageSource.initialise();
     messageSource.start();
     messageSource.onException(new ConnectionException(ERROR_MESSAGE));
+
+    new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
+      verify(source, times(2)).onStart(sourceCallback);
+      verify(source, times(1)).onStop();
+      return true;
+    }));
+  }
+
+  @Test
+  public void failOnExceptionWithAccessTokenExpiredExceptionInConnectionExceptionAndGetsReconnected() throws Exception {
+    messageSource.initialise();
+    messageSource.start();
+    when(configurationInstance.getConnectionProvider()).thenReturn(of(mock(ConnectionProvider.class)));
+    messageSource.onException(new ConnectionException(new AccessTokenExpiredException(ERROR_MESSAGE)));
 
     new PollingProber(TEST_TIMEOUT, TEST_POLL_DELAY).check(new JUnitLambdaProbe(() -> {
       verify(source, times(2)).onStart(sourceCallback);

@@ -1,26 +1,30 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.test.runner.api;
 
-import static org.mule.maven.client.internal.util.VersionChecker.areCompatibleVersions;
-import static org.mule.maven.client.internal.util.VersionChecker.isHighestVersion;
-import static org.mule.runtime.api.util.Preconditions.checkNotNull;
+import static org.mule.runtime.api.util.MuleSystemProperties.classloaderContainerJpmsModuleLayer;
+import static org.mule.runtime.core.api.util.FileUtils.unzip;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 import static org.mule.test.runner.api.ArtifactClassificationType.APPLICATION;
 import static org.mule.test.runner.api.ArtifactClassificationType.MODULE;
 import static org.mule.test.runner.api.ArtifactClassificationType.PLUGIN;
 import static org.mule.test.runner.api.ArtifactClassificationType.SERVICE;
 import static org.mule.test.runner.utils.RunnerModuleUtils.JAR_EXTENSION;
+import static org.mule.test.runner.utils.RunnerModuleUtils.RUNNER_PROPERTIES_MULE_VERSION;
 import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkApiArtifact;
+import static org.mule.test.runner.utils.RunnerModuleUtils.getDefaultSdkCompatibilityApiArtifact;
 
 import static java.lang.String.format;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Paths.get;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -28,6 +32,7 @@ import static java.util.stream.Collectors.toList;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.apache.commons.lang3.StringUtils.endsWithIgnoreCase;
 import static org.eclipse.aether.util.artifact.ArtifactIdUtils.toId;
@@ -39,6 +44,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.andFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 
+import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
@@ -49,14 +55,16 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,6 +74,8 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import com.vdurmont.semver4j.Semver;
+import com.vdurmont.semver4j.SemverException;
 
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.eclipse.aether.artifact.Artifact;
@@ -99,7 +109,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 4.0
  */
-public class AetherClassPathClassifier implements ClassPathClassifier {
+public class AetherClassPathClassifier implements ClassPathClassifier, AutoCloseable {
 
   private static final String POM = "pom";
   private static final String POM_XML = POM + ".xml";
@@ -117,6 +127,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
 
+  private static final Set<String> JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST =
+      new HashSet<>(asList("xml-apis:xml-apis"));
+
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private final VersionScheme versionScheme = new GenericVersionScheme();
@@ -126,17 +139,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
   private final DependencyResolver dependencyResolver;
   private final ArtifactClassificationTypeResolver artifactClassificationTypeResolver;
   private final PluginResourcesResolver pluginResourcesResolver = new PluginResourcesResolver();
-  private final ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver();
-
-  static String getMuleVersion() {
-    try {
-      Properties properties = new Properties();
-      properties.load(AetherClassPathClassifier.class.getResourceAsStream("/runner.properties"));
-      return properties.getProperty("mule.version");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /**
    * Creates an instance of the classifier.
@@ -146,13 +148,13 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   public AetherClassPathClassifier(DependencyResolver dependencyResolver,
                                    ArtifactClassificationTypeResolver artifactClassificationTypeResolver) {
-    checkNotNull(dependencyResolver, "dependencyResolver cannot be null");
-    checkNotNull(artifactClassificationTypeResolver, "artifactClassificationTypeResolver cannot be null");
+    requireNonNull(dependencyResolver, "dependencyResolver cannot be null");
+    requireNonNull(artifactClassificationTypeResolver, "artifactClassificationTypeResolver cannot be null");
 
     this.dependencyResolver = dependencyResolver;
     this.artifactClassificationTypeResolver = artifactClassificationTypeResolver;
 
-    muleVersion = getMuleVersion();
+    muleVersion = RUNNER_PROPERTIES_MULE_VERSION;
   }
 
   /**
@@ -164,7 +166,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    */
   @Override
   public ArtifactsUrlClassification classify(final ClassPathClassifierContext context) {
-    checkNotNull(context, "context cannot be null");
+    requireNonNull(context, "context cannot be null");
 
     logger.info("Running dependencies classification on: '{}' in order to build Mule class loaders", context.getRootArtifact());
 
@@ -207,14 +209,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .map(pluginUrlClassification -> pluginUrlClassification.getArtifactId()).collect(toList()));
     }
 
-    List<ArtifactUrlClassification> serviceUrlClassifications =
+    List<ServiceUrlClassification> serviceUrlClassifications =
         buildServicesUrlClassification(context, directDependencies, rootArtifactType, remoteRepositories);
     if (logger.isDebugEnabled()) {
       logger.debug("Resolved services: {}", serviceUrlClassifications.stream()
-          .map(serviceUrlClassification -> serviceUrlClassification.getArtifactId()).collect(toList()));
+          .map(serviceUrlClassification -> serviceUrlClassification.getName()).collect(toList()));
     }
 
-    List<URL> containerUrls =
+    Pair<List<URL>, List<URL>> containerUrls =
         buildContainerUrlClassification(context, directDependencies, applicationSharedLibArtifactUrlClassifications,
                                         serviceUrlClassifications, pluginUrlClassifications, rootArtifactType,
                                         remoteRepositories);
@@ -227,8 +229,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     resolveSnapshotVersionsToTimestampedFromClassPath(applicationSharedLibUrls, context.getClassPathURLs());
 
-    return new ArtifactsUrlClassification(containerUrls, serviceUrlClassifications, testRunnerLibUrls, applicationLibUrls,
-                                          applicationSharedLibUrls, pluginUrlClassifications, testRunnerExportedLibUrls);
+    return new ArtifactsUrlClassification(containerUrls.getFirst(),
+                                          containerUrls.getSecond(),
+                                          serviceUrlClassifications,
+                                          testRunnerLibUrls,
+                                          applicationLibUrls,
+                                          applicationSharedLibUrls,
+                                          pluginUrlClassifications,
+                                          testRunnerExportedLibUrls);
   }
 
   /**
@@ -242,10 +250,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact.
    * @return a {@link List} of {@link ArtifactUrlClassification}s that would be the one used for the plugins class loaders.
    */
-  private List<ArtifactUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
-                                                                         final List<Dependency> directDependencies,
-                                                                         ArtifactClassificationType rootArtifactType,
-                                                                         final List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private List<ServiceUrlClassification> buildServicesUrlClassification(final ClassPathClassifierContext context,
+                                                                        final List<Dependency> directDependencies,
+                                                                        ArtifactClassificationType rootArtifactType,
+                                                                        final List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<ArtifactClassificationNode> servicesClassified = newArrayList();
 
     final Predicate<Dependency> muleServiceClassifiedDependencyFilter =
@@ -265,9 +273,9 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     }
 
     serviceArtifactsDeclared.stream()
-        .forEach(serviceArtifact -> buildPluginUrlClassification(serviceArtifact, context,
-                                                                 nestedServicesClassifier, servicesClassified,
-                                                                 rootArtifactRemoteRepositories));
+        .forEach(serviceArtifact -> buildServiceUrlClassification(serviceArtifact, context,
+                                                                  nestedServicesClassifier, servicesClassified,
+                                                                  rootArtifactRemoteRepositories));
 
     return toServiceUrlClassification(resolveArtifactsUsingSemanticVersioning(servicesClassified));
 
@@ -300,8 +308,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           try {
             return new ArtifactUrlClassification(ArtifactIdUtils
                 .toId(pluginSharedLibDependency.getArtifact()),
-                                                 pluginSharedLibDependency.getArtifact()
-                                                     .getArtifactId(),
+                                                 pluginSharedLibDependency.getArtifact(),
                                                  Lists.newArrayList(dependencyResolver
                                                      .resolveArtifact(pluginSharedLibDependency.getArtifact(),
                                                                       rootArtifactRemoteRepositories)
@@ -393,15 +400,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param pluginUrlClassifications       {@link PluginUrlClassification}s to check if rootArtifact was classified as plugin
    * @param rootArtifactType               {@link ArtifactClassificationType} for rootArtifact
    * @param rootArtifactRemoteRepositories remote repositories defined at the rootArtifact
-   * @return {@link List} of {@link URL}s for the container class loader
+   * @return a {@link Pair} with {@link List}s of {@link URL}s for the container class loader. First are mule jar urls, second are
+   *         jar urls for third parties.
    */
-  private List<URL> buildContainerUrlClassification(ClassPathClassifierContext context,
-                                                    List<Dependency> directDependencies,
-                                                    List<ArtifactUrlClassification> applicationSharedLibUrls,
-                                                    List<ArtifactUrlClassification> serviceUrlClassifications,
-                                                    List<PluginUrlClassification> pluginUrlClassifications,
-                                                    ArtifactClassificationType rootArtifactType,
-                                                    List<RemoteRepository> rootArtifactRemoteRepositories) {
+  private Pair<List<URL>, List<URL>> buildContainerUrlClassification(ClassPathClassifierContext context,
+                                                                     List<Dependency> directDependencies,
+                                                                     List<ArtifactUrlClassification> applicationSharedLibUrls,
+                                                                     List<ServiceUrlClassification> serviceUrlClassifications,
+                                                                     List<PluginUrlClassification> pluginUrlClassifications,
+                                                                     ArtifactClassificationType rootArtifactType,
+                                                                     List<RemoteRepository> rootArtifactRemoteRepositories) {
     directDependencies = directDependencies.stream()
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
         .filter(dependency -> {
@@ -416,9 +424,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                   // Plugins may have ended up with a highest version due to transitive dependencies... therefore comparing
                   // without version
                   .anyMatch(artifactUrlClassification -> artifactUrlClassification.getArtifactId()
-                      .equals(toVersionlessId(artifact)))
-              && !applicationSharedLibUrls.stream()
-                  .anyMatch(applicationSharedLibUrl -> applicationSharedLibUrl.getArtifactId().equals(artifactId)));
+                      .equals(toVersionlessId(artifact))));
         })
         .map(depToTransform -> depToTransform.setScope(COMPILE))
         .collect(toList());
@@ -431,6 +437,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
     directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
+    directDependencies.add(new Dependency(getDefaultSdkCompatibilityApiArtifact(), COMPILE));
 
     logger.debug("Selected direct dependencies to be used for resolving container dependency graph (changed to compile in " +
         "order to resolve the graph): {}", directDependencies);
@@ -458,15 +465,24 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
 
     final DependencyFilter dependencyFilter = new PatternExclusionsDependencyFilter(excludedFilterPattern);
 
-    List<URL> containerUrls;
+    List<URL> containerMuleUrls;
+    List<URL> containerOptUrls;
     try {
-      containerUrls = toUrl(dependencyResolver.resolveDependencies(null, directDependencies, managedDependencies,
-                                                                   dependencyFilter,
-                                                                   rootArtifactRemoteRepositories));
+      final Pair<List<File>, List<File>> resolvedDependencies =
+          dependencyResolver.resolveContainerDependencies(null, directDependencies, managedDependencies,
+                                                          dependencyFilter,
+                                                          rootArtifactRemoteRepositories);
+      containerMuleUrls = toUrl(resolvedDependencies.getFirst());
+      containerOptUrls = toUrl(resolvedDependencies.getSecond());
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for Container", e);
     }
-    containerUrls = containerUrls.stream().filter(url -> {
+    containerMuleUrls = containerMuleUrls.stream().filter(url -> {
+      String file = toFile(url).getAbsolutePath();
+      return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
+                                                                                                                  ZIP_EXTENSION));
+    }).collect(toList());
+    containerOptUrls = containerOptUrls.stream().filter(url -> {
       String file = toFile(url).getAbsolutePath();
       return !(endsWithIgnoreCase(file, POM_XML) || endsWithIgnoreCase(file, POM_EXTENSION) || endsWithIgnoreCase(file,
                                                                                                                   ZIP_EXTENSION));
@@ -478,12 +494,12 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
         throw new IllegalStateException("rootArtifact (" + context.getRootArtifact()
             + ") identified as MODULE but doesn't have an output");
       }
-      containerUrls.add(0, toUrl(rootArtifactOutputFile));
+      containerMuleUrls.add(0, toUrl(rootArtifactOutputFile));
     }
 
-    resolveSnapshotVersionsToTimestampedFromClassPath(containerUrls, context.getClassPathURLs());
+    resolveSnapshotVersionsToTimestampedFromClassPath(containerMuleUrls, context.getClassPathURLs());
 
-    return containerUrls;
+    return new Pair<>(containerMuleUrls, containerOptUrls);
   }
 
   /**
@@ -549,10 +565,16 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @return {@link Predicate} for selecting direct dependencies for the Container.
    */
   private Predicate<Dependency> getContainerDirectDependenciesFilter(ArtifactClassificationType rootArtifactType) {
-    return rootArtifactType.equals(MODULE)
-        ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
-        : directDep -> directDep.getScope().equals(PROVIDED)
-            || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER);
+    Predicate<Dependency> xmlApisInContainer = classloaderContainerJpmsModuleLayer()
+        ? directDep -> !JPMS_CONTAINER_ARTIFACT_COORDINATES_DENYLIST
+            .contains(directDep.getArtifact().getGroupId() + ":" + directDep.getArtifact().getArtifactId())
+        : directDep -> true;
+
+    return xmlApisInContainer
+        .and(rootArtifactType.equals(MODULE)
+            ? directDep -> directDep.getScope().equals(PROVIDED) || directDep.getScope().equals(COMPILE)
+            : directDep -> directDep.getScope().equals(PROVIDED)
+                || directDep.getArtifact().getClassifier().equals(MULE_PLUGIN_CLASSIFIER));
   }
 
   /**
@@ -672,11 +694,14 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
    * @param classificationNodes the fat object classified that needs to be transformed
    * @return {@link ArtifactsUrlClassification}
    */
-  private List<ArtifactUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
+  private List<ServiceUrlClassification> toServiceUrlClassification(Collection<ArtifactClassificationNode> classificationNodes) {
+    ServiceResourcesResolver serviceResourcesResolver = new ServiceResourcesResolver(classificationNodes);
+
     return classificationNodes.stream().map(node -> {
       final String versionLessId = toVersionlessId(node.getArtifact());
       return serviceResourcesResolver
-          .resolveServiceResourcesFor(new ArtifactUrlClassification(versionLessId, node.getArtifact().getArtifactId(),
+          .resolveServiceResourcesFor(new ArtifactUrlClassification(versionLessId,
+                                                                    node.getArtifact(),
                                                                     node.getUrls()));
     }).collect(toList());
   }
@@ -734,7 +759,62 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                             Predicate<Dependency> directDependenciesFilter,
                                             List<ArtifactClassificationNode> artifactsClassified,
                                             List<RemoteRepository> rootArtifactRemoteRepositories) {
+    List<URL> urls = resolveUrls(artifactToClassify, context, rootArtifactRemoteRepositories);
 
+    buildClassification(artifactToClassify, context, directDependenciesFilter, artifactsClassified,
+                        rootArtifactRemoteRepositories, urls);
+  }
+
+  /**
+   * Classifies a service {@link Artifact}, taking into account its contained {@code lib} folder rather than its Maven
+   * dependencies.
+   *
+   * @param artifactToClassify             {@link Artifact} that represents the artifact to be classified
+   * @param context                        {@link ClassPathClassifierContext} with settings for the classification process
+   * @param artifactsClassified            {@link Map} that contains already classified plugins
+   * @param rootArtifactRemoteRepositories remote repositories defined at the root artifact.
+   */
+  private void buildServiceUrlClassification(Artifact artifactToClassify, ClassPathClassifierContext context,
+                                             Predicate<Dependency> directDependenciesFilter,
+                                             List<ArtifactClassificationNode> artifactsClassified,
+                                             List<RemoteRepository> rootArtifactRemoteRepositories) {
+    // Unpack the service because java doesn't allow to create a classloader with jars within a zip out of the box.
+    File serviceExplodedDir;
+    try {
+      serviceExplodedDir = createTempDirectory(artifactToClassify.getArtifactId()).toFile();
+    } catch (IOException e) {
+      throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
+                                      e);
+    }
+
+    URL serviceBundleUrl = resolveUrls(artifactToClassify, context, rootArtifactRemoteRepositories).get(0);
+
+    try {
+      unzip(get(serviceBundleUrl.toURI()).toFile(), serviceExplodedDir);
+    } catch (IOException | URISyntaxException e) {
+      throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
+                                      e);
+    }
+
+    List<URL> serviceUrls = new ArrayList<>();
+    try {
+      serviceUrls.add(serviceExplodedDir.toURI().toURL());
+    } catch (MalformedURLException e) {
+      throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
+                                      e);
+    }
+
+    ArtifactClassificationNode artifactUrlClassification = new ArtifactClassificationNode(artifactToClassify,
+                                                                                          serviceUrls,
+                                                                                          emptyList(),
+                                                                                          emptyList());
+
+    logger.debug("Artifact discovered: {}", toId(artifactUrlClassification.getArtifact()));
+    artifactsClassified.add(artifactUrlClassification);
+  }
+
+  private List<URL> resolveUrls(Artifact artifactToClassify, ClassPathClassifierContext context,
+                                List<RemoteRepository> rootArtifactRemoteRepositories) {
     List<URL> urls;
     try {
       final DependencyFilter dependencyFilter = andFilter(classpathFilter(COMPILE),
@@ -742,14 +822,22 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
                                                           orFilter(new PatternExclusionsDependencyFilter("*:*:*:"
                                                               + MULE_PLUGIN_CLASSIFIER + ":*"),
                                                                    new PatternInclusionsDependencyFilter(toId(artifactToClassify))));
-      urls = toUrl(dependencyResolver.resolveDependencies(new Dependency(artifactToClassify, COMPILE),
-                                                          emptyList(), emptyList(),
-                                                          dependencyFilter, rootArtifactRemoteRepositories));
+      final List<File> resolvedDependencies =
+          dependencyResolver.resolveDependencies(new Dependency(artifactToClassify, COMPILE),
+                                                 emptyList(), emptyList(),
+                                                 dependencyFilter, rootArtifactRemoteRepositories);
+      urls = toUrl(resolvedDependencies);
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for artifact: '" + artifactToClassify + "' classification",
                                       e);
     }
+    return urls;
+  }
 
+  private void buildClassification(Artifact artifactToClassify, ClassPathClassifierContext context,
+                                   Predicate<Dependency> directDependenciesFilter,
+                                   List<ArtifactClassificationNode> artifactsClassified,
+                                   List<RemoteRepository> rootArtifactRemoteRepositories, List<URL> urls) {
     List<Dependency> directDependencies;
     List<ArtifactClassificationNode> artifactDependencies = newArrayList();
     try {
@@ -1080,8 +1168,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
           .resolveDependencies(rootTestDependency, directDependencies, managedDependencies,
                                orFilter(dependencyFilter, new PatternExclusionsDependencyFilter(exclusionsPatterns)),
                                rootArtifactRemoteRepositories);
-      appFiles
-          .addAll(urls);
+      appFiles.addAll(urls);
     } catch (Exception e) {
       throw new IllegalStateException("Couldn't resolve dependencies for application '" + context.getRootArtifact()
           + "' classification", e);
@@ -1239,4 +1326,39 @@ public class AetherClassPathClassifier implements ClassPathClassifier {
     return urlOpt.orElse(null);
   }
 
+  //////////////
+  // From VersionChecker
+
+  public static boolean areCompatibleVersions(String version1, String version2) {
+    return getSemver(version1).getMajor().equals(getSemver(version2).getMajor());
+  }
+
+  public static String getHighestVersion(String version1, String version2) {
+    final Semver semver1 = new Semver(version1, LOOSE);
+    final Semver semver2 = new Semver(version2, LOOSE);
+    return semver1.isGreaterThan(semver2) ? semver1.getOriginalValue() : semver2.getOriginalValue();
+  }
+
+  public static boolean isHighestVersion(String version1, String version2) {
+    final Semver semver1 = new Semver(version1, LOOSE);
+    final Semver semver2 = new Semver(version2, LOOSE);
+    return semver1.isGreaterThan(semver2);
+  }
+
+  private static Semver getSemver(String version) {
+    try {
+      return new Semver(version, LOOSE);
+    } catch (SemverException e) {
+      throw new IllegalArgumentException(
+                                         format("Unable to parse version %s, version is not following semantic versioning",
+                                                version),
+                                         e);
+    }
+  }
+
+  @Override
+  public void close() throws Exception {
+    dependencyResolver.close();
+    artifactClassificationTypeResolver.close();
+  }
 }

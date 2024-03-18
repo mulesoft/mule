@@ -1,19 +1,21 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-
 package org.mule.runtime.module.artifact.api.descriptor;
 
-import static java.io.File.separator;
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_FOLDER;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+
+import static java.io.File.separator;
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.api.annotation.NoExtend;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.deployment.meta.AbstractMuleArtifactModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
@@ -44,6 +46,7 @@ import org.slf4j.Logger;
  * @since 4.0
  */
 @NoInstantiate
+@NoExtend
 public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleArtifactModel, T extends ArtifactDescriptor>
     implements ArtifactDescriptorFactory<T> {
 
@@ -71,6 +74,7 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
         .validateMinMuleVersion()
         .validateMuleProduct()
         .validateVersionFormat()
+        .validateSupportedJavaVersions()
         .build();
   }
 
@@ -187,9 +191,9 @@ public abstract class AbstractArtifactDescriptorFactory<M extends AbstractMuleAr
     }
   }
 
-  private ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
-                                                               MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
-                                                               BundleDescriptor bundleDescriptor) {
+  protected ClassLoaderConfiguration getClassLoaderConfiguration(File artifactFolder, Optional<Properties> deploymentProperties,
+                                                                 MuleArtifactLoaderDescriptor classLoaderModelLoaderDescriptor,
+                                                                 BundleDescriptor bundleDescriptor) {
     ClassLoaderConfigurationLoader classLoaderConfigurationLoader;
     try {
       classLoaderConfigurationLoader =

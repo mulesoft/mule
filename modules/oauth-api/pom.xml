@@ -4,13 +4,17 @@
     <parent>
         <groupId>org.mule.runtime</groupId>
         <artifactId>mule-modules</artifactId>
-        <version>4.6.0-SNAPSHOT</version>
+        <version>4.7.0-SNAPSHOT</version>
     </parent>
     <artifactId>mule-service-oauth-api</artifactId>
+    <description>Mule service that provides OAuth authentication support</description>
     
     <properties>
+        <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>1.2.0-SNAPSHOT</muleOAuthClientVersion>
+        <muleOAuthClientVersion>2.2.0-SNAPSHOT</muleOAuthClientVersion>
+        <!-- because this module requires transitive org.mule.oauth.client.api -->
+        <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>
 
     <dependencies>
@@ -21,8 +25,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.mule.commons</groupId>
-            <artifactId>mule-oauth-client</artifactId>
+            <artifactId>mule-oauth-client-api</artifactId>
             <version>${muleOAuthClientVersion}</version>
         </dependency>
     </dependencies>
