@@ -87,16 +87,16 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
         </dependency>
-        <!-- Added back because this was brought transitively by okio-->
+<!--         Added back because this was brought transitively by okio-->
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
         <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-core</artifactId>
-        </dependency>
+            <groupId>io.helidon.grpc</groupId>
+            <artifactId>io.grpc</artifactId></dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
@@ -133,17 +133,22 @@
         <dependency>
             <groupId>com.linecorp.armeria</groupId>
             <artifactId>armeria-junit4</artifactId>
+            <version>1.20.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.linecorp.armeria</groupId>
             <artifactId>armeria-grpc</artifactId>
+            <version>1.20.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-proto</artifactId>
+            <version>0.17.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
 </project>
