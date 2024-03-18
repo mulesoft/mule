@@ -87,16 +87,15 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp-common</artifactId>
         </dependency>
-<!--         Added back because this was brought transitively by okio-->
+        <!-- Added back because this was brought transitively by okio-->
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio-jvm</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <!-- Workaround for split package in grpc https://github.com/grpc/grpc-java/issues/3522#issuecomment-542987101 -->
         <dependency>
-            <groupId>io.helidon.grpc</groupId>
-            <artifactId>io.grpc</artifactId></dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-core</artifactId></dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-core</artifactId>
