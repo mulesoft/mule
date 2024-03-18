@@ -24,9 +24,6 @@ module org.mule.boot.api {
       com.mulesoft.mule.boot,
       com.mulesoft.mule.runtime.plugin; // container layer!
 
-  // Needed by the MuleLog4jConfigurer
-  requires org.mule.runtime.boot.log4j;
-
   // Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader
   requires org.mule.runtime.jpms.utils;
 
@@ -34,11 +31,13 @@ module org.mule.boot.api {
   requires org.mule.runtime.logging;
 
   requires org.apache.commons.cli;
+  requires org.slf4j;
 
   uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 
   // Required to programmatically propagate accessibility by JpmsUtils
   opens org.mule.runtime.module.boot.internal to
       org.mule.runtime.jpms.utils;
+  opens org.mule.runtime.module.boot.api to org.mule.runtime.jpms.utils;
 
 }

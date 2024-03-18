@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.boot.internal;
 
-import static org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory.createAndInstall;
 
 import static java.lang.System.getProperty;
+
+import org.mule.runtime.module.boot.api.MuleLog4jContextFactoryConfigurator;
 
 /**
  * A {@link BootstrapConfigurer} that configures the log4j factory.
@@ -22,7 +23,7 @@ public class MuleLog4jConfigurer implements BootstrapConfigurer {
   @Override
   public boolean configure() throws BootstrapConfigurationException {
     if (getProperty(MULE_SIMPLE_LOG) == null) {
-      createAndInstall();
+      MuleLog4jContextFactoryConfigurator.load(this.getClass().getClassLoader()).createAndLoggerInstall();
     }
     return true;
   }
