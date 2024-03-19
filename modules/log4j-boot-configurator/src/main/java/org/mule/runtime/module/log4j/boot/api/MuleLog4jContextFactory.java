@@ -89,7 +89,7 @@ public class MuleLog4jContextFactory extends Log4jContextFactory
   }
 
   @Override
-  public void createAndLoggerInstall() {
+  public void createAndInstallLogger() {
     createAndInstall();
   }
 

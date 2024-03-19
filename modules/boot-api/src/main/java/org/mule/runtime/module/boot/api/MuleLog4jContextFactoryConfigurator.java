@@ -9,9 +9,16 @@ package org.mule.runtime.module.boot.api;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+/**
+ * Helps configuration of the log4j factory.
+ * Implementations will be discovered through SPI.
+ */
 public interface MuleLog4jContextFactoryConfigurator {
 
-  void createAndLoggerInstall();
+  /**
+   * Encapsulation of org.mule.runtime.module.log4j.boot.api.MuleLog4jContextFactory#createAndInstall()
+   */
+  void createAndInstallLogger();
 
   static MuleLog4jContextFactoryConfigurator load(ClassLoader classLoader) {
     ServiceLoader<MuleLog4jContextFactoryConfigurator> factories =

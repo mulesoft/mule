@@ -13,6 +13,8 @@
  */
 module org.mule.runtime.boot.log4j {
 
+  requires org.mule.boot.api;
+
   // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 
@@ -22,5 +24,4 @@ module org.mule.runtime.boot.log4j {
 
   requires transitive org.apache.logging.log4j;
   requires org.slf4j;
-  requires org.mule.boot.api;
 }
