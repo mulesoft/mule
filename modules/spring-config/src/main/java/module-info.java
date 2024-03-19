@@ -19,6 +19,7 @@ module org.mule.runtime.spring.config {
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.artifact.declaration;
   requires org.mule.runtime.dsl.api;
+  requires org.mule.runtime.errors;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.metadata.model.java;

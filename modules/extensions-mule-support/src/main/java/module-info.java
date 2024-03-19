@@ -16,6 +16,7 @@ module org.mule.runtime.extensions.mule.support {
 
   requires org.mule.runtime.api;
   requires org.mule.runtime.metadata.model.api;
+  requires org.mule.runtime.errors;
   requires org.mule.runtime.metadata.model.java;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.dsl.api;

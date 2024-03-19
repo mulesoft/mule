@@ -57,6 +57,11 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-runtime-extension-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
             <artifactId>mule-extensions-mime-types</artifactId>
             <version>${muleExtensionsApiVersion}</version>
         </dependency>
