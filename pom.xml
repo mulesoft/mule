@@ -277,6 +277,7 @@
         <xmlUnitVersion>1.6</xmlUnitVersion>
         <assertJVersion>3.5.2</assertJVersion>
         <byteBuddyVersion>1.14.0</byteBuddyVersion>
+        <wireMockVersion>2.27.2</wireMockVersion>
         <jettyVersion>9.4.53.v20231009</jettyVersion>
     </properties>
 
@@ -345,6 +346,11 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mule.skyscreamer</groupId>
+                <artifactId>jsonassert</artifactId>
+                <version>${jsonassert.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitilityVersion}</version>
@@ -400,6 +406,22 @@
                 <version>${ftpServerVersion}</version>
             </dependency>
             <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>${wireMockVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock-standalone</artifactId>
+                <version>${wireMockVersion}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jettyVersion}</version>
@@ -409,6 +431,26 @@
                         <artifactId>javax.servlet</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jettyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-continuation</artifactId>
+                <version>${jettyVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.sshd</groupId>
