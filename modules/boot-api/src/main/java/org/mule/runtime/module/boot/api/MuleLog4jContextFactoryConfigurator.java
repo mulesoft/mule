@@ -10,8 +10,7 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 /**
- * Helps configuration of the log4j factory.
- * Implementations will be discovered through SPI.
+ * Helps configuration of the log4j factory. Implementations will be discovered through SPI.
  */
 public interface MuleLog4jContextFactoryConfigurator {
 
