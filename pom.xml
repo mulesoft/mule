@@ -174,7 +174,7 @@
         <testcontainersVersion>1.17.6</testcontainersVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.3.0-SNAPSHOT</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.3.0-20240318</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.7.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.7.0-SNAPSHOT</muleHttpPolicyApiVersion>
