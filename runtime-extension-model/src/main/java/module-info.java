@@ -5,8 +5,6 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
-import org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider;
-import org.mule.runtime.core.api.extension.provider.OperationDslExtensionModelProvider;
 
 /**
  * Extension model for the core Mule Runtime components.
@@ -57,8 +55,8 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.extensions.mule.support;
 
   provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
-      CoreRuntimeExtensionModelProvider,
-      OperationDslExtensionModelProvider;
+      org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider,
+      org.mule.runtime.core.api.extension.provider.OperationDslExtensionModelProvider;
 
   // required by modules creating crafted extension models
   exports org.mule.runtime.core.internal.extension to

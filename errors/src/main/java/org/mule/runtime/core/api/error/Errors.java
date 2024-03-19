@@ -208,71 +208,67 @@ public abstract class Errors {
 
     public static final class Handleable {
 
-      public static final ComponentIdentifier ANY =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(ANY_IDENTIFIER).build();
+      public static final ComponentIdentifier ANY = builder().namespace(CORE_NAMESPACE_NAME).name(ANY_IDENTIFIER).build();
       public static final ComponentIdentifier TRANSFORMATION =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(TRANSFORMATION_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(TRANSFORMATION_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier EXPRESSION =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(EXPRESSION_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(EXPRESSION_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier VALIDATION =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(VALIDATION_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(VALIDATION_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier DUPLICATE_MESSAGE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(DUPLICATE_MESSAGE_ERROR_IDENTIFIER).build();
-      public static final ComponentIdentifier REDELIVERY_EXHAUSTED = ComponentIdentifier.builder()
-          .namespace(CORE_NAMESPACE_NAME).name(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
-      public static final ComponentIdentifier RETRY_EXHAUSTED = ComponentIdentifier.builder()
-          .namespace(CORE_NAMESPACE_NAME).name(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(DUPLICATE_MESSAGE_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier REDELIVERY_EXHAUSTED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier RETRY_EXHAUSTED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier ROUTING =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(ROUTING_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(ROUTING_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier CONNECTIVITY =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(CONNECTIVITY_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(CONNECTIVITY_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SECURITY =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SECURITY_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SECURITY_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier CLIENT_SECURITY =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(CLIENT_SECURITY_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SERVER_SECURITY =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SERVER_SECURITY_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SERVER_SECURITY_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier NOT_PERMITTED =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(NOT_PERMITTED_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(NOT_PERMITTED_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier STREAM_MAXIMUM_SIZE_EXCEEDED =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER)
-              .build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(STREAM_MAXIMUM_SIZE_EXCEEDED_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier TIMEOUT =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(TIMEOUT_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier COMPOSITE_ROUTING =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(COMPOSITE_ROUTING_ERROR).build();
       public static final ComponentIdentifier UNKNOWN =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(UNKNOWN_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(UNKNOWN_ERROR_IDENTIFIER).build();
 
       public static final ComponentIdentifier SOURCE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_RESPONSE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_RESPONSE_GENERATE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_RESPONSE_SEND =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_RESPONSE_SEND_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_GENERATE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER)
-              .build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
-
+          builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier TRANSACTION =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(TRANSACTION_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(TRANSACTION_ERROR_IDENTIFIER).build();
 
     }
 
     public static final class Unhandleable {
 
       public static final ComponentIdentifier CRITICAL =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(CRITICAL_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(CRITICAL_IDENTIFIER).build();
       public static final ComponentIdentifier OVERLOAD =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(OVERLOAD_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier FLOW_BACK_PRESSURE =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(FLOW_BACK_PRESSURE_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(FLOW_BACK_PRESSURE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier FATAL =
-          ComponentIdentifier.builder().namespace(CORE_NAMESPACE_NAME).name(FATAL_ERROR_IDENTIFIER).build();
+          builder().namespace(CORE_NAMESPACE_NAME).name(FATAL_ERROR_IDENTIFIER).build();
 
     }
 

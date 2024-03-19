@@ -14,27 +14,17 @@
  */
 module org.mule.runtime.errors {
 
-    requires org.mule.sdk.api;
-    requires org.mule.runtime.api;
-    requires org.mule.runtime.metadata.model.api;
-    requires org.mule.runtime.metadata.model.java;
-    requires org.mule.runtime.metadata.model.message;
-    requires org.mule.runtime.metadata.model.catalog;
-    requires org.mule.runtime.extensions.api;
-    requires org.mule.runtime.dsl.api;
-    requires org.mule.runtime.artifact.ast;
-    requires org.mule.runtime.artifact.ast.dependency.graph;
+  requires org.mule.runtime.api;
+  requires org.mule.runtime.artifact.ast;
 
-    requires java.inject;
+  exports org.mule.runtime.core.api.error;
+  exports org.mule.runtime.config.internal.error to
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.mule.support,
+      org.mule.runtime.spring.config,
+      org.mule.runtime.artifact.ast.serialization.test;
 
-    requires com.google.common;
-    requires com.google.gson;
-    requires org.apache.commons.lang3;
-
-    exports org.mule.runtime.core.api.error;
-    exports org.mule.runtime.config.internal.error;
-
-    provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
-            org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
+  provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
+      org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
 
 }
