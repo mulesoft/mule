@@ -11,6 +11,8 @@ import java.util.ServiceLoader;
 
 /**
  * Helps configuration of the log4j factory. Implementations will be discovered through SPI.
+ *
+ *  @since 4.7.0
  */
 public interface MuleLog4jContextFactoryConfigurator {
 
