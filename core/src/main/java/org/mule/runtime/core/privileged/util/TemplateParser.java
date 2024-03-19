@@ -262,11 +262,13 @@ public final class TemplateParser {
     return this.getStyle().getName().equals(style);
   }
 
-  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalacedCharactersMuleStyle(String template) {
+  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalancedCharactersMuleStyle(String template) {
     // Save the line and column of each special character for error tracing purposes
     Stack<Pair<Character, Pair<Integer, Integer>>> stack = new Stack<>();
     boolean lastStartedExpression = false;
     boolean lastIsBackSlash = false;
+    boolean isSingleQuoteLiteral = false;
+    boolean isDoubleQuoteLiteral = false;
     int openBraces = 0;
     int openSingleQuotes = 0;
     int openDoubleQuotes = 0;
@@ -277,7 +279,11 @@ public final class TemplateParser {
       char c = template.charAt(i);
       switch (c) {
         case '\'':
-          if (lastIsBackSlash || openBraces == 0) {
+          if (openBraces == 0) {
+            break;
+          }
+          if (lastIsBackSlash) {
+            isSingleQuoteLiteral = true;
             break;
           }
           if (!stack.empty() && stack.peek().getFirst().equals('\'')) {
@@ -289,7 +295,11 @@ public final class TemplateParser {
           }
           break;
         case '"':
-          if (lastIsBackSlash || openBraces == 0) {
+          if (openBraces == 0) {
+            break;
+          }
+          if (lastIsBackSlash) {
+            isDoubleQuoteLiteral = true;
             break;
           }
           if (!stack.empty() && stack.peek().getFirst().equals('"')) {
@@ -301,6 +311,16 @@ public final class TemplateParser {
           }
           break;
         case CLOSE_EXPRESSION:
+          if (!stack.empty() && stack.peek().getFirst().equals('"') && isDoubleQuoteLiteral) {
+            stack.pop();
+            openDoubleQuotes--;
+            isDoubleQuoteLiteral = false;
+          }
+          if (!stack.empty() && stack.peek().getFirst().equals('\'') && isSingleQuoteLiteral) {
+            stack.pop();
+            openSingleQuotes--;
+            isSingleQuoteLiteral = false;
+          }
           if (!stack.empty() && stack.peek().getFirst().equals(OPEN_EXPRESSION)) {
             stack.pop();
             openBraces--;
@@ -318,14 +338,14 @@ public final class TemplateParser {
           break;
       }
       lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
-      lastIsBackSlash = (c == '\\' && !lastIsBackSlash);
+      lastIsBackSlash = c == '\\';
       column++;
     }
     return stack;
   }
 
   private void validateBalanceMuleStyle(String template) {
-    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalacedCharactersMuleStyle(template);
+    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalancedCharactersMuleStyle(template);
     if (!remaining.empty()) {
       throwValidationError(template, remaining);
     }
@@ -415,7 +435,7 @@ public final class TemplateParser {
 
   public boolean isValid(String expression) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return unbalacedCharactersMuleStyle(expression).empty();
+      return unbalancedCharactersMuleStyle(expression).empty();
     }
 
     try {
