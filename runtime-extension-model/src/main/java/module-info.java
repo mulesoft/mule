@@ -55,8 +55,7 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.extensions.mule.support;
 
   provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
-      org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider,
-      org.mule.runtime.core.api.extension.provider.OperationDslExtensionModelProvider;
+      org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider;
 
   // required by modules creating crafted extension models
   exports org.mule.runtime.core.internal.extension to

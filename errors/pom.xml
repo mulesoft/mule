@@ -23,6 +23,7 @@
                 <groupId>org.revapi</groupId>
                 <artifactId>revapi-maven-plugin</artifactId>
                 <configuration>
+                    <!-- TODO (W-15278731): unskip after 4.7 release -->
                     <skip>true</skip>
                 </configuration>
             </plugin>
