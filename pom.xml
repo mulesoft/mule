@@ -180,7 +180,7 @@
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
          its version is not changed by the versions:set plugin -->
-        <muleTestComponentsVersion>4.6.0-rc5</muleTestComponentsVersion>
+        <muleTestComponentsVersion>4.6.0</muleTestComponentsVersion>
         <muleTxExtVersion>4.6.0-rc5</muleTxExtVersion>
 
         <!-- Test Extensions -->
