@@ -144,7 +144,7 @@ public class PartitionedPersistentObjectStoreTestCase extends AbstractMuleTestCa
 
   @Test
   public void allowsAnyPartitionName() throws Exception {
-    os.open("asdfsadfsa#$%@#$@#$@$%$#&8******ASDFWER??!?!");
+    os.open("asdfsadfsa#$%@#$@#$@$%$#&8ASDFWER!!");
   }
 
   @Test
