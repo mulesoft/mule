@@ -13,11 +13,16 @@ import static org.mule.tck.MavenTestUtils.installArtifact;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
+import static java.lang.System.getProperty;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -30,18 +35,24 @@ import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.junit4.rule.SystemProperty;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @Feature(DEPLOYMENT_TYPE)
 @Story(LIGHTWEIGHT)
@@ -75,7 +86,22 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   @Test
   @Issue("W-12142901")
   public void createDeployableProjectModelWithAdditionalDependenciesInAPlugin() throws Exception {
-    installArtifact(getResourceFolder("apps/lightweight/application-using-additional-libraries"),
+    final File artifactFolder = getResourceFolder("apps/lightweight/application-using-additional-libraries");
+    final Collection<File> listFiles = listFiles(artifactFolder, nameFileFilter("pom.xml"), TrueFileFilter.INSTANCE);
+    listFiles.forEach(pom -> {
+      try {
+        String pomContent = readFileToString(pom, UTF_8);
+        pomContent = pomContent.replaceAll("\\$\\{mule\\.maven\\.plugin\\.version}", getProperty("mule.maven.plugin.version"));
+        pomContent = pomContent.replaceAll("\\$\\{derbyVersion}", getProperty("derbyVersion"));
+        pomContent = pomContent.replaceAll("\\$\\{mule\\.db\\.connector\\.version}", getProperty("mule.db.connector.version"));
+
+        FileUtils.writeStringToFile(pom, pomContent, UTF_8);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    });
+
+    installArtifact(artifactFolder,
                     getMavenConfig().getLocalMavenRepositoryLocation());
     File artifact =
         new File(getMavenConfig().getLocalMavenRepositoryLocation(),
@@ -90,11 +116,17 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     assertThat(deployableProjectModel.getAdditionalPluginDependencies().size(), is(1));
     List<BundleDependency> additionalBundleDependencies =
         deployableProjectModel.getAdditionalPluginDependencies().values().stream().findFirst().get();
-    assertThat(additionalBundleDependencies.size(), is(1));
+    assertThat(additionalBundleDependencies.size(), is(2));
+
     org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor descriptor =
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
+
+    descriptor =
+        additionalBundleDependencies.get(1).getDescriptor();
+    assertThat(descriptor.getGroupId(), is("org.apache.derby"));
+    assertThat(descriptor.getArtifactId(), is("derbyshared"));
   }
 
 

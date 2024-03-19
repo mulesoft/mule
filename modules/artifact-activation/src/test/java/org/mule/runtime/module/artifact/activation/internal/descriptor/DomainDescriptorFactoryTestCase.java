@@ -94,8 +94,9 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(1));
+    assertThat(additionalDependencies, hasSize(2));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+    assertThat(additionalDependencies.get(1).getDescriptor().getArtifactId(), is("derbyshared"));
 
     ArtifactPluginDescriptor dbPlugin = domainDescriptor.getPlugins()
         .stream()
@@ -112,10 +113,11 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
     DomainDescriptor domainDescriptor = createDomainDescriptor("domains/additional-plugin-dependency-and-dep");
 
     assertThat(domainDescriptor.getClassLoaderConfiguration().getExportedPackages(), hasSize(0));
-    assertThat(domainDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(4));
+    assertThat(domainDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(5));
 
     assertThat(domainDescriptor.getClassLoaderConfiguration().getDependencies(),
                hasItems(hasProperty("descriptor", hasProperty("artifactId", equalTo("derby"))),
+                        hasProperty("descriptor", hasProperty("artifactId", equalTo("derbyshared"))),
                         hasProperty("descriptor", hasProperty("artifactId", equalTo("mule-db-connector")))));
 
     List<BundleDependency> additionalDependencies =
@@ -123,8 +125,9 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
             .filter(bundleDependency -> bundleDependency.getDescriptor().getArtifactId().equals("mule-db-connector")).findAny()
             .get().getAdditionalDependenciesList();
 
-    assertThat(additionalDependencies, hasSize(1));
+    assertThat(additionalDependencies, hasSize(2));
     assertThat(additionalDependencies.get(0).getDescriptor().getArtifactId(), is("derby"));
+    assertThat(additionalDependencies.get(1).getDescriptor().getArtifactId(), is("derbyshared"));
 
     ArtifactPluginDescriptor dbPlugin = domainDescriptor.getPlugins()
         .stream()
