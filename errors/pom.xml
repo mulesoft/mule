@@ -7,38 +7,17 @@
         <artifactId>mule</artifactId>
         <version>4.7.0-SNAPSHOT</version>
     </parent>
-    <artifactId>mule-runtime-extension-model</artifactId>
+    <artifactId>mule-runtime-errors</artifactId>
     <packaging>jar</packaging>
-    <name>Mule 4 Runtime Extension model</name>
+    <name>Mule 4 Runtime Errors</name>
 
     <properties>
-        <!-- xml parser is a test dependency so it is not in the module-path, open its required packages -->
-        <surefire.args>
-            -XX:+IgnoreUnrecognizedVMOptions
-              --add-reads=org.mule.runtime.extension.model=org.apache.commons.io
-            --add-exports=org.mule.runtime.api/org.mule.runtime.internal.dsl=ALL-UNNAMED
-            --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation.test=ALL-UNNAMED
-            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.spi=ALL-UNNAMED
-            --add-exports=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
-            ${surefire.args.base}
-        </surefire.args>
-
-        <javaModuleName>org.mule.runtime.extension.model</javaModuleName>
+        <javaModuleName>org.mule.runtime.errors</javaModuleName>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../formatter.xml</formatterConfigPath>
     </properties>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/filtering-resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.revapi</groupId>
@@ -46,23 +25,6 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
-            </plugin>        
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-test-jar</id>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>org/mule/runtime/config/internal/validation/test/**</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>                
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -99,11 +61,6 @@
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast-dependency-graph</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-runtime-errors</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

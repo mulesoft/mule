@@ -157,7 +157,7 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
 
   private ErrorType buildErrorType(ComponentIdentifier identifier, ErrorType parent) {
     if (errorTypes.containsKey(identifier) || internalErrorTypes.containsKey(identifier)) {
-      throw new IllegalStateException(format("An error type with identifier '%s' already exists", identifier));
+      throw new IllegalStateException(String.format("An error type with identifier '%s' already exists", identifier));
     }
     return ErrorTypeBuilder.builder()
         .namespace(identifier.getNamespace())

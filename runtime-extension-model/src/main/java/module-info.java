@@ -5,6 +5,8 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider;
+import org.mule.runtime.core.api.extension.provider.OperationDslExtensionModelProvider;
 
 /**
  * Extension model for the core Mule Runtime components.
@@ -33,6 +35,7 @@ module org.mule.runtime.extension.model {
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.artifact.ast.dependency.graph;
+  requires org.mule.runtime.errors;
   
   requires java.inject;
 
@@ -40,13 +43,9 @@ module org.mule.runtime.extension.model {
   requires com.google.gson;
   requires org.apache.commons.lang3;
 
-  exports org.mule.runtime.core.api.error;
   exports org.mule.runtime.core.api.extension.provider;
 
   uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
-
-  provides org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider with
-      org.mule.runtime.config.internal.error.CoreErrorTypeRepositoryProvider;
 
   provides org.mule.runtime.ast.api.validation.ValidationsProvider with
       org.mule.runtime.config.internal.validation.CoreValidationsProvider;
@@ -56,12 +55,11 @@ module org.mule.runtime.extension.model {
 
   exports org.mule.runtime.config.internal.dsl.processor.xml.provider to
       org.mule.runtime.extensions.mule.support;
-  exports org.mule.runtime.config.internal.error to
-      org.mule.runtime.core,
-      org.mule.runtime.extensions.mule.support,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.artifact.ast.serialization.test;
-  
+
+  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+      CoreRuntimeExtensionModelProvider,
+      OperationDslExtensionModelProvider;
+
   // required by modules creating crafted extension models
   exports org.mule.runtime.core.internal.extension to
       org.mule.runtime.artifact.ast,

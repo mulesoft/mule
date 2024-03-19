@@ -116,7 +116,7 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-runtime-extension-model</artifactId>
+            <artifactId>mule-runtime-errors</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
