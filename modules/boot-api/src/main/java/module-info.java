@@ -9,6 +9,9 @@
  *
  * @moduleGraph
  * @since 4.6
+ *
+ * Note: changes to this API will impact 'mule-embedded-api' and MUnit (This module's version does not depend on the Runtime version currently in use (reference: W-14853053).
+ * Adding a method to this API and using it within the Runtime will cause newer versions of the Runtime to fail in instance of MUnit versions that use the old version of this module.
  */
 module org.mule.boot.api {
 
