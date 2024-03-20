@@ -88,7 +88,7 @@ public class JvmThreadSnapshotCollectorTestCase {
 
   @Test
   public void cpuTime() {
-    for (long l = 0L; l < 100L; ++l) {
+    for (long l = 0L; l < 10000000L; ++l) {
       // Just the loop to make the cpu work for some time...
     }
     ThreadSnapshot snapshot = threadSnapshotCollector.getCurrentThreadSnapshot();
