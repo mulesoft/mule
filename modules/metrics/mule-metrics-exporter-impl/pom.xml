@@ -113,25 +113,21 @@
         <dependency>
             <groupId>com.linecorp.armeria</groupId>
             <artifactId>armeria-grpc</artifactId>
-            <version>1.20.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.linecorp.armeria</groupId>
             <artifactId>armeria-junit4</artifactId>
-            <version>1.20.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-proto</artifactId>
-            <version>1.7.1-alpha</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.17.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

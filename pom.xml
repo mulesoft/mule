@@ -159,20 +159,6 @@
         <muleBomVersion>4.7.0-SNAPSHOT</muleBomVersion>
         <muleMavenClientBomVersion>2.2.0-SNAPSHOT</muleMavenClientBomVersion>
 
-        <activemqVersion>5.15.15</activemqVersion>
-        <hawtbufVersion>1.1</hawtbufVersion>
-        <activemqProtobuf>1.1</activemqProtobuf>
-        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
-        <aspectjVersion>1.9.2</aspectjVersion>
-        <derbyVersion>10.14.2.0</derbyVersion>
-        <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
-        <jsonassert.version>1.5.2</jsonassert.version>
-        <commonsNet.version>3.9.0</commonsNet.version>
-        <sshdVersion>2.10.0</sshdVersion>
-        <ftpServerVersion>1.2.0</ftpServerVersion>
-        <commonsExecVersion>1.3</commonsExecVersion>
-        <testcontainersVersion>1.17.6</testcontainersVersion>
-
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.3.0-SNAPSHOT</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.7.0-SNAPSHOT</muleExtensionsApiVersion>
@@ -268,6 +254,10 @@
         <groovyVersionBuild>4.0.11</groovyVersionBuild>
         <assembly.verifier.version>2.0.0</assembly.verifier.version>
 
+        <!-- *************************** -->
+        <!-- Test dependencies versions: -->
+        <!-- *************************** -->
+
         <junitVersion>4.13.2</junitVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <allureJunitVersion>2.22.2</allureJunitVersion>
@@ -279,6 +269,23 @@
         <byteBuddyVersion>1.14.0</byteBuddyVersion>
         <wireMockVersion>2.27.2</wireMockVersion>
         <jettyVersion>9.4.53.v20231009</jettyVersion>
+        <compileTestingVersion>0.21.0</compileTestingVersion>
+        <activemqVersion>5.15.15</activemqVersion>
+        <hawtbufVersion>1.1</hawtbufVersion>
+        <activemqProtobuf>1.1</activemqProtobuf>
+        <managementJ2eeVersion>1.1.4</managementJ2eeVersion>
+        <aspectjVersion>1.9.2</aspectjVersion>
+        <derbyVersion>10.14.2.0</derbyVersion>
+        <weaveVersion>2.7.0-SNAPSHOT</weaveVersion>
+        <jsonassert.version>1.5.2</jsonassert.version>
+        <commonsNet.version>3.9.0</commonsNet.version>
+        <sshdVersion>2.10.0</sshdVersion>
+        <ftpServerVersion>1.2.0</ftpServerVersion>
+        <commonsExecVersion>1.3</commonsExecVersion>
+        <testcontainersVersion>1.17.6</testcontainersVersion>
+        <armeriaVersion>1.20.3</armeriaVersion>
+        <protobufVersion>3.21.9</protobufVersion>
+        <openTelemetryProtoVersion>1.7.1-alpha</openTelemetryProtoVersion>
     </properties>
 
     <dependencyManagement>
@@ -287,6 +294,13 @@
                 <groupId>org.mule</groupId>
                 <artifactId>mule-runtime-bom</artifactId>
                 <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainersVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -485,7 +499,39 @@
             <dependency>
                 <groupId>com.google.testing.compile</groupId>
                 <artifactId>compile-testing</artifactId>
-                <version>0.21.0</version>
+                <version>${compileTestingVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.linecorp.armeria</groupId>
+                <artifactId>armeria-junit4</artifactId>
+                <version>${armeriaVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.linecorp.armeria</groupId>
+                <artifactId>armeria-grpc</artifactId>
+                <version>${armeriaVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>jsr305</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-proto</artifactId>
+                <version>${openTelemetryProtoVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobufVersion}</version>
             </dependency>
 
             <!-- NOT the service (with mule-service classifier) -->
