@@ -123,6 +123,7 @@
         <module>runtime-extension-model</module>
         <module>core</module>
         <module>core-tests</module>
+        <module>errors</module>
         <module>modules</module>
         <module>tests</module>
     </modules>
