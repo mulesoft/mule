@@ -87,7 +87,8 @@ public class RxUtils {
    */
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber) {
-    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, null, null, null);
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, uPublisher -> (Publisher<T>) uPublisher,
+                                                null, null, null);
   }
 
   /**
@@ -118,12 +119,14 @@ public class RxUtils {
    */
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber,
-                                                                    @Nullable Consumer<? super U> consumer,
+                                                                    Function<Publisher<U>, Publisher<T>> deferredTransformation,
+                                                                    @Nullable Consumer<T> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer) {
+
     return triggeringSubscriber
         .transformDeferredContextual((eventPub, ctx) -> eventPub
-            .doOnSubscribe(s -> deferredSubscriber
+            .doOnSubscribe(s -> deferredSubscriber.transform(deferredTransformation)
                 .contextWrite(ctx)
                 .subscribe(consumer, errorConsumer, completeConsumer)));
   }
@@ -268,9 +271,8 @@ public class RxUtils {
 
     AtomicReference<ScheduledFuture<?>> scheduledCompletion = new AtomicReference<>();
 
-    Flux<T> enrichedUpstream = Flux.from(upstream)
-        .doOnNext(s -> inflightCounter.incrementAndGet())
-        .transform(transformer);
+    Flux<U> enrichedUpstream = Flux.from(upstream)
+        .doOnNext(s -> inflightCounter.incrementAndGet());
 
     return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
         .doOnNext(s -> {
@@ -283,6 +285,7 @@ public class RxUtils {
           }
         }),
                                                 enrichedUpstream,
+                                                transformer,
                                                 null,
                                                 t -> {
                                                   upstreamError.set(t);
