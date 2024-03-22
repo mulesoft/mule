@@ -117,18 +117,49 @@ public class RxUtils {
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.4, 4.3.1
    */
+  // public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+  // Flux<U> deferredSubscriber,
+  // Function<Publisher<U>, Publisher<T>> deferredSubscriberTransformation,
+  // @Nullable Consumer<T> consumer,
+  // @Nullable Consumer<? super Throwable> errorConsumer,
+  // @Nullable Runnable completeConsumer) {
+  //
+  // return triggeringSubscriber
+  // .transformDeferredContextual((eventPub, ctx) -> eventPub
+  // .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
+  // .contextWrite(ctx)
+  // .subscribe(consumer, errorConsumer, completeConsumer)));
+  // }
+
   public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
                                                                     Flux<U> deferredSubscriber,
-                                                                    Function<Publisher<U>, Publisher<T>> deferredTransformation,
+                                                                    Function<Publisher<U>, Publisher<T>> deferredSubscriberTransformation,
                                                                     @Nullable Consumer<T> consumer,
                                                                     @Nullable Consumer<? super Throwable> errorConsumer,
                                                                     @Nullable Runnable completeConsumer) {
-
-    return triggeringSubscriber
+    Flux<T> propagatorFlux = Flux.empty(); // A flux whose only objective is to propagate the subscription.
+    return triggeringSubscriber.startWith(propagatorFlux
         .transformDeferredContextual((eventPub, ctx) -> eventPub
-            .doOnSubscribe(s -> deferredSubscriber.transform(deferredTransformation)
+            .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
                 .contextWrite(ctx)
-                .subscribe(consumer, errorConsumer, completeConsumer)));
+                .subscribe(consumer, errorConsumer, completeConsumer))));
+  }
+
+  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Function<Publisher<T>, Publisher<T>> triggeringSubscriber,
+                                                                    Flux<U> deferredSubscriber,
+                                                                    Function<Publisher<U>, Publisher<U>> deferredSubscriberTransformation,
+                                                                    @Nullable Consumer<? super U> consumer,
+                                                                    @Nullable Consumer<? super Throwable> errorConsumer,
+                                                                    @Nullable Runnable completeConsumer) {
+    // An internal FluxSink that complete as soon as the flux is subscribed but allows to retrieve the subscriber context at the
+    // top of the triggering subscriber.
+    FluxSinkRecorder<T> temporarySink = new FluxSinkRecorder<>();
+    return temporarySink.flux()
+        .transformDeferredContextual((eventPub, ctx) -> eventPub
+            .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
+                .contextWrite(ctx)
+                .subscribe(consumer, errorConsumer, completeConsumer)))
+        .transform(triggeringSubscriber);
   }
 
   /**
