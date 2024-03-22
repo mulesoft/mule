@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.mule.api.extension;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -15,7 +17,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for Mule SDK Extensions
@@ -35,7 +36,7 @@ public class MuleSdkExtensionExtensionModelProvider {
 
   private static ExtensionModelLoadingRequest loadingRequest() {
     return ExtensionModelLoadingRequest
-        .builder(MuleSdkExtensionExtensionModelProvider.class.getClassLoader(), new NullDslResolvingContext())
+        .builder(MuleSdkExtensionExtensionModelProvider.class.getClassLoader(), nullDslResolvingContext())
         .build();
   }
 

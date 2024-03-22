@@ -19,7 +19,6 @@ import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.
 import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
@@ -93,6 +92,8 @@ import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
+
+  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
 
   private XmlExtensionModelLoader loader;
 

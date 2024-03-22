@@ -20,7 +20,6 @@ import static org.mule.runtime.api.component.ComponentIdentifier.buildFromString
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.core.api.event.EventContextFactory.create;
 import static org.mule.runtime.core.internal.event.DefaultEventContext.child;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static org.mule.tck.probe.PollingProber.probe;
 import static org.mule.test.allure.AllureConstants.EventContextFeature.EVENT_CONTEXT;
@@ -84,6 +83,7 @@ public class DefaultEventContextTestCase extends AbstractMuleContextTestCase {
 
   private static final int GC_POLLING_TIMEOUT = 10000;
   private static final String TEST_CORRELATION_ID = "Gracia al fulbo";
+  private static final String CORE_PREFIX = "mule";
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();

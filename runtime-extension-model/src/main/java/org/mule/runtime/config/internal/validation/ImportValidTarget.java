@@ -11,7 +11,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.ast.api.ImportedResource.COULD_NOT_RESOLVE_IMPORTED_RESOURCE;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;

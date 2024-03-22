@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.validation.test;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
@@ -33,8 +34,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.DslConstants;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
+import org.mule.runtime.config.internal.dsl.DslConstants;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -90,7 +90,7 @@ public abstract class AbstractCoreValidationTestCase {
         .withExtensionModel(new ExtensionModelFactory()
             .create(new DefaultExtensionLoadingContext(extensionDeclarer,
                                                        builder(AbstractCoreValidationTestCase.class.getClassLoader(),
-                                                               new NullDslResolvingContext()).build())))
+                                                               nullDslResolvingContext()).build())))
         .withSchemaValidationsDisabled()
         .build();
   }

@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser;
 
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.module.extension.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Locale.ROOT;
 import static java.util.Optional.ofNullable;

@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findSource;

@@ -7,9 +7,9 @@
 package org.mule.runtime.config.api.dsl;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.DOMAIN_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.EE_DOMAIN_PREFIX;
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.component.ComponentIdentifier;
 
