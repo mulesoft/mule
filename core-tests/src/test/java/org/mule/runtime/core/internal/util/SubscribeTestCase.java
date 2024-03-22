@@ -39,16 +39,22 @@ public class SubscribeTestCase extends AbstractMuleTestCase {
 
     FluxSinkRecorder<String> downStream = new FluxSinkRecorder<>();
 
-    Flux<String> combined = from(propagateCompletion(upstreamFlux, completeDownstreamFlux(downStream.flux(), complete),
-                                                     pub -> from(pub)
-                                                         .doOnNext(downStream::next),
-                                                     inflightEvents,
-                                                     downStream::complete,
-                                                     downStream::error));
+    // Flux<String> combined = from(propagateCompletion(upstreamFlux, completeDownstreamFlux(downStream.flux(), complete),
+    // pub -> from(pub)
+    // .doOnNext(downStream::next),
+    // inflightEvents,
+    // downStream::complete,
+    // downStream::error));
 
     // Flux<String> combined =
-    // subscribeFluxOnPublisherSubscription(downstreamFlux -> completeDownstreamFlux(from(downstreamFlux), complete),
-    // upstreamFlux);
+    // subscribeFluxOnPublisherSubscription(pub -> completeDownstreamFlux(downStream.flux(), complete), upstreamFlux,
+    // stringPublisher -> from(stringPublisher).doOnNext(downStream::next), null,
+    // downStream::error, downStream::complete);
+
+    Flux<String> combined =
+        subscribeFluxOnPublisherSubscription(completeDownstreamFlux(downStream.flux(), complete), upstreamFlux,
+                                             stringPublisher -> from(stringPublisher).doOnNext(downStream::next), null,
+                                             downStream::error, downStream::complete);
 
     combined
         .subscribe(System.out::println, throwable -> {
