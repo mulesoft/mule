@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableSet;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;

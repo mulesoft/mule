@@ -18,7 +18,6 @@ module org.mule.runtime.artifact.activation {
   requires org.mule.runtime.artifact.ast.xmlParser;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
-  requires org.mule.runtime.extension.model;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.global.config;
   requires org.mule.runtime.jar.handling.utils;

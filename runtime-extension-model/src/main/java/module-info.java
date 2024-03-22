@@ -5,6 +5,7 @@
  * LICENSE.txt file.
  */
 import org.mule.api.annotation.jpms.PrivilegedApi;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
 /**
  * Extension model for the core Mule Runtime components.
@@ -43,7 +44,7 @@ module org.mule.runtime.extension.model {
 
   exports org.mule.runtime.core.api.extension.provider;
 
-  uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+  uses RuntimeExtensionModelProvider;
 
   provides org.mule.runtime.ast.api.validation.ValidationsProvider with
       org.mule.runtime.config.internal.validation.CoreValidationsProvider;

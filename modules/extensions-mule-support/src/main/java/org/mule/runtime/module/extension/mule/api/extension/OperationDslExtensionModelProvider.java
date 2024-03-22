@@ -13,7 +13,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static java.lang.Boolean.getBoolean;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
 /**
  * Provides the {@link ExtensionModel} for operations Mule DSL

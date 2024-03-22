@@ -6,13 +6,12 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider.discoverRuntimeExtensionModels;
+import static org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider.discoverRuntimeExtensionModels;
 
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionDiscoveryRequest;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor;
@@ -20,8 +19,6 @@ import org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesP
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Default implementation of {@link ExtensionModelDiscoverer}.
@@ -46,12 +43,7 @@ public class DefaultExtensionModelDiscoverer implements ExtensionModelDiscoverer
 
                    dependencies.addAll(extensions);
                    dependencies.addAll(discoveryRequest.getParentArtifactExtensions());
-                   if (!dependencies.contains(MuleExtensionModelProvider.getExtensionModel())) {
-                     dependencies = ImmutableSet.<ExtensionModel>builder()
-                         .addAll(extensions)
-                         .addAll(runtimeExtensionModels)
-                         .build();
-                   }
+                   dependencies.addAll(runtimeExtensionModels);
 
                    ExtensionModel extension =
                        extensionModelGenerator.obtainExtensionModel(discoveryRequest, artifactPlugin, dependencies);

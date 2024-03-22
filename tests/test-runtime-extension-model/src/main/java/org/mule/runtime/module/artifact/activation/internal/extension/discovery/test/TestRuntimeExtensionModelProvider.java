@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
 public class TestRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 

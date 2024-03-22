@@ -11,7 +11,7 @@ import static org.mule.runtime.extension.api.extension.XmlSdk1ExtensionModelProv
 
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
 /**
  * A {@link RuntimeExtensionModelProvider} for Mule's XML SDK v1.

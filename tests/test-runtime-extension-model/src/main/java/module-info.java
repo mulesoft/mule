@@ -4,6 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
+
 /**
  * @moduleGraph
  * @since 4.5
@@ -16,6 +19,6 @@ module org.mule.test.runtime.extension.model {
 
   requires org.mockito;
   
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+  provides RuntimeExtensionModelProvider with
       org.mule.runtime.module.artifact.activation.internal.extension.discovery.test.TestRuntimeExtensionModelProvider;
 }

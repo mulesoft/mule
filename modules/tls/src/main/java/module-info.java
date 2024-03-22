@@ -4,6 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
+
 /**
  * A Mule module for connectivity using TLS/SSL authentication.
  *
@@ -39,7 +42,7 @@ module org.mule.runtime.tls {
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
       org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
 
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+  provides RuntimeExtensionModelProvider with
       org.mule.runtime.module.tls.api.extension.TlsRuntimeExtensionModelProvider;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
