@@ -25,17 +25,17 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;

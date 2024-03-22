@@ -17,7 +17,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_PREFIX;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 
 import org.mule.metadata.api.model.MetadataType;

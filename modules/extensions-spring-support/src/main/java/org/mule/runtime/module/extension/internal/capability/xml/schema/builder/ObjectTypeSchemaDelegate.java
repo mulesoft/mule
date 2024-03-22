@@ -22,7 +22,7 @@ import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.get
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getLayoutModel;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getSubstitutionGroup;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isFlattenedParameterGroup;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MAX_ONE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_EXTENSION_TYPE;
 import static org.mule.runtime.module.extension.internal.config.dsl.SchemaConstants.MULE_ABSTRACT_SHARED_EXTENSION;

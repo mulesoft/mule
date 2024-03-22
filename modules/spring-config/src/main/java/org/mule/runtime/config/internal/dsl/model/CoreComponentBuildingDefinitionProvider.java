@@ -39,15 +39,15 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.NON_REPEATABLE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.ERROR_MAPPING_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECTION_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 

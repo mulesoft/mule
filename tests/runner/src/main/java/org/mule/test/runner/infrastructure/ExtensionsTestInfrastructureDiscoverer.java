@@ -7,6 +7,7 @@
 package org.mule.test.runner.infrastructure;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
 import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
@@ -30,7 +31,6 @@ import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.ResourcesGenerator;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -125,7 +125,7 @@ public class ExtensionsTestInfrastructureDiscoverer {
       models.add(MuleExtensionModelProvider.getExtensionModel());
       context = DslResolvingContext.getDefault(models);
     } else {
-      context = new NullDslResolvingContext();
+      context = nullDslResolvingContext();
     }
 
     ExtensionsTestDslResourcesGenerator dslResourceGenerator =

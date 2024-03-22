@@ -13,7 +13,7 @@ import static org.mule.runtime.ast.api.ArtifactType.DOMAIN;
 import static org.mule.runtime.ast.api.ArtifactType.POLICY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.hasPropertyPlaceholder;
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
-import static org.mule.runtime.internal.dsl.DslConstants.EE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.EE_PREFIX;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.APP_CONFIG;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIG;
 

@@ -10,7 +10,7 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.FLOW;
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SCOPE;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyRecursively;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.CORE_PREFIX;
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;

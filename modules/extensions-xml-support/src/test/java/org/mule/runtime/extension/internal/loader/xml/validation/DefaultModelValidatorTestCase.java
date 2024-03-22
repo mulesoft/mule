@@ -20,7 +20,6 @@ import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPr
 import static org.mule.runtime.extension.internal.loader.xml.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -68,6 +67,7 @@ import io.qameta.allure.Issue;
 @SmallTest
 public class DefaultModelValidatorTestCase extends AbstractMuleTestCase {
 
+  private static final String CORE_PREFIX = "mule";
   public static final String CONFIGURATION_PROPERTIES_ELEMENT = "configuration-properties";
   public static final ComponentIdentifier CONFIGURATION_PROPERTIES =
       builder().namespace(CORE_PREFIX).name(CONFIGURATION_PROPERTIES_ELEMENT).build();

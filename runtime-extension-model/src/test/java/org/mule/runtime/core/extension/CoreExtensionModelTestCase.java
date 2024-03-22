@@ -36,7 +36,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SOURCE;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toSet;

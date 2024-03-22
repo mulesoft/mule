@@ -8,8 +8,8 @@ package org.mule.runtime.metadata.internal.cache;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.metadata.internal.DslElementIdHelper.NAME_ATTRIBUTE_NAME;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparingInt;

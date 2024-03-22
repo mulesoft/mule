@@ -10,8 +10,8 @@ import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;

@@ -30,8 +30,8 @@ import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import static java.lang.Class.forName;
 import static java.util.Collections.emptyList;
