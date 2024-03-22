@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connectivity;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingStrategy.lookupConnectivityTestingStrategies;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import static java.util.stream.Collectors.toList;
@@ -40,7 +41,7 @@ import javax.inject.Inject;
 public class DefaultConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
   private Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry =
-      ConnectivityTestingStrategy::lookupConnectivityTestingStrategies;
+      () -> lookupConnectivityTestingStrategies(this.getClass().getClassLoader());
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
   private MuleContext muleContext;
   private ConfigurationComponentLocator locator;

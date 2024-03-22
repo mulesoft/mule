@@ -345,7 +345,7 @@ public class SpringMuleContextServiceConfigurator extends AbstractSpringMuleCont
   }
 
   private void loadServiceConfigurators() {
-    lookupServiceConfigurators()
+    lookupServiceConfigurators(this.getClass().getClassLoader())
         .forEach(customizationInfo -> customizationInfo.configure(getCustomizationService()));
   }
 
