@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.http.api.server;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
 
 import io.qameta.allure.Feature;
 import org.junit.Rule;

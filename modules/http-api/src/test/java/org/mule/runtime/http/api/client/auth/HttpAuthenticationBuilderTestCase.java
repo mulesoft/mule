@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.BASIC;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.DIGEST;
 import static org.mule.runtime.http.api.client.auth.HttpAuthenticationType.NTLM;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
 
 import org.mule.runtime.http.api.client.auth.HttpAuthentication.HttpNtlmAuthentication;
 

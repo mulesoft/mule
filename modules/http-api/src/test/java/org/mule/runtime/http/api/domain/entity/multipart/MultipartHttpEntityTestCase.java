@@ -12,7 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
 
 import org.mule.runtime.http.api.domain.entity.HttpEntity;
 
