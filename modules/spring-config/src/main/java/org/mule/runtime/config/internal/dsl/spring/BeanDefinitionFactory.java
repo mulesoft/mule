@@ -79,7 +79,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
@@ -446,14 +445,8 @@ public class BeanDefinitionFactory {
               .name(paramSyntax.getElementName())
               .build();
 
-          final ComponentIdentifier paramValueComponentIdentifier = param.getGenerationInformation().getSyntax()
-              .filter(paramValueSyntax -> !isEmpty(paramSyntax.getElementName()))
-              .map(paramValueSyntax -> ComponentIdentifier.builder()
-                  .namespaceUri(paramValueSyntax.getNamespace())
-                  .namespace(paramValueSyntax.getPrefix())
-                  .name(paramValueSyntax.getElementName())
-                  .build())
-              .orElse(paramComponentIdentifier);
+          final ComponentIdentifier paramValueComponentIdentifier =
+              getParamValueComponentIdentifier(param, paramComponentIdentifier);
 
           return resolveComplexParamBuildingDefinition(param, paramValueComponentIdentifier)
               .map(buildingDefinition -> {
@@ -473,6 +466,25 @@ public class BeanDefinitionFactory {
                 return request.getSpringComponentModel();
               });
         });
+  }
+
+  private static ComponentIdentifier getParamValueComponentIdentifier(ComponentParameterAst param,
+                                                                      ComponentIdentifier paramComponentIdentifier) {
+    if (param.getValue().getValue().isPresent()) {
+      Object valueObject = param.getValue().getValue().get();
+      if (valueObject instanceof ComponentAst) {
+        ComponentAst valueAst = (ComponentAst) valueObject;
+        return valueAst.getIdentifier();
+      }
+    }
+    return param.getGenerationInformation().getSyntax()
+        .filter(paramValueSyntax -> !isEmpty(paramValueSyntax.getElementName()))
+        .map(paramValueSyntax -> ComponentIdentifier.builder()
+            .namespaceUri(paramValueSyntax.getNamespace())
+            .namespace(paramValueSyntax.getPrefix())
+            .name(paramValueSyntax.getElementName())
+            .build())
+        .orElse(paramComponentIdentifier);
   }
 
   private Optional<ComponentBuildingDefinition<?>> resolveComplexParamBuildingDefinition(ComponentParameterAst param,
