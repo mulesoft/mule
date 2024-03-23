@@ -16,7 +16,7 @@
         <app.runtime>4.4.0</app.runtime>
         <mule.maven.plugin.version>3.7.0-SNAPSHOT</mule.maven.plugin.version>
 
-        <spring.version>4.3.17.RELEASE</spring.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
     </properties>
 
     <build>
