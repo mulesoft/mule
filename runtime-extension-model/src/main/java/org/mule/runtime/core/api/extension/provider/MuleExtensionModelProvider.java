@@ -13,8 +13,8 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import static java.lang.String.format;
 

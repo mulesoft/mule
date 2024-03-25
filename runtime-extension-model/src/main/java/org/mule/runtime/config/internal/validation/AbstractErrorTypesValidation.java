@@ -11,7 +11,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERRO
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.Validation.Level.WARN;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;
 import static java.util.Locale.getDefault;

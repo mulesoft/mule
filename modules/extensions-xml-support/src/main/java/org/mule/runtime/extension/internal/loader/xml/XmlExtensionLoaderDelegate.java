@@ -156,11 +156,11 @@ public final class XmlExtensionLoaderDelegate {
 
   private static final String RAISE_ERROR = "raise-error";
 
+  public static final String CORE_PREFIX = "mule";
+
   private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       ComponentIdentifier.builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
   public static final String GLOBAL_PROPERTY = "global-property";
-
-  public static final String CORE_PREFIX = "mule";
 
   private static final String PARAMETER_NAME = "name";
   private static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
