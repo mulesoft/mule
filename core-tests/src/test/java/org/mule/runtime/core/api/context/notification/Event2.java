@@ -11,11 +11,11 @@ import org.mule.runtime.api.notification.AbstractServerNotification;
 public class Event2 extends AbstractServerNotification {
 
   public Event2() {
-    super("", 0);
+    super("", NO_ACTION_ID);
   }
 
   public Event2(String id) {
-    super("", 0, id);
+    super("", NO_ACTION_ID, id);
   }
 
   @Override

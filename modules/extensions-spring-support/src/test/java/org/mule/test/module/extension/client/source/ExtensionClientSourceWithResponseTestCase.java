@@ -19,7 +19,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -40,9 +40,10 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
+import org.junit.Test;
+
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Feature(EXTENSIONS_CLIENT)
 @Story(MESSAGE_SOURCE)
@@ -60,7 +61,7 @@ public class ExtensionClientSourceWithResponseTestCase extends BaseExtensionClie
   private ExtensionManager extensionManager;
 
   private ClassLoader sourceCallbackContextClassLoader;
-  private Latch sourceCallbackContextClassLoaderLatch = new Latch();
+  private final Latch sourceCallbackContextClassLoaderLatch = new Latch();
 
   @Override
   protected void doSetUp() throws Exception {
