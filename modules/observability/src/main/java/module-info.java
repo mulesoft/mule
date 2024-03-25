@@ -21,6 +21,7 @@ module org.mule.runtime.module.observability {
   requires com.fasterxml.jackson.dataformat.yaml;
 
   exports org.mule.runtime.module.observability to
+      org.mule.runtime.tracer.configuration.impl,
       org.mule.runtime.tracer.exporter.config.impl,
       org.mule.runtime.metrics.exporter.configuration.impl;
 

@@ -51,7 +51,7 @@ public class DefaultInitialSpanInfoProviderTestCase {
     TracingLevelConfiguration mockedTracingLevelConfiguration = mock(TracingLevelConfiguration.class);
     when(mockedTracingLevelConfiguration.getTracingLevel()).thenReturn(MONITORING);
     when(mockedTracingLevelConfiguration.getTracingLevelOverride(any())).thenReturn(MONITORING);
-    defaultInitialSpanInfoProvider.seTracingLevelConfiguration(mockedTracingLevelConfiguration);
+    defaultInitialSpanInfoProvider.setTracingLevelConfiguration(mockedTracingLevelConfiguration);
     MuleContext mockedMuleContext = mock(MuleContext.class);
     when(mockedMuleContext.getArtifactType()).thenReturn(APP);
     defaultInitialSpanInfoProvider.setMuleContext(mockedMuleContext);
