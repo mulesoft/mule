@@ -12,9 +12,9 @@ import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.equals
 import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.config.internal.dsl.utils.DslUtils.OPERATION_BODY_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.DslConstants.ERROR_HANDLER_NAME;
-import static org.mule.runtime.config.internal.dsl.DslConstants.ERROR_HANDLER_REF_PARAMETER_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_HANDLER_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.ERROR_HANDLER_REF_PARAMETER_NAME;
 
 import static java.util.stream.Stream.empty;
 import static java.util.stream.Stream.of;

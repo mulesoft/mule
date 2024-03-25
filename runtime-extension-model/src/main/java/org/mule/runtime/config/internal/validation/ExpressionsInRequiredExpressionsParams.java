@@ -15,7 +15,7 @@ import static org.mule.runtime.ast.api.validation.Validation.Level.ERROR;
 import static org.mule.runtime.ast.api.validation.ValidationResultItem.create;
 import static org.mule.runtime.core.internal.expression.util.ExpressionUtils.isExpression;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;

@@ -34,7 +34,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.config.internal.dsl.DslConstants;
+import org.mule.runtime.config.internal.dsl.utils.DslConstants;
 
 import java.io.InputStream;
 import java.io.StringReader;

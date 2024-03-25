@@ -42,7 +42,6 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
-import org.mule.runtime.metadata.api.dsl.DslElementModel.Builder;
 
 import java.util.Collection;
 import java.util.Map;

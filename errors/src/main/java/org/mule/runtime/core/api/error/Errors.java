@@ -35,7 +35,7 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSACTION_ERR
 import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
