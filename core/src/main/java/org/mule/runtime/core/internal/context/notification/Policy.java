@@ -6,14 +6,14 @@
  */
 package org.mule.runtime.core.internal.context.notification;
 
+import static java.lang.String.format;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.notification.Notification;
 import org.mule.runtime.api.notification.NotificationListener;
 import org.mule.runtime.core.api.context.notification.ListenerSubscriptionPair;
 import org.mule.runtime.core.api.context.notification.NotifierCallback;
-
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+
 /**
  * For a particular configuration, this describes what events should be delivered where. It is read-only and a lazy instance is
  * cached by the {@link Configuration}
@@ -34,15 +36,15 @@ public class Policy {
   private static final Logger LOGGER = getLogger(Policy.class);
 
   // map from event to set of senders
-  private Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
+  private final Map<Class<? extends Notification>, Collection<Sender>> eventToSenders =
       new HashMap<>();
-  private Map<Class<? extends Notification>, Collection<Sender>> concreteEventToSenders =
+  private final Map<Class<? extends Notification>, Collection<Sender>> concreteEventToSenders =
       new ConcurrentHashMap<>();
 
   // these are cumulative - set values should never change, they are just a cache of known info
   // they are co and contra-variant wrt to exact event type (see code below).
-  private ConcurrentMap<Class, Boolean> knownEventsExact = new ConcurrentHashMap<>();
-  private ConcurrentMap<Class, Boolean> knownEventsSuper = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Class, Boolean> knownEventsExact = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Class, Boolean> knownEventsSuper = new ConcurrentHashMap<>();
 
   /**
    * For each listener, we check each interface and see what events can be delivered.
@@ -63,7 +65,7 @@ public class Policy {
                 knownEventsSuper.put(event, Boolean.TRUE);
                 if (!eventToSenders.containsKey(event)) {
                   // use a collection with predictable iteration order
-                  eventToSenders.put(event, new ArrayList<Sender>());
+                  eventToSenders.put(event, new ArrayList<>());
                 }
                 eventToSenders.get(event).add(new Sender(pair));
               }
@@ -75,8 +77,8 @@ public class Policy {
   }
 
   protected static boolean notASubclassOfAnyClassInSet(Set set, Class clazz) {
-    for (Iterator iterator = set.iterator(); iterator.hasNext();) {
-      Class disabled = (Class) iterator.next();
+    for (Object element : set) {
+      Class disabled = (Class) element;
       if (disabled.isAssignableFrom(clazz)) {
         return false;
       }
@@ -85,8 +87,8 @@ public class Policy {
   }
 
   protected static boolean notASuperclassOfAnyClassInSet(Set set, Class clazz) {
-    for (Iterator iterator = set.iterator(); iterator.hasNext();) {
-      Class disabled = (Class) iterator.next();
+    for (Object element : set) {
+      Class disabled = (Class) element;
       if (clazz.isAssignableFrom(disabled)) {
         return false;
       }
@@ -139,13 +141,13 @@ public class Policy {
   private void dispatchToSenders(Notification notification, Collection<Sender> senders, NotifierCallback notifier) {
     for (Sender sender : senders) {
       try {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("Sending notification: " + notification.toString());
-        }
+        LOGGER.debug("Sending notification: {}", notification.toString());
         sender.dispatch(notification, notifier);
       } catch (Throwable e) {
-        LOGGER.info("NotificationListener {} was unable to fire notification {} due to an exception: {}.", sender.getListener(),
-                    notification, e);
+        LOGGER.info(format("NotificationListener %s was unable to fire notification %s due to an exception.",
+                           sender.getListener().toString(),
+                           notification.toString()),
+                    e);
       }
     }
   }

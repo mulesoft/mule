@@ -6,10 +6,14 @@
  */
 package org.mule.runtime.core.api.context.notification;
 
+import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
+import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
+import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -17,9 +21,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mule.runtime.core.api.context.notification.MuleContextNotification.CONTEXT_STOPPED;
-import static org.mule.runtime.core.api.context.notification.ServerNotificationsTestCase.DummyNotification.EVENT_RECEIVED;
-import static org.mule.tck.util.MuleContextUtils.getNotificationDispatcher;
 
 import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.notification.CustomNotificationListener;
@@ -35,14 +36,14 @@ import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.registry.RegistrationException;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
-import org.junit.Test;
-
 import java.util.EventObject;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Test;
 
 public class ServerNotificationsTestCase extends AbstractMuleContextTestCase implements MuleContextNotificationListener {
 
@@ -65,7 +66,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
   public void testStandardNotifications() throws Exception {
     getNotificationListenerRegistry().registerListener(this);
     muleContext.stop();
-    assertTrue(managerStopped.get());
+    assertThat(managerStopped.get(), is(true));
   }
 
   @Test
@@ -73,8 +74,8 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     getNotificationListenerRegistry().registerListener(this);
     getNotificationListenerRegistry().registerListener(this);
     muleContext.stop();
-    assertTrue(managerStopped.get());
-    assertEquals(1, managerStoppedEvents.get());
+    assertThat(managerStopped.get(), is(true));
+    assertThat(managerStoppedEvents.get(), is(1));
   }
 
   @Test
@@ -83,7 +84,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     getNotificationListenerRegistry().unregisterListener(this);
     muleContext.stop();
     // these should still be false because we unregistered ourselves
-    assertFalse(managerStopped.get());
+    assertThat(managerStopped.get(), is(false));
   }
 
   @Test
@@ -96,8 +97,8 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     getNotificationListenerRegistry().unregisterListener(dummy);
     muleContext.stop();
 
-    assertTrue(managerStopped.get());
-    assertEquals(1, managerStoppedEvents.get());
+    assertThat(managerStopped.get(), is(true));
+    assertThat(managerStoppedEvents.get(), is(1));
   }
 
   @Test
@@ -107,7 +108,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
     getNotificationListenerRegistry().registerListener((DummyNotificationListener) notification -> {
       if (new IntegerAction(EVENT_RECEIVED).equals(notification.getAction())) {
         customNotificationCount.incrementAndGet();
-        assertEquals("hello", ((EventObject) notification).getSource());
+        assertThat(((EventObject) notification).getSource(), is("hello"));
         latch.countDown();
       }
     });
@@ -117,7 +118,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
 
     // Wait for the notifcation event to be fired as they are queued
     latch.await(2000, MILLISECONDS);
-    assertEquals(2, customNotificationCount.get());
+    assertThat(customNotificationCount.get(), is(2));
   }
 
   @Test
@@ -209,7 +210,7 @@ public class ServerNotificationsTestCase extends AbstractMuleContextTestCase imp
      */
     private static final long serialVersionUID = -1117307108932589331L;
 
-    public static final int EVENT_RECEIVED = -999999;
+    public static final int EVENT_RECEIVED = NO_ACTION_ID;
 
     public DummyNotification(String message, int action) {
       super(message, action);

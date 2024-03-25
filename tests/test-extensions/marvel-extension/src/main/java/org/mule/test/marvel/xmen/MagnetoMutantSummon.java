@@ -13,7 +13,6 @@ import static java.lang.Thread.currentThread;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.api.notification.CustomNotification;
 import org.mule.runtime.api.streaming.bytes.CursorStreamProvider;
 import org.mule.runtime.core.api.context.notification.ServerNotificationManager;
 import org.mule.runtime.extension.api.annotation.execution.OnError;
@@ -72,7 +71,7 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
   @OnError
   public void onError(Error error) {
     notifyContextClassLoader();
-    notificationManager.fireNotification(new CustomNotification(error, ERROR_NOTIFICATION_ACTION));
+    notificationManager.fireNotification(new MagnetoMutantNotification(error, ERROR_NOTIFICATION_ACTION));
   }
 
   @Override
@@ -82,7 +81,8 @@ public class MagnetoMutantSummon extends Source<InputStream, Void> {
 
   private void notifyContextClassLoader() {
     notificationManager
-        .fireNotification(new CustomNotification(currentThread().getContextClassLoader(), CLASSLOADER_NOTIFICATION_ACTION));
+        .fireNotification(new MagnetoMutantNotification(currentThread().getContextClassLoader(),
+                                                        CLASSLOADER_NOTIFICATION_ACTION));
   }
 
 }
