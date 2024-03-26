@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.api.exception.ExceptionHelper.suppressIfPresent;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
 import static org.mule.runtime.module.extension.internal.error.SdkErrorTypeDefinitionAdapter.from;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static com.github.benmanes.caffeine.cache.Caffeine.newBuilder;
 
 import org.mule.runtime.api.config.MuleRuntimeFeature;
@@ -24,7 +24,6 @@ import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.sdk.api.error.ErrorTypeDefinition;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -144,7 +143,7 @@ public class ModuleExceptionHandler {
    * 
    * @param throwable Throwable where the suppression will be done.
    * @return Throwable with the result of the suppression.
-   * @see SuppressedMuleException
+   * @see org.mule.runtime.api.exception.ExceptionHelper#suppressIfPresent
    */
   private Throwable suppressMessagingException(Throwable throwable) {
     if (suppressErrors) {
