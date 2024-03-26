@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor.chain;
 
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -267,14 +268,16 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
               routeError(errorRouter, throwable);
             }));
 
-        return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
-                                        pub -> from(pub)
-                                            .map(event -> {
-                                              final Either<MessagingException, CoreEvent> result =
-                                                  right(MessagingException.class, event);
-                                              errorSwitchSinkSinkRef.next(result);
-                                              return result;
-                                            }),
+        Function<Publisher<CoreEvent>, Publisher<Either<MessagingException, CoreEvent>>> upstreamTransformation = pub -> from(pub)
+            .map(event -> {
+              final Either<MessagingException, CoreEvent> result =
+                  right(MessagingException.class, event);
+              errorSwitchSinkSinkRef.next(result);
+              return result;
+            });
+
+        return from(propagateCompletion(upstream, identity(),
+                                        upstreamTransformation,
                                         inflightEvents,
                                         () -> {
                                           errorSwitchSinkSinkRef.complete();
@@ -285,7 +288,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                           errorSwitchSinkSinkRef.error(t);
                                           disposeIfNeeded(errorRouter, LOGGER);
                                           clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                        }))
+                                        }).apply(errorSwitchSinkSinkRef.flux()))
                                             .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
       });
 
