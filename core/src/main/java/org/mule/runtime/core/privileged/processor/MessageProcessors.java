@@ -565,15 +565,15 @@ public class MessageProcessors {
                     // it will be cancelled, ignoring the onErrorContinue of the parent Flux.
                     .map(event -> right(MessagingException.class, event));
 
-            return from(subscribeFluxOnPublisherSubscription(identity(), Flux.from(eventChildCtxPub),
-                                                             upstreamTransform,
-                                                             completeSuccessEitherIfNeeded(),
-                                                             errorSwitchSinkSinkRef::error,
-                                                             errorSwitchSinkSinkRef::complete)
-                                                                 .apply(errorSwitchSinkSinkRef.flux()))
-                                                                     .map(RxUtils
-                                                                         .<MessagingException>propagateErrorResponseMapper()
-                                                                         .andThen(MessageProcessors::toParentContext));
+            return Flux.from(subscribeFluxOnPublisherSubscription(identity(), Flux.from(eventChildCtxPub),
+                                                                  upstreamTransform,
+                                                                  completeSuccessEitherIfNeeded(),
+                                                                  errorSwitchSinkSinkRef::error,
+                                                                  errorSwitchSinkSinkRef::complete)
+                                                                      .apply(errorSwitchSinkSinkRef.flux()))
+                .map(RxUtils
+                    .<MessagingException>propagateErrorResponseMapper()
+                    .andThen(MessageProcessors::toParentContext));
           }
         });
   }

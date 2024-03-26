@@ -6,10 +6,12 @@
  */
 package org.mule.runtime.core.internal.routing;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.core.api.rx.Exceptions.checkedConsumer;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+
 import static reactor.core.publisher.Flux.from;
 
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -18,10 +20,8 @@ import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
-
 import reactor.core.publisher.Flux;
 
 /**

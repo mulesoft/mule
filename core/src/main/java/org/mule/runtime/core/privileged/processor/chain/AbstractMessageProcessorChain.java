@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.privileged.processor.chain;
 
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.notification.MessageProcessorNotification.MESSAGE_PROCESSOR_POST_INVOKE;
@@ -252,8 +253,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                       errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
                     }), recreateRouter(ctx));
 
-        final Function<Publisher<CoreEvent>, Publisher<Either<MessagingException, CoreEvent>>> upstream =
-            coreEventPublisher -> from(doApply(coreEventPublisher, interceptors, (context, throwable) -> {
+        final Flux<CoreEvent> upstream =
+            from(doApply(publisher, interceptors, (context, throwable) -> {
               inflightEvents.incrementAndGet();
               if (chainSpanCreated) {
                 // Record the error at the current (MessageProcessor) Span.
@@ -265,15 +266,18 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                                getNotNullSpanTracingCondition());
               }
               routeError(errorRouter, throwable);
-            })).map(event -> {
+            }));
+
+        Function<Publisher<CoreEvent>, Publisher<Either<MessagingException, CoreEvent>>> upstreamTransformation = pub -> from(pub)
+            .map(event -> {
               final Either<MessagingException, CoreEvent> result =
                   right(MessagingException.class, event);
               errorSwitchSinkSinkRef.next(result);
               return result;
             });
 
-        return from(propagateCompletion(publisher, eitherPublisher -> eitherPublisher,
-                                        upstream,
+        return from(propagateCompletion(upstream, identity(),
+                                        upstreamTransformation,
                                         inflightEvents,
                                         () -> {
                                           errorSwitchSinkSinkRef.complete();
