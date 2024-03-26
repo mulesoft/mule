@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.routing;
 
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
+import static org.mule.runtime.api.exception.ExceptionHelper.suppressIfPresent;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -16,7 +17,6 @@ import static org.mule.runtime.core.api.retry.policy.SimpleRetryPolicyTemplate.R
 import static org.mule.runtime.core.api.rx.Exceptions.propagateWrappingFatal;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.isTransactionActive;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.applyWithChildContext;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 
 import static java.lang.Integer.parseInt;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -40,7 +40,6 @@ import org.mule.runtime.core.internal.event.EventInternalContextResolver;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.rx.FluxSinkRecorder;
 import org.mule.runtime.core.internal.util.rx.ConditionalExecutorServiceDecorator;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -328,7 +327,7 @@ class UntilSuccessfulRouter {
    * 
    * @param throwable Throwable where the suppression will be done.
    * @return Throwable with the result of the suppression.
-   * @see SuppressedMuleException
+   * @see org.mule.runtime.api.exception.ExceptionHelper#suppressIfPresent
    */
   private Throwable suppressMuleException(Throwable throwable) {
     if (suppressErrors) {

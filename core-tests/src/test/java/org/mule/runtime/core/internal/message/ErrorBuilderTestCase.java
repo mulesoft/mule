@@ -19,11 +19,12 @@ import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import static org.mule.runtime.api.exception.ExceptionHelper.suppressIfPresent;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.message.Message.of;
 import static org.mule.runtime.core.api.util.ExceptionUtils.getMessagingExceptionCause;
 import static org.mule.runtime.core.internal.message.ErrorBuilder.builder;
-import static org.mule.runtime.internal.exception.SuppressedMuleException.suppressIfPresent;
 import static org.mule.tck.junit4.matcher.IsEqualIgnoringLineBreaks.equalToIgnoringLineBreaks;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 import org.mule.runtime.api.component.Component;
@@ -39,7 +40,6 @@ import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -183,7 +183,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
     ComposedErrorMessageAwareException composedMessageAwareException =
         new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError, getMessagingException());
     // Adding a suppression in order to wrap the ComposedErrorMessageAwareException
-    Error error = builder(SuppressedMuleException.suppressIfPresent(composedMessageAwareException, MessagingException.class))
+    Error error = builder(suppressIfPresent(composedMessageAwareException, MessagingException.class))
         .errorType(testError)
         .build();
     assertThat(error.getDetailedDescription(), equalTo(EXCEPTION_MESSAGE));
@@ -295,8 +295,7 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   private Error getComposedErrorMessageAwareWithSuppressionException() {
     Throwable composedMessageAwareException =
         new ComposedErrorMessageAwareException(createStaticMessage(EXCEPTION_MESSAGE), testError, getMessagingException());
-    composedMessageAwareException =
-        SuppressedMuleException.suppressIfPresent(composedMessageAwareException, MessagingException.class);
+    composedMessageAwareException = suppressIfPresent(composedMessageAwareException, MessagingException.class);
     return builder(composedMessageAwareException)
         .errorType(testError)
         .build();
