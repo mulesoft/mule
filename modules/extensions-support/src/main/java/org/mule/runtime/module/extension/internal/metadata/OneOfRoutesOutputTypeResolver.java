@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
+
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
+
+import java.util.Map;
 
 /**
  * {@link OutputTypeResolver} implementation for Routers.
@@ -31,7 +36,11 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Void> {
   @Override
   public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
     UnionTypeBuilder builder = context.getTypeBuilder().unionType();
-    context.getInnerRoutesOutputType().values().forEach(metadataSupplier -> builder.of(metadataSupplier.get()));
+    Map<String, ChainPropagationContext> routes = context.getRouterPropagationContext()
+        .map(ctx -> ctx.getRoutesPropagationContext())
+        .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
+
+    routes.values().forEach(route -> builder.of(route.getChainOutputResolver().get()));
     return builder.build();
   }
 }

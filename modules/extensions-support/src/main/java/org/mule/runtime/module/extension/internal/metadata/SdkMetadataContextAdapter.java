@@ -6,12 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Collections.unmodifiableMap;
+import static java.util.stream.Collectors.toMap;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.sdk.api.metadata.ChainPropagationContext;
 import org.mule.sdk.api.metadata.MetadataCache;
 import org.mule.sdk.api.metadata.MetadataContext;
+import org.mule.sdk.api.metadata.RouterPropagationContext;
 
 import java.util.Map;
 import java.util.Optional;
@@ -51,12 +56,57 @@ public class SdkMetadataContextAdapter implements MetadataContext {
   }
 
   @Override
-  public Optional<Supplier<MetadataType>> getInnerChainOutputType() {
-    return delegate.getInnerChainOutputType();
+  public Optional<ChainPropagationContext> getScopeChainPropagationContext() {
+    return delegate.getScopePropagationContext().map(SdkChainPropagationContextAdapter::new);
   }
 
   @Override
-  public Map<String, Supplier<MetadataType>> getInnerRoutesOutputType() {
-    return delegate.getInnerRoutesOutputType();
+  public Optional<RouterPropagationContext> getRouterPropagationContext() {
+    return delegate.getRouterPropagationContext().map(SdkRouterPropagationContextAdapter::new);
+  }
+
+  static class SdkChainPropagationContextAdapter implements ChainPropagationContext {
+
+    private final org.mule.runtime.api.metadata.ChainPropagationContext delegate;
+
+    private SdkChainPropagationContextAdapter(org.mule.runtime.api.metadata.ChainPropagationContext delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public Supplier<MessageMetadataType> getChainInputResolver() {
+      return delegate.getChainInputResolver();
+    }
+
+    @Override
+    public Supplier<MessageMetadataType> getChainOutputResolver() {
+      return delegate.getChainOutputResolver();
+    }
+
+    org.mule.runtime.api.metadata.ChainPropagationContext getDelegate() {
+      return delegate;
+    }
+  }
+
+  static class SdkRouterPropagationContextAdapter implements RouterPropagationContext {
+
+    private final org.mule.runtime.api.metadata.RouterPropagationContext delegate;
+
+    private SdkRouterPropagationContextAdapter(org.mule.runtime.api.metadata.RouterPropagationContext delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public Map<String, ChainPropagationContext> getRoutesPropagationContext() {
+      return unmodifiableMap(
+                             delegate.getRoutesPropagationContext().entrySet().stream().collect(
+                                                                                                toMap(entry -> entry.getKey(),
+                                                                                                      entry -> new SdkChainPropagationContextAdapter(entry
+                                                                                                          .getValue()))));
+    }
+
+    org.mule.runtime.api.metadata.RouterPropagationContext getDelegate() {
+      return delegate;
+    }
   }
 }

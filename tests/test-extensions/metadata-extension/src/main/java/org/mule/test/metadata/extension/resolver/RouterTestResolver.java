@@ -6,13 +6,16 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
+import java.util.Map;
 
 public class RouterTestResolver implements OutputTypeResolver<String> {
 
@@ -23,9 +26,10 @@ public class RouterTestResolver implements OutputTypeResolver<String> {
 
   @Override
   public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException {
-    if (!context.getInnerRoutesOutputType().containsKey("metaroute")) {
+    Map<String, ChainPropagationContext> routes = context.getRouterPropagationContext().get().getRoutesPropagationContext();
+    if (!routes.containsKey("metaroute")) {
       throw new MetadataResolvingException("Invalid Chain output.", INVALID_CONFIGURATION);
     }
-    return context.getInnerRoutesOutputType().get("metaroute").get();
+    return routes.get("metaroute").getChainOutputResolver().get().getPayloadType().get();
   }
 }

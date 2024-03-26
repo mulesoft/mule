@@ -9,7 +9,7 @@ package org.mule.runtime.config.internal.bean.lazy;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 
 import org.mule.runtime.api.metadata.RouterPropagationContext;
-import org.mule.runtime.api.metadata.ScopePropagationContext;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
@@ -160,7 +160,7 @@ public class LazyMetadataService implements MetadataService, Initialisable {
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
-                                                                         ScopePropagationContext ctx) {
+                                                                         ChainPropagationContext ctx) {
     return (MetadataResult<OutputMetadataDescriptor>) initializeComponent(location)
         .orElseGet(() -> metadataService.getScopeOutputMetadata(location, key, ctx));
   }

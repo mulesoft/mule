@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
+import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -15,22 +15,26 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 /**
- * {@link OutputTypeResolver} implementation for Scopes.
+ * Pass Through {@link OutputTypeResolver} implementation for Scopes.
  * <p>
- * This {@link OutputTypeResolver} propagates the metadata result of the inner chain of the scope, without any modification.
+ * Propagates the inner chain's resolved payload type.
  *
  * @since 4.7
  */
-public class PassThroughOutputTypeResolver implements OutputTypeResolver<Void> {
+public class ChainOutputPayloadPassThroughTypeResolver implements OutputTypeResolver<Void> {
 
   @Override
   public String getCategoryName() {
-    return "OUTPUT_SCOPE_DYNAMIC";
+    return "SCOPE_PASSTHROUGH_OUTPUT_PAYLOAD";
   }
 
   @Override
   public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
-    return context.getInnerChainOutputType()
-        .orElseThrow(() -> new MetadataResolvingException("Invalid Chain output.", INVALID_CONFIGURATION)).get();
+    return context.getScopePropagationContext()
+        .map(ctx -> ctx.getChainOutputResolver())
+        .orElseThrow(() -> new MetadataResolvingException("Chain Output Context not found.", UNKNOWN))
+        .get()
+        .getPayloadType()
+        .orElseThrow(() -> new MetadataResolvingException("Resolved output payload not found.", UNKNOWN));
   }
 }

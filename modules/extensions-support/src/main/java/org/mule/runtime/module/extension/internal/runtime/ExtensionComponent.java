@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.runtime;
 
-import static java.util.Collections.emptyMap;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
@@ -46,7 +45,15 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.metadata.*;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeyProvider;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
+import org.mule.runtime.api.metadata.MetadataProvider;
+import org.mule.runtime.api.metadata.MetadataResolvingException;
+import org.mule.runtime.api.metadata.RouterPropagationContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -93,11 +100,9 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -786,7 +791,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer,
-                                                         Optional<ScopePropagationContext> scopePropagationContext,
+                                                         Optional<ChainPropagationContext> scopePropagationContext,
                                                          Optional<RouterPropagationContext> routerPropagationContext)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
@@ -844,7 +849,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return result;
   }
 
-  private MetadataContext getMetadataContext(MetadataCache cache, Optional<ScopePropagationContext> scopePropagationContext,
+  private MetadataContext getMetadataContext(MetadataCache cache,
+                                             Optional<ChainPropagationContext> scopePropagationContext,
                                              Optional<RouterPropagationContext> routerPropagationContext)
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
@@ -865,10 +871,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
           throw new MetadataResolvingException("Configuration used for Metadata fetch cannot be dynamic", INVALID_CONFIGURATION);
         }
       }
-      return new DefaultMetadataContext(() -> configuration, connectionManager, cache, typeLoader,
-                                        scopePropagationContext.map(ScopePropagationContext::getInnerChainResolver),
-                                        routerPropagationContext.map(RouterPropagationContext::getRouteResolvers)
-                                            .orElse(emptyMap()));
+      return new DefaultMetadataContext(() -> configuration, connectionManager, cache, typeLoader, scopePropagationContext,
+                                        routerPropagationContext);
     } finally {
       if (fakeEvent != null) {
         ((BaseEventContext) fakeEvent.getContext()).success();
@@ -898,12 +902,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(MetadataKey key,
-                                                                         ScopePropagationContext scopePropagationContext)
+                                                                         ChainPropagationContext chainPropagationContext)
       throws MetadataResolvingException {
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)),
-                                    of(scopePropagationContext), empty());
+                                    of(chainPropagationContext), empty());
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

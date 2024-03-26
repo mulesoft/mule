@@ -13,8 +13,9 @@ import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.metadata.internal.NullMetadataResolverSupplier;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.metadata.AllOfRoutesOutputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.ChainOutputAttributesPassThroughTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.OneOfRoutesOutputTypeResolver;
-import org.mule.runtime.module.extension.internal.metadata.PassThroughOutputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.ChainOutputPayloadPassThroughTypeResolver;
 
 /**
  * Utils that allow to set TypeResolvers to an {@link OperationDeclarer}.
@@ -28,17 +29,17 @@ public class TypeResolverUtils {
   }
 
   /**
-   * Sets to the {@code operation} (that declares a Scope) a resolver which return type corresponds to the result of the inner
-   * chain.
-   * 
+   * For a scope declared by {@code operation}, add resolvers that propagate the inner chain's output payload and attributes
+   * types.
+   *
    * @param operation
    */
-  public static void addPassThroughOutputTypeResolver(OperationDeclarer operation) {
+  public static void addScopePassThroughOutputTypeResolver(OperationDeclarer operation) {
     operation
         .withModelProperty(new MetadataResolverFactoryModelProperty(() -> new DefaultMetadataResolverFactory(new NullMetadataResolverSupplier(),
                                                                                                              emptyMap(),
-                                                                                                             PassThroughOutputTypeResolver::new,
-                                                                                                             new NullMetadataResolverSupplier())));
+                                                                                                             ChainOutputPayloadPassThroughTypeResolver::new,
+                                                                                                             ChainOutputAttributesPassThroughTypeResolver::new)));
   }
 
   /**
