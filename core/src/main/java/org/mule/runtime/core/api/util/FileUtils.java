@@ -423,7 +423,12 @@ public class FileUtils {
    * @see File
    */
   public static File newFile(String pathName) {
-    return org.mule.runtime.internal.util.FileUtils.newFile(pathName);
+    try {
+      return new File(pathName).getCanonicalFile();
+    } catch (IOException e) {
+      throw new MuleRuntimeException(createStaticMessage("Unable to create a canonical file for " + pathName),
+                                     e);
+    }
   }
 
   /**
