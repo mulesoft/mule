@@ -6,19 +6,6 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.isOneOf;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -39,6 +26,21 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.isOneOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -56,7 +58,7 @@ import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.RouterPropagationContext;
-import org.mule.runtime.api.metadata.ScopePropagationContext;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -85,8 +87,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.junit.Test;
 import io.qameta.allure.Issue;
+import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -286,16 +288,17 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Issue("W-15158118")
   public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    ScopePropagationContext scopeContext = new ScopePropagationContext() {
+    ChainPropagationContext scopeContext = new ChainPropagationContext() {
 
       @Override
-      public Supplier<MetadataType> getInnerChainResolver() {
-        return () -> carType;
+      public Supplier<MessageMetadataType> getChainInputResolver() {
+        // TODO: implement in W-14969942
+        return () -> null;
       }
 
       @Override
-      public Supplier<MessageMetadataType> getMessageTypeResolver() {
-        return null;
+      public Supplier<MessageMetadataType> getChainOutputResolver() {
+        return () -> MessageMetadataType.builder().payload(carType).build();
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
@@ -312,13 +315,20 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
 
       @Override
-      public Map<String, Supplier<MetadataType>> getRouteResolvers() {
-        return singletonMap("metaroute", () -> carType);
-      }
+      public Map<String, ChainPropagationContext> getRoutesPropagationContext() {
+        return singletonMap("metaroute", new ChainPropagationContext() {
 
-      @Override
-      public Supplier<MessageMetadataType> getMessageTypeResolver() {
-        return null;
+          @Override
+          public Supplier<MessageMetadataType> getChainInputResolver() {
+            // TODO: implement in W-14969942
+            return () -> null;
+          }
+
+          @Override
+          public Supplier<MessageMetadataType> getChainOutputResolver() {
+            return () -> MessageMetadataType.builder().payload(carType).build();
+          }
+        });
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =

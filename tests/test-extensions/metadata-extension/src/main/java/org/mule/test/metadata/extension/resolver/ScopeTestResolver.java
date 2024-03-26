@@ -6,13 +6,13 @@
  */
 package org.mule.test.metadata.extension.resolver;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_CONFIGURATION;
 
 public class ScopeTestResolver implements OutputTypeResolver<String> {
 
@@ -23,7 +23,9 @@ public class ScopeTestResolver implements OutputTypeResolver<String> {
 
   @Override
   public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException {
-    return context.getInnerChainOutputType()
-        .orElseThrow(() -> new MetadataResolvingException("Invalid Chain output.", INVALID_CONFIGURATION)).get();
+    return context.getScopePropagationContext().map(ctx -> ctx.getChainOutputResolver())
+        .orElseThrow(() -> new MetadataResolvingException("Invalid Chain output.", INVALID_CONFIGURATION))
+        .get()
+        .getPayloadType().get();
   }
 }

@@ -8,13 +8,12 @@ package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.RouterPropagationContext;
 import org.mule.sdk.api.metadata.MetadataContext;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata.MetadataContext {
 
@@ -50,13 +49,15 @@ public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata
   }
 
   @Override
-  public Optional<Supplier<MetadataType>> getInnerChainOutputType() {
-    return delegate.getInnerChainOutputType();
+  public Optional<ChainPropagationContext> getScopePropagationContext() {
+    return delegate.getScopeChainPropagationContext()
+        .map(ctx -> ((SdkMetadataContextAdapter.SdkChainPropagationContextAdapter) ctx).getDelegate());
   }
 
   @Override
-  public Map<String, Supplier<MetadataType>> getInnerRoutesOutputType() {
-    return delegate.getInnerRoutesOutputType();
+  public Optional<RouterPropagationContext> getRouterPropagationContext() {
+    return delegate.getRouterPropagationContext()
+        .map(ctx -> ((SdkMetadataContextAdapter.SdkRouterPropagationContextAdapter) ctx).getDelegate());
   }
 
   @Override
