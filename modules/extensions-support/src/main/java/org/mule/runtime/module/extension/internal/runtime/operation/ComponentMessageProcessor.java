@@ -670,11 +670,14 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
           return deferContextual(ctx -> {
             final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
-            return from(propagateCompletion(from(publisher), emitter.flux(),
-                                            pub -> from(pub)
-                                                .doOnNext(innerEventDispatcher(emitter))
-                                                .map(e -> Either.empty()),
-                                            () -> emitter.complete(), e -> emitter.error(e)))
+            Function<Publisher<CoreEvent>, Publisher<Either<EventProcessingException, CoreEvent>>> publisherPublisherFunction =
+                pub -> from(pub)
+                    .doOnNext(innerEventDispatcher(emitter))
+                    .map(e -> Either.empty());
+
+            return from(propagateCompletion(from(publisher), identity(),
+                                            publisherPublisherFunction,
+                                            () -> emitter.complete(), e -> emitter.error(e)).apply(emitter.flux()))
                                                 .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
           });
         }
