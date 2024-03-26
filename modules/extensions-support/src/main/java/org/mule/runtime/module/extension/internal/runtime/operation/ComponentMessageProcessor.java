@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static java.util.function.Function.identity;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
@@ -406,19 +407,19 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
         // impose a timeout in the operation, which we don't want to.
         // In this case, the flux will be complete when there are no more inflight operations.
         || ctx.getOrDefault(WITHIN_PROCESS_TO_APPLY, false)) {
-      return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
+      return from(propagateCompletion(from(publisher), identity(), transformer,
                                       () -> errorSwitchSinkSinkRef.complete(),
-                                      t -> errorSwitchSinkSinkRef.error(t)));
+                                      t -> errorSwitchSinkSinkRef.error(t)).apply(errorSwitchSinkSinkRef.flux()));
     } else {
       // For fluxes, the only way they would complete is when the flow that owns the flux is stopped.
       // In that case we need to enforce the timeout configured in the app so that the stop of the flow doesn't take more than
       // that time.
-      return from(propagateCompletion(from(publisher), errorSwitchSinkSinkRef.flux(), transformer,
+      return from(propagateCompletion(from(publisher), identity(), transformer,
                                       () -> errorSwitchSinkSinkRef.complete(),
                                       t -> errorSwitchSinkSinkRef.error(t),
                                       outerFluxTerminationTimeout,
                                       outerFluxCompletionScheduler,
-                                      getDslSource()));
+                                      getDslSource()).apply(errorSwitchSinkSinkRef.flux()));
     }
   }
 

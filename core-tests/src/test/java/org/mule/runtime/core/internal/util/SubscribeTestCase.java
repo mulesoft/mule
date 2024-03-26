@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.core.internal.util;
 
-import static org.mule.runtime.core.internal.util.rx.RxUtils.propagateCompletion;
 import static org.mule.runtime.core.internal.util.rx.RxUtils.subscribeFluxOnPublisherSubscription;
 import static org.mule.tck.probe.PollingProber.probe;
 
@@ -19,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
@@ -33,40 +33,28 @@ public class SubscribeTestCase extends AbstractMuleTestCase {
     Flux<String> upstreamFlux = Flux.<String>create(sink -> {
       sink.next("Hello");
       sink.complete();
-    }).doOnSubscribe(subscription -> {
-      System.out.println(subscription);
     });
 
-    FluxSinkRecorder<String> downStream = new FluxSinkRecorder<>();
-
-    // Flux<String> combined = from(propagateCompletion(upstreamFlux, completeDownstreamFlux(downStream.flux(), complete),
-    // pub -> from(pub)
-    // .doOnNext(downStream::next),
-    // inflightEvents,
-    // downStream::complete,
-    // downStream::error));
-
-    // Flux<String> combined =
-    // subscribeFluxOnPublisherSubscription(pub -> completeDownstreamFlux(downStream.flux(), complete), upstreamFlux,
-    // stringPublisher -> from(stringPublisher).doOnNext(downStream::next), null,
-    // downStream::error, downStream::complete);
+    FluxSinkRecorder<String> downstreamSink = new FluxSinkRecorder<>();
+    Flux<String> initialDownstream = downstreamSink.flux();
 
     Flux<String> combined =
-        subscribeFluxOnPublisherSubscription(completeDownstreamFlux(downStream.flux(), complete), upstreamFlux,
-                                             stringPublisher -> from(stringPublisher).doOnNext(downStream::next), null,
-                                             downStream::error, downStream::complete);
+        Flux.from(subscribeFluxOnPublisherSubscription(pub -> completeDownstreamFlux(pub, complete), upstreamFlux,
+                                                       stringPublisher -> from(stringPublisher).doOnNext(downstreamSink::next),
+                                                       null,
+                                                       downstreamSink::error, downstreamSink::complete).apply(initialDownstream));
+
 
     combined
-        .subscribe(System.out::println, throwable -> {
-        }, () -> {
+        .subscribe(System.out::println, throwable -> System.out.println("Error!"), () -> {
         }, Context.of("test", "value"));
 
     probe(complete::get);
   }
 
-  private static Flux<String> completeDownstreamFlux(Flux<String> downStream, AtomicBoolean complete) {
-    return downStream
-        .contextWrite(ctx -> ctx.put("test2", "value2"))
+  private static <T> Flux<T> completeDownstreamFlux(Publisher<T> downStream, AtomicBoolean complete) {
+    Flux<T> result = Flux.from(downStream);
+    return (Flux<T>) result.contextWrite(ctx -> ctx.put("test2", "value2"))
         .map(s -> s + " World!")
         .doOnComplete(() -> complete.set(true));
   }

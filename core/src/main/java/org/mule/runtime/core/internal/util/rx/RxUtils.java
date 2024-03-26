@@ -16,7 +16,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.UnaryOperator.identity;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static reactor.core.publisher.Mono.from;
+import static reactor.core.publisher.Flux.from;
 import static reactor.core.scheduler.Schedulers.fromExecutorService;
 
 import org.mule.runtime.api.component.Component;
@@ -85,10 +85,10 @@ public class RxUtils {
    * @return the triggeringSubscriber {@link Flux}, decorated with the callback that will perform this deferred subscription.
    * @since 4.3
    */
-  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
-                                                                    Flux<U> deferredSubscriber) {
-    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, uPublisher -> (Publisher<T>) uPublisher,
-                                                null, null, null);
+  public static <T, U> Function<Publisher<T>, Publisher<T>> subscribeFluxOnPublisherSubscription(Function<Publisher<T>, Publisher<T>> triggeringSubscriber,
+                                                                                                 Flux<T> deferredSubscriber) {
+    return subscribeFluxOnPublisherSubscription(triggeringSubscriber, deferredSubscriber, publisher -> publisher, null, null,
+                                                null);
   }
 
   /**
@@ -131,36 +131,51 @@ public class RxUtils {
   // .subscribe(consumer, errorConsumer, completeConsumer)));
   // }
 
-  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
-                                                                    Flux<U> deferredSubscriber,
-                                                                    Function<Publisher<U>, Publisher<T>> deferredSubscriberTransformation,
-                                                                    @Nullable Consumer<T> consumer,
-                                                                    @Nullable Consumer<? super Throwable> errorConsumer,
-                                                                    @Nullable Runnable completeConsumer) {
-    Flux<T> propagatorFlux = Flux.empty(); // A flux whose only objective is to propagate the subscription.
-    return triggeringSubscriber.startWith(propagatorFlux
-        .transformDeferredContextual((eventPub, ctx) -> eventPub
-            .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
-                .contextWrite(ctx)
-                .subscribe(consumer, errorConsumer, completeConsumer))));
-  }
+  // public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Flux<T> triggeringSubscriber,
+  // Flux<U> deferredSubscriber,
+  // Function<Publisher<U>, Publisher<T>> deferredSubscriberTransformation,
+  // @Nullable Consumer<T> consumer,
+  // @Nullable Consumer<? super Throwable> errorConsumer,
+  // @Nullable Runnable completeConsumer) {
+  //
+  // Flux<T> propagatorFlux = Flux.empty(); // A flux whose only objective is to propagate the subscription.
+  // return triggeringSubscriber.startWith(propagatorFlux
+  // .transformDeferredContextual((eventPub, ctx) -> eventPub
+  // .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
+  // .contextWrite(ctx)
+  // .subscribe(consumer, errorConsumer, completeConsumer))));
+  // }
 
-  public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Function<Publisher<T>, Publisher<T>> triggeringSubscriber,
-                                                                    Flux<U> deferredSubscriber,
-                                                                    Function<Publisher<U>, Publisher<U>> deferredSubscriberTransformation,
-                                                                    @Nullable Consumer<? super U> consumer,
-                                                                    @Nullable Consumer<? super Throwable> errorConsumer,
-                                                                    @Nullable Runnable completeConsumer) {
-    // An internal FluxSink that complete as soon as the flux is subscribed but allows to retrieve the subscriber context at the
-    // top of the triggering subscriber.
-    FluxSinkRecorder<T> temporarySink = new FluxSinkRecorder<>();
-    return temporarySink.flux()
+  public static <T, U> Function<Publisher<T>, Publisher<T>> subscribeFluxOnPublisherSubscription(Function<Publisher<T>, Publisher<T>> triggeringSubscriber,
+                                                                                                 Flux<U> deferredSubscriber,
+                                                                                                 Function<Publisher<U>, Publisher<T>> deferredSubscriberTransformation,
+                                                                                                 @Nullable Consumer<? super T> consumer,
+                                                                                                 @Nullable Consumer<? super Throwable> errorConsumer,
+                                                                                                 @Nullable Runnable completeConsumer) {
+    return publisher -> from(publisher)
         .transformDeferredContextual((eventPub, ctx) -> eventPub
             .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
                 .contextWrite(ctx)
                 .subscribe(consumer, errorConsumer, completeConsumer)))
         .transform(triggeringSubscriber);
   }
+
+  // public static <T, U> Flux<T> subscribeFluxOnPublisherSubscription(Function<Publisher<T>, Publisher<T>> triggeringSubscriber,
+  // Flux<U> deferredSubscriber,
+  // Function<Publisher<U>, Publisher<U>> deferredSubscriberTransformation,
+  // @Nullable Consumer<? super U> consumer,
+  // @Nullable Consumer<? super Throwable> errorConsumer,
+  // @Nullable Runnable completeConsumer) {
+  // // An internal FluxSink that complete as soon as the flux is subscribed but allows to retrieve the subscriber context at the
+  // // top of the triggering subscriber.
+  // FluxSinkRecorder<T> temporarySink = new FluxSinkRecorder<>();
+  // return temporarySink.flux()
+  // .transformDeferredContextual((eventPub, ctx) -> eventPub
+  // .doOnSubscribe(s -> deferredSubscriber.transform(deferredSubscriberTransformation)
+  // .contextWrite(ctx)
+  // .subscribe(consumer, errorConsumer, completeConsumer)))
+  // .transform(triggeringSubscriber);
+  // }
 
   /**
    * As {@link #subscribeFluxOnPublisherSubscription(Flux, Flux)}, but also propagates completion and cancellation events in the
@@ -170,28 +185,29 @@ public class RxUtils {
    * cancellation event. This implementation will not reject new items after receiving the completion or cancellation event. It is
    * up to the caller to avoid sending new items to be processed when completion or cancellation is expected.
    *
-   * @param upstream           the source of the items, completion of cancellation events to be processed and propagated
-   *                           downstream.
-   * @param downstream         the downstream that will receive the items, completion of cancellation events, as well as trigger
-   *                           the subscription to upstream.
-   * @param transformer        the data transformation to be done on the items of upstream. If any items are in any operators of
-   *                           this transformation when a completion or cancellation event is received, that event will wait for
-   *                           any in-flight events to finish.
-   * @param completionCallback how a completion event will be triggered on the downstream.
-   * @param errorCallback      how a cancellation event will be triggered on the downstream.
+   * @param upstream            the source of the items, completion of cancellation events to be processed and propagated
+   *                            downstream.
+   * @param downstream          the downstream that will receive the items, completion of cancellation events, as well as trigger
+   *                            the subscription to upstream.
+   * @param upstreamTransformer the data transformation to be done on the items of upstream. If any items are in any operators of
+   *                            this transformation when a completion or cancellation event is received, that event will wait for
+   *                            any in-flight events to finish.
+   * @param completionCallback  how a completion event will be triggered on the downstream.
+   * @param errorCallback       how a cancellation event will be triggered on the downstream.
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
-  public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
-                                                        Function<Publisher<U>, Publisher<T>> transformer,
-                                                        CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback) {
+  public static <T, U> Function<Publisher<T>, Publisher<T>> propagateCompletion(Publisher<U> upstream,
+                                                                                Function<Publisher<T>, Publisher<T>> downstream,
+                                                                                Function<Publisher<U>, Publisher<T>> upstreamTransformer,
+                                                                                CheckedRunnable completionCallback,
+                                                                                CheckedConsumer<Throwable> errorCallback) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
-    requireNonNull(transformer, "'transformer' must not be null");
+    requireNonNull(upstreamTransformer, "'upstreamTransformer' must not be null");
     requireNonNull(completionCallback, "'completionCallback' must not be null");
     requireNonNull(errorCallback, "'errorCallback' must not be null");
 
-    return doPropagateCompletion(upstream, downstream, transformer,
+    return doPropagateCompletion(upstream, downstream, upstreamTransformer,
                                  new AtomicInteger(0),
                                  Once.of(completionCallback), Once.of(errorCallback),
                                  () -> null);
@@ -209,31 +225,32 @@ public class RxUtils {
    * Upon termination of the {@code upstream}, the downstream will be terminated as well when there are no more inflight events,
    * or after {@code completionTimeoutMillis} have elapsed, canceling the inflight events.
    *
-   * @param upstream           the source of the items, completion of cancellation events to be processed and propagated
-   *                           downstream.
-   * @param downstream         the downstream that will receive the items, completion of cancellation events, as well as trigger
-   *                           the subscription to upstream.
-   * @param transformer        the data transformation to be done on the items of upstream. If any items are in any operators of
-   *                           this transformation when a completion or cancellation event is received, that event will wait for
-   *                           any in-flight events to finish.
-   * @param inflightCounter    a counter where externally executing items may be accounted for, to avoid premature completion of
-   *                           the downstream flux.
-   * @param completionCallback how a completion event will be triggered on the downstream.
-   * @param errorCallback      how a cancellation event will be triggered on the downstream.
+   * @param upstream            the source of the items, completion of cancellation events to be processed and propagated
+   *                            downstream.
+   * @param downstream          the downstream that will receive the items, completion of cancellation events, as well as trigger
+   *                            the subscription to upstream.
+   * @param upstreamTransformer the data transformation to be done on the items of upstream. If any items are in any operators of
+   *                            this transformation when a completion or cancellation event is received, that event will wait for
+   *                            any in-flight events to finish.
+   * @param inflightCounter     a counter where externally executing items may be accounted for, to avoid premature completion of
+   *                            the downstream flux.
+   * @param completionCallback  how a completion event will be triggered on the downstream.
+   * @param errorCallback       how a cancellation event will be triggered on the downstream.
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
-  public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
-                                                        Function<Publisher<U>, Publisher<T>> transformer,
-                                                        AtomicInteger inflightCounter,
-                                                        CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback) {
+  public static <T, U> Function<Publisher<T>, Publisher<T>> propagateCompletion(Publisher<U> upstream,
+                                                                                Function<Publisher<T>, Publisher<T>> downstream,
+                                                                                Function<Publisher<U>, Publisher<T>> upstreamTransformer,
+                                                                                AtomicInteger inflightCounter,
+                                                                                CheckedRunnable completionCallback,
+                                                                                CheckedConsumer<Throwable> errorCallback) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
-    requireNonNull(transformer, "'transformer' must not be null");
+    requireNonNull(upstreamTransformer, "'upstreamTransformer' must not be null");
     requireNonNull(completionCallback, "'completionCallback' must not be null");
     requireNonNull(errorCallback, "'errorCallback' must not be null");
 
-    return doPropagateCompletion(upstream, downstream, transformer,
+    return doPropagateCompletion(upstream, downstream, upstreamTransformer,
                                  inflightCounter,
                                  Once.of(completionCallback), Once.of(errorCallback),
                                  () -> null);
@@ -254,7 +271,7 @@ public class RxUtils {
    *                                downstream.
    * @param downstream              the downstream that will receive the items, completion of cancellation events, as well as
    *                                trigger the subscription to upstream.
-   * @param transformer             the data transformation to be done on the items of upstream. If any items are in any operators
+   * @param upstreamTransformer     the data transformation to be done on the items of upstream. If any items are in any operators
    *                                of this transformation when a completion or cancellation event is received, that event will
    *                                wait for any in-flight events to finish.
    * @param completionCallback      how a completion event will be triggered on the downstream.
@@ -267,15 +284,17 @@ public class RxUtils {
    *                                delayedExecutor
    * @return an enriched downstream where items and events will be triggered according to the rules defined for this method.
    */
-  public static <T, U> Publisher<T> propagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
-                                                        Function<Publisher<U>, Publisher<T>> transformer,
-                                                        CheckedRunnable completionCallback,
-                                                        CheckedConsumer<Throwable> errorCallback,
-                                                        long completionTimeoutMillis, ScheduledExecutorService delayedExecutor,
-                                                        final String dslSource) {
+  public static <T, U> Function<Publisher<T>, Publisher<T>> propagateCompletion(Publisher<U> upstream,
+                                                                                Function<Publisher<T>, Publisher<T>> downstream,
+                                                                                Function<Publisher<U>, Publisher<T>> upstreamTransformer,
+                                                                                CheckedRunnable completionCallback,
+                                                                                CheckedConsumer<Throwable> errorCallback,
+                                                                                long completionTimeoutMillis,
+                                                                                ScheduledExecutorService delayedExecutor,
+                                                                                final String dslSource) {
     requireNonNull(upstream, "'upstream' must not be null");
     requireNonNull(downstream, "'downstream' must not be null");
-    requireNonNull(transformer, "'transformer' must not be null");
+    requireNonNull(upstreamTransformer, "'upstreamTransformer' must not be null");
     requireNonNull(completionCallback, "'completionCallback' must not be null");
     requireNonNull(errorCallback, "'errorCallback' must not be null");
     requireNonNull(delayedExecutor, "'delayedExecutor' must not be null");
@@ -283,7 +302,7 @@ public class RxUtils {
     final RunOnce completer = Once.of(completionCallback);
     final ConsumeOnce<Throwable> errorForwarder = Once.of(errorCallback);
 
-    return doPropagateCompletion(upstream, downstream, transformer,
+    return doPropagateCompletion(upstream, downstream, upstreamTransformer,
                                  new AtomicInteger(0), completer, errorForwarder,
                                  () -> delayedExecutor.schedule(() -> {
                                    LOGGER.debug("Propagating completion after {} milliseconds\nDSL Source:\n{}",
@@ -292,36 +311,26 @@ public class RxUtils {
                                  }, completionTimeoutMillis, MILLISECONDS));
   }
 
-  private static <T, U> Publisher<T> doPropagateCompletion(Publisher<U> upstream, Publisher<T> downstream,
-                                                           Function<Publisher<U>, Publisher<T>> transformer,
-                                                           AtomicInteger inflightCounter,
-                                                           final RunOnce completer, final ConsumeOnce<Throwable> errorForwarder,
-                                                           final Supplier<ScheduledFuture<?>> scheduleCompletion) {
+  private static <T, U> Function<Publisher<T>, Publisher<T>> doPropagateCompletion(Publisher<U> upstream,
+                                                                                   Function<Publisher<T>, Publisher<T>> downstream,
+                                                                                   Function<Publisher<U>, Publisher<T>> upstreamTransformer,
+                                                                                   AtomicInteger inflightCounter,
+                                                                                   final RunOnce completer,
+                                                                                   final ConsumeOnce<Throwable> errorForwarder,
+                                                                                   final Supplier<ScheduledFuture<?>> scheduleCompletion) {
     AtomicBoolean upstreamComplete = new AtomicBoolean(false);
-    AtomicReference<Throwable> upstreamError = new AtomicReference<>();
 
     AtomicReference<ScheduledFuture<?>> scheduledCompletion = new AtomicReference<>();
 
-    Flux<U> enrichedUpstream = Flux.from(upstream)
+    Flux<U> upstreamThatCountsInflight = from(upstream)
         .doOnNext(s -> inflightCounter.incrementAndGet());
 
-    return subscribeFluxOnPublisherSubscription(Flux.from(downstream)
-        .doOnNext(s -> {
-          if (inflightCounter.decrementAndGet() == 0 && upstreamComplete.get()) {
-            completer.runOnce();
-            final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
-            if (scheduledFuture != null) {
-              scheduledFuture.cancel(true);
-            }
-          }
-        }),
-                                                enrichedUpstream,
-                                                transformer,
+    return subscribeFluxOnPublisherSubscription(downstream
+        .compose(completeIfNecessary(inflightCounter, completer, upstreamComplete, scheduledCompletion)),
+                                                upstreamThatCountsInflight,
+                                                upstreamTransformer,
                                                 null,
-                                                t -> {
-                                                  upstreamError.set(t);
-                                                  errorForwarder.consumeOnce(t);
-                                                },
+                                                errorForwarder::consumeOnce,
                                                 () -> {
                                                   upstreamComplete.set(true);
 
@@ -331,6 +340,20 @@ public class RxUtils {
                                                     scheduledCompletion.set(scheduleCompletion.get());
                                                   }
                                                 });
+  }
+
+  private static <T> Function<Publisher<T>, Publisher<T>> completeIfNecessary(AtomicInteger inflightCounter, RunOnce completer,
+                                                                              AtomicBoolean upstreamComplete,
+                                                                              AtomicReference<ScheduledFuture<?>> scheduledCompletion) {
+    return pub -> from(pub).doOnNext(s -> {
+      if (inflightCounter.decrementAndGet() == 0 && upstreamComplete.get()) {
+        completer.runOnce();
+        final ScheduledFuture<?> scheduledFuture = scheduledCompletion.get();
+        if (scheduledFuture != null) {
+          scheduledFuture.cancel(true);
+        }
+      }
+    });
   }
 
   /**
@@ -343,7 +366,7 @@ public class RxUtils {
    * @since 4.3
    */
   public static Publisher<CoreEvent> transform(Publisher<CoreEvent> publisher, ReactiveProcessor processor) {
-    return Flux.from(publisher).transform(processor);
+    return from(publisher).transform(processor);
   }
 
   /**
@@ -356,7 +379,7 @@ public class RxUtils {
    * @since 4.3
    */
   public static Publisher<CoreEvent> map(Publisher<CoreEvent> publisher, Function<CoreEvent, CoreEvent> mapper) {
-    return Flux.from(publisher).map(mapper);
+    return from(publisher).map(mapper);
   }
 
   /**
@@ -371,7 +394,7 @@ public class RxUtils {
    */
   public static Publisher<CoreEvent> flatMap(Publisher<CoreEvent> publisher,
                                              Function<CoreEvent, Publisher<CoreEvent>> function, Component component) {
-    return Flux.from(publisher)
+    return from(publisher)
         .flatMap(event -> from(function.apply(event))
             .onErrorMap(e -> !(e instanceof MessagingException), e -> new MessagingException(event, e, component)));
   }

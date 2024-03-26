@@ -252,8 +252,8 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                       errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class));
                     }), recreateRouter(ctx));
 
-        final Flux<CoreEvent> upstream =
-            from(doApply(publisher, interceptors, (context, throwable) -> {
+        final Function<Publisher<CoreEvent>, Publisher<Either<MessagingException, CoreEvent>>> upstream =
+            coreEventPublisher -> from(doApply(coreEventPublisher, interceptors, (context, throwable) -> {
               inflightEvents.incrementAndGet();
               if (chainSpanCreated) {
                 // Record the error at the current (MessageProcessor) Span.
@@ -265,16 +265,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                                getNotNullSpanTracingCondition());
               }
               routeError(errorRouter, throwable);
-            }));
+            })).map(event -> {
+              final Either<MessagingException, CoreEvent> result =
+                  right(MessagingException.class, event);
+              errorSwitchSinkSinkRef.next(result);
+              return result;
+            });
 
-        return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
-                                        pub -> from(pub)
-                                            .map(event -> {
-                                              final Either<MessagingException, CoreEvent> result =
-                                                  right(MessagingException.class, event);
-                                              errorSwitchSinkSinkRef.next(result);
-                                              return result;
-                                            }),
+        return from(propagateCompletion(publisher, eitherPublisher -> eitherPublisher,
+                                        upstream,
                                         inflightEvents,
                                         () -> {
                                           errorSwitchSinkSinkRef.complete();
@@ -285,7 +284,7 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
                                           errorSwitchSinkSinkRef.error(t);
                                           disposeIfNeeded(errorRouter, LOGGER);
                                           clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                        }))
+                                        }).apply(errorSwitchSinkSinkRef.flux()))
                                             .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
       });
 
