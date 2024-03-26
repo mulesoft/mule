@@ -21,8 +21,23 @@ public class MagnetoMutantNotification extends CustomNotification {
   }
 
   static {
-    registerAction("Magento Mutant Error", ERROR_NOTIFICATION_ACTION);
-    registerAction("Magneto Mutant Classloader", CLASSLOADER_NOTIFICATION_ACTION);
+    // Support redeployment of apps with this extension in the same container
+    
+    try {
+      if (ERROR_NOTIFICATION_ACTION != getActionId("Magento Mutant Error")) {
+        throw new IllegalStateException("Action " + "Magento Mutant Error" + " already registered");
+      }
+    } catch (IllegalArgumentException e) {
+      registerAction("Magento Mutant Error", ERROR_NOTIFICATION_ACTION);
+    }
+
+    try {
+      if (CLASSLOADER_NOTIFICATION_ACTION != getActionId("Magneto Mutant Classloader")) {
+        throw new IllegalStateException("Action " + "Magneto Mutant Classloader" + " already registered");
+      }
+    } catch (IllegalArgumentException e) {
+      registerAction("Magneto Mutant Classloader", CLASSLOADER_NOTIFICATION_ACTION);
+    }
   }
 
 }
