@@ -96,9 +96,9 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
       try {
         tracingLevel = valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
-        throw new IllegalArgumentException(
-                                           format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level.",
-                                                  configuredTracingLevel));
+        LOGGER.error(format("Wrong tracing level found in configuration file: %s.",
+                            configuredTracingLevel));
+        throw new IllegalArgumentException();
       }
     }
   }

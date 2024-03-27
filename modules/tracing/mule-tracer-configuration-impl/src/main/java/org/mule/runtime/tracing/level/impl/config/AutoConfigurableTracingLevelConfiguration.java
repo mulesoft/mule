@@ -81,7 +81,7 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
       TracingLevel level = isOverride ? delegate.getTracingLevelOverride(location) : delegate.getTracingLevel();
       return level != null ? level : defaultLevel;
     } catch (IllegalArgumentException e) {
-      LOGGER.error(e.getMessage());
+      LOGGER.error("The tracing level will be set to the default level.");
     } catch (MuleRuntimeException e) {
       if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
         if (LOGGER.isDebugEnabled()) {
