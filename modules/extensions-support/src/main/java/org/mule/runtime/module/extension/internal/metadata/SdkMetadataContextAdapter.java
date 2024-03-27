@@ -22,6 +22,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Adapts {@code mule-api}'s {@link org.mule.runtime.api.metadata.MetadataContext} into a {@code sdk-api} {@link MetadataContext}
+ *
+ * @since 4.7.0
+ */
 public class SdkMetadataContextAdapter implements MetadataContext {
 
   private final org.mule.runtime.api.metadata.MetadataContext delegate;
