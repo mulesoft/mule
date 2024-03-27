@@ -27,5 +27,11 @@
             <groupId>org.mule.sdk</groupId>
             <artifactId>mule-sdk-compatibility-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-runtime-extension-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 </project>

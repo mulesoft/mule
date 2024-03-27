@@ -208,8 +208,7 @@ public abstract class Errors {
 
     public static final class Handleable {
 
-      public static final ComponentIdentifier ANY =
-          builder().namespace(CORE_NAMESPACE_NAME).name(ANY_IDENTIFIER).build();
+      public static final ComponentIdentifier ANY = builder().namespace(CORE_NAMESPACE_NAME).name(ANY_IDENTIFIER).build();
       public static final ComponentIdentifier TRANSFORMATION =
           builder().namespace(CORE_NAMESPACE_NAME).name(TRANSFORMATION_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier EXPRESSION =
@@ -218,10 +217,10 @@ public abstract class Errors {
           builder().namespace(CORE_NAMESPACE_NAME).name(VALIDATION_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier DUPLICATE_MESSAGE =
           builder().namespace(CORE_NAMESPACE_NAME).name(DUPLICATE_MESSAGE_ERROR_IDENTIFIER).build();
-      public static final ComponentIdentifier REDELIVERY_EXHAUSTED = builder()
-          .namespace(CORE_NAMESPACE_NAME).name(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
-      public static final ComponentIdentifier RETRY_EXHAUSTED = builder()
-          .namespace(CORE_NAMESPACE_NAME).name(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier REDELIVERY_EXHAUSTED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(REDELIVERY_EXHAUSTED_ERROR_IDENTIFIER).build();
+      public static final ComponentIdentifier RETRY_EXHAUSTED =
+          builder().namespace(CORE_NAMESPACE_NAME).name(RETRY_EXHAUSTED_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier ROUTING =
           builder().namespace(CORE_NAMESPACE_NAME).name(ROUTING_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier CONNECTIVITY =
@@ -255,7 +254,6 @@ public abstract class Errors {
           builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_GENERATE_ERROR_IDENTIFIER).build();
       public static final ComponentIdentifier SOURCE_ERROR_RESPONSE_SEND =
           builder().namespace(CORE_NAMESPACE_NAME).name(SOURCE_ERROR_RESPONSE_SEND_ERROR_IDENTIFIER).build();
-
       public static final ComponentIdentifier TRANSACTION =
           builder().namespace(CORE_NAMESPACE_NAME).name(TRANSACTION_ERROR_IDENTIFIER).build();
 

@@ -24,6 +24,7 @@ module org.mule.runtime.extensions.xml.support {
   requires org.mule.runtime.properties.api;
   requires org.mule.runtime.extension.model;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.errors;
   requires org.mule.runtime.extensions.support;
   requires org.mule.runtime.extensions.spring.support;
   requires org.mule.runtime.properties.config;
