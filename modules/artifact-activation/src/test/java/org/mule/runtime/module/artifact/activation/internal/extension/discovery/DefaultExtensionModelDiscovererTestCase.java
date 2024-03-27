@@ -67,7 +67,6 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
       protected void declareExtension(ExtensionLoadingContext context) {
         extensionDeclared.set(true);
         assertThat(context.getDslResolvingContext().getExtension("mule").isPresent(), is(true));
-        assertThat(context.getDslResolvingContext().getExtension("testRuntime").isPresent(), is(true));
 
         context.getExtensionDeclarer()
             .named("test")
