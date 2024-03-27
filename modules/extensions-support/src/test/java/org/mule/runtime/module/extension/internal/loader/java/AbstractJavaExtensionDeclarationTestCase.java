@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.loader.java;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
 import static org.mule.runtime.extension.api.ExtensionConstants.REDELIVERY_POLICY_PARAMETER_NAME;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertType;
@@ -33,8 +35,6 @@ import org.mule.test.module.extension.internal.util.ExtensionDeclarationTestUtil
 import java.util.List;
 
 public abstract class AbstractJavaExtensionDeclarationTestCase extends AbstractMuleTestCase {
-
-  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
 
   private ExtensionDeclarer declarer;
 
