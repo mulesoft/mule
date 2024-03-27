@@ -9,9 +9,9 @@ package org.mule.runtime.module.extension.internal.capability.xml.schema;
 
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.CORE_PREFIX;
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;

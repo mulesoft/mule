@@ -51,6 +51,18 @@ module org.mule.runtime.extension.model {
   provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
       org.mule.runtime.config.internal.dsl.processor.xml.provider.CoreXmlNamespaceInfoProvider;
 
+  exports org.mule.runtime.config.internal.dsl.utils to
+      org.mule.runtime.core,
+      org.mule.runtime.extensions.mule.support,
+      org.mule.runtime.extensions.spring.support,
+      org.mule.runtime.extensions.support,
+      org.mule.runtime.extensions.xml.support,
+      org.mule.runtime.metadata.support,
+      org.mule.runtime.properties.config,
+      org.mule.runtime.spring.config,
+      org.mule.runtime.tls,
+      com.mulesoft.mule.runtime.cluster,
+      com.mulesoft.mule.runtime.ee.extension.model;
   exports org.mule.runtime.config.internal.dsl.processor.xml.provider to
       org.mule.runtime.extensions.mule.support;
 

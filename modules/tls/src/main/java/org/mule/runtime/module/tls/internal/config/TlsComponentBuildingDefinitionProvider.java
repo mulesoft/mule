@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.module.tls.internal.config;
 
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CRL_FILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromSimpleParameter;
 import static org.mule.runtime.dsl.api.component.TypeDefinition.fromType;
@@ -29,13 +36,6 @@ import java.util.List;
 public class TlsComponentBuildingDefinitionProvider implements ComponentBuildingDefinitionProvider {
 
   public static final String TLS_NAMESPACE = "tls";
-  private static final String TLS_CONTEXT_ELEMENT_IDENTIFIER = "context";
-  private static final String TLS_KEY_STORE_ELEMENT_IDENTIFIER = "key-store";
-  private static final String TLS_TRUST_STORE_ELEMENT_IDENTIFIER = "trust-store";
-  private static final String TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER = "revocation-check";
-  private static final String TLS_STANDARD_REVOCATION_CHECK_ELEMENT_IDENTIFIER = "standard-revocation-check";
-  private static final String TLS_CUSTOM_OCSP_RESPONDER_ELEMENT_IDENTIFIER = "custom-ocsp-responder";
-  private static final String TLS_CRL_FILE_ELEMENT_IDENTIFIER = "crl-file";
 
   private static ComponentBuildingDefinition.Builder baseDefinition =
       new ComponentBuildingDefinition.Builder().withNamespace(TLS_NAMESPACE);

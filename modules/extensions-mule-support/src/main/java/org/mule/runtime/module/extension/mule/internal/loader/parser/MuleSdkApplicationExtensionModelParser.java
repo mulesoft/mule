@@ -7,6 +7,8 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.THIS_PREFIX;
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
 import static org.mule.sdk.api.annotation.Extension.MULESOFT;
 
@@ -39,10 +41,6 @@ public class MuleSdkApplicationExtensionModelParser extends MuleSdkExtensionMode
   // The namespace of the extension when it's defined within an application rather than in a separate artifact.
   public static final String APP_LOCAL_EXTENSION_NAMESPACE = "THIS";
   private static final String MIN_MULE_VERSION = "4.5";
-
-  private static final String THIS_PREFIX = "this";
-  private static final String DEFAULT_NAMESPACE_URI_MASK = "http://www.mulesoft.org/schema/mule/%s";
-  private static final String THIS_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, THIS_PREFIX);
 
   private final String extensionName;
 

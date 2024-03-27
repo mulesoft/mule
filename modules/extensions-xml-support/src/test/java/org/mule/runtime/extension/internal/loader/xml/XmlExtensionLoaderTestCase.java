@@ -7,6 +7,7 @@
 package org.mule.runtime.extension.internal.loader.xml;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -92,8 +93,6 @@ import io.qameta.allure.Issue;
 
 @RunWith(Parameterized.class)
 public class XmlExtensionLoaderTestCase extends AbstractMuleTestCase {
-
-  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
 
   private XmlExtensionModelLoader loader;
 

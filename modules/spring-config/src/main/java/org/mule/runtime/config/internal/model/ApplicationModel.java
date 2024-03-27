@@ -21,19 +21,19 @@ import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyT
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_IN_MEMORY_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getGroupAndParametersPairs;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.EE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.config.internal.dsl.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CRON_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
 
 import static java.util.stream.Collectors.toList;
 

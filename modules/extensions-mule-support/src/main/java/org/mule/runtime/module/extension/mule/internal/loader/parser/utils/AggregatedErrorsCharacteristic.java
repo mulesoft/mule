@@ -17,6 +17,7 @@ import static org.mule.runtime.config.api.dsl.CoreDslConstants.ON_ERROR_CONTINUE
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.TRY_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.processor.xml.provider.OperationDslNamespaceInfoProvider.OPERATION_DSL_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 
@@ -47,7 +48,6 @@ import java.util.function.BiFunction;
  */
 public class AggregatedErrorsCharacteristic extends Characteristic<List<ErrorModelParser>> {
 
-  private static final String CORE_PREFIX = "mule";
   private static final String CORE_ERROR_NAMESPACE = CORE_PREFIX.toUpperCase(getDefault());
   private static final String ERROR_TYPE_PARAM = "type";
   private static final String WHEN_PARAM = "when";
