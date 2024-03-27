@@ -15,6 +15,7 @@ import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -155,9 +156,6 @@ public final class XmlExtensionLoaderDelegate {
   public static final String CYCLIC_OPERATIONS_ERROR = "Cyclic operations detected, offending ones: [%s]";
 
   private static final String RAISE_ERROR = "raise-error";
-
-  public static final String CORE_PREFIX = "mule";
-
   private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       ComponentIdentifier.builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
   public static final String GLOBAL_PROPERTY = "global-property";

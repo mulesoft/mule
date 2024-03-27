@@ -11,7 +11,7 @@ import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newLis
 import static org.mule.runtime.app.declaration.api.fluent.ElementDeclarer.newParameterGroup;
 import static org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue.plain;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
-import static org.mule.runtime.config.internal.dsl.DslConstants.FLOW_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_CACHE;
 

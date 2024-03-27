@@ -7,10 +7,10 @@
 package org.mule.runtime.module.extension.internal.config.dsl;
 
 import static java.lang.String.format;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_CONTEXT_ELEMENT_IDENTIFIER;
 
 import javax.xml.namespace.QName;
 

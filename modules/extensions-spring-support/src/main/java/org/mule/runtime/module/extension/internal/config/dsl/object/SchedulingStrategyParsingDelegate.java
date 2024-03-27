@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import static org.mule.runtime.dsl.api.component.AttributeDefinition.Builder.fromChildConfiguration;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.config.dsl.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.SCHEDULING_STRATEGY_ELEMENT_IDENTIFIER;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.scheduler.SchedulingStrategy;

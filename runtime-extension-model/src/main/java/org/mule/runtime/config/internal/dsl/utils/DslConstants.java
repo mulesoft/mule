@@ -10,7 +10,7 @@ import static java.lang.String.format;
 
 /**
  * Mule DSL constants.
- *
+ * <p>
  * This is an internal utils class (internal to the container, not the module), not to be considered part of the API. Backwards
  * compatibility not guaranteed.
  *

@@ -29,7 +29,6 @@ import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.config.extension.SimpleExtension;
 import org.mule.tck.classlaoder.TestClassLoader;
@@ -60,7 +59,7 @@ public class ConfigurationDefinitionParserTestCase extends AbstractMuleTestCase 
       ExtensionModel extensionModel = factory.create(ctx);
       ConfigurationModel configurationModel = extensionModel.getConfigurationModels().get(0);
 
-      DslResolvingContext dslResolvingContext = new DefaultDslResolvingContext(singleton(extensionModel));
+      DslResolvingContext dslResolvingContext = getDefault(singleton(extensionModel));
       DslSyntaxResolver dslSyntaxResolver = DslSyntaxResolver.getDefault(extensionModel, dslResolvingContext);
       ExtensionParsingContext extensionParsingContext = new ExtensionParsingContext(extensionModel);
 
