@@ -7,13 +7,18 @@
 package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL;
+import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
 
-import org.mule.runtime.ast.api.exception.PropertyNotFoundException;
+import static org.slf4j.LoggerFactory.getLogger;
+
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
@@ -25,7 +30,14 @@ import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
-public class OpenTelemetryAutoConfigurableTracingLevelConfiguration implements TracingLevelConfiguration {
+import org.slf4j.Logger;
+
+/**
+ * Autoconfiguration of tracing level. Will use MONITORING as the default level if there is not one configured in a config file.
+ */
+public class AutoConfigurableTracingLevelConfiguration implements TracingLevelConfiguration {
+
+  private static final Logger LOGGER = getLogger(AutoConfigurableTracingLevelConfiguration.class);
 
   @Inject
   private MuleContext muleContext;
@@ -39,9 +51,9 @@ public class OpenTelemetryAutoConfigurableTracingLevelConfiguration implements T
   /**
    * This constructor is needed for injection in the registry.
    */
-  public OpenTelemetryAutoConfigurableTracingLevelConfiguration() {}
+  public AutoConfigurableTracingLevelConfiguration() {}
 
-  public OpenTelemetryAutoConfigurableTracingLevelConfiguration(TracingLevelConfiguration delegate) {
+  public AutoConfigurableTracingLevelConfiguration(TracingLevelConfiguration delegate) {
     this.delegate = delegate;
   }
 
@@ -52,29 +64,39 @@ public class OpenTelemetryAutoConfigurableTracingLevelConfiguration implements T
 
   @Override
   public TracingLevel getTracingLevel() {
-    try {
-      if (delegate == null) {
-        this.delegate = new FileTracingLevelConfiguration(muleContext);
-        ((FileTracingLevelConfiguration) delegate).setSpanExporterConfiguration(spanExporterConfiguration);
-        consumersOnChange.forEach(consumer -> this.delegate.onConfigurationChange(consumer));
-      }
-      return delegate.getTracingLevel(defaultLevel);
-    } catch (PropertyNotFoundException e) {
-      return defaultLevel;
-    }
+    return getTracingLevel(false, null);
   }
 
   @Override
   public TracingLevel getTracingLevelOverride(String location) {
+    return getTracingLevel(true, location);
+  }
+
+  public TracingLevel getTracingLevel(boolean isOverride, String location) {
     try {
       if (delegate == null) {
         this.delegate = new FileTracingLevelConfiguration(muleContext);
         consumersOnChange.forEach(consumer -> this.delegate.onConfigurationChange(consumer));
       }
-      return delegate.getTracingLevelOverride(location, defaultLevel);
-    } catch (PropertyNotFoundException e) {
-      return defaultLevel;
+      TracingLevel level = isOverride ? delegate.getTracingLevelOverride(location) : delegate.getTracingLevel();
+      return level != null ? level : defaultLevel;
+    } catch (IllegalArgumentException e) {
+      LOGGER.error(e.getMessage());
+    } catch (MuleRuntimeException e) {
+      if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER
+              .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s",
+                            defaultLevel),
+                     e);
+        } else {
+          LOGGER
+              .info(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default: %s. Enable DEBUG log level to see the exception",
+                           defaultLevel));
+        }
+      }
     }
+    return defaultLevel;
   }
 
   @Override
