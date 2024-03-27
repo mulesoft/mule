@@ -167,9 +167,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   private final ExceptionHandlerManager exceptionEnricherManager;
   private final AtomicBoolean reconnecting = new AtomicBoolean(false);
   private final DefaultLifecycleManager<ExtensionMessageSource> lifecycleManager;
-  private final TemplateParser expressionParser = createMuleStyleParser();
   private final ConfigurationProvider explicitConfigProvider;
-
   private SourceConnectionManager sourceConnectionManager;
   private Processor messageProcessor;
   private final LazyValue<TransactionConfig> transactionConfig = new LazyValue<>(this::buildTransactionConfig);
@@ -851,6 +849,7 @@ public class ExtensionMessageSource extends ExtensionComponent<SourceModel> impl
   }
 
   private void validateConfigurationProviderIsNotExpression() throws InitialisationException {
+    TemplateParser expressionParser = createMuleStyleParser(featureFlaggingService);
     if (explicitConfigProvider != null && expressionParser.isContainsTemplate(explicitConfigProvider.getName())) {
       throw new InitialisationException(
                                         createStaticMessage(

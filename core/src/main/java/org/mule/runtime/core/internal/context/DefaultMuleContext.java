@@ -19,6 +19,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_L
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_ALTERNATING_BACKSLASH_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_ERROR_TYPES_VALIDATION;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENFORCE_EXPRESSION_VALIDATION;
@@ -357,6 +358,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureDisableSchedulerLogging();
       configureErrorAndRollbackTxWhenTimeout();
       configureDisableXmlSdkImplicitConfigurationCreation();
+      configureEnableAlternatingBackslashValidation();
     }
   }
 
@@ -1579,6 +1581,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureDisableXmlSdkImplicitConfigurationCreation() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(DISABLE_XML_SDK_IMPLICIT_CONFIGURATION_CREATION, minMuleVersion("4.7.0"));
+  }
+
+  private static void configureEnableAlternatingBackslashValidation() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_ALTERNATING_BACKSLASH_VALIDATION, minMuleVersion("4.3.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
