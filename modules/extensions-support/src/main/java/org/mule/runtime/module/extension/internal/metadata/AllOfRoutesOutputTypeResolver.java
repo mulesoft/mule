@@ -11,7 +11,7 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
@@ -36,7 +36,7 @@ public class AllOfRoutesOutputTypeResolver implements OutputTypeResolver<Void> {
   @Override
   public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
     ObjectTypeBuilder builder = context.getTypeBuilder().objectType();
-    Map<String, ChainPropagationContext> routes = context.getRouterPropagationContext()
+    Map<String, ScopeOutputMetadataContext> routes = context.getRouterOutputMetadataContext()
         .map(route -> route.getRoutesPropagationContext())
         .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
 

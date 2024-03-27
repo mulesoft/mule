@@ -30,7 +30,7 @@ public class ChainOutputPayloadPassThroughTypeResolver implements OutputTypeReso
 
   @Override
   public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
-    return context.getScopePropagationContext()
+    return context.getScopeOutputMetadataContext()
         .map(ctx -> ctx.getChainOutputResolver())
         .orElseThrow(() -> new MetadataResolvingException("Chain Output Context not found.", UNKNOWN))
         .get()

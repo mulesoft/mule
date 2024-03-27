@@ -9,8 +9,8 @@ package org.mule.runtime.module.extension.internal.metadata;
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ChainPropagationContext;
-import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataContext;
 
 import java.util.Optional;
@@ -49,13 +49,13 @@ public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata
   }
 
   @Override
-  public Optional<ChainPropagationContext> getScopePropagationContext() {
+  public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
     return delegate.getScopeChainPropagationContext()
         .map(ctx -> ((SdkMetadataContextAdapter.SdkChainPropagationContextAdapter) ctx).getDelegate());
   }
 
   @Override
-  public Optional<RouterPropagationContext> getRouterPropagationContext() {
+  public Optional<RouterOutputMetadataContext> getRouterOutputMetadataContext() {
     return delegate.getRouterPropagationContext()
         .map(ctx -> ((SdkMetadataContextAdapter.SdkRouterPropagationContextAdapter) ctx).getDelegate());
   }

@@ -12,10 +12,10 @@ import static java.util.Optional.empty;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
-import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
@@ -33,8 +33,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
 
   private final MetadataCache cache;
   private final ClassTypeLoader classTypeLoader;
-  private final Optional<ChainPropagationContext> scopePropagationContext;
-  private final Optional<RouterPropagationContext> routerPropagationContext;
+  private final Optional<ScopeOutputMetadataContext> scopePropagationContext;
+  private final Optional<RouterOutputMetadataContext> routerPropagationContext;
 
   /**
    * Retrieves the configuration for the related component
@@ -58,15 +58,15 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    *                                 {@param configInstance}
    * @param cache                    instance of the {@link MetadataCache} for this context
    * @param typeLoader               instance of a {@link ClassTypeLoader} in the context of this extension
-   * @param scopePropagationContext  an optional {@link ChainPropagationContext} for the inner chain. Value is only present for
+   * @param scopePropagationContext  an optional {@link ScopeOutputMetadataContext} for the inner chain. Value is only present for
    *                                 scope components
-   * @param routerPropagationContext an optional {@link RouterPropagationContext} with routes information. Value is only present
+   * @param routerPropagationContext an optional {@link RouterOutputMetadataContext} with routes information. Value is only present
    *                                 for router components
    */
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
-                                Optional<ChainPropagationContext> scopePropagationContext,
-                                Optional<RouterPropagationContext> routerPropagationContext) {
+                                Optional<ScopeOutputMetadataContext> scopePropagationContext,
+                                Optional<RouterOutputMetadataContext> routerPropagationContext) {
     super(configurationSupplier, connectionManager);
     this.cache = cache;
     this.classTypeLoader = typeLoader;
@@ -83,12 +83,12 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
   }
 
   @Override
-  public Optional<ChainPropagationContext> getScopePropagationContext() {
+  public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
     return scopePropagationContext;
   }
 
   @Override
-  public Optional<RouterPropagationContext> getRouterPropagationContext() {
+  public Optional<RouterOutputMetadataContext> getRouterOutputMetadataContext() {
     return routerPropagationContext;
   }
 

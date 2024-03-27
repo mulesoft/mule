@@ -29,6 +29,7 @@ import static java.util.Optional.of;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.config.FeatureFlaggingService;
@@ -45,7 +46,7 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.parameter.ValueProviderModel;
-import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -53,10 +54,12 @@ import org.mule.runtime.api.metadata.MetadataKeyProvider;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
-import org.mule.runtime.api.metadata.RouterPropagationContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.api.value.Value;
@@ -688,6 +691,26 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataKey key, MessageMetadataType scopeInputMessageType) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+          context -> withContextClassLoader(classLoader, () -> metadataMediator.getScopeInputMetadata(context, key, scopeInputMessageType)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataKey key, MessageMetadataType routerInputMessageType) throws MetadataResolvingException {
+    try {
+      return runWithMetadataContext(
+          context -> withContextClassLoader(classLoader, () -> metadataMediator.getRouterInputMetadata(context, key, routerInputMessageType)));
+    } catch (ConnectionException e) {
+      return failure(newFailure(e).onComponent());
+    }
+  }
+
+  @Override
   public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataKey key) throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
@@ -791,8 +814,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   protected <R> MetadataResult<R> runWithMetadataContext(Function<MetadataContext, MetadataResult<R>> contextConsumer,
-                                                         Optional<ChainPropagationContext> scopePropagationContext,
-                                                         Optional<RouterPropagationContext> routerPropagationContext)
+                                                         Optional<ScopeOutputMetadataContext> scopePropagationContext,
+                                                         Optional<RouterOutputMetadataContext> routerPropagationContext)
       throws MetadataResolvingException, ConnectionException {
     MetadataContext context = null;
     try {
@@ -850,8 +873,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   private MetadataContext getMetadataContext(MetadataCache cache,
-                                             Optional<ChainPropagationContext> scopePropagationContext,
-                                             Optional<RouterPropagationContext> routerPropagationContext)
+                                             Optional<ScopeOutputMetadataContext> scopePropagationContext,
+                                             Optional<RouterOutputMetadataContext> routerPropagationContext)
       throws MetadataResolvingException {
     CoreEvent fakeEvent = null;
     try {
@@ -902,12 +925,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(MetadataKey key,
-                                                                         ChainPropagationContext chainPropagationContext)
+                                                                         ScopeOutputMetadataContext scopeOutputMetadataContext)
       throws MetadataResolvingException {
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)),
-                                    of(chainPropagationContext), empty());
+                                    of(scopeOutputMetadataContext), empty());
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
@@ -915,12 +938,12 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(MetadataKey key,
-                                                                          RouterPropagationContext routerPropagationContext)
+                                                                          RouterOutputMetadataContext routerOutputMetadataContext)
       throws MetadataResolvingException {
     try {
       return runWithMetadataContext(context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getOutputMetadata(context, key)),
-                                    empty(), of(routerPropagationContext));
+                                    empty(), of(routerOutputMetadataContext));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

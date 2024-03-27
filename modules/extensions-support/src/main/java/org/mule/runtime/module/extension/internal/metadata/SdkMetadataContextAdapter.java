@@ -13,6 +13,8 @@ import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.sdk.api.metadata.ChainPropagationContext;
 import org.mule.sdk.api.metadata.MetadataCache;
 import org.mule.sdk.api.metadata.MetadataContext;
@@ -62,19 +64,19 @@ public class SdkMetadataContextAdapter implements MetadataContext {
 
   @Override
   public Optional<ChainPropagationContext> getScopeChainPropagationContext() {
-    return delegate.getScopePropagationContext().map(SdkChainPropagationContextAdapter::new);
+    return delegate.getScopeOutputMetadataContext().map(SdkChainPropagationContextAdapter::new);
   }
 
   @Override
   public Optional<RouterPropagationContext> getRouterPropagationContext() {
-    return delegate.getRouterPropagationContext().map(SdkRouterPropagationContextAdapter::new);
+    return delegate.getRouterOutputMetadataContext().map(SdkRouterPropagationContextAdapter::new);
   }
 
   static class SdkChainPropagationContextAdapter implements ChainPropagationContext {
 
-    private final org.mule.runtime.api.metadata.ChainPropagationContext delegate;
+    private final ScopeOutputMetadataContext delegate;
 
-    private SdkChainPropagationContextAdapter(org.mule.runtime.api.metadata.ChainPropagationContext delegate) {
+    private SdkChainPropagationContextAdapter(ScopeOutputMetadataContext delegate) {
       this.delegate = delegate;
     }
 
@@ -88,16 +90,16 @@ public class SdkMetadataContextAdapter implements MetadataContext {
       return delegate.getChainOutputResolver();
     }
 
-    org.mule.runtime.api.metadata.ChainPropagationContext getDelegate() {
+    ScopeOutputMetadataContext getDelegate() {
       return delegate;
     }
   }
 
   static class SdkRouterPropagationContextAdapter implements RouterPropagationContext {
 
-    private final org.mule.runtime.api.metadata.RouterPropagationContext delegate;
+    private final RouterOutputMetadataContext delegate;
 
-    private SdkRouterPropagationContextAdapter(org.mule.runtime.api.metadata.RouterPropagationContext delegate) {
+    private SdkRouterPropagationContextAdapter(RouterOutputMetadataContext delegate) {
       this.delegate = delegate;
     }
 
@@ -110,7 +112,7 @@ public class SdkMetadataContextAdapter implements MetadataContext {
                                                                                                           .getValue()))));
     }
 
-    org.mule.runtime.api.metadata.RouterPropagationContext getDelegate() {
+    RouterOutputMetadataContext getDelegate() {
       return delegate;
     }
   }
