@@ -9,11 +9,13 @@ package org.mule.runtime.extension.internal.loader.xml;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.meta.model.display.LayoutModel.builder;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.ast.api.util.MuleArtifactAstCopyUtils.copyComponentTreeRecursively;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
@@ -26,7 +28,6 @@ import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
@@ -110,7 +111,6 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
 import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
 import org.mule.runtime.properties.api.ConfigurationProperty;
@@ -156,7 +156,6 @@ public final class XmlExtensionLoaderDelegate {
   public static final String CYCLIC_OPERATIONS_ERROR = "Cyclic operations detected, offending ones: [%s]";
 
   private static final String RAISE_ERROR = "raise-error";
-
   private static final ComponentIdentifier RAISE_ERROR_IDENTIFIER =
       ComponentIdentifier.builder().namespace(CORE_PREFIX).name(RAISE_ERROR).build();
   public static final String GLOBAL_PROPERTY = "global-property";
@@ -665,7 +664,7 @@ public final class XmlExtensionLoaderDelegate {
     return new ExtensionModelFactory().create(
                                               new DefaultExtensionLoadingContext(declarer,
                                                                                  builder(currentThread().getContextClassLoader(),
-                                                                                         new NullDslResolvingContext()).build()));
+                                                                                         nullDslResolvingContext()).build()));
   }
 
   private void fillDeclarer(ExtensionDeclarer declarer, String name, String version, String category, String vendor,

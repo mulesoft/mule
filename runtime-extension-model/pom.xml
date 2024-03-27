@@ -20,6 +20,7 @@
             --add-exports=org.mule.runtime.extension.model/org.mule.runtime.config.internal.validation.test=ALL-UNNAMED
             --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.spi=ALL-UNNAMED
             --add-exports=org.mule.runtime.dsl.api/org.mule.runtime.dsl.internal.xml.parser=ALL-UNNAMED
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.dsl=ALL-UNNAMED
             ${surefire.args.base}
         </surefire.args>
 

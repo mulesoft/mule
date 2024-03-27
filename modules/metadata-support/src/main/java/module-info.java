@@ -20,6 +20,7 @@ module org.mule.runtime.metadata.support {
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.extension.model;
 
   requires com.google.common;
   requires org.apache.commons.lang3;

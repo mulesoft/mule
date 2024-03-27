@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.manager;
 
 import static org.mule.metadata.api.builder.BaseTypeBuilder.create;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
+import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.tck.util.MuleContextUtils.mockMuleContext;
@@ -25,25 +26,22 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_MOCKS;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.metadata.api.annotation.TypeAliasAnnotation;
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.ExpressionModule;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.internal.registry.MuleRegistry;
 import org.mule.runtime.core.privileged.el.GlobalBindingContextProvider;
-import org.mule.runtime.internal.dsl.DefaultDslResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.DefaultJavaExtensionModelLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
-import org.mule.tck.util.MuleContextUtils;
 import org.mule.test.heisenberg.extension.HeisenbergExtension;
 
 import java.util.HashMap;
@@ -74,7 +72,7 @@ public class ExtensionActivatorTestCase extends AbstractMuleTestCase {
 
     ExtensionModel extensionModel =
         new DefaultJavaExtensionModelLoader().loadExtensionModel(HeisenbergExtension.class.getClassLoader(),
-                                                                 new DefaultDslResolvingContext(emptySet()),
+                                                                 getDefault(emptySet()),
                                                                  attributes);
 
     ExtensionActivator extensionActivator = new ExtensionActivator(mockMuleContext());

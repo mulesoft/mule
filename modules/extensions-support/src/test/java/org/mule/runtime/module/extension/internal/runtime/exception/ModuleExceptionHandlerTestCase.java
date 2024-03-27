@@ -18,20 +18,24 @@ import static org.mule.runtime.module.extension.internal.runtime.exception.TestE
 import static org.mule.runtime.module.extension.internal.runtime.exception.TestError.PARENT;
 import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ERROR_HANDLING;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
+import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.message.ErrorType;
@@ -43,7 +47,6 @@ import org.mule.runtime.ast.internal.error.DefaultErrorTypeRepository;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.extension.api.exception.ModuleException;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -58,6 +61,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 @SmallTest
 @RunWith(Parameterized.class)
@@ -75,10 +80,10 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
   private final ErrorTypeRepository typeRepository = new DefaultErrorTypeRepository();
 
-  @Parameterized.Parameter
+  @Parameter
   public boolean suppressErrors;
 
-  @Parameterized.Parameters(name = "Suppress errors: {0}")
+  @Parameters(name = "Suppress errors: {0}")
   public static Collection<Boolean> parameters() {
     return asList(true, false);
   }
@@ -208,11 +213,10 @@ public class ModuleExceptionHandlerTestCase extends AbstractMuleTestCase {
 
     assertThat(exception, is(instanceOf(TypedException.class)));
     if (suppressErrors) {
-      assertThat(exception.getCause(), is(instanceOf(SuppressedMuleException.class)));
-      assertThat(((SuppressedMuleException) exception.getCause()).getSuppressedException(),
-                 is(messagingException));
+      assertThat(exception.getCause(), is(instanceOf(MuleException.class)));
+      assertThat(((MuleException) exception.getCause()).getExceptionInfo().getSuppressedCauses(),
+                 hasItem(isA(MessagingException.class)));
     } else {
-      assertThat(exception.getCause(), is(not(instanceOf(SuppressedMuleException.class))));
       assertThat(exception.getCause(), is(messagingException));
     }
   }

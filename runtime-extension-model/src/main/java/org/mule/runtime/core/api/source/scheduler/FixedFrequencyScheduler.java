@@ -9,7 +9,7 @@ package org.mule.runtime.core.api.source.scheduler;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.internal.dsl.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FIXED_FREQUENCY_STRATEGY_ELEMENT_IDENTIFIER;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 

@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.error;
 
 import static org.mule.runtime.api.meta.model.error.ErrorModelBuilder.newError;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.error.ErrorModelUtils.isMuleError;
 import static org.mule.runtime.module.extension.internal.error.ModuleErrors.CONNECTIVITY;
 import static org.mule.runtime.module.extension.internal.error.ModuleErrors.RETRY_EXHAUSTED;

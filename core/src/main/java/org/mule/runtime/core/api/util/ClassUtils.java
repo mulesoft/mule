@@ -25,7 +25,6 @@ import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.core.api.registry.SpiServiceRegistry;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
@@ -44,7 +43,6 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -52,11 +50,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
-import java.util.stream.StreamSupport;
 
 import com.google.common.primitives.Primitives;
 
@@ -128,7 +124,21 @@ public class ClassUtils {
    * @return A URL pointing to the resource to load or null if the resource is not found
    */
   public static URL getResource(final String resourceName, final Class<?> callingClass) {
-    return org.mule.runtime.internal.util.ClassUtils.getResource(resourceName, callingClass);
+    URL url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> {
+      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+      return cl != null ? cl.getResource(resourceName) : null;
+    });
+
+    if (url == null) {
+      url = AccessController
+          .doPrivileged((PrivilegedAction<URL>) () -> ClassUtils.class.getClassLoader().getResource(resourceName));
+    }
+
+    if (url == null) {
+      url = AccessController.doPrivileged((PrivilegedAction<URL>) () -> callingClass.getClassLoader().getResource(resourceName));
+    }
+
+    return url;
   }
 
   /**
