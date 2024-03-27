@@ -7,9 +7,12 @@
 package org.mule.runtime.core.internal.el;
 
 import static java.lang.String.format;
+
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_ALTERNATING_BACKSLASH_VALIDATION;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
@@ -17,6 +20,7 @@ import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -73,6 +77,7 @@ public final class TemplateParser {
   private final int pre;
   private final int post;
   private final PatternInfo style;
+  private final Optional<FeatureFlaggingService> featureFlaggingService;
 
 
   public static TemplateParser createAntStyleParser() {
@@ -83,11 +88,15 @@ public final class TemplateParser {
     return new TemplateParser(SQUARE_TEMPLATE_STYLE);
   }
 
-  public static TemplateParser createMuleStyleParser() {
-    return new TemplateParser(WIGGLY_MULE_TEMPLATE_STYLE);
+  public static TemplateParser createMuleStyleParser(FeatureFlaggingService featureFlaggingService) {
+    return new TemplateParser(WIGGLY_MULE_TEMPLATE_STYLE, featureFlaggingService);
   }
 
   private TemplateParser(String styleName) {
+    this(styleName, null);
+  }
+
+  private TemplateParser(String styleName, FeatureFlaggingService featureFlaggingService) {
     this.style = patterns.get(styleName);
     if (this.style == null) {
       throw new IllegalArgumentException("Unknown template style: " + styleName);
@@ -96,6 +105,7 @@ public final class TemplateParser {
     pattern = style.getPattern();
     pre = style.getPrefix().length();
     post = style.getSuffix().length();
+    this.featureFlaggingService = Optional.ofNullable(featureFlaggingService);
   }
 
   /**
@@ -262,7 +272,9 @@ public final class TemplateParser {
     return this.getStyle().getName().equals(style);
   }
 
-  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalacedCharactersMuleStyle(String template) {
+  private Stack<Pair<Character, Pair<Integer, Integer>>> unbalancedCharactersMuleStyle(String template) {
+    boolean isAlternatingBackslashValidationEnabled =
+        featureFlaggingService.orElse(f -> true).isEnabled(ENABLE_ALTERNATING_BACKSLASH_VALIDATION);
     // Save the line and column of each special character for error tracing purposes
     Stack<Pair<Character, Pair<Integer, Integer>>> stack = new Stack<>();
     boolean lastStartedExpression = false;
@@ -318,14 +330,14 @@ public final class TemplateParser {
           break;
       }
       lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
-      lastIsBackSlash = (c == '\\' && !lastIsBackSlash);
+      lastIsBackSlash = isAlternatingBackslashValidationEnabled ? (c == '\\' && !lastIsBackSlash) : c == '\\';
       column++;
     }
     return stack;
   }
 
   private void validateBalanceMuleStyle(String template) {
-    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalacedCharactersMuleStyle(template);
+    Stack<Pair<Character, Pair<Integer, Integer>>> remaining = unbalancedCharactersMuleStyle(template);
     if (!remaining.empty()) {
       throwValidationError(template, remaining);
     }
@@ -415,7 +427,7 @@ public final class TemplateParser {
 
   public boolean isValid(String expression) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return unbalacedCharactersMuleStyle(expression).empty();
+      return unbalancedCharactersMuleStyle(expression).empty();
     }
 
     try {

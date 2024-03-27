@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_ALTERNATING_BACKSLASH_VALIDATION;
 import static org.mule.runtime.core.internal.el.TemplateParser.createAntStyleParser;
 import static org.mule.runtime.core.internal.el.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.core.internal.el.TemplateParser.createSquareBracesStyleParser;
@@ -14,8 +15,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.mule.runtime.core.internal.el.TemplateParser;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,10 +28,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Issue;
+import org.junit.Before;
 import org.junit.Test;
 
 @SmallTest
 public class TemplateParserTestCase extends AbstractMuleTestCase {
+
+  private FeatureFlaggingService featureFlaggingService;
+
+  @Before
+  public void setUp() {
+    featureFlaggingService = mock(FeatureFlaggingService.class);
+    when(featureFlaggingService.isEnabled(ENABLE_ALTERNATING_BACKSLASH_VALIDATION)).thenReturn(true);
+  }
 
   @Test
   public void squareBracesParserDefaultConfiguration() {
@@ -177,7 +190,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesPipeCharacter() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
 
     final String expectedResult = "mel:evaluator: 'Hello|Hi'";
 
@@ -188,7 +201,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNestedSquareBrackets() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "zero[one[two[three[four[five]]]]]";
     String expression = "#[zero[one[two[three[four[five]]]]]]";
     assertTrue(tp.isValid(expression));
@@ -198,7 +211,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNestedExpressions() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "mel:zero mel:one mel:two mel:three mel:four mel:five";
     String expression = "#[mel:zero #[mel:one #[mel:two #[mel:three #[mel:four #[mel:five]]]]]]";
     assertTrue(tp.isValid(expression));
@@ -208,7 +221,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesConcatenation() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
 
     final String expectedResult = "'hi'+'world'";
 
@@ -219,7 +232,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserManagesNullExpressions() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
 
     final String expectedResult = "null";
 
@@ -230,7 +243,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserDefaultConfiguration() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     assertNotNull(tp.getStyle());
     assertEquals("#[", tp.getStyle().getPrefix());
     assertEquals("]", tp.getStyle().getSuffix());
@@ -238,7 +251,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserShouldValidateExpressionDelimiters() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
 
     assertTrue(tp.isValid("#[mel:]"));
     assertTrue(tp.isValid("#[mel:]   #[mel:]"));
@@ -262,7 +275,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testWithoutSharp() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     assertTrue(tp.isValid(""));
     assertTrue(tp.isValid("]]]]]"));
     assertTrue(tp.isValid("["));
@@ -289,7 +302,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void testWithSharp() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     assertTrue(tp.isValid("#"));
     assertTrue(tp.isValid("##[]"));
     assertTrue(tp.isValid("#[]"));
@@ -320,7 +333,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithStringBracesInside() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "'['";
     String expression = "#['[']";
     assertTrue(tp.isValid(expression));
@@ -330,7 +343,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithScapedQuote() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "\"";
     String expression = "#[\\\"]";
     assertTrue(tp.isValid(expression));
@@ -340,7 +353,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithBackSlashWithoutQuote() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "\\a";
     String expression = "#[\\a]";
     assertTrue(tp.isValid(expression));
@@ -350,7 +363,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInside() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[hello #[mule]]";
     String expectedResult = "hello mule";
     assertTrue(tp.isValid(expression));
@@ -361,7 +374,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithValueWithSharps() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[hello mule]";
     String expectedResult = "sarasa # sarasa2";
     assertTrue(tp.isValid(expression));
@@ -372,7 +385,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithValueWithScapedSharps() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[hello mule]";
     String expectedResult = "sarasa \\# sarasa2";
     assertTrue(tp.isValid(expression));
@@ -383,7 +396,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutSharp() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[hello [mule]]";
     String expectedResult = "hello [mule]";
     assertTrue(tp.isValid(expression));
@@ -393,7 +406,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutLiteralWithoutSharp() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[[mule]]";
     String expectedResult = "[mule]";
     assertTrue(tp.isValid(expression));
@@ -403,7 +416,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithExpresionInsideWithoutLiteral() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expression = "#[#[mule]]";
     String expectedResult = "mule";
     assertTrue(tp.isValid(expression));
@@ -413,7 +426,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParserWithLiteralBefore() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "muleman 'value'";
     String expression = "muleman #['value']";
     assertTrue(tp.isValid(expression));
@@ -423,7 +436,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseConsecutiveExpressions() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "muleman value";
     String expression = "#[muleman] #[value]";
     assertTrue(tp.isValid(expression));
@@ -433,7 +446,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseConsecutiveSharps() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "#muleman # ##value";
     String expression = "##[muleman] # ###[value]";
     assertTrue(tp.isValid(expression));
@@ -443,7 +456,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseConsecutiveSharpsEvaluated() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "##[muleman] # ###[value]";
     String expression = "#[payload]";
     assertTrue(tp.isValid(expression));
@@ -453,7 +466,7 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
 
   @Test
   public void muleParseMultiLine() {
-    TemplateParser tp = createMuleStyleParser();
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
     final String expectedResult = "{\n" +
         "    \"text\" : \"#\n" +
         "    3\"\n" +
@@ -465,6 +478,17 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
     assertTrue(tp.isValid(expression));
     String result = tp.parse(null, expression, token -> token);
     assertEquals(expectedResult, result);
+  }
+
+  @Test
+  @Issue("W-15141905")
+  public void muleParserShouldValidateSequentialBackslashWhenFeatureFlagDisabled() {
+    when(featureFlaggingService.isEnabled(ENABLE_ALTERNATING_BACKSLASH_VALIDATION)).thenReturn(false);
+
+    TemplateParser tp = createMuleStyleParser(featureFlaggingService);
+
+    assertTrue(tp.isValid("\\\\#["));
+    assertTrue(tp.isValid("\\\\#['"));
   }
 
   private Map<String, Object> buildMap() {

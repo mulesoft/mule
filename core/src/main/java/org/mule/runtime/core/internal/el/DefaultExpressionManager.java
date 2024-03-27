@@ -23,6 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.message.api.el.TypeBindings;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.DefaultValidationResult;
@@ -63,10 +64,10 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
 
   private MuleContext muleContext;
   private TransformersRegistry transformersRegistry;
-
+  private FeatureFlaggingService featureFlaggingService;
   private ExtendedExpressionLanguageAdaptor expressionLanguage;
   // Default style parser
-  private final TemplateParser parser = TemplateParser.createMuleStyleParser();
+  private TemplateParser parser;
 
   @Override
   public void addGlobalBindings(BindingContext bindingContext) {
@@ -344,6 +345,11 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
     this.transformersRegistry = transformersRegistry;
   }
 
+  @Inject
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
+  }
+
   public StreamingManager getStreamingManager() {
     return muleContext.getStreamingManager();
   }
@@ -360,6 +366,7 @@ public class DefaultExpressionManager implements ExtendedExpressionManager, Init
   @Override
   public void initialise() throws InitialisationException {
     initialiseIfNeeded(expressionLanguage);
+    parser = TemplateParser.createMuleStyleParser(featureFlaggingService);
   }
 
   @Override
