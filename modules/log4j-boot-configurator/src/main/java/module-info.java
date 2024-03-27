@@ -13,6 +13,8 @@
  */
 module org.mule.runtime.boot.log4j {
 
+  requires org.mule.boot.api;
+
   // Exported.
   exports org.mule.runtime.module.log4j.boot.api;
 
