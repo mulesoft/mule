@@ -8,13 +8,11 @@ package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.TRACING_LEVEL_CONFIGURATION_PATH;
 import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
-import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
@@ -30,7 +28,6 @@ import org.mule.runtime.container.api.MuleFoldersUtil;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.module.observability.FileConfiguration;
 import org.mule.runtime.tracer.common.watcher.TracingConfigurationFileWatcher;
-import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
@@ -43,8 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
-
-import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -61,8 +56,6 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
                   getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
 
   private final MuleContext muleContext;
-
-  private SpanExporterConfiguration spanExporterConfiguration;
 
   private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
   private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
@@ -84,11 +77,6 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
     this.muleContext = muleContext;
   }
 
-  @Inject
-  public void setSpanExporterConfiguration(SpanExporterConfiguration spanExporterConfiguration) {
-    this.spanExporterConfiguration = spanExporterConfiguration;
-  }
-
   private Runnable getOnConfigurationChanged() {
     return () -> onConfigurationChangeRunnables.forEach(Runnable::run);
   }
@@ -108,9 +96,9 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
       try {
         tracingLevel = valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
-        LOGGER
-            .error(format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level.",
-                          configuredTracingLevel));
+        throw new IllegalArgumentException(
+                                           format("Wrong tracing level found in configuration file: %s. The tracing level will be set to the default level.",
+                                                  configuredTracingLevel));
       }
     }
   }
@@ -190,19 +178,9 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
       configurationUrl =
           getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
       return loadConfiguration(is);
-    } catch (MuleRuntimeException | IOException e) {
-      if (parseBoolean(spanExporterConfiguration.getStringValue(MULE_OPEN_TELEMETRY_EXPORTER_ENABLED, "false"))) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER
-              .debug(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default."),
-                     e);
-        } else {
-          LOGGER
-              .info(format("Non existent or non parseable tracing level config file found. The tracing level will be set to the default. Enable DEBUG log level to see the exception"));
-        }
-      }
+    } catch (IOException e) {
+      throw new MuleRuntimeException(e);
     }
-    return null;
   }
 
   protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {

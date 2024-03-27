@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
-import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -29,7 +28,7 @@ import org.junit.Test;
 
 @Feature(PROFILING)
 @Story(TRACING_CONFIGURATION)
-public class OpenTelemetryTracingLevelConfigTestCase {
+public class AutoConfigurableTracingLevelConfigurationTestCase {
 
   private static final TracingLevel DEFAULT_LEVEL = MONITORING;
   private static final String CONF_FOLDER = "conf";
@@ -41,9 +40,9 @@ public class OpenTelemetryTracingLevelConfigTestCase {
   public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
-    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    TracingLevelConfiguration tracingLevelConfiguration =
-        new OpenTelemetryAutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
+        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
@@ -53,9 +52,9 @@ public class OpenTelemetryTracingLevelConfigTestCase {
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
-    fileTracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
-    TracingLevelConfiguration tracingLevelConfiguration =
-        new OpenTelemetryAutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
+        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    tracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
@@ -63,9 +62,9 @@ public class OpenTelemetryTracingLevelConfigTestCase {
   public void whenLevelIsWrongInFileDefaultLevelIsReturned() {
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
         new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
-    fileTracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    TracingLevelConfiguration tracingLevelConfiguration =
-        new OpenTelemetryAutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
+        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+    tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 

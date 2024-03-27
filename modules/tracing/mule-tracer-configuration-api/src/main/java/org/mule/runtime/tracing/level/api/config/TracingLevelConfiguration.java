@@ -16,14 +16,9 @@ import java.util.function.Consumer;
 public interface TracingLevelConfiguration {
 
   /**
-   * @return the default tracing level, if no other tracing level is specified from a configuration.
+   * @return The configured tracing level.
    */
   TracingLevel getTracingLevel();
-
-  default TracingLevel getTracingLevel(TracingLevel defaultLevel) {
-    TracingLevel level = getTracingLevel();
-    return level != null ? level : defaultLevel;
-  }
 
   /**
    * If the specified location and tracing level exist, returns an override of a tracing level corresponding to a location.
@@ -34,10 +29,6 @@ public interface TracingLevelConfiguration {
    */
   TracingLevel getTracingLevelOverride(String location);
 
-  default TracingLevel getTracingLevelOverride(String location, TracingLevel defaultLevel) {
-    TracingLevel level = getTracingLevelOverride(location);
-    return level != null ? level : defaultLevel;
-  }
 
   /**
    * Consumer to be invoked when a {@link TracingLevelConfiguration} is changed.
