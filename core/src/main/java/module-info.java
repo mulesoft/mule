@@ -332,7 +332,7 @@ module org.mule.runtime.core {
   // and for MUnit and ApiKit
   exports org.mule.runtime.core.internal.message;
   exports org.mule.runtime.core.internal.metadata to
-      com.mulesoft.mule.runtime.kryo;
+      com.mulesoft.mule.runtime.kryo, org.mule.runtime.core.components;
   exports org.mule.runtime.core.internal.policy to
       org.mule.runtime.core.components,
       org.mule.runtime.extensions.support,
