@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isCollection;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isNullType;
 import static org.mule.metadata.java.api.utils.JavaTypeUtils.getType;
@@ -17,6 +15,10 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.connection.ConnectionException;
@@ -67,10 +69,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component has not parameter definitions to be described").onComponent());
     }
-    for (ParameterModel parameter : ((ParameterizedModel) model).getParameterGroupModels()
-        .stream()
-        .flatMap(parameterGroupModel -> parameterGroupModel.getParameterModels().stream())
-        .collect(toList())) {
+    for (ParameterModel parameter : ((ParameterizedModel) model).getAllParameterModels()) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
       input.withParameter(parameter.getName(), result.get());
       results.add(result);

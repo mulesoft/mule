@@ -6,16 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -39,6 +41,8 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -198,6 +202,35 @@ public final class MetadataMediator<T extends ComponentModel> {
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
     }
+  }
+
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
+                                                                            MetadataKey key,
+                                                                            MessageMetadataType scopeInputMessageType) {
+
+    MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
+    if (!inputMetadata.isSuccess()) {
+      return (MetadataResult) inputMetadata;
+    }
+
+    return success(ScopeInputMetadataDescriptor.builder()
+        .withParameters(inputMetadata.get().getAllParameters())
+        .withChainInputMessageType(null /*TODO*/)
+        .build());
+  }
+
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
+                                                                              MetadataKey key,
+                                                                              MessageMetadataType routerInputMessageType) {
+    MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
+    if (!inputMetadata.isSuccess()) {
+      return (MetadataResult) inputMetadata;
+    }
+
+    return success(RouterInputMetadataDescriptor.builder()
+        .withParameters(inputMetadata.get().getAllParameters())
+        .withRouteInputMessageType("", null/*routerInputMessageType*/)
+        .build());
   }
 
   public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key) {

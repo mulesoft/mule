@@ -57,8 +57,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.RouterPropagationContext;
-import org.mule.runtime.api.metadata.ChainPropagationContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -288,7 +288,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Issue("W-15158118")
   public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    ChainPropagationContext scopeContext = new ChainPropagationContext() {
+    ScopeOutputMetadataContext scopeContext = new ScopeOutputMetadataContext() {
 
       @Override
       public Supplier<MessageMetadataType> getChainInputResolver() {
@@ -312,11 +312,11 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Test
   public void outputResolverForRouter() throws Exception {
     location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
+    RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
 
       @Override
-      public Map<String, ChainPropagationContext> getRoutesPropagationContext() {
-        return singletonMap("metaroute", new ChainPropagationContext() {
+      public Map<String, ScopeOutputMetadataContext> getRoutesPropagationContext() {
+        return singletonMap("metaroute", new ScopeOutputMetadataContext() {
 
           @Override
           public Supplier<MessageMetadataType> getChainInputResolver() {
@@ -332,7 +332,7 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
-        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerPropagationContext);
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerOutputMetadataContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
