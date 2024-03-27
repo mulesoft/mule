@@ -22,7 +22,7 @@ public class MagnetoMutantNotification extends CustomNotification {
 
   static {
     // Support redeployment of apps with this extension in the same container
-    
+
     try {
       if (ERROR_NOTIFICATION_ACTION != getActionId("Magento Mutant Error")) {
         throw new IllegalStateException("Action " + "Magento Mutant Error" + " already registered");
