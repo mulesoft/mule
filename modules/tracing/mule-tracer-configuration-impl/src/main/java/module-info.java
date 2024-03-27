@@ -14,8 +14,10 @@
 module org.mule.runtime.tracer.configuration.impl {
 
   requires org.mule.runtime.api;
+  requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.container;
   requires org.mule.runtime.core;
+  requires org.mule.runtime.module.observability;
   requires org.mule.runtime.properties.config;
   requires org.mule.runtime.tracer.common;
   requires org.mule.runtime.tracer.configuration.api;
@@ -29,5 +31,7 @@ module org.mule.runtime.tracer.configuration.impl {
   exports org.mule.runtime.tracing.level.impl.config to
       org.mule.runtime.spring.config,
       spring.beans;
+
+  opens org.mule.runtime.tracing.level.impl.config to spring.core;
 
 }
