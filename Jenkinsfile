@@ -1,5 +1,5 @@
 def UPSTREAM_PROJECTS_LIST = [ "Mule-runtime/metadata-model-api/support/1.3.x",
-                               "Mule-runtime/mule-api/support/1.3.x",
+                               "Mule-runtime/mule-api/1.3.0-TESTCYCLE-2020-DRY-RUN",
                                "Mule-runtime/mule-extensions-api/support/1.3.x",
                                "Mule-runtime/mule-artifact-ast/support/0.8.x",
                                "DataWeave/data-weave/support/2.3.0",
