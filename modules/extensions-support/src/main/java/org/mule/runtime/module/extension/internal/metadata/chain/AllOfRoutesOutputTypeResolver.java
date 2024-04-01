@@ -10,13 +10,14 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.UNKNOWN;
 
 import org.mule.metadata.api.builder.ObjectTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * {@link OutputTypeResolver} implementation for Routers.
@@ -28,20 +29,29 @@ import java.util.Map;
  */
 public class AllOfRoutesOutputTypeResolver implements OutputTypeResolver<Void> {
 
+  public static final AllOfRoutesOutputTypeResolver INSTANCE = new AllOfRoutesOutputTypeResolver();
+
+  private AllOfRoutesOutputTypeResolver() {}
+
   @Override
   public String getCategoryName() {
-    return "OUTPUT_ROUTER_DYNAMIC";
+    return "ALL_OF_ROUTER";
+  }
+
+  @Override
+  public String getResolverName() {
+    return "ALL_OF_ROUTER";
   }
 
   @Override
   public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
     ObjectTypeBuilder builder = context.getTypeBuilder().objectType();
-    Map<String, ScopeOutputMetadataContext> routes = context.getRouterOutputMetadataContext()
-        .map(route -> route.getRoutesPropagationContext())
+    Map<String, Supplier<MessageMetadataType>> routes = context.getRouterOutputMetadataContext()
+        .map(route -> route.getRouteOutputMessageTypes())
         .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
 
     routes.forEach((routeName, route) -> {
-      builder.addField().key(routeName).value(route.getChainOutputResolver().get());
+      builder.addField().key(routeName).value(route.get());
     });
 
     return builder.build();

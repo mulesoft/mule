@@ -60,8 +60,8 @@ public class DefaultMetadataContext extends ExtensionResolvingContext implements
    * @param typeLoader               instance of a {@link ClassTypeLoader} in the context of this extension
    * @param scopePropagationContext  an optional {@link ScopeOutputMetadataContext} for the inner chain. Value is only present for
    *                                 scope components
-   * @param routerPropagationContext an optional {@link RouterOutputMetadataContext} with routes information. Value is only present
-   *                                 for router components
+   * @param routerPropagationContext an optional {@link RouterOutputMetadataContext} with routes information. Value is only
+   *                                 present for router components
    */
   public DefaultMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
                                 ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,

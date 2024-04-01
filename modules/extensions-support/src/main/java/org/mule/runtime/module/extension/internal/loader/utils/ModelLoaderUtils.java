@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer.configureNullMetadata;
 import static org.mule.sdk.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 
 import static java.util.Collections.emptyList;
@@ -30,9 +31,8 @@ import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
-import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
-import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
@@ -187,12 +187,12 @@ public final class ModelLoaderUtils {
                                                                  List<InputResolverModelParser> inputResolverModelParsers,
                                                                  Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
     declareMetadataResolverFactoryModelProperty(baseDeclaration,
-        outputResolverModelParser,
-        attributesResolverModelParser,
-        inputResolverModelParsers,
-        keyIdResolverModelParser,
-        empty(),
-        empty());
+                                                outputResolverModelParser,
+                                                attributesResolverModelParser,
+                                                inputResolverModelParsers,
+                                                keyIdResolverModelParser,
+                                                empty(),
+                                                empty());
   }
 
   public static void declareMetadataResolverFactoryModelProperty(BaseDeclaration baseDeclaration,
@@ -231,18 +231,17 @@ public final class ModelLoaderUtils {
           .map(RoutesChainInputTypesResolverModelParser::getRoutesChainInputResolvers)
           .orElse(emptyMap());
 
-      metadataResolverFactory = new DefaultMetadataResolverFactory(
-          typeKeysResolverSupplier,
-          inputTypeResolvers,
-          outputTypeResolverSupplier,
-          attributesTypeResolverSupplier,
-          scopeChainInputTypeResolver,
-          routesChainInputTypeResolver);
+      new ComponentMetadataConfigurer()
+          .setKeysResolver(typeKeysResolverSupplier)
+          .addInputResolvers(inputTypeResolvers)
+          .setOutputTypeResolver(outputTypeResolverSupplier)
+          .setAttributesTypeResolver(attributesTypeResolverSupplier)
+          .setChainInputTypeResolver(scopeChainInputTypeResolver.orElse(null))
+          .addRoutesChainInputResolvers(routesChainInputTypeResolver)
+          .configure(baseDeclaration);
     } else {
-      metadataResolverFactory = new NullMetadataResolverFactory();
+      configureNullMetadata(baseDeclaration);
     }
-
-    baseDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
   }
 
   /**

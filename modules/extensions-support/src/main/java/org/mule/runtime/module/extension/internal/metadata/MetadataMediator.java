@@ -71,6 +71,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 
@@ -208,7 +209,7 @@ public final class MetadataMediator<T extends ComponentModel> {
 
   public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
                                                                             MetadataKey key,
-                                                                            MessageMetadataType scopeInputMessageType) {
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
     if (!isScope(component)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component is not a scope").onComponent());
@@ -218,7 +219,8 @@ public final class MetadataMediator<T extends ComponentModel> {
       return (MetadataResult) inputMetadata;
     }
 
-    MetadataResult<MessageMetadataType> scopeChainInputType = inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get());
+    MetadataResult<MessageMetadataType> scopeChainInputType =
+        inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get());
 
     if (scopeChainInputType.isSuccess()) {
       return success(ScopeInputMetadataDescriptor.builder()
@@ -232,7 +234,7 @@ public final class MetadataMediator<T extends ComponentModel> {
 
   public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
                                                                               MetadataKey key,
-                                                                              MessageMetadataType routerInputMessageType) {
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
     if (!isRouter(component)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component is not a router").onComponent());
@@ -242,10 +244,17 @@ public final class MetadataMediator<T extends ComponentModel> {
       return (MetadataResult) inputMetadata;
     }
 
-    return success(RouterInputMetadataDescriptor.builder()
-        .withParameters(inputMetadata.get().getAllParameters())
-        .withRouteInputMessageType("", null/*routerInputMessageType*/)
-        .build());
+    MetadataResult<Map<String, MessageMetadataType>> routesInputTypes =
+        inputDelegate.getRoutesChainInputType(context, routerInputMessageType, inputMetadata.get());
+
+    if (routesInputTypes.isSuccess()) {
+      return success(RouterInputMetadataDescriptor.builder()
+          .withParameters(inputMetadata.get().getAllParameters())
+          .withRoutesInputMessageTypes(routesInputTypes.get())
+          .build());
+    } else {
+      return (MetadataResult) routesInputTypes;
+    }
   }
 
   public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key) {

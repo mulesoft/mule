@@ -23,6 +23,7 @@ module org.mule.runtime.spring.config {
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.metadata.model.api;
   requires org.mule.runtime.metadata.model.java;
+  requires org.mule.runtime.metadata.model.message;
   requires org.mule.runtime.properties.api;
   requires org.mule.sdk.api;
 

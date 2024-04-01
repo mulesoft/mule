@@ -291,14 +291,14 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     ScopeOutputMetadataContext scopeContext = new ScopeOutputMetadataContext() {
 
       @Override
-      public Supplier<MessageMetadataType> getChainInputResolver() {
-        // TODO: implement in W-14969942
-        return () -> null;
+      public Supplier<MessageMetadataType> getInnerChainOutputMessageType() {
+        return () -> MessageMetadataType.builder().payload(carType).build();
       }
 
       @Override
-      public Supplier<MessageMetadataType> getChainOutputResolver() {
-        return () -> MessageMetadataType.builder().payload(carType).build();
+      public Supplier<MessageMetadataType> getScopeInputMessageType() {
+        // TODO: implement in W-14969942
+        return () -> null;
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
@@ -315,20 +315,13 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
 
       @Override
-      public Map<String, ScopeOutputMetadataContext> getRoutesPropagationContext() {
-        return singletonMap("metaroute", new ScopeOutputMetadataContext() {
+      public Map<String, Supplier<MessageMetadataType>> getRouteOutputMessageTypes() {
+        return singletonMap("metaroute", () -> MessageMetadataType.builder().payload(carType).build());
+      }
 
-          @Override
-          public Supplier<MessageMetadataType> getChainInputResolver() {
-            // TODO: implement in W-14969942
-            return () -> null;
-          }
-
-          @Override
-          public Supplier<MessageMetadataType> getChainOutputResolver() {
-            return () -> MessageMetadataType.builder().payload(carType).build();
-          }
-        });
+      @Override
+      public Supplier<MessageMetadataType> getRouterInputMessageType() {
+        return () -> null;
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =

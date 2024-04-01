@@ -7,17 +7,14 @@
 package org.mule.runtime.config.internal.bean.lazy;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
-
-import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
-import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 
-
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -26,9 +23,13 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
@@ -156,6 +157,22 @@ public class LazyMetadataService implements MetadataService, Initialisable {
   public MetadataResult<TypeMetadataDescriptor> getEntityMetadata(Location location, MetadataKey key) {
     return (MetadataResult<TypeMetadataDescriptor>) initializeComponent(location)
         .orElseGet(() -> metadataService.getEntityMetadata(location, key));
+  }
+
+  @Override
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(Location location,
+                                                                            MetadataKey key,
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
+    return (MetadataResult<ScopeInputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getScopeInputMetadata(location, key, scopeInputMessageType));
+  }
+
+  @Override
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(Location location,
+                                                                              MetadataKey key,
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
+    return (MetadataResult<RouterInputMetadataDescriptor>) initializeComponent(location)
+        .orElseGet(() -> metadataService.getRouterInputMetadata(location, key, routerInputMessageType));
   }
 
   @Override

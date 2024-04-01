@@ -23,7 +23,7 @@ public class ScopeTestResolver implements OutputTypeResolver<String> {
 
   @Override
   public MetadataType getOutputType(MetadataContext context, String key) throws MetadataResolvingException, ConnectionException {
-    return context.getScopeOutputMetadataContext().map(ctx -> ctx.getChainOutputResolver())
+    return context.getScopeOutputMetadataContext().map(ctx -> ctx.getInnerChainOutputMessageType())
         .orElseThrow(() -> new MetadataResolvingException("Invalid Chain output.", INVALID_CONFIGURATION))
         .get()
         .getPayloadType().get();

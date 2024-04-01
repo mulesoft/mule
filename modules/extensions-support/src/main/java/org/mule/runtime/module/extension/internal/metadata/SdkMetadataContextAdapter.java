@@ -107,5 +107,9 @@ public class SdkMetadataContextAdapter implements MetadataContext {
     public Supplier<MessageMetadataType> getRouterInputMessageType() {
       return delegate.getRouterInputMessageType();
     }
+
+    org.mule.runtime.api.metadata.RouterOutputMetadataContext getDelegate() {
+      return delegate;
+    }
   }
 }

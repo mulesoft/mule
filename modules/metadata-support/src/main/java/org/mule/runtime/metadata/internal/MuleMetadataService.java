@@ -42,6 +42,8 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
 
+import java.util.function.Supplier;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -99,15 +101,17 @@ public class MuleMetadataService implements MetadataService {
   @Override
   public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(Location location,
                                                                             MetadataKey key,
-                                                                            MessageMetadataType scopeInputMessageType) {
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
     return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getScopeInputMetadata(key, scopeInputMessageType),
-        EXCEPTION_RESOLVING_COMPONENT_METADATA);
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }
 
   @Override
-  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(Location location, MetadataKey key, MessageMetadataType routerInputMessageType) {
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(Location location,
+                                                                              MetadataKey key,
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
     return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getRouterInputMetadata(key, routerInputMessageType),
-        EXCEPTION_RESOLVING_COMPONENT_METADATA);
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }
 
   /**

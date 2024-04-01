@@ -108,6 +108,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -691,20 +692,26 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
   }
 
   @Override
-  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataKey key, MessageMetadataType scopeInputMessageType) throws MetadataResolvingException {
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataKey key,
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType)
+      throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-          context -> withContextClassLoader(classLoader, () -> metadataMediator.getScopeInputMetadata(context, key, scopeInputMessageType)));
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getScopeInputMetadata(context, key, scopeInputMessageType)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }
   }
 
   @Override
-  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataKey key, MessageMetadataType routerInputMessageType) throws MetadataResolvingException {
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataKey key,
+                                                                              Supplier<MessageMetadataType> routerInputMessageType)
+      throws MetadataResolvingException {
     try {
       return runWithMetadataContext(
-          context -> withContextClassLoader(classLoader, () -> metadataMediator.getRouterInputMetadata(context, key, routerInputMessageType)));
+                                    context -> withContextClassLoader(classLoader, () -> metadataMediator
+                                        .getRouterInputMetadata(context, key, routerInputMessageType)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

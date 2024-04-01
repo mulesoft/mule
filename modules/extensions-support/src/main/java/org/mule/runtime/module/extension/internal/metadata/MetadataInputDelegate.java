@@ -18,6 +18,7 @@ import static org.mule.runtime.module.extension.internal.metadata.MetadataResolv
 import static org.mule.runtime.module.extension.internal.metadata.chain.NullChainInputTypeResolver.NULL_INSTANCE;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
@@ -45,9 +46,12 @@ import org.mule.runtime.module.extension.internal.metadata.chain.DefaultChainInp
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
@@ -85,22 +89,48 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
   }
 
   MetadataResult<MessageMetadataType> getScopeChainInputType(MetadataContext context,
-                                                             MessageMetadataType scopeInputMessageType,
+                                                             Supplier<MessageMetadataType> scopeInputMessageType,
                                                              InputMetadataDescriptor inputMetadataDescriptor) {
     try {
       return resolveWithOAuthRefresh(context, () -> {
         ChainInputTypeResolver resolver = resolverFactory.getScopeChainInputTypeResolver().orElse(NULL_INSTANCE);
-        ChainInputMetadataContext chainCtx = new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
+        ChainInputMetadataContext chainCtx =
+            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
 
         return success(resolver.getChainInputMetadataType(chainCtx));
       });
     } catch (ConnectionException e) {
       return connectivityFailure(e);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain").onComponent());
     }
   }
+
+  MetadataResult<Map<String, MessageMetadataType>> getRoutesChainInputType(MetadataContext context,
+                                                                           Supplier<MessageMetadataType> scopeInputMessageType,
+                                                                           InputMetadataDescriptor inputMetadataDescriptor) {
+    try {
+      return resolveWithOAuthRefresh(context, () -> {
+        ChainInputMetadataContext chainCtx =
+            new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
+        Map<String, MessageMetadataType> result = new HashMap<>();
+        for (Map.Entry<String, ChainInputTypeResolver> entry : resolverFactory.getRouterChainInputResolvers().entrySet()) {
+          try {
+            result.put(entry.getKey(), entry.getValue().getChainInputMetadataType(chainCtx));
+          } catch (ConnectionException e) {
+            return connectivityFailure(e);
+          } catch (Exception e) {
+            return failure(newFailure(e).withMessage("Failed to resolve input types for route inner chain")
+                .onParameter(entry.getKey()));
+          }
+        }
+        return success(unmodifiableMap(result));
+      });
+    } catch (Exception e) {
+      return failure(newFailure(e).withMessage(e.getMessage()).onComponent());
+    }
+  }
+
 
   private static <T> MetadataResult<T> connectivityFailure(ConnectionException e) {
     return failure(newFailure(e).withMessage("Failed to establish connection: " + getMessage(e))

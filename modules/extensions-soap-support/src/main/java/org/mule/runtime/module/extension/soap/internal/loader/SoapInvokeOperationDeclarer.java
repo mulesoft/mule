@@ -30,23 +30,19 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
-import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
-import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -121,23 +117,26 @@ public class SoapInvokeOperationDeclarer {
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
-    Map<String, Supplier<? extends InputTypeResolver>> inputResolver =
+    Map<String, Supplier<? extends InputTypeResolver>> inputResolvers =
         ImmutableMap.<String, Supplier<? extends InputTypeResolver>>builder()
             .put(BODY_PARAM, InvokeRequestTypeResolver::new)
             .put(HEADERS_PARAM, InvokeInputHeadersTypeResolver::new)
             .put(ATTACHMENTS_PARAM, InvokeInputAttachmentsTypeResolver::new)
             .build();
-    TypeKeysResolver keysResolver = new InvokeKeysResolver();
-    OutputTypeResolver outputResolver = new InvokeOutputTypeResolver();
-    DefaultMetadataResolverFactory factory = new DefaultMetadataResolverFactory(() -> keysResolver,
-                                                                                inputResolver,
-                                                                                () -> outputResolver,
-                                                                                NullMetadataResolver::new);
-    operation.withModelProperty(new MetadataResolverFactoryModelProperty(() -> factory));
+
+    final InvokeKeysResolver keysResolver = new InvokeKeysResolver();
+    final InvokeOutputTypeResolver outputResolver = new InvokeOutputTypeResolver();
+
+    new ComponentMetadataConfigurer()
+        .setKeysResolver(keysResolver)
+        .addInputResolvers(inputResolvers)
+        .setOutputTypeResolver(outputResolver)
+        .configure(operation);
+
     operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP,
                                                                keysResolver.getCategoryName()));
 
-    Map<String, String> inputResolversByParam = inputResolver
+    Map<String, String> inputResolversByParam = inputResolvers
         .entrySet().stream()
         .collect(toImmutableMap(Map.Entry::getKey,
                                 e -> e.getValue().get().getResolverName()));

@@ -117,12 +117,12 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
                                                  keyIdResolverModelParser, parser.isConnected());
 
     declareMetadataResolverFactoryModelProperty(operation.getDeclaration(),
-        outputResolverModelParser,
-        attributesResolverModelParser,
-        inputResolverModelParsers,
-        keyIdResolverModelParser,
-        parser.getScopeChainInputTypeResolverModelParser(),
-        parser.getRoutesChainInputTypesResolverModelParser());
+                                                outputResolverModelParser,
+                                                attributesResolverModelParser,
+                                                inputResolverModelParsers,
+                                                keyIdResolverModelParser,
+                                                parser.getScopeChainInputTypeResolverModelParser(),
+                                                parser.getRoutesChainInputTypesResolverModelParser());
 
     declareOperationMetadataKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers,
                                                keyIdResolverModelParser);

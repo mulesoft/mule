@@ -104,12 +104,12 @@ import java.util.stream.Stream;
 public class JavaOperationModelParser extends AbstractJavaExecutableComponentModelParser implements OperationModelParser {
 
   private static final List<Class<?>> ROUTER_CALLBACK_PARAMETER_TYPES = asList(
-      RouterCompletionCallback.class,
-      org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
-      VoidCompletionCallback.class,
-      org.mule.sdk.api.runtime.process.VoidCompletionCallback.class,
-      CompletionCallback.class,
-      org.mule.sdk.api.runtime.process.CompletionCallback.class);
+                                                                               RouterCompletionCallback.class,
+                                                                               org.mule.sdk.api.runtime.process.RouterCompletionCallback.class,
+                                                                               VoidCompletionCallback.class,
+                                                                               org.mule.sdk.api.runtime.process.VoidCompletionCallback.class,
+                                                                               CompletionCallback.class,
+                                                                               org.mule.sdk.api.runtime.process.CompletionCallback.class);
 
   private final JavaExtensionModelParser extensionModelParser;
   private final OperationElement operationElement;
@@ -149,10 +149,10 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
       parseStructure();
       collectAdditionalModelProperties();
       this.resolvedMinMuleVersion = resolveOperationMinMuleVersion(operationElement, this.operationContainer,
-          getContainerAnnotationMinMuleVersion(extensionElement,
-              Operations.class,
-              Operations::value,
-              this.operationContainer));
+                                                                   getContainerAnnotationMinMuleVersion(extensionElement,
+                                                                                                        Operations.class,
+                                                                                                        Operations::value,
+                                                                                                        this.operationContainer));
     } else {
       this.operationContainer = null;
       enclosingType = null;
@@ -171,8 +171,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
     if (scope && router) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Operation '%s' is both a Scope and a Router, which is invalid",
-          getName()));
+                                                                "Operation '%s' is both a Scope and a Router, which is invalid",
+                                                                getName()));
     }
 
     parseComponentConnectivity(operationElement);
@@ -201,12 +201,12 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
     if (chains.size() > 1) {
       throw new IllegalOperationModelDefinitionException(
-          format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
-                  + "Offending parameters are: %s",
-              getName(),
-              Chain.class.getSimpleName(),
-              chains.stream().map(ExtensionParameter::getName)
-                  .collect(toList())));
+                                                         format("Scope '%s' declares too many parameters of type '%s', only one input of this kind is supported."
+                                                             + "Offending parameters are: %s",
+                                                                getName(),
+                                                                Chain.class.getSimpleName(),
+                                                                chains.stream().map(ExtensionParameter::getName)
+                                                                    .collect(toList())));
     }
 
     return chains.isEmpty() ? null : chains.get(0);
@@ -215,35 +215,35 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private void validateScope() {
     if (blocking) {
       throw new IllegalOperationModelDefinitionException(format("Scope '%s' does not declare a '%s' parameter. One is required " +
-              "for all operations that receive and execute a Chain of other components",
-          getName(),
-          CompletionCallback.class.getSimpleName()));
+          "for all operations that receive and execute a Chain of other components",
+                                                                getName(),
+                                                                CompletionCallback.class.getSimpleName()));
     }
 
     if (hasConfig()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Scope '%s' requires a config, but that is not allowed, remove such parameter",
-          getName()));
+                                                                "Scope '%s' requires a config, but that is not allowed, remove such parameter",
+                                                                getName()));
     }
 
     if (isConnected()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Scope '%s' requires a connection, but that is not allowed, remove such parameter",
-          getName()));
+                                                                "Scope '%s' requires a connection, but that is not allowed, remove such parameter",
+                                                                getName()));
     }
   }
 
   private void parseRouter() {
     if (hasConfig()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' requires a config, but that is not allowed, remove such parameter",
-          getName()));
+                                                                "Router '%s' requires a config, but that is not allowed, remove such parameter",
+                                                                getName()));
     }
 
     if (isConnected()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' requires a connection, but that is not allowed, remove such parameter",
-          getName()));
+                                                                "Router '%s' requires a connection, but that is not allowed, remove such parameter",
+                                                                getName()));
     }
 
     List<ExtensionParameter> callbackParameters = operationElement.getParameters().stream()
@@ -252,25 +252,25 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
     if (callbackParameters.isEmpty()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' does not declare a parameter with one of the types '%s'. One is required.",
-          getName(), ROUTER_CALLBACK_PARAMETER_TYPES));
+                                                                "Router '%s' does not declare a parameter with one of the types '%s'. One is required.",
+                                                                getName(), ROUTER_CALLBACK_PARAMETER_TYPES));
     } else if (callbackParameters.size() > 1) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' defines more than one CompletionCallback parameters. Only one is allowed",
-          getName()));
+                                                                "Router '%s' defines more than one CompletionCallback parameters. Only one is allowed",
+                                                                getName()));
     }
 
     List<ExtensionParameter> routes = operationElement.getParameters().stream().filter(this::isRoute).collect(toList());
 
     if (routes.isEmpty()) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' does not declare a '%s' parameter. One is required.",
-          getName(), Route.class.getSimpleName()));
+                                                                "Router '%s' does not declare a '%s' parameter. One is required.",
+                                                                getName(), Route.class.getSimpleName()));
     }
 
     if (!IntrospectionUtils.isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(format(
-          "Router '%s' is not declared in a void method.", getName()));
+                                                                "Router '%s' is not declared in a void method.", getName()));
     }
     hasDeprecatedRouterCompletion =
         operationElement.getParameters().stream().anyMatch(this::parameterOfRouterCompletionCallbackType);
@@ -319,17 +319,17 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private void parseNonBlockingOperation(List<ExtensionParameter> callbackParameters) {
     if (callbackParameters.size() > 1) {
       throw new IllegalOperationModelDefinitionException(
-          format("Operation '%s' defines more than one %s parameters. Only one is allowed",
-              getName(), CompletionCallback.class.getSimpleName()));
+                                                         format("Operation '%s' defines more than one %s parameters. Only one is allowed",
+                                                                getName(), CompletionCallback.class.getSimpleName()));
     }
 
     if (!isVoid(operationElement)) {
       throw new IllegalOperationModelDefinitionException(
-          format("Operation '%s' has a parameter of type %s but is not void. "
-                  + "Non-blocking operations have to be declared as void and the "
-                  + "return type provided through the callback",
-              getName(),
-              CompletionCallback.class.getSimpleName()));
+                                                         format("Operation '%s' has a parameter of type %s but is not void. "
+                                                             + "Non-blocking operations have to be declared as void and the "
+                                                             + "return type provided through the callback",
+                                                                getName(),
+                                                                CompletionCallback.class.getSimpleName()));
     }
     Optional<OutputResolverModelParser> outputResolverModelParser = getOutputResolverModelParser();
     boolean isDynamicResolver = outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver();
@@ -366,25 +366,25 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
 
     List<ParameterGroupModelParser> parameterGroupModelParsers = getParameterGroupParsers(methodParameters, context);
     parameterGroupModelParsers.addAll(
-        getParameterGroupParsers(operationContainer.getParameters(),
-            context,
-            p -> new ParameterModelParserDecorator(p) {
+                                      getParameterGroupParsers(operationContainer.getParameters(),
+                                                               context,
+                                                               p -> new ParameterModelParserDecorator(p) {
 
-              @Override
-              public ExpressionSupport getExpressionSupport() {
-                return NOT_SUPPORTED;
-              }
+                                                                 @Override
+                                                                 public ExpressionSupport getExpressionSupport() {
+                                                                   return NOT_SUPPORTED;
+                                                                 }
 
-              @Override
-              public List<ModelProperty> getAdditionalModelProperties() {
-                List<ModelProperty> modelProperties =
-                    decoratee.getAdditionalModelProperties();
-                modelProperties
-                    .add(new FieldOperationParameterModelProperty());
+                                                                 @Override
+                                                                 public List<ModelProperty> getAdditionalModelProperties() {
+                                                                   List<ModelProperty> modelProperties =
+                                                                       decoratee.getAdditionalModelProperties();
+                                                                   modelProperties
+                                                                       .add(new FieldOperationParameterModelProperty());
 
-                return modelProperties;
-              }
-            }));
+                                                                   return modelProperties;
+                                                                 }
+                                                               }));
 
     return parameterGroupModelParsers;
   }
@@ -402,9 +402,9 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<CompletableComponentExecutorModelProperty> getExecutorModelProperty() {
     return operationElement.getMethod().map(method -> new CompletableComponentExecutorModelProperty(
-        new CompletableOperationExecutorFactory(enclosingType
-            .getDeclaringClass()
-            .get(), method)));
+                                                                                                    new CompletableOperationExecutorFactory(enclosingType
+                                                                                                        .getDeclaringClass()
+                                                                                                        .get(), method)));
   }
 
   @Override
@@ -535,8 +535,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private void checkOperationIsNotAnExtension() {
     if (operationContainer.isAssignableFrom(extensionElement) || extensionElement.isAssignableFrom(operationContainer)) {
       throw new IllegalOperationModelDefinitionException(
-          format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
-              operationContainer.getName(), extensionElement.getName()));
+                                                         format("Operation class '%s' cannot be the same class (nor a derivative) of the extension class '%s",
+                                                                operationContainer.getName(), extensionElement.getName()));
     }
   }
 

@@ -58,14 +58,15 @@ public class JavaInputResolverModelParserUtils {
 
   public static Optional<ChainInputTypeResolver> getChainInputTypeResolver(ExtensionParameter chain) {
     return chain.getValueFromAnnotation(ChainInputResolver.class)
-        .flatMap(a ->a.getClassValue(ChainInputResolver::value).getDeclaringClass())
+        .flatMap(a -> a.getClassValue(ChainInputResolver::value).getDeclaringClass())
         .map(type -> {
           try {
             return (ChainInputTypeResolver) instantiateClass(type, null);
           } catch (Exception e) {
             throw new IllegalModelDefinitionException(format("Non instantiable %s type: %s",
-                ChainInputTypeResolver.class.getSimpleName(),
-                type.getName()), e);
+                                                             ChainInputTypeResolver.class.getSimpleName(),
+                                                             type.getName()),
+                                                      e);
           }
         });
   }

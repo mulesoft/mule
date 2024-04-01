@@ -1,5 +1,5 @@
 /*
- * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
+ * Copyright 2023 Salesforce, Inc. All rights reserved.
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
@@ -12,6 +12,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataCache;
@@ -21,22 +22,23 @@ import org.mule.sdk.api.metadata.ScopeOutputMetadataContext;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class DefaultChainInputMetadataContext implements ChainInputMetadataContext {
 
-  private final MessageMetadataType inputMessageMetadataType;
+  private final Supplier<MessageMetadataType> inputMessageMetadataType;
   private final InputMetadataDescriptor inputMetadataDescriptor;
   private final MetadataContext rootContext;
 
-  public DefaultChainInputMetadataContext(MessageMetadataType inputMessageMetadataType,
+  public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
                                           MetadataContext rootContext) {
-    this.inputMessageMetadataType = inputMessageMetadataType;
+    this.inputMessageMetadataType = new LazyValue<>(inputMessageMetadataType);
     this.inputMetadataDescriptor = inputMetadataDescriptor;
     this.rootContext = rootContext;
   }
 
-  public DefaultChainInputMetadataContext(MessageMetadataType inputMessageMetadataType,
+  public DefaultChainInputMetadataContext(Supplier<MessageMetadataType> inputMessageMetadataType,
                                           InputMetadataDescriptor inputMetadataDescriptor,
                                           org.mule.runtime.api.metadata.MetadataContext rootContext) {
     this(inputMessageMetadataType, inputMetadataDescriptor, new SdkMetadataContextAdapter(rootContext));
@@ -49,7 +51,7 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
 
   @Override
   public MessageMetadataType getInputMessageMetadataType() {
-    return inputMessageMetadataType;
+    return inputMessageMetadataType.get();
   }
 
   @Override
