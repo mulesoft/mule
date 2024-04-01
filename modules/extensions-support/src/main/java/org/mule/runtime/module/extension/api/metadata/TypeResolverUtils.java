@@ -12,10 +12,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.metadata.internal.NullMetadataResolverSupplier;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.metadata.AllOfRoutesOutputTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.chain.AllOfRoutesOutputTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.ChainOutputAttributesPassThroughTypeResolver;
 import org.mule.runtime.module.extension.internal.metadata.OneOfRoutesOutputTypeResolver;
-import org.mule.runtime.module.extension.internal.metadata.ChainOutputPayloadPassThroughTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.chain.ChainOutputPayloadPassThroughTypeResolver;
 
 /**
  * Utils that allow to set TypeResolvers to an {@link OperationDeclarer}.

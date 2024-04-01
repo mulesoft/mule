@@ -7,7 +7,6 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclaration;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.operation.ExecutionType;
@@ -17,6 +16,11 @@ import org.mule.runtime.module.extension.api.loader.java.property.CompletableCom
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -197,5 +201,9 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    *         metadata were defined
    */
   Optional<MetadataKeyModelParser> getMetadataKeyModelParser();
+
+  Optional<ScopeChainInputTypeResolverModelParser> getScopeChainInputTypeResolverModelParser();
+
+  Optional<RoutesChainInputTypesResolverModelParser> getRoutesChainInputTypesResolverModelParser();
 
 }

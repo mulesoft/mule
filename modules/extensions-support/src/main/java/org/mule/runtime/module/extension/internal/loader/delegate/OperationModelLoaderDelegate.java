@@ -25,10 +25,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 
 import java.util.HashMap;
 import java.util.List;
@@ -116,9 +116,13 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
                                                  attributesResolverModelParser, inputResolverModelParsers,
                                                  keyIdResolverModelParser, parser.isConnected());
 
-    declareMetadataResolverFactoryModelProperty(operation.getDeclaration(), outputResolverModelParser,
-                                                attributesResolverModelParser,
-                                                inputResolverModelParsers, keyIdResolverModelParser);
+    declareMetadataResolverFactoryModelProperty(operation.getDeclaration(),
+        outputResolverModelParser,
+        attributesResolverModelParser,
+        inputResolverModelParsers,
+        keyIdResolverModelParser,
+        parser.getScopeChainInputTypeResolverModelParser(),
+        parser.getRoutesChainInputTypesResolverModelParser());
 
     declareOperationMetadataKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers,
                                                keyIdResolverModelParser);

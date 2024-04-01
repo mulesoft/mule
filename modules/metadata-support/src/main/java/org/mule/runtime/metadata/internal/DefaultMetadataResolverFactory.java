@@ -6,8 +6,13 @@
  */
 package org.mule.runtime.metadata.internal;
 
-import static java.util.Collections.unmodifiableCollection;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableCollection;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
+
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
@@ -16,10 +21,12 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.metadata.NullQueryMetadataResolver;
+import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 
@@ -35,21 +42,37 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
   private final AttributesTypeResolver attributesTypeResolver;
   private final Map<String, InputTypeResolver> inputResolvers = new HashMap<>();
   private final TypeKeysResolver keysResolver;
+  private final Optional<ChainInputTypeResolver> chainInputTypeResolver;
+  private final Map<String, ChainInputTypeResolver> routesChainInputTypesResolvers;
 
   public DefaultMetadataResolverFactory(Supplier<? extends TypeKeysResolver> keyResolver,
                                         Map<String, Supplier<? extends InputTypeResolver>> typeResolvers,
                                         Supplier<? extends OutputTypeResolver> outputResolver,
                                         Supplier<? extends AttributesTypeResolver> attributesResolver) {
+    this(keyResolver, typeResolvers, outputResolver, attributesResolver, empty(), emptyMap());
+  }
+
+  public DefaultMetadataResolverFactory(Supplier<? extends TypeKeysResolver> keyResolver,
+                                        Map<String, Supplier<? extends InputTypeResolver>> typeResolvers,
+                                        Supplier<? extends OutputTypeResolver> outputResolver,
+                                        Supplier<? extends AttributesTypeResolver> attributesResolver,
+                                        Optional<ChainInputTypeResolver> chainInputTypeResolver,
+                                        Map<String, ChainInputTypeResolver> routesChainInputTypesResolvers) {
 
     checkArgument(keyResolver != null, "MetadataKeyResolver type cannot be null");
     checkArgument(typeResolvers != null, "InputTypeResolvers cannot be null");
     checkArgument(outputResolver != null, "OutputTypeResolver type cannot be null");
     checkArgument(attributesResolver != null, "AttributesTypeResolver type cannot be null");
+    checkArgument(chainInputTypeResolver != null, "chainInputTypeResolver type cannot be null");
+    checkArgument(routesChainInputTypesResolvers != null, "routesChainInputTypesResolvers type cannot be null");
 
     typeResolvers.forEach((k, v) -> inputResolvers.put(k, v.get()));
     keysResolver = keyResolver.get();
     outputTypeResolver = outputResolver.get();
     attributesTypeResolver = attributesResolver.get();
+
+    this.chainInputTypeResolver = chainInputTypeResolver;
+    this.routesChainInputTypesResolvers = unmodifiableMap(routesChainInputTypesResolvers);
 
     checkArgument(keysResolver != null, "MetadataKeyResolver type cannot be null");
     inputResolvers.values().forEach(resolver -> checkArgument(resolver != null, "Input Type Resolver cannot be null"));
@@ -102,5 +125,15 @@ public final class DefaultMetadataResolverFactory implements MetadataResolverFac
   @Override
   public QueryEntityResolver getQueryEntityResolver() {
     return new NullQueryMetadataResolver();
+  }
+
+  @Override
+  public Optional<ChainInputTypeResolver> getScopeChainInputTypeResolver() {
+    return chainInputTypeResolver;
+  }
+
+  @Override
+  public Map<String, ChainInputTypeResolver> getRouterChainInputResolvers() {
+    return routesChainInputTypesResolvers;
   }
 }

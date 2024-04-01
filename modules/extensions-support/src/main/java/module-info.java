@@ -114,7 +114,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.soap.support;
   exports org.mule.runtime.module.extension.internal.loader.java.property to
       org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.extensions.soap.support;
+      org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.mule.support;
   exports org.mule.runtime.module.extension.internal.loader.java.type.property to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.soap.support;
@@ -196,9 +196,17 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.extensions.soap.support;
   exports org.mule.runtime.module.extension.internal.type.catalog to
       org.mule.runtime.spring.config;
+  exports org.mule.runtime.module.extension.internal.loader.parser to
+      org.mule.runtime.extensions.mule.support;
+  exports org.mule.runtime.module.extension.internal.loader.parser.java.utils to
+      org.mule.runtime.extensions.mule.support;
 
   opens org.mule.runtime.module.extension.internal.resources.documentation to
       java.xml.bind;
+  exports org.mule.runtime.module.extension.internal.loader.parser.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
+  exports org.mule.runtime.module.extension.internal.metadata.chain to org.mule.runtime.tooling.support;
+  exports org.mule.runtime.module.extension.internal.loader.parser.java.metadata to org.mule.runtime.extensions.mule.support, org.mule.runtime.extensions.soap.support, org.mule.runtime.extensions.spring.support;
+
 
   provides org.mule.runtime.api.connectivity.ConnectivityTestingStrategy with
       org.mule.runtime.module.extension.api.tooling.ExtensionConnectivityTestingStrategy;

@@ -6,12 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static java.util.Collections.emptyList;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
 import static org.mule.sdk.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -34,14 +36,16 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
+import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,6 +186,22 @@ public final class ModelLoaderUtils {
                                                                  Optional<AttributesResolverModelParser> attributesResolverModelParser,
                                                                  List<InputResolverModelParser> inputResolverModelParsers,
                                                                  Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
+    declareMetadataResolverFactoryModelProperty(baseDeclaration,
+        outputResolverModelParser,
+        attributesResolverModelParser,
+        inputResolverModelParsers,
+        keyIdResolverModelParser,
+        empty(),
+        empty());
+  }
+
+  public static void declareMetadataResolverFactoryModelProperty(BaseDeclaration baseDeclaration,
+                                                                 Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                                 Optional<AttributesResolverModelParser> attributesResolverModelParser,
+                                                                 List<InputResolverModelParser> inputResolverModelParsers,
+                                                                 Optional<MetadataKeyModelParser> keyIdResolverModelParser,
+                                                                 Optional<ScopeChainInputTypeResolverModelParser> scopeChainInputResolverParser,
+                                                                 Optional<RoutesChainInputTypesResolverModelParser> routesChainInputTypesResolverParser) {
     MetadataResolverFactory metadataResolverFactory;
     if ((outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver()) ||
         !inputResolverModelParsers.isEmpty()) {
@@ -204,9 +224,20 @@ public final class ModelLoaderUtils {
       Map<String, Supplier<? extends InputTypeResolver>> inputTypeResolvers = new HashMap<>();
       inputResolverModelParsers.forEach(parser -> inputTypeResolvers.put(parser.getParameterName(), parser::getInputResolver));
 
-      metadataResolverFactory = new DefaultMetadataResolverFactory(typeKeysResolverSupplier, inputTypeResolvers,
-                                                                   outputTypeResolverSupplier,
-                                                                   attributesTypeResolverSupplier);
+      Optional<ChainInputTypeResolver> scopeChainInputTypeResolver = scopeChainInputResolverParser
+          .map(ScopeChainInputTypeResolverModelParser::getChainInputTypeResolver);
+
+      Map<String, ChainInputTypeResolver> routesChainInputTypeResolver = routesChainInputTypesResolverParser
+          .map(RoutesChainInputTypesResolverModelParser::getRoutesChainInputResolvers)
+          .orElse(emptyMap());
+
+      metadataResolverFactory = new DefaultMetadataResolverFactory(
+          typeKeysResolverSupplier,
+          inputTypeResolvers,
+          outputTypeResolverSupplier,
+          attributesTypeResolverSupplier,
+          scopeChainInputTypeResolver,
+          routesChainInputTypeResolver);
     } else {
       metadataResolverFactory = new NullMetadataResolverFactory();
     }

@@ -13,9 +13,9 @@ import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaAttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaOutputResolverModelParser;
 import org.mule.sdk.api.annotation.metadata.MetadataScope;
 import org.mule.sdk.api.annotation.metadata.OutputResolver;
 

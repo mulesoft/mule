@@ -6,19 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toMap;
-
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
-import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
-import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
-import org.mule.sdk.api.metadata.ChainPropagationContext;
 import org.mule.sdk.api.metadata.MetadataCache;
 import org.mule.sdk.api.metadata.MetadataContext;
-import org.mule.sdk.api.metadata.RouterPropagationContext;
+import org.mule.sdk.api.metadata.RouterOutputMetadataContext;
+import org.mule.sdk.api.metadata.ScopeOutputMetadataContext;
 
 import java.util.Map;
 import java.util.Optional;
@@ -63,57 +58,54 @@ public class SdkMetadataContextAdapter implements MetadataContext {
   }
 
   @Override
-  public Optional<ChainPropagationContext> getScopeChainPropagationContext() {
-    return delegate.getScopeOutputMetadataContext().map(SdkChainPropagationContextAdapter::new);
+  public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
+    return delegate.getScopeOutputMetadataContext().map(SdkScopeOutputMetadataContext::new);
   }
 
   @Override
-  public Optional<RouterPropagationContext> getRouterPropagationContext() {
-    return delegate.getRouterOutputMetadataContext().map(SdkRouterPropagationContextAdapter::new);
+  public Optional<RouterOutputMetadataContext> getRouterOutputMetadataContext() {
+    return delegate.getRouterOutputMetadataContext().map(SdkRouterOutputMetadataContextAdapter::new);
   }
 
-  static class SdkChainPropagationContextAdapter implements ChainPropagationContext {
+  static class SdkScopeOutputMetadataContext implements ScopeOutputMetadataContext {
 
-    private final ScopeOutputMetadataContext delegate;
+    private final org.mule.runtime.api.metadata.ScopeOutputMetadataContext delegate;
 
-    private SdkChainPropagationContextAdapter(ScopeOutputMetadataContext delegate) {
+    private SdkScopeOutputMetadataContext(org.mule.runtime.api.metadata.ScopeOutputMetadataContext delegate) {
       this.delegate = delegate;
     }
 
     @Override
-    public Supplier<MessageMetadataType> getChainInputResolver() {
-      return delegate.getChainInputResolver();
+    public Supplier<MessageMetadataType> getInnerChainOutputMessageType() {
+      return delegate.getInnerChainOutputMessageType();
     }
 
     @Override
-    public Supplier<MessageMetadataType> getChainOutputResolver() {
-      return delegate.getChainOutputResolver();
+    public Supplier<MessageMetadataType> getScopeInputMessageType() {
+      return delegate.getScopeInputMessageType();
     }
 
-    ScopeOutputMetadataContext getDelegate() {
+    org.mule.runtime.api.metadata.ScopeOutputMetadataContext getDelegate() {
       return delegate;
     }
   }
 
-  static class SdkRouterPropagationContextAdapter implements RouterPropagationContext {
+  static class SdkRouterOutputMetadataContextAdapter implements RouterOutputMetadataContext {
 
-    private final RouterOutputMetadataContext delegate;
+    private final org.mule.runtime.api.metadata.RouterOutputMetadataContext delegate;
 
-    private SdkRouterPropagationContextAdapter(RouterOutputMetadataContext delegate) {
+    public SdkRouterOutputMetadataContextAdapter(org.mule.runtime.api.metadata.RouterOutputMetadataContext delegate) {
       this.delegate = delegate;
     }
 
     @Override
-    public Map<String, ChainPropagationContext> getRoutesPropagationContext() {
-      return unmodifiableMap(
-                             delegate.getRoutesPropagationContext().entrySet().stream().collect(
-                                                                                                toMap(entry -> entry.getKey(),
-                                                                                                      entry -> new SdkChainPropagationContextAdapter(entry
-                                                                                                          .getValue()))));
+    public Map<String, Supplier<MessageMetadataType>> getRouteOutputMessageTypes() {
+      return delegate.getRouteOutputMessageTypes();
     }
 
-    RouterOutputMetadataContext getDelegate() {
-      return delegate;
+    @Override
+    public Supplier<MessageMetadataType> getRouterInputMessageType() {
+      return delegate.getRouterInputMessageType();
     }
   }
 }

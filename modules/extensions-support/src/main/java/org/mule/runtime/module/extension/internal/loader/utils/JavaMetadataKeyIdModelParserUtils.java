@@ -26,13 +26,13 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.java.HasExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.java.JavaMetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaMetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParser;
 import org.mule.sdk.api.annotation.metadata.MetadataKeyId;

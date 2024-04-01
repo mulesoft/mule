@@ -10,6 +10,8 @@ import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADA
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRouter;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isScope;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -207,21 +209,34 @@ public final class MetadataMediator<T extends ComponentModel> {
   public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
                                                                             MetadataKey key,
                                                                             MessageMetadataType scopeInputMessageType) {
-
+    if (!isScope(component)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component is not a scope").onComponent());
+    }
     MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
     if (!inputMetadata.isSuccess()) {
       return (MetadataResult) inputMetadata;
     }
 
-    return success(ScopeInputMetadataDescriptor.builder()
-        .withParameters(inputMetadata.get().getAllParameters())
-        .withChainInputMessageType(null /*TODO*/)
-        .build());
+    MetadataResult<MessageMetadataType> scopeChainInputType = inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get());
+
+    if (scopeChainInputType.isSuccess()) {
+      return success(ScopeInputMetadataDescriptor.builder()
+          .withParameters(inputMetadata.get().getAllParameters())
+          .withChainInputMessageType(scopeChainInputType.get())
+          .build());
+    } else {
+      return (MetadataResult) scopeChainInputType;
+    }
   }
 
   public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
                                                                               MetadataKey key,
                                                                               MessageMetadataType routerInputMessageType) {
+    if (!isRouter(component)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component is not a router").onComponent());
+    }
     MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
     if (!inputMetadata.isSuccess()) {
       return (MetadataResult) inputMetadata;

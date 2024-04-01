@@ -15,12 +15,16 @@ import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.ne
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 import static org.mule.runtime.module.extension.internal.metadata.MetadataResolverUtils.resolveWithOAuthRefresh;
+import static org.mule.runtime.module.extension.internal.metadata.chain.NullChainInputTypeResolver.NULL_INSTANCE;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
@@ -29,6 +33,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor.InputMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor.ParameterMetadataDescriptorBuilder;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
@@ -36,12 +41,13 @@ import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
+import org.mule.runtime.module.extension.internal.metadata.chain.DefaultChainInputMetadataContext;
+import org.mule.sdk.api.metadata.ChainInputMetadataContext;
+import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Metadata service delegate implementations that handles the resolution of a {@link ComponentModel}
@@ -63,12 +69,12 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    *         only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
-    InputMetadataDescriptor.InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
-    List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
     if (!(model instanceof ParameterizedModel)) {
       return failure(MetadataFailure.Builder.newFailure()
           .withMessage("The given component has not parameter definitions to be described").onComponent());
     }
+    InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
+    List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
     for (ParameterModel parameter : ((ParameterizedModel) model).getAllParameterModels()) {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
       input.withParameter(parameter.getName(), result.get());
@@ -76,6 +82,29 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
     List<MetadataFailure> failures = results.stream().flatMap(e -> e.getFailures().stream()).collect(toList());
     return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
+  }
+
+  MetadataResult<MessageMetadataType> getScopeChainInputType(MetadataContext context,
+                                                             MessageMetadataType scopeInputMessageType,
+                                                             InputMetadataDescriptor inputMetadataDescriptor) {
+    try {
+      return resolveWithOAuthRefresh(context, () -> {
+        ChainInputTypeResolver resolver = resolverFactory.getScopeChainInputTypeResolver().orElse(NULL_INSTANCE);
+        ChainInputMetadataContext chainCtx = new DefaultChainInputMetadataContext(scopeInputMessageType, inputMetadataDescriptor, context);
+
+        return success(resolver.getChainInputMetadataType(chainCtx));
+      });
+    } catch (ConnectionException e) {
+      return connectivityFailure(e);
+    }
+    catch (Exception e) {
+      return failure(newFailure(e).withMessage("Failed to resolve input types for scope inner chain").onComponent());
+    }
+  }
+
+  private static <T> MetadataResult<T> connectivityFailure(ConnectionException e) {
+    return failure(newFailure(e).withMessage("Failed to establish connection: " + getMessage(e))
+        .withFailureCode(CONNECTION_FAILURE).onComponent());
   }
 
   /**
@@ -138,8 +167,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
           .onParameter(parameter.getName());
       return failure(parameter.getType(), failure);
     } catch (ConnectionException e) {
-      return failure(newFailure(e).withMessage("Failed to establish connection: " + ExceptionUtils.getMessage(e))
-          .withFailureCode(CONNECTION_FAILURE).onComponent());
+      return connectivityFailure(e);
     } catch (Exception e) {
       return failure(parameter.getType(), newFailure(e).onParameter(parameter.getName()));
     }
