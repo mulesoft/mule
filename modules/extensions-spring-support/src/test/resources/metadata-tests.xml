@@ -306,7 +306,13 @@
         </metadata:scope-with-metadata-resolver>
     </flow>
 
-    <flow name="routerWithOutputResolver">
+    <flow name="scopeWithInputResolver">
+        <metadata:scope-with-input-metadata-resolver jsonValue="#[vars.json]">
+            <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>
+        </metadata:scope-with-input-metadata-resolver>
+    </flow>
+
+    <flow name="routerWithMetadataResolver">
         <metadata:router-with-metadata-resolver>
             <metadata:metaroute>
                 <metadata:output-and-multiple-input-with-key-id config-ref="config" type="PERSON"/>

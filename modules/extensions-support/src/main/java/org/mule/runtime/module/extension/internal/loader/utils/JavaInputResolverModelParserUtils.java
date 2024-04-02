@@ -22,7 +22,9 @@ import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupMo
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaInputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.metadata.chain.PassThroughChainInputTypeResolver;
 import org.mule.sdk.api.annotation.metadata.ChainInputResolver;
+import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 import org.mule.sdk.api.annotation.metadata.TypeResolver;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
@@ -57,18 +59,25 @@ public class JavaInputResolverModelParserUtils {
   }
 
   public static Optional<ChainInputTypeResolver> getChainInputTypeResolver(ExtensionParameter chain) {
-    return chain.getValueFromAnnotation(ChainInputResolver.class)
-        .flatMap(a -> a.getClassValue(ChainInputResolver::value).getDeclaringClass())
-        .map(type -> {
-          try {
-            return (ChainInputTypeResolver) instantiateClass(type, null);
-          } catch (Exception e) {
-            throw new IllegalModelDefinitionException(format("Non instantiable %s type: %s",
-                                                             ChainInputTypeResolver.class.getSimpleName(),
-                                                             type.getName()),
-                                                      e);
-          }
-        });
+    Optional<ChainInputTypeResolver> resolver = chain.getValueFromAnnotation(PassThroughInputChainResolver.class)
+        .map(a -> PassThroughChainInputTypeResolver.INSTANCE);
+
+    if (!resolver.isPresent()) {
+      resolver = chain.getValueFromAnnotation(ChainInputResolver.class)
+          .flatMap(a -> a.getClassValue(ChainInputResolver::value).getDeclaringClass())
+          .map(type -> {
+            try {
+              return (ChainInputTypeResolver) instantiateClass(type, null);
+            } catch (Exception e) {
+              throw new IllegalModelDefinitionException(format("Non instantiable %s type: %s",
+                                                               ChainInputTypeResolver.class.getSimpleName(),
+                                                               type.getName()),
+                                                        e);
+            }
+          });
+    }
+
+    return resolver;
   }
 
   private static Optional<InputResolverModelParser> getJavaInputResolverParser(String parameterName, Type type) {

@@ -26,11 +26,11 @@ import java.util.function.Function;
  *
  * @since 4.7
  */
-public class ChainOutputPassThroughTypeResolver implements OutputTypeResolver<Void>, AttributesTypeResolver<Void> {
+public class PassThroughChainOutputTypeResolver implements OutputTypeResolver<Void>, AttributesTypeResolver<Void> {
 
-  public static final ChainOutputPassThroughTypeResolver INSTANCE = new ChainOutputPassThroughTypeResolver();
+  public static final PassThroughChainOutputTypeResolver INSTANCE = new PassThroughChainOutputTypeResolver();
 
-  private ChainOutputPassThroughTypeResolver() {}
+  private PassThroughChainOutputTypeResolver() {}
 
   @Override
   public String getCategoryName() {
@@ -39,7 +39,7 @@ public class ChainOutputPassThroughTypeResolver implements OutputTypeResolver<Vo
 
   @Override
   public String getResolverName() {
-    return "SCOPE_PASSTHROUGH";
+    return "SCOPE_OUTPUT_PASSTHROUGH";
   }
 
   @Override

@@ -6,6 +6,8 @@
  */
 package org.mule.test.module.extension.metadata;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -47,6 +49,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -62,6 +65,8 @@ import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
@@ -310,8 +315,49 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-14969942")
+  public void passthroughInputResolverForScope() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(carType)
+        .attributes(typeBuilder.voidType().build())
+        .build();
+
+    MetadataResult<ScopeInputMetadataDescriptor> inputMetadata =
+        metadataService.getScopeInputMetadata(location, CAR_KEY, () -> inputMessageType);
+
+    assertThat(inputMetadata.isSuccess(), is(true));
+    ScopeInputMetadataDescriptor metadataDescriptor = inputMetadata.get();
+    assertThat(metadataDescriptor.getChainInputMessageType(), is(sameInstance(inputMessageType)));
+  }
+
+  @Test
+  @Issue("W-14969942")
+  public void inputResolverForScope() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_INPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<ScopeInputMetadataDescriptor> inputMetadata =
+        metadataService.getScopeInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadata.isSuccess(), is(true));
+    ScopeInputMetadataDescriptor metadataDescriptor = inputMetadata.get();
+
+    MessageMetadataType chainInputMessageType = metadataDescriptor.getChainInputMessageType();
+    assertThat(chainInputMessageType.getPayloadType().get(),
+               is(sameInstance(metadataDescriptor.getParameterMetadata("jsonValue").getType())));
+    assertThat(chainInputMessageType.getPayloadType().get().getMetadataFormat(), is(JSON));
+    assertThat(chainInputMessageType.getAttributesType().get(), is(instanceOf(VoidType.class)));
+  }
+
+  @Test
   public void outputResolverForRouter() throws Exception {
-    location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
     RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
 
       @Override
@@ -330,6 +376,25 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
     assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void inputResolverForRouter() throws Exception {
+    location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<RouterInputMetadataDescriptor> inputMetadataResult =
+        metadataService.getRouterInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadataResult.isSuccess(), is(true));
+    RouterInputMetadataDescriptor inputMetadata = inputMetadataResult.get();
+
+    MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("metaroute");
+    assertThat(routeInputType.getPayloadType().get().getMetadataFormat(), is(JSON));
   }
 
   @Test
