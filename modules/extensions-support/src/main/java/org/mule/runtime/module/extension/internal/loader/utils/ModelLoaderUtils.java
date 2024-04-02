@@ -12,7 +12,6 @@ import static org.mule.runtime.module.extension.api.metadata.ComponentMetadataCo
 import static org.mule.sdk.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
@@ -23,12 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
-import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
-import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
@@ -44,13 +37,10 @@ import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputR
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
-import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
@@ -202,43 +192,17 @@ public final class ModelLoaderUtils {
                                                                  Optional<MetadataKeyModelParser> keyIdResolverModelParser,
                                                                  Optional<ScopeChainInputTypeResolverModelParser> scopeChainInputResolverParser,
                                                                  Optional<RoutesChainInputTypesResolverModelParser> routesChainInputTypesResolverParser) {
-    MetadataResolverFactory metadataResolverFactory;
-    if ((outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver()) ||
-        !inputResolverModelParsers.isEmpty()) {
+    if (outputResolverModelParser.map(p -> p.hasOutputResolver()).orElse(false) || !inputResolverModelParsers.isEmpty()) {
+      final ComponentMetadataConfigurer configurer = new ComponentMetadataConfigurer();
+      outputResolverModelParser.ifPresent(p -> configurer.setOutputTypeResolver(p.getOutputResolver()));
+      attributesResolverModelParser.ifPresent(p -> configurer.setAttributesTypeResolver(p.getAttributesResolver()));
+      keyIdResolverModelParser.ifPresent(p -> configurer.setKeysResolver(p.getKeyResolver()));
 
-      NullMetadataResolver nullMetadataResolver = new NullMetadataResolver();
-
-      OutputTypeResolver<?> outputTypeResolver = outputResolverModelParser.map(OutputResolverModelParser::getOutputResolver)
-          .orElse((OutputTypeResolver) nullMetadataResolver);
-      Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier = () -> outputTypeResolver;
-
-      AttributesTypeResolver<?> attributesTypeResolver =
-          attributesResolverModelParser.map(AttributesResolverModelParser::getAttributesResolver)
-              .orElse((AttributesTypeResolver) nullMetadataResolver);
-      Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier = () -> attributesTypeResolver;
-
-      TypeKeysResolver typeKeysResolver = keyIdResolverModelParser.map(MetadataKeyModelParser::getKeyResolver)
-          .orElse(nullMetadataResolver);
-      Supplier<TypeKeysResolver> typeKeysResolverSupplier = () -> typeKeysResolver;
-
-      Map<String, Supplier<? extends InputTypeResolver>> inputTypeResolvers = new HashMap<>();
-      inputResolverModelParsers.forEach(parser -> inputTypeResolvers.put(parser.getParameterName(), parser::getInputResolver));
-
-      Optional<ChainInputTypeResolver> scopeChainInputTypeResolver = scopeChainInputResolverParser
-          .map(ScopeChainInputTypeResolverModelParser::getChainInputTypeResolver);
-
-      Map<String, ChainInputTypeResolver> routesChainInputTypeResolver = routesChainInputTypesResolverParser
-          .map(RoutesChainInputTypesResolverModelParser::getRoutesChainInputResolvers)
-          .orElse(emptyMap());
-
-      new ComponentMetadataConfigurer()
-          .setKeysResolver(typeKeysResolverSupplier)
-          .addInputResolvers(inputTypeResolvers)
-          .setOutputTypeResolver(outputTypeResolverSupplier)
-          .setAttributesTypeResolver(attributesTypeResolverSupplier)
-          .setChainInputTypeResolver(scopeChainInputTypeResolver.orElse(null))
-          .addRoutesChainInputResolvers(routesChainInputTypeResolver)
-          .configure(baseDeclaration);
+      inputResolverModelParsers.forEach(parser -> configurer.addInputResolver(parser.getParameterName(), parser::getInputResolver));
+      scopeChainInputResolverParser.ifPresent(p -> configurer.setChainInputTypeResolver(p.getChainInputTypeResolver()));
+      routesChainInputTypesResolverParser.ifPresent(p -> configurer.addRoutesChainInputResolvers(p.getRoutesChainInputResolvers()));
+      
+      configurer.configure(baseDeclaration);
     } else {
       configureNullMetadata(baseDeclaration);
     }

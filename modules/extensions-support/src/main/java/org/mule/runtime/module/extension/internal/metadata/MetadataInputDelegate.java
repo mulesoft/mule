@@ -79,11 +79,17 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
     InputMetadataDescriptorBuilder input = InputMetadataDescriptor.builder();
     List<MetadataResult<ParameterMetadataDescriptor>> results = new LinkedList<>();
-    for (ParameterModel parameter : ((ParameterizedModel) model).getAllParameterModels()) {
+
+    // Do this instead of {@link ParameterizedModel#getAllParameterModels() since for sources that
+    // would merge the source parameters with the callback ones and that's not something we want here
+    ((ParameterizedModel) model).getParameterGroupModels()
+        .stream()
+        .flatMap(parameterGroupModel -> parameterGroupModel.getParameterModels().stream())
+        .forEach(parameter -> {
       MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
       input.withParameter(parameter.getName(), result.get());
       results.add(result);
-    }
+    });
     List<MetadataFailure> failures = results.stream().flatMap(e -> e.getFailures().stream()).collect(toList());
     return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
   }
