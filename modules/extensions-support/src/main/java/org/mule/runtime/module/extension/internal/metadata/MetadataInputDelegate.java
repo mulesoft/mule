@@ -86,10 +86,10 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
         .stream()
         .flatMap(parameterGroupModel -> parameterGroupModel.getParameterModels().stream())
         .forEach(parameter -> {
-      MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
-      input.withParameter(parameter.getName(), result.get());
-      results.add(result);
-    });
+          MetadataResult<ParameterMetadataDescriptor> result = getParameterMetadataDescriptor(parameter, context, key);
+          input.withParameter(parameter.getName(), result.get());
+          results.add(result);
+        });
     List<MetadataFailure> failures = results.stream().flatMap(e -> e.getFailures().stream()).collect(toList());
     return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
   }

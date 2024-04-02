@@ -198,10 +198,12 @@ public final class ModelLoaderUtils {
       attributesResolverModelParser.ifPresent(p -> configurer.setAttributesTypeResolver(p.getAttributesResolver()));
       keyIdResolverModelParser.ifPresent(p -> configurer.setKeysResolver(p.getKeyResolver()));
 
-      inputResolverModelParsers.forEach(parser -> configurer.addInputResolver(parser.getParameterName(), parser::getInputResolver));
+      inputResolverModelParsers
+          .forEach(parser -> configurer.addInputResolver(parser.getParameterName(), parser::getInputResolver));
       scopeChainInputResolverParser.ifPresent(p -> configurer.setChainInputTypeResolver(p.getChainInputTypeResolver()));
-      routesChainInputTypesResolverParser.ifPresent(p -> configurer.addRoutesChainInputResolvers(p.getRoutesChainInputResolvers()));
-      
+      routesChainInputTypesResolverParser
+          .ifPresent(p -> configurer.addRoutesChainInputResolvers(p.getRoutesChainInputResolvers()));
+
       configurer.configure(baseDeclaration);
     } else {
       configureNullMetadata(baseDeclaration);
