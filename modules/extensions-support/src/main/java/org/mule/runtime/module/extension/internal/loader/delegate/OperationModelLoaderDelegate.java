@@ -11,8 +11,6 @@ import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDeleg
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareOperationMetadataKeyIdModelProperty;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareTypeResolversInformationModelProperty;
 
 import static java.lang.String.format;
 import static java.util.Optional.of;
@@ -112,10 +110,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     List<InputResolverModelParser> inputResolverModelParsers = parser.getInputResolverModelParsers();
     Optional<MetadataKeyModelParser> keyIdResolverModelParser = parser.getMetadataKeyModelParser();
 
-    declareTypeResolversInformationModelProperty(operation.getDeclaration(), outputResolverModelParser,
-                                                 attributesResolverModelParser, inputResolverModelParsers,
-                                                 keyIdResolverModelParser, parser.isConnected());
-
     declareMetadataResolverFactoryModelProperty(operation.getDeclaration(),
                                                 outputResolverModelParser,
                                                 attributesResolverModelParser,
@@ -123,9 +117,6 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
                                                 keyIdResolverModelParser,
                                                 parser.getScopeChainInputTypeResolverModelParser(),
                                                 parser.getRoutesChainInputTypesResolverModelParser());
-
-    declareOperationMetadataKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers,
-                                               keyIdResolverModelParser);
 
     parser.getDeprecationModel().ifPresent(operation::withDeprecation);
     parser.getDisplayModel().ifPresent(d -> operation.getDeclaration().setDisplayModel(d));

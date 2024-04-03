@@ -12,7 +12,6 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetada
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 
 import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
@@ -26,15 +25,15 @@ import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
 import org.mule.runtime.module.extension.api.loader.java.type.WithAnnotations;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.java.HasExtensionParameter;
-import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaMetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaOperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.JavaSourceModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaMetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.sdk.api.annotation.metadata.MetadataKeyId;
 import org.mule.sdk.api.annotation.metadata.MetadataKeyPart;
 import org.mule.sdk.api.annotation.metadata.MetadataScope;
@@ -196,8 +195,6 @@ public class JavaMetadataKeyIdModelParserUtils {
       keyIdResolverModelParser = (Optional<MetadataKeyModelParser>) parameterGroupModelParsers.stream()
           .map(ParameterGroupModelParser::getParameterParsers)
           .flatMap(List::stream)
-          .collect(toList())
-          .stream()
           .map(parameterModelParser -> {
 
             if (parameterModelParser instanceof ParameterModelParserDecorator) {
