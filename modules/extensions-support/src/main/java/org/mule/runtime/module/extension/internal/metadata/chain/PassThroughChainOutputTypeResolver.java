@@ -20,8 +20,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Pass Through {@link OutputTypeResolver} implementation for routes or scope's inner chains that outputs a message with
- * the same payload and attributes types that were received.
+ * Pass Through {@link OutputTypeResolver} implementation for routes or scope's inner chains that outputs a message with the same
+ * payload and attributes types that were received.
  * <p>
  * Propagates the inner chain's resolved payload type.
  *

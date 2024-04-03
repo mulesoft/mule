@@ -26,8 +26,8 @@ import java.util.function.Supplier;
 /**
  * {@link OutputTypeResolver} implementation for Routers.
  * <p>
- * This {@link OutputTypeResolver} propagates the metadata the union of every route's output. This symbolizes
- * that the result will be the output of (any) one of the routes.
+ * This {@link OutputTypeResolver} propagates the metadata the union of every route's output. This symbolizes that the result will
+ * be the output of (any) one of the routes.
  *
  * @since 4.7
  */

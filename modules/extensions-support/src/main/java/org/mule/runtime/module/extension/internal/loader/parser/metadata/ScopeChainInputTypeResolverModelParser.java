@@ -17,8 +17,8 @@ import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 public interface ScopeChainInputTypeResolverModelParser {
 
   /**
-   * Parses the {@link ChainInputTypeResolver} for the scope's inner chain. If none is specified, a default
-   * instance implementing the {@code Null-Object} design pattern will be returned.
+   * Parses the {@link ChainInputTypeResolver} for the scope's inner chain. If none is specified, a default instance implementing
+   * the {@code Null-Object} design pattern will be returned.
    *
    * @return a non {@code null} {@link ChainInputTypeResolver}
    */

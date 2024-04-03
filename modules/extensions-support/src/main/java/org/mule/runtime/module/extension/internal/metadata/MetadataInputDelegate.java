@@ -70,7 +70,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    *
    * @return A {@link List} containing a {@link MetadataResult} of {@link TypeMetadataDescriptor} for each input parameter using
-   * only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
+   *         only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
     if (!(model instanceof ParameterizedModel)) {
@@ -179,8 +179,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link Optional} {@link TypeMetadataDescriptor} representing the Component's Content metadata,
-   * resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
-   * {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
+   *         resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
+   *         {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
    */
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {
@@ -210,7 +210,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
       MetadataType metadata =
           resolveWithOAuthRefresh(context,
-              () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key));
+                                  () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key));
       if (isMetadataResolvedCorrectly(metadata, allowsNullType)) {
         return success(adaptToListIfNecessary(metadata, parameter, context));
       }

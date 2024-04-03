@@ -40,8 +40,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * Declarative API for configuring DataSense related resolvers at the declarer or declaration level with minimal exposure
- * to the implementation details.
+ * Declarative API for configuring DataSense related resolvers at the declarer or declaration level with minimal exposure to the
+ * implementation details.
  *
  * <b>NOTE:</b> Experimental feature. Backwards compatibility is not guaranteed.
  *
@@ -67,8 +67,8 @@ public final class ComponentMetadataConfigurer {
   private final Map<String, ChainInputTypeResolver> routesChainInputTypesResolvers = new HashMap<>();
 
   /**
-   * Configures the given {@code declaration} with resolvers that implement the {@code Null-Object} design pattern. That is,
-   * the declaration will get enriched with resolver instances that yield default (non necessarily useful) values.
+   * Configures the given {@code declaration} with resolvers that implement the {@code Null-Object} design pattern. That is, the
+   * declaration will get enriched with resolver instances that yield default (non necessarily useful) values.
    *
    * @param declaration a component's declaration object
    */
@@ -77,8 +77,8 @@ public final class ComponentMetadataConfigurer {
   }
 
   /**
-   * Configures the given {@code declarer} with resolvers that implement the {@code Null-Object} design pattern. That is,
-   * the declaration will get enriched with resolver instances that yield default (non necessarily useful) values.
+   * Configures the given {@code declarer} with resolvers that implement the {@code Null-Object} design pattern. That is, the
+   * declaration will get enriched with resolver instances that yield default (non necessarily useful) values.
    *
    * @param declarer a component's declarer object
    */
@@ -122,7 +122,8 @@ public final class ComponentMetadataConfigurer {
    * @param keyParameterType     the type of the parameter referenced by the {@code keyParameterName} argument
    * @param isPartialKeyResolver whether this resolver is a partial key resolver
    * @return {@code this} instance
-   * @throws IllegalArgumentException if {@code keysResolver} or {@code keyParameterType} are {@code null}, or {@code keyParameterName} is blank
+   * @throws IllegalArgumentException if {@code keysResolver} or {@code keyParameterType} are {@code null}, or
+   *                                  {@code keyParameterName} is blank
    */
   public ComponentMetadataConfigurer setKeysResolver(TypeKeysResolver keysResolver,
                                                      String keyParameterName,
@@ -176,7 +177,8 @@ public final class ComponentMetadataConfigurer {
    *
    * @param resolvers the resolvers to add.
    * @return {@code this} instance
-   * @throws IllegalArgumentException under any of the circumstances that {@link #addInputResolver(String, InputTypeResolver)} would
+   * @throws IllegalArgumentException under any of the circumstances that {@link #addInputResolver(String, InputTypeResolver)}
+   *                                  would
    */
   public ComponentMetadataConfigurer addInputResolvers(Map<String, InputTypeResolver> resolvers) {
     checkArgument(resolvers != null, "resolvers cannot be null");
@@ -206,7 +208,8 @@ public final class ComponentMetadataConfigurer {
    *
    * @param resolvers the resolvers to add.
    * @return {@code this} instance
-   * @throws IllegalArgumentException under any of the circumstances that {@link #addRouteChainInputResolver(String, ChainInputTypeResolver) would
+   * @throws IllegalArgumentException under any of the circumstances that
+   *                                  {@link #addRouteChainInputResolver(String, ChainInputTypeResolver) would
    */
   public ComponentMetadataConfigurer addRoutesChainInputResolvers(Map<String, ChainInputTypeResolver> resolvers) {
     checkArgument(resolvers != null, "resolvers cannot be null");
@@ -216,8 +219,8 @@ public final class ComponentMetadataConfigurer {
   }
 
   /**
-   * Convenience method to configure routers that will output the result of (any) one of its routes. An example of
-   * such a router would be {@code <first-successful>}
+   * Convenience method to configure routers that will output the result of (any) one of its routes. An example of such a router
+   * would be {@code <first-successful>}
    *
    * @return {@code this} instance
    */
@@ -229,8 +232,8 @@ public final class ComponentMetadataConfigurer {
   }
 
   /**
-   * Convenience method to configure a scope that outputs the result of its inner chain. An example of such a scope
-   * would be {@code <try>}
+   * Convenience method to configure a scope that outputs the result of its inner chain. An example of such a scope would be
+   * {@code <try>}
    *
    * @return {@code this} instance
    */
@@ -242,8 +245,8 @@ public final class ComponentMetadataConfigurer {
   }
 
   /**
-   * Convenience method to configure routers that return the sum of all its routes, in the form of an object which
-   * attributes matches the route names (e.g: {@code <scatter-gather>}
+   * Convenience method to configure routers that return the sum of all its routes, in the form of an object which attributes
+   * matches the route names (e.g: {@code <scatter-gather>}
    *
    * @return {@code this} instance
    */
@@ -272,19 +275,19 @@ public final class ComponentMetadataConfigurer {
 
     if (keysResolver != NULL_METADATA_RESOLVER) {
       declaration.addModelProperty(new MetadataKeyIdModelProperty(keyParameterType, keyParameterName,
-          getCategoryName(keysResolver, firstSeenInputResolverCategory,
-              outputTypeResolver)));
+                                                                  getCategoryName(keysResolver, firstSeenInputResolverCategory,
+                                                                                  outputTypeResolver)));
     }
   }
 
   private MetadataResolverFactoryModelProperty buildFactoryModelProperty() {
     return new MetadataResolverFactoryModelProperty(() -> new DefaultMetadataResolverFactory(
-        () -> keysResolver,
-        copy(inputResolvers),
-        () -> outputTypeResolver,
-        () -> attributesTypeResolver,
-        ofNullable(chainInputTypeResolver),
-        copy(routesChainInputTypesResolvers)));
+                                                                                             () -> keysResolver,
+                                                                                             copy(inputResolvers),
+                                                                                             () -> outputTypeResolver,
+                                                                                             () -> attributesTypeResolver,
+                                                                                             ofNullable(chainInputTypeResolver),
+                                                                                             copy(routesChainInputTypesResolvers)));
   }
 
   private TypeResolversInformationModelProperty buildResolverInformationModelProperty(ParameterizedDeclaration declaration) {
@@ -294,14 +297,14 @@ public final class ComponentMetadataConfigurer {
         : false;
 
     return new TypeResolversInformationModelProperty(
-        categoryName,
-        copy(inputResolverNames),
-        outputTypeResolver.getResolverName(),
-        attributesTypeResolver.getResolverName(),
-        keysResolver.getResolverName(),
-        connected,
-        connected,
-        hasPartialKeyResolver);
+                                                     categoryName,
+                                                     copy(inputResolverNames),
+                                                     outputTypeResolver.getResolverName(),
+                                                     attributesTypeResolver.getResolverName(),
+                                                     keysResolver.getResolverName(),
+                                                     connected,
+                                                     connected,
+                                                     hasPartialKeyResolver);
   }
 
   private <K, V> Map<K, V> copy(Map<K, V> map) {

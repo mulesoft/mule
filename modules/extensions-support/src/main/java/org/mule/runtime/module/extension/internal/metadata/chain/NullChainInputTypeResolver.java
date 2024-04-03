@@ -18,8 +18,7 @@ import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
  *
  * @since 4.7.0
  */
-public class
-NullChainInputTypeResolver implements ChainInputTypeResolver {
+public class NullChainInputTypeResolver implements ChainInputTypeResolver {
 
   public static ChainInputTypeResolver NULL_INSTANCE = new NullChainInputTypeResolver();
 
