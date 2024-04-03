@@ -8,7 +8,6 @@ package org.mule.runtime.metadata.internal.cache;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
@@ -47,6 +46,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ComponentBasedIdHelper {
+
+  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
 
   public static Optional<String> getModelNameAst(ComponentAst component) {
     final Optional<NamedObject> namedObjectModel = component.getModel(NamedObject.class);

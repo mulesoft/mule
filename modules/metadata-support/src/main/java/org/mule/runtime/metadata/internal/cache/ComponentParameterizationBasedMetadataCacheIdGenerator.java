@@ -8,8 +8,6 @@ package org.mule.runtime.metadata.internal.cache;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.NAME_ATTRIBUTE_NAME;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparingInt;
@@ -53,6 +51,9 @@ import java.util.function.Supplier;
  * Client, to generate the keys from the ComponentAst.
  */
 public class ComponentParameterizationBasedMetadataCacheIdGenerator implements ComponentParameterizationMetadataCacheIdGenerator {
+
+  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
+  private static final String NAME_ATTRIBUTE_NAME = "name";
 
   private final ConfigurationMetadataCacheIdGenerator configIdGenerator;
 

@@ -11,7 +11,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.core.api.el.ExpressionManager.DEFAULT_EXPRESSION_PREFIX;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import org.mule.metadata.api.model.ArrayType;
@@ -39,6 +38,8 @@ import org.slf4j.LoggerFactory;
 public class DslElementIdHelper {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DslElementIdHelper.class);
+
+  private static final String CONFIG_ATTRIBUTE_NAME = "config-ref";
 
   public static String getSourceElementName(DslElementModel<?> elementModel) {
     return elementModel.getDsl().getPrefix() + ":" +

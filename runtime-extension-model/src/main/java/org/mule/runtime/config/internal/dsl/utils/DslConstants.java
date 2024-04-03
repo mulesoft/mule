@@ -93,11 +93,6 @@ public interface DslConstants {
   String DOMAIN_PREFIX = "domain";
 
   /**
-   * Namespace for Mule core domain elements
-   */
-  String DOMAIN_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "domain");
-
-  /**
    * This is the namespace prefix for EE elements in the configuration.
    */
   String EE_PREFIX = "ee";
@@ -113,19 +108,9 @@ public interface DslConstants {
   String EE_DOMAIN_PREFIX = "ee-domain";
 
   /**
-   * Namespace for EE domain elements
-   */
-  String EE_DOMAIN_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "ee/domain");
-
-  /**
    * The identifier name of a {@code flow}
    */
   String FLOW_ELEMENT_IDENTIFIER = "flow";
-
-  /**
-   * The identifier name of a {@code sub-flow}
-   */
-  String SUBFLOW_ELEMENT_IDENTIFIER = "sub-flow";
 
   /**
    * The name of the 'name' attribute of a DSL element
@@ -234,17 +219,7 @@ public interface DslConstants {
   String CRON_STRATEGY_ELEMENT_IDENTIFIER = "cron";
 
   /**
-   * The identifier name of the {@code errorMappings} infrastructure parameter
-   */
-  String ERROR_MAPPINGS_ELEMENT_IDENTIFIER = "error-mappings";
-
-  /**
    * The identifier name of the {@code errorMapping} infrastructure parameter
    */
   String ERROR_MAPPING_ELEMENT_IDENTIFIER = "error-mapping";
-
-  /**
-   * The identifier name of the on-error-propagate element
-   */
-  String ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER = "on-error-propagate";
 }

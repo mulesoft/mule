@@ -52,13 +52,10 @@ module org.mule.runtime.extension.model {
       org.mule.runtime.config.internal.dsl.processor.xml.provider.CoreXmlNamespaceInfoProvider;
 
   exports org.mule.runtime.config.internal.dsl.utils to
-      org.mule.runtime.core,
       org.mule.runtime.extensions.mule.support,
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.support,
       org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.metadata.support,
-      org.mule.runtime.properties.config,
       org.mule.runtime.spring.config,
       org.mule.runtime.tls,
       com.mulesoft.mule.runtime.cluster,
