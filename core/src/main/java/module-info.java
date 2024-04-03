@@ -64,7 +64,7 @@ module org.mule.runtime.core {
   requires org.mule.runtime.tracer.exporter.configuration.api;
 
   requires org.mule.runtime.featureManagement;
-  requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.errors;
 
   // reactor and friends
   requires org.reactivestreams;
@@ -164,10 +164,6 @@ module org.mule.runtime.core {
 
   provides org.mule.runtime.api.metadata.AbstractDataTypeBuilderFactory with
       org.mule.runtime.core.api.metadata.DefaultDataTypeBuilderFactory;
-
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
-      org.mule.runtime.core.api.extension.CoreRuntimeExtensionModelProvider,
-      org.mule.runtime.core.api.extension.OperationDslExtensionModelProvider;
 
   provides org.mule.runtime.core.api.transaction.TypedTransactionFactory with
       org.mule.runtime.core.api.transaction.DelegateTransactionFactory;

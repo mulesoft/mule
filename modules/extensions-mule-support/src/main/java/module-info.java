@@ -16,6 +16,7 @@ module org.mule.runtime.extensions.mule.support {
 
   requires org.mule.runtime.api;
   requires org.mule.runtime.metadata.model.api;
+  requires org.mule.runtime.errors;
   requires org.mule.runtime.metadata.model.java;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.dsl.api;
@@ -30,7 +31,8 @@ module org.mule.runtime.extensions.mule.support {
   requires java.inject;
 
   provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider
-      with org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider;
+      with org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider,
+      org.mule.runtime.module.extension.mule.api.extension.OperationDslExtensionModelProvider;
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider
       with org.mule.runtime.module.extension.mule.internal.config.provider.OperationDslBuildingDefinitionProvider;
   provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider
