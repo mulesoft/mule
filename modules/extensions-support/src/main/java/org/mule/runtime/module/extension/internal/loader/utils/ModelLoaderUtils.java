@@ -123,6 +123,18 @@ public final class ModelLoaderUtils {
                                                 empty());
   }
 
+  /**
+   * Declares the model property {@link MetadataResolverFactoryModelProperty} on the given {@link BaseDeclaration declaration}
+   *
+   * @param declaration                         the declaration
+   * @param outputResolverModelParser           parser with the output metadata
+   * @param attributesResolverModelParser       parser with the attributes metadata
+   * @param inputResolverModelParsers           parser with the input metadata
+   * @param keyIdResolverModelParser            parser with the key id metadata
+   * @param scopeChainInputResolverParser       parser with chain input resolver
+   * @param routesChainInputTypesResolverParser parser with routes chain input resolvers
+   * @since 4.7.0
+   */
   public static void declareMetadataResolverFactoryModelProperty(ParameterizedDeclaration declaration,
                                                                  Optional<OutputResolverModelParser> outputResolverModelParser,
                                                                  Optional<AttributesResolverModelParser> attributesResolverModelParser,

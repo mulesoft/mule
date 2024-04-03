@@ -20,7 +20,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Pass Through {@link OutputTypeResolver} implementation for Scopes.
+ * Pass Through {@link OutputTypeResolver} implementation for routes or scope's inner chains that outputs a message with
+ * the same payload and attributes types that were received.
  * <p>
  * Propagates the inner chain's resolved payload type.
  *
@@ -56,8 +57,7 @@ public class PassThroughChainOutputTypeResolver implements OutputTypeResolver<Vo
   }
 
   private Optional<MetadataType> passthrough(MetadataContext context,
-                                             Function<MessageMetadataType, Optional<MetadataType>> extractor)
-      throws MetadataResolvingException {
+                                             Function<MessageMetadataType, Optional<MetadataType>> extractor) {
     return context.getScopeOutputMetadataContext()
         .flatMap(ctx -> extractor.apply(ctx.getInnerChainOutputMessageType().get()));
   }

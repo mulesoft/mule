@@ -58,6 +58,13 @@ public class JavaInputResolverModelParserUtils {
     return type.flatMap(t -> getJavaInputResolverParser(extensionParameter.getName(), t));
   }
 
+  /**
+   * If defined, instantiates and returns the {@link ChainInputTypeResolver} of the given {@code chain}
+   *
+   * @param chain a {@link ExtensionParameter} representing the inner chain of a scope or route
+   * @return an optional {@link ChainInputTypeResolver}
+   * @since 4.7.0
+   */
   public static Optional<ChainInputTypeResolver> getChainInputTypeResolver(ExtensionParameter chain) {
     Optional<ChainInputTypeResolver> resolver = chain.getValueFromAnnotation(PassThroughInputChainResolver.class)
         .map(a -> PassThroughChainInputTypeResolver.INSTANCE);

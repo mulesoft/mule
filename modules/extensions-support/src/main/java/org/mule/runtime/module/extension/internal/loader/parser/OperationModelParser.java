@@ -202,8 +202,15 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
    */
   Optional<MetadataKeyModelParser> getMetadataKeyModelParser();
 
+  /**
+   * @return a {@link ScopeChainInputTypeResolverModelParser} if the parsed operation is a scope
+   * @since 4.7.0
+   */
   Optional<ScopeChainInputTypeResolverModelParser> getScopeChainInputTypeResolverModelParser();
 
+  /**
+   * @return a {@link RoutesChainInputTypesResolverModelParser} if the parsed operation is a router
+   * @since 4.7.0
+   */
   Optional<RoutesChainInputTypesResolverModelParser> getRoutesChainInputTypesResolverModelParser();
-
 }

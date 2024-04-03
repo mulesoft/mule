@@ -13,6 +13,11 @@ import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeCh
 import org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
+/**
+ * {@link ScopeChainInputTypeResolverModelParser} implementation for the Java SDK
+ *
+ * @since 4.7.0
+ */
 public class JavaScopeChainInputTypeResolverModelParser implements ScopeChainInputTypeResolverModelParser {
 
   private final ExtensionParameter chain;

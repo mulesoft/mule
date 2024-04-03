@@ -70,7 +70,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    *
    * @return A {@link List} containing a {@link MetadataResult} of {@link TypeMetadataDescriptor} for each input parameter using
-   *         only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
+   * only its static {@link MetadataType} and ignoring if any parameter has a dynamic type.
    */
   MetadataResult<InputMetadataDescriptor> getInputMetadataDescriptors(MetadataContext context, Object key) {
     if (!(model instanceof ParameterizedModel)) {
@@ -94,6 +94,15 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     return failures.isEmpty() ? success(input.build()) : failure(input.build(), failures);
   }
 
+  /**
+   * Resolves a {@link MessageMetadataType} that describes the message that will enter a scope's inner chain
+   *
+   * @param context                 the current {@link MetadataContext}
+   * @param scopeInputMessageType   a {@link MessageMetadataType} for the message that originally entered the scope
+   * @param inputMetadataDescriptor a previously resolved {@link InputMetadataDescriptor}
+   * @return a {@link MetadataResult} with the resolved {@link MessageMetadataType}
+   * @since 4.7.0
+   */
   MetadataResult<MessageMetadataType> getScopeChainInputType(MetadataContext context,
                                                              Supplier<MessageMetadataType> scopeInputMessageType,
                                                              InputMetadataDescriptor inputMetadataDescriptor) {
@@ -112,6 +121,15 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
     }
   }
 
+  /**
+   * Resolves a {@link MessageMetadataType} that describes the message that will enter each route of a router component
+   *
+   * @param context                 the current {@link MetadataContext}
+   * @param scopeInputMessageType   a {@link MessageMetadataType} for the message that originally entered the router
+   * @param inputMetadataDescriptor a previously resolved {@link InputMetadataDescriptor}
+   * @return a {@link MetadataResult} with the resolved {@link MessageMetadataType}
+   * @since 4.7.0
+   */
   MetadataResult<Map<String, MessageMetadataType>> getRoutesChainInputType(MetadataContext context,
                                                                            Supplier<MessageMetadataType> scopeInputMessageType,
                                                                            InputMetadataDescriptor inputMetadataDescriptor) {
@@ -145,7 +163,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
 
   /**
    * Given a parameters name, returns the associated {@link NamedTypeResolver}.
-   * 
+   *
    * @param parameterName name of the parameter
    * @return {@link NamedTypeResolver} of the parameter
    */
@@ -161,8 +179,8 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
    * @param context current {@link MetadataContext} that will be used by the {@link InputTypeResolver}
    * @param key     {@link MetadataKey} of the type which's structure has to be resolved
    * @return Success with an {@link Optional} {@link TypeMetadataDescriptor} representing the Component's Content metadata,
-   *         resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
-   *         {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
+   * resolved using the {@link InputTypeResolver} if one is available to resolve its {@link MetadataType}, returning
+   * {@link Optional#empty()} if no Content parameter is present Failure if the dynamic resolution fails for any reason.
    */
   private MetadataResult<ParameterMetadataDescriptor> getParameterMetadataDescriptor(ParameterModel parameter,
                                                                                      MetadataContext context, Object key) {
@@ -192,7 +210,7 @@ class MetadataInputDelegate extends BaseMetadataDelegate {
       boolean allowsNullType = !parameter.isRequired() && (parameter.getDefaultValue() == null);
       MetadataType metadata =
           resolveWithOAuthRefresh(context,
-                                  () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key));
+              () -> resolverFactory.getInputResolver(parameter.getName()).getInputMetadata(context, key));
       if (isMetadataResolvedCorrectly(metadata, allowsNullType)) {
         return success(adaptToListIfNecessary(metadata, parameter, context));
       }

@@ -24,6 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+/**
+ * Default implementation of {@link ChainInputMetadataContext}
+ *
+ * @since 4.7.0
+ */
 public class DefaultChainInputMetadataContext implements ChainInputMetadataContext {
 
   private final Supplier<MessageMetadataType> inputMessageMetadataType;
@@ -46,7 +51,11 @@ public class DefaultChainInputMetadataContext implements ChainInputMetadataConte
 
   @Override
   public MetadataType getParameterResolvedType(String parameterName) throws NoSuchElementException {
-    return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
+    try {
+      return inputMetadataDescriptor.getParameterMetadata(parameterName).getType();
+    } catch (IllegalArgumentException e) {
+      throw new NoSuchElementException(e.getMessage());
+    }
   }
 
   @Override

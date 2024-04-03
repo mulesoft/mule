@@ -12,11 +12,18 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
+/**
+ * {@link ChainInputTypeResolver} implementation that simply returns
+ * the received {@link ChainInputMetadataContext#getInputMessageMetadataType()}
+ *
+ * @since 4.7.0
+ */
 public class PassThroughChainInputTypeResolver implements ChainInputTypeResolver {
 
   public static PassThroughChainInputTypeResolver INSTANCE = new PassThroughChainInputTypeResolver();
 
-  private PassThroughChainInputTypeResolver() {}
+  private PassThroughChainInputTypeResolver() {
+  }
 
   @Override
   public MessageMetadataType getChainInputMetadataType(ChainInputMetadataContext context)

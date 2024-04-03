@@ -13,7 +13,13 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.sdk.api.metadata.ChainInputMetadataContext;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
-public class NullChainInputTypeResolver implements ChainInputTypeResolver {
+/**
+ * Null object implementation of {@link ChainInputTypeResolver}
+ *
+ * @since 4.7.0
+ */
+public class
+NullChainInputTypeResolver implements ChainInputTypeResolver {
 
   public static ChainInputTypeResolver NULL_INSTANCE = new NullChainInputTypeResolver();
 
