@@ -18,7 +18,6 @@ import static java.util.Optional.ofNullable;
 import org.mule.api.annotation.Experimental;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExecutableComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclarer;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
@@ -67,6 +66,8 @@ public final class ComponentMetadataConfigurer {
 
   private ChainInputTypeResolver chainInputTypeResolver;
   private final Map<String, ChainInputTypeResolver> routesChainInputTypesResolvers = new HashMap<>();
+
+  private boolean connected = false;
 
   /**
    * Configures the given {@code declaration} with resolvers that implement the {@code Null-Object} design pattern. That is, the
@@ -221,6 +222,18 @@ public final class ComponentMetadataConfigurer {
   }
 
   /**
+   * Whether any of the configured resolvers require a connection. If not invoked, all resolvers will be assumed to not require
+   * it.
+   * 
+   * @param connected whether any of the configured resolvers require a connection
+   * @return {@code this} instance
+   */
+  public ComponentMetadataConfigurer setConnected(boolean connected) {
+    this.connected = connected;
+    return this;
+  }
+
+  /**
    * Convenience method to configure routers that will output the result of (any) one of its routes. An example of such a router
    * would be {@code <first-successful>}
    *
@@ -298,10 +311,6 @@ public final class ComponentMetadataConfigurer {
     if (isBlank(categoryName)) {
       return empty();
     }
-
-    boolean connected = declaration instanceof ExecutableComponentDeclaration
-        ? ((ExecutableComponentDeclaration<?>) declaration).isRequiresConnection()
-        : false;
 
     return Optional.of(new TypeResolversInformationModelProperty(
                                                                  categoryName,

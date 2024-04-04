@@ -115,6 +115,7 @@ public class SoapInvokeOperationDeclarer {
         .addInputResolver(HEADERS_PARAM, new InvokeInputHeadersTypeResolver())
         .addInputResolver(ATTACHMENTS_PARAM, new InvokeInputAttachmentsTypeResolver())
         .setOutputTypeResolver(new InvokeOutputTypeResolver())
+        .setConnected(true)
         .configure(operation);
   }
 

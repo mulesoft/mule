@@ -115,7 +115,9 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
 
       declareMetadataModelProperties(sourceDeclarer.getDeclaration(), outputResolverModelParser,
                                      attributesResolverModelParser,
-                                     emptyList(), keyIdResolverModelParser);
+                                     emptyList(),
+                                     keyIdResolverModelParser,
+                                     parser.isConnected());
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
@@ -134,7 +136,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
             successCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
 
         declareMetadataModelProperties(onSuccessSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
-                                       sourceCallbackInputResolverModelParsers, empty());
+                                       sourceCallbackInputResolverModelParsers, empty(), parser.isConnected());
 
         declareSourceCallbackParameters(successCallbackSourceCallbackModelParser, () -> onSuccessSourceCallbackDeclarer);
       }
@@ -147,7 +149,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
             errorCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
 
         declareMetadataModelProperties(onErrorSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
-                                       sourceCallbackInputResolverModelParsers, empty());
+                                       sourceCallbackInputResolverModelParsers, empty(), parser.isConnected());
 
         declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), () -> onErrorSourceCallbackDeclarer);
       }

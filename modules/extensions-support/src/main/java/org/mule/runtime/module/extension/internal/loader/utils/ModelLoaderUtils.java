@@ -111,12 +111,14 @@ public final class ModelLoaderUtils {
                                                     Optional<OutputResolverModelParser> outputResolverModelParser,
                                                     Optional<AttributesResolverModelParser> attributesResolverModelParser,
                                                     List<InputResolverModelParser> inputResolverModelParsers,
-                                                    Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
+                                                    Optional<MetadataKeyModelParser> keyIdResolverModelParser,
+                                                    boolean connected) {
     declareMetadataModelProperties(declaration,
                                    outputResolverModelParser,
                                    attributesResolverModelParser,
                                    inputResolverModelParsers,
                                    keyIdResolverModelParser,
+                                   connected,
                                    empty(),
                                    empty());
   }
@@ -138,12 +140,13 @@ public final class ModelLoaderUtils {
                                                     Optional<AttributesResolverModelParser> attributesResolverModelParser,
                                                     List<InputResolverModelParser> inputResolverModelParsers,
                                                     Optional<MetadataKeyModelParser> keyIdResolverModelParser,
+                                                    boolean connected,
                                                     Optional<ScopeChainInputTypeResolverModelParser> scopeChainInputResolverParser,
                                                     Optional<RoutesChainInputTypesResolverModelParser> routesChainInputTypesResolverParser) {
     if (outputResolverModelParser.map(p -> p.hasOutputResolver()).orElse(false)
         || !inputResolverModelParsers.isEmpty()
         || keyIdResolverModelParser.map(p -> p.hasKeyIdResolver()).orElse(false)) {
-      final ComponentMetadataConfigurer configurer = new ComponentMetadataConfigurer();
+      final ComponentMetadataConfigurer configurer = new ComponentMetadataConfigurer().setConnected(connected);
       outputResolverModelParser.ifPresent(p -> configurer.setOutputTypeResolver(p.getOutputResolver()));
       attributesResolverModelParser.ifPresent(p -> configurer.setAttributesTypeResolver(p.getAttributesResolver()));
       keyIdResolverModelParser.ifPresent(p -> configurer.setKeysResolver(p.getKeyResolver(), p.getParameterName(),
