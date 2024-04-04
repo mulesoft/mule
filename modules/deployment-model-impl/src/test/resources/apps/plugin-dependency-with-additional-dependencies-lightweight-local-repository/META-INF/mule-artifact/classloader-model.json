@@ -38,10 +38,10 @@
           "artifactCoordinates": {
             "groupId": "org.apache.commons",
             "artifactId": "commons-collections4",
-            "version": "4.4",
+            "version": "${commonsCollections4Version}",
             "type": "jar"
           },
-          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar",
+          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/org/apache/commons/commons-collections4/${commonsCollections4Version}/commons-collections4-${commonsCollections4Version}.jar",
           "packages": [
             "org.apache.commons.collections4",
             "org.apache.commons.collections4.bag",
@@ -75,10 +75,10 @@
           "artifactCoordinates": {
             "groupId": "commons-io",
             "artifactId": "commons-io",
-            "version": "2.15.1",
+            "version": "${commonsIoVersion}",
             "type": "jar"
           },
-          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar",
+          "uri": "${outputDirectory}/apps/plugin-dependency-with-additional-dependencies-lightweight-local-repository/local-repository/commons-io/commons-io/${commonsIoVersion}/commons-io-${commonsIoVersion}.jar",
           "packages": [
             "",
             "org.apache.commons.io",

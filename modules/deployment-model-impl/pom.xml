@@ -40,9 +40,12 @@
         </surefire.args>
         <skipExportTests>false</skipExportTests>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <maven.compat.version>3.3.9</maven.compat.version>
-    </properties>
 
+        <maven.compat.version>3.3.9</maven.compat.version>
+        <commonsIoVersion>2.16.0</commonsIoVersion>
+        <commonsCollections4Version>4.4</commonsCollections4Version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.mule.runtime</groupId>
