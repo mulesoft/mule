@@ -12,6 +12,7 @@ import static org.mule.runtime.metadata.internal.NullMetadataResolverSupplier.NU
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.getCategoryName;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import org.mule.api.annotation.Experimental;
@@ -37,6 +38,7 @@ import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -271,7 +273,7 @@ public final class ComponentMetadataConfigurer {
    */
   public <T extends ComponentDeclaration> void configure(ParameterizedDeclaration<T> declaration) {
     declaration.addModelProperty(buildFactoryModelProperty());
-    declaration.addModelProperty(buildResolverInformationModelProperty(declaration));
+    buildResolverInformationModelProperty(declaration).ifPresent(declaration::addModelProperty);
 
     if (keysResolver != NULL_METADATA_RESOLVER) {
       declaration.addModelProperty(new MetadataKeyIdModelProperty(keyParameterType, keyParameterName,
@@ -290,21 +292,26 @@ public final class ComponentMetadataConfigurer {
                                                                                              copy(routesChainInputTypesResolvers)));
   }
 
-  private TypeResolversInformationModelProperty buildResolverInformationModelProperty(ParameterizedDeclaration declaration) {
+  private Optional<TypeResolversInformationModelProperty> buildResolverInformationModelProperty(ParameterizedDeclaration declaration) {
     String categoryName = getCategoryName(keysResolver, firstSeenInputResolverCategory, outputTypeResolver);
+
+    if (isBlank(categoryName)) {
+      return empty();
+    }
+
     boolean connected = declaration instanceof ExecutableComponentDeclaration
         ? ((ExecutableComponentDeclaration<?>) declaration).isRequiresConnection()
         : false;
 
-    return new TypeResolversInformationModelProperty(
-                                                     categoryName,
-                                                     copy(inputResolverNames),
-                                                     outputTypeResolver.getResolverName(),
-                                                     attributesTypeResolver.getResolverName(),
-                                                     keysResolver.getResolverName(),
-                                                     connected,
-                                                     connected,
-                                                     hasPartialKeyResolver);
+    return Optional.of(new TypeResolversInformationModelProperty(
+                                                                 categoryName,
+                                                                 copy(inputResolverNames),
+                                                                 outputTypeResolver.getResolverName(),
+                                                                 attributesTypeResolver.getResolverName(),
+                                                                 keysResolver.getResolverName(),
+                                                                 connected,
+                                                                 connected,
+                                                                 hasPartialKeyResolver));
   }
 
   private <K, V> Map<K, V> copy(Map<K, V> map) {

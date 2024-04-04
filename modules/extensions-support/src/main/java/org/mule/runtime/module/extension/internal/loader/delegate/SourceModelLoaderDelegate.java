@@ -10,7 +10,7 @@ import static org.mule.runtime.extension.api.property.BackPressureStrategyModelP
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils.declareEmittedNotifications;
 import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.addSemanticTerms;
-import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataResolverFactoryModelProperty;
+import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoaderUtils.declareMetadataModelProperties;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -113,9 +113,9 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       parser.getExceptionHandlerModelProperty().ifPresent(sourceDeclarer::withModelProperty);
       loader.registerOutputTypes(sourceDeclarer.getDeclaration());
 
-      declareMetadataResolverFactoryModelProperty(sourceDeclarer.getDeclaration(), outputResolverModelParser,
-                                                  attributesResolverModelParser,
-                                                  emptyList(), keyIdResolverModelParser);
+      declareMetadataModelProperties(sourceDeclarer.getDeclaration(), outputResolverModelParser,
+                                     attributesResolverModelParser,
+                                     emptyList(), keyIdResolverModelParser);
 
       addSemanticTerms(sourceDeclarer.getDeclaration(), parser);
       declareEmittedNotifications(parser, sourceDeclarer, loader::getNotificationModel);
@@ -133,8 +133,8 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         List<InputResolverModelParser> sourceCallbackInputResolverModelParsers =
             successCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
 
-        declareMetadataResolverFactoryModelProperty(onSuccessSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
-                                                    sourceCallbackInputResolverModelParsers, empty());
+        declareMetadataModelProperties(onSuccessSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
+                                       sourceCallbackInputResolverModelParsers, empty());
 
         declareSourceCallbackParameters(successCallbackSourceCallbackModelParser, () -> onSuccessSourceCallbackDeclarer);
       }
@@ -146,8 +146,8 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
         List<InputResolverModelParser> sourceCallbackInputResolverModelParsers =
             errorCallbackSourceCallbackModelParser.get().getInputResolverModelParsers();
 
-        declareMetadataResolverFactoryModelProperty(onErrorSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
-                                                    sourceCallbackInputResolverModelParsers, empty());
+        declareMetadataModelProperties(onErrorSourceCallbackDeclarer.getDeclaration(), empty(), empty(),
+                                       sourceCallbackInputResolverModelParsers, empty());
 
         declareSourceCallbackParameters(parser.getOnErrorCallbackParser(), () -> onErrorSourceCallbackDeclarer);
       }
