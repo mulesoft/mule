@@ -4,14 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.parser;
+package org.mule.runtime.module.extension.internal.loader.parser.metadata;
 
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.metadata.resolving.PartialTypeKeysResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-
-import java.util.Optional;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 
 /**
  * Parses the syntactic definition of the metadata keys id so that the semantics reflected in it can be extracted in a uniform

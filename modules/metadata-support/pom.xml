@@ -25,10 +25,18 @@
             <artifactId>mule-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
             <artifactId>mule-artifact-ast</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.runtime</groupId>
+            <artifactId>mule-message-metadata-model</artifactId>
         </dependency>
 
         <!-- Unit tests -->

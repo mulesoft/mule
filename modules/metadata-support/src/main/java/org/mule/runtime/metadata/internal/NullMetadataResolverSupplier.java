@@ -18,10 +18,13 @@ import java.util.function.Supplier;
  */
 public class NullMetadataResolverSupplier implements Supplier<NullMetadataResolver> {
 
-  private static final NullMetadataResolver resolver = new NullMetadataResolver();
+  public static final NullMetadataResolverSupplier INSTANCE = new NullMetadataResolverSupplier();
+  public static final NullMetadataResolver NULL_METADATA_RESOLVER = new NullMetadataResolver();
+
+  private NullMetadataResolverSupplier() {}
 
   @Override
   public NullMetadataResolver get() {
-    return resolver;
+    return NULL_METADATA_RESOLVER;
   }
 }

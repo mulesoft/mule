@@ -19,6 +19,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterRole;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
 
 import java.util.List;
 import java.util.Optional;

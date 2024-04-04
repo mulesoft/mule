@@ -14,12 +14,14 @@
 module org.mule.runtime.metadata.support {
 
   requires org.mule.runtime.metadata.model.api;
+  requires org.mule.runtime.metadata.model.message;
   requires org.mule.runtime.artifact.declaration;
   requires transitive org.mule.runtime.api;
   requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.artifact.ast;
   requires org.mule.runtime.core;
+  requires org.mule.sdk.api;
 
   requires com.google.common;
   requires org.apache.commons.lang3;

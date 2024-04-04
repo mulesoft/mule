@@ -13,8 +13,8 @@ import static org.mule.runtime.api.metadata.MetadataService.METADATA_SERVICE_KEY
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultFailureMatcher.isFailure;
 import static org.mule.tck.junit4.matcher.metadata.MetadataKeyResultSuccessMatcher.isSuccess;
-import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.allure.AllureConstants.SdkToolingSupport.MetadataTypeResolutionStory.METADATA_SERVICE;
+import static org.mule.test.allure.AllureConstants.SdkToolingSupport.SDK_TOOLING_SUPPORT;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
 import static org.mule.test.metadata.extension.MetadataConnection.PERSON;
 import static org.mule.test.metadata.extension.resolver.TestMetadataResolverUtils.getCarMetadata;
@@ -66,11 +66,10 @@ import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.junit.Before;
-import org.junit.runners.Parameterized;
-
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.junit.Before;
+import org.junit.runners.Parameterized;
 
 //TODO MULE-12809: Make MetadataTestCase use LazyMetadataService
 @RunnerDelegateTo(Parameterized.class)
@@ -100,7 +99,8 @@ public abstract class MetadataExtensionFunctionalTestCase<T extends ComponentMod
   protected static final String OUTPUT_METADATA_WITHOUT_KEYS_WITH_KEY_ID = "outputMetadataWithoutKeysWithKeyId";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER = "contentAndOutputWithCacheResolver";
   protected static final String SCOPE_WITH_OUTPUT_RESOLVER = "scopeWithOutputResolver";
-  protected static final String ROUTER_WITH_OUTPUT_RESOLVER = "routerWithOutputResolver";
+  protected static final String SCOPE_WITH_INPUT_RESOLVER = "scopeWithInputResolver";
+  protected static final String ROUTER_WITH_METADATA_RESOLVER = "routerWithMetadataResolver";
   protected static final String CONTENT_AND_OUTPUT_CACHE_RESOLVER_WITH_ALTERNATIVE_CONFIG =
       "contentAndOutputWithCacheResolverWithSpecificConfig";
   protected static final String QUERY_FLOW = "queryOperation";

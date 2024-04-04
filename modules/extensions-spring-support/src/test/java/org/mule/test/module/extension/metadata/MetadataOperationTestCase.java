@@ -6,19 +6,8 @@
  */
 package org.mule.test.module.extension.metadata;
 
-import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.isOneOf;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.metadata.api.model.MetadataFormat.JSON;
 import static org.mule.runtime.api.metadata.MetadataKeyBuilder.newKey;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
@@ -39,12 +28,28 @@ import static org.mule.test.metadata.extension.resolver.TestMultiLevelKeyResolve
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.TYPE_BUILDER;
 import static org.mule.test.module.extension.internal.util.ExtensionsTestUtils.assertMessageType;
 
+import static java.util.Collections.singletonMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.isOneOf;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.mock;
+
 import org.mule.functional.listener.Callback;
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.metadata.api.model.NullType;
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.metadata.api.model.StringType;
+import org.mule.metadata.api.model.VoidType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.meta.model.ComponentModel;
@@ -55,11 +60,13 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.metadata.MetadataKey;
 import org.mule.runtime.api.metadata.MetadataKeyBuilder;
 import org.mule.runtime.api.metadata.MetadataKeysContainer;
-import org.mule.runtime.api.metadata.RouterPropagationContext;
-import org.mule.runtime.api.metadata.ScopePropagationContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.extension.api.metadata.NullMetadataKey;
@@ -85,8 +92,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.junit.Test;
 import io.qameta.allure.Issue;
+import org.junit.Test;
 
 public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase {
 
@@ -286,16 +293,17 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   @Issue("W-15158118")
   public void outputResolverForScope() throws Exception {
     location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    ScopePropagationContext scopeContext = new ScopePropagationContext() {
+    ScopeOutputMetadataContext scopeContext = new ScopeOutputMetadataContext() {
 
       @Override
-      public Supplier<MetadataType> getInnerChainResolver() {
-        return () -> carType;
+      public Supplier<MessageMetadataType> getInnerChainOutputMessageType() {
+        return () -> MessageMetadataType.builder().payload(carType).build();
       }
 
       @Override
-      public Supplier<MessageMetadataType> getMessageTypeResolver() {
-        return null;
+      public Supplier<MessageMetadataType> getScopeInputMessageType() {
+        // TODO: implement in W-14969942
+        return () -> null;
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
@@ -307,26 +315,86 @@ public class MetadataOperationTestCase extends AbstractMetadataOperationTestCase
   }
 
   @Test
+  @Issue("W-14969942")
+  public void passthroughInputResolverForScope() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(carType)
+        .attributes(typeBuilder.voidType().build())
+        .build();
+
+    MetadataResult<ScopeInputMetadataDescriptor> inputMetadata =
+        metadataService.getScopeInputMetadata(location, CAR_KEY, () -> inputMessageType);
+
+    assertThat(inputMetadata.isSuccess(), is(true));
+    ScopeInputMetadataDescriptor metadataDescriptor = inputMetadata.get();
+    assertThat(metadataDescriptor.getChainInputMessageType(), is(sameInstance(inputMessageType)));
+  }
+
+  @Test
+  @Issue("W-14969942")
+  public void inputResolverForScope() throws Exception {
+    location = Location.builder().globalName(SCOPE_WITH_INPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<ScopeInputMetadataDescriptor> inputMetadata =
+        metadataService.getScopeInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadata.isSuccess(), is(true));
+    ScopeInputMetadataDescriptor metadataDescriptor = inputMetadata.get();
+
+    MessageMetadataType chainInputMessageType = metadataDescriptor.getChainInputMessageType();
+    assertThat(chainInputMessageType.getPayloadType().get(),
+               is(sameInstance(metadataDescriptor.getParameterMetadata("jsonValue").getType())));
+    assertThat(chainInputMessageType.getPayloadType().get().getMetadataFormat(), is(JSON));
+    assertThat(chainInputMessageType.getAttributesType().get(), is(instanceOf(VoidType.class)));
+  }
+
+  @Test
   public void outputResolverForRouter() throws Exception {
-    location = Location.builder().globalName(ROUTER_WITH_OUTPUT_RESOLVER).addProcessorsPart().addIndexPart(0).build();
-    RouterPropagationContext routerPropagationContext = new RouterPropagationContext() {
+    location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+    RouterOutputMetadataContext routerOutputMetadataContext = new RouterOutputMetadataContext() {
 
       @Override
-      public Map<String, Supplier<MetadataType>> getRouteResolvers() {
-        return singletonMap("metaroute", () -> carType);
+      public Map<String, Supplier<MessageMetadataType>> getRouteOutputMessageTypes() {
+        return singletonMap("metaroute", () -> MessageMetadataType.builder().payload(carType).build());
       }
 
       @Override
-      public Supplier<MessageMetadataType> getMessageTypeResolver() {
-        return null;
+      public Supplier<MessageMetadataType> getRouterInputMessageType() {
+        return () -> null;
       }
     };
     MetadataResult<OutputMetadataDescriptor> outputMetadataResult =
-        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerPropagationContext);
+        metadataService.getRouterOutputMetadata(location, CAR_KEY, routerOutputMetadataContext);
     assertThat(outputMetadataResult.isSuccess(), is(true));
     OutputMetadataDescriptor outputMetadataDescriptor = outputMetadataResult.get();
     assertThat(outputMetadataDescriptor.getPayloadMetadata().isDynamic(), is(true));
     assertExpectedType(outputMetadataDescriptor.getPayloadMetadata().getType(), carType);
+  }
+
+  @Test
+  public void inputResolverForRouter() throws Exception {
+    location = Location.builder().globalName(ROUTER_WITH_METADATA_RESOLVER).addProcessorsPart().addIndexPart(0).build();
+
+    MessageMetadataType inputMessageType = MessageMetadataType.builder()
+        .payload(typeBuilder.withFormat(JAVA).objectType().build())
+        .attributes(typeBuilder.withFormat(JAVA).objectType().build())
+        .build();
+
+    MetadataResult<RouterInputMetadataDescriptor> inputMetadataResult =
+        metadataService.getRouterInputMetadata(location, null, () -> inputMessageType);
+
+    assertThat(inputMetadataResult.isSuccess(), is(true));
+    RouterInputMetadataDescriptor inputMetadata = inputMetadataResult.get();
+
+    MessageMetadataType routeInputType = inputMetadata.getRouteInputMessageTypes().get("metaroute");
+    assertThat(routeInputType.getPayloadType().get().getMetadataFormat(), is(JSON));
   }
 
   @Test

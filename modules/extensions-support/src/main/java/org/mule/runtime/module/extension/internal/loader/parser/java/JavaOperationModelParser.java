@@ -6,13 +6,6 @@
  */
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
-import static java.lang.String.format;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.hash;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
@@ -26,8 +19,8 @@ import static org.mule.runtime.module.extension.internal.loader.parser.java.sema
 import static org.mule.runtime.module.extension.internal.loader.parser.java.stereotypes.JavaStereotypeModelParserUtils.resolveStereotype;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationAttributesType;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.type.CustomStaticTypeUtils.getOperationOutputType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveOperationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.getContainerAnnotationMinMuleVersion;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.utils.MinMuleVersionUtils.resolveOperationMinMuleVersion;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaInputResolverModelParserUtils.parseInputResolversModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.getKeyIdResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaMetadataKeyIdModelParserUtils.parseKeyIdResolverModelParser;
@@ -35,6 +28,14 @@ import static org.mule.runtime.module.extension.internal.loader.utils.JavaModelL
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseAttributesResolverModelParser;
 import static org.mule.runtime.module.extension.internal.loader.utils.JavaOutputResolverModelParserUtils.parseOutputResolverModelParser;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isVoid;
+
+import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.hash;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
@@ -67,26 +68,27 @@ import org.mule.runtime.module.extension.internal.loader.java.type.property.Exte
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParserDecorator;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.connection.JavaConnectionProviderModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.error.JavaErrorModelParserUtils;
+import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaRoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.java.metadata.JavaScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.java.notification.NotificationModelParserUtils;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory;
 import org.mule.runtime.module.extension.internal.util.IntrospectionUtils;
 import org.mule.sdk.api.annotation.Operations;
 
-import java.lang.reflect.Executable;
-import java.lang.reflect.Parameter;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -487,6 +489,22 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public Optional<MetadataKeyModelParser> getMetadataKeyModelParser() {
     return getKeyIdResolverModelParser(this, operationElement.getEnclosingType(), extensionElement);
+  }
+
+  @Override
+  public Optional<ScopeChainInputTypeResolverModelParser> getScopeChainInputTypeResolverModelParser() {
+    if (isScope()) {
+      return of(new JavaScopeChainInputTypeResolverModelParser(nestedChain));
+    }
+    return empty();
+  }
+
+  @Override
+  public Optional<RoutesChainInputTypesResolverModelParser> getRoutesChainInputTypesResolverModelParser() {
+    if (isRouter()) {
+      return of(new JavaRoutesChainInputTypesResolverModelParser(routes));
+    }
+    return empty();
   }
 
   private boolean hasKeyResolverAvailable() {

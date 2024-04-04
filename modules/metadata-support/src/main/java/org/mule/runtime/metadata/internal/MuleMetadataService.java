@@ -7,22 +7,22 @@
 package org.mule.runtime.metadata.internal;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-
-import org.mule.runtime.api.metadata.RouterPropagationContext;
-import org.mule.runtime.api.metadata.ScopePropagationContext;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.NO_DYNAMIC_METADATA_AVAILABLE;
 import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
 import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
 import static org.mule.runtime.metadata.internal.cache.MetadataCacheManager.METADATA_CACHE_MANAGER_KEY;
+
 import static java.lang.String.format;
 
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
 import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.metadata.EntityMetadataProvider;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataKey;
@@ -31,13 +31,18 @@ import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.MetadataProvider;
 import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.MetadataService;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
+
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -90,6 +95,22 @@ public class MuleMetadataService implements MetadataService {
   @Override
   public MetadataResult<InputMetadataDescriptor> getInputMetadata(Location location, MetadataKey key) {
     return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getInputMetadata(key),
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
+  }
+
+  @Override
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(Location location,
+                                                                            MetadataKey key,
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getScopeInputMetadata(key, scopeInputMessageType),
+                                         EXCEPTION_RESOLVING_COMPONENT_METADATA);
+  }
+
+  @Override
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(Location location,
+                                                                              MetadataKey key,
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
+    return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getRouterInputMetadata(key, routerInputMessageType),
                                          EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }
 
@@ -146,15 +167,16 @@ public class MuleMetadataService implements MetadataService {
   }
 
   @Override
-  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location, MetadataKey key,
-                                                                         ScopePropagationContext ctx) {
+  public MetadataResult<OutputMetadataDescriptor> getScopeOutputMetadata(Location location,
+                                                                         MetadataKey key,
+                                                                         ScopeOutputMetadataContext ctx) {
     return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getScopeOutputMetadata(key, ctx),
                                          EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }
 
   @Override
   public MetadataResult<OutputMetadataDescriptor> getRouterOutputMetadata(Location location, MetadataKey key,
-                                                                          RouterPropagationContext ctx) {
+                                                                          RouterOutputMetadataContext ctx) {
     return exceptionHandledMetadataFetch(() -> findMetadataProvider(location).getRouterOutputMetadata(key, ctx),
                                          EXCEPTION_RESOLVING_COMPONENT_METADATA);
   }

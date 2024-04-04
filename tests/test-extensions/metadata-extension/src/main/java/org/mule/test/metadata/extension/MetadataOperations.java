@@ -6,12 +6,13 @@
  */
 package org.mule.test.metadata.extension;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.ANY;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.APPLICATION_JSON;
 import static org.mule.runtime.extension.api.annotation.param.MediaType.TEXT_PLAIN;
 import static org.mule.test.metadata.extension.MetadataConnection.CAR;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.annotation.metadata.MetadataKeyId;
@@ -28,6 +29,8 @@ import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.process.CompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
+import org.mule.sdk.api.annotation.metadata.ChainInputResolver;
+import org.mule.sdk.api.annotation.metadata.PassThroughInputChainResolver;
 import org.mule.tck.message.StringAttributes;
 import org.mule.test.metadata.extension.model.animals.Animal;
 import org.mule.test.metadata.extension.model.animals.AnimalClade;
@@ -62,6 +65,7 @@ import org.mule.test.metadata.extension.resolver.TestOutputResolverWithKeyResolv
 import org.mule.test.metadata.extension.resolver.TestOutputResolverWithoutKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestPartialMultiLevelKeyResolver;
 import org.mule.test.metadata.extension.resolver.TestResolverWithCache;
+import org.mule.test.metadata.extension.resolver.TestChainInputTypeResolver;
 import org.mule.test.metadata.extension.resolver.TestThreadContextClassLoaderResolver;
 
 import java.io.InputStream;
@@ -385,14 +389,24 @@ public class MetadataOperations {
 
   @MediaType(value = ANY, strict = false)
   @OutputResolver(output = ScopeTestResolver.class)
-  public Object scopeWithMetadataResolver(Chain chain, CompletionCallback<Object, Void> cb) {
+  public void scopeWithMetadataResolver(@PassThroughInputChainResolver Chain chain,
+                                        CompletionCallback<Object, Void> cb) {
     chain.process(cb::success, (t, e) -> cb.error(t));
-    return null;
+  }
+
+  @MediaType(value = ANY, strict = false)
+  @OutputResolver(output = ScopeTestResolver.class)
+  public void scopeWithInputMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) Chain chain,
+                                             @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
+                                             CompletionCallback<Object, Void> cb) {
+    chain.process(jsonValue, null, cb::success, (t, e) -> cb.error(t));
   }
 
   @MediaType(value = ANY, strict = false)
   @OutputResolver(output = RouterTestResolver.class)
-  public void routerWithMetadataResolver(MetadataRoute metaroute, CompletionCallback<Object, Void> cb) {
+  public void routerWithMetadataResolver(@ChainInputResolver(TestChainInputTypeResolver.class) MetadataRoute metaroute,
+                                         @TypeResolver(AnyJsonTypeStaticResolver.class) @Optional String jsonValue,
+                                         CompletionCallback<Object, Void> cb) {
     metaroute.getChain().process(cb::success, (t, e) -> cb.error(t));
   }
 }

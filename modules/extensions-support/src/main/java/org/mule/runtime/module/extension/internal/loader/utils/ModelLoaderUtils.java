@@ -6,47 +6,35 @@
  */
 package org.mule.runtime.module.extension.internal.loader.utils;
 
-import static java.util.Collections.emptyList;
+import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
+import static org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer.configureNullMetadata;
+
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
-import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.sdk.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.XmlDslModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
-import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
-import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.ParameterizedDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDeclaration;
-import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
-import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
-import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
-import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
-import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
+import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsParser;
 import org.mule.runtime.module.extension.internal.loader.parser.XmlDslConfiguration;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.sdk.api.annotation.dsl.xml.Xml;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
  * Utility class for {@link ModelLoaderDelegate model loaders}
@@ -108,110 +96,72 @@ public final class ModelLoaderUtils {
     return getXmlDslModel(extensionElement.getName(), version, xmlDslAnnotationConfiguration);
   }
 
-
   /**
-   * Declares the model property {@link TypeResolversInformationModelProperty} on the given {@link BaseDeclaration declaration}
+   * Declares all the model properties necessary to enable the parsed resolved
    *
-   * @param baseDeclaration               the declaration
+   * @param declaration                   the declaration
    * @param outputResolverModelParser     parser with the output metadata
    * @param attributesResolverModelParser parser with the attributes metadata
    * @param inputResolverModelParsers     parser with the input metadata
    * @param keyIdResolverModelParser      parser with the key id metadata
-   * @param requiresConnection            indicates if the resolution of metadata requieres a connecion and configuration
    *
-   * @since 4.5.0
+   * @since 4.7.0
    */
-  public static void declareTypeResolversInformationModelProperty(BaseDeclaration baseDeclaration,
-                                                                  Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                                  Optional<AttributesResolverModelParser> attributesResolverModelParser,
-                                                                  List<InputResolverModelParser> inputResolverModelParsers,
-                                                                  Optional<MetadataKeyModelParser> keyIdResolverModelParser,
-                                                                  boolean requiresConnection) {
-
-    if ((outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver()) ||
-        !inputResolverModelParsers.isEmpty()) {
-
-      Map<String, String> inputResolversByParam = inputResolverModelParsers.stream()
-          .collect(toImmutableMap(InputResolverModelParser::getParameterName, r -> r.getInputResolver().getResolverName()));
-
-      String outputResolver = outputResolverModelParser
-          .map(outputResolverParser -> outputResolverParser.getOutputResolver().getResolverName())
-          .orElse(NULL_RESOLVER_NAME);
-
-      String attributesResolver = attributesResolverModelParser
-          .map(attributesResolverParser -> attributesResolverParser.getAttributesResolver().getResolverName())
-          .orElse(NULL_RESOLVER_NAME);
-
-      String keysResolver = keyIdResolverModelParser
-          .map(keyResolverParser -> keyResolverParser.getKeyResolver().getResolverName())
-          .orElse(NULL_RESOLVER_NAME);
-
-      boolean isPartialKeyResolver = keyIdResolverModelParser
-          .map(MetadataKeyModelParser::isPartialKeyResolver).orElse(false);
-
-      String categoryName = getCategoryName(keyIdResolverModelParser.orElse(null), inputResolverModelParsers,
-                                            outputResolverModelParser.orElse(null));
-
-      TypeResolversInformationModelProperty typeResolversInformationModelProperty = new TypeResolversInformationModelProperty(
-                                                                                                                              categoryName,
-                                                                                                                              inputResolversByParam,
-                                                                                                                              outputResolver,
-                                                                                                                              attributesResolver,
-                                                                                                                              keysResolver,
-                                                                                                                              requiresConnection,
-                                                                                                                              requiresConnection,
-                                                                                                                              isPartialKeyResolver);
-
-      baseDeclaration.addModelProperty(typeResolversInformationModelProperty);
-    }
+  public static void declareMetadataModelProperties(ParameterizedDeclaration declaration,
+                                                    Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                    Optional<AttributesResolverModelParser> attributesResolverModelParser,
+                                                    List<InputResolverModelParser> inputResolverModelParsers,
+                                                    Optional<MetadataKeyModelParser> keyIdResolverModelParser,
+                                                    boolean connected) {
+    declareMetadataModelProperties(declaration,
+                                   outputResolverModelParser,
+                                   attributesResolverModelParser,
+                                   inputResolverModelParsers,
+                                   keyIdResolverModelParser,
+                                   connected,
+                                   empty(),
+                                   empty());
   }
 
   /**
-   * Declares the model property {@link MetadataResolverFactoryModelProperty} on the given {@link BaseDeclaration declaration}
+   * Declares all the model properties necessary to enable the parsed resolved
    *
-   * @param baseDeclaration               the declaration
-   * @param outputResolverModelParser     parser with the output metadata
-   * @param attributesResolverModelParser parser with the attributes metadata
-   * @param inputResolverModelParsers     parser with the input metadata
-   * @param keyIdResolverModelParser      parser with the key id metadata
-   *
-   * @since 4.5.0
+   * @param declaration                         the declaration
+   * @param outputResolverModelParser           parser with the output metadata
+   * @param attributesResolverModelParser       parser with the attributes metadata
+   * @param inputResolverModelParsers           parser with the input metadata
+   * @param keyIdResolverModelParser            parser with the key id metadata
+   * @param scopeChainInputResolverParser       parser with chain input resolver
+   * @param routesChainInputTypesResolverParser parser with routes chain input resolvers
+   * @since 4.7.0
    */
-  public static void declareMetadataResolverFactoryModelProperty(BaseDeclaration baseDeclaration,
-                                                                 Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                                 Optional<AttributesResolverModelParser> attributesResolverModelParser,
-                                                                 List<InputResolverModelParser> inputResolverModelParsers,
-                                                                 Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    MetadataResolverFactory metadataResolverFactory;
-    if ((outputResolverModelParser.isPresent() && outputResolverModelParser.get().hasOutputResolver()) ||
-        !inputResolverModelParsers.isEmpty()) {
+  public static void declareMetadataModelProperties(ParameterizedDeclaration declaration,
+                                                    Optional<OutputResolverModelParser> outputResolverModelParser,
+                                                    Optional<AttributesResolverModelParser> attributesResolverModelParser,
+                                                    List<InputResolverModelParser> inputResolverModelParsers,
+                                                    Optional<MetadataKeyModelParser> keyIdResolverModelParser,
+                                                    boolean connected,
+                                                    Optional<ScopeChainInputTypeResolverModelParser> scopeChainInputResolverParser,
+                                                    Optional<RoutesChainInputTypesResolverModelParser> routesChainInputTypesResolverParser) {
+    if (outputResolverModelParser.map(p -> p.hasOutputResolver()).orElse(false)
+        || !inputResolverModelParsers.isEmpty()
+        || keyIdResolverModelParser.map(p -> p.hasKeyIdResolver()).orElse(false)) {
+      final ComponentMetadataConfigurer configurer = new ComponentMetadataConfigurer().setConnected(connected);
+      outputResolverModelParser.ifPresent(p -> configurer.setOutputTypeResolver(p.getOutputResolver()));
+      attributesResolverModelParser.ifPresent(p -> configurer.setAttributesTypeResolver(p.getAttributesResolver()));
+      keyIdResolverModelParser.ifPresent(p -> configurer.setKeysResolver(p.getKeyResolver(), p.getParameterName(),
+                                                                         p.getMetadataType(), p.isPartialKeyResolver()));
 
-      NullMetadataResolver nullMetadataResolver = new NullMetadataResolver();
+      inputResolverModelParsers
+          .forEach(parser -> configurer.addInputResolver(parser.getParameterName(), parser.getInputResolver()));
+      scopeChainInputResolverParser.ifPresent(p -> configurer.setChainInputTypeResolver(p.getChainInputTypeResolver()));
+      routesChainInputTypesResolverParser
+          .ifPresent(p -> configurer.addRoutesChainInputResolvers(p.getRoutesChainInputResolvers()));
 
-      OutputTypeResolver<?> outputTypeResolver = outputResolverModelParser.map(OutputResolverModelParser::getOutputResolver)
-          .orElse((OutputTypeResolver) nullMetadataResolver);
-      Supplier<OutputTypeResolver<?>> outputTypeResolverSupplier = () -> outputTypeResolver;
-
-      AttributesTypeResolver<?> attributesTypeResolver =
-          attributesResolverModelParser.map(AttributesResolverModelParser::getAttributesResolver)
-              .orElse((AttributesTypeResolver) nullMetadataResolver);
-      Supplier<AttributesTypeResolver<?>> attributesTypeResolverSupplier = () -> attributesTypeResolver;
-
-      TypeKeysResolver typeKeysResolver = keyIdResolverModelParser.map(MetadataKeyModelParser::getKeyResolver)
-          .orElse(nullMetadataResolver);
-      Supplier<TypeKeysResolver> typeKeysResolverSupplier = () -> typeKeysResolver;
-
-      Map<String, Supplier<? extends InputTypeResolver>> inputTypeResolvers = new HashMap<>();
-      inputResolverModelParsers.forEach(parser -> inputTypeResolvers.put(parser.getParameterName(), parser::getInputResolver));
-
-      metadataResolverFactory = new DefaultMetadataResolverFactory(typeKeysResolverSupplier, inputTypeResolvers,
-                                                                   outputTypeResolverSupplier,
-                                                                   attributesTypeResolverSupplier);
+      configurer.configure(declaration);
     } else {
-      metadataResolverFactory = new NullMetadataResolverFactory();
+      configureNullMetadata(declaration);
     }
-
-    baseDeclaration.addModelProperty(new MetadataResolverFactoryModelProperty(() -> metadataResolverFactory));
   }
 
   /**
@@ -239,30 +189,30 @@ public final class ModelLoaderUtils {
     }
   }
 
-  public static void declareOperationMetadataKeyIdModelProperty(OperationDeclarer operation,
-                                                                Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                                List<InputResolverModelParser> inputResolverModelParsers,
-                                                                Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    declareMetadateKeyIdModelProperty(operation, outputResolverModelParser, inputResolverModelParsers, keyIdResolverModelParser);
-  }
-
-  public static void declareSourceMetadataKeyIdModelProperty(SourceDeclarer source,
-                                                             Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                             Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    declareMetadateKeyIdModelProperty(source, outputResolverModelParser, emptyList(), keyIdResolverModelParser);
-  }
-
-  private static void declareMetadateKeyIdModelProperty(ComponentDeclarer declarer,
-                                                        Optional<OutputResolverModelParser> outputResolverModelParser,
-                                                        List<InputResolverModelParser> inputResolverModelParsers,
-                                                        Optional<MetadataKeyModelParser> keyIdResolverModelParser) {
-    if (keyIdResolverModelParser.isPresent()) {
-      String parameterName = keyIdResolverModelParser.get().getParameterName();
-      MetadataType metadataType = keyIdResolverModelParser.get().getMetadataType();
-      String categoryName = ModelLoaderUtils.getCategoryName(keyIdResolverModelParser.orElse(null), inputResolverModelParsers,
-                                                             outputResolverModelParser.orElse(null));
-
-      declarer.withModelProperty(new MetadataKeyIdModelProperty(metadataType, parameterName, categoryName));
+  public static String getCategoryName(TypeKeysResolver typeKeysResolver,
+                                       String firstSeenInputResolverCategory,
+                                       OutputTypeResolver outputTypeResolver) {
+    if (isNotNull(typeKeysResolver)) {
+      return typeKeysResolver.getCategoryName();
+    } else if (!isBlank(firstSeenInputResolverCategory)) {
+      return firstSeenInputResolverCategory;
+    } else if (isNotNull(outputTypeResolver)) {
+      return outputTypeResolver.getCategoryName();
+    } else {
+      return null;
     }
+  }
+
+  private static boolean isNotNull(Object resolver) {
+    if (resolver == null) {
+      return false;
+    }
+    if (resolver instanceof NamedTypeResolver) {
+      return !(resolver instanceof NullMetadataResolver);
+    } else if (resolver instanceof org.mule.sdk.api.metadata.resolving.NamedTypeResolver) {
+      return !(resolver instanceof org.mule.sdk.api.metadata.NullMetadataResolver);
+    }
+
+    return true;
   }
 }
