@@ -186,8 +186,8 @@ public class MavenTestUtils {
         .setVersion("1.0.0").setClassifier(classifier.orElse("mule-application")).build();
   }
 
-  public static BundleDescriptor getDomainBundleDescriptor(String appName) {
-    return new BundleDescriptor.Builder().setGroupId("test").setArtifactId(appName)
+  public static BundleDescriptor getDomainBundleDescriptor(String domainName) {
+    return new BundleDescriptor.Builder().setGroupId("test").setArtifactId(domainName)
         .setVersion("1.0.0").setClassifier("mule-domain").build();
   }
 }
