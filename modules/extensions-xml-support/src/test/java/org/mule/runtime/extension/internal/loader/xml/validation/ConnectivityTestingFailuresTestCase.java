@@ -8,6 +8,7 @@ package org.mule.runtime.extension.internal.loader.xml.validation;
 
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.MODULE_CONNECTION_MARKER_ANNOTATION_ATTRIBUTE;
@@ -35,7 +36,6 @@ import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader;
 import org.mule.runtime.extension.internal.loader.xml.validator.TestConnectionValidator;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -148,7 +148,7 @@ public class ConnectivityTestingFailuresTestCase extends AbstractMuleTestCase {
     return new ExtensionModelFactory().create(
                                               new DefaultExtensionLoadingContext(extensionDeclarer,
                                                                                  builder(currentThread().getContextClassLoader(),
-                                                                                         new NullDslResolvingContext()).build()));
+                                                                                         nullDslResolvingContext()).build()));
   }
 
   private ExtensionModel getExtensionModelFrom(String modulePath) {

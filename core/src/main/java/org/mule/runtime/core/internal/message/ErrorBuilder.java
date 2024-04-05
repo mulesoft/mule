@@ -7,6 +7,8 @@
 package org.mule.runtime.core.internal.message;
 
 import static org.mule.runtime.api.exception.ExceptionHelper.getRootMuleException;
+import static org.mule.runtime.api.exception.ExceptionHelper.containsSuppressedException;
+import static org.mule.runtime.api.exception.ExceptionHelper.unwrapSuppressedException;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 
 import static java.lang.System.lineSeparator;
@@ -25,7 +27,6 @@ import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
-import org.mule.runtime.internal.exception.SuppressedMuleException;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
@@ -75,12 +76,12 @@ public final class ErrorBuilder {
     String exceptionDescription = e.getMessage() != null ? e.getMessage() : "unknown description";
     this.description = exceptionDescription;
     this.detailedDescription = exceptionDescription;
-    if (cause instanceof SuppressedMuleException) {
-      // We need to unwrap SuppressedMuleException instances since they are not meant to be returned as error causes
-      cause = ((SuppressedMuleException) e).unwrap();
+    if (containsSuppressedException(cause)) {
+      // We need to unwrap MuleExceptions that were suppressed since they are not meant to be returned as error causes
+      cause = unwrapSuppressedException(cause);
       exception = cause;
-      addSuppressedErrors((SuppressedMuleException) e);
-      updateErrorDescription((SuppressedMuleException) e);
+      addSuppressedErrors((MuleException) e);
+      updateErrorDescription((MuleException) e);
     } else {
       MuleException muleRoot = getRootMuleException(cause);
       if (muleRoot != null) {

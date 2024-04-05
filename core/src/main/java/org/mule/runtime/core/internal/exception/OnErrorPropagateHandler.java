@@ -13,8 +13,6 @@ import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.TX_
 import static org.mule.runtime.config.internal.error.MuleCoreErrorTypeRepository.MULE_CORE_ERROR_TYPE_REPOSITORY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.REDELIVERY_EXHAUSTED;
 import static org.mule.runtime.core.api.transaction.TransactionUtils.profileTransactionAction;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER;
 
 import org.mule.runtime.api.component.location.ComponentLocation;
 import org.mule.runtime.api.lifecycle.InitialisationException;
@@ -45,6 +43,8 @@ import java.util.function.Function;
  */
 public class OnErrorPropagateHandler extends TemplateOnErrorHandler {
 
+  private static final String CORE_PREFIX = "mule";
+  private static final String ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER = "on-error-propagate";
   private static final String COMPONENT_IDENTIFIER = CORE_PREFIX + ":" + ON_ERROR_PROPAGATE_ELEMENT_IDENTIFIER;
   private final ErrorTypeMatcher redeliveryExhaustedMatcher;
 

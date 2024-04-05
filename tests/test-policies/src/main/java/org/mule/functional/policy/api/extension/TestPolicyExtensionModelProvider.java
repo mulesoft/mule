@@ -6,11 +6,12 @@
  */
 package org.mule.functional.policy.api.extension;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for test Policy components
@@ -26,7 +27,7 @@ public final class TestPolicyExtensionModelProvider {
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(new DefaultExtensionLoadingContext(new TestPolicyExtensionModelDeclarer().createExtensionModel(),
                                                  TestPolicyExtensionModelProvider.class.getClassLoader(),
-                                                 new NullDslResolvingContext())));
+                                                 nullDslResolvingContext())));
 
   /**
    * @return the {@link ExtensionModel} definition for test policies

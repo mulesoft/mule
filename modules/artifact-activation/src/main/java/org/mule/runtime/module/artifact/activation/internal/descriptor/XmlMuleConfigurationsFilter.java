@@ -7,8 +7,8 @@
 package org.mule.runtime.module.artifact.activation.internal.descriptor;
 
 import static org.mule.runtime.api.util.xmlsecurity.XMLSecureFactories.createDefault;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.internal.dsl.DslConstants.DOMAIN_NAMESPACE;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.module.artifact.activation.api.descriptor.MuleConfigurationsFilter;
 
@@ -24,6 +24,9 @@ import org.xml.sax.SAXException;
 
 public class XmlMuleConfigurationsFilter implements MuleConfigurationsFilter {
 
+  private static final String DEFAULT_NAMESPACE_URI_MASK = "http://www.mulesoft.org/schema/mule/%s";
+  private static final String CORE_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "core");
+  private static final String DOMAIN_NAMESPACE = format(DEFAULT_NAMESPACE_URI_MASK, "domain");
   private static final String CONFIG_FILE_EXTENSION = ".xml";
   private static final String muleLocalName = "mule";
   private static final String muleDomainLocalName = "mule-domain";

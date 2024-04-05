@@ -35,7 +35,6 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSACTION_ERR
 import static org.mule.runtime.core.api.error.Errors.Identifiers.TRANSFORMATION_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.VALIDATION_ERROR_IDENTIFIER;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 
 import org.mule.api.annotation.NoExtend;
 import org.mule.runtime.api.component.ComponentIdentifier;
@@ -46,6 +45,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 @NoExtend
 public abstract class Errors {
 
+  private static final String CORE_PREFIX = "mule";
   public static final String CORE_NAMESPACE_NAME = CORE_PREFIX.toUpperCase();
 
   protected Errors() {

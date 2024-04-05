@@ -6,9 +6,8 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
-import static org.mule.runtime.internal.util.collection.UnmodifiableMap.unmodifiableMap;
-
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;

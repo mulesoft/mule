@@ -7,7 +7,7 @@
 package org.mule.runtime.config.internal.dsl.processor.xml.provider;
 
 import static java.util.Arrays.asList;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfo;
 import org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider;
 

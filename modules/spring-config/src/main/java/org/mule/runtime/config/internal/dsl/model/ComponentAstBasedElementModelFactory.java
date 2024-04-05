@@ -19,8 +19,8 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefault
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
-import static org.mule.runtime.internal.dsl.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.VALUE_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -42,7 +42,6 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.metadata.api.dsl.DslElementModel;
-import org.mule.runtime.metadata.api.dsl.DslElementModel.Builder;
 
 import java.util.Collection;
 import java.util.Map;

@@ -11,6 +11,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.config.api.dsl.CoreDslConstants.RAISE_ERROR_IDENTIFIER;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.CORE_ERROR_NS;
 import static org.mule.runtime.config.internal.dsl.spring.BeanDefinitionFactory.TARGET_TYPE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.model.ApplicationModel.ERROR_MAPPING_IDENTIFIER;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
@@ -20,7 +21,6 @@ import static org.mule.runtime.extension.internal.loader.xml.validator.CorrectPr
 import static org.mule.runtime.extension.internal.loader.xml.validator.ForbiddenConfigurationPropertiesValidator.CONFIGURATION_PROPERTY_NOT_SUPPORTED_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.ILLEGAL_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
 import static org.mule.runtime.extension.internal.loader.xml.validator.GlobalElementNamesValidator.REPEATED_GLOBAL_ELEMENT_NAME_FORMAT_MESSAGE;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 

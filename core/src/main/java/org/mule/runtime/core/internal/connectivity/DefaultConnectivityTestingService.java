@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.connectivity;
 
 import static org.mule.runtime.api.connection.ConnectionValidationResult.failure;
+import static org.mule.runtime.api.connectivity.ConnectivityTestingStrategy.lookupConnectivityTestingStrategies;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 
 import static java.util.stream.Collectors.toList;
@@ -22,7 +23,6 @@ import org.mule.runtime.api.exception.ObjectNotFoundException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.internal.connectivity.ConnectivityTestingStrategyUtils;
 
 import java.util.Collection;
 import java.util.function.Supplier;
@@ -41,7 +41,7 @@ import javax.inject.Inject;
 public class DefaultConnectivityTestingService implements ConnectivityTestingService, Initialisable {
 
   private Supplier<Stream<ConnectivityTestingStrategy>> serviceRegistry =
-      ConnectivityTestingStrategyUtils::lookupConnectivityTestingStrategies;
+      () -> lookupConnectivityTestingStrategies(this.getClass().getClassLoader());
   private Collection<ConnectivityTestingStrategy> connectivityTestingStrategies;
   private MuleContext muleContext;
   private ConfigurationComponentLocator locator;

@@ -12,7 +12,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
 import static org.mule.runtime.extension.api.ExtensionConstants.PRIMARY_NODE_ONLY_PARAMETER_NAME;
-import static org.mule.runtime.internal.dsl.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.toBackPressureStrategy;
 
