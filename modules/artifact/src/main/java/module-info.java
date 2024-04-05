@@ -26,6 +26,7 @@ module org.mule.runtime.artifact {
   requires com.google.common;
   requires org.apache.commons.io;
   requires org.apache.commons.lang3;
+  requires semver4j;
 
   exports org.mule.runtime.module.artifact.api;
   exports org.mule.runtime.module.artifact.api.classloader;
