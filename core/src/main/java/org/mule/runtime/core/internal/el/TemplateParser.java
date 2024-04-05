@@ -15,9 +15,11 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +39,6 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
-  private static final Pattern ESCAPE_PATTERN = Pattern.compile("(^|[^\\\\])" + START_EXPRESSION + "\\" + OPEN_EXPRESSION);
   private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
   private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
       "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
@@ -122,12 +123,19 @@ public final class TemplateParser {
     return parse(null, template, callback);
   }
 
-  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+    return parseMule(props, template, callback, 0);
+  }
+
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, int depth) {
     validateBalanceMuleStyle(template);
+
+    // Will be storing the tokens candidate for callback evaluation
+    Map<UUID, String> tokens = new LinkedHashMap<>();
 
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
-    boolean inExpression = insideExpression;
+    boolean inExpression = false;
     boolean openSingleQuotes = false;
 
     StringBuilder result = new StringBuilder();
@@ -146,7 +154,7 @@ public final class TemplateParser {
       }
 
       if (lastIsBackSlash) {
-        if ((inExpression ? c != '\'' && c != '"' : true) && c != START_EXPRESSION) {
+        if (c != START_EXPRESSION) {
           result.append("\\");
         }
       } else {
@@ -155,21 +163,15 @@ public final class TemplateParser {
         }
       }
 
-      if (c == OPEN_EXPRESSION && lastStartedExpression && (!insideExpression || !openSingleQuotes)) {
+      if (c == OPEN_EXPRESSION && lastStartedExpression) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
-
-        Object value = enclosingTemplate;
-        if (callback != null) {
-          value = callback.match(enclosingTemplate);
-          if (value == null) {
-            value = NULL_AS_STRING;
-          } else {
-            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, value.equals(enclosingTemplate));
-          }
-        }
-        result.append(value);
-
+        // TODO: performance - pool the UUIDs and a compiled Patterns
+        UUID tokenId = UUID.randomUUID();
+        // Remember the token and its associated ID
+        tokens.put(tokenId, enclosingTemplate);
+        // Append the token ID on the result as a reference, so we can replace it at the end with the evaluated token value
+        result.append(tokenId);
         currentPosition = closing;
       } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
         result.append(c);
@@ -180,7 +182,23 @@ public final class TemplateParser {
       currentPosition++;
     }
 
-    return result.toString();
+    // At this point we evaluate the tokenized template
+    // depth > 0 is because the root template is not an actual token on itself, so it shouldn't be evaluated by the callback
+    String evaluatedTokenizedTemplate = depth > 0 ? (String) callback.match(result.toString()) : result.toString();
+
+    if (evaluatedTokenizedTemplate == null) {
+      return NULL_AS_STRING;
+    }
+
+    // Parses any token found and replaces on the tokenized result
+    for (Map.Entry<UUID, String> tokenEntry : tokens.entrySet()) {
+      // TODO: performance - avoid parsing the value if there is no match
+      evaluatedTokenizedTemplate = evaluatedTokenizedTemplate.replace(tokenEntry.getKey().toString(),
+                                                                      parseMule(props, tokenEntry.getValue(), callback,
+                                                                                depth + 1));
+    }
+
+    return evaluatedTokenizedTemplate;
   }
 
   private int closingBracesPosition(String template, int startingPosition) {
@@ -207,17 +225,9 @@ public final class TemplateParser {
     return -1;
   }
 
-  private String escapeValue(String original, String processed) {
-    if (original.contains("#")) {
-      return processed;
-    }
-
-    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION + OPEN_EXPRESSION);
-  }
-
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return parseMule(props, template, callback, false);
+      return parseMule(props, template, callback);
     }
     String result = template;
     Map<?, ?> newProps = props;

@@ -10,12 +10,13 @@ import static org.mule.runtime.core.internal.el.TemplateParser.createAntStylePar
 import static org.mule.runtime.core.internal.el.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.core.internal.el.TemplateParser.createSquareBracesStyleParser;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.mule.runtime.core.internal.el.TemplateParser;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.qameta.allure.Issue;
 import org.junit.Test;
 
 @SmallTest
@@ -207,6 +209,32 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void muleParserManagesNestedNonStaticExpressions() {
+    TemplateParser tp = createMuleStyleParser();
+    String expression = "#[hello #[payload]]";
+    assertThat(tp.isValid(expression), is(true));
+    String result = tp.parse(null, expression, token -> token + "-suffix");
+    assertThat(result, is("hello payload-suffix-suffix"));
+  }
+
+  @Test
+  @Issue("W-15141905")
+  public void muleParserManagesNestedExpressionsEvaluatingToExpressions() {
+    TemplateParser tp = createMuleStyleParser();
+    final String expectedResult = "hello world-#[universe]-#[universe]";
+    String expression = "#[hello #[world]]";
+    assertThat(tp.isValid(expression), is(true));
+    String result = tp.parse(null, expression, token -> {
+      if (token.equals("universe")) {
+        return "error";
+      } else {
+        return token + "-#[universe]";
+      }
+    });
+    assertThat(result, is(expectedResult));
+  }
+
+  @Test
   public void muleParserManagesConcatenation() {
     TemplateParser tp = createMuleStyleParser();
 
@@ -329,9 +357,10 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-15141905")
   public void muleParserWithScapedQuote() {
     TemplateParser tp = createMuleStyleParser();
-    final String expectedResult = "\"";
+    final String expectedResult = "\\\"";
     String expression = "#[\\\"]";
     assertTrue(tp.isValid(expression));
     String result = tp.parse(null, expression, token -> token);
@@ -371,10 +400,11 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  @Issue("W-15141905")
   public void muleParserWithValueWithScapedSharps() {
     TemplateParser tp = createMuleStyleParser();
     final String expression = "#[hello mule]";
-    String expectedResult = "sarasa \\# sarasa2";
+    String expectedResult = "sarasa \\\\# sarasa2";
     assertTrue(tp.isValid(expression));
 
     String result = tp.parse(null, expression, token -> "sarasa \\\\# sarasa2");
