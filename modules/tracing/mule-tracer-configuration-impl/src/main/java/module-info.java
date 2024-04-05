@@ -32,6 +32,4 @@ module org.mule.runtime.tracer.configuration.impl {
       org.mule.runtime.spring.config,
       spring.beans;
 
-  opens org.mule.runtime.tracing.level.impl.config to spring.core;
-
 }

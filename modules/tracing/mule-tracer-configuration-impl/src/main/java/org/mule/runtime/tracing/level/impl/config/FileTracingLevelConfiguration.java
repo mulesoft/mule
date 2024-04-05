@@ -98,7 +98,7 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
       } catch (IllegalArgumentException e) {
         LOGGER.error(format("Wrong tracing level found in configuration file: %s.",
                             configuredTracingLevel));
-        throw new IllegalArgumentException();
+        throw new MuleRuntimeException(e);
       }
     }
   }
