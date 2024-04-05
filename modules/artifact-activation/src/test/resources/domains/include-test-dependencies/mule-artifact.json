@@ -5,10 +5,7 @@
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
-      "exportedResources": [
-        "app.xml",
-        "test-script.dwl"
-      ]
+      "includeTestDependencies": "true"
     }
   },
   "bundleDescriptorLoader": {

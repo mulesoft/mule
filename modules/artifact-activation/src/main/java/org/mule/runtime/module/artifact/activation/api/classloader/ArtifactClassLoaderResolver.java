@@ -101,6 +101,8 @@ public interface ArtifactClassLoaderResolver {
    *                                  created.
    * @param additionalClassloaderUrls a list of {@link URL} pointing to additional resources and classes
    * @return a class loader for a domain.
+   * 
+   * @since 4.7
    */
   MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
                                                             PluginClassLoaderResolver pluginClassLoaderResolver,
