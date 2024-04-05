@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 
@@ -39,6 +43,7 @@ public final class TemplateParser {
   private static final char START_EXPRESSION = '#';
   private static final char OPEN_EXPRESSION = '[';
   private static final char CLOSE_EXPRESSION = ']';
+  private static final Pattern ESCAPE_PATTERN = Pattern.compile("(^|[^\\\\])" + START_EXPRESSION + "\\" + OPEN_EXPRESSION);
   private static final String EXPRESSION_NOT_CLOSED_ERROR_MSG = "\tOpened expression (%c) at line %d, column %d is not closed\n";
   private static final String QUOTATION_NOT_CLOSED_ERROR_MSG =
       "\tQuotation (%c) at line %d, column %d is not closed. Remember to use backslash (\\) if you are trying to use that character as a literal";
@@ -69,6 +74,22 @@ public final class TemplateParser {
    * logger used by this class
    */
   protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
+
+  @Deprecated
+  private static boolean IS_COMPATIBILITY_MODE_ENABLED = isCompatibilityModeEnabled();
+
+  @Deprecated
+  private static boolean isCompatibilityModeEnabled() {
+    return parseBoolean(getProperty(ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE, "false"));
+  }
+
+  /**
+   * Package-private, used only for testing.
+   */
+  @Deprecated
+  static void reloadKillSwitches() {
+    IS_COMPATIBILITY_MODE_ENABLED = isCompatibilityModeEnabled();
+  }
 
   private final Pattern pattern;
   private final int pre;
@@ -124,6 +145,9 @@ public final class TemplateParser {
   }
 
   private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+    if (IS_COMPATIBILITY_MODE_ENABLED) {
+      return legacyParseMule(props, template, callback, false);
+    }
     return parseMule(props, template, callback, 0);
   }
 
@@ -199,6 +223,80 @@ public final class TemplateParser {
     }
 
     return evaluatedTokenizedTemplate;
+  }
+
+  // Used only for the kill switch
+  @Deprecated
+  private String legacyParseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
+    validateBalanceMuleStyle(template);
+
+    boolean lastIsBackSlash = false;
+    boolean lastStartedExpression = false;
+    boolean inExpression = insideExpression;
+    boolean openSingleQuotes = false;
+
+    StringBuilder result = new StringBuilder();
+    int currentPosition = 0;
+    while (currentPosition < template.length()) {
+      char c = template.charAt(currentPosition);
+
+      if (lastStartedExpression && c != OPEN_EXPRESSION) {
+        result.append(START_EXPRESSION);
+      }
+      if (lastStartedExpression && c == OPEN_EXPRESSION) {
+        inExpression = true;
+      }
+      if (inExpression && c == CLOSE_EXPRESSION) {
+        inExpression = false;
+      }
+
+      if (lastIsBackSlash) {
+        if ((inExpression ? c != '\'' && c != '"' : true) && c != START_EXPRESSION) {
+          result.append("\\");
+        }
+      } else {
+        if (c == '\'') {
+          openSingleQuotes = !openSingleQuotes;
+        }
+      }
+
+      if (c == OPEN_EXPRESSION && lastStartedExpression && (!insideExpression || !openSingleQuotes)) {
+        int closing = closingBracesPosition(template, currentPosition);
+        String enclosingTemplate = template.substring(currentPosition + 1, closing);
+
+        Object value = enclosingTemplate;
+        if (callback != null) {
+          value = callback.match(enclosingTemplate);
+          if (value == null) {
+            value = NULL_AS_STRING;
+          } else {
+            value = legacyParseMule(props, escapeValue(enclosingTemplate, value.toString()), callback,
+                                    value.equals(enclosingTemplate));
+          }
+        }
+        result.append(value);
+
+        currentPosition = closing;
+      } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
+        result.append(c);
+      }
+
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
+      lastIsBackSlash = c == '\\';
+      currentPosition++;
+    }
+
+    return result.toString();
+  }
+
+  // Used only for the legacyParseMule
+  @Deprecated
+  private String escapeValue(String original, String processed) {
+    if (original.contains("#")) {
+      return processed;
+    }
+
+    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION + OPEN_EXPRESSION);
   }
 
   private int closingBracesPosition(String template, int startingPosition) {

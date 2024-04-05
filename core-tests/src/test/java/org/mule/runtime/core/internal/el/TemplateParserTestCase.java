@@ -6,9 +6,13 @@
  */
 package org.mule.runtime.core.internal.el;
 
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE;
 import static org.mule.runtime.core.internal.el.TemplateParser.createAntStyleParser;
 import static org.mule.runtime.core.internal.el.TemplateParser.createMuleStyleParser;
 import static org.mule.runtime.core.internal.el.TemplateParser.createSquareBracesStyleParser;
+
+import static java.lang.System.clearProperty;
+import static java.lang.System.setProperty;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -232,6 +236,31 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
       }
     });
     assertThat(result, is(expectedResult));
+  }
+
+  @Test
+  @Issue("W-15141905")
+  public void muleParserManagesNestedExpressionsEvaluatingToExpressionsAndCompatibilityModeEnabled() {
+    // Enable the flag
+    setProperty(ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE, "true");
+    try {
+      TemplateParser.reloadKillSwitches();
+      TemplateParser tp = createMuleStyleParser();
+      String expression = "#[hello #[world]]";
+      assertThat(tp.isValid(expression), is(true));
+      String result = tp.parse(null, expression, token -> {
+        if (token.equals("universe")) {
+          return "good";
+        } else {
+          return token + "-#[universe]";
+        }
+      });
+      assertThat(result, is("hello world-#[universe]-good"));
+    } finally {
+      // Restore the flag to its previous state
+      clearProperty(ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE);
+      TemplateParser.reloadKillSwitches();
+    }
   }
 
   @Test
