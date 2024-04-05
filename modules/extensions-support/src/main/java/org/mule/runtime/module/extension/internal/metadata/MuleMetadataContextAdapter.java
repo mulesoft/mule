@@ -6,15 +6,18 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static java.util.Optional.empty;
+
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.builder.BaseTypeBuilder;
-import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter.SdkRouterOutputMetadataContextAdapter;
+import org.mule.runtime.module.extension.internal.metadata.SdkMetadataContextAdapter.SdkScopeOutputMetadataContext;
 import org.mule.sdk.api.metadata.MetadataContext;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata.MetadataContext {
 
@@ -50,17 +53,19 @@ public class MuleMetadataContextAdapter implements org.mule.runtime.api.metadata
   }
 
   @Override
-  public Optional<Supplier<MetadataType>> getInnerChainOutputType() {
-    return delegate.getInnerChainOutputType();
+  public Optional<ScopeOutputMetadataContext> getScopeOutputMetadataContext() {
+    return delegate.getScopeOutputMetadataContext()
+        .map(ctx -> ((SdkScopeOutputMetadataContext) ctx).getDelegate());
   }
 
   @Override
-  public Map<String, Supplier<MetadataType>> getInnerRoutesOutputType() {
-    return delegate.getInnerRoutesOutputType();
+  public Optional<RouterOutputMetadataContext> getRouterOutputMetadataContext() {
+    return delegate.getRouterOutputMetadataContext()
+        .map(ctx -> ((SdkRouterOutputMetadataContextAdapter) ctx).getDelegate());
   }
 
   @Override
   public <C> Optional<C> getConfig() {
-    return Optional.empty();
+    return empty();
   }
 }

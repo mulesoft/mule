@@ -6,16 +6,20 @@
  */
 package org.mule.runtime.module.extension.internal.metadata;
 
+import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
+import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
+import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRouter;
+import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isScope;
+
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.api.metadata.resolving.FailureCode.INVALID_METADATA_KEY;
-import static org.mule.runtime.api.metadata.resolving.MetadataFailure.Builder.newFailure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.failure;
-import static org.mule.runtime.api.metadata.resolving.MetadataResult.success;
 
+import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.ComponentModelVisitor;
 import org.mule.runtime.api.meta.model.HasOutputModel;
@@ -39,6 +43,8 @@ import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.ParameterMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.RouterInputMetadataDescriptor;
+import org.mule.runtime.api.metadata.descriptor.ScopeInputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.TypeMetadataDescriptor;
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.MetadataFailure;
@@ -65,6 +71,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 
@@ -197,6 +204,76 @@ public final class MetadataMediator<T extends ComponentModel> {
       return getMetadata(context, keyValue, builder);
     } catch (MetadataResolvingException e) {
       return failure(newFailure(e).onComponent());
+    }
+  }
+
+  /**
+   * Resolves the {@link ScopeInputMetadataDescriptor}. Only to be used for scope components
+   *
+   * @param context               current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                   {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                              output types
+   * @param scopeInputMessageType a {@link MessageMetadataType} for the message that originally entered the scope
+   * @return a {@link MetadataResult} of {@link ScopeInputMetadataDescriptor}
+   * @since 4.7.0
+   */
+  public MetadataResult<ScopeInputMetadataDescriptor> getScopeInputMetadata(MetadataContext context,
+                                                                            MetadataKey key,
+                                                                            Supplier<MessageMetadataType> scopeInputMessageType) {
+    if (!isScope(component)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component is not a scope").onComponent());
+    }
+    MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
+    if (!inputMetadata.isSuccess()) {
+      return (MetadataResult) inputMetadata;
+    }
+
+    MetadataResult<MessageMetadataType> scopeChainInputType =
+        inputDelegate.getScopeChainInputType(context, scopeInputMessageType, inputMetadata.get());
+
+    if (scopeChainInputType.isSuccess()) {
+      return success(ScopeInputMetadataDescriptor.builder()
+          .withParameters(inputMetadata.get().getAllParameters())
+          .withChainInputMessageType(scopeChainInputType.get())
+          .build());
+    } else {
+      return (MetadataResult) scopeChainInputType;
+    }
+  }
+
+  /**
+   * Resolves the {@link RouterInputMetadataDescriptor}. Only to be used for router components
+   *
+   * @param context                current {@link MetadataContext} that will be used by the metadata resolvers.
+   * @param key                    {@link MetadataKey} of the type which structure has to be resolved, used both for input and
+   *                               output types
+   * @param routerInputMessageType a {@link MessageMetadataType} for the message that originally entered the router
+   * @return a {@link MetadataResult} of {@link RouterInputMetadataDescriptor}
+   * @since 4.7.0
+   */
+  public MetadataResult<RouterInputMetadataDescriptor> getRouterInputMetadata(MetadataContext context,
+                                                                              MetadataKey key,
+                                                                              Supplier<MessageMetadataType> routerInputMessageType) {
+    if (!isRouter(component)) {
+      return failure(MetadataFailure.Builder.newFailure()
+          .withMessage("The given component is not a router").onComponent());
+    }
+    MetadataResult<InputMetadataDescriptor> inputMetadata = getInputMetadata(context, key);
+    if (!inputMetadata.isSuccess()) {
+      return (MetadataResult) inputMetadata;
+    }
+
+    MetadataResult<Map<String, MessageMetadataType>> routesInputTypes =
+        inputDelegate.getRoutesChainInputType(context, routerInputMessageType, inputMetadata.get());
+
+    if (routesInputTypes.isSuccess()) {
+      return success(RouterInputMetadataDescriptor.builder()
+          .withParameters(inputMetadata.get().getAllParameters())
+          .withRoutesInputMessageTypes(routesInputTypes.get())
+          .build());
+    } else {
+      return (MetadataResult) routesInputTypes;
     }
   }
 

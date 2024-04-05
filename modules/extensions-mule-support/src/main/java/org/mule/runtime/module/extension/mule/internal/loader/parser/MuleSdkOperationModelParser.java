@@ -46,16 +46,18 @@ import org.mule.runtime.module.extension.internal.loader.java.property.MediaType
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.DefaultOutputModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.InputResolverModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedChainModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.NestedRouteModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OperationModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.OutputModelParser;
-import org.mule.runtime.module.extension.internal.loader.parser.OutputResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.OutputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterGroupModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.RoutesChainInputTypesResolverModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.ScopeChainInputTypeResolverModelParser;
 import org.mule.runtime.module.extension.mule.internal.execution.MuleOperationExecutor;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.AggregatedErrorsCharacteristic;
 import org.mule.runtime.module.extension.mule.internal.loader.parser.utils.Characteristic;
@@ -322,6 +324,16 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public Optional<MetadataKeyModelParser> getMetadataKeyModelParser() {
+    return empty();
+  }
+
+  @Override
+  public Optional<ScopeChainInputTypeResolverModelParser> getScopeChainInputTypeResolverModelParser() {
+    return empty();
+  }
+
+  @Override
+  public Optional<RoutesChainInputTypesResolverModelParser> getRoutesChainInputTypesResolverModelParser() {
     return empty();
   }
 

@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.DEFAULT_GROUP_NAME;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockDeprecatedAst;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockTypeLoader;
@@ -29,7 +30,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -148,7 +148,7 @@ class MuleSdkParameterModelParserSdkBuilder {
 
   private ExtensionModelLoadingRequest createLoadingRequest() {
     return ExtensionModelLoadingRequest
-        .builder(MuleSdkParameterModelParserSdkBuilder.class.getClassLoader(), new NullDslResolvingContext())
+        .builder(MuleSdkParameterModelParserSdkBuilder.class.getClassLoader(), nullDslResolvingContext())
         .build();
   }
 

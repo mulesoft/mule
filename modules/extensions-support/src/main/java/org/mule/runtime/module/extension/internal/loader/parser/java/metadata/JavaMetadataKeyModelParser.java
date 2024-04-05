@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.parser.java;
+package org.mule.runtime.module.extension.internal.loader.parser.java.metadata;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.isEnum;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -16,7 +16,7 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.util.ClassUtils;
-import org.mule.runtime.module.extension.internal.loader.parser.MetadataKeyModelParser;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.MetadataKeyModelParser;
 import org.mule.runtime.module.extension.internal.metadata.BooleanKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.EnumKeyResolver;
 import org.mule.runtime.module.extension.internal.metadata.MuleTypeKeysResolverAdapter;

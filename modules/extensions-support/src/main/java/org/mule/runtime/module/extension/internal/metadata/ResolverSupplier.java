@@ -26,7 +26,6 @@ import java.util.function.Supplier;
  */
 public final class ResolverSupplier<T extends NamedTypeResolver> implements Supplier<T> {
 
-  private static final NullMetadataResolverSupplier NULL_METADATA_RESOLVER_SUPPLIER = new NullMetadataResolverSupplier();
   private Class<T> clazz;
 
   private ResolverSupplier(Class<T> clazz) {
@@ -45,7 +44,7 @@ public final class ResolverSupplier<T extends NamedTypeResolver> implements Supp
   public static <T extends NamedTypeResolver> Supplier<T> of(Class<T> aClass) {
     checkArgument(aClass != null, "The class can't be null");
     if (aClass.equals(NullMetadataResolver.class)) {
-      return (Supplier<T>) NULL_METADATA_RESOLVER_SUPPLIER;
+      return (Supplier<T>) NullMetadataResolverSupplier.INSTANCE;
     } else {
       return new ResolverSupplier<>(aClass);
     }

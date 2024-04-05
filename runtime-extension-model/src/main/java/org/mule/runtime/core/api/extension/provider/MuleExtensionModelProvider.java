@@ -12,8 +12,9 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.BOOLEAN;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.NUMBER;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.PRIMITIVE_TYPES;
 import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
-import static org.mule.runtime.internal.dsl.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.internal.dsl.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
 
 import static java.lang.String.format;
 
@@ -31,7 +32,6 @@ import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
-import org.mule.runtime.internal.dsl.NullDslResolvingContext;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -94,7 +94,7 @@ public final class MuleExtensionModelProvider {
   }
 
   private static ExtensionModelLoadingRequest loadingRequest() {
-    return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), new NullDslResolvingContext())
+    return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), nullDslResolvingContext())
         .build();
   }
 

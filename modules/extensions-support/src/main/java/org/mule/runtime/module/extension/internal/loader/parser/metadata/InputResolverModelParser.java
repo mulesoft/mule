@@ -4,9 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.loader.parser;
+package org.mule.runtime.module.extension.internal.loader.parser.metadata;
 
 import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
+import org.mule.runtime.module.extension.internal.loader.parser.ExtensionModelParser;
 
 /**
  * Parses the syntactic definition of input resolvers so that the semantics reflected in it can be extracted in a uniform way,

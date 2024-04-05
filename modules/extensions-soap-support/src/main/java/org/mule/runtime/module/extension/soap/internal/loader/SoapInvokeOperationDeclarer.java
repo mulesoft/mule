@@ -9,9 +9,7 @@ package org.mule.runtime.module.extension.soap.internal.loader;
 import static org.mule.metadata.java.api.JavaTypeLoader.JAVA;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
-import static org.mule.runtime.api.util.collection.Collectors.toImmutableMap;
 import static org.mule.runtime.extension.api.annotation.param.Optional.PAYLOAD;
-import static org.mule.runtime.extension.api.metadata.NullMetadataResolver.NULL_RESOLVER_NAME;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.metadata.api.ClassTypeLoader;
@@ -29,24 +27,17 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.api.metadata.resolving.InputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
-import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
-import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
-import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
-import org.mule.runtime.extension.api.property.TypeResolversInformationModelProperty;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
-import org.mule.runtime.metadata.internal.DefaultMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.DeclaringMemberModelProperty;
-import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -61,9 +52,6 @@ import org.mule.runtime.module.extension.soap.internal.runtime.operation.SoapOpe
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Declares the invoke operation for a given Soap Extension {@link ExtensionDeclarer}.
@@ -121,36 +109,14 @@ public class SoapInvokeOperationDeclarer {
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
-    Map<String, Supplier<? extends InputTypeResolver>> inputResolver =
-        ImmutableMap.<String, Supplier<? extends InputTypeResolver>>builder()
-            .put(BODY_PARAM, InvokeRequestTypeResolver::new)
-            .put(HEADERS_PARAM, InvokeInputHeadersTypeResolver::new)
-            .put(ATTACHMENTS_PARAM, InvokeInputAttachmentsTypeResolver::new)
-            .build();
-    TypeKeysResolver keysResolver = new InvokeKeysResolver();
-    OutputTypeResolver outputResolver = new InvokeOutputTypeResolver();
-    DefaultMetadataResolverFactory factory = new DefaultMetadataResolverFactory(() -> keysResolver,
-                                                                                inputResolver,
-                                                                                () -> outputResolver,
-                                                                                NullMetadataResolver::new);
-    operation.withModelProperty(new MetadataResolverFactoryModelProperty(() -> factory));
-    operation.withModelProperty(new MetadataKeyIdModelProperty(loader.load(WebServiceTypeKey.class), KEYS_GROUP,
-                                                               keysResolver.getCategoryName()));
-
-    Map<String, String> inputResolversByParam = inputResolver
-        .entrySet().stream()
-        .collect(toImmutableMap(Map.Entry::getKey,
-                                e -> e.getValue().get().getResolverName()));
-
-    // TODO MULE-15638 - Once Metadata API 2.0 is implemented we will know better if the resolver requires or not a connection
-    // of config.
-    operation.withModelProperty(new TypeResolversInformationModelProperty(keysResolver.getCategoryName(),
-                                                                          inputResolversByParam,
-                                                                          outputResolver.getResolverName(),
-                                                                          NULL_RESOLVER_NAME,
-                                                                          keysResolver.getResolverName(),
-                                                                          true,
-                                                                          true));
+    new ComponentMetadataConfigurer()
+        .setKeysResolver(new InvokeKeysResolver(), KEYS_GROUP, loader.load(WebServiceTypeKey.class), false)
+        .addInputResolver(BODY_PARAM, new InvokeRequestTypeResolver())
+        .addInputResolver(HEADERS_PARAM, new InvokeInputHeadersTypeResolver())
+        .addInputResolver(ATTACHMENTS_PARAM, new InvokeInputAttachmentsTypeResolver())
+        .setOutputTypeResolver(new InvokeOutputTypeResolver())
+        .setConnected(true)
+        .configure(operation);
   }
 
   private void declareOutput(OperationDeclarer operation, ClassTypeLoader loader) {
