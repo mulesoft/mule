@@ -10,7 +10,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.app.declaration.internal.utils.Preconditions.checkArgument;
+
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 import static org.mule.runtime.metadata.internal.DslElementIdHelper.getSourceElementName;
 import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveConfigName;
 import static org.mule.runtime.metadata.internal.DslElementIdHelper.resolveSimpleValue;
