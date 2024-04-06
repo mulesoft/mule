@@ -208,11 +208,7 @@ public final class TemplateParser {
 
     // At this point we evaluate the tokenized template
     // depth > 0 is because the root template is not an actual token on itself, so it shouldn't be evaluated by the callback
-    String evaluatedTokenizedTemplate = depth > 0 ? (String) callback.match(result.toString()) : result.toString();
-
-    if (evaluatedTokenizedTemplate == null) {
-      return NULL_AS_STRING;
-    }
+    String evaluatedTokenizedTemplate = depth > 0 ? evaluateToken(callback, result.toString()) : result.toString();
 
     // Parses any token found and replaces on the tokenized result
     for (Map.Entry<UUID, String> tokenEntry : tokens.entrySet()) {
@@ -223,6 +219,14 @@ public final class TemplateParser {
     }
 
     return evaluatedTokenizedTemplate;
+  }
+
+  private String evaluateToken(TemplateCallback callback, String token) {
+    Object result = callback.match(token);
+    if (result == null) {
+      return NULL_AS_STRING;
+    }
+    return result.toString();
   }
 
   // Used only for the kill switch
