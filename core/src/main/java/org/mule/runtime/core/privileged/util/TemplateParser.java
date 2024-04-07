@@ -6,7 +6,11 @@
  */
 package org.mule.runtime.core.privileged.util;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
+
+import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE;
 import static org.mule.runtime.api.util.collection.SmallMap.forSize;
 import static org.mule.runtime.api.util.collection.SmallMap.of;
 
@@ -15,9 +19,11 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +74,22 @@ public final class TemplateParser {
    * logger used by this class
    */
   protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
+
+  @Deprecated
+  private static boolean IS_COMPATIBILITY_MODE_ENABLED = isCompatibilityModeEnabled();
+
+  @Deprecated
+  private static boolean isCompatibilityModeEnabled() {
+    return parseBoolean(getProperty(ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE, "false"));
+  }
+
+  /**
+   * Package-private, used only for testing.
+   */
+  @Deprecated
+  static void reloadKillSwitches() {
+    IS_COMPATIBILITY_MODE_ENABLED = isCompatibilityModeEnabled();
+  }
 
   private final Pattern pattern;
   private final int pre;
@@ -122,7 +144,94 @@ public final class TemplateParser {
     return parse(null, template, callback);
   }
 
-  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback) {
+    if (IS_COMPATIBILITY_MODE_ENABLED) {
+      return legacyParseMule(props, template, callback, false);
+    }
+    return parseMule(props, template, callback, 0);
+  }
+
+  private String parseMule(Map<?, ?> props, String template, TemplateCallback callback, int depth) {
+    validateBalanceMuleStyle(template);
+
+    // Will be storing the tokens candidate for callback evaluation
+    Map<UUID, String> tokens = new LinkedHashMap<>();
+
+    boolean lastIsBackSlash = false;
+    boolean lastStartedExpression = false;
+    boolean inExpression = false;
+    boolean openSingleQuotes = false;
+
+    StringBuilder result = new StringBuilder();
+    int currentPosition = 0;
+    while (currentPosition < template.length()) {
+      char c = template.charAt(currentPosition);
+
+      if (lastStartedExpression && c != OPEN_EXPRESSION) {
+        result.append(START_EXPRESSION);
+      }
+      if (lastStartedExpression && c == OPEN_EXPRESSION) {
+        inExpression = true;
+      }
+      if (inExpression && c == CLOSE_EXPRESSION) {
+        inExpression = false;
+      }
+
+      if (lastIsBackSlash) {
+        if (c != START_EXPRESSION) {
+          result.append("\\");
+        }
+      } else {
+        if (c == '\'') {
+          openSingleQuotes = !openSingleQuotes;
+        }
+      }
+
+      if (c == OPEN_EXPRESSION && lastStartedExpression) {
+        int closing = closingBracesPosition(template, currentPosition);
+        String enclosingTemplate = template.substring(currentPosition + 1, closing);
+        // TODO: performance - pool the UUIDs and a compiled Patterns
+        UUID tokenId = UUID.randomUUID();
+        // Remember the token and its associated ID
+        tokens.put(tokenId, enclosingTemplate);
+        // Append the token ID on the result as a reference, so we can replace it at the end with the evaluated token value
+        result.append(tokenId);
+        currentPosition = closing;
+      } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
+        result.append(c);
+      }
+
+      lastStartedExpression = !lastIsBackSlash && c == START_EXPRESSION;
+      lastIsBackSlash = c == '\\';
+      currentPosition++;
+    }
+
+    // At this point we evaluate the tokenized template
+    // depth > 0 is because the root template is not an actual token on itself, so it shouldn't be evaluated by the callback
+    String evaluatedTokenizedTemplate = depth > 0 ? evaluateToken(callback, result.toString()) : result.toString();
+
+    // Parses any token found and replaces on the tokenized result
+    for (Map.Entry<UUID, String> tokenEntry : tokens.entrySet()) {
+      // TODO: performance - avoid parsing the value if there is no match
+      evaluatedTokenizedTemplate = evaluatedTokenizedTemplate.replace(tokenEntry.getKey().toString(),
+                                                                      parseMule(props, tokenEntry.getValue(), callback,
+                                                                                depth + 1));
+    }
+
+    return evaluatedTokenizedTemplate;
+  }
+
+  private String evaluateToken(TemplateCallback callback, String token) {
+    Object result = callback.match(token);
+    if (result == null) {
+      return NULL_AS_STRING;
+    }
+    return result.toString();
+  }
+
+  // Used only for the kill switch
+  @Deprecated
+  private String legacyParseMule(Map<?, ?> props, String template, TemplateCallback callback, boolean insideExpression) {
     validateBalanceMuleStyle(template);
 
     boolean lastIsBackSlash = false;
@@ -165,7 +274,8 @@ public final class TemplateParser {
           if (value == null) {
             value = NULL_AS_STRING;
           } else {
-            value = parseMule(props, escapeValue(enclosingTemplate, value.toString()), callback, value.equals(enclosingTemplate));
+            value = legacyParseMule(props, escapeValue(enclosingTemplate, value.toString()), callback,
+                                    value.equals(enclosingTemplate));
           }
         }
         result.append(value);
@@ -181,6 +291,16 @@ public final class TemplateParser {
     }
 
     return result.toString();
+  }
+
+  // Used only for the legacyParseMule
+  @Deprecated
+  private String escapeValue(String original, String processed) {
+    if (original.contains("#")) {
+      return processed;
+    }
+
+    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION + OPEN_EXPRESSION);
   }
 
   private int closingBracesPosition(String template, int startingPosition) {
@@ -207,17 +327,9 @@ public final class TemplateParser {
     return -1;
   }
 
-  private String escapeValue(String original, String processed) {
-    if (original.contains("#")) {
-      return processed;
-    }
-
-    return ESCAPE_PATTERN.matcher(processed).replaceAll("$1\\\\" + START_EXPRESSION + OPEN_EXPRESSION);
-  }
-
   protected String parse(Map<?, ?> props, String template, TemplateCallback callback) {
     if (styleIs(WIGGLY_MULE_TEMPLATE_STYLE)) {
-      return parseMule(props, template, callback, false);
+      return parseMule(props, template, callback);
     }
     String result = template;
     Map<?, ?> newProps = props;
