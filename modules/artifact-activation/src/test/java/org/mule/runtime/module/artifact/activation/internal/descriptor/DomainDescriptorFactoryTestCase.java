@@ -196,7 +196,7 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
   }
 
   @Test
-  public void applicationDescriptorWithIncludeTestDependencies() throws Exception {
+  public void domainDescriptorWithIncludeTestDependencies() throws Exception {
     DomainDescriptor domainDescriptor = createDomainDescriptor("domains/include-test-dependencies", true);
 
     assertThat(domainDescriptor.getClassLoaderConfiguration().isIncludeTestDependencies(), is(true));
@@ -207,7 +207,7 @@ public class DomainDescriptorFactoryTestCase extends AbstractDeployableArtifactD
   }
 
   @Test
-  public void applicationDescriptorWithoutIncludeTestDependencies() throws Exception {
+  public void domainDescriptorWithoutIncludeTestDependencies() throws Exception {
     DomainDescriptor domainDescriptor = createDomainDescriptor("domains/do-not-include-test-dependencies");
 
     assertThat(domainDescriptor.getClassLoaderConfiguration().isIncludeTestDependencies(), is(false));
