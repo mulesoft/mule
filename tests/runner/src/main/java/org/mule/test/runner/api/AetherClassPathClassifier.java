@@ -122,7 +122,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
   private static final String TESTS_JAR = "-tests.jar";
   private static final String MULE_SERVICE_CLASSIFIER = "mule-service";
 
-  private static final String RUNTIME_GROUP_ID = "org.mule.runtime";
+  private static final String RUNTIME_BOOT_GROUP_ID = "org.mule.runtime.boot";
   private static final String LOGGING_ARTIFACT_ID = "mule-module-logging";
 
   private static final String MULE_ARTIFACT_JSON_PATH = "META-INF/mule-artifact/mule-artifact.json";
@@ -433,7 +433,8 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
     // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
     directDependencies
-        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
+        .add(new Dependency(new DefaultArtifact(RUNTIME_BOOT_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion),
+                            COMPILE));
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
     directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
