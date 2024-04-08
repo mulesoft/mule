@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.tracing.level.impl.config;
 
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_EXPORTER_ENABLED;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
@@ -44,7 +45,6 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   private static final Logger LOGGER = getLogger(AutoConfigurableTracingLevelConfiguration.class);
 
-  @Inject
   private MuleContext muleContext;
   private SpanExporterConfiguration spanExporterConfiguration;
   private TracingLevelConfiguration delegate;
@@ -63,6 +63,11 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
   }
 
   @Inject
+  void setMuleContext(MuleContext muleContext) {
+    this.muleContext = muleContext;
+  }
+
+  @Inject
   public void setSpanExporterConfiguration(SpanExporterConfiguration spanExporterConfiguration) {
     this.spanExporterConfiguration = spanExporterConfiguration;
   }
@@ -77,7 +82,7 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
     return getTracingLevelFromDelegate(() -> delegate.getTracingLevelOverride(location));
   }
 
-  public TracingLevel getTracingLevelFromDelegate(Supplier<TracingLevel> tracingLevelSupplier) {
+  private TracingLevel getTracingLevelFromDelegate(Supplier<TracingLevel> tracingLevelSupplier) {
     try {
       if (delegate == null) {
         this.delegate = new FileTracingLevelConfiguration(muleContext);
@@ -109,8 +114,8 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   @Override
   public void dispose() {
-    if (delegate instanceof Disposable) {
-      ((Disposable) delegate).dispose();
+    if (delegate != null) {
+      disposeIfNeeded(delegate, LOGGER);;
     }
   }
 }
