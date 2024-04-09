@@ -1,0 +1,22 @@
+{
+  "name": "basic-with-supported-java-versions",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "app.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "supportedJavaVersions": [
+    "1.8",
+    "11",
+    "17"
+  ]
+}

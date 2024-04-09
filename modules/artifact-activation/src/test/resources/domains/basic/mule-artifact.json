@@ -3,7 +3,13 @@
   "minMuleVersion": "4.4.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
-    "id": "mule"
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "app.xml",
+        "test-script.dwl"
+      ]
+    }
   },
   "bundleDescriptorLoader": {
     "id": "mule",
