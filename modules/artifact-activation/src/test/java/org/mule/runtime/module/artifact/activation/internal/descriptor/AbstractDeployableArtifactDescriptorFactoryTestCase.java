@@ -30,7 +30,12 @@ public class AbstractDeployableArtifactDescriptorFactoryTestCase extends Abstrac
       new DefaultDeployableArtifactDescriptorFactory();
 
   protected DomainDescriptor createDomainDescriptor(String domainPath) throws URISyntaxException {
-    DeployableProjectModel model = getDeployableProjectModel(domainPath);
+    return createDomainDescriptor(domainPath, false);
+  }
+
+  protected DomainDescriptor createDomainDescriptor(String domainPath, boolean includeTestDependencies)
+      throws URISyntaxException {
+    DeployableProjectModel model = getDeployableProjectModel(domainPath, includeTestDependencies);
 
     return deployableArtifactDescriptorFactory.createDomainDescriptor(model, emptyMap());
   }

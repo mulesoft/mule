@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.toSet;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static com.vdurmont.semver4j.Semver.SemverType.LOOSE;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -60,9 +60,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.vdurmont.semver4j.Semver;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link DeployableProjectModelBuilder} that builds a model based on the files provided within a packaged Mule
@@ -72,10 +72,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MuleDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MuleDeployableProjectModelBuilder.class);
-
-  private static final String GROUP_ID = "groupId";
-  private static final String ARTIFACT_ID = "artifactId";
+  private static final Logger LOGGER = getLogger(MuleDeployableProjectModelBuilder.class);
 
   private final File projectFolder;
   private final Optional<MuleDeployableModel> model;
@@ -85,6 +82,10 @@ public class MuleDeployableProjectModelBuilder extends AbstractDeployableProject
   }
 
   public MuleDeployableProjectModelBuilder(File projectFolder, Optional<MuleDeployableModel> model) {
+    if (!projectFolder.isDirectory()) {
+      throw new IllegalArgumentException(format("projectFolder '%s' is not a folder", projectFolder.getAbsolutePath()));
+    }
+
     this.projectFolder = projectFolder;
     this.model = model;
   }
