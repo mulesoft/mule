@@ -16,6 +16,7 @@ import static org.mule.runtime.core.api.config.MuleProperties.COMPATIBILITY_PLUG
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
@@ -83,6 +84,15 @@ public class InvokerMessageProcessorTestCase extends AbstractMuleContextTestCase
     invoker.initialise();
     assertEquals("1-2-3 echo",
                  ((PrivilegedEvent) invoker.process(testEvent())).getMessageAsString(muleContext));
+  }
+
+  @Test
+  public void testMethodFoundNestedExpressionEvaluatingToExpression() throws MuleException, Exception {
+    CoreEvent event = getEventBuilder().message(Message.of("#[1 + 1]")).build();
+    invoker.setMethodName("testMethod3");
+    invoker.setArgumentExpressionsString("#[mel:#[mel:payload]]");
+    invoker.initialise();
+    assertEquals("#[1 + 1] echo", ((PrivilegedEvent) invoker.process(event)).getMessageAsString(muleContext));
   }
 
   @Test
