@@ -414,7 +414,6 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
         .filter(getContainerDirectDependenciesFilter(rootArtifactType))
         .filter(dependency -> {
           Artifact artifact = dependency.getArtifact();
-          String artifactId = toId(artifact);
           return (!serviceUrlClassifications.stream()
               // Services may have ended up with a highest version due to transitive dependencies... therefore comparing without
               // version
@@ -432,8 +431,10 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
     // Add logging dependencies to avoid every module from having to declare this dependency.
     // This brings the slf4j bridges required by transitive dependencies of the container to its classpath
     // TODO MULE-10837 Externalize this dependency along with the other commonly used container dependencies.
+    // TODO W-15453073 make this work with the same version as the runner, with `org.mule.runtime.boot` groupId.
     directDependencies
-        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, muleVersion), COMPILE));
+        .add(new Dependency(new DefaultArtifact(RUNTIME_GROUP_ID, LOGGING_ARTIFACT_ID, JAR_EXTENSION, "4.6.0"),
+                            COMPILE));
 
     // TODO: MULE-19762 remove once forward compatiblity is finished
     directDependencies.add(new Dependency(getDefaultSdkApiArtifact(), COMPILE));
@@ -1239,7 +1240,7 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
     logger.debug("Checking if resolved SNAPSHOT URLs had a timestamped version already included in class path URLs");
     Map<File, List<URL>> classpathFolders = groupArtifactUrlsByFolder(classpathURLs);
 
-    FileFilter snapshotFileFilter = new WildcardFileFilter(SNAPSHOT_WILCARD_FILE_FILTER);
+    FileFilter snapshotFileFilter = WildcardFileFilter.builder().setWildcards(SNAPSHOT_WILCARD_FILE_FILTER).get();
     ListIterator<URL> listIterator = resolvedURLs.listIterator();
     while (listIterator.hasNext()) {
       final URL urlResolved = listIterator.next();
