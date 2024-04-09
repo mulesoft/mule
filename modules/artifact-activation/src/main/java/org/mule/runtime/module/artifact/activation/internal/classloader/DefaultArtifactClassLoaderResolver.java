@@ -16,7 +16,6 @@ import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.M
 import static org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor.DEFAULT_DOMAIN_NAME;
 
 import static java.lang.String.format;
-import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -97,6 +96,13 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   @Override
   public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
                                                                    PluginClassLoaderResolver pluginClassLoaderResolver) {
+    return createDomainClassLoader(descriptor, pluginClassLoaderResolver, emptyList());
+  }
+
+  @Override
+  public MuleDeployableArtifactClassLoader createDomainClassLoader(DomainDescriptor descriptor,
+                                                                   PluginClassLoaderResolver pluginClassLoaderResolver,
+                                                                   List<URL> additionalClassloaderUrls) {
     String artifactId = getDomainId(descriptor.getName());
 
     ClassLoaderLookupPolicy parentLookupPolicy = getDomainParentLookupPolicy(containerClassLoader);
@@ -114,7 +120,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     } else {
       NativeLibraryFinder nativeLibraryFinder =
           nativeLibraryFinderFactory.create(descriptor.getDataFolderName(), descriptor.getClassLoaderConfiguration().getUrls());
-      domainClassLoader = getCustomDomainClassLoader(regionClassLoader, descriptor, nativeLibraryFinder);
+      domainClassLoader =
+          getCustomDomainClassLoader(regionClassLoader, descriptor, nativeLibraryFinder, additionalClassloaderUrls);
     }
 
     regionClassLoader.addClassLoader(domainClassLoader, artifactClassLoaderFilter);
@@ -143,12 +150,17 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   }
 
   private MuleSharedDomainClassLoader getCustomDomainClassLoader(ArtifactClassLoader parent, DomainDescriptor domain,
-                                                                 NativeLibraryFinder nativeLibraryFinder) {
+                                                                 NativeLibraryFinder nativeLibraryFinder,
+                                                                 List<URL> additionalClassloaderUrls) {
     validateDomain(domain);
+
+    List<URL> resourcesPath =
+        concat(additionalClassloaderUrls.stream(), stream(domain.getClassLoaderConfiguration().getUrls())).collect(toList());
 
     return new MuleSharedDomainClassLoader(domain, parent.getClassLoader(),
                                            getArtifactClassLoaderLookupPolicy(parent, domain),
-                                           asList(domain.getClassLoaderConfiguration().getUrls()), nativeLibraryFinder);
+                                           resourcesPath,
+                                           nativeLibraryFinder);
   }
 
   private void validateDomain(DomainDescriptor domainDescriptor) {

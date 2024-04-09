@@ -37,6 +37,7 @@ import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.runtime.api.deployment.meta.MuleApplicationModel;
 import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptor;
 import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.api.deployment.meta.MuleDomainModel;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.ArtifactActivationException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
@@ -154,23 +155,28 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     if (deployableArtifactCoordinates.getClassifier().equals(MULE_APPLICATION_CLASSIFIER)) {
       return () -> {
         MuleApplicationModel applicationModel = applicationModelResolver().resolve(projectFolder);
-        if (shouldEditApplicationModel(applicationModel)) {
+        if (shouldEditDeployableModel(applicationModel)) {
           applicationModel = buildApplicationModel(applicationModel, allResources, muleConfigs, packages);
         }
         return applicationModel;
       };
     } else if (deployableArtifactCoordinates.getClassifier().equals(MULE_DOMAIN_CLASSIFIER)) {
-      // TODO W-12428790 - the domain model creation must take into account the same concerns as the application model does
-      return () -> domainModelResolver().resolve(projectFolder);
+      return () -> {
+        MuleDomainModel domainModel = domainModelResolver().resolve(projectFolder);
+        if (shouldEditDeployableModel(domainModel)) {
+          domainModel = buildDomainModel(domainModel, allResources, muleConfigs, packages);
+        }
+        return domainModel;
+      };
     } else {
       throw new IllegalStateException("project is not a " + MULE_APPLICATION_CLASSIFIER + " or " + MULE_DOMAIN_CLASSIFIER);
     }
   }
 
-  private boolean shouldEditApplicationModel(MuleApplicationModel applicationModel) {
+  private boolean shouldEditDeployableModel(MuleDeployableModel deployableModel) {
     return (exportAllResourcesAndPackagesIfEmptyLoaderDescriptor
-        && applicationModel.getClassLoaderModelLoaderDescriptor() == null) || includeTestDependencies
-        || applicationModel.getConfigs() == null;
+        && deployableModel.getClassLoaderModelLoaderDescriptor() == null) || includeTestDependencies
+        || deployableModel.getConfigs() == null;
   }
 
   @Override
@@ -196,6 +202,26 @@ public class MavenDeployableProjectModelBuilder extends AbstractMavenDeployableP
     builder.setSecureProperties(applicationModel.getSecureProperties());
     builder.setSupportedJavaVersions(applicationModel.getSupportedJavaVersions());
     builder.setLogConfigFile(applicationModel.getLogConfigFile());
+    return builder.build();
+  }
+
+  private MuleDomainModel buildDomainModel(MuleDomainModel domainModel, List<String> allResources,
+                                           Set<String> muleConfigs, List<String> packages) {
+    MuleDomainModel.MuleDomainModelBuilder builder = new MuleDomainModel.MuleDomainModelBuilder()
+        .setName(domainModel.getName() != null ? domainModel.getName() : "mule")
+        .setMinMuleVersion(domainModel.getMinMuleVersion())
+        .setRequiredProduct(domainModel.getRequiredProduct())
+        .withClassLoaderModelDescriptorLoader(createClassLoaderModelDescriptorLoader(domainModel
+            .getClassLoaderModelLoaderDescriptor(), allResources, packages))
+        .withBundleDescriptorLoader(domainModel.getBundleDescriptorLoader() != null
+            ? domainModel.getBundleDescriptorLoader()
+            : new MuleArtifactLoaderDescriptor("mule", emptyMap()));
+
+    builder.setConfigs(domainModel.getConfigs() != null ? domainModel.getConfigs() : muleConfigs);
+    builder.setRedeploymentEnabled(domainModel.isRedeploymentEnabled());
+    builder.setSecureProperties(domainModel.getSecureProperties());
+    builder.setSupportedJavaVersions(domainModel.getSupportedJavaVersions());
+    builder.setLogConfigFile(domainModel.getLogConfigFile());
     return builder.build();
   }
 

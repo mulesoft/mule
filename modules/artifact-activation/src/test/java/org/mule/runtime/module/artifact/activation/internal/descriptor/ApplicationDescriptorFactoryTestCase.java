@@ -35,13 +35,14 @@ import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.junit.Test;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.junit.Test;
 
 @Story(ARTIFACT_DESCRIPTORS)
-public class DefaultDeployableArtifactDescriptorFactoryTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
+public class ApplicationDescriptorFactoryTestCase extends AbstractDeployableArtifactDescriptorFactoryTestCase {
 
   private static final ArtifactClassLoaderResolver artifactClassLoaderResolver =
       ArtifactClassLoaderResolver.defaultClassLoaderResolver();
@@ -184,7 +185,7 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
   @Description("Tests whenever a domain has a dependency that is also present in an application either as a dependency " +
       "or a transitive dependency, the application class loader can be correctly created.")
   public void applicationDescriptorWithDomainProvidingAPluginAllowsClassLoadersCreation() throws Exception {
-    DomainDescriptor domainDescriptor = createDomainDescriptor("domains/basic");
+    DomainDescriptor domainDescriptor = createDomainDescriptor("domains/basic-sockets");
 
     assertThat(domainDescriptor.getClassLoaderConfiguration().getDependencies(), hasSize(1));
     assertThat(domainDescriptor.getPlugins(), contains(hasProperty("name", equalTo("Sockets"))));
@@ -229,24 +230,6 @@ public class DefaultDeployableArtifactDescriptorFactoryTestCase extends Abstract
     final MuleDeployableArtifactClassLoader applicationClassLoader =
         artifactClassLoaderResolver.createApplicationClassLoader(applicationDescriptor);
     final RegionClassLoader regionClassLoader = (RegionClassLoader) applicationClassLoader.getParent();
-
-    assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
-        .collect(toList()), hasItems(hasProperty("name", equalTo("HTTP")), hasProperty("name", equalTo("Sockets"))));
-  }
-
-  @Test
-  @Issue("W-11261035")
-  public void domainDescriptorWithDependenciesSharingExportedPackagesAllowsClassLoaderCreation() throws Exception {
-    DomainDescriptor domainDescriptor = createDomainDescriptor("domains/with-http-dependency");
-
-    assertThat(domainDescriptor.getPlugins(),
-               hasItems(hasProperty("name", equalTo("HTTP")), hasProperty("name", equalTo("Sockets"))));
-
-    // For the class loader creation to be successful, the exported packages from HTTP must not contain the ones from its
-    // transitive dependency, Sockets
-    final MuleDeployableArtifactClassLoader domainClassLoader =
-        artifactClassLoaderResolver.createDomainClassLoader(domainDescriptor);
-    final RegionClassLoader regionClassLoader = (RegionClassLoader) domainClassLoader.getParent();
 
     assertThat(regionClassLoader.getArtifactPluginClassLoaders().stream().map(ArtifactClassLoader::getArtifactDescriptor)
         .collect(toList()), hasItems(hasProperty("name", equalTo("HTTP")), hasProperty("name", equalTo("Sockets"))));
