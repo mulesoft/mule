@@ -4,11 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal;
+package org.mule.runtime.module.boot.commons.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.DEPLOYMENT_APPLICATION_PROPERTY;
-import static org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory.APP_COMMAND_LINE_OPTION;
-import static org.mule.runtime.module.boot.internal.AbstractMuleContainerFactory.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
+import static org.mule.runtime.module.boot.commons.internal.AbstractMuleContainerFactory.APP_COMMAND_LINE_OPTION;
+import static org.mule.runtime.module.boot.commons.internal.AbstractMuleContainerFactory.INVALID_DEPLOY_APP_CONFIGURATION_ERROR;
 
 import static java.lang.System.clearProperty;
 import static java.lang.System.getProperty;
@@ -19,6 +19,8 @@ import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.module.boot.api.MuleContainer;
+import org.mule.runtime.module.boot.commons.internal.AbstractMuleContainerFactory;
+import org.mule.runtime.module.boot.commons.internal.DefaultMuleClassPathConfig;
 import org.mule.tck.MuleTestUtils.TestCallback;
 import org.mule.tck.size.SmallTest;
 

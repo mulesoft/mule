@@ -4,10 +4,11 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal;
+package org.mule.runtime.module.boot.commons.internal;
 
 import static org.junit.rules.ExpectedException.none;
 
+import org.mule.runtime.module.boot.commons.internal.MuleContainerBasicWrapper;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Rule;

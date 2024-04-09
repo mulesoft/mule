@@ -4,11 +4,10 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.boot.internal;
+package org.mule.runtime.module.boot.commons.internal;
 
 import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.jpms.api.MultiLevelClassLoaderFactory.MULTI_LEVEL_URL_CLASSLOADER_FACTORY;
-import static org.mule.runtime.module.boot.internal.util.SystemUtils.getCommandLineOptions;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.String.format;
@@ -19,6 +18,7 @@ import static java.util.ServiceLoader.load;
 
 import org.mule.runtime.module.boot.api.MuleContainer;
 import org.mule.runtime.module.boot.api.MuleContainerProvider;
+import org.mule.runtime.module.boot.commons.internal.util.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public abstract class AbstractMuleContainerFactory implements MuleContainerFacto
   }
 
   private void validateCommnadLineOptions(String[] args) {
-    Map<String, Object> commandlineOptions = getCommandLineOptions(args, CLI_OPTIONS);
+    Map<String, Object> commandlineOptions = SystemUtils.getCommandLineOptions(args, CLI_OPTIONS);
     String appOption = (String) commandlineOptions.get(APP_COMMAND_LINE_OPTION);
     if (appOption != null) {
       if (getProperty(DEPLOYMENT_APPLICATION_PROPERTY) != null) {

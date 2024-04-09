@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.boot.api;
 
-import org.mule.runtime.module.boot.internal.MuleContainerWrapperProvider;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerWrapperProvider;
 
 /**
  * Manages the lifecycle of the {@link MuleContainer}.

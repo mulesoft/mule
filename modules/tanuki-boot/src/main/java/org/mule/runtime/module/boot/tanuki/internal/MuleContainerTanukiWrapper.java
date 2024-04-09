@@ -8,9 +8,9 @@ package org.mule.runtime.module.boot.tanuki.internal;
 
 import static org.tanukisoftware.wrapper.WrapperManager.addWrapperEventListener;
 
-import org.mule.runtime.module.boot.internal.AbstractMuleContainerWrapper;
-import org.mule.runtime.module.boot.internal.MuleContainerFactory;
-import org.mule.runtime.module.boot.internal.MuleContainerWrapper;
+import org.mule.runtime.module.boot.commons.internal.AbstractMuleContainerWrapper;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerFactory;
+import org.mule.runtime.module.boot.commons.internal.MuleContainerWrapper;
 
 import java.text.NumberFormat;
 import java.util.Locale;

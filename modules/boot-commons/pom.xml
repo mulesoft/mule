@@ -10,12 +10,12 @@
     </parent>
 
     <groupId>org.mule.runtime.boot</groupId>
-    <artifactId>mule-module-boot-api</artifactId>
-    <name>Mule Boot API</name>
+    <artifactId>mule-module-boot-commons</artifactId>
+    <name>Mule Boot Commons</name>
     <packaging>jar</packaging>
 
     <properties>
-        <javaModuleName>org.mule.boot.api</javaModuleName>
+        <javaModuleName>org.mule.boot.commons</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
@@ -55,9 +55,10 @@
         </dependency>
         <dependency>
             <groupId>org.mule.runtime.boot</groupId>
-            <artifactId>mule-module-boot-commons</artifactId>
+            <artifactId>mule-module-boot-api</artifactId>
             <version>4.8.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
 
 </project>
