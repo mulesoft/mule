@@ -109,7 +109,11 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   @Override
   public void onConfigurationChange(Consumer<TracingLevelConfiguration> onConfigurationChangeConsumer) {
-    consumersOnChange.add(onConfigurationChangeConsumer);
+    if (delegate != null) {
+      delegate.onConfigurationChange(onConfigurationChangeConsumer);
+    } else {
+      consumersOnChange.add(onConfigurationChangeConsumer);
+    }
   }
 
   @Override
