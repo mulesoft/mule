@@ -4,6 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
 /**
  * A Mule module for connectivity using TLS/SSL authentication.
  *
@@ -17,6 +18,7 @@ module org.mule.runtime.tls {
   requires org.mule.runtime.core;
   requires org.mule.runtime.dsl.api;
   requires org.mule.runtime.extension.model;
+  requires org.mule.runtime.extensions.api;
   requires org.mule.runtime.spring.config;
 
   // QName
@@ -39,7 +41,7 @@ module org.mule.runtime.tls {
   provides org.mule.runtime.api.tls.AbstractTlsContextFactoryBuilderFactory with
       org.mule.runtime.module.tls.api.DefaultTlsContextFactoryBuilderFactory;
 
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+  provides org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider with
       org.mule.runtime.module.tls.api.extension.TlsRuntimeExtensionModelProvider;
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with

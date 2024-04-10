@@ -10,7 +10,7 @@ import static java.util.Collections.unmodifiableSet;
 
 import org.mule.api.annotation.NoImplement;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProviderLoaderUtils;
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderSupplier;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.DefaultExtensionModelDiscoverer;
 import org.mule.runtime.module.artifact.activation.internal.extension.discovery.RepositoryLookupExtensionModelGenerator;
@@ -66,11 +66,11 @@ public interface ExtensionModelDiscoverer {
    *
    * @return {@link Set} of the runtime provided {@link ExtensionModel}s.
    * 
-   * @deprecated since 4.5 use {@link RuntimeExtensionModelProvider#discoverRuntimeExtensionModels()} instead.
+   * @deprecated since 4.5 use {@link RuntimeExtensionModelProviderLoaderUtils#discoverRuntimeExtensionModels()} instead.
    */
   @Deprecated
   static Set<ExtensionModel> discoverRuntimeExtensionModels() {
-    return unmodifiableSet(RuntimeExtensionModelProvider.discoverRuntimeExtensionModels());
+    return unmodifiableSet(RuntimeExtensionModelProviderLoaderUtils.discoverRuntimeExtensionModels());
   }
 
   /**
