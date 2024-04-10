@@ -53,18 +53,12 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   private final List<Consumer<TracingLevelConfiguration>> consumersOnChange = synchronizedList(new ArrayList<>());
 
-  /**
-   * This constructor is needed for injection in the registry.
-   */
-  public AutoConfigurableTracingLevelConfiguration() {}
-
-  public AutoConfigurableTracingLevelConfiguration(TracingLevelConfiguration delegate) {
-    this.delegate = delegate;
+  public AutoConfigurableTracingLevelConfiguration(MuleContext muleContext) {
+    this.muleContext = muleContext;
   }
 
-  @Inject
-  void setMuleContext(MuleContext muleContext) {
-    this.muleContext = muleContext;
+  void setDelegate(TracingLevelConfiguration delegate) {
+    this.delegate = delegate;
   }
 
   @Inject

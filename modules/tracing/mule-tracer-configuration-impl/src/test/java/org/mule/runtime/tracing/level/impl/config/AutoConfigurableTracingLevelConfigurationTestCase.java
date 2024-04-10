@@ -38,10 +38,12 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
 
   @Test
   public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() {
+    MuleContext muleContext = mock(MuleContext.class);
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestEmptyFileTracingLevelConfiguration(mock(MuleContext.class));
+        new TestEmptyFileTracingLevelConfiguration(muleContext);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext);
+    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
     tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
@@ -50,20 +52,24 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
   public void whenNoFileExistsDefaultLevelIsReturned() {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
+    MuleContext muleContext = mock(MuleContext.class);
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestNoFileTracingLevelConfiguration(mock(MuleContext.class));
+        new TestNoFileTracingLevelConfiguration(muleContext);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext);
+    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
     tracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
   @Test
   public void whenLevelIsWrongInFileDefaultLevelIsReturned() {
+    MuleContext muleContext = mock(MuleContext.class);
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestWrongLevelTracingLevelConfiguration(mock(MuleContext.class));
+        new TestWrongLevelTracingLevelConfiguration(muleContext);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext);
+    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
     tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
