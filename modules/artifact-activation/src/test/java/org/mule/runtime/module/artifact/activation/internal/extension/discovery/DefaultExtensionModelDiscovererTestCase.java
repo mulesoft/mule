@@ -7,7 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider.discoverRuntimeExtensionModels;
+import static org.mule.runtime.extension.api.provider.RuntimeExtensionModelProviderLoaderUtils.discoverRuntimeExtensionModels;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
 
@@ -67,7 +67,6 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
       protected void declareExtension(ExtensionLoadingContext context) {
         extensionDeclared.set(true);
         assertThat(context.getDslResolvingContext().getExtension("mule").isPresent(), is(true));
-        assertThat(context.getDslResolvingContext().getExtension("testRuntime").isPresent(), is(true));
 
         context.getExtensionDeclarer()
             .named("test")
