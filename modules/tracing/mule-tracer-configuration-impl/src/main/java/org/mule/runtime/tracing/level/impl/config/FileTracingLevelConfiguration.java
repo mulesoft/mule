@@ -11,15 +11,16 @@ import static org.mule.runtime.core.api.util.ClassUtils.getResourceOrFail;
 import static org.mule.runtime.tracer.exporter.config.api.OpenTelemetrySpanExporterConfigurationProperties.MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.util.Collections.synchronizedList;
 import static java.util.Optional.empty;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.config.api.properties.ConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
@@ -51,30 +52,44 @@ import org.slf4j.Logger;
  */
 public class FileTracingLevelConfiguration extends FileConfiguration implements TracingLevelConfiguration, Disposable {
 
+  private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
+  private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
+  private static final String OVERRIDES_PROPERTY_NAME = "mule.openTelemetry.tracer.levelOverrides";
+
+  private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
   private final String CONFIGURATION_FILE_PATH =
       getProperty(MULE_OPEN_TELEMETRY_TRACING_CONFIGURATION_FILE_PATH,
                   getConfFolder() + FileSystems.getDefault().getSeparator() + getPropertiesFileName());
 
-  private final MuleContext muleContext;
-
-  private static final String CONFIGURATION_FILE_NAME = "tracing-level.conf";
-  private static final String LEVEL_PROPERTY_NAME = "mule.openTelemetry.tracer.level";
-  private static final String OVERRIDES_PROPERTY_NAME = "mule.openTelemetry.tracer.levelOverrides";
-  private static final Logger LOGGER = getLogger(FileTracingLevelConfiguration.class);
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
-  private boolean tracingConfigurationFileWatcherInitialised;
+  private final List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
+  private LazyValue<TracingLevel> tracingLevelInitializer = new LazyValue<>(() -> {
+    initialise();
+    return null;
+  });
   private TracingLevel tracingLevel = null;
-  private JsonNode configuration;
 
-  private List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
+  private final MuleContext muleContext;
+  private JsonNode configuration;
   private URL configurationUrl;
-  private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private ConfigurationPropertiesResolver propertyResolver;
-  private boolean initialised;
+  private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
+  private boolean tracingConfigurationFileWatcherInitialised;
 
   public FileTracingLevelConfiguration(MuleContext muleContext) {
     super(muleContext);
     this.muleContext = muleContext;
+  }
+
+  private void initialise() {
+    setTracingLevels();
+    onConfigurationChangeRunnables.add(this::setTracingLevels);
+    if (configuration != null && !tracingConfigurationFileWatcherInitialised) {
+      tracingConfigurationFileWatcher =
+          new TracingConfigurationFileWatcher(configurationUrl.getFile(), getOnConfigurationChanged());
+      tracingConfigurationFileWatcher.start();
+      tracingConfigurationFileWatcherInitialised = true;
+    }
   }
 
   private Runnable getOnConfigurationChanged() {
@@ -83,9 +98,7 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
 
   private void setTracingLevels() {
     configuration = getTracingLevelConfiguration();
-    propertyResolver =
-        new DefaultConfigurationPropertiesResolver(empty(),
-                                                   new SystemPropertiesConfigurationProvider());
+    propertyResolver = new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
     setTracingLevel();
     setTracingLevelOverrides();
   }
@@ -96,8 +109,7 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
       try {
         tracingLevel = valueOf(configuredTracingLevel.toUpperCase(Locale.ROOT));
       } catch (IllegalArgumentException e) {
-        LOGGER.error(format("Wrong tracing level found in configuration file: %s.",
-                            configuredTracingLevel));
+        LOGGER.error(format("Wrong tracing level found in configuration file: %s.", configuredTracingLevel));
         throw new MuleRuntimeException(e);
       }
     }
@@ -122,36 +134,15 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
 
   @Override
   public TracingLevel getTracingLevel() {
-    // The levels are initialised here so that we can know if tracing is enabled and so that the logs are printed on the app's
-    // logs
-    if (tracingLevel == null) {
-      initialise();
-    }
+    tracingLevelInitializer.get();
     return tracingLevel;
-  }
-
-  private void initialise() {
-    setTracingLevels();
-    onConfigurationChangeRunnables.add(() -> setTracingLevels());
-    if (configuration != null && !tracingConfigurationFileWatcherInitialised) {
-      tracingConfigurationFileWatcher =
-          new TracingConfigurationFileWatcher(configurationUrl.getFile(), getOnConfigurationChanged());
-      tracingConfigurationFileWatcher.start();
-      tracingConfigurationFileWatcherInitialised = true;
-    }
-    initialised = true;
   }
 
   @Override
   public TracingLevel getTracingLevelOverride(String location) {
-    if (!initialised) {
-      initialise();
-    }
+    tracingLevelInitializer.get();
     TracingLevel tracingLevelOverride = getTracingLevelOverrideFrom(location);
-    if (tracingLevelOverride != null) {
-      return tracingLevelOverride;
-    }
-    return tracingLevel;
+    return tracingLevelOverride != null ? tracingLevelOverride : tracingLevel;
   }
 
   @Override
@@ -173,10 +164,8 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
   private JsonNode getTracingLevelConfiguration() {
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(getExecutionClassLoader(muleContext));
     try {
-      InputStream is = resourceProvider
-          .getResourceAsStream(CONFIGURATION_FILE_PATH);
-      configurationUrl =
-          getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
+      InputStream is = resourceProvider.getResourceAsStream(CONFIGURATION_FILE_PATH);
+      configurationUrl = getResourceOrFail(CONFIGURATION_FILE_PATH, getExecutionClassLoader(muleContext), true);
       return loadConfiguration(is);
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
