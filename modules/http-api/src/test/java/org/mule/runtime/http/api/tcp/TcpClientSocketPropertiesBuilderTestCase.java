@@ -6,8 +6,8 @@
  */
 package org.mule.runtime.http.api.tcp;
 
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.TCP_BUILDER;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HttpStory.TCP_BUILDER;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;

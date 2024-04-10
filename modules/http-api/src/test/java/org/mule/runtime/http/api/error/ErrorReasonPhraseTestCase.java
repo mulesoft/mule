@@ -7,8 +7,8 @@
 package org.mule.runtime.http.api.error;
 
 import static org.mule.runtime.http.api.HttpConstants.HttpStatus.getReasonPhraseForStatusCode;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HTTP_SERVICE;
-import static org.mule.test.allure.AllureConstants.HttpFeature.HttpStory.ERRORS;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HTTP_SERVICE;
+import static org.mule.runtime.http.api.AllureConstants.HttpFeature.HttpStory.ERRORS;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
