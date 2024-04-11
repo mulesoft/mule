@@ -21,8 +21,10 @@ import org.mule.runtime.module.deployment.internal.singleapp.SingleAppApplicatio
 import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentFileResolver;
 import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentService;
 import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDomainDeployerBuilder;
+import org.mule.runtime.module.deployment.internal.singleapp.WriteToRouteTerminationHandler;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -38,6 +40,8 @@ public class DeploymentServiceBuilder {
   private DefaultDomainFactory domainFactory;
   private DefaultApplicationFactory applicationFactory;
   private Supplier<SchedulerService> artifactStartExecutorSupplier;
+  private Consumer<Throwable> deploymentFailureThrowableConsumer = t -> {
+  };
 
   private DeploymentServiceBuilder() {}
 
@@ -72,6 +76,16 @@ public class DeploymentServiceBuilder {
     return this;
   }
 
+  /**
+   * @param deploymentFailureThrowableConsumer the {@link Consumer<Throwable>} a consumer for the throwable in case of a
+   *                                           deployment failure .
+   * @return the builder.
+   */
+  public DeploymentServiceBuilder withDeploymentFailureThrowableConsumer(Consumer<Throwable> deploymentFailureThrowableConsumer) {
+    this.deploymentFailureThrowableConsumer = deploymentFailureThrowableConsumer;
+    return this;
+  }
+
   public DeploymentService build() {
     requireNonNull(domainFactory, DOMAIN_FACTORY_IS_NULL_ERROR_MESSAGE);
     requireNonNull(applicationFactory, APPLICATION_FACTORY_IS_NULL_ERROR_MESSAGE);
@@ -86,12 +100,17 @@ public class DeploymentServiceBuilder {
       SingleAppApplicationDeployerBuilder singleAppApplicationDeployerBuilder = getSingleAppApplicationDeployerBuilder();
       singleAppApplicationDeployerBuilder.withApplicationFactory(applicationFactory);
 
-      return new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
-                                            singleAppApplicationDeployerBuilder,
-                                            new SingleAppDeploymentFileResolver(),
-                                            new ArrayList<>(),
-                                            new ArrayList<>(),
-                                            artifactStartExecutorSupplier);
+
+      DeploymentService deploymentService = new SingleAppDeploymentService(singleAppDomainDeployerBuilder,
+                                                                           singleAppApplicationDeployerBuilder,
+                                                                           new SingleAppDeploymentFileResolver(),
+                                                                           new ArrayList<>(),
+                                                                           new ArrayList<>(),
+                                                                           artifactStartExecutorSupplier);
+
+      deploymentService.onDeploymentError(new WriteToRouteTerminationHandler(deploymentFailureThrowableConsumer));
+
+      return deploymentService;
     }
 
     return new MuleDeploymentService(domainFactory,

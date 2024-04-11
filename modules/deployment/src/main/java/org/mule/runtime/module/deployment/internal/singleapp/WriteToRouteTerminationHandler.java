@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.launcher;
+package org.mule.runtime.module.deployment.internal.singleapp;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_TERMINATION_LOG_PATH_PROPERTY;
 
@@ -25,9 +25,9 @@ import org.slf4j.Logger;
  *
  * @since 4.7.0
  */
-class WriteToRouteTerminationHandler implements Consumer<Throwable> {
+public class WriteToRouteTerminationHandler implements Consumer<Throwable> {
 
-  private static final Logger LOGGER = getLogger(DefaultMuleContainer.class);
+  private static final Logger LOGGER = getLogger(WriteToRouteTerminationHandler.class);
   public static final String MULE_TERMINATION_LOG_PATH_ENV_VARIABLE = "MULE_TERMINATION_LOG_PATH";
 
   private final Consumer<Throwable> shutdownConsumer;
