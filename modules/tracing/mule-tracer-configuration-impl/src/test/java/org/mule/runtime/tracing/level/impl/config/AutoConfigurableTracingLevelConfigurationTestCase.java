@@ -23,6 +23,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
+import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -37,11 +38,11 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
   @Test
   public void returnValueFromDelegate() {
     MuleContext muleContext = mock(MuleContext.class);
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
+    TracingLevelConfiguration delegate =
         mock(FileTracingLevelConfiguration.class);
-    when(fileTracingLevelConfiguration.getTracingLevel()).thenReturn(OVERVIEW);
+    when(delegate.getTracingLevel()).thenReturn(OVERVIEW);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext, delegate);
     tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(OVERVIEW));
   }
@@ -49,11 +50,11 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
   @Test
   public void whenDelegateReturnsNullDefaultLevelIsReturned() {
     MuleContext muleContext = mock(MuleContext.class);
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        mock(FileTracingLevelConfiguration.class);
-    when(fileTracingLevelConfiguration.getTracingLevel()).thenReturn(null);
+    TracingLevelConfiguration delegate =
+        mock(TracingLevelConfiguration.class);
+    when(delegate.getTracingLevel()).thenReturn(null);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext, delegate);
     tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
@@ -63,11 +64,11 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     MuleContext muleContext = mock(MuleContext.class);
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        mock(FileTracingLevelConfiguration.class);
-    when(fileTracingLevelConfiguration.getTracingLevel()).thenThrow(new MuleRuntimeException(new IllegalArgumentException()));
+    TracingLevelConfiguration delegate =
+        mock(TracingLevelConfiguration.class);
+    when(delegate.getTracingLevel()).thenThrow(new MuleRuntimeException(new IllegalArgumentException()));
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext, delegate);
     tracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }

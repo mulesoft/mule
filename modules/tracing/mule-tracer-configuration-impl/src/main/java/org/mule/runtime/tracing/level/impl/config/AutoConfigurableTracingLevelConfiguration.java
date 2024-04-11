@@ -15,7 +15,7 @@ import static org.mule.runtime.tracing.level.api.config.TracingLevel.valueOf;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static java.util.Collections.synchronizedList;
+import static java.util.Objects.requireNonNull;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -27,8 +27,6 @@ import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
 import org.mule.runtime.tracing.level.api.config.TracingLevelConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -51,14 +49,14 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
   private TracingLevel defaultLevel =
       valueOf(getProperty(MULE_OPEN_TELEMETRY_EXPORTER_DEFAULT_TRACING_LEVEL, MONITORING.toString()).toUpperCase());
 
-  private final List<Consumer<TracingLevelConfiguration>> consumersOnChange = synchronizedList(new ArrayList<>());
-
   @Inject
   public AutoConfigurableTracingLevelConfiguration(MuleContext muleContext) {
     this(muleContext, new FileTracingLevelConfiguration(muleContext));
   }
 
   protected AutoConfigurableTracingLevelConfiguration(MuleContext muleContext, TracingLevelConfiguration delegate) {
+    requireNonNull(delegate, "delegate cannot be null");
+
     this.muleContext = muleContext;
     this.delegate = delegate;
   }
@@ -101,17 +99,11 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   @Override
   public void onConfigurationChange(Consumer<TracingLevelConfiguration> onConfigurationChangeConsumer) {
-    if (delegate != null) {
-      delegate.onConfigurationChange(onConfigurationChangeConsumer);
-    } else {
-      consumersOnChange.add(onConfigurationChangeConsumer);
-    }
+    delegate.onConfigurationChange(onConfigurationChangeConsumer);
   }
 
   @Override
   public void dispose() {
-    if (delegate != null) {
-      disposeIfNeeded(delegate, LOGGER);;
-    }
+    disposeIfNeeded(delegate, LOGGER);
   }
 }
