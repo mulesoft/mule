@@ -53,11 +53,13 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   private final List<Consumer<TracingLevelConfiguration>> consumersOnChange = synchronizedList(new ArrayList<>());
 
+  @Inject
   public AutoConfigurableTracingLevelConfiguration(MuleContext muleContext) {
-    this.muleContext = muleContext;
+    this(muleContext, new FileTracingLevelConfiguration(muleContext));
   }
 
-  void setDelegate(TracingLevelConfiguration delegate) {
+  protected AutoConfigurableTracingLevelConfiguration(MuleContext muleContext, TracingLevelConfiguration delegate) {
+    this.muleContext = muleContext;
     this.delegate = delegate;
   }
 
@@ -78,10 +80,6 @@ public class AutoConfigurableTracingLevelConfiguration implements TracingLevelCo
 
   private TracingLevel getTracingLevelFromDelegate(Supplier<TracingLevel> tracingLevelSupplier) {
     try {
-      if (delegate == null) {
-        this.delegate = new FileTracingLevelConfiguration(muleContext);
-        consumersOnChange.forEach(consumer -> this.delegate.onConfigurationChange(consumer));
-      }
       TracingLevel level = tracingLevelSupplier.get();
       return level != null ? level : defaultLevel;
     } catch (MuleRuntimeException e) {

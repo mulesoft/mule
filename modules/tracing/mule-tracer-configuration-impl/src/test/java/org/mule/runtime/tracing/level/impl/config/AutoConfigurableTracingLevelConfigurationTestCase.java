@@ -7,6 +7,7 @@
 package org.mule.runtime.tracing.level.impl.config;
 
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
+import static org.mule.runtime.tracing.level.api.config.TracingLevel.OVERVIEW;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
 import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceStory.TRACING_CONFIGURATION;
 
@@ -18,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
@@ -31,128 +33,43 @@ import org.junit.Test;
 public class AutoConfigurableTracingLevelConfigurationTestCase {
 
   private static final TracingLevel DEFAULT_LEVEL = MONITORING;
-  private static final String CONF_FOLDER = "conf";
-  private static final String TRACING_LEVEL_EMPTY_CONF = "tracing-level-empty.conf";
-  private static final String NON_EXISTENT_CONF = "non-existent.conf";
-  private static final String WRONG_LEVEL_CONF = "wrong-level.conf";
 
   @Test
-  public void whenNoPropertyIsInTheFileDefaultLevelIsReturned() {
+  public void returnValueFromDelegate() {
     MuleContext muleContext = mock(MuleContext.class);
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestEmptyFileTracingLevelConfiguration(muleContext);
+        mock(FileTracingLevelConfiguration.class);
+    when(fileTracingLevelConfiguration.getTracingLevel()).thenReturn(OVERVIEW);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext);
-    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
+    tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
+    assertThat(tracingLevelConfiguration.getTracingLevel(), is(OVERVIEW));
+  }
+
+  @Test
+  public void whenDelegateReturnsNullDefaultLevelIsReturned() {
+    MuleContext muleContext = mock(MuleContext.class);
+    FileTracingLevelConfiguration fileTracingLevelConfiguration =
+        mock(FileTracingLevelConfiguration.class);
+    when(fileTracingLevelConfiguration.getTracingLevel()).thenReturn(null);
+    AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
+        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
     tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
   }
 
   @Test
-  public void whenNoFileExistsDefaultLevelIsReturned() {
+  public void whenDelegateThrowsExceptionDefaultLevelIsReturned() {
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     MuleContext muleContext = mock(MuleContext.class);
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestNoFileTracingLevelConfiguration(muleContext);
+        mock(FileTracingLevelConfiguration.class);
+    when(fileTracingLevelConfiguration.getTracingLevel()).thenThrow(new MuleRuntimeException(new IllegalArgumentException()));
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext);
-    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
+        new AutoConfigurableTracingLevelConfiguration(muleContext, fileTracingLevelConfiguration);
     tracingLevelConfiguration.setSpanExporterConfiguration(spanExporterConfiguration);
     assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
-  }
-
-  @Test
-  public void whenLevelIsWrongInFileDefaultLevelIsReturned() {
-    MuleContext muleContext = mock(MuleContext.class);
-    FileTracingLevelConfiguration fileTracingLevelConfiguration =
-        new TestWrongLevelTracingLevelConfiguration(muleContext);
-    AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
-        new AutoConfigurableTracingLevelConfiguration(muleContext);
-    tracingLevelConfiguration.setDelegate(fileTracingLevelConfiguration);
-    tracingLevelConfiguration.setSpanExporterConfiguration(mock(SpanExporterConfiguration.class));
-    assertThat(tracingLevelConfiguration.getTracingLevel(), is(DEFAULT_LEVEL));
-  }
-
-  /**
-   * {@link FileTracingLevelConfiguration} used for testing the case when the written level does not exist
-   */
-  private static class TestWrongLevelTracingLevelConfiguration extends FileTracingLevelConfiguration {
-
-    public static final String TEST_CONF_FILE_NAME = WRONG_LEVEL_CONF;
-
-    public TestWrongLevelTracingLevelConfiguration(MuleContext muleContext) {
-      super(muleContext);
-    }
-
-    @Override
-    protected String getPropertiesFileName() {
-      return TEST_CONF_FILE_NAME;
-    }
-
-    @Override
-    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-      return Thread.currentThread().getContextClassLoader();
-    }
-
-    @Override
-    protected String getConfFolder() {
-      return CONF_FOLDER;
-    }
-  }
-
-  /**
-   * {@link FileTracingLevelConfiguration} used for testing an empty file.
-   */
-  private static class TestEmptyFileTracingLevelConfiguration extends FileTracingLevelConfiguration {
-
-    public static final String TEST_CONF_FILE_NAME = TRACING_LEVEL_EMPTY_CONF;
-
-    public TestEmptyFileTracingLevelConfiguration(MuleContext muleContext) {
-      super(muleContext);
-    }
-
-    @Override
-    protected String getPropertiesFileName() {
-      return TEST_CONF_FILE_NAME;
-    }
-
-    @Override
-    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-      return Thread.currentThread().getContextClassLoader();
-    }
-
-    @Override
-    protected String getConfFolder() {
-      return CONF_FOLDER;
-    }
-  }
-
-  /**
-   * {@link FileTracingLevelConfiguration} used for testing the case where the file does not exist
-   */
-  private static class TestNoFileTracingLevelConfiguration extends FileTracingLevelConfiguration {
-
-    public static final String TEST_CONF_FILE_NAME = NON_EXISTENT_CONF;
-
-    public TestNoFileTracingLevelConfiguration(MuleContext muleContext) {
-      super(muleContext);
-    }
-
-    @Override
-    protected String getPropertiesFileName() {
-      return TEST_CONF_FILE_NAME;
-    }
-
-    @Override
-    protected ClassLoader getExecutionClassLoader(MuleContext muleContext) {
-      return Thread.currentThread().getContextClassLoader();
-    }
-
-    @Override
-    protected String getConfFolder() {
-      return CONF_FOLDER;
-    }
   }
 
 }
