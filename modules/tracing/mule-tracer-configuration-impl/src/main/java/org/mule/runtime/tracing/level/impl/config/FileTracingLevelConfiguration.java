@@ -63,7 +63,7 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
 
   private final HashMap<String, TracingLevel> tracingLevelOverrides = new HashMap<>();
   private final List<Runnable> onConfigurationChangeRunnables = synchronizedList(new ArrayList<>());
-  private LazyValue<TracingLevel> tracingLevelInitializer = new LazyValue<>(() -> {
+  private final LazyValue<TracingLevel> tracingLevelInitializer = new LazyValue<>(() -> {
     initialise();
     return null;
   });

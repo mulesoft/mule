@@ -6,7 +6,6 @@
  */
 package org.mule.runtime.tracing.level.impl.config;
 
-import static org.junit.Assert.assertEquals;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.MONITORING;
 import static org.mule.runtime.tracing.level.api.config.TracingLevel.OVERVIEW;
 import static org.mule.test.allure.AllureConstants.Profiling.PROFILING;
