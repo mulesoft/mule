@@ -147,6 +147,7 @@ public class DefaultMuleContainer implements MuleContainer {
         .withArtifactStartExecutorSupplier(() -> findSchedulerService(serviceManager))
         .withApplicationFactory(artifactResourcesRegistry.getApplicationFactory())
         .withDomainFactory(artifactResourcesRegistry.getDomainFactory())
+        .withDeploymentFailureThrowableConsumer(this::attemptContainerShutdown)
         .build();
   }
 
@@ -236,7 +237,6 @@ public class DefaultMuleContainer implements MuleContainer {
 
       startIfNeeded(extensionModelLoaderRepository);
       deploymentService.start();
-      deploymentService.onDeploymentError(new WriteToRouteTerminationHandler(this::attemptContainerShutdown));
     } catch (MuleException e) {
       shutdown(e);
       throw e;

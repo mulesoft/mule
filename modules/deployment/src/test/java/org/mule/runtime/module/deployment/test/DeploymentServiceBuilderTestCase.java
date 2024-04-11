@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.deployment.test;
 
+
+
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
 import static org.mule.runtime.module.deployment.internal.DeploymentServiceBuilder.deploymentServiceBuilder;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -13,18 +15,28 @@ import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.Dep
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.System.clearProperty;
+import static java.lang.System.getProperty;
 import static java.lang.System.setProperty;
+import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.Paths.get;
 
 import static org.junit.rules.ExpectedException.none;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.module.deployment.api.DeploymentService;
 import org.mule.runtime.module.deployment.impl.internal.application.DefaultApplicationFactory;
 import org.mule.runtime.module.deployment.impl.internal.domain.DefaultDomainFactory;
+import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
+import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentService;
 
+import java.net.URI;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import io.qameta.allure.Feature;
@@ -33,12 +45,13 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mule.runtime.module.deployment.internal.MuleDeploymentService;
-import org.mule.runtime.module.deployment.internal.singleapp.SingleAppDeploymentService;
+
 
 @Feature(APP_DEPLOYMENT)
 @Story(DEPLOYMENT_SERVICE_BUILDER)
 public class DeploymentServiceBuilderTestCase {
+
+  public static final String TEST_TERMINATION_FILE_LOG_MESSAGE = "URI is not absolute";
 
   @Rule
   public ExpectedException expectedException = none();
@@ -93,6 +106,27 @@ public class DeploymentServiceBuilderTestCase {
   @Test
   public void whenNoSystemPropertyIsSetSingleAppModeDeploymentServiceIsObtained() {
     verifyDeploymentServiceImplementation(MuleDeploymentService.class);
+  }
+
+  @Test
+  public void singleAppDeploymentServiceIsConfiguredWithOnDeploymentErrorWriteToFileHandler() throws Exception {
+    setProperty(SINGLE_APP_MODE_PROPERTY, TRUE.toString());
+    DefaultDomainFactory domainFactory = mock(DefaultDomainFactory.class);
+    DefaultApplicationFactory applicationFactory = mock(DefaultApplicationFactory.class);
+    Supplier<SchedulerService> artifactStartExecutorSupplier = mock(Supplier.class);
+    Consumer<Throwable> throwableConsumer = mock(Consumer.class);
+
+    DeploymentService deploymentService = deploymentServiceBuilder().withDomainFactory(domainFactory)
+        .withArtifactStartExecutorSupplier(artifactStartExecutorSupplier)
+        .withApplicationFactory(applicationFactory)
+        .withDeploymentFailureThrowableConsumer(throwableConsumer)
+        .build();
+
+    deploymentService.deploy(new URI("unknown-uri"));
+    String terminationFileContent = new String(readAllBytes(get(getProperty("java.io.tmpdir") + getProperty("file.separator")
+        + "termination_log_set_by_env_property")));
+    assertThat(terminationFileContent, equalTo(TEST_TERMINATION_FILE_LOG_MESSAGE));
+    verify(throwableConsumer).accept(any());
   }
 
   private static void verifyDeploymentServiceImplementation(Class expectedClass) {

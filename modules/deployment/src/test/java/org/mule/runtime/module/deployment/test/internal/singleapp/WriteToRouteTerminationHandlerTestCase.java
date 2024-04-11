@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.launcher;
+package org.mule.runtime.module.deployment.test.internal.singleapp;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_TERMINATION_LOG_PATH_PROPERTY;
 import static org.mule.test.allure.AllureConstants.ArtifactDeploymentFeature.APP_DEPLOYMENT;
@@ -21,6 +21,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import org.mule.runtime.module.deployment.internal.singleapp.WriteToRouteTerminationHandler;
 
 import java.io.File;
 import java.io.IOException;
