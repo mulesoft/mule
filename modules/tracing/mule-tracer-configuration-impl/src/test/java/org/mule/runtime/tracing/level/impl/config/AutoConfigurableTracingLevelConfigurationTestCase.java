@@ -39,7 +39,7 @@ public class AutoConfigurableTracingLevelConfigurationTestCase {
   public void returnValueFromDelegate() {
     MuleContext muleContext = mock(MuleContext.class);
     TracingLevelConfiguration delegate =
-        mock(FileTracingLevelConfiguration.class);
+        mock(TracingLevelConfiguration.class);
     when(delegate.getTracingLevel()).thenReturn(OVERVIEW);
     AutoConfigurableTracingLevelConfiguration tracingLevelConfiguration =
         new AutoConfigurableTracingLevelConfiguration(muleContext, delegate);
