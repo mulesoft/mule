@@ -157,7 +157,7 @@ public abstract class TemplateOnErrorHandler extends AbstractExceptionListener
       Flux<CoreEvent> onErrorFlux = sinkRef.flux().map(beforeRouting());
 
       if (!getMessageProcessors().isEmpty()) {
-        onErrorFlux = onErrorFlux.compose(TemplateOnErrorHandler.this::route);
+        onErrorFlux = onErrorFlux.transformDeferred(TemplateOnErrorHandler.this::route);
       }
 
       onErrorFlux = Flux.from(publisherPostProcessor

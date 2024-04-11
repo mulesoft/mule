@@ -116,27 +116,27 @@ public class TryScope extends AbstractMessageProcessorOwner implements Scope {
     final I18nMessage txErrorMessage = errorInvokingMessageProcessorWithinTransaction(nestedChain, transactionConfig);
 
     return deferContextual(ctx -> from(publisher)
-            .handle((event, sink) -> {
-              final boolean txPrevoiuslyActive = isTransactionActive();
-              Transaction previousTx = getCurrentTx();
-              try {
-                sink.next(executionTemplate.execute(() -> {
-                  handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
-                  profileBeforeExecution(txPrevoiuslyActive);
-                  CoreEvent result = processBlocking(ctx, event);
-                  profileAfterExecution(txPrevoiuslyActive);
-                  return result;
-                }));
-              } catch (Exception e) {
-                final Throwable unwrapped = unwrap(e);
-
-                if (unwrapped instanceof MuleException) {
-                  sink.error(unwrapped);
-                } else {
-                  sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
-                }
-              }
+        .handle((event, sink) -> {
+          final boolean txPrevoiuslyActive = isTransactionActive();
+          Transaction previousTx = getCurrentTx();
+          try {
+            sink.next(executionTemplate.execute(() -> {
+              handlePreviousTransaction(txPrevoiuslyActive, previousTx, getCurrentTx());
+              profileBeforeExecution(txPrevoiuslyActive);
+              CoreEvent result = processBlocking(ctx, event);
+              profileAfterExecution(txPrevoiuslyActive);
+              return result;
             }));
+          } catch (Exception e) {
+            final Throwable unwrapped = unwrap(e);
+
+            if (unwrapped instanceof MuleException) {
+              sink.error(unwrapped);
+            } else {
+              sink.error(new DefaultMuleException(txErrorMessage, unwrapped));
+            }
+          }
+        }));
   }
 
   private void profileBeforeExecution(boolean txPrevoiuslyActive) {

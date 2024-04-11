@@ -104,31 +104,28 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
                                                                                  Thread.currentThread().getName(), artifactId,
                                                                                  artifactType, currentTimeMillis());
 
-      return pub -> deferContextual(ctx -> {
-          if (isTxActiveByContext(ctx)) {
-            // The profiling events related to the processing strategy scheduling are triggered independently of this being
-            // a blocking processing strategy that does not involve a thread switch.
-            return buildFlux(pub)
-                .setTracingContext(profilingService,
-                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
-                                       .getCorrelationId(), artifactId, artifactType, location)))
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
-                                                transformer)
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(
-                                                                STARTING_FLOW_EXECUTION),
-                                                transformer)
-                .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(
-                                                                FLOW_EXECUTED),
-                                                transformer)
-                .build();
-          } else {
-            return from(pub).transform(delegate.onPipeline(pipeline));
-          }
-        });
+    return pub -> deferContextual(ctx -> {
+      if (isTxActiveByContext(ctx)) {
+        // The profiling events related to the processing strategy scheduling are triggered independently of this being
+        // a blocking processing strategy that does not involve a thread switch.
+        return buildFlux(pub)
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(PS_SCHEDULING_FLOW_EXECUTION),
+                                            transfomer)
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(
+                                                            STARTING_FLOW_EXECUTION),
+                                            transfomer)
+            .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onPipeline(pipeline))
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(
+                                                            FLOW_EXECUTED),
+                                            transfomer)
+            .build();
+      } else {
+        return from(pub).transform(delegate.onPipeline(pipeline));
+      }
+    });
   }
 
   private ProfilingDataProducer<ComponentProcessingStrategyProfilingEventContext, CoreEvent> getDataProducer(
@@ -148,32 +145,29 @@ public class TransactionAwareStreamEmitterProcessingStrategyDecorator extends Pr
                                                                                  artifactType, currentTimeMillis());
 
     return pub -> deferContextual(ctx -> {
-          if (isTxActiveByContext(ctx)) {
-            // The profiling events related to the processing strategy scheduling are triggered independently of this being
-            // a blocking processing strategy that does not involve a thread switch.
-            return buildFlux(pub)
-                .setTracingContext(profilingService,
-                                   coreEvent -> new DefaultExecutionContext(new DefaultComponentMetadata(coreEvent
-                                       .getCorrelationId(), artifactId, artifactType, location)))
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
-                                                transformer)
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(PS_STARTING_OPERATION_EXECUTION),
-                                                transformer)
-                .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(
-                                                                PS_OPERATION_EXECUTED),
-                                                transformer)
-                .profileProcessingStrategyEvent(profilingService,
-                                                getDataProducer(
-                                                                PS_FLOW_MESSAGE_PASSING),
-                                                transformer)
-                .build();
-          } else {
-            return from(pub).transform(delegate.onProcessor(processor));
-          }
-        });
+      if (isTxActiveByContext(ctx)) {
+        // The profiling events related to the processing strategy scheduling are triggered independently of this being
+        // a blocking processing strategy that does not involve a thread switch.
+        return buildFlux(pub)
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(PS_SCHEDULING_OPERATION_EXECUTION),
+                                            transfomer)
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(PS_STARTING_OPERATION_EXECUTION),
+                                            transfomer)
+            .transform(BLOCKING_PROCESSING_STRATEGY_INSTANCE.onProcessor(processor))
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(
+                                                            PS_OPERATION_EXECUTED),
+                                            transfomer)
+            .profileProcessingStrategyEvent(profilingService,
+                                            getDataProducer(
+                                                            PS_FLOW_MESSAGE_PASSING),
+                                            transfomer)
+            .build();
+      } else {
+        return from(pub).transform(delegate.onProcessor(processor));
+      }
+    });
   }
 }

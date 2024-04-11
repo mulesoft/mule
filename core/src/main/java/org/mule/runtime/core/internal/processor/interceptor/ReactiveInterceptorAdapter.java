@@ -109,36 +109,36 @@ public class ReactiveInterceptorAdapter extends AbstractInterceptorAdapter imple
                    componentLocation.getLocation());
 
       return publisher -> deferContextual(ctx -> from(publisher)
-              .flatMap(event -> just(event)
-                  .cast(InternalEvent.class)
-                  .map(doBefore(interceptor, (Component) component, dslParameters))
-                  .cast(CoreEvent.class)
-                  .transform(next)
-                  .onErrorMap(MessagingException.class,
-                              error -> {
-                                InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
-                                                                      of(error.getCause()))
-                                                                          .apply((InternalEvent) error.getEvent());
-                                Component failingComponent = error.getFailingComponent() != null
-                                    ? error.getFailingComponent()
-                                    : (Component) component;
+          .flatMap(event -> just(event)
+              .cast(InternalEvent.class)
+              .map(doBefore(interceptor, (Component) component, dslParameters))
+              .cast(CoreEvent.class)
+              .transform(next)
+              .onErrorMap(MessagingException.class,
+                          error -> {
+                            InternalEvent resolvedEvent = doAfter(interceptor, (Component) component,
+                                                                  of(error.getCause()))
+                                                                      .apply((InternalEvent) error.getEvent());
+                            Component failingComponent = error.getFailingComponent() != null
+                                ? error.getFailingComponent()
+                                : (Component) component;
 
-                                if (interceptor.isErrorMappingRequired(componentLocation)) {
-                                  return resolveMessagingException(resolvedEvent,
-                                                                   error.getCause(),
-                                                                   failingComponent,
-                                                                   of(error));
-                                } else {
-                                  return createMessagingException(resolvedEvent,
-                                                                  error.getCause(),
-                                                                  failingComponent,
-                                                                  of(error));
-                                }
-                              })
-                  .cast(InternalEvent.class)
-                  .map(doAfter(interceptor, (Component) component, empty()))
-                  .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
-                  .onErrorStop()));
+                            if (interceptor.isErrorMappingRequired(componentLocation)) {
+                              return resolveMessagingException(resolvedEvent,
+                                                               error.getCause(),
+                                                               failingComponent,
+                                                               of(error));
+                            } else {
+                              return createMessagingException(resolvedEvent,
+                                                              error.getCause(),
+                                                              failingComponent,
+                                                              of(error));
+                            }
+                          })
+              .cast(InternalEvent.class)
+              .map(doAfter(interceptor, (Component) component, empty()))
+              .subscriberContext(innerCtx -> innerCtx.put(WITHIN_PROCESS_TO_APPLY, true))
+              .onErrorStop()));
     } else {
       return next;
     }

@@ -310,24 +310,24 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     final boolean mayCompleteInDifferentThread = mayCompleteInDifferentThread();
     final ComponentLocation location = getLocation();
 
-      return deferContextual(ctx -> {
-          Flux<CoreEvent> transformed =
-              createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
-                  .doOnNext(result -> {
-                    removeSdkInternalContextFromResult(location, result);
-                  })
-                  .map(propagateErrorResponseMapper());
+    return deferContextual(ctx -> {
+      Flux<CoreEvent> transformed =
+          createOuterFlux(from(publisher), localOperatorErrorHook, mayCompleteInDifferentThread, ctx)
+              .doOnNext(result -> {
+                removeSdkInternalContextFromResult(location, result);
+              })
+              .map(propagateErrorResponseMapper());
 
-          if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
-            return transformed
-                .doAfterTerminate(this::outerPublisherTerminated)
-                .doOnSubscribe(s -> outerPublisherSubscribedTo());
-          } else {
-            // Certain features (ext client, batch, flow runner, interception-api) use Mono, so we don't want to dispose the inner
-            // stuff after the first event comes through
-            return transformed;
-          }
-        });
+      if (publisher instanceof Flux && !ctx.getOrEmpty(WITHIN_PROCESS_TO_APPLY).isPresent()) {
+        return transformed
+            .doAfterTerminate(this::outerPublisherTerminated)
+            .doOnSubscribe(s -> outerPublisherSubscribedTo());
+      } else {
+        // Certain features (ext client, batch, flow runner, interception-api) use Mono, so we don't want to dispose the inner
+        // stuff after the first event comes through
+        return transformed;
+      }
+    });
   }
 
   private void removeSdkInternalContextFromResult(final ComponentLocation location, Either<Throwable, CoreEvent> result) {
@@ -345,7 +345,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   private Flux<Either<Throwable, CoreEvent>> createOuterFlux(final Flux<CoreEvent> publisher,
                                                              final BiFunction<Throwable, Object, Throwable> localOperatorErrorHook,
                                                              final boolean mayCompleteInDifferentThread,
-                                                             Context ctx) {
+                                                             ContextView ctx) {
     final FluxSinkRecorder<Either<Throwable, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
     final Function<Publisher<CoreEvent>, Publisher<Either<Throwable, CoreEvent>>> transformer =
@@ -663,16 +663,16 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
         @Override
         public Publisher<CoreEvent> apply(Publisher<CoreEvent> publisher) {
-            return deferContextual(ctx -> {
-                final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
+          return deferContextual(ctx -> {
+            final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter = new FluxSinkRecorder<>();
 
-                return from(propagateCompletion(from(publisher), emitter.flux(),
-                                                pub -> from(pub)
-                                                    .doOnNext(innerEventDispatcher(emitter))
-                                                    .map(e -> Either.empty()),
-                                                () -> emitter.complete(), e -> emitter.error(e)))
-                                                    .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
-              });
+            return from(propagateCompletion(from(publisher), emitter.flux(),
+                                            pub -> from(pub)
+                                                .doOnNext(innerEventDispatcher(emitter))
+                                                .map(e -> Either.empty()),
+                                            () -> emitter.complete(), e -> emitter.error(e)))
+                                                .map(RxUtils.<EventProcessingException>propagateErrorResponseMapper());
+          });
         }
 
         private Consumer<? super CoreEvent> innerEventDispatcher(final FluxSinkRecorder<Either<EventProcessingException, CoreEvent>> emitter) {

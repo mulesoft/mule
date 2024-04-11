@@ -107,6 +107,7 @@ import org.slf4j.MDC;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
+import reactor.util.context.ContextView;
 
 /**
  * Builder needs to return a composite rather than the first MessageProcessor in the chain. This is so that if this chain is
@@ -196,51 +197,51 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
     if (messagingExceptionHandler != null) {
       final FluxSinkRecorder<Either<MessagingException, CoreEvent>> errorSwitchSinkSinkRef = new FluxSinkRecorder<>();
 
-        return deferContextual(ctx -> {
-            // Take into account events that might still be in an error handler to keep the flux from completing until those are
-            // finished.
-            final AtomicInteger inflightEvents = new AtomicInteger();
+      return deferContextual(ctx -> {
+        // Take into account events that might still be in an error handler to keep the flux from completing until those are
+        // finished.
+        final AtomicInteger inflightEvents = new AtomicInteger();
 
-            final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
-                .router(pub -> from(pub).subscriberContext(ctx),
-                        handled -> errorSwitchSinkSinkRef.next(right(handled)),
-                        rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))),
-                                                              recreateRouter(ctx));
+        final Consumer<Exception> errorRouter = getRouter(() -> messagingExceptionHandler
+            .router(pub -> from(pub).contextWrite(ctx),
+                    handled -> errorSwitchSinkSinkRef.next(right(handled)),
+                    rethrown -> errorSwitchSinkSinkRef.next(left((MessagingException) rethrown, CoreEvent.class))),
+                                                          recreateRouter(ctx));
 
-            final Flux<CoreEvent> upstream =
-                from(doApply(publisher, interceptors, (context, throwable) -> {
-                  inflightEvents.incrementAndGet();
-                  routeError(errorRouter, throwable);
-                }));
+        final Flux<CoreEvent> upstream =
+            from(doApply(publisher, interceptors, (context, throwable) -> {
+              inflightEvents.incrementAndGet();
+              routeError(errorRouter, throwable);
+            }));
 
-            return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
-                                            pub -> from(pub)
-                                                .map(event -> {
-                                                  final Either<MessagingException, CoreEvent> result =
-                                                      right(MessagingException.class, event);
-                                                  errorSwitchSinkSinkRef.next(result);
-                                                  return result;
-                                                }),
-                                            inflightEvents,
-                                            () -> {
-                                              errorSwitchSinkSinkRef.complete();
-                                              disposeIfNeeded(errorRouter, LOGGER);
-                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                            },
-                                            t -> {
-                                              errorSwitchSinkSinkRef.error(t);
-                                              disposeIfNeeded(errorRouter, LOGGER);
-                                              clearRouterInGlobalErrorHandler(messagingExceptionHandler);
-                                            }))
-                                                .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
-          });
+        return from(propagateCompletion(upstream, errorSwitchSinkSinkRef.flux(),
+                                        pub -> from(pub)
+                                            .map(event -> {
+                                              final Either<MessagingException, CoreEvent> result =
+                                                  right(MessagingException.class, event);
+                                              errorSwitchSinkSinkRef.next(result);
+                                              return result;
+                                            }),
+                                        inflightEvents,
+                                        () -> {
+                                          errorSwitchSinkSinkRef.complete();
+                                          disposeIfNeeded(errorRouter, LOGGER);
+                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                        },
+                                        t -> {
+                                          errorSwitchSinkSinkRef.error(t);
+                                          disposeIfNeeded(errorRouter, LOGGER);
+                                          clearRouterInGlobalErrorHandler(messagingExceptionHandler);
+                                        }))
+                                            .map(RxUtils.<MessagingException>propagateErrorResponseMapper());
+      });
 
     } else {
       return doApply(publisher, interceptors, (context, throwable) -> context.error(throwable));
     }
   }
 
-  private boolean recreateRouter(Context ctx) {
+  private boolean recreateRouter(ContextView ctx) {
     return ctx.getOrDefault(REACTOR_RECREATE_ROUTER, false);
   }
 
@@ -296,15 +297,15 @@ abstract class AbstractMessageProcessorChain extends AbstractExecutableComponent
       // along with the interceptors that decorate it.
       stream = stream.transform(applyInterceptors(interceptors, processor))
           // #1 Register local error hook to wrap exceptions in a MessagingException maintaining failed event.
-          .subscriberContext(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
-                                                    getLocalOperatorErrorHook(processor, errorTypeLocator,
-                                                                              exceptionContextProviders)))
+          .contextWrite(context -> context.put(REACTOR_ON_OPERATOR_ERROR_LOCAL,
+                                               getLocalOperatorErrorHook(processor, errorTypeLocator,
+                                                                         exceptionContextProviders)))
           // #2 Register continue error strategy to handle errors without stopping the stream.
           .onErrorContinue(exception -> !(exception instanceof LifecycleException),
                            getContinueStrategyErrorHandler(processor, errorBubbler));
     }
 
-    stream = stream.subscriberContext(ctx -> {
+    stream = stream.contextWrite(ctx -> {
       ClassLoader tccl = currentThread().getContextClassLoader();
       if (tccl == null || tccl.getParent() == null
           || appClClass == null || !appClClass.isAssignableFrom(tccl.getClass())) {
