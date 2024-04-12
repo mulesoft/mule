@@ -4,13 +4,15 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.reboot.api;
+package org.mule.runtime.module.api;
 
 import static org.mule.runtime.module.boot.internal.BootstrapConstants.MULE_HOME_DIRECTORY_PROPERTY;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import org.mule.runtime.module.reboot.api.MuleContainerBootstrapUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

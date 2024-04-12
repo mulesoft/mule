@@ -5,8 +5,16 @@
  * LICENSE.txt file.
  */
 
+/**
+ * Bootstrap API for the Mule Container.
+ *
+ * @moduleGraph
+ * @since 4.6
+ */
 module org.mule.boot.commons {
 
+  // This directs some exports to modules that are loaded in the container layer. Those are used for compile-time validation and
+  // then directed programmatically by JpmsUtils
   exports org.mule.runtime.module.boot.commons.internal to
           org.mule.boot,
           org.mule.boot.tanuki,
@@ -14,20 +22,22 @@ module org.mule.boot.commons {
           com.mulesoft.mule.boot,
           com.mulesoft.mule.runtime.plugin; // container layer!
 
+  requires org.mule.boot.api;
+  // Needed by the MuleLog4jConfigurer
+  requires org.mule.runtime.boot.log4j;
 
   // Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader
   requires org.mule.runtime.jpms.utils;
-  requires org.mule.boot.api;
 
   // Needed by the SLF4JBridgeHandlerBootstrapConfigurer, but also to make the logging modules available from the boot layer
   requires org.mule.runtime.logging;
 
   requires org.apache.commons.cli;
   requires org.slf4j;
-  requires org.mule.runtime.boot.log4j;
 
 
   // Required to programmatically propagate accessibility by JpmsUtils
-  opens org.mule.runtime.module.boot.commons.internal to org.mule.runtime.jpms.utils;
+  opens org.mule.runtime.module.boot.commons.internal to
+      org.mule.runtime.jpms.utils;
 
 }

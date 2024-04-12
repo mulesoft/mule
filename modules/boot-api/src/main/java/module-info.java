@@ -17,10 +17,15 @@ module org.mule.boot.api {
 
   exports org.mule.runtime.module.boot.api;
   exports org.mule.runtime.module.reboot.api;
-  exports org.mule.runtime.module.boot.internal;
+
+  exports org.mule.runtime.module.boot.internal to
+          org.mule.boot,
+          com.mulesoft.mule.boot;
 
   uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 
-  opens org.mule.runtime.module.boot.api to org.mule.runtime.jpms.utils;
+  // Required to programmatically propagate accessibility by JpmsUtils
+  opens org.mule.runtime.module.boot.api to
+      org.mule.runtime.jpms.utils;
 
 }

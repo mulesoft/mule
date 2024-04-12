@@ -454,7 +454,6 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util to
       org.mule.runtime.core.components,
       org.mule.runtime.container,
-      org.mule.runtime.container.api,
       org.mule.runtime.deployment.model,
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.log4j,

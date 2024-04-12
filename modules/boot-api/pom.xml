@@ -19,14 +19,4 @@
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
     </properties>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>org.mule.tests</groupId>
-            <artifactId>mule-tests-unit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
 </project>

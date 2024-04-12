@@ -31,6 +31,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Needed by the MuleLog4jConfigurer -->
+        <dependency>
+            <groupId>org.mule.runtime.boot</groupId>
+            <artifactId>mule-module-log4j-boot-configurator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Needed by the BootModuleLayerValidationBootstrapConfigurer and for creating the container ClassLoader -->
         <dependency>
             <groupId>org.mule.runtime.boot</groupId>
@@ -58,12 +65,6 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mule.runtime.boot</groupId>
-            <artifactId>mule-module-log4j-boot-configurator</artifactId>
-            <version>4.8.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
-
 
 </project>
