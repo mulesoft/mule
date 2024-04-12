@@ -104,7 +104,7 @@ public class DefaultInitialSpanInfoProvider implements InitialSpanInfoProvider {
   }
 
   @Inject
-  public void seTracingLevelConfiguration(TracingLevelConfiguration tracingLevelConfiguration) {
+  public void setTracingLevelConfiguration(TracingLevelConfiguration tracingLevelConfiguration) {
     this.tracingLevelConfiguration = tracingLevelConfiguration;
   }
 
