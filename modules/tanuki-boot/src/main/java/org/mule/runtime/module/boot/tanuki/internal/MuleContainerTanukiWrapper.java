@@ -44,7 +44,7 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
   }
 
   @Override
-  protected void start(MuleContainerFactory muleContainerFactory, String[] args) {
+  protected synchronized void start(MuleContainerFactory muleContainerFactory, String[] args) {
     WrapperListener wrapperListener =
         new MuleContainerTanukiWrapperListener(muleContainerFactory, getAllConfigurersReady(), this::dispose);
     WrapperManager.start(wrapperListener, args);
@@ -52,7 +52,7 @@ public class MuleContainerTanukiWrapper extends AbstractMuleContainerWrapper imp
   }
 
   @Override
-  public void haltAndCatchFire(int exitCode, String message) {
+  public synchronized void haltAndCatchFire(int exitCode, String message) {
     // If #start has not been called yet, we need to start a NoOp WrapperListener to notify the native wrapper and allow
     // events to be processed
     if (!isStarted) {
