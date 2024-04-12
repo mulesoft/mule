@@ -468,7 +468,7 @@ public class MessageProcessors {
             .toProcessor())
         .map(MessageProcessors::toParentContext)
         .contextWrite(ctx -> ctx.put(WITHIN_PROCESS_WITH_CHILD_CONTEXT, true)
-                .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
+            .put(WITHIN_PROCESS_TO_APPLY, true).put(REACTOR_RECREATE_ROUTER, true));
   }
 
   private static Publisher<CoreEvent> internalProcessWithChildContextAlwaysComplete(CoreEvent event,
