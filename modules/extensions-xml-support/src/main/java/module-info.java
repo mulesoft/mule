@@ -4,6 +4,9 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
+
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
+
 /**
  * Default implementation of the Mule Extension XML API.
  *
@@ -44,7 +47,7 @@ module org.mule.runtime.extensions.xml.support {
 
   provides org.mule.runtime.config.internal.model.ApplicationModelAstPostProcessor with
       org.mule.runtime.extension.internal.ast.MacroExpansionAstPostProcessor;
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+  provides RuntimeExtensionModelProvider with
       org.mule.runtime.extension.api.extension.XmlSdk1RuntimeExtensionModelProvider;
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.extension.internal.config.dsl.XmlExtensionBuildingDefinitionProvider;

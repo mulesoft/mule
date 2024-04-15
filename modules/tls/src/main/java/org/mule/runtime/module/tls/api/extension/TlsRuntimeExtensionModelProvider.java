@@ -9,7 +9,7 @@ package org.mule.runtime.module.tls.api.extension;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getTlsExtensionModel;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+import org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
 public final class TlsRuntimeExtensionModelProvider implements RuntimeExtensionModelProvider {
 

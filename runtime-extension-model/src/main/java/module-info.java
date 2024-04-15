@@ -43,7 +43,7 @@ module org.mule.runtime.extension.model {
 
   exports org.mule.runtime.core.api.extension.provider;
 
-  uses org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider;
+  uses org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider;
 
   provides org.mule.runtime.ast.api.validation.ValidationsProvider with
       org.mule.runtime.config.internal.validation.CoreValidationsProvider;
@@ -63,7 +63,7 @@ module org.mule.runtime.extension.model {
   exports org.mule.runtime.config.internal.dsl.processor.xml.provider to
       org.mule.runtime.extensions.mule.support;
 
-  provides org.mule.runtime.core.api.extension.provider.RuntimeExtensionModelProvider with
+  provides org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider with
       org.mule.runtime.core.api.extension.provider.CoreRuntimeExtensionModelProvider;
 
   // required by modules creating crafted extension models
