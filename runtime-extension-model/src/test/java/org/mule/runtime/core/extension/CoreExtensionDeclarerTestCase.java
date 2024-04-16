@@ -6,7 +6,13 @@
  */
 package org.mule.runtime.core.extension;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static java.util.stream.Collectors.toList;
+
+import io.qameta.allure.Issue;
 import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.NamedDeclaration;
@@ -19,18 +25,13 @@ import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelDeclarer;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-
+@Issue("W-15261626")
 public class CoreExtensionDeclarerTestCase {
 
   private List<ParameterizedDeclarer> routersOneOf = new ArrayList<>();
