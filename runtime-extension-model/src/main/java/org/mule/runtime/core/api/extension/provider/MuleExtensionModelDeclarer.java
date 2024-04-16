@@ -150,7 +150,7 @@ import com.google.gson.reflect.TypeToken;
  *
  * @since 4.0
  */
-class MuleExtensionModelDeclarer {
+public class MuleExtensionModelDeclarer {
 
   static final String DEFAULT_LOG_LEVEL = "INFO";
   private static final ClassValueModel NOTIFICATION_CLASS_VALUE_MODEL =
@@ -169,11 +169,11 @@ class MuleExtensionModelDeclarer {
 
   private final Optional<ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory> configurerFactory;
 
-  MuleExtensionModelDeclarer(ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory configurerFactory) {
+  public MuleExtensionModelDeclarer(ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory configurerFactory) {
     this.configurerFactory = ofNullable(configurerFactory);
   }
 
-  ExtensionDeclarer createExtensionModel() {
+  public ExtensionDeclarer createExtensionModel() {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
         .named(MULE_NAME)
         .describedAs("Mule Runtime and Integration Platform: Core components")
