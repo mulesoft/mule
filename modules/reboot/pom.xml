@@ -28,6 +28,7 @@
             <groupId>org.mule.runtime.boot</groupId>
             <artifactId>mule-module-boot-commons</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

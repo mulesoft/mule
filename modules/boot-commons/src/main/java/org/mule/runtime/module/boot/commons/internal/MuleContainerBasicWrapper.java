@@ -6,8 +6,6 @@
  */
 package org.mule.runtime.module.boot.commons.internal;
 
-import static org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider.load;
-
 import static java.lang.String.format;
 import static java.lang.System.exit;
 import static java.lang.Thread.currentThread;
@@ -16,7 +14,6 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.module.boot.api.MuleContainer;
-import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,11 +45,6 @@ public class MuleContainerBasicWrapper extends AbstractMuleContainerWrapper {
     if (exitCode != 0) {
       throw new RuntimeException(message);
     }
-  }
-
-  @Override
-  public MuleContainerLifecycleWrapper getMuleContainerWrapper() {
-    return load(this.getClass().getClassLoader()).getMuleContainerLifecycleWrapper();
   }
 
   @Override

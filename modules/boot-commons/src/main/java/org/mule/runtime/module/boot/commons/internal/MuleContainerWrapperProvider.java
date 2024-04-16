@@ -9,9 +9,6 @@ package org.mule.runtime.module.boot.commons.internal;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
-import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapper;
-import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider;
-
 /**
  * Helps with the creation and provisioning of the {@link MuleContainerWrapper} implementation instance as a singleton.
  * <p>
@@ -19,7 +16,7 @@ import org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider;
  *
  * @since 4.5
  */
-public class MuleContainerWrapperProvider implements MuleContainerLifecycleWrapperProvider {
+public class MuleContainerWrapperProvider {
 
   private static final String MULE_BOOTSTRAP_CONTAINER_WRAPPER_CLASS_SYSTEM_PROPERTY = "mule.bootstrap.container.wrapper.class";
   private static MuleContainerWrapper INSTANCE;
@@ -35,12 +32,6 @@ public class MuleContainerWrapperProvider implements MuleContainerLifecycleWrapp
       INSTANCE = createContainerWrapper();
     }
 
-    return INSTANCE;
-  }
-
-  @Override
-  public MuleContainerLifecycleWrapper getMuleContainerLifecycleWrapper() {
-    getMuleContainerWrapper();
     return INSTANCE;
   }
 
