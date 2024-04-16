@@ -21,6 +21,7 @@
         <module>artifact</module>
         <module>artifact-activation</module>
         <module>boot-api</module>
+        <module>boot-commons</module>
         <module>container</module>
         <module>deployment</module>
         <module>deployment-model</module>

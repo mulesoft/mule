@@ -9,10 +9,23 @@ package org.mule.runtime.module.boot.api;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+/**
+ * Uses SPI to get the {@link MuleContainerLifecycleWrapper} implementation.
+ *
+ * @since 4.8
+ */
 public interface MuleContainerLifecycleWrapperProvider {
 
+  /**
+   * @return a MuleContainerLifecycleWrapper discovered through SPI.
+   */
   MuleContainerLifecycleWrapper getMuleContainerLifecycleWrapper();
 
+  /**
+   * Discovers a {@link MuleContainerLifecycleWrapper} through SPI.
+   *
+   * @return a MuleContainerWrapperProvider
+   */
   static MuleContainerLifecycleWrapperProvider load(ClassLoader classLoader) {
     ServiceLoader<MuleContainerLifecycleWrapperProvider> factories =
         ServiceLoader.load(MuleContainerLifecycleWrapperProvider.class, classLoader);
