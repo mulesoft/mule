@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.extension.provider;
 
+import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
@@ -127,6 +128,7 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
 import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
@@ -137,6 +139,7 @@ import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.xml.namespace.QName;
 
@@ -163,6 +166,12 @@ class MuleExtensionModelDeclarer {
   private static final String BUSINESS_EVENTS = "Business Events";
   private static final String TRACKING_NAMESPACE = "tracking";
   private static final String TRACKING_NAMESPACE_URI = "http://www.mulesoft.org/schema/mule/ee/tracking";
+
+  private final Optional<ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory> configurerFactory;
+
+  MuleExtensionModelDeclarer(ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory configurerFactory) {
+    this.configurerFactory = ofNullable(configurerFactory);
+  }
 
   ExtensionDeclarer createExtensionModel() {
     ExtensionDeclarer extensionDeclarer = new ExtensionDeclarer()
@@ -657,6 +666,7 @@ class MuleExtensionModelDeclarer {
 
     untilSuccessful.withOutput().ofType(ANY_TYPE);
     untilSuccessful.withOutputAttributes().ofType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asPassthroughScope().configure(untilSuccessful));
   }
 
   private void declareChoice(ExtensionDeclarer extensionDeclarer) {
@@ -680,6 +690,7 @@ class MuleExtensionModelDeclarer {
         .setExecutionOccurrence(ONCE_OR_NONE);
     choice.withOutput().ofDynamicType(ANY_TYPE);
     choice.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asOneOfRouter().configure(choice));
   }
 
   private void declareFlow(ExtensionDeclarer extensionDeclarer) {
@@ -742,6 +753,7 @@ class MuleExtensionModelDeclarer {
 
     firstSuccessful.withOutput().ofDynamicType(ANY_TYPE);
     firstSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asOneOfRouter().configure(firstSuccessful));
   }
 
   private void declareRoundRobin(ExtensionDeclarer extensionDeclarer) {
@@ -760,6 +772,7 @@ class MuleExtensionModelDeclarer {
 
     roundRobin.withOutput().ofDynamicType(ANY_TYPE);
     roundRobin.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asOneOfRouter().configure(roundRobin));
   }
 
   private void declareScatterGather(ExtensionDeclarer extensionDeclarer, ClassTypeLoader typeLoader) {
@@ -820,6 +833,7 @@ class MuleExtensionModelDeclarer {
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asAllOfRouter().configure(scatterGather));
 
     // TODO MULE-13316 Define error model (Routers should be able to define error type(s) thrown in ModelDeclarer but
     // ConstructModel doesn't support it.)
@@ -875,6 +889,7 @@ class MuleExtensionModelDeclarer {
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asPassthroughScope().configure(parallelForeach));
   }
 
   private void declareTry(ExtensionDeclarer extensionDeclarer) {
@@ -902,6 +917,7 @@ class MuleExtensionModelDeclarer {
     tryScope.withChain().withModelProperty(NoWrapperModelProperty.INSTANCE).setExecutionOccurrence(ONCE);
     tryScope.withOutput().ofDynamicType(ANY_TYPE);
     tryScope.withOutputAttributes().ofDynamicType(ANY_TYPE);
+    configurerFactory.ifPresent(factory -> factory.create().asPassthroughScope().configure(tryScope));
 
     addErrorHandling(tryScope);
   }

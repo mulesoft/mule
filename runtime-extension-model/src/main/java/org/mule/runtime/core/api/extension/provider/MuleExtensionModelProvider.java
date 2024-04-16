@@ -30,6 +30,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryUtils;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 
@@ -81,7 +82,8 @@ public final class MuleExtensionModelProvider {
   }
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new MuleExtensionModelDeclarer().createExtensionModel())));
+      .create(contextFor(new MuleExtensionModelDeclarer(new ComponentMetadataConfigurerFactoryUtils().create())
+          .createExtensionModel())));
 
   private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
       .create(contextFor(new TlsExtensionModelDeclarer().createExtensionModel())));

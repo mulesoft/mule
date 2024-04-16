@@ -33,7 +33,7 @@ import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
+import org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -109,7 +109,7 @@ public class SoapInvokeOperationDeclarer {
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
-    new ComponentMetadataConfigurer()
+    new DefaultComponentMetadataConfigurer()
         .setKeysResolver(new InvokeKeysResolver(), KEYS_GROUP, loader.load(WebServiceTypeKey.class), false)
         .addInputResolver(BODY_PARAM, new InvokeRequestTypeResolver())
         .addInputResolver(HEADERS_PARAM, new InvokeInputHeadersTypeResolver())
