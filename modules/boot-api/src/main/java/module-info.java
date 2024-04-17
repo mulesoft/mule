@@ -24,8 +24,4 @@ module org.mule.boot.api {
 
   uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 
-  // Required to programmatically propagate accessibility by JpmsUtils
-  opens org.mule.runtime.module.boot.api to
-      org.mule.runtime.jpms.utils;
-
 }
