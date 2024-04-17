@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.context.lazy;
 
-import static org.mule.runtime.ast.api.ArtifactAst.filteredArtifactAst;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.filteredArtifactAst;
 
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;

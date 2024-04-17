@@ -11,7 +11,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.ast.api.ArtifactAst.filteredArtifactAst;
+import static org.mule.runtime.ast.api.util.MuleAstUtils.filteredArtifactAst;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
