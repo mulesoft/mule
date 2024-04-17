@@ -206,8 +206,8 @@ public final class JpmsUtils {
     ClassLoader childParentClassLoader = parentLayer.findLoader(parentLayer.modules().iterator().next().getName());
     final ModuleLayer childLayer =
         createModuleLayer(modulePathEntriesChild, childParentClassLoader, of(parentLayer), false, true);
-    openToModule(childLayer, "org.mule.runtime.launcher", "org.mule.boot.api",
-                 asList("org.mule.runtime.module.boot.internal"));
+    openToModule(childLayer, "org.mule.runtime.launcher", "org.mule.boot.commons",
+                 asList("org.mule.runtime.module.boot.commons.internal"));
     openToModule(childLayer, "kryo.shaded", "java.base",
                  asList("java.lang", "java.lang.reflect"));
 
