@@ -30,7 +30,7 @@ import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryUtils;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 
@@ -65,6 +65,8 @@ public final class MuleExtensionModelProvider {
   public static final MetadataType VOID_TYPE = BASE_TYPE_BUILDER.voidType().build();
   public static final MetadataType OBJECT_STORE_TYPE = TYPE_LOADER.load(ObjectStore.class);
 
+  private static ComponentMetadataConfigurerFactory configurerFactory = ComponentMetadataConfigurerFactory.getDefault();
+
   static {
     try {
       final Properties buildProperties = new Properties();
@@ -82,7 +84,7 @@ public final class MuleExtensionModelProvider {
   }
 
   private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new MuleExtensionModelDeclarer(new ComponentMetadataConfigurerFactoryUtils().create())
+      .create(contextFor(new MuleExtensionModelDeclarer(configurerFactory)
           .createExtensionModel())));
 
   private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
@@ -127,5 +129,9 @@ public final class MuleExtensionModelProvider {
    */
   public static MuleVersion getMuleVersion() {
     return PARSED_MULE_VERSION;
+  }
+
+  public static void setConfigurerFactory(ComponentMetadataConfigurerFactory componentMetadataConfigurerFactory) {
+    configurerFactory = componentMetadataConfigurerFactory;
   }
 }

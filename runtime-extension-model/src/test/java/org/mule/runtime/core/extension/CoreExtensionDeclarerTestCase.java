@@ -24,6 +24,7 @@ import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.core.api.extension.provider.MuleExtensionModelDeclarer;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.sdk.api.metadata.resolving.ChainInputTypeResolver;
 import org.junit.Test;
 
@@ -40,7 +41,13 @@ public class CoreExtensionDeclarerTestCase {
 
   @Test
   public void configurationOfExtensionDeclarer() {
-    MuleExtensionModelDeclarer declarer = new MuleExtensionModelDeclarer(MockConfigurer::new);
+    MuleExtensionModelDeclarer declarer = new MuleExtensionModelDeclarer(new ComponentMetadataConfigurerFactory() {
+
+      @Override
+      public ComponentMetadataConfigurer create() {
+        return new MockConfigurer();
+      }
+    });
     declarer.createExtensionModel();
     assertThat(routersAllOf, hasSize(1));
     assertThat(getNameOfDeclarer(routersAllOf.get(0)), is("scatterGather"));
