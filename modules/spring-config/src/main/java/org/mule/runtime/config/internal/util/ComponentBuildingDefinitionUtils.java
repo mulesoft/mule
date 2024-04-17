@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.config.internal.util;
 
-import static org.mule.runtime.dsl.internal.component.config.ComponentBuildingDefinitionProviderUtils.lookupComponentBuildingDefinitionProviders;
+import static org.mule.runtime.dsl.api.component.config.ComponentBuildingDefinitionProviderUtils.lookupComponentBuildingDefinitionProviders;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
 import org.mule.runtime.api.meta.model.ExtensionModel;

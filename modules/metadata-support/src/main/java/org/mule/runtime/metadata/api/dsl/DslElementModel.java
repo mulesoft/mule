@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.metadata.api.dsl;
 
-import static com.google.common.collect.ImmutableList.copyOf;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.util.Preconditions.checkState;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.isMap;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.collect.ImmutableList.copyOf;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ArrayType;
 import org.mule.metadata.api.model.MetadataType;
@@ -30,7 +32,6 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 
 import java.util.ArrayList;
@@ -239,7 +240,7 @@ public class DslElementModel<T> {
     }
 
     private ComponentConfiguration from(ComponentAst element) {
-      InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+      ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
           .withIdentifier(element.getIdentifier());
 
       List<ComponentIdentifier> dslGroupsAsChildrenNames = new ArrayList<>();
@@ -280,7 +281,7 @@ public class DslElementModel<T> {
                 .namespaceUri(groupSyntax.getNamespace())
                 .build();
 
-            InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+            ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
                 .withIdentifier(groupIdentifier);
 
             dslGroup.getParameterModels().forEach(pm -> {
@@ -296,7 +297,7 @@ public class DslElementModel<T> {
 
     protected void fromSourceCallbackGroup(ParameterGroupModel pmg, ComponentAst element,
                                            List<ComponentIdentifier> dslGroupsAsChildrenNames,
-                                           InternalComponentConfiguration.Builder builder) {
+                                           ComponentConfiguration.Builder builder) {
       if (pmg.isShowInDsl()) {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
@@ -310,7 +311,7 @@ public class DslElementModel<T> {
     }
 
     protected void fromGroup(ParameterGroupModel pmg, ComponentAst element, List<ComponentIdentifier> dslGroupsAsChildrenNames,
-                             InternalComponentConfiguration.Builder builder) {
+                             ComponentConfiguration.Builder builder) {
       if (pmg.isShowInDsl()) {
         fromDslGroup(pmg, element, dslGroupsAsChildrenNames, builder);
       } else {
@@ -324,7 +325,7 @@ public class DslElementModel<T> {
     }
 
     protected void fromDslGroup(ParameterGroupModel pmg, ComponentAst element, List<ComponentIdentifier> dslGroupsAsChildrenNames,
-                                InternalComponentConfiguration.Builder builder) {
+                                ComponentConfiguration.Builder builder) {
       final DslElementSyntax dslElementSyntax =
           element.getGenerationInformation().getSyntax().get().getChild(pmg.getName()).get();
 
@@ -335,7 +336,7 @@ public class DslElementModel<T> {
 
       dslGroupsAsChildrenNames.add(dslGroupIdentifier);
 
-      InternalComponentConfiguration.Builder dslElementBuilder = InternalComponentConfiguration.builder()
+      ComponentConfiguration.Builder dslElementBuilder = ComponentConfiguration.builder()
           .withIdentifier(dslGroupIdentifier);
 
       AtomicBoolean paramHandled = new AtomicBoolean(false);
@@ -352,14 +353,14 @@ public class DslElementModel<T> {
       }
     }
 
-    protected void handleParam(ComponentParameterAst param, MetadataType type, InternalComponentConfiguration.Builder builder) {
+    protected void handleParam(ComponentParameterAst param, MetadataType type, ComponentConfiguration.Builder builder) {
       param.getValue().apply(expr -> handleExpressionParam(param, expr, builder),
                              v -> handleFixedValueParam(param, type, builder));
 
     }
 
     protected void handleExpressionParam(ComponentParameterAst param, String expr,
-                                         InternalComponentConfiguration.Builder builder) {
+                                         ComponentConfiguration.Builder builder) {
       if (isContent(param.getModel()) || isText(param.getModel())) {
         param.getGenerationInformation().getSyntax().ifPresent(contentParamSyntax -> {
           final ComponentIdentifier contentParamIdentifier = ComponentIdentifier.builder()
@@ -367,7 +368,7 @@ public class DslElementModel<T> {
               .namespace(contentParamSyntax.getPrefix())
               .name(contentParamSyntax.getElementName()).build();
 
-          InternalComponentConfiguration.Builder dslElementBuilder = InternalComponentConfiguration.builder()
+          ComponentConfiguration.Builder dslElementBuilder = ComponentConfiguration.builder()
               .withIdentifier(contentParamIdentifier);
 
           dslElementBuilder.withValue("#[" + expr + "]");
@@ -380,7 +381,7 @@ public class DslElementModel<T> {
     }
 
     protected void handleFixedValueParam(ComponentParameterAst param, MetadataType type,
-                                         InternalComponentConfiguration.Builder builder) {
+                                         ComponentConfiguration.Builder builder) {
       type.accept(new MetadataTypeVisitor() {
 
         @Override
@@ -400,8 +401,8 @@ public class DslElementModel<T> {
                     .name(dslElementSyntax.getElementName()).build();
 
                 if (param.getValue().getRight() instanceof Collection) {
-                  InternalComponentConfiguration.Builder listWrapperBuilder =
-                      InternalComponentConfiguration.builder()
+                  ComponentConfiguration.Builder listWrapperBuilder =
+                      ComponentConfiguration.builder()
                           .withIdentifier(listWrapperIdentifier);
 
                   Collection<ComponentAst> arrayValues =
@@ -431,8 +432,8 @@ public class DslElementModel<T> {
                       .namespace(dslElementSyntax.getPrefix())
                       .name(dslElementSyntax.getElementName()).build();
 
-                  InternalComponentConfiguration.Builder listWrapperBuilder =
-                      InternalComponentConfiguration.builder()
+                  ComponentConfiguration.Builder listWrapperBuilder =
+                      ComponentConfiguration.builder()
                           .withIdentifier(listWrapperIdentifier);
 
                   // Collection mapValues = (Collection) param.getValue().getRight();
@@ -468,8 +469,8 @@ public class DslElementModel<T> {
                           .namespace(dslElementSyntax.getPrefix())
                           .name(dslElementSyntax.getElementName()).build();
 
-                      InternalComponentConfiguration.Builder unionWrapperBuilder =
-                          InternalComponentConfiguration.builder()
+                      ComponentConfiguration.Builder unionWrapperBuilder =
+                          ComponentConfiguration.builder()
                               .withIdentifier(unionWrapperIdentifier);
 
                       handleParam(param, type, unionWrapperBuilder);

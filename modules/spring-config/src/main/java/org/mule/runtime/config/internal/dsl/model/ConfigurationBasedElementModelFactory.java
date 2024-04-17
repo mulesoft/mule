@@ -6,15 +6,10 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getLocalPart;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.config.internal.model.ApplicationModel.CRON_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.EXPIRATION_POLICY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.NON_REPEATABLE_ITERABLE_IDENTIFIER;
@@ -43,8 +38,15 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isText;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+
+import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -75,7 +77,6 @@ import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.core.api.source.scheduler.CronScheduler;
 import org.mule.runtime.core.api.source.scheduler.FixedFrequencyScheduler;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.declaration.type.annotation.FlattenedTypeAnnotation;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
@@ -536,7 +537,7 @@ class ConfigurationBasedElementModelFactory {
                           .withConfig(nestedComponentConfig)
                           .isExplicitInDsl(true);
 
-                  populateParameterizedElements((ParameterizedModel) nestedModel, routeDsl, routeBuilder, nestedComponentConfig);
+                  populateParameterizedElements(nestedModel, routeDsl, routeBuilder, nestedComponentConfig);
                   nestedComponentConfig.getNestedComponents()
                       .forEach(routeElement -> {
                         DslElementModel nestableElementModel = createIdentifiedElement(routeElement);
@@ -591,8 +592,8 @@ class ConfigurationBasedElementModelFactory {
 
   private void builDefaultInlineGroupElement(DslElementModel.Builder parent, ParameterGroupModel group, DslElementSyntax groupDsl,
                                              ComponentIdentifier identifier) {
-    InternalComponentConfiguration.Builder groupConfigBuilder =
-        InternalComponentConfiguration.builder().withIdentifier(identifier);
+    ComponentConfiguration.Builder groupConfigBuilder =
+        ComponentConfiguration.builder().withIdentifier(identifier);
     DslElementModel.Builder<ParameterGroupModel> groupElementBuilder = DslElementModel.<ParameterGroupModel>builder()
         .withModel(group)
         .isExplicitInDsl(false)
@@ -610,7 +611,7 @@ class ConfigurationBasedElementModelFactory {
 
                   if (isContent(paramModel) || isText(paramModel)) {
                     getIdentifier(paramDsl)
-                        .ifPresent(tagId -> groupConfigBuilder.withNestedComponent(InternalComponentConfiguration.builder()
+                        .ifPresent(tagId -> groupConfigBuilder.withNestedComponent(ComponentConfiguration.builder()
                             .withIdentifier(tagId)
                             .withValue(defaultValue)
                             .build()));

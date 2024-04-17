@@ -6,15 +6,12 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static java.util.stream.Stream.of;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.NAME_ATTRIBUTE_NAME;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
 import static org.mule.runtime.dsl.api.xml.parser.XmlApplicationParser.IS_CDATA;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
@@ -24,10 +21,15 @@ import static org.mule.runtime.extension.api.util.ExtensionModelUtils.getDefault
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isContent;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isInfrastructure;
 import static org.mule.runtime.extension.api.util.ExtensionModelUtils.isRequired;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.KEY_ATTRIBUTE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.NAME_ATTRIBUTE_NAME;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.VALUE_ATTRIBUTE_NAME;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.Stream.of;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.metadata.api.model.ArrayType;
@@ -77,7 +79,6 @@ import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.config.api.dsl.model.DslElementModelFactory;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntaxBuilder;
@@ -194,7 +195,7 @@ class DeclarationBasedElementModelFactory {
                                                                          ConfigurationElementDeclaration configDeclaration) {
     DslElementSyntax configDsl = dsl.resolve(model);
 
-    InternalComponentConfiguration.Builder configuration = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(configDsl))
         .withParameter(NAME_ATTRIBUTE_NAME, configDeclaration.getRefName());
 
@@ -213,7 +214,7 @@ class DeclarationBasedElementModelFactory {
   private DslElementModel<? extends ComponentModel> createComponentElement(ComponentModel model,
                                                                            ComponentElementDeclaration<?> componentDeclaration) {
     DslElementSyntax configDsl = dsl.resolve(model);
-    InternalComponentConfiguration.Builder configuration = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(configDsl));
 
     if (componentDeclaration instanceof ReferableElementDeclaration) {
@@ -263,7 +264,7 @@ class DeclarationBasedElementModelFactory {
   private DslElementModel<? extends NestedRouteModel> crateRouteElement(NestedRouteModel model,
                                                                         RouteElementDeclaration routeDeclaration) {
     DslElementSyntax routeDsl = dsl.resolve(model);
-    InternalComponentConfiguration.Builder routeConfiguration = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder routeConfiguration = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(routeDsl));
 
     DslElementModel.Builder<? extends NestedRouteModel> routeElement =
@@ -292,7 +293,7 @@ class DeclarationBasedElementModelFactory {
         .withModel(model)
         .withDsl(objectDsl);
 
-    InternalComponentConfiguration.Builder configuration = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder configuration = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(objectDsl))
         .withParameter(NAME_ATTRIBUTE_NAME, declaration.getRefName());
 
@@ -314,7 +315,7 @@ class DeclarationBasedElementModelFactory {
                                                                                  ConnectionElementDeclaration connection) {
     DslElementSyntax providerDsl = dsl.resolve(providerModel);
 
-    InternalComponentConfiguration.Builder builder = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder builder = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(providerDsl));
 
     DslElementModel.Builder<ConnectionProviderModel> element =
@@ -326,7 +327,7 @@ class DeclarationBasedElementModelFactory {
 
   private void addConnectionProvider(ConnectionElementDeclaration connection,
                                      ConfigurationModel model,
-                                     InternalComponentConfiguration.Builder configuration,
+                                     ComponentConfiguration.Builder configuration,
                                      DslElementModel.Builder<ConfigurationModel> configElement) {
 
     concat(model.getConnectionProviders().stream(), currentExtension.getConnectionProviders()
@@ -344,7 +345,7 @@ class DeclarationBasedElementModelFactory {
   private <T extends ParameterizedModel> DslElementModel.Builder<T> createParameterizedElementModel(T model,
                                                                                                     DslElementSyntax elementDsl,
                                                                                                     ParameterizedElementDeclaration declaration,
-                                                                                                    InternalComponentConfiguration.Builder parentConfig) {
+                                                                                                    ComponentConfiguration.Builder parentConfig) {
     DslElementModel.Builder<T> parentElement = DslElementModel.<T>builder()
         .withModel(model)
         .withDsl(elementDsl);
@@ -356,7 +357,7 @@ class DeclarationBasedElementModelFactory {
 
   private <T extends ParameterizedModel> void enrichParameterizedElementModel(T model, DslElementSyntax elementDsl,
                                                                               ParameterizedElementDeclaration declaration,
-                                                                              InternalComponentConfiguration.Builder parentConfig,
+                                                                              ComponentConfiguration.Builder parentConfig,
                                                                               DslElementModel.Builder<T> parentElement) {
     addAllDeclaredParameters(model.getParameterGroupModels(), declaration, elementDsl, parentConfig, parentElement);
 
@@ -377,7 +378,7 @@ class DeclarationBasedElementModelFactory {
   }
 
   private <T extends ParameterizedModel> void addCustomParameters(ParameterizedElementDeclaration declaration,
-                                                                  InternalComponentConfiguration.Builder parentConfig,
+                                                                  ComponentConfiguration.Builder parentConfig,
                                                                   DslElementModel.Builder<T> parentElement) {
     declaration.getCustomConfigurationParameters()
         .forEach(p -> {
@@ -394,7 +395,7 @@ class DeclarationBasedElementModelFactory {
   private void addAllDeclaredParameters(List<ParameterGroupModel> groups,
                                         ParameterizedElementDeclaration parameterizedDeclaration,
                                         DslElementSyntax parentDsl,
-                                        InternalComponentConfiguration.Builder parentConfig,
+                                        ComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement) {
 
     groups.forEach(group -> {
@@ -421,7 +422,7 @@ class DeclarationBasedElementModelFactory {
 
   private <T> void addGroupParameterElements(ParameterGroupModel group,
                                              DslElementSyntax elementDsl,
-                                             InternalComponentConfiguration.Builder parentConfig,
+                                             ComponentConfiguration.Builder parentConfig,
                                              DslElementModel.Builder<T> parentElement,
                                              Optional<ParameterGroupElementDeclaration> declaration) {
     group.getParameterModels()
@@ -449,7 +450,7 @@ class DeclarationBasedElementModelFactory {
 
   private <T> void addInlineGroupElement(ParameterGroupModel group,
                                          DslElementSyntax elementDsl,
-                                         InternalComponentConfiguration.Builder parentConfig,
+                                         ComponentConfiguration.Builder parentConfig,
                                          DslElementModel.Builder<T> parentElement,
                                          Optional<ParameterGroupElementDeclaration> declaration) {
     elementDsl.getChild(group.getName())
@@ -459,8 +460,8 @@ class DeclarationBasedElementModelFactory {
               .withDsl(groupDsl)
               .isExplicitInDsl(declaration.isPresent());
 
-          InternalComponentConfiguration.Builder groupConfigBuilder =
-              InternalComponentConfiguration.builder().withIdentifier(asIdentifier(groupDsl));
+          ComponentConfiguration.Builder groupConfigBuilder =
+              ComponentConfiguration.builder().withIdentifier(asIdentifier(groupDsl));
 
           addGroupParameterElements(group, groupDsl, groupConfigBuilder, groupElementBuilder, declaration);
 
@@ -475,7 +476,7 @@ class DeclarationBasedElementModelFactory {
   private void addParameter(String parameterName, ParameterValue value,
                             ParameterModel parameterModel,
                             DslElementSyntax paramDsl,
-                            final InternalComponentConfiguration.Builder parentConfig,
+                            final ComponentConfiguration.Builder parentConfig,
                             final DslElementModel.Builder parentElement) {
 
     if (isInfrastructure(parameterModel)) {
@@ -526,7 +527,7 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void createMapParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, Object model, ObjectType mapType,
-                                  InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
+                                  ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
     createMapParameter(objectValue, paramDsl, model, mapType, parentConfig, parentElement,
                        isParameterWrappedByContainer(model));
   }
@@ -538,9 +539,9 @@ class DeclarationBasedElementModelFactory {
 
 
   private void createMapParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, Object model, ObjectType mapType,
-                                  InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
+                                  ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                   boolean isParameterWrappedByContainer) {
-    InternalComponentConfiguration.Builder mapConfig = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder mapConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
     DslElementModel.Builder mapElement = DslElementModel.builder()
@@ -551,7 +552,7 @@ class DeclarationBasedElementModelFactory {
 
     paramDsl.getGeneric(valueType)
         .ifPresent(entryDsl -> objectValue.getParameters().forEach((key, value) -> {
-          InternalComponentConfiguration.Builder entryConfigBuilder = InternalComponentConfiguration.builder()
+          ComponentConfiguration.Builder entryConfigBuilder = ComponentConfiguration.builder()
               .withIdentifier(asIdentifier(entryDsl));
 
           DslElementModel.Builder<MetadataType> entryElement = DslElementModel.<MetadataType>builder()
@@ -616,7 +617,7 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void createComplexParameter(ParameterObjectValue objectValue, DslElementSyntax paramDsl, ParameterModel parameterModel,
-                                      InternalComponentConfiguration.Builder parentConfig,
+                                      ComponentConfiguration.Builder parentConfig,
                                       DslElementModel.Builder parentElement) {
     if (!paramDsl.isWrapped()) {
       // the parameter is of a complex object type, so we have both nested elements
@@ -635,12 +636,12 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void createWrappedObject(ParameterObjectValue objectValue, ParameterModel parameterModel, DslElementSyntax paramDsl,
-                                   InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
+                                   ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement) {
     DslElementModel.Builder<ParameterModel> wrapperElement = DslElementModel.<ParameterModel>builder()
         .withModel(parameterModel)
         .withDsl(paramDsl);
 
-    InternalComponentConfiguration.Builder wrapperConfig = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder wrapperConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(paramDsl));
 
     Reference<DslSyntaxResolver> customDsl = new Reference<>(dsl);
@@ -669,7 +670,7 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void createSimpleParameter(ParameterSimpleValue value, DslElementSyntax paramDsl,
-                                     InternalComponentConfiguration.Builder parentConfig,
+                                     ComponentConfiguration.Builder parentConfig,
                                      DslElementModel.Builder parentElement, ParameterModel parameterModel, boolean explicit) {
     if (paramDsl.supportsAttributeDeclaration()) {
       // skip the compId since it was already added in createComponentElement
@@ -687,7 +688,7 @@ class DeclarationBasedElementModelFactory {
           .build());
     } else {
       // we are in the text or content case, so we have one more nesting level
-      ComponentConfiguration parameterConfig = InternalComponentConfiguration.builder()
+      ComponentConfiguration parameterConfig = ComponentConfiguration.builder()
           .withIdentifier(asIdentifier(paramDsl))
           .withValue(value.getValue())
           .withProperty(IS_CDATA, value.isCData() ? true : null)
@@ -715,7 +716,7 @@ class DeclarationBasedElementModelFactory {
   private void createListItemConfig(MetadataType itemValueType,
                                     ParameterValue itemValue,
                                     DslElementSyntax itemDsl,
-                                    InternalComponentConfiguration.Builder parentConfig,
+                                    ComponentConfiguration.Builder parentConfig,
                                     DslElementModel.Builder parentElement) {
 
     itemValue.accept(new ParameterValueVisitor() {
@@ -724,7 +725,7 @@ class DeclarationBasedElementModelFactory {
       public void visitSimpleValue(ParameterSimpleValue text) {
         itemDsl.getContainedElement(VALUE_ATTRIBUTE_NAME)
             .ifPresent(valueDsl -> {
-              ComponentConfiguration item = InternalComponentConfiguration.builder()
+              ComponentConfiguration item = ComponentConfiguration.builder()
                   .withIdentifier(asIdentifier(itemDsl))
                   .withParameter(VALUE_ATTRIBUTE_NAME, text.getValue())
                   .build();
@@ -767,7 +768,7 @@ class DeclarationBasedElementModelFactory {
 
   private void addObjectField(MetadataType fieldType, ParameterValue fieldValue,
                               DslElementSyntax fieldDsl,
-                              InternalComponentConfiguration.Builder objectConfig,
+                              ComponentConfiguration.Builder objectConfig,
                               DslElementModel.Builder objectElement) {
 
     fieldValue.accept(new ParameterValueVisitor() {
@@ -782,7 +783,7 @@ class DeclarationBasedElementModelFactory {
               .withValue(text.getValue())
               .build());
         } else {
-          ComponentConfiguration contentConfiguration = InternalComponentConfiguration.builder()
+          ComponentConfiguration contentConfiguration = ComponentConfiguration.builder()
               .withIdentifier(asIdentifier(fieldDsl))
               .withValue(text.getValue())
               .withProperty(IS_CDATA, text.isCData() ? true : null)
@@ -825,7 +826,7 @@ class DeclarationBasedElementModelFactory {
                           DslElementSyntax listDsl,
                           Object model,
                           ArrayType listType,
-                          InternalComponentConfiguration.Builder parentConfig,
+                          ComponentConfiguration.Builder parentConfig,
                           DslElementModel.Builder parentElement) {
     createList(list, listDsl, model, listType, parentConfig, parentElement, isParameterWrappedByContainer(model));
   }
@@ -834,14 +835,14 @@ class DeclarationBasedElementModelFactory {
                           DslElementSyntax listDsl,
                           Object model,
                           ArrayType listType,
-                          InternalComponentConfiguration.Builder parentConfig,
+                          ComponentConfiguration.Builder parentConfig,
                           DslElementModel.Builder parentElement, boolean isParameterWrappedByContainer) {
 
     final DslElementModel.Builder listElement = DslElementModel.builder()
         .withModel(model)
         .withDsl(listDsl);
 
-    final InternalComponentConfiguration.Builder listConfig = InternalComponentConfiguration.builder()
+    final ComponentConfiguration.Builder listConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(listDsl));
 
     final MetadataType itemType = listType.getType();
@@ -863,10 +864,10 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void createObject(ParameterObjectValue objectValue, DslElementSyntax objectDsl, Object model, ObjectType objectType,
-                            InternalComponentConfiguration.Builder parentConfig,
+                            ComponentConfiguration.Builder parentConfig,
                             DslElementModel.Builder parentElement) {
 
-    InternalComponentConfiguration.Builder objectConfig = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder objectConfig = ComponentConfiguration.builder()
         .withIdentifier(asIdentifier(objectDsl));
 
     DslElementModel.Builder objectElement = DslElementModel.builder()
@@ -882,7 +883,7 @@ class DeclarationBasedElementModelFactory {
   }
 
   private void populateObjectElementFields(ObjectType objectType, ParameterObjectValue objectValue, DslElementSyntax objectDsl,
-                                           InternalComponentConfiguration.Builder objectConfig,
+                                           ComponentConfiguration.Builder objectConfig,
                                            DslElementModel.Builder objectElement) {
     List<ObjectFieldType> fields = objectType.getFields()
         .stream()
