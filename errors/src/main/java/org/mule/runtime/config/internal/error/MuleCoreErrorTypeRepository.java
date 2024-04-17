@@ -9,6 +9,8 @@ package org.mule.runtime.config.internal.error;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Optional.ofNullable;
+
+import static org.mule.runtime.ast.api.error.ErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.CORE_NAMESPACE_NAME;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
@@ -47,7 +49,7 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_I
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.api.error.ErrorTypeBuilder;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -62,27 +64,27 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
    * Error type that represents all of them that can be handled.
    */
   private static final ErrorType ANY_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
+      builder().namespace(CORE_NAMESPACE_NAME).identifier(ANY_IDENTIFIER).build();
 
   /**
    * Parent error type for errors that occur on the source of a flow.
    */
   private static final ErrorType SOURCE_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_ERROR_IDENTIFIER)
+      builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_ERROR_IDENTIFIER)
           .parentErrorType(ANY_ERROR_TYPE).build();
 
   /**
    * Parent error type for errors that occur in a source processing a successful response of a flow.
    */
   private static final ErrorType SOURCE_RESPONSE_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_RESPONSE_ERROR_IDENTIFIER)
+      builder().namespace(CORE_NAMESPACE_NAME).identifier(SOURCE_RESPONSE_ERROR_IDENTIFIER)
           .parentErrorType(SOURCE_ERROR_TYPE).build();
 
   /**
    * Error type for which there's no clear reason for failure. Will be used when no specific match is found.
    */
   private static final ErrorType UNKNOWN_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
+      builder().namespace(CORE_NAMESPACE_NAME).identifier(UNKNOWN_ERROR_IDENTIFIER)
           .parentErrorType(ANY_ERROR_TYPE).build();
 
   /**
@@ -90,7 +92,7 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
    * error occurs it will always be propagated. Same for it's children.
    */
   public static final ErrorType CRITICAL_ERROR_TYPE =
-      ErrorTypeBuilder.builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
+      builder().namespace(CORE_NAMESPACE_NAME).identifier(CRITICAL_IDENTIFIER)
           .parentErrorType(null).build();
 
   public static final ErrorTypeRepository MULE_CORE_ERROR_TYPE_REPOSITORY = new MuleCoreErrorTypeRepository();
@@ -159,7 +161,7 @@ public final class MuleCoreErrorTypeRepository implements ErrorTypeRepository {
     if (errorTypes.containsKey(identifier) || internalErrorTypes.containsKey(identifier)) {
       throw new IllegalStateException(format("An error type with identifier '%s' already exists", identifier));
     }
-    return ErrorTypeBuilder.builder()
+    return builder()
         .namespace(identifier.getNamespace())
         .identifier(identifier.getName())
         .parentErrorType(parent)

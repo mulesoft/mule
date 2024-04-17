@@ -55,7 +55,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.functional.Either;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.util.Reference;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.exception.FlowExceptionHandler;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
@@ -102,7 +102,7 @@ import org.mockito.ArgumentCaptor;
 public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   private static final ErrorType ERROR_FROM_FLOW =
-      ErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
+      DefaultErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
 
   private AbstractPipeline flow;
   private ExceptionRouter flowErrorHandlerRouter;

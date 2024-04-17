@@ -36,7 +36,7 @@ import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.transformer.TransformerException;
 import org.mule.runtime.core.internal.exception.MessagingException;
@@ -174,7 +174,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolveWithParentInChain() {
-    ErrorType withParent = ErrorTypeBuilder.builder().parentErrorType(CONNECTION).identifier("CONNECT").namespace("TEST").build();
+    ErrorType withParent = DefaultErrorTypeBuilder.builder().parentErrorType(CONNECTION).identifier("CONNECT").namespace("TEST").build();
     Optional<Error> surfaceError = mockError(withParent, new Exception());
     when(event.getError()).thenReturn(surfaceError);
     Exception cause = new ConnectionException("Some Connection Error", new Exception());
@@ -186,7 +186,7 @@ public class MessagingExceptionResolverTestCase extends AbstractMuleTestCase {
 
   @Test
   public void resolveCorrectConnectionException() {
-    ErrorType expected = ErrorTypeBuilder.builder().namespace("NS").identifier("CONNECTION").parentErrorType(CONNECTION).build();
+    ErrorType expected = DefaultErrorTypeBuilder.builder().namespace("NS").identifier("CONNECTION").parentErrorType(CONNECTION).build();
     ErrorTypeLocator locator = ErrorTypeLocator.builder(getCoreErrorTypeRepo())
         .addComponentExceptionMapper(ci, ExceptionMapper.builder()
             .addExceptionMapping(ConnectionException.class, expected)

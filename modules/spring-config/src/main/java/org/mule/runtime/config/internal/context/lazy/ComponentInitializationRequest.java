@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.config.internal.context.lazy;
 
+import static org.mule.runtime.ast.api.ArtifactAst.filteredArtifactAst;
+
 import static java.util.Collections.singleton;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -16,7 +18,6 @@ import org.mule.runtime.api.component.location.Location;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
-import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.config.api.LazyComponentInitializer.ComponentLocationFilter;
 import org.mule.runtime.core.api.config.ConfigurationException;
 
@@ -277,7 +278,7 @@ class ComponentInitializationRequest {
 
   private ArtifactAst doGetFilteredAstToInitialize(ArtifactAst artifactAst) {
     if (isKeepPreviousRequested()) {
-      return new FilteredArtifactAst(artifactAst, comp -> !componentInitializationState.isComponentAlreadyInitialized(comp));
+      return filteredArtifactAst(artifactAst, comp -> !componentInitializationState.isComponentAlreadyInitialized(comp));
     } else {
       return artifactAst;
     }

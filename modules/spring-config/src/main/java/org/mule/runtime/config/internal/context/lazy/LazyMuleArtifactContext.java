@@ -11,6 +11,7 @@ import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentT
 import static org.mule.runtime.api.component.TypedComponentIdentifier.ComponentType.SOURCE;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkState;
+import static org.mule.runtime.ast.api.ArtifactAst.filteredArtifactAst;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.resolveOrphanComponents;
 import static org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraphFactory.generateFor;
 import static org.mule.runtime.config.internal.parsers.generic.AutoIdUtils.uniqueValue;
@@ -45,7 +46,6 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.graph.api.ArtifactAstDependencyGraph;
-import org.mule.runtime.ast.internal.FilteredArtifactAst;
 import org.mule.runtime.config.internal.context.BaseConfigurationComponentLocator;
 import org.mule.runtime.config.internal.context.MuleArtifactContext;
 import org.mule.runtime.config.internal.context.SpringConfigurationComponentLocator;
@@ -498,7 +498,7 @@ public class LazyMuleArtifactContext extends MuleArtifactContext
       // all error types this time.
       // Note that using the full AST directly does not work the same as a FilteredArtifactAst that filters nothing. This
       // is because the FilteredArtifactAst has some special case for error handlers.
-      doRegisterErrors(new FilteredArtifactAst(getApplicationModel(), c -> true));
+      doRegisterErrors(filteredArtifactAst(getApplicationModel(), c -> true));
       currentComponentInitializationState.setAllErrorTypesRegistered();
     } else {
       // If we do not care about previously registered errors, we can discover the error types just from the filtered AST

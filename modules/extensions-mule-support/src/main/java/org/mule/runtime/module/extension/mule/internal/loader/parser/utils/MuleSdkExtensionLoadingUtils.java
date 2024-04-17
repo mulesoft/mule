@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser.utils;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.ast.api.model.ExtensionModelHelper.defaultExtensionModelHelper;
 import static org.mule.runtime.extension.api.ExtensionConstants.MULE_SDK_EXPRESSION_LANGUAGE_METADATA_SERVICE_PROPERTY_NAME;
 
 import static java.lang.String.format;
@@ -15,7 +16,7 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.ExpressionLanguageMetadataService;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.ExtensionConstants;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.module.extension.internal.type.catalog.DefaultArtifactTypeLoader;
@@ -66,8 +67,8 @@ public class MuleSdkExtensionLoadingUtils {
    *         context.
    */
   public static ExtensionModelHelper createExtensionModelHelper(ExtensionLoadingContext context) {
-    return new ExtensionModelHelper(context.getDslResolvingContext().getExtensions(),
-                                    context.getDslResolvingContext());
+    return defaultExtensionModelHelper(context.getDslResolvingContext().getExtensions(),
+                                       context.getDslResolvingContext());
   }
 
   private static RuntimeException createParameterNotFoundException(String parameterName) {
