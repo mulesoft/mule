@@ -97,7 +97,8 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
   public void wildcardIdentifierAlsoMatchesChildren() {
     ComponentIdentifier wildcardErrorType = buildFromStringRepresentation(WILDCARD_TOKEN + ":TRANSFORMATION");
     ErrorType testErrorType =
-        DefaultErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType)
+            .build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(testErrorType), is(true));
@@ -107,7 +108,8 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
   public void wildcardNamespaceDoesntMatchesChildren() {
     ComponentIdentifier wildcardErrorType = buildFromStringRepresentation(CORE_NAMESPACE_NAME + ":" + WILDCARD_TOKEN);
     ErrorType testErrorType =
-        DefaultErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("unknown").identifier("unknown").parentErrorType(transformationErrorType)
+            .build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(testErrorType), is(false));
@@ -122,7 +124,8 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
     ErrorType test2ErrorType = DefaultErrorTypeBuilder.builder().namespace("test2").identifier("fixedIdentifier")
         .parentErrorType(transformationErrorType).build();
     ErrorType test3ErrorType =
-        DefaultErrorTypeBuilder.builder().namespace("test3").identifier("unknown").parentErrorType(transformationErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("test3").identifier("unknown").parentErrorType(transformationErrorType)
+            .build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(test1ErrorType), is(true));
@@ -147,7 +150,8 @@ public class WildcardErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTe
     ComponentIdentifier wildcardErrorType = buildFromStringRepresentation(WILDCARD_TOKEN + ":anId");
 
     ErrorType testErrorType =
-        DefaultErrorTypeBuilder.builder().namespace("test").identifier("otherId").parentErrorType(transformationErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("test").identifier("otherId").parentErrorType(transformationErrorType)
+            .build();
 
     ErrorTypeMatcher wildcardMatcher = new WildcardErrorTypeMatcher(wildcardErrorType);
     assertThat(wildcardMatcher.match(testErrorType), is(false));

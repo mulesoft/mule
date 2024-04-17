@@ -102,7 +102,8 @@ import org.mockito.ArgumentCaptor;
 public class FlowProcessMediatorTestCase extends AbstractMuleContextTestCase {
 
   private static final ErrorType ERROR_FROM_FLOW =
-      DefaultErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED").build();
+      DefaultErrorTypeBuilder.builder().parentErrorType(mock(ErrorType.class)).namespace("TEST").identifier("FLOW_FAILED")
+          .build();
 
   private AbstractPipeline flow;
   private ExceptionRouter flowErrorHandlerRouter;
