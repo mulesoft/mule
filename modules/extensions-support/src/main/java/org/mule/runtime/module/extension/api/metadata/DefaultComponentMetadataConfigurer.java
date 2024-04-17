@@ -233,11 +233,4 @@ public final class DefaultComponentMetadataConfigurer implements ComponentMetada
     return unmodifiableMap(new HashMap<>(map));
   }
 
-  public static class Factory implements ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory {
-
-    @Override
-    public ComponentMetadataConfigurer create() {
-      return new DefaultComponentMetadataConfigurer();
-    }
-  }
 }

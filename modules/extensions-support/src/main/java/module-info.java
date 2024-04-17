@@ -221,7 +221,7 @@ module org.mule.runtime.extensions.support {
       org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDocumentationResourceGenerator;
   provides org.mule.runtime.core.api.transaction.TransactionFactory with
       org.mule.runtime.module.extension.internal.runtime.transaction.ExtensionTransactionFactory;
-  provides org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer.ComponentMetadataConfigurerFactory with
-      org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer.Factory;
+  provides org.mule.runtime.extension.internal.metadata.ComponentMetadataConfigurerFactoryDelegate with
+      org.mule.runtime.module.extension.internal.metadata.DefaultComponentMetadataConfigurerFactoryDelegate;
 
 }
