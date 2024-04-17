@@ -28,12 +28,12 @@ import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.extension.api.soap.SoapAttributes;
 import org.mule.runtime.extension.api.soap.SoapOutputPayload;
 import org.mule.runtime.extension.api.soap.WebServiceTypeKey;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
-import org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -109,7 +109,7 @@ public class SoapInvokeOperationDeclarer {
   }
 
   private void declareMetadata(OperationDeclarer operation, ClassTypeLoader loader) {
-    new DefaultComponentMetadataConfigurer()
+    ComponentMetadataConfigurerFactory.getDefault().create()
         .setKeysResolver(new InvokeKeysResolver(), KEYS_GROUP, loader.load(WebServiceTypeKey.class), false)
         .addInputResolver(BODY_PARAM, new InvokeRequestTypeResolver())
         .addInputResolver(HEADERS_PARAM, new InvokeInputHeadersTypeResolver())
