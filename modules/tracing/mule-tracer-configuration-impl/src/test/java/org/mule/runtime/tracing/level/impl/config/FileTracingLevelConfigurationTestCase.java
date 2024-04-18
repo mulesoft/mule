@@ -14,6 +14,7 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static java.lang.Boolean.TRUE;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +26,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.ResourceNotFoundException;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracing.level.api.config.TracingLevel;
+
+import java.io.File;
 
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -66,7 +69,8 @@ public class FileTracingLevelConfigurationTestCase {
   @Test
   public void whenNoFileExistsExceptionIsThrown() {
     expectedException.expect(ResourceNotFoundException.class);
-    expectedException.expectMessage("Couldn't find resource: conf/non-existent.conf neither on classpath or in file system");
+    expectedException.expectMessage("Couldn't find resource: conf" + File.separator
+        + "non-existent.conf neither on classpath or in file system");
     SpanExporterConfiguration spanExporterConfiguration = mock(SpanExporterConfiguration.class);
     when(spanExporterConfiguration.getStringValue(any(), any())).thenReturn(TRUE.toString());
     FileTracingLevelConfiguration fileTracingLevelConfiguration =
