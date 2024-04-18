@@ -14,7 +14,6 @@ import static org.mule.test.allure.AllureConstants.Profiling.ProfilingServiceSto
 import static java.lang.Boolean.TRUE;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
