@@ -28,9 +28,9 @@ import org.mule.runtime.core.internal.connection.ConfigNameResolverConnectionPro
 import org.mule.runtime.core.internal.connection.ErrorTypeHandlerConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.PoolingConnectionProviderWrapper;
 import org.mule.runtime.core.internal.connection.ReconnectableConnectionProviderWrapper;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ResolverSetBasedObjectBuilder;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 
 /**
  * Implementation of {@link ResolverSetBasedObjectBuilder} which produces instances of {@link ConnectionProviderModel}

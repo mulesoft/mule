@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getField;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 import org.mule.test.heisenberg.extension.model.PersonalInfo;

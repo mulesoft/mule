@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.resolver;
+package org.mule.runtime.module.extension.api.runtime.resolver;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;

@@ -10,8 +10,8 @@ import static java.util.Optional.ofNullable;
 
 import org.mule.metadata.java.api.JavaTypeLoader;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.type.runtime.TypeWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 import java.util.Optional;
 

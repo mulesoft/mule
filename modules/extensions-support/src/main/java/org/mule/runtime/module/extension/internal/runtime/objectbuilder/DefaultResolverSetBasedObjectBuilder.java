@@ -13,7 +13,7 @@ import static org.mule.runtime.module.extension.internal.runtime.objectbuilder.O
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 
 /**
  * Default implementation of {@link ResolverSetBasedObjectBuilder} which uses reflection and a default constructor to instantiate

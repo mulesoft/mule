@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import org.mule.runtime.api.meta.model.parameter.ParameterModel;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 
 import java.lang.reflect.Field;
 

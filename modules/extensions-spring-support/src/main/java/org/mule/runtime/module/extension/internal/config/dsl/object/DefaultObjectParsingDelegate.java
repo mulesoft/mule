@@ -12,7 +12,7 @@ import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.dsl.api.component.AttributeDefinition;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 
 /**
  * Default {@link ObjectParsingDelegate} which accepts any {@link ObjectType} and parses it as a {@link ValueResolver}

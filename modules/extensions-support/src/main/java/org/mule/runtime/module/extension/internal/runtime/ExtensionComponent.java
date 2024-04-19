@@ -88,6 +88,8 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
@@ -96,8 +98,6 @@ import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigur
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;

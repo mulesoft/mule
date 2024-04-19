@@ -9,6 +9,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 /**
  * A value resolver which returns the values of a {@link ConfigurationInstance} obtained through a {@link ConfigurationProvider}

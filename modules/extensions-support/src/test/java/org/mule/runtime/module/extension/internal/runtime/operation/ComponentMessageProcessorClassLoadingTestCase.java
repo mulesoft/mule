@@ -36,10 +36,10 @@ import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.TestComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorTestCase;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.slf4j.Logger;

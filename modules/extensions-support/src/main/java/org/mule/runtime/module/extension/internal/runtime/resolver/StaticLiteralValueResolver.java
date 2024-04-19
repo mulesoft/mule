@@ -8,6 +8,8 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.runtime.parameter.Literal;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 /**
  * {@link ValueResolver} that produces instances of {@link Literal}

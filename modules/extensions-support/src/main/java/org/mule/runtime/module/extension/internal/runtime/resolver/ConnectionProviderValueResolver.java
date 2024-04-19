@@ -9,6 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Optional.empty;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.util.Pair;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
