@@ -6,10 +6,19 @@
  */
 package org.mule.runtime.config.internal.dsl.model;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.RECONNECTION_CONFIG_PARAMETER_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.SCHEDULING_STRATEGY_IDENTIFIER;
 import static org.mule.runtime.config.internal.model.ApplicationModel.TLS_CONTEXT_IDENTIFIER;
@@ -25,17 +34,10 @@ import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrate
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_BYTES_STREAM_ALIAS;
 import static org.mule.runtime.extension.api.declaration.type.StreamingStrategyTypeBuilder.REPEATABLE_FILE_STORE_OBJECTS_STREAM_ALIAS;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureTypeMapping.getQName;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.EXPIRATION_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.POOLING_PROFILE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.RECONNECT_FOREVER_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.REDELIVERY_POLICY_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_KEY_STORE_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_REVOCATION_CHECK_ELEMENT_IDENTIFIER;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.TLS_TRUST_STORE_ELEMENT_IDENTIFIER;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.metadata.api.model.ObjectType;
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -45,7 +47,6 @@ import org.mule.runtime.app.declaration.api.ParameterValueVisitor;
 import org.mule.runtime.app.declaration.api.fluent.ParameterObjectValue;
 import org.mule.runtime.app.declaration.api.fluent.ParameterSimpleValue;
 import org.mule.runtime.dsl.api.component.config.ComponentConfiguration;
-import org.mule.runtime.dsl.internal.component.config.InternalComponentConfiguration;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
@@ -53,10 +54,10 @@ import org.mule.runtime.metadata.api.dsl.DslElementModel;
 
 import java.util.Set;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Delegate to be used by a {@link DeclarationBasedElementModelFactory} in order to resolve the {@link DslElementModel} of an
@@ -74,7 +75,7 @@ class InfrastructureElementModelDelegate {
   public void addParameter(String parameterName, ParameterValue value,
                            ParameterModel parameterModel,
                            DslElementSyntax paramDsl,
-                           InternalComponentConfiguration.Builder parentConfig,
+                           ComponentConfiguration.Builder parentConfig,
                            DslElementModel.Builder parentElement,
                            DslResolvingContext context, DslSyntaxResolver dsl) {
 
@@ -137,12 +138,12 @@ class InfrastructureElementModelDelegate {
   private void createSchedulingStrategy(ParameterObjectValue value,
                                         ParameterModel parameterModel,
                                         DslElementSyntax paramDsl,
-                                        InternalComponentConfiguration.Builder parentConfig,
+                                        ComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement,
                                         DslResolvingContext context,
                                         DslSyntaxResolver dsl) {
 
-    InternalComponentConfiguration.Builder schedulingWrapperConfig = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder schedulingWrapperConfig = ComponentConfiguration.builder()
         .withIdentifier(SCHEDULING_STRATEGY_IDENTIFIER);
 
     DslElementModel.Builder schedulingElement = DslElementModel.builder()
@@ -153,7 +154,7 @@ class InfrastructureElementModelDelegate {
         .ifPresent(strategyType -> {
           dsl.resolve(strategyType)
               .ifPresent(strategyDsl -> {
-                InternalComponentConfiguration.Builder strategyConfig = InternalComponentConfiguration.builder()
+                ComponentConfiguration.Builder strategyConfig = ComponentConfiguration.builder()
                     .withIdentifier(builder()
                         .namespace(CORE_PREFIX)
                         .name(strategyDsl.getElementName())
@@ -184,7 +185,7 @@ class InfrastructureElementModelDelegate {
   private void createTlsContext(ParameterValue value,
                                 ParameterModel parameterModel,
                                 DslElementSyntax paramDsl,
-                                InternalComponentConfiguration.Builder parentConfig,
+                                ComponentConfiguration.Builder parentConfig,
                                 DslElementModel.Builder parentElement) {
 
     value.accept(new ParameterValueVisitor() {
@@ -201,7 +202,7 @@ class InfrastructureElementModelDelegate {
       @Override
       public void visitObjectValue(ParameterObjectValue objectValue) {
 
-        InternalComponentConfiguration.Builder tlsConfig = InternalComponentConfiguration.builder()
+        ComponentConfiguration.Builder tlsConfig = ComponentConfiguration.builder()
             .withIdentifier(TLS_CONTEXT_IDENTIFIER);
 
         objectValue.getParameters()
@@ -224,8 +225,8 @@ class InfrastructureElementModelDelegate {
                   return;
                 }
 
-                InternalComponentConfiguration.Builder innerComponent =
-                    InternalComponentConfiguration.builder()
+                ComponentConfiguration.Builder innerComponent =
+                    ComponentConfiguration.builder()
                         .withIdentifier(builder()
                             .namespace(TLS_PREFIX)
                             .name(name)
@@ -235,7 +236,7 @@ class InfrastructureElementModelDelegate {
                   getQName(objectValue.getTypeId())
                       .map(QNameModelProperty::getValue)
                       .ifPresent(qname -> {
-                        InternalComponentConfiguration.Builder nested = InternalComponentConfiguration.builder()
+                        ComponentConfiguration.Builder nested = ComponentConfiguration.builder()
                             .withIdentifier(builder()
                                 .namespace(qname.getPrefix())
                                 .name(qname.getLocalPart())
@@ -260,10 +261,10 @@ class InfrastructureElementModelDelegate {
   private void createReconnectionConfig(ParameterValue value,
                                         ParameterModel parameterModel,
                                         DslElementSyntax paramDsl,
-                                        InternalComponentConfiguration.Builder parentConfig,
+                                        ComponentConfiguration.Builder parentConfig,
                                         DslElementModel.Builder parentElement) {
 
-    InternalComponentConfiguration.Builder config = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
         .withIdentifier(RECONNECTION_CONFIG_PARAMETER_IDENTIFIER);
 
     final DslElementModel.Builder<Object> elementBuilder = DslElementModel.builder()
@@ -299,7 +300,7 @@ class InfrastructureElementModelDelegate {
   private void createReconnectionStrategy(ParameterValue value,
                                           Object parameterModel,
                                           DslElementSyntax paramDsl,
-                                          InternalComponentConfiguration.Builder parentConfig,
+                                          ComponentConfiguration.Builder parentConfig,
                                           DslElementModel.Builder parentElement) {
 
     ParameterObjectValue objectValue = (ParameterObjectValue) value;
@@ -316,7 +317,7 @@ class InfrastructureElementModelDelegate {
   private void createStreamingStrategy(ParameterValue value,
                                        ParameterModel parameterModel,
                                        DslElementSyntax paramDsl,
-                                       InternalComponentConfiguration.Builder parentConfig,
+                                       ComponentConfiguration.Builder parentConfig,
                                        DslElementModel.Builder parentElement) {
 
     ParameterObjectValue objectValue = (ParameterObjectValue) value;
@@ -328,11 +329,11 @@ class InfrastructureElementModelDelegate {
   }
 
   private void cloneDeclarationToElement(Object parameterModel, DslElementSyntax paramDsl,
-                                         InternalComponentConfiguration.Builder parentConfig,
+                                         ComponentConfiguration.Builder parentConfig,
                                          DslElementModel.Builder parentElement,
                                          ParameterObjectValue objectValue, String elementName, String customNamespace) {
 
-    InternalComponentConfiguration.Builder config = InternalComponentConfiguration.builder()
+    ComponentConfiguration.Builder config = ComponentConfiguration.builder()
         .withIdentifier(builder()
             .namespace(isBlank(customNamespace) ? CORE_PREFIX : customNamespace)
             .name(elementName)
@@ -344,7 +345,7 @@ class InfrastructureElementModelDelegate {
   }
 
   private void addParameterElement(Object parameterModel, DslElementSyntax paramDsl,
-                                   InternalComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
+                                   ComponentConfiguration.Builder parentConfig, DslElementModel.Builder parentElement,
                                    ComponentConfiguration result) {
     parentConfig.withNestedComponent(result);
     parentElement.containing(DslElementModel.builder()
@@ -354,7 +355,7 @@ class InfrastructureElementModelDelegate {
   }
 
   private void cloneParameters(ParameterObjectValue objectValue,
-                               final InternalComponentConfiguration.Builder config) {
+                               final ComponentConfiguration.Builder config) {
     objectValue.getParameters()
         .forEach((name, value) -> value.accept(new ParameterValueVisitor() {
 
