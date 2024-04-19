@@ -92,7 +92,7 @@ import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContext
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.tck.size.SmallTest;

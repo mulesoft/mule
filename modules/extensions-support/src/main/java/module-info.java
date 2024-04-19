@@ -139,8 +139,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.resources.manifest to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime to
-      org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core,
       org.mule.runtime.extensions.soap.support;
@@ -176,9 +175,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.resolver to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.tooling.support,
-      org.mule.runtime.extensions.soap.support;
+      org.mule.runtime.extensions.soap.support,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver.resolver to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to
