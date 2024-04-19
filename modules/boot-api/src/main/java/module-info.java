@@ -23,5 +23,6 @@ module org.mule.boot.api {
           com.mulesoft.mule.boot;
 
   uses org.mule.runtime.module.boot.api.MuleContainerProvider;
+  uses org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider;
 
 }

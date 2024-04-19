@@ -40,4 +40,7 @@ module org.mule.boot.commons {
   opens org.mule.runtime.module.boot.commons.internal to
       org.mule.runtime.jpms.utils;
 
+  provides org.mule.runtime.module.boot.api.MuleContainerLifecycleWrapperProvider with
+          org.mule.runtime.module.boot.commons.internal.MuleContainerWrapperProvider;
+  uses org.mule.runtime.module.boot.api.MuleContainerProvider;
 }
