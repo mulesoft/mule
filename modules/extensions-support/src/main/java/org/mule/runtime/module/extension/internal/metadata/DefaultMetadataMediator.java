@@ -65,6 +65,7 @@ import org.mule.runtime.extension.api.model.source.ImmutableSourceModel;
 import org.mule.runtime.extension.api.property.MetadataKeyIdModelProperty;
 import org.mule.runtime.extension.api.property.MetadataKeyPartModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.LinkedList;
@@ -85,7 +86,7 @@ import com.google.common.collect.ImmutableList;
  *
  * @since 4.0
  */
-public final class MetadataMediator<T extends ComponentModel> {
+public final class DefaultMetadataMediator<T extends ComponentModel> implements MetadataMediator {
 
   protected final T component;
   private final List<ParameterModel> metadataKeyParts;
@@ -97,7 +98,7 @@ public final class MetadataMediator<T extends ComponentModel> {
   private final Optional<MetadataInputDelegate> errorCallbackInputDelegate;
   private String keyContainerName = null;
 
-  public MetadataMediator(T componentModel) {
+  public DefaultMetadataMediator(T componentModel) {
     this.component = componentModel;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
@@ -277,6 +278,7 @@ public final class MetadataMediator<T extends ComponentModel> {
     }
   }
 
+  @Override
   public MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolve(key);
@@ -314,6 +316,7 @@ public final class MetadataMediator<T extends ComponentModel> {
     }
   }
 
+  @Override
   public MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataContext context, MetadataKey key) {
     if (!(component instanceof HasOutputModel)) {
       return failure(MetadataFailure.Builder.newFailure()

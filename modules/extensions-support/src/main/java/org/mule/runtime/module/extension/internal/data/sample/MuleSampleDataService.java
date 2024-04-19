@@ -32,6 +32,7 @@ import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -103,13 +104,14 @@ public class MuleSampleDataService implements SampleDataService {
                                     INVALID_TARGET_EXTENSION);
     }
 
-    SampleDataProviderMediator mediator = new SampleDataProviderMediator(
-                                                                         extensionModel,
-                                                                         componentModel,
-                                                                         new ResolvingComponent(extensionName, componentName),
-                                                                         muleContext,
-                                                                         new ReflectionCache(),
-                                                                         streamingManager);
+    SampleDataProviderMediator mediator = new DefaultSampleDataProviderMediator(
+                                                                                extensionModel,
+                                                                                componentModel,
+                                                                                new ResolvingComponent(extensionName,
+                                                                                                       componentName),
+                                                                                muleContext,
+                                                                                new ReflectionCache(),
+                                                                                streamingManager);
 
     ExtensionResolvingContext ctx = new ExtensionResolvingContext(configurationInstanceSupplier, connectionManager);
     try {

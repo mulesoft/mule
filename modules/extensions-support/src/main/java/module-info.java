@@ -76,14 +76,17 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;
   exports org.mule.runtime.module.extension.api.loader.java.property;
-  exports org.mule.runtime.module.extension.api.util;
+  exports org.mule.runtime.module.extension.api.loader.java.type;
   exports org.mule.runtime.module.extension.api.metadata;
-  exports org.mule.runtime.module.extension.api.tooling;
   exports org.mule.runtime.module.extension.api.runtime.compatibility;
   exports org.mule.runtime.module.extension.api.runtime.config;
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.runtime.resolver;
-  exports org.mule.runtime.module.extension.api.loader.java.type;
+  exports org.mule.runtime.module.extension.api.tooling;
+  exports org.mule.runtime.module.extension.api.tooling.metadata;
+  exports org.mule.runtime.module.extension.api.tooling.sampledata;
+  exports org.mule.runtime.module.extension.api.tooling.valueprovider;
+  exports org.mule.runtime.module.extension.api.util;
 
   exports org.mule.runtime.module.extension.api.runtime.privileged to
       org.mule.runtime.extensions.spring.support,
