@@ -26,18 +26,18 @@ import org.mule.runtime.extension.api.soap.message.MessageDispatcher;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.config.BaseConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultResolverSetBasedObjectBuilder;
 import org.mule.runtime.module.extension.soap.api.runtime.connection.transport.DefaultHttpMessageDispatcherProvider;
 import org.mule.runtime.soap.api.client.SoapClient;
 
 /**
- * Implementation of {@link ConnectionProviderObjectBuilder} which produces instances of
+ * Implementation of {@link BaseConnectionProviderObjectBuilder} which produces instances of
  * {@link ForwardingSoapClientConnectionProvider}.
  *
  * @since 4.0
  */
-public final class SoapConnectionProviderObjectBuilder extends ConnectionProviderObjectBuilder<SoapClient> {
+public final class SoapConnectionProviderObjectBuilder extends BaseConnectionProviderObjectBuilder<SoapClient> {
 
   private final DefaultResolverSetBasedObjectBuilder<SoapServiceProvider> objectBuilder;
 

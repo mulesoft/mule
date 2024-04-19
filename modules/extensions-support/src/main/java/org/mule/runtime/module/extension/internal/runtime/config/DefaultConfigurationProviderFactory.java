@@ -29,11 +29,14 @@ import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
+import org.mule.runtime.module.extension.api.runtime.config.ConfigurationProviderFactory;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+
+import javax.inject.Inject;
 
 /**
  * Default implementation of {@link ConfigurationProviderFactory}
@@ -41,6 +44,13 @@ import org.mule.runtime.module.extension.internal.util.ReflectionCache;
  * @since 4.0
  */
 public final class DefaultConfigurationProviderFactory implements ConfigurationProviderFactory {
+
+  @Inject
+  private ReflectionCache reflectionCache;
+  @Inject
+  private ExpressionManager expressionManager;
+  @Inject
+  private MuleContext muleContext;
 
   /**
    * {@inheritDoc}
@@ -51,10 +61,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                   ConfigurationModel configurationModel,
                                                                   ResolverSet resolverSet,
                                                                   ConnectionProviderValueResolver connectionProviderResolver,
-                                                                  ExpirationPolicy expirationPolicy,
-                                                                  ReflectionCache reflectionCache,
-                                                                  ExpressionManager expressionManager,
-                                                                  MuleContext muleContext) {
+                                                                  ExpirationPolicy expirationPolicy) {
 
     configureConnectionProviderResolver(name, connectionProviderResolver);
     return new DynamicConfigurationProvider(name, extensionModel, configurationModel, resolverSet, connectionProviderResolver,
@@ -69,10 +76,7 @@ public final class DefaultConfigurationProviderFactory implements ConfigurationP
                                                                  ExtensionModel extensionModel,
                                                                  ConfigurationModel configurationModel,
                                                                  ResolverSet resolverSet,
-                                                                 ConnectionProviderValueResolver connectionProviderResolver,
-                                                                 ReflectionCache reflectionCache,
-                                                                 ExpressionManager expressionManager,
-                                                                 MuleContext muleContext)
+                                                                 ConnectionProviderValueResolver connectionProviderResolver)
       throws Exception {
     return withExtensionClassLoader(extensionModel, () -> {
       configureConnectionProviderResolver(name, connectionProviderResolver);

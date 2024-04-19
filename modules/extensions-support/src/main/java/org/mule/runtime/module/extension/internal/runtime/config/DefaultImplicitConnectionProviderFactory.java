@@ -76,11 +76,11 @@ public final class DefaultImplicitConnectionProviderFactory<T> implements Implic
   @Override
   public <T> Pair<ConnectionProvider<T>, ResolverSetResult> createImplicitConnectionProvider(String configName, CoreEvent event) {
     ResolverSet resolverSet = resolverSetProvider.get();
-    ConnectionProviderObjectBuilder<T> builder = new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel,
-                                                                                              resolverSet,
-                                                                                              extensionModel,
-                                                                                              expressionManager,
-                                                                                              muleContext);
+    BaseConnectionProviderObjectBuilder<T> builder = new DefaultConnectionProviderObjectBuilder<>(connectionProviderModel,
+                                                                                                  resolverSet,
+                                                                                                  extensionModel,
+                                                                                                  expressionManager,
+                                                                                                  muleContext);
     builder.setOwnerConfigName(configName);
     try (ValueResolvingContext ctx = ValueResolvingContext.builder(event, expressionManager).build()) {
       return builder.build(ctx);

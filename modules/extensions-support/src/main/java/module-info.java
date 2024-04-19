@@ -80,6 +80,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.metadata;
   exports org.mule.runtime.module.extension.api.tooling;
   exports org.mule.runtime.module.extension.api.runtime.compatibility;
+  exports org.mule.runtime.module.extension.api.runtime.config;
   exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.runtime.resolver;
   exports org.mule.runtime.module.extension.api.loader.java.type;
@@ -146,8 +147,7 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.config to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.tooling.support,
-      org.mule.runtime.extensions.soap.support,
-      org.mule.runtime.extensions.xml.support;
+      org.mule.runtime.extensions.soap.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to

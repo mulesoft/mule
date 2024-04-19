@@ -61,7 +61,7 @@ import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGra
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.config.BaseConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
@@ -204,7 +204,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
       ResolverSet delegateResolverSet = getResolverSetFromParameterValues(descriptor.getParameters());
-      ConnectionProviderObjectBuilder builder =
+      BaseConnectionProviderObjectBuilder builder =
           new DefaultConnectionProviderObjectBuilder<>(connectionProviderDelegateClass,
                                                        oauthConfig.getDelegateConnectionProviderModel(),
                                                        delegateResolverSet,

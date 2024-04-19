@@ -37,7 +37,7 @@ import org.mule.runtime.module.extension.internal.runtime.objectbuilder.Resolver
  *
  * @since 4.0
  */
-public class DefaultConnectionProviderObjectBuilder<C> extends ConnectionProviderObjectBuilder<C> {
+public class DefaultConnectionProviderObjectBuilder<C> extends BaseConnectionProviderObjectBuilder<C> {
 
   public DefaultConnectionProviderObjectBuilder(ConnectionProviderModel providerModel, ResolverSet resolverSet,
                                                 ExtensionModel extensionModel, ExpressionManager expressionManager,

@@ -6,13 +6,14 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.config;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
+import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
+
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
-import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
-import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -27,14 +28,13 @@ import org.mule.runtime.dsl.api.component.ObjectFactory;
 import org.mule.runtime.extension.api.property.ClassLoaderModelProperty;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.api.runtime.config.ConfigurationProviderFactory;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.ConfigurationProviderFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.DefaultConfigurationProviderFactory;
 import org.mule.runtime.module.extension.internal.runtime.exception.RequiredParameterNotSetException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
 
@@ -50,7 +50,7 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
 
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
-  private final ConfigurationProviderFactory configurationProviderFactory = new DefaultConfigurationProviderFactory();
+  private final ConfigurationProviderFactory configurationProviderFactory;
 
   private ExpirationPolicy expirationPolicy;
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
@@ -60,10 +60,12 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
 
   public ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                             ConfigurationModel configurationModel,
+                                            ConfigurationProviderFactory configurationProviderFactory,
                                             MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
+    this.configurationProviderFactory = configurationProviderFactory;
   }
 
   @Override
@@ -89,25 +91,20 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
       ConfigurationProvider configurationProvider;
       try {
         if (resolverSet.isDynamic() || connectionProviderResolver.isDynamic()) {
-          configurationProvider =
-              configurationProviderFactory.createDynamicConfigurationProvider(configName.get(), extensionModel,
-                                                                              configurationModel,
-                                                                              resolverSet,
-                                                                              connectionProviderResolver,
-                                                                              expirationPolicy,
-                                                                              reflectionCache,
-                                                                              expressionManager,
-                                                                              muleContext);
+          configurationProvider = configurationProviderFactory
+              .createDynamicConfigurationProvider(configName.get(),
+                                                  extensionModel,
+                                                  configurationModel,
+                                                  resolverSet,
+                                                  connectionProviderResolver,
+                                                  expirationPolicy);
         } else {
           configurationProvider = configurationProviderFactory
               .createStaticConfigurationProvider(configName.get(),
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
-                                                 connectionProviderResolver,
-                                                 reflectionCache,
-                                                 expressionManager,
-                                                 muleContext);
+                                                 connectionProviderResolver);
         }
 
       } catch (Exception e) {

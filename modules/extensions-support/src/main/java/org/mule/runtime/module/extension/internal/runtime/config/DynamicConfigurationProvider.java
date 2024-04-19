@@ -42,11 +42,11 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ExpirableConfigurationProvider;
 import org.mule.runtime.extension.api.values.ConfigurationParameterValueProvider;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
 
@@ -350,8 +350,8 @@ public final class DynamicConfigurationProvider extends LifecycleAwareConfigurat
 
   private Optional<ConnectionProviderModel> getConnectionProviderModel() {
     return this.connectionProviderResolver.getObjectBuilder()
-        .filter(ob -> ob instanceof ConnectionProviderObjectBuilder)
-        .map(ob -> ((ConnectionProviderObjectBuilder) ob).providerModel);
+        .filter(ob -> ob instanceof BaseConnectionProviderObjectBuilder)
+        .map(ob -> ((BaseConnectionProviderObjectBuilder) ob).providerModel);
   }
 
   /**
