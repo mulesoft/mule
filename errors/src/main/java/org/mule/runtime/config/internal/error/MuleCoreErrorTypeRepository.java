@@ -49,7 +49,6 @@ import static org.mule.runtime.core.api.error.Errors.Identifiers.UNKNOWN_ERROR_I
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.ast.api.error.ErrorTypeBuilder;
 
 import java.util.Collection;
 import java.util.HashMap;
