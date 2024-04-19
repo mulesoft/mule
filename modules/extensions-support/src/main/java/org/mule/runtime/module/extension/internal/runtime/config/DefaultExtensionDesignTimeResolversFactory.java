@@ -68,13 +68,13 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
 
   @Override
   public <C> ConnectionProviderValueResolver<C> createConnectionProviderResolver(ConnectionProviderModel connectionProviderModel,
-                                                                          ComponentParameterization componentParameterization,
-                                                                          PoolingProfile poolingProfile,
-                                                                          ReconnectionConfig reconnectionConfig,
-                                                                          ExtensionModel extensionModel,
-                                                                          ConfigurationProperties configurationProperties,
-                                                                          String parametersOwner,
-                                                                          DslSyntaxResolver dslSyntaxResolver)
+                                                                                 ComponentParameterization componentParameterization,
+                                                                                 PoolingProfile poolingProfile,
+                                                                                 ReconnectionConfig reconnectionConfig,
+                                                                                 ExtensionModel extensionModel,
+                                                                                 ConfigurationProperties configurationProperties,
+                                                                                 String parametersOwner,
+                                                                                 DslSyntaxResolver dslSyntaxResolver)
       throws MuleException {
     ConnectionProviderSettings settings = new ConnectionProviderSettings(connectionProviderModel,
                                                                          componentParameterization,
@@ -126,13 +126,6 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
   }
 
   @Override
-  public ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
-    return new DefaultValueProviderMediator(parameterizedModel,
-                                            () -> muleContext,
-                                            () -> reflectionCache);
-  }
-
-  @Override
   public ParameterValueResolver createParameterValueResolver(ComponentParameterization<?> actingParameter,
                                                              ParameterizedModel parameterizedModel)
       throws MuleException {
@@ -164,6 +157,14 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                          parameterizedModel.getParameterGroupModels());
   }
 
+  @Override
+  public ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
+    return new DefaultValueProviderMediator(parameterizedModel,
+                                            () -> muleContext,
+                                            () -> reflectionCache);
+  }
+
+  @Override
   public SampleDataProviderMediator createSampleDataProviderMediator(ExtensionModel extensionModel,
                                                                      ComponentModel componentModel,
                                                                      Component component,

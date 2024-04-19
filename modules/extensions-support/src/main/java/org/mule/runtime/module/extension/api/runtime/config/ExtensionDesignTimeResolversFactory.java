@@ -11,6 +11,7 @@ import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
@@ -28,6 +29,7 @@ import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
+import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 
 import java.util.Map;
 import java.util.Optional;
@@ -39,16 +41,29 @@ import java.util.Optional;
  */
 public interface ExtensionDesignTimeResolversFactory {
 
+  /**
+   * Creates a {@link ConnectionProviderValueResolver} for the provided parameters.
+   * 
+   * @return a new {@link ConnectionProviderValueResolver}
+   * @param <C> the generic type of the provider's connection object
+   * @throws MuleException if the resolver cannot be created
+   */
   <C> ConnectionProviderValueResolver<C> createConnectionProviderResolver(ConnectionProviderModel connectionProviderModel,
-                                                                   ComponentParameterization componentParameterization,
-                                                                   PoolingProfile poolingProfile,
-                                                                   ReconnectionConfig reconnectionConfig,
-                                                                   ExtensionModel extensionModel,
-                                                                   ConfigurationProperties configurationProperties,
-                                                                   String parametersOwner,
-                                                                   DslSyntaxResolver dslSyntaxResolver)
+                                                                          ComponentParameterization componentParameterization,
+                                                                          PoolingProfile poolingProfile,
+                                                                          ReconnectionConfig reconnectionConfig,
+                                                                          ExtensionModel extensionModel,
+                                                                          ConfigurationProperties configurationProperties,
+                                                                          String parametersOwner,
+                                                                          DslSyntaxResolver dslSyntaxResolver)
       throws MuleException;
 
+  /**
+   * Creates a {@link ConfigurationProvider} for the provided parameters.
+   *
+   * @return a new {@link ConfigurationProvider}
+   * @throws MuleException if the resolver cannot be created
+   */
   ConfigurationProvider createConfigurationProvider(ExtensionModel extensionModel,
                                                     ConfigurationModel configurationModel,
                                                     String configName,
@@ -60,8 +75,15 @@ public interface ExtensionDesignTimeResolversFactory {
                                                     DslSyntaxResolver dslSyntaxResolver,
                                                     ClassLoader extensionClassLoader);
 
-  ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel);
-
+  /**
+   * Creates a {@link ResolverSetBasedParameterResolver} from a {@link ResolverSet} of a {@link ParameterizedModel} based on
+   * static values of its parameters.
+   *
+   * @param actingParameter    the componentParameterization that describes the model parameter values.
+   * @param parameterizedModel the owner of the parameters from the parameters resolver.
+   * @return the corresponding {@link ParameterValueResolver}
+   * @throws MuleException if the resolver cannot be created
+   */
   ParameterValueResolver createParameterValueResolver(ComponentParameterization<?> actingParameter,
                                                       ParameterizedModel parameterizedModel)
       throws MuleException;
@@ -69,11 +91,24 @@ public interface ExtensionDesignTimeResolversFactory {
   ResolverSet createParametersResolverSetFromValues(Map<String, ?> values, ParameterizedModel parameterizedModel)
       throws ConfigurationException;
 
+  /**
+   * Creates a new instance of a {@link ValueProviderMediator}.
+   *
+   * @param parameterizedModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
+   */
+  ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel);
+
+  /**
+   * Creates a new instance of a {@link SampleDataProviderMediator}.
+   */
   SampleDataProviderMediator createSampleDataProviderMediator(ExtensionModel extensionModel,
                                                               ComponentModel componentModel,
                                                               Component component,
                                                               StreamingManager streamingManager);
 
+  /**
+   * Creates a new instance of a {@link MetadataMediator}.
+   */
   <CM extends ComponentModel> MetadataMediator createMetadataMediator(CM componentModel);
 
 }
