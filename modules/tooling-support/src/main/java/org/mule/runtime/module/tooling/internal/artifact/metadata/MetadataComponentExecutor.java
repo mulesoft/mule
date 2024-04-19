@@ -145,7 +145,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
                                                                            MetadataKey metadataKey,
                                                                            ClassLoader extensionClassLoader)
       throws MetadataResolvingException {
-    MetadataMediator metadataMediator = new DefaultMetadataMediator<>(componentModel);
+    MetadataMediator metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
 
     return withContextClassLoader(extensionClassLoader,
                                   () -> runWithMetadataContext(componentElementDeclaration, configurationInstance,

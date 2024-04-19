@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.api.tooling.metadata;
 
 import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.metadata.MetadataKey;
+import org.mule.runtime.api.metadata.MetadataKeysContainer;
 import org.mule.runtime.api.metadata.descriptor.ComponentMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.InputMetadataDescriptor;
 import org.mule.runtime.api.metadata.descriptor.OutputMetadataDescriptor;
@@ -17,6 +18,7 @@ import org.mule.runtime.api.metadata.resolving.MetadataResult;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
 import org.mule.runtime.extension.api.metadata.MetadataResolverFactory;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 
 /**
  * Resolves a Component's Metadata by coordinating the several moving parts that are affected by the Metadata fetching process, so
@@ -33,5 +35,11 @@ public interface MetadataMediator {
   MetadataResult<InputMetadataDescriptor> getInputMetadata(MetadataContext context, MetadataKey key);
 
   MetadataResult<OutputMetadataDescriptor> getOutputMetadata(MetadataContext context, MetadataKey key);
+
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context,
+                                                        ParameterValueResolver metadataKeyResolver);
+
+  MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context,
+                                                        MetadataKey partialKey);
 
 }

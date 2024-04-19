@@ -31,6 +31,7 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
+import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
@@ -72,7 +73,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
 
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(componentElementDeclaration));
 
-      DefaultMetadataMediator<ComponentModel> metadataMediator = new DefaultMetadataMediator<>(componentModel);
+      MetadataMediator metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
 
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Invoking connector's metadata key resolver for component: {}", componentModel.getName());
@@ -81,8 +82,7 @@ public class MetadataKeysExecutor extends MetadataExecutor {
                                     () -> runWithMetadataContext(componentElementDeclaration, optionalConfigurationInstance,
                                                                  extensionClassLoader,
                                                                  (metadataContext) -> metadataMediator
-                                                                     .getMetadataKeys(metadataContext, metadataKey,
-                                                                                      reflectionCache)),
+                                                                     .getMetadataKeys(metadataContext, metadataKey)),
                                     MetadataResolvingException.class, e -> {
                                       throw new ExecutorExceptionWrapper(e);
                                     });

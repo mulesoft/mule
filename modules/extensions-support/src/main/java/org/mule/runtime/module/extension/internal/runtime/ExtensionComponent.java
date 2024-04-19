@@ -216,7 +216,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.configurationProviderResolver.set(configurationProviderResolver);
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.metadataMediator = new DefaultMetadataMediator<>(componentModel);
+    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -628,8 +628,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             getParameterValueResolver(),
-                                                                                                             reflectionCache)));
+                                                                                                             getParameterValueResolver())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -644,8 +643,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             partialKey,
-                                                                                                             reflectionCache)));
+                                                                                                             partialKey)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -660,8 +658,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getMetadata(context, getParameterValueResolver(),
-                                                     reflectionCache)));
+                                        .getMetadata(context, getParameterValueResolver())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

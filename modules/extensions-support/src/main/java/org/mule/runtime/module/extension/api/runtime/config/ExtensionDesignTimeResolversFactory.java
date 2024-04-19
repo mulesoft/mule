@@ -39,7 +39,7 @@ import java.util.Optional;
  */
 public interface ExtensionDesignTimeResolversFactory {
 
-  ConnectionProviderValueResolver createConnectionProviderResolver(ConnectionProviderModel connectionProviderModel,
+  <C> ConnectionProviderValueResolver<C> createConnectionProviderResolver(ConnectionProviderModel connectionProviderModel,
                                                                    ComponentParameterization componentParameterization,
                                                                    PoolingProfile poolingProfile,
                                                                    ReconnectionConfig reconnectionConfig,

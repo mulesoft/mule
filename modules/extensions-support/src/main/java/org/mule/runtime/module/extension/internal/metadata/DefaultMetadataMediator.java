@@ -89,6 +89,7 @@ import com.google.common.collect.ImmutableList;
 public final class DefaultMetadataMediator<T extends ComponentModel> implements MetadataMediator {
 
   protected final T component;
+  private final ReflectionCache reflectionCache;
   private final List<ParameterModel> metadataKeyParts;
   private final MetadataKeysDelegate keysDelegate;
   private final MetadataOutputDelegate outputDelegate;
@@ -98,8 +99,9 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
   private final Optional<MetadataInputDelegate> errorCallbackInputDelegate;
   private String keyContainerName = null;
 
-  public DefaultMetadataMediator(T componentModel) {
+  public DefaultMetadataMediator(T componentModel, ReflectionCache reflectionCache) {
     this.component = componentModel;
+    this.reflectionCache = reflectionCache;
     this.metadataKeyParts = getMetadataKeyParts(componentModel);
     this.keysDelegate = new MetadataKeysDelegate(componentModel, metadataKeyParts);
     this.keyIdObjectResolver = new MetadataKeyIdObjectResolver(component);
@@ -130,13 +132,12 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
    * @return Successful {@link MetadataResult} if the keys are obtained without errors Failure {@link MetadataResult} when no
    *         Dynamic keys are a available or the retrieval fails for any reason
    */
-  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context, ReflectionCache reflectionCache) {
+  public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context) {
     return keysDelegate.getMetadataKeys(context, reflectionCache);
   }
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context,
-                                                               ParameterValueResolver metadataKeyResolver,
-                                                               ReflectionCache reflectionCache) {
+                                                               ParameterValueResolver metadataKeyResolver) {
     MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
     if (!keyValueResult.isSuccess()) {
       return keyValueResult;
@@ -146,8 +147,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
   }
 
   public MetadataResult<MetadataKeysContainer> getMetadataKeys(MetadataContext context,
-                                                               MetadataKey partialKey,
-                                                               ReflectionCache reflectionCache) {
+                                                               MetadataKey partialKey) {
     try {
       Object resolvedKey = keyIdObjectResolver.resolveWithPartialKey(partialKey);
       return keysDelegate.getMetadataKeys(context, resolvedKey, reflectionCache);
@@ -182,8 +182,7 @@ public final class DefaultMetadataMediator<T extends ComponentModel> implements 
    *         when the Metadata retrieval of any element fails for any reason
    */
   public MetadataResult<ComponentMetadataDescriptor<T>> getMetadata(MetadataContext context,
-                                                                    ParameterValueResolver metadataKeyResolver,
-                                                                    ReflectionCache reflectionCache) {
+                                                                    ParameterValueResolver metadataKeyResolver) {
     try {
       Object keyValue;
       MetadataResult keyValueResult = getMetadataKeyObjectValue(metadataKeyResolver);
