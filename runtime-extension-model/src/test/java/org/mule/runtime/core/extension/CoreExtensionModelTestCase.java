@@ -25,6 +25,8 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.setConfigurerFactory;
+import static org.mule.runtime.core.extension.ComponentConfigurerTestUtils.createMockedFactory;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
@@ -53,6 +55,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 
+import org.junit.BeforeClass;
 import org.mule.metadata.api.annotation.DefaultValueAnnotation;
 import org.mule.metadata.api.annotation.EnumAnnotation;
 import org.mule.metadata.api.annotation.TypeIdAnnotation;
@@ -104,7 +107,13 @@ public class CoreExtensionModelTestCase {
 
   private static final ErrorModel errorMuleAny = newError("ANY", "MULE").build();
 
-  private static ExtensionModel coreExtensionModel = getExtensionModel();
+  private static ExtensionModel coreExtensionModel;
+
+  @BeforeClass
+  public static void setupClass() {
+    setConfigurerFactory(createMockedFactory());
+    coreExtensionModel = getExtensionModel();
+  }
 
   @Test
   public void consistentWithManifest() {

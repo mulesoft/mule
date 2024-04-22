@@ -10,6 +10,7 @@ import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingConte
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
 import static org.mule.runtime.ast.api.util.MuleAstUtils.recursiveStreamWithHierarchy;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULESOFT_VENDOR;
+import static org.mule.runtime.core.extension.ComponentConfigurerTestUtils.createMockedFactory;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import static java.lang.String.format;
@@ -96,6 +97,7 @@ public abstract class AbstractCoreValidationTestCase {
   }
 
   protected List<ExtensionModel> resolveRuntimeExtensionModels() {
+    MuleExtensionModelProvider.setConfigurerFactory(createMockedFactory());
     return asList(MuleExtensionModelProvider.getExtensionModel());
   }
 
