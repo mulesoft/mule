@@ -8,6 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
+import static org.mule.runtime.api.util.MuleSystemProperties.USE_APP_LOG4J_CONFIGURATION_ON_SINGLE_APP_DEPLOYMENT;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
@@ -42,7 +43,7 @@ public final class MuleLog4jConfiguratorUtils {
    * @param contextFactory the {@link MuleLog4jContextFactory} where the selector will be set.
    */
   public static void configureSelector(MuleLog4jContextFactory contextFactory) {
-    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+    if (useAppLog4jConfigurationInSingleAppMode()) {
       configureSelector(contextFactory, SINGLE_APP_CONTEXT_SELECTOR);
     } else {
       configureSelector(contextFactory, getProperty(MULE_LOG_SEPARATION_DISABLED) == null);
@@ -80,12 +81,16 @@ public final class MuleLog4jConfiguratorUtils {
    * @since 4.7.0
    */
   public static Consumer<ClassLoader> getDefaultReconfigurationAction() {
-    if (getBoolean(SINGLE_APP_MODE_PROPERTY)) {
+    if (useAppLog4jConfigurationInSingleAppMode()) {
       return classloader -> SINGLE_APP_CONTEXT_SELECTOR
           .reconfigureAccordingToAppClassloader(classloader);
     }
 
     return cl -> {
     };
+  }
+
+  private static boolean useAppLog4jConfigurationInSingleAppMode() {
+    return getBoolean(SINGLE_APP_MODE_PROPERTY) && getBoolean(USE_APP_LOG4J_CONFIGURATION_ON_SINGLE_APP_DEPLOYMENT);
   }
 }
