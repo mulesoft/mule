@@ -40,6 +40,8 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnect
 
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 /**
  * A {@link AbstractExtensionObjectFactory} which produces {@link ConfigurationProvider} instances
  *
@@ -50,7 +52,9 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
 
   private final ExtensionModel extensionModel;
   private final ConfigurationModel configurationModel;
-  private final ConfigurationProviderFactory configurationProviderFactory;
+
+  @Inject
+  private ConfigurationProviderFactory configurationProviderFactory;
 
   private ExpirationPolicy expirationPolicy;
   private Optional<ConnectionProviderValueResolver> connectionProviderResolver = empty();
@@ -60,12 +64,10 @@ public class ConfigurationProviderObjectFactory extends AbstractExtensionObjectF
 
   public ConfigurationProviderObjectFactory(ExtensionModel extensionModel,
                                             ConfigurationModel configurationModel,
-                                            ConfigurationProviderFactory configurationProviderFactory,
                                             MuleContext muleContext) {
     super(muleContext);
     this.extensionModel = extensionModel;
     this.configurationModel = configurationModel;
-    this.configurationProviderFactory = configurationProviderFactory;
   }
 
   @Override
