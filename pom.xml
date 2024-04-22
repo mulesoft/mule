@@ -161,7 +161,7 @@
         <muleMavenClientBomVersion>2.3.0-SNAPSHOT</muleMavenClientBomVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <mulePropertiesApiVersion>1.4.0-SNAPSHOT</mulePropertiesApiVersion>
+        <mulePropertiesApiVersion>1.4.0-20240422</mulePropertiesApiVersion>
         <muleExtensionsApiVersion>1.8.0-SNAPSHOT</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.8.0-SNAPSHOT</muleHttpPolicyApiVersion>
