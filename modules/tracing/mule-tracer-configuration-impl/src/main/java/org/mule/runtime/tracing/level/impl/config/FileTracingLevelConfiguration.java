@@ -76,7 +76,7 @@ public class FileTracingLevelConfiguration extends FileConfiguration implements 
   }
 
   private void setTracingLevels() {
-    yamlConfiguration.loadJSONConfigurationFromFile(getExecutionClassLoader(muleContext));
+    yamlConfiguration.loadJSONConfiguration(getExecutionClassLoader(muleContext));
     setTracingLevel();
     setTracingLevelOverrides();
   }

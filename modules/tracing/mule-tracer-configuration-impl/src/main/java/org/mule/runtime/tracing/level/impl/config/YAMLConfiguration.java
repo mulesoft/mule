@@ -32,11 +32,11 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class YAMLConfiguration extends FileConfiguration {
 
-  private final ConfigurationPropertiesResolver propertyResolver;
   private final List<Runnable> onConfigurationChangeRunnables;
   private final String configurationFilePath;
   private JsonNode configuration;
   private URL configurationUrl;
+  private ConfigurationPropertiesResolver propertyResolver;
   private TracingConfigurationFileWatcher tracingConfigurationFileWatcher;
   private boolean tracingConfigurationFileWatcherInitialised;
 
@@ -45,7 +45,6 @@ public class YAMLConfiguration extends FileConfiguration {
     super(muleContext);
     this.onConfigurationChangeRunnables = onConfigurationChangeRunnables;
     this.configurationFilePath = configurationFilePath;
-    this.propertyResolver = new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
   }
 
   public void initialiseWatcher() {
@@ -58,7 +57,12 @@ public class YAMLConfiguration extends FileConfiguration {
     }
   }
 
-  public void loadJSONConfigurationFromFile(ClassLoader classLoader) {
+  public void loadJSONConfiguration(ClassLoader classLoader) {
+    loadJSONConfigurationFromFile(classLoader);
+    loadPropertyResolver();
+  }
+
+  private void loadJSONConfigurationFromFile(ClassLoader classLoader) {
     ClassLoaderResourceProvider resourceProvider = new ClassLoaderResourceProvider(classLoader);
     try {
       InputStream is = resourceProvider.getResourceAsStream(configurationFilePath);
@@ -67,6 +71,10 @@ public class YAMLConfiguration extends FileConfiguration {
     } catch (Exception e) {
       throw new MuleRuntimeException(e);
     }
+  }
+
+  private void loadPropertyResolver() {
+    propertyResolver = new DefaultConfigurationPropertiesResolver(empty(), new SystemPropertiesConfigurationProvider());
   }
 
   public String getValue(String property) {
