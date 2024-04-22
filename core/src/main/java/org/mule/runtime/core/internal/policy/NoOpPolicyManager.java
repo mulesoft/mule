@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.policy;
+package org.mule.runtime.core.internal.policy;
 
 import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 
@@ -13,13 +13,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.internal.event.InternalEvent;
-import org.mule.runtime.core.internal.policy.DefaultPolicyManager;
-import org.mule.runtime.core.internal.policy.MessageSourceResponseParametersProcessor;
-import org.mule.runtime.core.internal.policy.NoSourcePolicy;
-import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
-import org.mule.runtime.core.internal.policy.OperationPolicy;
-import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.policy.SourcePolicy;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 
 /**

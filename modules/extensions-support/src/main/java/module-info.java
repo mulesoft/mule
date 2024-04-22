@@ -46,7 +46,6 @@ module org.mule.runtime.extensions.support {
   requires org.mule.runtime.metadata.model.xml;
   requires org.mule.runtime.metadata.support;
   requires org.mule.runtime.oauth.api;
-  requires org.mule.runtime.policy.api;
   requires org.mule.runtime.profiling.api;
   requires org.mule.runtime.tracer.api;
   requires org.mule.runtime.tracer.customization.api;

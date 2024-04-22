@@ -24,6 +24,11 @@ import org.mule.runtime.policy.api.PolicyPointcutParameters;
 public interface PolicyManager {
 
   /**
+   * A {@link PolicyManager} that does not apply any policy.
+   */
+  public static final PolicyManager NOOP_POLICY_MANAGER = new NoOpPolicyManager();
+
+  /**
    * Creates a policy to be applied to a source. The creation must have into consideration the {@code sourceIdentifier} to find
    * specific policies applied to that source and also the {@code sourceEvent} which will be used to extract data to match against
    * the policies pointcuts.

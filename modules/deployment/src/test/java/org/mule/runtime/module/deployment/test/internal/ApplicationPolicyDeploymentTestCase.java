@@ -78,6 +78,7 @@ import org.mule.runtime.core.api.policy.Policy;
 import org.mule.runtime.core.api.policy.PolicyParametrization;
 import org.mule.runtime.core.api.security.AbstractSecurityProvider;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.core.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.deployment.model.api.application.Application;
 import org.mule.runtime.deployment.model.api.policy.PolicyRegistrationException;
@@ -86,7 +87,6 @@ import org.mule.runtime.module.deployment.impl.internal.builder.ApplicationFileB
 import org.mule.runtime.module.deployment.impl.internal.builder.ArtifactPluginFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.JarFileBuilder;
 import org.mule.runtime.module.deployment.impl.internal.builder.PolicyFileBuilder;
-import org.mule.runtime.module.extension.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.policy.api.PolicyPointcut;
 import org.mule.runtime.policy.api.PolicyPointcutParameters;
 import org.mule.tck.junit4.rule.SystemProperty;
