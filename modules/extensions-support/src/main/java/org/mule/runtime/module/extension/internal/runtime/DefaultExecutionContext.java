@@ -25,6 +25,7 @@ import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
+import org.mule.runtime.extension.api.runtime.route.Route;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.runtime.operation.ProcessorChainExecutor;
 
@@ -186,9 +187,10 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
     this.getParameters().values().forEach(parameterValue -> {
       if (parameterValue instanceof ProcessorChainExecutor) {
         CoreEvent originalEvent = ((ProcessorChainExecutor) parameterValue).getOriginalEvent();
-        if (originalEvent.getContext().getId().equals(event.getContext().getId())) {
-          ((InternalEvent) originalEvent).setSdkInternalContext(((InternalEvent) updated).getSdkInternalContext());
-        }
+        addContextToOriginalEvent(originalEvent, updated);
+      } else if (parameterValue instanceof Route && ((Route) parameterValue).getChain() instanceof ProcessorChainExecutor) {
+        CoreEvent originalEvent = ((ProcessorChainExecutor) ((Route) parameterValue).getChain()).getOriginalEvent();
+        addContextToOriginalEvent(originalEvent, updated);
       }
     });
     event = updated;
@@ -285,5 +287,11 @@ public class DefaultExecutionContext<M extends ComponentModel> implements Execut
   @Override
   public Optional<RetryPolicyTemplate> getRetryPolicyTemplate() {
     return ofNullable(retryPolicyTemplate);
+  }
+
+  private void addContextToOriginalEvent(CoreEvent originalEvent, CoreEvent updatedEvent) {
+    if (originalEvent.getContext().getId().equals(event.getContext().getId())) {
+      ((InternalEvent) originalEvent).setSdkInternalContext(((InternalEvent) updatedEvent).getSdkInternalContext());
+    }
   }
 }
