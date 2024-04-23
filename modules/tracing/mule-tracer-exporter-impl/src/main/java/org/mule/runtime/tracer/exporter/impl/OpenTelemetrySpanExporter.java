@@ -40,6 +40,7 @@ import static io.opentelemetry.sdk.common.InstrumentationLibraryInfo.create;
 import static io.opentelemetry.sdk.internal.InstrumentationScopeUtil.toInstrumentationScopeInfo;
 import static io.opentelemetry.sdk.trace.data.StatusData.unset;
 import static io.opentelemetry.sdk.trace.samplers.SamplingDecision.RECORD_AND_SAMPLE;
+import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.profiling.tracing.Span;
 import org.mule.runtime.api.profiling.tracing.SpanIdentifier;
@@ -75,6 +76,7 @@ import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.samplers.Sampler;
 import io.opentelemetry.sdk.trace.samplers.SamplingResult;
+import org.slf4j.Logger;
 
 /**
  * A {@link SpanExporter} that exports the spans as Open Telemetry Spans.
@@ -117,6 +119,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   private MutableMuleTraceState muleTraceState;
   private Sampler sampler;
+
+  private static final Logger LOGGER = getLogger(OpenTelemetrySpanExporter.class);
 
   public OpenTelemetrySpanExporter(Span span,
                                    InitialSpanInfo initialSpanInfo,
@@ -186,8 +190,10 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
 
   @Override
   public void export() {
+    LOGGER.error("EXPORTING EXPORTING EXPORTING");
     if (exportable && spanContext.isSampled()) {
       endThreadNameValue = Thread.currentThread().getName();
+      LOGGER.error("SPAN EXPORTED SPAN EXPORTED");
       spanProcessor.onEnd(this);
     }
   }

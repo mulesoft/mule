@@ -31,6 +31,7 @@ import static org.mule.tck.probe.PollingProber.DEFAULT_POLLING_INTERVAL;
 import static java.lang.Boolean.TRUE;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.testcontainers.Testcontainers.exposeHostPorts;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 import static org.testcontainers.utility.MountableFile.forHostPath;
@@ -70,6 +71,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
@@ -105,6 +107,8 @@ public class OpenTelemetryExporterConfigTestCase {
 
   @ClassRule
   public static final GrpcServerRule server = new GrpcServerRule();
+
+  private static final Logger LOGGER = getLogger(OpenTelemetryExporterConfigTestCase.class);
 
   @Before
   public void before() {
@@ -212,8 +216,10 @@ public class OpenTelemetryExporterConfigTestCase {
     exportSpan(properties);
 
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
-        .check(new JUnitLambdaProbe(() -> !server.getTraceRequests().isEmpty()
-            && server.getTraceRequests().get(0).getResourceSpansCount() == 1));
+        .check(new JUnitLambdaProbe(() -> {
+          return !server.getTraceRequests().isEmpty()
+            && server.getTraceRequests().get(0).getResourceSpansCount() == 1);}
+        );
   }
 
   @Test
