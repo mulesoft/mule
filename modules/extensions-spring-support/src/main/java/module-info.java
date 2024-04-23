@@ -84,7 +84,8 @@ module org.mule.runtime.extensions.spring.support {
   opens org.mule.runtime.module.extension.internal.config.dsl to
       spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.config to
-      net.bytebuddy;
+      net.bytebuddy,
+      spring.core;
   opens org.mule.runtime.module.extension.internal.config.dsl.connection to
       net.bytebuddy,
       spring.core;

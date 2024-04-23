@@ -132,7 +132,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private final ExtensionModel extensionModel;
   private final AtomicReference<ValueResolver<ConfigurationProvider>> configurationProviderResolver = new AtomicReference<>();
-  private final DefaultMetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
   private final LazyValue<Boolean> usesDynamicConfiguration = new LazyValue<>(this::computeUsesDynamicConfiguration);
@@ -142,6 +141,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       new LazyValue<>(this::doGetStaticConfiguration);
 
   protected final ExtensionManager extensionManager;
+  private DefaultMetadataMediator<T> metadataMediator;
   protected ClassLoader classLoader;
   protected final T componentModel;
 
@@ -216,7 +216,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.configurationProviderResolver.set(configurationProviderResolver);
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -228,6 +227,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
+    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
+
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
