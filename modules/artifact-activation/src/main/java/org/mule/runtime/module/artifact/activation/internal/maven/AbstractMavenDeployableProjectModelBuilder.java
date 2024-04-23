@@ -11,6 +11,8 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
@@ -72,7 +74,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   protected Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   protected Set<BundleDescriptor> sharedDeployableBundleDescriptors;
-  protected Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
+  protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   protected File deployableArtifactRepositoryFolder;
 
@@ -109,8 +111,14 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   public final DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
 
-    Properties properties = getPomPropertiesFolder(projectFolder);
-    String version = properties.getProperty("version");
+    Properties pomProperties;
+    String version = "";
+    if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN)) {
+      if (projectFolder.isDirectory()) {
+        pomProperties = getPomPropertiesFolder(projectFolder);
+        version = pomProperties.getProperty("version");
+      }
+    }
 
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
     MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
@@ -129,7 +137,9 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
     }
 
-    deployableArtifactCoordinates.setVersion(version);
+    if (!version.isEmpty()) {
+      deployableArtifactCoordinates.setVersion(version);
+    }
 
     return doBuild(parser, deployableArtifactCoordinates);
   }
