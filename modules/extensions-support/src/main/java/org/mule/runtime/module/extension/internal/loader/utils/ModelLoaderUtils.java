@@ -8,7 +8,6 @@ package org.mule.runtime.module.extension.internal.loader.utils;
 
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer.configureNullMetadata;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -19,9 +18,10 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSemanticTermsDecla
 import org.mule.runtime.api.metadata.resolving.NamedTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 import org.mule.runtime.api.metadata.resolving.TypeKeysResolver;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
-import org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.SemanticTermsParser;
@@ -146,7 +146,8 @@ public final class ModelLoaderUtils {
     if (outputResolverModelParser.map(p -> p.hasOutputResolver()).orElse(false)
         || !inputResolverModelParsers.isEmpty()
         || keyIdResolverModelParser.map(p -> p.hasKeyIdResolver()).orElse(false)) {
-      final ComponentMetadataConfigurer configurer = new ComponentMetadataConfigurer().setConnected(connected);
+      final ComponentMetadataConfigurer configurer =
+          ComponentMetadataConfigurerFactory.getDefault().create().setConnected(connected);
       outputResolverModelParser.ifPresent(p -> configurer.setOutputTypeResolver(p.getOutputResolver()));
       attributesResolverModelParser.ifPresent(p -> configurer.setAttributesTypeResolver(p.getAttributesResolver()));
       keyIdResolverModelParser.ifPresent(p -> configurer.setKeysResolver(p.getKeyResolver(), p.getParameterName(),
@@ -160,7 +161,7 @@ public final class ModelLoaderUtils {
 
       configurer.configure(declaration);
     } else {
-      configureNullMetadata(declaration);
+      ComponentMetadataConfigurerFactory.getDefault().create().configureNullMetadata(declaration);
     }
   }
 

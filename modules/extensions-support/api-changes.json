@@ -1,4 +1,16 @@
 {
+  "4.8.0": {
+    "revapi": {
+      "ignore": [
+        {
+          "ignore": true,
+          "code": "java.class.removed",
+          "old": "class org.mule.runtime.module.extension.api.metadata.ComponentMetadataConfigurer",
+          "justification": "W-15261626: Changed class to be the implementation of an API defined in Extensions API"
+        }
+      ]
+    }
+  },
   "4.5.0": {
     "revapi": {
       "ignore": [
