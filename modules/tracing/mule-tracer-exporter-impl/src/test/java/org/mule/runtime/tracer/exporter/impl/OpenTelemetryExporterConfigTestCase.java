@@ -218,8 +218,8 @@ public class OpenTelemetryExporterConfigTestCase {
     new PollingProber(TIMEOUT_MILLIS, DEFAULT_POLLING_INTERVAL)
         .check(new JUnitLambdaProbe(() -> {
           return !server.getTraceRequests().isEmpty()
-            && server.getTraceRequests().get(0).getResourceSpansCount() == 1);}
-        );
+              && server.getTraceRequests().get(0).getResourceSpansCount() == 1;
+        }));
   }
 
   @Test
