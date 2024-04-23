@@ -16,6 +16,7 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.m
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
+import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
@@ -58,6 +59,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -107,6 +109,9 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   public final DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
 
+    Properties properties = getPomPropertiesFolder(projectFolder);
+    String version = properties.getProperty("version");
+
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
     MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
 
@@ -123,6 +128,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
     }
+
+    deployableArtifactCoordinates.setVersion(version);
 
     return doBuild(parser, deployableArtifactCoordinates);
   }
