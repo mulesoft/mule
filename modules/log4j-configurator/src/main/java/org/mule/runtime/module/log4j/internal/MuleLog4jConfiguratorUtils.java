@@ -8,7 +8,7 @@ package org.mule.runtime.module.log4j.internal;
 
 import static org.mule.runtime.api.util.MuleSystemProperties.MULE_LOG_SEPARATION_DISABLED;
 import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_PROPERTY;
-import static org.mule.runtime.api.util.MuleSystemProperties.USE_APP_LOG4J_CONFIGURATION_ON_SINGLE_APP_DEPLOYMENT;
+import static org.mule.runtime.api.util.MuleSystemProperties.SINGLE_APP_MODE_CONTAINER_USE_APP_LOG4J_CONFIGURATION;
 
 import static java.lang.Boolean.getBoolean;
 import static java.lang.System.getProperty;
@@ -91,6 +91,6 @@ public final class MuleLog4jConfiguratorUtils {
   }
 
   private static boolean useAppLog4jConfigurationInSingleAppMode() {
-    return getBoolean(SINGLE_APP_MODE_PROPERTY) && getBoolean(USE_APP_LOG4J_CONFIGURATION_ON_SINGLE_APP_DEPLOYMENT);
+    return getBoolean(SINGLE_APP_MODE_PROPERTY) && getBoolean(SINGLE_APP_MODE_CONTAINER_USE_APP_LOG4J_CONFIGURATION);
   }
 }
