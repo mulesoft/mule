@@ -17,6 +17,7 @@ import static java.lang.Boolean.getBoolean;
 import static java.lang.Class.forName;
 import static java.lang.String.format;
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -38,6 +39,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
@@ -129,26 +131,54 @@ public class PropertiesResolverUtils {
   public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
                                                                                                         ResourceProvider externalResourceProvider,
                                                                                                         ConfigurationPropertiesResolver localResolver) {
+    return getConfigurationPropertiesProvidersFromComponents(artifactAst, externalResourceProvider, localResolver, false);
+  }
+
+  /**
+   * @param artifactAst                    the {@link ArtifactAst} to get the {@link ConfigurationPropertiesProvider} from.
+   * @param externalResourceProvider       a {@link ResourceProvider} to use to read files when needed for properties resolution.
+   * @param localResolver                  A resolver that retrieves properties that are used when resolving parameters of a
+   *                                       {@link ConfigurationPropertiesProvider}.
+   * @param ignoreCreateProviderExceptions if {@code true}, exceptions that occur when calling
+   *                                       {@link ConfigurationPropertiesProviderFactory#createProvider(org.mule.runtime.ast.api.ComponentAst, java.util.function.UnaryOperator, ResourceProvider)}
+   *                                       are just logged instead of rethrown.
+   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
+   *         {@link ArtifactAst}.
+   */
+  public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
+                                                                                                        ResourceProvider externalResourceProvider,
+                                                                                                        ConfigurationPropertiesResolver localResolver,
+                                                                                                        boolean ignoreCreateProviderExceptions) {
     Map<ComponentIdentifier, ConfigurationPropertiesProviderFactory> providerFactoriesMap = loadProviderFactories();
 
     return artifactAst.topLevelComponentsStream()
         .filter(comp -> providerFactoriesMap.containsKey(comp.getIdentifier()))
         .map(comp -> {
-          ConfigurationPropertiesProvider provider = providerFactoriesMap.get(comp.getIdentifier())
-              .createProvider(comp, localResolver, externalResourceProvider);
-          if (provider instanceof Component) {
-            final Map<QName, Object> annotations = new HashMap<>();
-            annotations.put(LOCATION_KEY, comp.getLocation());
-            annotations.put(ANNOTATION_NAME, comp.getIdentifier());
-            annotations.put(SOURCE_ELEMENT_ANNOTATION_KEY,
-                            comp.getMetadata().getSourceCode()
-                                .map(LocationExecutionContextProvider::maskPasswords)
-                                .orElse(null));
+          try {
+            ConfigurationPropertiesProvider provider = providerFactoriesMap.get(comp.getIdentifier())
+                .createProvider(comp, localResolver, externalResourceProvider);
+            if (provider instanceof Component) {
+              final Map<QName, Object> annotations = new HashMap<>();
+              annotations.put(LOCATION_KEY, comp.getLocation());
+              annotations.put(ANNOTATION_NAME, comp.getIdentifier());
+              annotations.put(SOURCE_ELEMENT_ANNOTATION_KEY,
+                              comp.getMetadata().getSourceCode()
+                                  .map(LocationExecutionContextProvider::maskPasswords)
+                                  .orElse(null));
 
-            ((Component) provider).setAnnotations(annotations);
+              ((Component) provider).setAnnotations(annotations);
+            }
+            return of(provider);
+          } catch (Exception e) {
+            if (ignoreCreateProviderExceptions) {
+              return Optional.<ConfigurationPropertiesProvider>empty();
+            } else {
+              throw e;
+            }
           }
-          return provider;
         })
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(toList());
   }
 
