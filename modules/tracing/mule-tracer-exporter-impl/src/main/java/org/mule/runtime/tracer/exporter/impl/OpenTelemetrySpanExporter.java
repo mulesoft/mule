@@ -191,6 +191,8 @@ public class OpenTelemetrySpanExporter implements SpanExporter, SpanData, Readab
   @Override
   public void export() {
     LOGGER.error("EXPORTING EXPORTING EXPORTING");
+    LOGGER.error("exportable: " + exportable);
+    LOGGER.error("spanContext.isSampled(): " + spanContext.isSampled());
     if (exportable && spanContext.isSampled()) {
       endThreadNameValue = Thread.currentThread().getName();
       LOGGER.error("SPAN EXPORTED SPAN EXPORTED");
