@@ -7,15 +7,17 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java.type;
 
 
+import static org.mule.metadata.xml.api.SchemaCollector.getInstance;
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
+import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
+
 import static java.lang.Thread.currentThread;
 import static java.util.Arrays.asList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.mule.metadata.xml.api.SchemaCollector.getInstance;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getType;
-import static org.mule.runtime.module.extension.internal.loader.parser.java.MuleExtensionAnnotationParser.mapReduceSingleAnnotation;
 
 import org.mule.metadata.api.annotation.TypeAnnotation;
 import org.mule.metadata.api.builder.ArrayTypeBuilder;
@@ -410,10 +412,18 @@ public class CustomStaticTypeUtils {
     } catch (IOException e) {
       throw new MuleRuntimeException(e);
     }
-    Optional<MetadataType> type = new JsonTypeLoader(schemaContent).load(null);
+
+    Optional<MetadataType> type = empty();
+    try {
+      type = new JsonTypeLoader(schemaContent).load(null);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Could not load type from Json schema [" + schema + "]", e);
+    }
+
     if (!type.isPresent()) {
       throw new IllegalArgumentException("Could not load type from Json schema [" + schema + "]");
     }
+
     return type;
   }
 

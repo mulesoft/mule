@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
+import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.JavaConstants.JAVA_VERSION_8;
 import static org.mule.runtime.api.util.MuleSystemProperties.DISABLE_SDK_IGNORE_COMPONENT;
 import static org.mule.runtime.api.util.MuleSystemProperties.ENABLE_SDK_POLLING_SOURCE_LIMIT;
@@ -22,6 +23,8 @@ import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
+import org.mule.runtime.api.exception.MuleRuntimeException;
+import org.mule.runtime.api.i18n.I18nMessageFactory;
 import org.mule.runtime.core.internal.util.version.JdkVersionUtils.JdkVersion;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
@@ -132,7 +135,9 @@ public abstract class AbstractExtensionModelLoader extends ExtensionModelLoader 
         }
       }
 
-      throw e;
+      throw new MuleRuntimeException(createStaticMessage("Exception loading extension with name '%s'.",
+                                                         context.getExtensionDeclarer().getDeclaration().getName()),
+                                     e);
     }
   }
 
