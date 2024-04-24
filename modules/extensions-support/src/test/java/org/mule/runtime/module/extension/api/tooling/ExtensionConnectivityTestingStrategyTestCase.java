@@ -22,8 +22,8 @@ import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.connection.DefaultConnectionManager;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
 import org.junit.Before;

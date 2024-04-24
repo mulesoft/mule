@@ -59,12 +59,12 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
 import org.mule.runtime.extension.api.exception.IllegalConnectionProviderModelDefinitionException;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.config.BaseConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ExtensionsOAuthUtils;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.OAuthConnectionProviderWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.FieldSetter;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.oauth.api.PlatformManagedConnectionDescriptor;
@@ -204,7 +204,7 @@ public class PlatformManagedOAuthConnectionProvider<C>
 
     return (ConnectionProvider<C>) withContextClassLoader(getClassLoader(oauthConfig.getExtensionModel()), () -> {
       ResolverSet delegateResolverSet = getResolverSetFromParameterValues(descriptor.getParameters());
-      ConnectionProviderObjectBuilder builder =
+      BaseConnectionProviderObjectBuilder builder =
           new DefaultConnectionProviderObjectBuilder<>(connectionProviderDelegateClass,
                                                        oauthConfig.getDelegateConnectionProviderModel(),
                                                        delegateResolverSet,

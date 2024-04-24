@@ -6,9 +6,10 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
-import static java.util.Optional.of;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
+
+import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.connection.ConnectionProvider;
@@ -18,20 +19,26 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.api.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.internal.runtime.config.BaseConnectionProviderObjectBuilder;
 
 import java.util.Optional;
 
 /**
  * A {@link ValueResolver} specialization for producing {@link ConnectionProvider} instances through a
- * {@link ConnectionProviderObjectBuilder}
+ * {@link BaseConnectionProviderObjectBuilder}
  *
  * @since 4.0
  */
 public class ConnectionProviderResolver<C> extends AbstractComponent
     implements ConnectionProviderValueResolver<C>, Initialisable, Startable {
 
-  private final ConnectionProviderObjectBuilder<C> objectBuilder;
+  private final BaseConnectionProviderObjectBuilder<C> objectBuilder;
   private final ObjectBuilderValueResolver<Pair<ConnectionProvider<C>, ResolverSetResult>> valueResolver;
   private final ResolverSet resolverSet;
 
@@ -40,7 +47,7 @@ public class ConnectionProviderResolver<C> extends AbstractComponent
    *
    * @param objectBuilder an object builder to instantiate the {@link ConnectionProvider}
    */
-  public ConnectionProviderResolver(ConnectionProviderObjectBuilder<C> objectBuilder, ResolverSet resolverSet,
+  public ConnectionProviderResolver(BaseConnectionProviderObjectBuilder<C> objectBuilder, ResolverSet resolverSet,
                                     MuleContext muleContext) {
     this.objectBuilder = objectBuilder;
     this.valueResolver = new ObjectBuilderValueResolver<>(objectBuilder, muleContext);

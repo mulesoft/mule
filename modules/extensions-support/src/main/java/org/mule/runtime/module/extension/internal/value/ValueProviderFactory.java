@@ -17,9 +17,9 @@ import static org.mule.sdk.api.data.sample.SampleDataException.CONNECTION_FAILUR
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
 import org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.InjectableParameterResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.values.ValueProvider;

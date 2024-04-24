@@ -87,14 +87,14 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationStats;
 import org.mule.runtime.extension.api.runtime.config.ConfiguredComponent;
 import org.mule.runtime.extension.api.runtime.source.ParameterizedSource;
 import org.mule.runtime.extension.api.runtime.source.Source;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.config.MutableConfigurationStats;
 import org.mule.runtime.module.extension.internal.runtime.exception.ExceptionHandlerManager;
 import org.mule.runtime.module.extension.internal.runtime.operation.IllegalSourceException;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBasedParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.poll.RestartContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 

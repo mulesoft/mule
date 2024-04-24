@@ -31,6 +31,8 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.el.ExpressionManagerSession;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.internal.context.MuleContextWithRegistry;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.junit4.AbstractMuleContextTestCase;
 
 import org.junit.Rule;

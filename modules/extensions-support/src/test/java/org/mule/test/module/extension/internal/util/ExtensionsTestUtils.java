@@ -81,6 +81,8 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.exception.SdkExceptionHandlerFactory;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectivityModelProperty;
@@ -88,8 +90,6 @@ import org.mule.runtime.module.extension.internal.loader.java.property.Exception
 import org.mule.runtime.module.extension.internal.loader.java.property.ImplementingTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MetadataResolverFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.ArrayList;
 import java.util.Collection;

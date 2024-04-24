@@ -23,8 +23,9 @@ import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantType;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthGrantTypeVisitor;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthModelProperty;
 import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGrantType;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.internal.runtime.config.BaseConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.config.DefaultConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeOAuthHandler;
@@ -33,7 +34,6 @@ import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.cli
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthHandler;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.soap.internal.loader.property.SoapExtensionModelProperty;
 import org.mule.runtime.module.extension.soap.internal.runtime.connection.SoapConnectionProviderObjectBuilder;
 
@@ -83,7 +83,7 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     Callable<ResolverSet> callable = () -> getParametersResolver().getParametersAsResolverSet(providerModel, muleContext);
     ResolverSet resolverSet = withContextClassLoader(getClassLoader(extensionModel), callable);
 
-    ConnectionProviderObjectBuilder builder;
+    BaseConnectionProviderObjectBuilder builder;
     if (extensionModel.getModelProperty(SoapExtensionModelProperty.class).isPresent()) {
       builder = new SoapConnectionProviderObjectBuilder(providerModel, resolverSet, poolingProfile,
                                                         reconnectionConfig,
@@ -103,12 +103,12 @@ public class ConnectionProviderObjectFactory extends AbstractExtensionObjectFact
     return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
   }
 
-  private ConnectionProviderObjectBuilder resolveOAuthBuilder(ResolverSet resolverSet) {
+  private BaseConnectionProviderObjectBuilder resolveOAuthBuilder(ResolverSet resolverSet) {
     OAuthGrantType grantType = providerModel.getModelProperty(OAuthModelProperty.class)
         .map(OAuthModelProperty::getGrantTypes)
         .get().get(0);
 
-    Reference<ConnectionProviderObjectBuilder> builder = new Reference<>();
+    Reference<BaseConnectionProviderObjectBuilder> builder = new Reference<>();
 
     grantType.accept(new OAuthGrantTypeVisitor() {
 

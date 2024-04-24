@@ -20,10 +20,10 @@ import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.runtime.privileged.EventedExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;

@@ -6,15 +6,17 @@
  */
 package org.mule.runtime.module.tooling.internal.artifact.value;
 
-import static com.google.common.base.Throwables.propagateIfPossible;
-import static java.lang.String.format;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static org.mule.runtime.api.metadata.resolving.FailureCode.COMPONENT_NOT_FOUND;
 import static org.mule.runtime.api.value.ResolvingFailure.Builder.newFailure;
 import static org.mule.runtime.api.value.ValueResult.resultFrom;
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
+
+import static java.lang.String.format;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+
+import static com.google.common.base.Throwables.propagateIfPossible;
 
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
@@ -30,10 +32,11 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.func.CheckedSupplier;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.values.ValueResolvingException;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.mule.runtime.module.extension.internal.value.DefaultValueProviderMediator;
 import org.mule.runtime.module.tooling.internal.artifact.AbstractParameterResolverExecutor;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
@@ -214,10 +217,10 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
         .findFirst().flatMap(parameterModel -> parameterModel.getValueProviderModel());
   }
 
-  private ValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
-    return new ValueProviderMediator(parameterizedModel,
-                                     () -> muleContext,
-                                     () -> reflectionCache);
+  private DefaultValueProviderMediator createValueProviderMediator(ParameterizedModel parameterizedModel) {
+    return new DefaultValueProviderMediator(parameterizedModel,
+                                            () -> muleContext,
+                                            () -> reflectionCache);
   }
 
   private Optional<String> getConfigRef(ParameterizedElementDeclaration component) {
@@ -230,7 +233,7 @@ public class ValueProviderExecutor extends AbstractParameterResolverExecutor {
   @FunctionalInterface
   private interface ValueProviderFunction {
 
-    Set<Value> apply(ValueProviderMediator<?> valueProviderMediator, ParameterValueResolver parameterValueResolver,
+    Set<Value> apply(ValueProviderMediator valueProviderMediator, ParameterValueResolver parameterValueResolver,
                      ExtensionResolvingContext extensionResolvingContext)
         throws ValueResolvingException;
 

@@ -14,6 +14,8 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.transformation.TransformationService;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 import javax.inject.Inject;
 

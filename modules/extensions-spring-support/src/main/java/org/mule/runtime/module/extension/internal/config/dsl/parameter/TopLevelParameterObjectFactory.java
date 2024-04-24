@@ -17,11 +17,11 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
 import org.mule.runtime.dsl.api.component.ObjectTypeProvider;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ObjectBuilderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 /**
  * An {@link AbstractExtensionObjectFactory} to resolve extension objects that can be defined as named top level elements and be

@@ -29,6 +29,7 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExclusiveOptionalModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
@@ -39,7 +40,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.RequiredParam
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticLiteralValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypeSafeExpressionValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.TypedValueValueResolverWrapper;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.sdk.api.runtime.parameter.Literal;
 
 import java.util.Optional;

@@ -29,9 +29,10 @@ import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.NullCursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.loader.java.property.SampleDataProviderFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.runtime.DefaultExecutionContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.result.ReturnDelegate;
 import org.mule.runtime.module.extension.internal.runtime.result.ValueReturnDelegate;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
@@ -47,7 +48,7 @@ import java.util.function.Supplier;
  *
  * @since 4.4.0
  */
-public class SampleDataProviderMediator {
+public class DefaultSampleDataProviderMediator implements SampleDataProviderMediator {
 
   private final ExtensionModel extensionModel;
   private final ComponentModel componentModel;
@@ -65,12 +66,12 @@ public class SampleDataProviderMediator {
    * @param componentModel container model which is a {@link ParameterizedModel} and {@link EnrichableModel}
    * @param muleContext    context to be able to initialize {@link SampleDataProvider} if necessary
    */
-  public SampleDataProviderMediator(ExtensionModel extensionModel,
-                                    ComponentModel componentModel,
-                                    Component component,
-                                    MuleContext muleContext,
-                                    ReflectionCache reflectionCache,
-                                    StreamingManager streamingManager) {
+  public DefaultSampleDataProviderMediator(ExtensionModel extensionModel,
+                                           ComponentModel componentModel,
+                                           Component component,
+                                           MuleContext muleContext,
+                                           ReflectionCache reflectionCache,
+                                           StreamingManager streamingManager) {
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
     this.component = component;
@@ -93,6 +94,7 @@ public class SampleDataProviderMediator {
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
    */
+  @Override
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
                                Supplier<Object> connectionSupplier,
                                Supplier<Object> configurationSupplier)
@@ -115,6 +117,7 @@ public class SampleDataProviderMediator {
    * @return a {@link Message} carrying the sample data
    * @throws SampleDataException if an error occurs resolving the sample data
    */
+  @Override
   public Message getSampleData(ParameterValueResolver parameterValueResolver,
                                Supplier<Object> connectionSupplier,
                                Supplier<Object> configurationSupplier,

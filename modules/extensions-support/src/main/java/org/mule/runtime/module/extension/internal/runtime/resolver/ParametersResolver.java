@@ -53,6 +53,8 @@ import org.mule.runtime.extension.api.declaration.type.annotation.NullSafeTypeAn
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.NullSafeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;

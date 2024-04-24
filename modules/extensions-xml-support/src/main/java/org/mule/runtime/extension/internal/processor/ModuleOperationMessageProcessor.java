@@ -81,9 +81,9 @@ import org.mule.runtime.core.privileged.event.DefaultFlowCallStack;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConfigurationProviderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 
 import java.util.ArrayList;
 import java.util.Collection;

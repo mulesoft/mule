@@ -4,19 +4,16 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.config;
+package org.mule.runtime.module.extension.api.runtime.config;
 
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.util.ReflectionCache;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 
 /**
  * A factory which creates instances of {@link ConfigurationProvider}
@@ -34,9 +31,6 @@ public interface ConfigurationProviderFactory {
    * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver a {@link ValueResolver} to obtain a {@link ConnectionProvider}
    * @param expirationPolicy           an {@link ExpirationPolicy} in case the configuration is dynamic
-   * @param reflectionCache            the {@link ReflectionCache} used to improve reflection lookups performance
-   * @param expressionManager          the {@link ExpressionManager} used to create a session used to evaluate the attributes.
-   * @param muleContext                the {@link MuleContext} that will own the configuration instances
    *
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
@@ -46,10 +40,7 @@ public interface ConfigurationProviderFactory {
                                                            ConfigurationModel configurationModel,
                                                            ResolverSet resolverSet,
                                                            ConnectionProviderValueResolver connectionProviderResolver,
-                                                           ExpirationPolicy expirationPolicy,
-                                                           ReflectionCache reflectionCache,
-                                                           ExpressionManager expressionManager,
-                                                           MuleContext muleContext)
+                                                           ExpirationPolicy expirationPolicy)
       throws Exception;
 
 
@@ -61,7 +52,6 @@ public interface ConfigurationProviderFactory {
    * @param configurationModel         the {@link ConfigurationModel} that describes the configuration instances to be returned
    * @param resolverSet                a {@link ResolverSet} for the configuration's attributes
    * @param connectionProviderResolver A {@link ValueResolver} to obtain a {@link ConnectionProvider}
-   * @param muleContext                the {@link MuleContext} that will own the configuration instances
    * @return a {@link ConfigurationProvider}
    * @throws Exception if anything goes wrong
    */
@@ -69,9 +59,6 @@ public interface ConfigurationProviderFactory {
                                                           ExtensionModel extensionModel,
                                                           ConfigurationModel configurationModel,
                                                           ResolverSet resolverSet,
-                                                          ConnectionProviderValueResolver connectionProviderResolver,
-                                                          ReflectionCache reflectionCache,
-                                                          ExpressionManager expressionManager,
-                                                          MuleContext muleContext)
+                                                          ConnectionProviderValueResolver connectionProviderResolver)
       throws Exception;
 }

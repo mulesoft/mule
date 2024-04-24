@@ -36,9 +36,9 @@ import org.mule.runtime.core.internal.exception.ErrorMappingsAware;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.metadata.EntityMetadataMediator;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.List;

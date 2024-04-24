@@ -22,9 +22,9 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 
 /**
  * A parser which returns the definition parsers for a given {@link NestedRouteModel}

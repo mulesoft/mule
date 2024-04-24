@@ -22,6 +22,8 @@ import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_CONFIGURATI
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.lifecycle.Lifecycle;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.tck.size.SmallTest;
 
 import java.util.Map;

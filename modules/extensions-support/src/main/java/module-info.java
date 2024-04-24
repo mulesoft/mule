@@ -76,12 +76,17 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.api.manager;
   exports org.mule.runtime.module.extension.api.loader;
   exports org.mule.runtime.module.extension.api.loader.java.property;
-  exports org.mule.runtime.module.extension.api.util;
-  exports org.mule.runtime.module.extension.api.metadata;
-  exports org.mule.runtime.module.extension.api.tooling;
-  exports org.mule.runtime.module.extension.api.runtime.compatibility;
-  exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
   exports org.mule.runtime.module.extension.api.loader.java.type;
+  exports org.mule.runtime.module.extension.api.metadata;
+  exports org.mule.runtime.module.extension.api.runtime.compatibility;
+  exports org.mule.runtime.module.extension.api.runtime.config;
+  exports org.mule.runtime.module.extension.api.runtime.connectivity.oauth;
+  exports org.mule.runtime.module.extension.api.runtime.resolver;
+  exports org.mule.runtime.module.extension.api.tooling;
+  exports org.mule.runtime.module.extension.api.tooling.metadata;
+  exports org.mule.runtime.module.extension.api.tooling.sampledata;
+  exports org.mule.runtime.module.extension.api.tooling.valueprovider;
+  exports org.mule.runtime.module.extension.api.util;
 
   exports org.mule.runtime.module.extension.api.runtime.privileged to
       org.mule.runtime.extensions.spring.support,
@@ -137,16 +142,14 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.resources.manifest to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime to
-      org.mule.runtime.extensions.spring.support,
-      org.mule.runtime.tooling.support;
+      org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.client to
       org.mule.runtime.core,
       org.mule.runtime.extensions.soap.support;
   exports org.mule.runtime.module.extension.internal.runtime.config to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.tooling.support,
-      org.mule.runtime.extensions.soap.support,
-      org.mule.runtime.extensions.xml.support;
+      org.mule.runtime.extensions.soap.support;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity to
       org.mule.runtime.core;
   exports org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode to
@@ -175,9 +178,8 @@ module org.mule.runtime.extensions.support {
   exports org.mule.runtime.module.extension.internal.runtime.resolver to
       org.mule.runtime.extensions.spring.support,
       org.mule.runtime.extensions.xml.support,
-      org.mule.runtime.spring.config,
-      org.mule.runtime.tooling.support,
-      org.mule.runtime.extensions.soap.support;
+      org.mule.runtime.extensions.soap.support,
+      org.mule.runtime.tooling.support;
   exports org.mule.runtime.module.extension.internal.runtime.resolver.resolver to
       org.mule.runtime.extensions.spring.support;
   exports org.mule.runtime.module.extension.internal.runtime.source to

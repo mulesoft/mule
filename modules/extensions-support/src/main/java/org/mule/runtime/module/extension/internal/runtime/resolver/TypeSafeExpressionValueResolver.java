@@ -16,6 +16,8 @@ import org.mule.runtime.api.transformation.TransformationService;
 import org.mule.runtime.core.api.el.ExtendedExpressionManager;
 import org.mule.runtime.core.api.transformer.Transformer;
 import org.mule.runtime.core.internal.util.attribute.AttributeEvaluator;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 import javax.inject.Inject;
 

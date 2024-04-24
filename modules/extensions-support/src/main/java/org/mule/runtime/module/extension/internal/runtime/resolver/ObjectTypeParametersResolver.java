@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import org.mule.metadata.api.model.ObjectType;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.DefaultObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.objectbuilder.ObjectBuilder;
 

@@ -11,6 +11,8 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.runtime.route.Chain;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.operation.ImmutableProcessorChildContextChainExecutor;
 
 /**

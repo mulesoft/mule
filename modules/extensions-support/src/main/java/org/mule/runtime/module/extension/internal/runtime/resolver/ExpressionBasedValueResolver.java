@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+
 /**
  * {@link ValueResolver} interface for expression based {@link ValueResolver}, in addition to be able to resolve a value,
  * implementations of this {@link ValueResolver} also can communicate the used expression.

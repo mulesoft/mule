@@ -17,14 +17,14 @@ import org.mule.runtime.api.meta.model.parameter.ParameterGroupModel;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.ParameterGroupDescriptor;
 import org.mule.runtime.module.extension.internal.loader.java.property.ParameterGroupModelProperty;
-import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBasedParameterResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterGroupArgumentResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
 import java.util.Map;
