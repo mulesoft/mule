@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.core.api.retry.policy;
 
+import org.mule.runtime.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.api.scheduler.Scheduler;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,9 +17,13 @@ import java.util.function.Supplier;
 
 /**
  * This policy is basically a placeholder. It does not attempt to retry at all.
+ * 
+ * @deprecated Use {@link RetryPolicyTemplate#NO_RETRY_POLICY}.
  */
+@Deprecated
 public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
+  @Override
   public RetryPolicy createRetryInstance() {
     return new NoRetryPolicy();
   }
@@ -30,6 +35,7 @@ public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
 
   protected static class NoRetryPolicy implements RetryPolicy {
 
+    @Override
     public PolicyStatus applyPolicy(Throwable cause) {
       return PolicyStatus.policyExhausted(cause);
     }
@@ -43,6 +49,7 @@ public final class NoRetryPolicyTemplate extends AbstractPolicyTemplate {
     }
   }
 
+  @Override
   public String toString() {
     return "NoRetryPolicy{}";
   }

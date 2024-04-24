@@ -14,6 +14,8 @@ module org.mule.runtime.http.api {
 
   requires transitive org.mule.runtime.api;
 
+  // For the deprecated API methods still relying on org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate
+  requires org.mule.runtime.core;
   requires com.github.benmanes.caffeine;
 
   exports org.mule.runtime.http.api;
