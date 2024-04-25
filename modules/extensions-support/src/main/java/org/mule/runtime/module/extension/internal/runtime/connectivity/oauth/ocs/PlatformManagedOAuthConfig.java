@@ -7,14 +7,14 @@
 package org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs;
 
 import static org.mule.runtime.core.api.util.StringUtils.sanitizeUrl;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_API_VERSION;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_ID;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_CLIENT_SECRET;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_ORG_ID;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_DEFAULT_PATH;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_PATH;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
-import static org.mule.runtime.extension.internal.ocs.OCSConstants.OCS_SERVICE_URL;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_API_VERSION;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_CLIENT_ID;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_CLIENT_SECRET;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_ORG_ID;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_PLATFORM_AUTH_DEFAULT_PATH;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_PLATFORM_AUTH_PATH;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_PLATFORM_AUTH_URL;
+import static org.mule.runtime.extension.api.ocs.OCSConstants.OCS_SERVICE_URL;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
