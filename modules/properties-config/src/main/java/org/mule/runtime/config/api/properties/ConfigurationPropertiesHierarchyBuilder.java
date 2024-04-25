@@ -10,6 +10,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.CompositeConfigurationPropertiesProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationPropertiesResolver;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
@@ -100,6 +101,19 @@ public class ConfigurationPropertiesHierarchyBuilder {
    */
   public ConfigurationPropertiesHierarchyBuilder withPropertiesFile(ResourceProvider resourceProvider) {
     this.fileProperties = of(new FileConfigurationPropertiesProvider(resourceProvider, "External Files"));
+    return this;
+  }
+
+  /**
+   * Sets an external resource provider classloader to get the file content to then use a File Configuration Property.
+   * 
+   * @param classLoader the {@link ClassLoader} to use to read the files to use when resolving a file-value property.
+   * @return this builder.
+   * @since 4.8
+   */
+  public ConfigurationPropertiesHierarchyBuilder withPropertiesFile(ClassLoader classLoader) {
+    this.fileProperties =
+        of(new FileConfigurationPropertiesProvider(new ClassLoaderResourceProvider(classLoader), "External Files"));
     return this;
   }
 
