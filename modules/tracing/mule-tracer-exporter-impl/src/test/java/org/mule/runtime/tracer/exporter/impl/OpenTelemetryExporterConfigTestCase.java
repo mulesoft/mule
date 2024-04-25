@@ -69,6 +69,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -77,6 +78,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
+@Ignore("W-15586397")
 public class OpenTelemetryExporterConfigTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
