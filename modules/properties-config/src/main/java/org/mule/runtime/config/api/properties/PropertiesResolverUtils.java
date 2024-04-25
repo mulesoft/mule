@@ -121,6 +121,29 @@ public class PropertiesResolverUtils {
   }
 
   /**
+   * @param artifactAst                    the {@link ArtifactAst} to get the {@link ConfigurationPropertiesProvider} from.
+   * @param externalResourceClassLoader    a {@link ClassLoader} to use to read files when needed for properties resolution.
+   * @param localResolver                  A resolver that retrieves properties that are used when resolving parameters of a
+   *                                       {@link ConfigurationPropertiesProvider}.
+   * @param ignoreCreateProviderExceptions if {@code true}, exceptions that occur when calling
+   *                                       {@link ConfigurationPropertiesProviderFactory#createProvider(org.mule.runtime.ast.api.ComponentAst, java.util.function.UnaryOperator, ResourceProvider)}
+   *                                       are just logged instead of rethrown.
+   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
+   *         {@link ArtifactAst}.
+   * 
+   * @since 4.8
+   */
+  public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
+                                                                                                        ClassLoader externalResourceClassLoader,
+                                                                                                        ConfigurationPropertiesResolver localResolver,
+                                                                                                        boolean ignoreCreateProviderExceptions) {
+    return getConfigurationPropertiesProvidersFromComponents(artifactAst,
+                                                             new ClassLoaderResourceProvider(externalResourceClassLoader),
+                                                             localResolver,
+                                                             ignoreCreateProviderExceptions);
+  }
+
+  /**
    * @param artifactAst              the {@link ArtifactAst} to get the {@link ConfigurationPropertiesProvider} from.
    * @param externalResourceProvider a {@link ResourceProvider} to use to read files when needed for properties resolution.
    * @param localResolver            A resolver that retrieves properties that are used when resolving parameters of a
@@ -144,6 +167,7 @@ public class PropertiesResolverUtils {
    *                                       are just logged instead of rethrown.
    * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
    *         {@link ArtifactAst}.
+   * @since 4.8
    */
   public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
                                                                                                         ResourceProvider externalResourceProvider,
@@ -171,6 +195,7 @@ public class PropertiesResolverUtils {
             return of(provider);
           } catch (Exception e) {
             if (ignoreCreateProviderExceptions) {
+              LOGGER.warn("Exception creating property provider for component `" + comp.toString() + "`", e);
               return Optional.<ConfigurationPropertiesProvider>empty();
             } else {
               throw e;
