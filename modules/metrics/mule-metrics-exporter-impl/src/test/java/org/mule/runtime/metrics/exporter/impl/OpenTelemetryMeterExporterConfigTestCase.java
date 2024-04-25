@@ -49,14 +49,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
-@Ignore("W-15586397")
 public class OpenTelemetryMeterExporterConfigTestCase {
 
   private static final int TIMEOUT_MILLIS = 30000;
@@ -75,7 +73,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   private static final String UNIT_NAME = "test-unit";
 
   private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("ghcr.io/open-telemetry/opentelemetry-java/otel-collector");
+      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
 
   private MeterExporter openTelemetryMeterExporter;
   private Meter meter;
