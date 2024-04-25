@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.policy;
+package org.mule.runtime.core.internal.policy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -13,6 +13,7 @@ import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolic
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.core.api.event.CoreEvent;
+import org.mule.runtime.core.internal.policy.NoOpPolicyManager;
 import org.mule.runtime.core.internal.policy.OperationParametersProcessor;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.tck.junit4.AbstractMuleTestCase;
