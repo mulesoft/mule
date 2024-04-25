@@ -12,6 +12,8 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.extension.api.dsql.DsqlParser;
 import org.mule.runtime.extension.api.dsql.DsqlQuery;
 import org.mule.runtime.extension.api.dsql.QueryTranslator;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 /**
  * {@link ValueResolver} implementation which translates {@link DsqlQuery}s to queries in the Native Query Language.

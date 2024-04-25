@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.util;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 
 /**
  * A contract for setting values into an object

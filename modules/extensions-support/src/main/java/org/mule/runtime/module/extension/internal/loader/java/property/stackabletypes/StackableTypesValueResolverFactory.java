@@ -9,9 +9,10 @@ package org.mule.runtime.module.extension.internal.loader.java.property.stackabl
 import static java.lang.String.format;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+
+import static org.mule.runtime.api.util.Preconditions.checkArgument;
 
 import java.util.Optional;
 import java.util.Stack;

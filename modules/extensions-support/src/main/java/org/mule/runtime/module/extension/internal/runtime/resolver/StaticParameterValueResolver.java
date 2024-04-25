@@ -9,7 +9,9 @@ package org.mule.runtime.module.extension.internal.runtime.resolver;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toMap;
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 
 import java.util.HashMap;
 import java.util.Map;

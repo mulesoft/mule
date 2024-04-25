@@ -10,12 +10,16 @@ import static java.util.Collections.emptyMap;
 
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 import java.util.Map;
 
 public class NullResolverSet extends ResolverSet {
 
-  private static final ResolverSetResult EMPTY_RESULT = new ResolverSetResult(emptyMap());
+  private static final ResolverSetResult EMPTY_RESULT = ResolverSetResult.newBuilder().build();
   public static final ResolverSet INSTANCE = new NullResolverSet();
 
   private NullResolverSet() {

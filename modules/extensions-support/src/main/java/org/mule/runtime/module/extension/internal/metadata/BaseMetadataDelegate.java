@@ -18,7 +18,7 @@ import org.mule.runtime.extension.api.metadata.NullMetadataResolver;
 import java.util.Optional;
 
 /**
- * Base implementation for the Metadata service delegate implementations that are used by the {@link MetadataMediator}
+ * Base implementation for the Metadata service delegate implementations that are used by the {@link DefaultMetadataMediator}
  *
  * @since 4.0
  */

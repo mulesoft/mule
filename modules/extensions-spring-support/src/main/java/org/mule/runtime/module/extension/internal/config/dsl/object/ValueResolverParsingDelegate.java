@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.config.dsl.object;
 
 import org.mule.metadata.api.model.MetadataType;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 
 /**
  * Specialization of {@link ParsingDelegate} that always produces instances of {@link ValueResolver}

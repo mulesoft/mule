@@ -73,7 +73,7 @@ public class OpenTelemetryMeterExporterConfigTestCase {
   private static final String UNIT_NAME = "test-unit";
 
   private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("ghcr.io/open-telemetry/opentelemetry-java/otel-collector");
+      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
 
   private MeterExporter openTelemetryMeterExporter;
   private Meter meter;

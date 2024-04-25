@@ -36,7 +36,8 @@ import org.mule.runtime.extension.api.property.TypeResolversInformationModelProp
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.internal.cache.MetadataCacheManager;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
+import org.mule.runtime.module.extension.api.tooling.metadata.MetadataMediator;
+import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.tooling.internal.artifact.ExecutorExceptionWrapper;
 import org.mule.runtime.module.tooling.internal.artifact.params.ExpressionNotSupportedException;
@@ -144,7 +145,7 @@ public class MetadataComponentExecutor extends MetadataExecutor {
                                                                            MetadataKey metadataKey,
                                                                            ClassLoader extensionClassLoader)
       throws MetadataResolvingException {
-    MetadataMediator<? extends ComponentModel> metadataMediator = new MetadataMediator<>(componentModel);
+    MetadataMediator metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
 
     return withContextClassLoader(extensionClassLoader,
                                   () -> runWithMetadataContext(componentElementDeclaration, configurationInstance,

@@ -88,19 +88,20 @@ import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.metadata.api.locator.ComponentLocator;
 import org.mule.runtime.metadata.internal.MuleMetadataService;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.api.tooling.valueprovider.ValueProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
-import org.mule.runtime.module.extension.internal.data.sample.SampleDataProviderMediator;
+import org.mule.runtime.module.extension.internal.data.sample.DefaultSampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataContext;
-import org.mule.runtime.module.extension.internal.metadata.MetadataMediator;
+import org.mule.runtime.module.extension.internal.metadata.DefaultMetadataMediator;
 import org.mule.runtime.module.extension.internal.runtime.config.DynamicConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.source.ExtensionMessageSource;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
-import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
+import org.mule.runtime.module.extension.internal.value.DefaultValueProviderMediator;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
 import java.util.List;
@@ -131,7 +132,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
 
   private final ExtensionModel extensionModel;
   private final AtomicReference<ValueResolver<ConfigurationProvider>> configurationProviderResolver = new AtomicReference<>();
-  private final MetadataMediator<T> metadataMediator;
   private final ClassTypeLoader typeLoader;
   private final LazyValue<Boolean> requiresConfig = new LazyValue<>(this::computeRequiresConfig);
   private final LazyValue<Boolean> usesDynamicConfiguration = new LazyValue<>(this::computeUsesDynamicConfiguration);
@@ -141,6 +141,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       new LazyValue<>(this::doGetStaticConfiguration);
 
   protected final ExtensionManager extensionManager;
+  private DefaultMetadataMediator<T> metadataMediator;
   protected ClassLoader classLoader;
   protected final T componentModel;
 
@@ -152,7 +153,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
    * or when the underlying component doesn't support the capability in the first place
    */
-  private ValueProviderMediator<T> valueProviderMediator;
+  private DefaultValueProviderMediator<T> valueProviderMediator;
 
   /**
    * Only to be accessed through {@link #getSampleDataProviderMediator()} as this is a lazy value only used in design time.
@@ -160,7 +161,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    * Purposely not modeled as a {@link LazyValue} to prevent the creation of unnecessary instances when not running in design time
    * or when the underlying component doesn't support the capability in the first place
    */
-  private SampleDataProviderMediator sampleDataProviderMediator;
+  private DefaultSampleDataProviderMediator sampleDataProviderMediator;
 
   protected MuleContext muleContext;
 
@@ -215,7 +216,6 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.configurationProviderResolver.set(configurationProviderResolver);
     this.extensionManager = extensionManager;
     this.cursorProviderFactory = cursorProviderFactory;
-    this.metadataMediator = new MetadataMediator<>(componentModel);
     this.typeLoader = ExtensionsTypeLoaderFactory.getDefault().createTypeLoader(classLoader);
   }
 
@@ -227,6 +227,8 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
    */
   @Override
   public final void initialise() throws InitialisationException {
+    this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
+
     if (cursorProviderFactory == null) {
       cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
           .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
@@ -569,7 +571,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       synchronized (this) {
         if (valueProviderMediator == null) {
           valueProviderMediator =
-              new ValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
+              new DefaultValueProviderMediator<>(componentModel, () -> muleContext, () -> reflectionCache);
         }
       }
     }
@@ -577,17 +579,17 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     return valueProviderMediator;
   }
 
-  private SampleDataProviderMediator getSampleDataProviderMediator() {
+  private DefaultSampleDataProviderMediator getSampleDataProviderMediator() {
     if (sampleDataProviderMediator == null) {
       synchronized (this) {
         if (sampleDataProviderMediator == null) {
-          sampleDataProviderMediator = new SampleDataProviderMediator(
-                                                                      extensionModel,
-                                                                      componentModel,
-                                                                      this,
-                                                                      muleContext,
-                                                                      reflectionCache,
-                                                                      streamingManager);
+          sampleDataProviderMediator = new DefaultSampleDataProviderMediator(
+                                                                             extensionModel,
+                                                                             componentModel,
+                                                                             this,
+                                                                             muleContext,
+                                                                             reflectionCache,
+                                                                             streamingManager);
         }
       }
     }
@@ -627,8 +629,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             getParameterValueResolver(),
-                                                                                                             reflectionCache)));
+                                                                                                             getParameterValueResolver())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -643,8 +644,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader,
                                                                       () -> metadataMediator.getMetadataKeys(context,
-                                                                                                             partialKey,
-                                                                                                             reflectionCache)));
+                                                                                                             partialKey)));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onKeys());
     }
@@ -659,8 +659,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     try {
       return runWithMetadataContext(
                                     context -> withContextClassLoader(classLoader, () -> metadataMediator
-                                        .getMetadata(context, getParameterValueResolver(),
-                                                     reflectionCache)));
+                                        .getMetadata(context, getParameterValueResolver())));
     } catch (ConnectionException e) {
       return failure(newFailure(e).onComponent());
     }

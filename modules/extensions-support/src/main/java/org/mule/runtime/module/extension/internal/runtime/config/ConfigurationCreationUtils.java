@@ -34,14 +34,15 @@ import org.mule.runtime.extension.api.connectivity.oauth.PlatformManagedOAuthGra
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
+import org.mule.runtime.module.extension.api.runtime.config.ConfigurationProviderFactory;
+import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.ConnectionProviderSettings;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.authcode.AuthorizationCodeConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.clientcredentials.ClientCredentialsConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.connectivity.oauth.ocs.PlatformManagedOAuthConnectionProviderObjectBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ImplicitConnectionProviderValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.runtime.resolver.StaticConnectionProviderResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 
@@ -110,26 +111,20 @@ public final class ConfigurationCreationUtils {
       ConfigurationProvider configurationProvider;
       try {
         if (resolverSet.isDynamic() || connectionResolver.isDynamic()) {
-          configurationProvider =
-              configurationProviderFactory.createDynamicConfigurationProvider(configName, extensionModel,
-                                                                              configurationModel,
-                                                                              resolverSet,
-                                                                              connectionResolver,
-                                                                              getActingExpirationPolicy(expirationPolicy,
-                                                                                                        muleContext),
-                                                                              reflectionCache,
-                                                                              expressionManager,
-                                                                              muleContext);
+          configurationProvider = configurationProviderFactory
+              .createDynamicConfigurationProvider(configName,
+                                                  extensionModel,
+                                                  configurationModel,
+                                                  resolverSet,
+                                                  connectionResolver,
+                                                  getActingExpirationPolicy(expirationPolicy, muleContext));
         } else {
           configurationProvider = configurationProviderFactory
               .createStaticConfigurationProvider(configName,
                                                  extensionModel,
                                                  configurationModel,
                                                  resolverSet,
-                                                 connectionResolver,
-                                                 reflectionCache,
-                                                 expressionManager,
-                                                 muleContext);
+                                                 connectionResolver);
         }
       } catch (Exception e) {
         throw new MuleRuntimeException(
@@ -177,7 +172,7 @@ public final class ConfigurationCreationUtils {
                                                                                 expressionManager,
                                                                                 parametersOwner);
 
-    ConnectionProviderObjectBuilder builder;
+    BaseConnectionProviderObjectBuilder builder;
     if (providerModel.getModelProperty(OAuthModelProperty.class).isPresent()) {
       builder = resolveOAuthBuilder(extensionModel, providerModel, settings, resolverSet,
                                     configurationProperties, expressionManager, muleContext);
@@ -193,18 +188,18 @@ public final class ConfigurationCreationUtils {
     return new ConnectionProviderResolver<>(builder, resolverSet, muleContext);
   }
 
-  private static ConnectionProviderObjectBuilder resolveOAuthBuilder(ExtensionModel extensionModel,
-                                                                     ConnectionProviderModel providerModel,
-                                                                     ConnectionProviderSettings settings,
-                                                                     ResolverSet resolverSet,
-                                                                     ConfigurationProperties configurationProperties,
-                                                                     ExpressionManager expressionManager,
-                                                                     MuleContext muleContext) {
+  private static BaseConnectionProviderObjectBuilder resolveOAuthBuilder(ExtensionModel extensionModel,
+                                                                         ConnectionProviderModel providerModel,
+                                                                         ConnectionProviderSettings settings,
+                                                                         ResolverSet resolverSet,
+                                                                         ConfigurationProperties configurationProperties,
+                                                                         ExpressionManager expressionManager,
+                                                                         MuleContext muleContext) {
     OAuthGrantType grantType = providerModel.getModelProperty(OAuthModelProperty.class)
         .map(OAuthModelProperty::getGrantTypes)
         .get().get(0);
 
-    Reference<ConnectionProviderObjectBuilder> builder = new Reference<>();
+    Reference<BaseConnectionProviderObjectBuilder> builder = new Reference<>();
 
     grantType.accept(new OAuthGrantTypeVisitor() {
 

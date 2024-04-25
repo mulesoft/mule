@@ -23,9 +23,9 @@ import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.util.IOUtils;
 import org.mule.runtime.core.api.util.NotAnInputStreamException;
 import org.mule.runtime.core.api.util.func.CheckedFunction;
+import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingException;
 import org.mule.runtime.module.extension.internal.loader.java.property.InjectableParameterInfo;
-import org.mule.runtime.module.extension.internal.runtime.ValueResolvingException;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ParameterValueResolver;
 
 import java.io.InputStream;
 import java.util.List;

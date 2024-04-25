@@ -82,7 +82,7 @@ public class OpenTelemetryExporterConfigTestCase {
   public static final String TEST_SERVICE_NAME = "test-service-name";
 
   private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("ghcr.io/open-telemetry/opentelemetry-java/otel-collector");
+      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
 
   private static final Integer COLLECTOR_OTLP_GRPC_PORT = 4317;
   private static final Integer COLLECTOR_OTLP_HTTP_PORT = 4318;

@@ -4,12 +4,13 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.runtime.resolver;
+package org.mule.runtime.module.extension.api.runtime.resolver;
 
 import static java.util.Optional.empty;
+
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.util.Pair;
-import org.mule.runtime.module.extension.internal.runtime.config.ConnectionProviderObjectBuilder;
+import org.mule.runtime.module.extension.api.runtime.config.ConnectionProviderObjectBuilder;
 
 import java.util.Optional;
 

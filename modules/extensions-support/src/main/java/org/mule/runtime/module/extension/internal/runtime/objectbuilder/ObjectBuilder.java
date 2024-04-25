@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.runtime.objectbuilder;
 
 import org.mule.runtime.api.exception.MuleException;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolver;
-import org.mule.runtime.module.extension.internal.runtime.resolver.ValueResolvingContext;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
+import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 
 /**
  * A builder capable of creating instances of a given {@link Class}, populating its attributes based on a list of
