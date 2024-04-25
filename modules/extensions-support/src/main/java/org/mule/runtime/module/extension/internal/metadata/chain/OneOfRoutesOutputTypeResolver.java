@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  *
  * @since 4.7
  */
-public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Void>, AttributesTypeResolver<Void> {
+public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Object>, AttributesTypeResolver<Object> {
 
   public static final OneOfRoutesOutputTypeResolver INSTANCE = new OneOfRoutesOutputTypeResolver();
 
@@ -48,12 +48,12 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Void>, 
   }
 
   @Override
-  public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
+  public MetadataType getOutputType(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException {
     return union(context, MessageMetadataType::getPayloadType);
   }
 
   @Override
-  public MetadataType getAttributesType(MetadataContext context, Void key)
+  public MetadataType getAttributesType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     return union(context, MessageMetadataType::getAttributesType);
   }
