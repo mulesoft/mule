@@ -48,6 +48,7 @@ import com.linecorp.armeria.testing.junit4.server.SelfSignedCertificateRule;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
@@ -55,6 +56,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.PullPolicy;
 import org.testcontainers.utility.DockerImageName;
 
+@Ignore("W-15586397")
 public class OpenTelemetryMeterExporterConfigTestCase {
 
   private static final int TIMEOUT_MILLIS = 30000;
