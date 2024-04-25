@@ -6,6 +6,13 @@
  */
 package org.mule.runtime.module.artifact.activation.api.deployable;
 
+import org.mule.runtime.api.deployment.meta.MuleDeployableModel;
+import org.mule.runtime.module.artifact.activation.internal.deployable.MuleDeployableProjectModelBuilder;
+import org.mule.runtime.module.artifact.activation.internal.maven.MavenDeployableProjectModelBuilder;
+
+import java.io.File;
+import java.util.Optional;
+
 /**
  * Generic builder to create a {@link DeployableProjectModel} representing the structure of a project.
  * <p>
@@ -14,6 +21,23 @@ package org.mule.runtime.module.artifact.activation.api.deployable;
  * @since 4.5
  */
 public interface DeployableProjectModelBuilder {
+
+  /**
+   * @return an implementation of {@link DeployableProjectModelBuilder} that builds a model based on the files provided within a
+   *         packaged Mule deployable artifact project.
+   *
+   * @since 4.8
+   */
+  public static DeployableProjectModelBuilder forMuleProject(File projectFolder, Optional<MuleDeployableModel> model) {
+    return new MuleDeployableProjectModelBuilder(projectFolder, model);
+  }
+
+  public static DeployableProjectModelBuilder forMavenProject(File projectFolder,
+                                                              boolean exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                              boolean includeTestDependencies) {
+    return new MavenDeployableProjectModelBuilder(projectFolder, exportAllResourcesAndPackagesIfEmptyLoaderDescriptor,
+                                                  includeTestDependencies);
+  }
 
   /**
    * Creates a {@link DeployableProjectModel}.

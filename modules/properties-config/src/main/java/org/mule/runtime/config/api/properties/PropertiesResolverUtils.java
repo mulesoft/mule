@@ -26,6 +26,7 @@ import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.ast.api.ArtifactAst;
+import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
 import org.mule.runtime.config.internal.model.dsl.config.DefaultConfigurationProperty;
 import org.mule.runtime.core.internal.execution.LocationExecutionContextProvider;
 import org.mule.runtime.properties.api.ConfigurationPropertiesProvider;
@@ -99,6 +100,22 @@ public class PropertiesResolverUtils {
 
       return globalProperties;
     });
+  }
+
+  /**
+   * @param artifactAst                 the {@link ArtifactAst} to get the {@link ConfigurationPropertiesProvider} from.
+   * @param externalResourceClassLoader a {@link ClassLoader} to use to read files when needed for properties resolution.
+   * @param localResolver               A resolver that retrieves properties that are used when resolving parameters of a
+   *                                    {@link ConfigurationPropertiesProvider}.
+   * @return A List with all the {@link ConfigurationPropertiesProvider} for Application Properties providers within the
+   *         {@link ArtifactAst}.
+   */
+  public static List<ConfigurationPropertiesProvider> getConfigurationPropertiesProvidersFromComponents(ArtifactAst artifactAst,
+                                                                                                        ClassLoader externalResourceClassLoader,
+                                                                                                        ConfigurationPropertiesResolver localResolver) {
+    return getConfigurationPropertiesProvidersFromComponents(artifactAst,
+                                                             new ClassLoaderResourceProvider(externalResourceClassLoader),
+                                                             localResolver);
   }
 
   /**

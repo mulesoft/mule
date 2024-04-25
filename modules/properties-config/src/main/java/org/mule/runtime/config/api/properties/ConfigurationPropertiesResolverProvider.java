@@ -7,17 +7,20 @@
 package org.mule.runtime.config.api.properties;
 
 import static org.mule.runtime.config.internal.model.properties.PropertiesHierarchyCreationUtils.createConfigurationAttributeResolver;
+
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.FeatureFlaggingService;
+import org.mule.runtime.api.lifecycle.Disposable;
+import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.config.internal.model.dsl.ClassLoaderResourceProvider;
+import org.mule.runtime.config.internal.model.dsl.config.PropertiesResolverConfigurationProperties;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
 /**
  * Specialization of {@link ConfigurationProperties} that may provide instances of a {@link UnaryOperator<String>} instance for
@@ -30,6 +33,20 @@ import java.util.function.UnaryOperator;
  * @since 4.4
  */
 public interface ConfigurationPropertiesResolverProvider extends ConfigurationProperties {
+
+  /**
+   * Creates a new instance of a {@link ConfigurationPropertiesResolverProvider}.
+   * <p>
+   * The returned instance may implement {@link Initialisable} and/or {@link Disposable}, so proper lifecycle must be applied on
+   * it for its use.
+   *
+   * @param configurationPropertiesResolver the resolver to use for getting the value of the property.
+   * 
+   * @since 4.8
+   */
+  public static ConfigurationPropertiesResolverProvider fromResolver(ConfigurationPropertiesResolver configurationPropertiesResolver) {
+    return new PropertiesResolverConfigurationProperties(configurationPropertiesResolver);
+  }
 
   /**
    * A builder for creating new {@link ConfigurationPropertiesResolverProvider} instances.
@@ -109,8 +126,8 @@ public interface ConfigurationPropertiesResolverProvider extends ConfigurationPr
   /**
    * Implementations must ensure that many calls to this method on the same object return the same value.
    *
-   * @return a {@link UnaryOperator<String>} instance for resolving configuration properties.
+   * @return a {@link ConfigurationPropertiesResolver} instance for resolving configuration properties.
    */
-  UnaryOperator<String> getConfigurationPropertiesResolver();
+  ConfigurationPropertiesResolver getConfigurationPropertiesResolver();
 
 }
