@@ -1,4 +1,24 @@
 {
+  "4.6.3": {
+    "revapi": {
+      "ignore": [
+        {
+	  "ignore": true,
+	  "code": "java.field.addedStaticField",
+	  "new": "field org.mule.runtime.api.util.MuleSystemProperties.ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE",
+	  "justification": "W-15534312 Update 4.6.3 repos to next version"
+	  "package": "org.mule.runtime.api.util",
+	  "classQualifiedName": "org.mule.runtime.api.util.MuleSystemProperties",
+	  "classSimpleName": "MuleSystemProperties",
+	  "fieldName": "ENABLE_TEMPLATE_PARSER_COMPATIBILITY_MODE",
+	  "elementKind": "field",
+	  "newArchive": "org.mule.runtime:mule-api:jar:1.6.4-SNAPSHOT",
+ 	  "newArchiveRole": "primary",
+ 	  "breaksSemanticVersioning": "true",
+        }
+      ]
+    }
+  },
   "4.6.2": {
     "revapi": {
       "ignore": [
