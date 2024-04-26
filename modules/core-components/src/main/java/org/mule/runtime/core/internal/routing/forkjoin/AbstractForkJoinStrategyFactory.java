@@ -9,7 +9,6 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
-import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 
 import static java.lang.Long.MAX_VALUE;
@@ -33,7 +32,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
@@ -43,7 +41,6 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
-import org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
