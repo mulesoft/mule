@@ -13,6 +13,7 @@ import static org.mule.runtime.core.privileged.processor.MessageProcessors.proce
 
 import static java.lang.Long.MAX_VALUE;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import static reactor.core.Exceptions.propagate;
@@ -23,6 +24,7 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
@@ -30,7 +32,6 @@ import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.scheduler.Scheduler;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.core.api.event.CoreEvent;
-import org.mule.runtime.core.api.message.GroupCorrelation;
 import org.mule.runtime.core.api.processor.ReactiveProcessor;
 import org.mule.runtime.core.api.processor.strategy.ProcessingStrategy;
 import org.mule.runtime.core.internal.event.DefaultEventBuilder;
@@ -156,7 +157,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                             CoreEvent.Builder resultBuilder);
 
   private Function<RoutingPair, RoutingPair> addSequence(AtomicInteger count) {
-    return pair -> of(builder(pair.getEvent()).groupCorrelation(Optional.of(GroupCorrelation.of(count.getAndIncrement())))
+    return pair -> of(builder(pair.getEvent()).itemSequenceInfo(ofNullable(ItemSequenceInfo.of(count.getAndIncrement())))
         .build(), pair.getRoute());
   }
 
