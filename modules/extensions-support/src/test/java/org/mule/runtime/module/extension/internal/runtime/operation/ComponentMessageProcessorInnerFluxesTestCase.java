@@ -10,6 +10,7 @@ import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUT
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.REACTOR;
 
 import org.mule.runtime.api.meta.model.ComponentModel;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.TestComponentMessageProcessor;
 
@@ -37,7 +38,7 @@ public class ComponentMessageProcessorInnerFluxesTestCase extends ComponentMessa
                                              componentModel, null, null, null,
                                              resolverSet, null, null, null,
                                              null, extensionManager,
-                                             mockPolicyManager, null, null,
+                                             null, null,
                                              muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override

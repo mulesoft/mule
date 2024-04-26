@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.el.ExpressionManager;
 import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
@@ -41,11 +40,10 @@ public final class OperationMessageProcessorBuilder
   public OperationMessageProcessorBuilder(ExtensionModel extension,
                                           OperationModel operation,
                                           List<EnrichedErrorMapping> errorMappings,
-                                          PolicyManager policyManager,
                                           MuleContext muleContext,
                                           Registry registry) {
 
-    super(extension, operation, policyManager, registry.lookupByType(ReflectionCache.class).get(),
+    super(extension, operation, registry.lookupByType(ReflectionCache.class).get(),
           registry.lookupByType(ExpressionManager.class).get(), muleContext, registry);
 
     this.errorMappings = errorMappings;
@@ -73,13 +71,13 @@ public final class OperationMessageProcessorBuilder
                                              targetValue,
                                              errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate,
                                              nestedChain, classLoader,
-                                             extensionManager, policyManager, reflectionCache, resultTransformer,
+                                             extensionManager, reflectionCache, resultTransformer,
                                              terminationTimeout);
     } else {
       operationMessageProcessor =
           new OperationMessageProcessor(extensionModel, operationModel, configurationProviderResolver, target, targetValue,
                                         errorMappings, arguments, cursorProviderFactory, retryPolicyTemplate, nestedChain,
-                                        classLoader, extensionManager, policyManager, reflectionCache, resultTransformer,
+                                        classLoader, extensionManager, reflectionCache, resultTransformer,
                                         terminationTimeout);
     }
 

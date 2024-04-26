@@ -8,6 +8,7 @@ package org.mule.runtime.core.internal.execution;
 
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.util.ClassUtils.setContextClassLoader;
+import static org.mule.runtime.core.internal.policy.PolicyManager.NOOP_POLICY_MANAGER;
 
 import static java.lang.Thread.currentThread;
 import static java.util.Optional.ofNullable;
@@ -18,6 +19,8 @@ import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.exception.SystemExceptionHandler;
 import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.sdk.api.runtime.source.DistributedTraceContextManager;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -75,7 +78,7 @@ public class MuleMessageProcessingManager implements MessageProcessingManager, I
   }
 
   @Inject
-  public void setPolicyManager(PolicyManager policyManager) {
-    this.policyManager = policyManager;
+  public void setPolicyManager(Optional<PolicyManager> policyManager) {
+    this.policyManager = policyManager.orElse(NOOP_POLICY_MANAGER);
   }
 }

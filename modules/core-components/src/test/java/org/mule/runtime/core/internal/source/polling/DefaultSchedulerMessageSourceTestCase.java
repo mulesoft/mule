@@ -81,7 +81,7 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     MuleMessageProcessingManager processingManager = new MuleMessageProcessingManager();
     processingManager.setMuleContext(muleContext);
-    processingManager.setPolicyManager(policyManager);
+    processingManager.setPolicyManager(of(policyManager));
 
     ((DefaultMuleContext) muleContext).getRegistry().unregisterObject(MESSAGE_PROCESSING_MANAGER_KEY);
     ((DefaultMuleContext) muleContext).getRegistry().registerObject(MESSAGE_PROCESSING_MANAGER_KEY, processingManager);

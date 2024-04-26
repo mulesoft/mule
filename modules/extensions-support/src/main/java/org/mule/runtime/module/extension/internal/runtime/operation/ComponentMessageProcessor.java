@@ -25,6 +25,7 @@ import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_COMPONENT;
 import static org.mule.runtime.core.internal.interception.DefaultInterceptionEvent.INTERCEPTION_RESOLVED_CONTEXT;
 import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
+import static org.mule.runtime.core.internal.policy.PolicyManager.NOOP_POLICY_MANAGER;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_IS_PROPAGATE_MESSAGE_TRANSFORMATIONS;
 import static org.mule.runtime.core.internal.policy.PolicyNextActionMessageProcessor.POLICY_NEXT_OPERATION;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.PROCESSOR_SCHEDULER_CONTEXT_KEY;
@@ -213,7 +214,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   protected ExecutionMediator executionMediator;
   protected CompletableComponentExecutor componentExecutor;
   protected ReturnDelegate returnDelegate;
-  protected PolicyManager policyManager;
+
   protected ClassLoader nestedChainClassLoader;
   private Optional<TransactionConfig> transactionConfig;
 
@@ -242,6 +243,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   @Inject
   private Optional<TransactionManager> transactionManager;
+
+  @Inject
+  private Optional<PolicyManager> policyManager;
 
   private Function<Optional<ConfigurationInstance>, RetryPolicyTemplate> retryPolicyResolver;
   private String resolvedProcessorRepresentation;
@@ -278,7 +282,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                                    MessageProcessorChain nestedChain,
                                    ClassLoader classLoader,
                                    ExtensionManager extensionManager,
-                                   PolicyManager policyManager,
                                    ReflectionCache reflectionCache,
                                    ResultTransformer resultTransformer,
                                    long terminationTimeout) {
@@ -287,7 +290,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
     this.resolverSet = resolverSet;
     this.target = target;
     this.targetValue = targetValue;
-    this.policyManager = policyManager;
     this.retryPolicyTemplate = retryPolicyTemplate;
     this.nestedChain = nestedChain;
     this.nestedChainClassLoader = classLoader;
@@ -779,7 +781,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
     sdkInternalContext.setResolutionResult(location, eventId, resolutionResult);
     sdkInternalContext.setPolicyToApply(location, eventId, location != null
-        ? policyManager.createOperationPolicy(this, event, () -> resolutionResult)
+        ? policyManager.orElse(NOOP_POLICY_MANAGER).createOperationPolicy(this, event, () -> resolutionResult)
         : noPolicyOperation());
 
     return event;

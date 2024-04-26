@@ -138,7 +138,7 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
     OperationMessageProcessor operationMessageProcessor =
         new TestOperationMessageProcessor(extensionModel, operationModel, configurationProvider, target, targetValue, emptyList(),
                                           resolverSet, cursorStreamProviderFactory, new NoRetryPolicyTemplate(), null,
-                                          null, extensionManager, mockPolicyManager, reflectionCache, null,
+                                          null, extensionManager, reflectionCache, null,
                                           muleContext.getConfiguration().getShutdownTimeout());
     operationMessageProcessor.setAnnotations(getFlowComponentLocationAnnotations(FLOW_NAME));
     operationMessageProcessor.setComponentLocator(componentLocator);
@@ -562,11 +562,11 @@ public class OperationMessageProcessorTestCase extends AbstractOperationMessageP
                                          CursorProviderFactory cursorProviderFactory, RetryPolicyTemplate retryPolicyTemplate,
                                          MessageProcessorChain nestedChain, ClassLoader classLoader,
                                          ExtensionManager extensionManager,
-                                         PolicyManager policyManager, ReflectionCache reflectionCache,
+                                         ReflectionCache reflectionCache,
                                          ResultTransformer resultTransformer, long terminationTimeout) {
       super(extensionModel, operationModel, new StaticValueResolver<>(configurationProvider), target, targetValue,
             errorMappings, resolverSet,
-            cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader, extensionManager, policyManager,
+            cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader, extensionManager,
             reflectionCache,
             resultTransformer, terminationTimeout);
     }

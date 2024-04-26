@@ -61,7 +61,6 @@ public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleC
   private MessageProcessorChain nestedChain;
   private ClassLoader applicationClassLoader;
   private ExtensionManager extensionManager;
-  private PolicyManager policyManager;
   private ClassLoader contextClassLoader;
 
   @After
@@ -87,12 +86,11 @@ public class ComponentMessageProcessorClassLoadingTestCase extends AbstractMuleC
     nestedChain = new DefaultMessageProcessorChainBuilder().build();
     applicationClassLoader = mock(ClassLoader.class);
     extensionManager = mock(ExtensionManager.class);
-    policyManager = mock(PolicyManager.class);
     contextClassLoader = Thread.currentThread().getContextClassLoader();
     processor = new TestComponentMessageProcessor(extensionModel, componentModel, null, null, null,
                                                   resolverSet, null, null,
                                                   nestedChain, applicationClassLoader, extensionManager,
-                                                  policyManager, null, null,
+                                                  null, null,
                                                   muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override
