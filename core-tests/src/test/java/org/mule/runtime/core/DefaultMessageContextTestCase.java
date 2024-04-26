@@ -17,6 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
 import org.mule.runtime.api.event.EventContext;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.FlowConstruct;
@@ -79,10 +80,29 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
   }
 
   @Test
-  public void overrideCorrelationIdInContext() {
+  public void overrideCorrelationIdInContextWithGroupCorrelation() {
     final Message message = of(TEST_PAYLOAD);
     final CoreEvent event = CoreEvent.builder(executionContextWithCorrelation).message(message)
         .groupCorrelation(empty()).build();
+
+    assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
+  }
+
+  @Test
+  public void overrideCorrelationIdInContextSequenceWithGroupCorrelation() {
+    final Message message = of(TEST_PAYLOAD);
+    final CoreEvent event =
+        PrivilegedEvent.builder(executionContextWithCorrelation).message(message).correlationId(CUSTOM_CORRELATION_ID)
+            .groupCorrelation(Optional.of(GroupCorrelation.of(6))).build();
+
+    assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
+  }
+
+  @Test
+  public void overrideCorrelationIdInContext() {
+    final Message message = of(TEST_PAYLOAD);
+    final CoreEvent event = CoreEvent.builder(executionContextWithCorrelation).message(message)
+        .itemSequenceInfo(empty()).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }
@@ -92,7 +112,7 @@ public class DefaultMessageContextTestCase extends AbstractMuleTestCase {
     final Message message = of(TEST_PAYLOAD);
     final CoreEvent event =
         PrivilegedEvent.builder(executionContextWithCorrelation).message(message).correlationId(CUSTOM_CORRELATION_ID)
-            .groupCorrelation(Optional.of(GroupCorrelation.of(6))).build();
+            .itemSequenceInfo(Optional.of(ItemSequenceInfo.of(6))).build();
 
     assertThat(event.getCorrelationId(), is(CUSTOM_CORRELATION_ID));
   }

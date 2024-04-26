@@ -9,10 +9,12 @@ package org.mule.runtime.core.internal.routing.forkjoin;
 import static org.mule.runtime.core.api.event.CoreEvent.builder;
 import static org.mule.runtime.core.internal.exception.ErrorHandlerContextManager.ERROR_HANDLER_CONTEXT;
 import static org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair.of;
+import static org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils.fromGroupCorrelation;
 import static org.mule.runtime.core.privileged.processor.MessageProcessors.processWithChildContextDontComplete;
 
 import static java.lang.Long.MAX_VALUE;
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import static reactor.core.Exceptions.propagate;
@@ -23,6 +25,7 @@ import static reactor.core.publisher.Mono.just;
 
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
+import org.mule.runtime.api.message.ItemSequenceInfo;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.CollectionDataType;
 import org.mule.runtime.api.metadata.DataType;
@@ -40,6 +43,7 @@ import org.mule.runtime.core.internal.routing.ForkJoinStrategy;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategy.RoutingPair;
 import org.mule.runtime.core.internal.routing.ForkJoinStrategyFactory;
 import org.mule.runtime.core.internal.routing.result.CompositeRoutingException;
+import org.mule.runtime.core.internal.util.message.ItemSequenceInfoUtils;
 import org.mule.runtime.core.privileged.exception.EventProcessingException;
 import org.mule.runtime.core.privileged.routing.RoutingResult;
 
@@ -156,7 +160,7 @@ public abstract class AbstractForkJoinStrategyFactory implements ForkJoinStrateg
                                                                             CoreEvent.Builder resultBuilder);
 
   private Function<RoutingPair, RoutingPair> addSequence(AtomicInteger count) {
-    return pair -> of(builder(pair.getEvent()).groupCorrelation(Optional.of(GroupCorrelation.of(count.getAndIncrement())))
+    return pair -> of(builder(pair.getEvent()).itemSequenceInfo(ofNullable(ItemSequenceInfo.of(count.getAndIncrement())))
         .build(), pair.getRoute());
   }
 

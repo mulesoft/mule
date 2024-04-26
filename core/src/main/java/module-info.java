@@ -484,6 +484,7 @@ module org.mule.runtime.core {
   exports org.mule.runtime.core.internal.util.mediatype to
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.message to
+      org.mule.runtime.core.components,
       org.mule.runtime.extensions.support;
   exports org.mule.runtime.core.internal.util.message.stream to
       org.mule.runtime.extensions.support;
