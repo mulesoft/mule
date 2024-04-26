@@ -6,14 +6,17 @@
  */
 package org.mule.runtime.module.extension.internal.data.sample;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
-import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver.staticParametersFrom;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.getImplementingName;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_LOCATION;
 import static org.mule.sdk.api.data.sample.SampleDataException.INVALID_TARGET_EXTENSION;
 import static org.mule.sdk.api.data.sample.SampleDataException.NOT_SUPPORTED;
 import static org.mule.sdk.api.data.sample.SampleDataException.NO_DATA_AVAILABLE;
+
+import static java.lang.String.format;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import org.mule.runtime.api.component.AbstractComponent;
 import org.mule.runtime.api.component.location.ComponentLocation;
@@ -34,7 +37,6 @@ import org.mule.runtime.extension.api.data.sample.ComponentSampleDataProvider;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.module.extension.api.tooling.sampledata.SampleDataProviderMediator;
 import org.mule.runtime.module.extension.internal.ExtensionResolvingContext;
-import org.mule.runtime.module.extension.internal.runtime.resolver.StaticParameterValueResolver;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.sdk.api.data.sample.SampleDataException;
 
@@ -115,10 +117,11 @@ public class MuleSampleDataService implements SampleDataService {
 
     ExtensionResolvingContext ctx = new ExtensionResolvingContext(configurationInstanceSupplier, connectionManager);
     try {
-      return mediator.getSampleData(StaticParameterValueResolver.from(replaceParameterAliases(parameters, componentModel)),
-                                    (CheckedSupplier<Object>) () -> ctx.getConnection().orElse(null),
-                                    (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null),
-                                    (CheckedSupplier<ConnectionProvider>) () -> ctx.getConnectionProvider().orElse(null));
+      return mediator
+          .getSampleData(staticParametersFrom(replaceParameterAliases(parameters, componentModel)),
+                         (CheckedSupplier<Object>) () -> ctx.getConnection().orElse(null),
+                         (CheckedSupplier<Object>) () -> ctx.getConfig().orElse(null),
+                         (CheckedSupplier<ConnectionProvider>) () -> ctx.getConnectionProvider().orElse(null));
     } finally {
       ctx.dispose();
     }

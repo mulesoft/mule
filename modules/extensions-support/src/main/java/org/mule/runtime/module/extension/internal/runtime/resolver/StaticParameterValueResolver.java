@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.runtime.resolver;
 
 import static java.util.Collections.unmodifiableMap;
-import static java.util.stream.Collectors.toMap;
+
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -20,12 +20,12 @@ public class StaticParameterValueResolver implements ParameterValueResolver {
 
   private final Map<String, ValueResolver<?>> resolvedParameters;
 
+  @Deprecated
   public static ParameterValueResolver from(Map<String, ?> parameters) {
-    return new StaticParameterValueResolver(parameters.entrySet().stream()
-        .collect(toMap(Map.Entry::getKey, e -> new StaticValueResolver<>(e.getValue()))));
+    return ParameterValueResolver.staticParametersFrom(parameters);
   }
 
-  private StaticParameterValueResolver(Map<String, ValueResolver<?>> resolvedParameters) {
+  public StaticParameterValueResolver(Map<String, ValueResolver<?>> resolvedParameters) {
     this.resolvedParameters = new HashMap<>(resolvedParameters);
   }
 
