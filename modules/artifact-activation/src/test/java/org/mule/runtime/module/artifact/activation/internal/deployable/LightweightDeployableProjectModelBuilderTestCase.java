@@ -108,7 +108,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
         getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
 
     assertThat(deployableProjectModel.getDescriptor().getVersion(), not("1.0.${versionToParse}"));
-    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.0"));
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.123"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)

@@ -11,12 +11,15 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
+import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFromJar;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
@@ -26,6 +29,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -110,11 +114,15 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     File pom = getPomFromFolder(projectFolder);
 
     Properties pomProperties;
-    String version = "";
+    Optional<String> version = empty();
 
-    if (projectFolder.isDirectory()) {
+    if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN) || projectFolder.isDirectory()) {
       pomProperties = getPomPropertiesFolder(projectFolder);
-      version = pomProperties.getProperty("version");
+      version = ofNullable(pomProperties.getProperty("version"));
+    } else {
+      pomProperties = getPomPropertiesFromJar(projectFolder);
+      version = ofNullable(pomProperties.getProperty("version"));
+
     }
 
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
@@ -134,8 +142,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
     }
 
-    if (!version.isEmpty()) {
-      deployableArtifactCoordinates.setVersion(version);
+    if (version.isPresent()) {
+      deployableArtifactCoordinates.setVersion(version.get());
     }
 
     return doBuild(parser, deployableArtifactCoordinates);
