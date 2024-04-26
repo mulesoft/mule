@@ -6,8 +6,12 @@
 
     <groupId>org.mule.test</groupId>
     <artifactId>db-plugin-with-additional-dep</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.${versionToParse}</version>
     <packaging>mule-application</packaging>
+
+    <properties>
+        <versionToParse>0</versionToParse>
+    </properties>
 
     <build>
         <plugins>

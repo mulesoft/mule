@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -32,6 +33,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
@@ -87,6 +89,26 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
+  }
+
+  @Test
+  @Issue("W-15228973")
+  @Description("When a version is provided using pom properties, include the information when building DeployableProjectModel.")
+  public void buildDeployableProjectModelWithPomProperty() throws Exception {
+    installArtifact(getResourceFolder("apps/lightweight/application-using-additional-libraries"),
+                    getMavenConfig().getLocalMavenRepositoryLocation());
+    File artifact =
+        new File(getMavenConfig().getLocalMavenRepositoryLocation(),
+                 "org/mule/test/application-using-additional-libraries/1.0.0/");
+
+    PluginFileMavenReactor pluginFileMavenReactor =
+        new PluginFileMavenReactor(artifact, "org.mule.test", "application-using-additional-libraries", "1.0.0");
+
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
+
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), not("1.0.${versionToParse}"));
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.0"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
