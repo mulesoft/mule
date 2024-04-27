@@ -6,6 +6,11 @@
  */
 package org.mule.runtime.module.extension.api.runtime.resolver;
 
+import static java.util.stream.Collectors.toMap;
+
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticParameterValueResolver;
+import org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver;
+
 import java.util.Map;
 
 /**
@@ -14,6 +19,17 @@ import java.util.Map;
  * @since 4.0
  */
 public interface ParameterValueResolver {
+
+  /**
+   * Creates a resolver for the provided {@code parameters}.
+   * 
+   * @param parameters the parameters to create a resolver for.
+   * @return a new resolver
+   */
+  public static ParameterValueResolver staticParametersFrom(Map<String, ?> parameters) {
+    return new StaticParameterValueResolver(parameters.entrySet().stream()
+        .collect(toMap(Map.Entry::getKey, e -> new StaticValueResolver<>(e.getValue()))));
+  }
 
   /**
    * @return The parameter value

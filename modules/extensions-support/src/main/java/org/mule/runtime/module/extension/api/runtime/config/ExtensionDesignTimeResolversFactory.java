@@ -6,22 +6,29 @@
  */
 package org.mule.runtime.module.extension.api.runtime.config;
 
+import org.mule.metadata.api.ClassTypeLoader;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ConfigurationProperties;
 import org.mule.runtime.api.config.PoolingProfile;
+import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.exception.MuleException;
+import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.config.ConfigurationModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
+import org.mule.runtime.api.metadata.MetadataCache;
+import org.mule.runtime.api.metadata.MetadataContext;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.connector.ConnectionManager;
 import org.mule.runtime.core.api.retry.ReconnectionConfig;
 import org.mule.runtime.core.api.streaming.StreamingManager;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
 import org.mule.runtime.extension.api.runtime.ExpirationPolicy;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.api.runtime.resolver.ConnectionProviderValueResolver;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -33,6 +40,7 @@ import org.mule.runtime.module.extension.internal.runtime.config.ResolverSetBase
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Provides a way to create resolvers, configProviders and mediators to be used in design time.
@@ -76,6 +84,18 @@ public interface ExtensionDesignTimeResolversFactory {
                                                     ClassLoader extensionClassLoader);
 
   /**
+   * Creates a {@link ConnectionProvider} for the provided parameters.
+   *
+   * @return a new {@link ConnectionProvider}
+   * @throws MuleException if the resolver cannot be created
+   */
+  <C> ConnectionProvider<C> createConnectionProvider(ExtensionModel extensionModel,
+                                                     ConnectionProviderModel connectionProviderModel,
+                                                     Map<String, Object> parameters,
+                                                     String parametersOwner)
+      throws MuleException;
+
+  /**
    * Creates a {@link ResolverSetBasedParameterResolver} from a {@link ResolverSet} of a {@link ParameterizedModel} based on
    * static values of its parameters.
    *
@@ -89,7 +109,7 @@ public interface ExtensionDesignTimeResolversFactory {
       throws MuleException;
 
   ResolverSet createParametersResolverSetFromValues(Map<String, ?> values, ParameterizedModel parameterizedModel)
-      throws ConfigurationException;
+      throws ConfigurationException, InitialisationException;
 
   /**
    * Creates a new instance of a {@link ValueProviderMediator}.
@@ -105,6 +125,14 @@ public interface ExtensionDesignTimeResolversFactory {
                                                               ComponentModel componentModel,
                                                               Component component,
                                                               StreamingManager streamingManager);
+
+  /**
+   * Creates a new instance of a {@link MetadataContext}.
+   */
+  MetadataContext createMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                        ConnectionManager connectionManager,
+                                        MetadataCache cache,
+                                        ClassTypeLoader typeLoader);
 
   /**
    * Creates a new instance of a {@link MetadataMediator}.

@@ -15,6 +15,8 @@ module org.mule.runtime.memory.management {
   requires org.mule.runtime.api;
   requires org.mule.runtime.profiling.api;
 
+  exports org.mule.runtime.api.memory.bytebuffer;
+
   exports org.mule.runtime.internal.memory.management to
       org.mule.runtime.deployment.model.impl,
       org.mule.runtime.spring.config;
