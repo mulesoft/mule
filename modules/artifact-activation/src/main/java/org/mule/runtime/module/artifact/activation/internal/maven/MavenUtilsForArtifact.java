@@ -22,8 +22,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -54,18 +52,13 @@ public class MavenUtilsForArtifact {
    */
   public static File lookupPomPropertiesMavenLocation(File artifactFolder) {
     File mulePropertiesPom = null;
-    File lookupFolder = new File(artifactFolder, "META-INF" + separator + "maven");
-    while (lookupFolder != null && lookupFolder.exists()) {
+    File lookupFolder =
+        new File(artifactFolder, "META-INF" + separator + "maven").listFiles((FileFilter) DIRECTORY)[0].listFiles()[0];
+    if (lookupFolder != null && lookupFolder.exists()) {
       File possiblePomPropertiesLocation = new File(lookupFolder, MULE_POM_PROPERTIES);
       if (possiblePomPropertiesLocation.exists()) {
         mulePropertiesPom = possiblePomPropertiesLocation;
-        break;
       }
-      File[] directories = lookupFolder.listFiles((FileFilter) DIRECTORY);
-      checkState(directories != null || directories.length == 0,
-                 format("No directories under %s so pom.properties file for artifact in folder %s could not be found",
-                        lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));
-      lookupFolder = directories[0];
     }
 
     if (mulePropertiesPom == null || !mulePropertiesPom.exists()) {
@@ -73,10 +66,6 @@ public class MavenUtilsForArtifact {
                                                          artifactFolder.getName()));
     }
     return mulePropertiesPom;
-  }
-
-  public static URL getUrlWithinJar(File jarFile, String filePath) throws MalformedURLException {
-    return new URL("jar:" + jarFile.toURI().toString() + "!/" + filePath);
   }
 
 }
