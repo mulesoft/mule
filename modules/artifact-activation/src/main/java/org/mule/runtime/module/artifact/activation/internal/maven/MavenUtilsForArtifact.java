@@ -6,23 +6,25 @@
  */
 package org.mule.runtime.module.artifact.activation.internal.maven;
 
-import static org.mule.runtime.api.util.Preconditions.checkState;
-import static org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor.MULE_POM_PROPERTIES;
-
 import static java.io.File.separator;
 import static java.lang.String.format;
 
-import static org.apache.commons.io.filefilter.DirectoryFileFilter.DIRECTORY;
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.filefilter.TrueFileFilter.*;
 
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Properties;
+
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
  * Provides utility methods for artifact-activation module to work with Maven
@@ -52,12 +54,13 @@ public class MavenUtilsForArtifact {
    */
   public static File lookupPomPropertiesMavenLocation(File artifactFolder) {
     File mulePropertiesPom = null;
-    File lookupFolder =
-        new File(artifactFolder, "META-INF" + separator + "maven").listFiles((FileFilter) DIRECTORY)[0].listFiles()[0];
-    if (lookupFolder != null && lookupFolder.exists()) {
-      File possiblePomPropertiesLocation = new File(lookupFolder, MULE_POM_PROPERTIES);
-      if (possiblePomPropertiesLocation.exists()) {
-        mulePropertiesPom = possiblePomPropertiesLocation;
+    File dir = new File(artifactFolder, "META-INF" + separator + "maven");
+
+    if (dir != null && dir.exists()) {
+      IOFileFilter fileFilter = new NameFileFilter("pom.properties");
+      Collection<File> potentialLocations = listFiles(dir, fileFilter, INSTANCE);
+      if (!potentialLocations.isEmpty()) {
+        mulePropertiesPom = potentialLocations.stream().findFirst().get();
       }
     }
 
