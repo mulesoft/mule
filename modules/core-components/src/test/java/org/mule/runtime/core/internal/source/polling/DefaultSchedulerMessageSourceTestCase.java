@@ -8,7 +8,9 @@ package org.mule.runtime.core.internal.source.polling;
 
 import static org.mule.runtime.api.component.AbstractComponent.LOCATION_KEY;
 import static org.mule.runtime.api.component.location.ConfigurationComponentLocator.REGISTRY_KEY;
+import static org.mule.runtime.core.api.config.MuleProperties.OBJECT_POLICY_MANAGER;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
+import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.tck.MuleTestUtils.APPLE_FLOW;
 import static org.mule.tck.MuleTestUtils.createFlowWithSource;
@@ -69,6 +71,7 @@ import io.qameta.allure.Story;
 public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTestCase {
 
   private static final Logger LOGGER = getLogger(DefaultSchedulerMessageSourceTestCase.class);
+  private Flow flow;
   private PolicyManager policyManager;
   private SourcePolicy sourcePolicy;
   private final String MESSAGE_PROCESSING_MANAGER_KEY = "_muleMessageProcessingManager";
@@ -81,8 +84,9 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
 
     MuleMessageProcessingManager processingManager = new MuleMessageProcessingManager();
     processingManager.setMuleContext(muleContext);
-    processingManager.setPolicyManager(of(policyManager));
 
+    ((DefaultMuleContext) muleContext).getRegistry().unregisterObject(OBJECT_POLICY_MANAGER);
+    ((DefaultMuleContext) muleContext).getRegistry().registerObject(OBJECT_POLICY_MANAGER, policyManager);
     ((DefaultMuleContext) muleContext).getRegistry().unregisterObject(MESSAGE_PROCESSING_MANAGER_KEY);
     ((DefaultMuleContext) muleContext).getRegistry().registerObject(MESSAGE_PROCESSING_MANAGER_KEY, processingManager);
   }
@@ -164,6 +168,9 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
   public void after() throws MuleException {
     stopIfNeeded(schedulerMessageSource);
     disposeIfNeeded(schedulerMessageSource, LOGGER);
+
+    stopIfNeeded(flow);
+    disposeIfNeeded(flow, LOGGER);
   }
 
   private DefaultSchedulerMessageSource createMessageSource() throws Exception {
@@ -171,10 +178,12 @@ public class DefaultSchedulerMessageSourceTestCase extends AbstractMuleContextTe
     schedulerMessageSource.setAnnotations(getAppleFlowComponentLocationAnnotations());
 
     // Manually create and register flow
-    Flow flow = createFlowWithSource(muleContext, APPLE_FLOW, schedulerMessageSource);
+    flow = createFlowWithSource(muleContext, APPLE_FLOW, schedulerMessageSource);
     when(componentLocator.find(Location.builder().globalName(APPLE_FLOW).build())).thenReturn(of(flow));
     // scheduler source is initialized when it's registered as the flow's source in the registry
     ((DefaultMuleContext) muleContext).getRegistry().registerFlowConstruct(flow);
+
+    startIfNeeded(flow);
 
     // Injecting processing manager dependency
     muleContext.getInjector().inject(schedulerMessageSource);
