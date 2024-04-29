@@ -29,6 +29,8 @@ import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationException;
@@ -263,6 +265,16 @@ public class DefaultExtensionDesignTimeResolversFactory implements ExtensionDesi
                                                MetadataCache cache,
                                                ClassTypeLoader typeLoader) {
     return new DefaultMetadataContext(configurationSupplier, connectionManager, cache, typeLoader);
+  }
+
+  @Override
+  public MetadataContext createMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                               ConnectionManager connectionManager, MetadataCache cache,
+                                               ClassTypeLoader typeLoader,
+                                               Optional<ScopeOutputMetadataContext> scopeOutputMetadataContext,
+                                               Optional<RouterOutputMetadataContext> routerOutputMetadataContext) {
+    return new DefaultMetadataContext(configurationSupplier, connectionManager, cache, typeLoader, scopeOutputMetadataContext,
+                                      routerOutputMetadataContext);
   }
 
   @Override

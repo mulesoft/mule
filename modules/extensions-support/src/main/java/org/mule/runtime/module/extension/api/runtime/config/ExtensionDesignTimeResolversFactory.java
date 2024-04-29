@@ -21,6 +21,8 @@ import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.parameter.ParameterizedModel;
 import org.mule.runtime.api.metadata.MetadataCache;
 import org.mule.runtime.api.metadata.MetadataContext;
+import org.mule.runtime.api.metadata.RouterOutputMetadataContext;
+import org.mule.runtime.api.metadata.ScopeOutputMetadataContext;
 import org.mule.runtime.api.parameterization.ComponentParameterization;
 import org.mule.runtime.core.api.config.ConfigurationException;
 import org.mule.runtime.core.api.connector.ConnectionManager;
@@ -133,6 +135,14 @@ public interface ExtensionDesignTimeResolversFactory {
                                         ConnectionManager connectionManager,
                                         MetadataCache cache,
                                         ClassTypeLoader typeLoader);
+
+  /**
+   * Creates a new instance of a {@link MetadataContext}.
+   */
+  MetadataContext createMetadataContext(Supplier<Optional<ConfigurationInstance>> configurationSupplier,
+                                        ConnectionManager connectionManager, MetadataCache cache, ClassTypeLoader typeLoader,
+                                        Optional<ScopeOutputMetadataContext> scopeOutputMetadataContext,
+                                        Optional<RouterOutputMetadataContext> routerOutputMetadataContext);
 
   /**
    * Creates a new instance of a {@link MetadataMediator}.
