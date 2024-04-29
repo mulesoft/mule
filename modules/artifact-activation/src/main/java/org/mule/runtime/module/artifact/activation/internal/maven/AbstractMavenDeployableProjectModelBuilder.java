@@ -19,7 +19,6 @@ import static org.mule.runtime.module.artifact.activation.internal.classloader.m
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
 import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
-import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFromJar;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 

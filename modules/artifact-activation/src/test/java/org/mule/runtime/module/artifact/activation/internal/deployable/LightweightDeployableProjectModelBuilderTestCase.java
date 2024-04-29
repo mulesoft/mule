@@ -10,6 +10,7 @@ import static org.mule.maven.client.api.MavenClientProvider.discoverProvider;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.getMavenConfig;
 import static org.mule.runtime.globalconfig.api.GlobalConfigLoader.reset;
 import static org.mule.tck.MavenTestUtils.installArtifact;
+import static org.mule.tck.MuleTestUtils.testWithSystemProperty;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DEPLOYMENT_TYPE;
 import static org.mule.test.allure.AllureConstants.DeploymentTypeFeature.DeploymentTypeStory.LIGHTWEIGHT;
 
@@ -108,7 +109,10 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
         getDeployableProjectModel("apps/lightweight/db-plugin-with-additional-dep", pluginFileMavenReactor);
 
     assertThat(deployableProjectModel.getDescriptor().getVersion(), not("1.0.${versionToParse}"));
-    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.123"));
+    testWithSystemProperty("versionToParse", "3", () -> {
+      assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.3"));
+    });
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), not("1.0.0"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
