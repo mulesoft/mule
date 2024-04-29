@@ -46,7 +46,6 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   protected final ExtensionModel extensionModel;
   protected final M operationModel;
-  protected final PolicyManager policyManager;
   protected final ReflectionCache reflectionCache;
   protected final MuleContext muleContext;
   protected final ExpressionManager expressionManager;
@@ -66,20 +65,17 @@ public abstract class ComponentMessageProcessorBuilder<M extends ComponentModel,
 
   public ComponentMessageProcessorBuilder(ExtensionModel extensionModel,
                                           M operationModel,
-                                          PolicyManager policyManager,
                                           ReflectionCache reflectionCache,
                                           ExpressionManager expressionManager,
                                           MuleContext muleContext,
                                           Registry registry) {
     checkArgument(extensionModel != null, "ExtensionModel cannot be null");
     checkArgument(operationModel != null, "OperationModel cannot be null");
-    checkArgument(policyManager != null, "PolicyManager cannot be null");
     checkArgument(muleContext != null, "muleContext cannot be null");
 
     this.muleContext = muleContext;
     this.extensionModel = extensionModel;
     this.operationModel = operationModel;
-    this.policyManager = policyManager;
     this.reflectionCache = reflectionCache;
     this.registry = registry;
     this.extensionConnectionSupplier = registry.lookupByType(ExtensionConnectionSupplier.class).get();

@@ -28,7 +28,6 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.DslElementSyntax;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
@@ -74,7 +73,6 @@ public abstract class AbstractComponentDefinitionParser<T extends ComponentModel
         .withConstructorParameterDefinition(fromFixedValue(componentModel).build())
         .withConstructorParameterDefinition(fromReferenceObject(MuleContext.class).build())
         .withConstructorParameterDefinition(fromReferenceObject(Registry.class).build())
-        .withConstructorParameterDefinition(fromReferenceObject(PolicyManager.class).build())
         .withSetterParameterDefinition(CURSOR_PROVIDER_FACTORY_FIELD_NAME,
                                        fromChildConfiguration(CursorProviderFactory.class).build())
         .withSetterParameterDefinition("retryPolicyTemplate", fromChildConfiguration(RetryPolicyTemplate.class).build());

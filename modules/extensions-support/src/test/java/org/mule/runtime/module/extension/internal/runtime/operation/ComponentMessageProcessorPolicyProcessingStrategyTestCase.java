@@ -50,6 +50,7 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.config.ConfigurationBuilder;
+import org.mule.runtime.core.api.config.MuleProperties;
 import org.mule.runtime.core.api.config.builders.AbstractConfigurationBuilder;
 import org.mule.runtime.core.api.construct.FlowConstruct;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -134,6 +135,12 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
   }
 
   @Override
+  protected void doSetUpBeforeMuleContextCreation() throws Exception {
+    super.doSetUpBeforeMuleContextCreation();
+    policyManager = mock(PolicyManager.class);
+  }
+
+  @Override
   protected void addBuilders(List<ConfigurationBuilder> builders) {
     super.addBuilders(builders);
     builders.add(new AbstractConfigurationBuilder() {
@@ -143,6 +150,8 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
         muleContext.getCustomizationService().overrideDefaultServiceImpl(FEATURE_FLAGGING_SERVICE_KEY,
                                                                          new DefaultFeatureFlaggingService(TEST_ARTIFACT_ID,
                                                                                                            emptyMap()));
+        muleContext.getCustomizationService().overrideDefaultServiceImpl(MuleProperties.OBJECT_POLICY_MANAGER,
+                                                                         policyManager);
       }
     });
   }
@@ -163,13 +172,12 @@ public class ComponentMessageProcessorPolicyProcessingStrategyTestCase extends A
     when(resolverSet.resolve(any(ValueResolvingContext.class))).thenReturn(mock(ResolverSetResult.class));
 
     extensionManager = mock(ExtensionManager.class);
-    policyManager = mock(PolicyManager.class);
 
     processor = new TestComponentMessageProcessor(extensionModel,
                                                   componentModel, null, null, null,
                                                   resolverSet, null, null, null,
                                                   null, extensionManager,
-                                                  policyManager, null, null,
+                                                  null, null,
                                                   muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override

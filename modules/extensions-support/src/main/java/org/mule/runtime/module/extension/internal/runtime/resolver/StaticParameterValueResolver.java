@@ -20,11 +20,6 @@ public class StaticParameterValueResolver implements ParameterValueResolver {
 
   private final Map<String, ValueResolver<?>> resolvedParameters;
 
-  @Deprecated
-  public static ParameterValueResolver from(Map<String, ?> parameters) {
-    return ParameterValueResolver.staticParametersFrom(parameters);
-  }
-
   public StaticParameterValueResolver(Map<String, ValueResolver<?>> resolvedParameters) {
     this.resolvedParameters = new HashMap<>(resolvedParameters);
   }

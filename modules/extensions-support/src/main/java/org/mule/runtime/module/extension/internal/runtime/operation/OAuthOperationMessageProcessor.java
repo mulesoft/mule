@@ -17,7 +17,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.api.connectivity.oauth.AccessTokenExpiredException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
@@ -54,13 +53,12 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
                                         MessageProcessorChain nestedChain,
                                         ClassLoader classLoader,
                                         ExtensionManager extensionManager,
-                                        PolicyManager policyManager,
                                         ReflectionCache reflectionCache,
                                         ResultTransformer resultTransformer,
                                         long outerFluxTerminationTimeout) {
     super(extensionModel, operationModel, configurationProviderResolver, target, targetValue, errorMappings, resolverSet,
           cursorProviderFactory, retryPolicyTemplate, nestedChain, classLoader,
-          extensionManager, policyManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
+          extensionManager, reflectionCache, resultTransformer, outerFluxTerminationTimeout);
   }
 
   @Override
@@ -94,7 +92,7 @@ public class OAuthOperationMessageProcessor extends OperationMessageProcessor {
 
       private void resetCursors(ExecutionContextAdapter<OperationModel> operationContext) {
         CursorResetHandler cursorResetHandler =
-            ((ExecutionContextAdapter<OperationModel>) operationContext).getVariable(CURSOR_RESET_HANDLER_VARIABLE);
+            operationContext.getVariable(CURSOR_RESET_HANDLER_VARIABLE);
         if (cursorResetHandler != null) {
           cursorResetHandler.resetCursors();
         }

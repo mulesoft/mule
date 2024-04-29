@@ -26,20 +26,20 @@ import org.mule.runtime.core.api.processor.Processor;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyTemplate;
 import org.mule.runtime.core.api.streaming.CursorProviderFactory;
 import org.mule.runtime.core.api.streaming.StreamingManager;
-import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
-import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
+import org.mule.runtime.dsl.api.component.config.DefaultComponentLocation;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.runtime.ExtensionComponent;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessor;
 import org.mule.runtime.module.extension.internal.runtime.operation.ComponentMessageProcessorBuilder;
 import org.mule.runtime.module.extension.internal.runtime.resolver.ProcessorChainValueResolver;
+import org.mule.runtime.tracer.api.component.ComponentTracerFactory;
 
-import javax.xml.namespace.QName;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 /**
  * A base {@link AbstractExtensionObjectFactory} for producers of {@link ExtensionComponent} instances
@@ -52,7 +52,6 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
   protected final Registry registry;
   protected final ExtensionModel extensionModel;
   protected final M componentModel;
-  protected final PolicyManager policyManager;
   protected ConfigurationProvider configurationProvider;
   protected String target = EMPTY;
   protected String targetValue = PAYLOAD;
@@ -63,13 +62,11 @@ public abstract class ComponentMessageProcessorObjectFactory<M extends Component
   public ComponentMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 M componentModel,
                                                 MuleContext muleContext,
-                                                Registry registry,
-                                                PolicyManager policyManager) {
+                                                Registry registry) {
     super(muleContext);
     this.registry = registry;
     this.extensionModel = extensionModel;
     this.componentModel = componentModel;
-    this.policyManager = policyManager;
   }
 
   @Override

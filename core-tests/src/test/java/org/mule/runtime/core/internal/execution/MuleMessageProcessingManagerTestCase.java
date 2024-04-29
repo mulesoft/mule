@@ -7,6 +7,7 @@
 package org.mule.runtime.core.internal.execution;
 
 import static java.lang.Thread.currentThread;
+import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
@@ -64,7 +65,7 @@ public class MuleMessageProcessingManagerTestCase extends AbstractMuleContextTes
 
     processingManager = new MuleMessageProcessingManager();
     processingManager.setMuleContext(spyContext);
-    processingManager.setPolicyManager(policyManager);
+    processingManager.setPolicyManager(of(policyManager));
 
     processingManager.initialise();
   }

@@ -13,7 +13,6 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.api.rx.Exceptions.unwrap;
-import static org.mule.runtime.core.internal.policy.DefaultPolicyManager.noPolicyOperation;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.EXECUTION_ENGINE;
 import static org.mule.test.allure.AllureConstants.ExecutionEngineFeature.ExecutionEngineStory.REACTOR;
 
@@ -45,9 +44,9 @@ import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.extension.ExtensionManager;
+import org.mule.runtime.core.api.processor.ReactiveProcessor.ProcessingType;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
@@ -62,19 +61,23 @@ import org.mule.tck.junit4.AbstractMuleContextTestCase;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Issue;
-import io.qameta.allure.Story;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Issue;
+import io.qameta.allure.Story;
+
 import reactor.core.publisher.Flux;
 
 @Feature(EXECUTION_ENGINE)
@@ -89,7 +92,6 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
   protected ComponentModel componentModel;
   protected ResolverSet resolverSet;
   protected ExtensionManager extensionManager;
-  protected PolicyManager mockPolicyManager;
 
   // A cached flow for creating test events. It doesn't even have to contain the processor we are going to test, because we will
   // be sending the events directly through the processor, without using the flow.
@@ -106,8 +108,6 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
     resolverSet = mock(ResolverSet.class);
 
     extensionManager = mock(ExtensionManager.class);
-    mockPolicyManager = mock(PolicyManager.class);
-    when(mockPolicyManager.createOperationPolicy(any(), any(), any())).thenReturn(noPolicyOperation());
 
     testFlow = getTestFlow(muleContext);
     initialiseIfNeeded(testFlow, muleContext);
@@ -140,7 +140,7 @@ public class ComponentMessageProcessorTestCase extends AbstractMuleContextTestCa
                                              componentModel, null, null, null,
                                              resolverSet, null, null, null,
                                              null, extensionManager,
-                                             mockPolicyManager, null, null,
+                                             null, null,
                                              muleContext.getConfiguration().getShutdownTimeout()) {
 
       @Override

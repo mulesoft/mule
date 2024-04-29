@@ -13,7 +13,6 @@ import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
-import org.mule.runtime.core.internal.policy.PolicyManager;
 import org.mule.runtime.module.extension.internal.config.dsl.AbstractExtensionObjectFactory;
 import org.mule.runtime.module.extension.internal.config.dsl.ComponentMessageProcessorObjectFactory;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
@@ -34,18 +33,16 @@ public class OperationMessageProcessorObjectFactory
   public OperationMessageProcessorObjectFactory(ExtensionModel extensionModel,
                                                 OperationModel componentModel,
                                                 MuleContext muleContext,
-                                                Registry registry,
-                                                PolicyManager policyManager) {
+                                                Registry registry) {
     super(extensionModel,
           componentModel,
           muleContext,
-          registry,
-          policyManager);
+          registry);
   }
 
   @Override
   protected OperationMessageProcessorBuilder getMessageProcessorBuilder() {
-    return new OperationMessageProcessorBuilder(extensionModel, componentModel, errorMappings, policyManager, muleContext,
+    return new OperationMessageProcessorBuilder(extensionModel, componentModel, errorMappings, muleContext,
                                                 registry);
   }
 
