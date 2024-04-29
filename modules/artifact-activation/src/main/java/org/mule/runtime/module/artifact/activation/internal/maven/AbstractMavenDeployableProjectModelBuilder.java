@@ -117,12 +117,11 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     Optional<String> version = empty();
 
     if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN) || projectFolder.isDirectory()) {
-      pomProperties = getPomPropertiesFolder(projectFolder);
-      version = ofNullable(pomProperties.getProperty("version"));
-    } else {
-      pomProperties = getPomPropertiesFromJar(projectFolder);
-      version = ofNullable(pomProperties.getProperty("version"));
-
+      try {
+        pomProperties = getPomPropertiesFolder(projectFolder);
+        version = ofNullable(pomProperties.getProperty("version"));
+      } catch (Exception e) {
+      }
     }
 
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());

@@ -119,6 +119,9 @@ public class MavenUtilsForArtifact {
       checkState(directories != null || directories.length == 0,
                  format("No directories under %s so pom.properties file for artifact in folder %s could not be found",
                         lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));
+      checkState(directories.length == 1,
+                 format("More than one directory under %s so pom.properties file for artifact in folder %s could not be found",
+                        lookupFolder.getAbsolutePath(), artifactFolder.getAbsolutePath()));
       lookupFolder = directories[0];
     }
 
