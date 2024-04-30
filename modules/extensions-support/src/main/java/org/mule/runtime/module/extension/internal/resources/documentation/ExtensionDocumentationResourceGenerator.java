@@ -6,10 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.resources.documentation;
 
+import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
+import static org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getAlias;
-import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
 import org.mule.metadata.api.annotation.DescriptionAnnotation;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -25,6 +26,9 @@ import org.mule.runtime.api.meta.model.util.ExtensionWalker;
 import org.mule.runtime.extension.api.resources.GeneratedResource;
 import org.mule.runtime.extension.api.resources.spi.GeneratedResourceFactory;
 import org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionParameterDocumentation;
 
 import java.util.ArrayList;
 import java.util.List;

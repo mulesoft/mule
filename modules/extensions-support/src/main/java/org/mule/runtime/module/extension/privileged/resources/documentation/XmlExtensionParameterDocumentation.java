@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.resources.documentation;
+package org.mule.runtime.module.extension.privileged.resources.documentation;
 
 import org.mule.runtime.api.meta.DescribedObject;
 import org.mule.runtime.api.meta.NamedObject;
@@ -24,11 +24,12 @@ public class XmlExtensionParameterDocumentation implements NamedObject, Describe
 
   public XmlExtensionParameterDocumentation() {}
 
-  XmlExtensionParameterDocumentation(String name, String description) {
+  public XmlExtensionParameterDocumentation(String name, String description) {
     this.name = name;
     this.description = description;
   }
 
+  @Override
   @XmlAttribute
   public String getName() {
     return name;
@@ -38,6 +39,7 @@ public class XmlExtensionParameterDocumentation implements NamedObject, Describe
     this.name = name;
   }
 
+  @Override
   @XmlElement
   public String getDescription() {
     return description;
