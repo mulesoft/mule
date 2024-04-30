@@ -7,7 +7,7 @@
 package org.mule.runtime.module.extension.internal.metadata;
 
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
-import org.mule.runtime.extension.internal.metadata.ComponentMetadataConfigurerFactoryDelegate;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactoryDelegate;
 import org.mule.runtime.module.extension.api.metadata.DefaultComponentMetadataConfigurer;
 
 public class DefaultComponentMetadataConfigurerFactoryDelegate implements ComponentMetadataConfigurerFactoryDelegate {
