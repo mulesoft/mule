@@ -27,7 +27,7 @@ import java.util.function.Function;
  *
  * @since 4.7
  */
-public class PassThroughChainOutputTypeResolver implements OutputTypeResolver<Void>, AttributesTypeResolver<Void> {
+public class PassThroughChainOutputTypeResolver implements OutputTypeResolver<Object>, AttributesTypeResolver<Object> {
 
   public static final PassThroughChainOutputTypeResolver INSTANCE = new PassThroughChainOutputTypeResolver();
 
@@ -44,13 +44,13 @@ public class PassThroughChainOutputTypeResolver implements OutputTypeResolver<Vo
   }
 
   @Override
-  public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
+  public MetadataType getOutputType(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException {
     return passthrough(context, MessageMetadataType::getPayloadType)
         .orElseThrow(() -> new MetadataResolvingException("Resolved output payload not found.", UNKNOWN));
   }
 
   @Override
-  public MetadataType getAttributesType(MetadataContext context, Void key)
+  public MetadataType getAttributesType(MetadataContext context, Object key)
       throws MetadataResolvingException, ConnectionException {
     return passthrough(context, MessageMetadataType::getAttributesType)
         .orElseThrow(() -> new MetadataResolvingException("Resolved output attributes not found.", UNKNOWN));
