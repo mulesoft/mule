@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  *
  * @since 1.7
  */
-public class AllOfRoutesOutputTypeResolver implements OutputTypeResolver<Void> {
+public class AllOfRoutesOutputTypeResolver implements OutputTypeResolver<Object> {
 
   public static final AllOfRoutesOutputTypeResolver INSTANCE = new AllOfRoutesOutputTypeResolver();
 
@@ -44,7 +44,7 @@ public class AllOfRoutesOutputTypeResolver implements OutputTypeResolver<Void> {
   }
 
   @Override
-  public MetadataType getOutputType(MetadataContext context, Void key) throws MetadataResolvingException, ConnectionException {
+  public MetadataType getOutputType(MetadataContext context, Object key) throws MetadataResolvingException, ConnectionException {
     ObjectTypeBuilder builder = context.getTypeBuilder().objectType();
     Map<String, Supplier<MessageMetadataType>> routes = context.getRouterOutputMetadataContext()
         .map(route -> route.getRouteOutputMessageTypes())
