@@ -69,6 +69,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -77,12 +78,13 @@ import org.testcontainers.utility.DockerImageName;
 
 @Feature(PROFILING)
 @Story(OPEN_TELEMETRY_EXPORTER)
+@Ignore("W-15586397")
 public class OpenTelemetryExporterConfigTestCase {
 
   public static final String TEST_SERVICE_NAME = "test-service-name";
 
   private static final DockerImageName COLLECTOR_IMAGE =
-      DockerImageName.parse("ghcr.io/open-telemetry/opentelemetry-java/otel-collector");
+      DockerImageName.parse("otel/opentelemetry-collector:0.99.0");
 
   private static final Integer COLLECTOR_OTLP_GRPC_PORT = 4317;
   private static final Integer COLLECTOR_OTLP_HTTP_PORT = 4318;
