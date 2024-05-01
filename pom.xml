@@ -164,7 +164,7 @@
         <weaveVersion>2.6.3-SNAPSHOT</weaveVersion>
         <jsonassert.version>1.5.2</jsonassert.version>
         <commonsNet.version>3.9.0</commonsNet.version>
-        <sshdVersion>2.10.0</sshdVersion>
+        <sshdVersion>2.12.1</sshdVersion>
         <ftpServerVersion>1.2.0</ftpServerVersion>
         <commonsExecVersion>1.3</commonsExecVersion>
 
