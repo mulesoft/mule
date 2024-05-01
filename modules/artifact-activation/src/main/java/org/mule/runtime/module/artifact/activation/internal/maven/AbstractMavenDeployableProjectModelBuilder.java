@@ -50,6 +50,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -129,7 +130,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         // 1) look for pom.properties, get the version info from there
         pomProperties = getPomPropertiesFolder(projectFolder);
         version = ofNullable(pomProperties.getProperty("version"));
-      } catch (Exception e) {
+      } catch (ArtifactDescriptorCreateException e) {
         logger.debug("unable to get version info from pom.properties:" + e.getMessage());
       }
     }
