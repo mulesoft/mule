@@ -160,7 +160,7 @@
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
         <weaveVersion>2.4.0-HF-SNAPSHOT</weaveVersion>
-        <sshdVersion>2.10.0</sshdVersion>
+        <sshdVersion>2.12.1</sshdVersion>
 
         <!-- Mule Snapshot Dependencies -->
         <muleDslApiVersion>1.4.1-SNAPSHOT</muleDslApiVersion>
