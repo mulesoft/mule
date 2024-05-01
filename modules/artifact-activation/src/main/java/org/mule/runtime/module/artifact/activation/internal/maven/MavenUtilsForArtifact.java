@@ -10,7 +10,7 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 
 import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.filefilter.TrueFileFilter.*;
+import static org.apache.commons.io.filefilter.TrueFileFilter.INSTANCE;
 
 import org.mule.runtime.core.api.util.PropertiesUtils;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
@@ -24,7 +24,6 @@ import java.util.Properties;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 
 /**
  * Provides utility methods for artifact-activation module to work with Maven
