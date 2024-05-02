@@ -87,6 +87,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   protected File deployableArtifactRepositoryFolder;
   private static final Logger logger = LoggerFactory.getLogger(AbstractMavenDeployableProjectModelBuilder.class);
+  // This pattern looks for placeholders like ${text}.
+  private final static Pattern PLACEHOLDER_PATTERN = compile("\\$\\{\\s*([^}]*)\\s*\\}");
 
 
   protected static MavenConfiguration getDefaultMavenConfiguration() {
@@ -140,12 +142,11 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
 
     // 2) if a version is passed using system properties, use the version instead
     String originalPomVersion = parser.getModel().getVersion();
-    Pattern pattern = compile("\\$\\{\\s*([^}]*)\\s*\\}");
-    Matcher matcher = pattern.matcher(originalPomVersion);
+    Matcher matcher = PLACEHOLDER_PATTERN.matcher(originalPomVersion);
     if (matcher.find()) {
       String potentialProperty = matcher.group(1);
       if (getProperty(potentialProperty) != null) {
-        version = ofNullable(originalPomVersion.replaceAll("\\$\\{[^}]*\\}", getProperty(potentialProperty)));
+        version = ofNullable(originalPomVersion.replaceAll(PLACEHOLDER_PATTERN.pattern(), getProperty(potentialProperty)));
       }
     }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
