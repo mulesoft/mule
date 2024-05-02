@@ -146,7 +146,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     if (matcher.find()) {
       String potentialProperty = matcher.group(1);
       if (getProperty(potentialProperty) != null) {
-        version = ofNullable(originalPomVersion.replaceAll(PLACEHOLDER_PATTERN.pattern(), getProperty(potentialProperty)));
+        version = ofNullable(matcher.replaceAll(getProperty(potentialProperty)));
       }
     }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
