@@ -4,7 +4,7 @@
  * license, a copy of which has been included with this distribution in the
  * LICENSE.txt file.
  */
-package org.mule.runtime.module.extension.internal.resources.documentation;
+package org.mule.runtime.module.extension.privileged.resources.documentation;
 
 import java.util.LinkedList;
 import java.util.List;

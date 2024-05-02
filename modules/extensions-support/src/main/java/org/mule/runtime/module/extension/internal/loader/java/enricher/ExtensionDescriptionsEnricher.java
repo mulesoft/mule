@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.java.enricher;
 
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.DISABLE_DESCRIPTIONS_ENRICHMENT;
-import static org.mule.runtime.module.extension.internal.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
+import static org.mule.runtime.module.extension.privileged.resources.documentation.ExtensionDescriptionsSerializer.SERIALIZER;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ConfigurationDeclaration;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConnectedDeclaration;
@@ -22,8 +22,8 @@ import org.mule.runtime.api.meta.model.declaration.fluent.WithSourcesDeclaration
 import org.mule.runtime.api.meta.model.declaration.fluent.util.DeclarationWalker;
 import org.mule.runtime.extension.api.loader.DeclarationEnricher;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionDocumentation;
-import org.mule.runtime.module.extension.internal.resources.documentation.XmlExtensionElementDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionDocumentation;
+import org.mule.runtime.module.extension.privileged.resources.documentation.XmlExtensionElementDocumentation;
 
 import java.io.IOException;
 import java.io.InputStream;
