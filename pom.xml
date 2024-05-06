@@ -5,7 +5,7 @@
     <groupId>org.mule.runtime</groupId>
     <artifactId>mule</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.0-20240503</version>
 
     <!-- Organization -->
     <organization>
@@ -152,29 +152,29 @@
         -->
         <jdk8Name>JavaSE-${javaVersion}</jdk8Name>
 
-        <muleBomVersion>4.4.1-SNAPSHOT</muleBomVersion>
+        <muleBomVersion>4.4.0-20240503</muleBomVersion>
 
         <activemqVersion>5.15.12</activemqVersion>
         <aspectjVersion>1.9.2</aspectjVersion>
         <derbyVersion>10.14.2.0</derbyVersion>
         <geronimoSpecsJmsVersion>1.1.1</geronimoSpecsJmsVersion>
         <geronimoSpecsServletApiVersion>1.0</geronimoSpecsServletApiVersion>
-        <weaveVersion>2.4.0-HF-SNAPSHOT</weaveVersion>
+        <weaveVersion>2.4.0-20240503</weaveVersion>
         <sshdVersion>2.12.1</sshdVersion>
 
         <!-- Mule Snapshot Dependencies -->
-        <muleDslApiVersion>1.4.1-SNAPSHOT</muleDslApiVersion>
-        <muleAstVersion>1.0.1-SNAPSHOT</muleAstVersion>
-        <mulePropertiesApiVersion>1.0.1-SNAPSHOT</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.4.1-SNAPSHOT</muleExtensionsApiVersion>
-        <muleConnectivityApiVersion>1.0.1-SNAPSHOT</muleConnectivityApiVersion>
-        <muleHttpPolicyApiVersion>1.4.1-SNAPSHOT</muleHttpPolicyApiVersion>
-        <muleMavenClientApi>1.6.1-SNAPSHOT</muleMavenClientApi>
-        <muleMavenClientImpl>1.6.1-SNAPSHOT</muleMavenClientImpl>
-        <muleMavenClientTest>1.6.1-SNAPSHOT</muleMavenClientTest>
-        <mulePolicyApiVersion>1.4.1-SNAPSHOT</mulePolicyApiVersion>
-        <muleApiVersion>1.4.1-SNAPSHOT</muleApiVersion>
-        <muleMetadataModelVersion>1.4.1-SNAPSHOT</muleMetadataModelVersion>
+        <muleDslApiVersion>1.4.0-20240503</muleDslApiVersion>
+        <muleAstVersion>1.0.0-20240503</muleAstVersion>
+        <mulePropertiesApiVersion>1.0.0-20240503</mulePropertiesApiVersion>
+        <muleExtensionsApiVersion>1.4.0-20240503</muleExtensionsApiVersion>
+        <muleConnectivityApiVersion>1.0.0</muleConnectivityApiVersion>
+        <muleHttpPolicyApiVersion>1.4.0-20240503</muleHttpPolicyApiVersion>
+        <muleMavenClientApi>1.6.0-20240503</muleMavenClientApi>
+        <muleMavenClientImpl>1.6.0-20240503</muleMavenClientImpl>
+        <muleMavenClientTest>1.6.0-20240503</muleMavenClientTest>
+        <mulePolicyApiVersion>1.4.0-20240503</mulePolicyApiVersion>
+        <muleApiVersion>1.4.0-20240503</muleApiVersion>
+        <muleMetadataModelVersion>1.4.0-20240503</muleMetadataModelVersion>
         <metadataModelApiVersion>${muleMetadataModelVersion}</metadataModelApiVersion>
 
         <!-- The tests/test-components artifacts is in the mule repo but as has the mule-modules-parent as parent
@@ -213,11 +213,11 @@
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <mule.module.maven.plugin.version>1.3.1-SNAPSHOT</mule.module.maven.plugin.version>
+        <mule.module.maven.plugin.version>1.3.0-20240503</mule.module.maven.plugin.version>
         <revapi-maven-plugin.version>0.9.5</revapi-maven-plugin.version>
-        <muleRevapiExtensionVersion>1.4.1-SNAPSHOT</muleRevapiExtensionVersion>
-        <mule.extensions.maven.plugin.version>1.4.2-SNAPSHOT</mule.extensions.maven.plugin.version>
-        <mule.app.plugins.maven.plugin.version>1.4.2-SNAPSHOT</mule.app.plugins.maven.plugin.version>
+        <muleRevapiExtensionVersion>1.4.0-20240503</muleRevapiExtensionVersion>
+        <mule.extensions.maven.plugin.version>1.4.1</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.4.1</mule.app.plugins.maven.plugin.version>
         <mule.jmh.elasticsearch.maven.plugin.version>1.0.0-SNAPSHOT</mule.jmh.elasticsearch.maven.plugin.version>
         <maven.replacer.plugin>1.5.3</maven.replacer.plugin>
 
