@@ -11,20 +11,26 @@ import static org.mule.maven.client.api.model.MavenConfiguration.newMavenConfigu
 import static org.mule.maven.pom.parser.api.model.BundleScope.SYSTEM;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.DOMAIN;
 import static org.mule.runtime.globalconfig.api.maven.MavenClientFactory.createMavenClient;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.getDeployableArtifactCoordinates;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.toApplicationModelArtifacts;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updateArtifactsSharedState;
 import static org.mule.runtime.module.artifact.activation.internal.classloader.model.utils.ArtifactUtils.updatePackagesResources;
+import static org.mule.runtime.module.artifact.activation.internal.maven.MavenUtilsForArtifact.getPomPropertiesFolder;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactConstants.getApiClassifiers;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -44,6 +50,7 @@ import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.activation.internal.deployable.DeployablePluginsDependenciesResolver;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorCreateException;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tools.api.classloader.model.ApplicationGAVModel;
 import org.mule.tools.api.classloader.model.Artifact;
@@ -58,9 +65,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMavenDeployableProjectModelBuilder extends AbstractDeployableProjectModelBuilder {
 
@@ -70,9 +83,13 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   protected List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency> deployableBundleDependencies;
   protected Map<ArtifactCoordinates, List<Artifact>> pluginsArtifactDependencies;
   protected Set<BundleDescriptor> sharedDeployableBundleDescriptors;
-  protected Map<org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
+  protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> additionalPluginDependencies;
   protected Map<BundleDescriptor, List<org.mule.runtime.module.artifact.api.descriptor.BundleDependency>> pluginsBundleDependencies;
   protected File deployableArtifactRepositoryFolder;
+  private static final Logger logger = LoggerFactory.getLogger(AbstractMavenDeployableProjectModelBuilder.class);
+  // This pattern looks for placeholders like ${text}.
+  private final static Pattern PLACEHOLDER_PATTERN = compile("\\$\\{\\s*([^}]*)\\s*\\}");
+
 
   protected static MavenConfiguration getDefaultMavenConfiguration() {
     final MavenClientProvider mavenClientProvider =
@@ -107,9 +124,31 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   public final DeployableProjectModel build() {
     File pom = getPomFromFolder(projectFolder);
 
+    Properties pomProperties;
+    Optional<String> version = empty();
+
+    if (projectFolder.equals(APP) || projectFolder.equals(DOMAIN) || projectFolder.isDirectory()) {
+      try {
+        // 1) look for pom.properties, get the version info from there
+        pomProperties = getPomPropertiesFolder(projectFolder);
+        version = ofNullable(pomProperties.getProperty("version"));
+      } catch (ArtifactDescriptorCreateException e) {
+        logger.debug("unable to get version info from pom.properties:" + e.getMessage());
+      }
+    }
+
     List<String> activeProfiles = mavenConfiguration.getActiveProfiles().orElse(emptyList());
     MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
 
+    // 2) if a version is passed using system properties, use the version instead
+    String originalPomVersion = parser.getModel().getVersion();
+    Matcher matcher = PLACEHOLDER_PATTERN.matcher(originalPomVersion);
+    if (matcher.find()) {
+      String potentialProperty = matcher.group(1);
+      if (getProperty(potentialProperty) != null) {
+        version = ofNullable(matcher.replaceAll(getProperty(potentialProperty)));
+      }
+    }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
     ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
@@ -122,6 +161,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
       resolveAdditionalPluginDependencies(mavenClient, parser, pluginsArtifactDependencies);
     } catch (Exception e) {
       throw new MuleRuntimeException(createStaticMessage("Error while resolving dependencies"), e);
+    }
+
+    if (version.isPresent()) {
+      deployableArtifactCoordinates.setVersion(version.get());
     }
 
     return doBuild(parser, deployableArtifactCoordinates);
