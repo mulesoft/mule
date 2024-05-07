@@ -38,6 +38,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.RETHROW_EXCEPTIONS_
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SET_VARIABLE_WITH_NULL_VALUE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.SUPPRESS_ERRORS;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.USE_TRANSACTION_SINK_INDEX;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.VALIDATE_APPLICATION_MODEL_WITH_REGION_CLASSLOADER;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
@@ -87,7 +88,9 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
+import static org.apache.commons.lang3.JavaVersion.JAVA_21;
 import static org.apache.commons.lang3.SystemUtils.JAVA_VERSION;
+import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.mule.runtime.api.component.location.ConfigurationComponentLocator;
@@ -185,6 +188,7 @@ import java.util.function.Predicate;
 
 import javax.transaction.TransactionManager;
 
+import org.apache.commons.lang3.JavaVersion;
 import org.slf4j.Logger;
 
 import reactor.core.publisher.Hooks;
@@ -359,6 +363,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureErrorAndRollbackTxWhenTimeout();
       configureDisableXmlSdkImplicitConfigurationCreation();
       configureEnableXmlSdkReset();
+      configureUnsupportedExtensionsClientRunAsync();
     }
   }
 
@@ -1588,8 +1593,19 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
     featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion("4.8.0"));
   }
 
+  private static void configureUnsupportedExtensionsClientRunAsync() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC,
+                                                minMuleVersion("4.8.0").and(minJavaVersion(JAVA_21)));
+  }
+
   private static Predicate<FeatureContext> minMuleVersion(String version) {
     return featureContext -> featureContext.getArtifactMinMuleVersion()
         .filter(muleVersion -> muleVersion.atLeast(version)).isPresent();
+  }
+
+  private static Predicate<FeatureContext> minJavaVersion(JavaVersion version) {
+    return featureContext -> featureContext.getArtifactMinMuleVersion()
+        .filter(muleVersion -> isJavaVersionAtLeast(version)).isPresent();
   }
 }

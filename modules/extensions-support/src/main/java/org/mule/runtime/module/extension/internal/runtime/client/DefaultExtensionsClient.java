@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.client;
 
+import static org.mule.runtime.api.config.MuleRuntimeFeature.UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
@@ -26,6 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static com.google.common.util.concurrent.MoreExecutors.shutdownAndAwaitTermination;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.ErrorTypeRepository;
 import org.mule.runtime.api.exception.MuleException;
@@ -124,6 +126,9 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
 
   @Inject
   private ComponentTracerFactory<CoreEvent> componentTracerFactory;
+
+  @Inject
+  private FeatureFlaggingService featureFlaggingService;
 
   @Inject
   private MuleContext muleContext;
@@ -281,6 +286,10 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   public <T, A> CompletableFuture<Result<T, A>> executeAsync(String extensionName,
                                                              String operationName,
                                                              OperationParameters parameters) {
+    // Prevent using code that relies on org.mule.runtime.extension.internal.client.ComplexParameter
+    if (featureFlaggingService.isEnabled(UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC)) {
+      throw new UnsupportedOperationException("executeAsync not supported. Ref MuleRuntimeFeature#UNSUPPORTED_EXTENSIONS_CLIENT_RUN_ASYNC");
+    }
 
     final ExtensionModel extensionModel = findExtension(extensionName);
     final OperationModel operationModel = findOperationModel(extensionModel, operationName);
@@ -296,7 +305,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
                      });
   }
 
-  protected void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
+  private void resolveLegacyParameters(OperationParameterizer parameterizer, OperationParameters legacyParameters) {
     resolveLegacyParameters(legacyParameters.get(), parameterizer::withParameter);
   }
 
