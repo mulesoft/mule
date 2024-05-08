@@ -6,12 +6,11 @@
  */
 package org.mule.runtime.module.extension.internal.loader;
 
-import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.MULE_DSL;
+import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.MULE_DSL;
 
 import org.mule.runtime.api.meta.model.declaration.fluent.ComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.error.ErrorModel;
-import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.error.ErrorsModelFactory;
 import org.mule.runtime.module.extension.internal.loader.delegate.ModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;
