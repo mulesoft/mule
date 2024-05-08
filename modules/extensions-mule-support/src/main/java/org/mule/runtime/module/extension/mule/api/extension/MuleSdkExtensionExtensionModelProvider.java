@@ -7,16 +7,14 @@
 package org.mule.runtime.module.extension.mule.api.extension;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.api.annotation.Experimental;
 import org.mule.api.annotation.NoInstantiate;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for Mule SDK Extensions
@@ -25,19 +23,23 @@ import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
  */
 @Experimental
 @NoInstantiate
-public class MuleSdkExtensionExtensionModelProvider {
+public class MuleSdkExtensionExtensionModelProvider extends ExtensionModelLoader {
 
-  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new MuleSdkExtensionExtensionModelDeclarer().declareExtensionModel())));
+  private static final LazyValue<ExtensionModel> EXTENSION_MODEL =
+      new LazyValue<>(() -> new MuleSdkExtensionExtensionModelProvider()
+          .loadExtensionModel(new MuleSdkExtensionExtensionModelDeclarer().declareExtensionModel(),
+                              builder(MuleSdkExtensionExtensionModelProvider.class.getClassLoader(),
+                                      nullDslResolvingContext())
+                                          .build()));
 
-  private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
-    return new DefaultExtensionLoadingContext(declarer, loadingRequest());
+  @Override
+  protected void declareExtension(ExtensionLoadingContext context) {
+    // nothing to do
   }
 
-  private static ExtensionModelLoadingRequest loadingRequest() {
-    return ExtensionModelLoadingRequest
-        .builder(MuleSdkExtensionExtensionModelProvider.class.getClassLoader(), nullDslResolvingContext())
-        .build();
+  @Override
+  public String getId() {
+    return "mule-muleSdk";
   }
 
   /**

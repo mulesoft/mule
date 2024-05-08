@@ -14,14 +14,12 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_DESCRIPTION;
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.declaration.type.ReconnectionStrategyTypeBuilder.RECONNECTION_CONFIG;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoader.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.FLOW;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
-import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.CONFIG_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionModelLoader.RESOURCE_XML;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
-import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 import static org.mule.test.marvel.MarvelExtension.MARVEL_EXTENSION;
 
 import static java.lang.Thread.currentThread;
