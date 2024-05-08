@@ -16,7 +16,7 @@ import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
 import org.mule.runtime.api.util.JavaConstants;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor;
-import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
+import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;

@@ -29,6 +29,7 @@ module org.mule.runtime.extensions.mule.support {
   requires org.mule.runtime.spring.config;
 
   requires java.inject;
+  requires org.jgrapht.core;
 
   provides org.mule.runtime.extension.api.provider.RuntimeExtensionModelProvider
       with org.mule.runtime.module.extension.mule.api.extension.MuleSdkExtensionRuntimeExtensionModelProvider,

@@ -8,15 +8,16 @@ package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.api.component.ComponentIdentifier.builder;
 import static org.mule.runtime.api.util.IdentifierParsingUtils.parseErrorType;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERRORS_CONSTRUCT_IDENTIFIER;
 import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_ERROR_CONSTRUCT_NAME;
+import static org.mule.runtime.module.extension.mule.internal.dsl.MuleSdkDslConstants.MULE_SDK_EXTENSION_DSL_NAMESPACE;
 import static org.mule.runtime.module.extension.mule.internal.loader.parser.Utils.mockErrorAst;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.REUSE;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.ERROR_HANDLING;
 import static org.mule.test.allure.AllureConstants.ReuseFeature.ReuseStory.EXTENSION_EXTENSION_MODEL;
 
 import static java.util.Collections.emptyMap;
+
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -34,12 +35,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import io.qameta.allure.Feature;
-import io.qameta.allure.Stories;
-import io.qameta.allure.Story;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import io.qameta.allure.Feature;
+import io.qameta.allure.Stories;
+import io.qameta.allure.Story;
 
 @Feature(REUSE)
 @Stories({@Story(EXTENSION_EXTENSION_MODEL), @Story(ERROR_HANDLING)})

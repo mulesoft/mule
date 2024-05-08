@@ -20,14 +20,14 @@ import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handle
 import static org.mule.runtime.core.api.util.StringUtils.isEmpty;
 import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguageModel;
-import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
+import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;
 
@@ -109,10 +109,10 @@ import org.mule.runtime.extension.internal.factories.XmlSdkConnectionProviderFac
 import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
 import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 import org.mule.runtime.extension.internal.loader.xml.validator.property.InvalidTestConnectionMarkerModelProperty;
-import org.mule.runtime.extension.internal.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConfigurationFactoryModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ConnectionProviderFactoryModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.DevelopmentFrameworkModelProperty;
 import org.mule.runtime.properties.api.ConfigurationProperty;
 
 import java.io.BufferedInputStream;

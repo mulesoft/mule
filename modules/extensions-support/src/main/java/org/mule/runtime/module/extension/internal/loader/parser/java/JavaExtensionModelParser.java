@@ -7,8 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.metadata.api.utils.MetadataTypeUtils.getTypeId;
-import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.extension.internal.util.ExtensionNamespaceUtils.getExtensionsNamespace;
+import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.JAVA_SDK;
 import static org.mule.runtime.module.extension.internal.loader.ModelLoaderDelegateUtils.requiresConfig;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getOperationParsers;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getRequiresEnterpriseLicenseInfo;
@@ -50,11 +50,11 @@ import org.mule.runtime.extension.api.annotation.notification.NotificationAction
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
-import org.mule.runtime.extension.internal.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.api.loader.java.type.AnnotationValueFetcher;
 import org.mule.runtime.module.extension.api.loader.java.type.ConfigurationElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
+import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.delegate.StereotypeModelLoaderDelegate;
 import org.mule.runtime.module.extension.internal.loader.java.property.ArtifactLifecycleListenerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
