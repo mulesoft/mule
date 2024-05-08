@@ -87,7 +87,7 @@ public class SdkInternalContext implements EventInternalContext<SdkInternalConte
                                           Optional<ConfigurationInstance> configuration,
                                           Map<String, Object> parameters, CoreEvent operationEvent, ExecutorCallback callback,
                                           ExecutionContextAdapter executionContextAdapter) {
-    LOGGER.debug("CCE - Setting Operation Parameters at location - {} for event - {}", location.getLocation(), eventId);
+    LOGGER.debug("Setting Operation Parameters at location - {} for event - {}", location.getLocation(), eventId);
     locationSpecificContext.get(new Pair<>(location, eventId)).setOperationExecutionParams(configuration, parameters,
                                                                                            operationEvent,
                                                                                            callback, executionContextAdapter);
