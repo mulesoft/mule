@@ -23,8 +23,8 @@ import static org.mule.runtime.extension.api.util.XmlModelUtils.createXmlLanguag
 import static org.mule.runtime.extension.internal.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.MODULE_CONNECTION_GLOBAL_ELEMENT_NAME;
 import static org.mule.runtime.extension.internal.ast.MacroExpansionModuleModel.TNS_PREFIX;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
