@@ -735,12 +735,11 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
     try {
-      SdkInternalContext SdkCtx = from(event);
-      if (SdkCtx == null) {
-        LOGGER.debug("Null SDK Context at {} for event - {}", getLocation().getLocation(), event.getContext().getId());
-      }
-      return SdkCtx.getOperationExecutionParams(getLocation(), event.getContext().getId());
+      return from(event)
+          .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {
+      LOGGER.debug("Null SDK Context at {} for event - {}", getLocation().getLocation(), event.getContext().getId());
+      LOGGER.debug("Null SDK Context at {} for event - {}", getLocation().getLocation(), event.getContext().getId());
       throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
           + getLocation().getLocation() + "' used its callback more than once?"),
                                                                 event, npe));
