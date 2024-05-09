@@ -7,6 +7,7 @@
 package org.mule.test.infrastructure;
 
 import static org.mule.runtime.core.api.config.bootstrap.ArtifactType.APP;
+import static org.mule.runtime.core.api.util.UUID.getUUID;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_ESCAPED_KEY;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_EVENT_NAME;
 import static org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher.OTEL_EXCEPTION_MESSAGE_KEY;
@@ -19,6 +20,7 @@ import static org.mule.test.infrastructure.profiling.tracing.TracingTestUtils.ge
 
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
+import static java.util.Collections.singletonList;
 
 import static org.hamcrest.Matchers.matchesRegex;
 import static org.junit.rules.ExpectedException.none;
@@ -32,7 +34,6 @@ import org.mule.test.infrastructure.profiling.tracing.ExceptionEventMatcher;
 import org.mule.test.infrastructure.profiling.tracing.SpanTestHierarchy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +102,25 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
         .addTraceStateKeyPresentAssertion("key4")
         .endChildren()
         .endChildren();
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenSpanShouldAssertAKindAndItIsDifferentTheAssertionShouldFail() {
+    expectedException.expectMessage("The span mule:flow was expected to have the kind CLIENT but had SERVER");
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(singletonList(mockCapturedExportedSpan(EXPECTED_FLOW_SPAN_NAME)));
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addKindToAssert("CLIENT");
+
+    spanTestHierarchy.assertSpanTree();
+  }
+
+  @Test
+  public void testWhenSpanShouldAssertAKindAndItIsEqualsToTheAssertionShouldNotFail() {
+    SpanTestHierarchy spanTestHierarchy = new SpanTestHierarchy(singletonList(mockCapturedExportedSpan(EXPECTED_FLOW_SPAN_NAME)));
+    spanTestHierarchy.withRoot(EXPECTED_FLOW_SPAN_NAME)
+        .addKindToAssert("SERVER");
 
     spanTestHierarchy.assertSpanTree();
   }
@@ -767,7 +787,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.getEvents()).thenReturn(singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
     when(async.getStatusAsString()).thenReturn(ERROR_STATUS);
 
@@ -858,7 +878,7 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.getEvents()).thenReturn(singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
@@ -906,13 +926,13 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(muleFlow.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(muleFlow.getName()).thenReturn(EXPECTED_FLOW_SPAN_NAME);
     when(muleFlow.getSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
-    when(muleFlow.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(muleFlow.getEvents()).thenReturn(singletonList(capturedEventData));
     when(muleFlow.hasErrorStatus()).thenReturn(true);
 
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.getEvents()).thenReturn(singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
@@ -962,14 +982,14 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(async.getParentSpanId()).thenReturn(MULE_FLOW_SPAN_ID);
     when(async.getName()).thenReturn(EXPECTED_ASYNC_SPAN_NAME);
     when(async.getSpanId()).thenReturn(ASYNC_SPAN_ID);
-    when(async.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(async.getEvents()).thenReturn(singletonList(capturedEventData));
     when(async.hasErrorStatus()).thenReturn(true);
     when(async.getStatusAsString()).thenReturn(ERROR_STATUS);
 
     when(logger.getParentSpanId()).thenReturn(ASYNC_SPAN_ID);
     when(logger.getName()).thenReturn(EXPECTED_LOGGER_SPAN_NAME);
     when(logger.getSpanId()).thenReturn(LOGGER_SPAN_ID);
-    when(logger.getEvents()).thenReturn(Collections.singletonList(capturedEventData));
+    when(logger.getEvents()).thenReturn(singletonList(capturedEventData));
     when(logger.hasErrorStatus()).thenReturn(true);
 
     capturedExportedSpans.add(muleFlow);
@@ -991,13 +1011,15 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     spanTestHierarchy.assertSpanTree();
   }
 
-  private CapturedExportedSpan mockCapturedExportedSpan() {
+  private CapturedExportedSpan mockCapturedExportedSpan(String name) {
     CapturedExportedSpan mockedSpan = mock(CapturedExportedSpan.class);
 
     // mocking start and end epoch nanos.
     when(mockedSpan.getStartEpochSpanNanos()).thenReturn(0L);
     when(mockedSpan.getEndSpanEpochNanos()).thenReturn(1L);
-
+    when(mockedSpan.getName()).thenReturn(name);
+    when(mockedSpan.getSpanId()).thenReturn(getUUID());
+    when(mockedSpan.getParentSpanId()).thenReturn(NO_PARENT_SPAN);
     when(mockedSpan.getStatusAsString()).thenReturn(UNSET_STATUS);
 
     Map<String, String> basicAttributes = new HashMap<>();
@@ -1009,6 +1031,11 @@ public class SpanTestHierarchyTestCase extends AbstractMuleTestCase {
     when(mockedSpan.getAttributes()).thenReturn(basicAttributes);
     when(mockedSpan.getServiceName()).thenReturn(TEST_ARTIFACT_ID);
     when(mockedSpan.getTraceId()).thenReturn("1-test-trace-id-1");
+    when(mockedSpan.getSpanKindName()).thenReturn("SERVER");
     return mockedSpan;
+  }
+
+  private CapturedExportedSpan mockCapturedExportedSpan() {
+    return mockCapturedExportedSpan("dummy");
   }
 }
