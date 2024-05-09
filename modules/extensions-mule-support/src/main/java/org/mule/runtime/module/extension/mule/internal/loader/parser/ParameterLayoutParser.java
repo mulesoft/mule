@@ -7,15 +7,15 @@
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.API_KEY;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_ID;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.CLIENT_SECRET;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.PASSWORD;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECRET_TOKEN;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECURITY_TOKEN;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_ID;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.TOKEN_URL;
-import static org.mule.runtime.extension.internal.semantic.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.API_KEY;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.CLIENT_ID;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.CLIENT_SECRET;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.PASSWORD;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.SECRET;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.SECRET_TOKEN;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.SECURITY_TOKEN;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.TOKEN_ID;
+import static org.mule.runtime.extension.api.semantic.ConnectivityVocabulary.TOKEN_URL;
 
 import static java.util.Optional.ofNullable;
 

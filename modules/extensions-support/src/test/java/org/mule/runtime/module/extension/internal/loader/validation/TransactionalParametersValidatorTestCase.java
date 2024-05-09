@@ -23,8 +23,8 @@ import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.extension.api.loader.ExtensionModelValidator;
 import org.mule.runtime.extension.api.loader.Problem;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
+import org.mule.runtime.extension.api.property.TransactionalActionModelProperty;
 import org.mule.runtime.extension.internal.loader.validator.TransactionalParametersValidator;
-import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
 import org.mule.tck.size.SmallTest;
 
 import org.junit.Before;

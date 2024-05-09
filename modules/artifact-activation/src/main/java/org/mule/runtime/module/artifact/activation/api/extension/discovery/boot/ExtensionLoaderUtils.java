@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.artifact.activation.api.extension.discovery.boot;
 
-import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionModelLoaderProviders;
+import static org.mule.runtime.extension.api.spi.ExtensionsApiSpiUtils.loadExtensionModelLoaderProviders;
 
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 

@@ -42,7 +42,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
+import org.mule.runtime.extension.api.property.NoErrorMappingModelProperty;
 
 /**
  * Builds the {@link ExtensionDeclarer} for the {@code operation} namespace used to define Mule DSL operations

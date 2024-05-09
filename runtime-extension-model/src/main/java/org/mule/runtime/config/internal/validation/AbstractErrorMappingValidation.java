@@ -6,11 +6,12 @@
  */
 package org.mule.runtime.config.internal.validation;
 
-import static java.util.Optional.empty;
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
+
+import static java.util.Optional.empty;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ArtifactAst;
@@ -19,7 +20,7 @@ import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.ast.api.validation.Validation;
 import org.mule.runtime.ast.api.validation.ValidationResultItem;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
+import org.mule.runtime.extension.api.property.NoErrorMappingModelProperty;
 
 import java.util.List;
 import java.util.Optional;

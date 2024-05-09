@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.ComponentParameterAst;
 import org.mule.runtime.extension.api.error.ErrorMapping;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
+import org.mule.runtime.extension.api.property.NoErrorMappingModelProperty;
 
 import java.util.List;
 import java.util.function.Consumer;

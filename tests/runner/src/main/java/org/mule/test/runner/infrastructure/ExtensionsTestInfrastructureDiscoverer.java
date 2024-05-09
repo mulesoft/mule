@@ -9,9 +9,9 @@ package org.mule.test.runner.infrastructure;
 import static org.mule.runtime.api.dsl.DslResolvingContext.getDefault;
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.core.api.config.MuleManifest.getProductVersion;
-import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
-import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
-import static org.mule.runtime.extension.internal.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
+import static org.mule.runtime.extension.api.spi.ExtensionsApiSpiUtils.loadDslResourceFactories;
+import static org.mule.runtime.extension.api.spi.ExtensionsApiSpiUtils.loadExtensionSchemaGenerators;
+import static org.mule.runtime.extension.api.spi.ExtensionsApiSpiUtils.loadGeneratedResourceFactories;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
