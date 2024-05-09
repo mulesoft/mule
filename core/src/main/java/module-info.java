@@ -567,6 +567,8 @@ module org.mule.runtime.core {
       spring.core;
   opens org.mule.runtime.core.api.context.notification to
       kryo.shaded;
+  opens org.mule.runtime.core.api.management.stats to
+      kryo.shaded;
   opens org.mule.runtime.core.api.processor to
       spring.core;
   opens org.mule.runtime.core.api.retry.policy to
@@ -618,6 +620,8 @@ module org.mule.runtime.core {
   opens org.mule.runtime.core.internal.lock to
       org.mule.runtime.core.components,
       spring.core;
+  opens org.mule.runtime.core.internal.management.stats to
+      kryo.shaded;
   opens org.mule.runtime.core.internal.message to
       kryo.shaded;
   opens org.mule.runtime.core.internal.policy to
