@@ -22,6 +22,7 @@
             -XX:+IgnoreUnrecognizedVMOptions
             --add-modules=net.bytebuddy.agent
             --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader=org.mule.runtime.extensions.support
+            --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.enricher=org.mule.runtime.extensions.support
             --add-exports=org.mule.runtime.extensions.api/org.mule.runtime.extension.internal.loader.validator=org.mule.runtime.extensions.support
             --add-reads=org.mule.runtime.extensions.support=com.google.gson
             --add-opens=org.mule.runtime.extensions.support/org.mule.runtime.module.extension.internal.loader.validation=org.mule.runtime.core

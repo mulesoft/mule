@@ -15,6 +15,7 @@ import static org.mule.metadata.catalog.api.PrimitiveTypesTypeLoader.STRING;
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.DEFAULT_NAMESPACE_URI_MASK;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import static java.lang.String.format;
 
@@ -24,15 +25,13 @@ import org.mule.metadata.api.model.MetadataType;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.store.ObjectStore;
 import org.mule.runtime.api.util.LazyValue;
 import org.mule.runtime.extension.api.declaration.type.ExtensionsTypeLoaderFactory;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -83,23 +82,24 @@ public final class MuleExtensionModelProvider {
     return PRIMITIVE_TYPES.get(id);
   }
 
-  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new MuleExtensionModelDeclarer(configurerFactory)
-          .createExtensionModel())));
+  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new MuleCoreExtensionModelLoader("mule")
+      .loadExtensionModel(new MuleExtensionModelDeclarer(configurerFactory).createExtensionModel(),
+                          loadingRequest()));
 
-  private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new TlsExtensionModelDeclarer().createExtensionModel())));
+  private static final LazyValue<ExtensionModel> TLS_EXTENSION_MODEL =
+      new LazyValue<>(() -> new MuleCoreExtensionModelLoader("mule-tls")
+          .loadExtensionModel(new TlsExtensionModelDeclarer().createExtensionModel(),
+                              loadingRequest()));
 
-  private static final LazyValue<ExtensionModel> OPERATION_DSL_EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(contextFor(new MuleOperationExtensionModelDeclarer().declareExtensionModel())));
-
-  private static ExtensionLoadingContext contextFor(ExtensionDeclarer declarer) {
-    return new DefaultExtensionLoadingContext(declarer, loadingRequest());
-  }
+  private static final LazyValue<ExtensionModel> OPERATION_DSL_EXTENSION_MODEL =
+      new LazyValue<>(() -> new MuleCoreExtensionModelLoader("mule-operationDsl")
+          .loadExtensionModel(new MuleOperationExtensionModelDeclarer().declareExtensionModel(),
+                              loadingRequest()));
 
   private static ExtensionModelLoadingRequest loadingRequest() {
-    return ExtensionModelLoadingRequest.builder(MuleExtensionModelProvider.class.getClassLoader(), nullDslResolvingContext())
-        .build();
+    return builder(MuleExtensionModelProvider.class.getClassLoader(),
+                   nullDslResolvingContext())
+                       .build();
   }
 
   /**
@@ -134,4 +134,24 @@ public final class MuleExtensionModelProvider {
   public static void setConfigurerFactory(ComponentMetadataConfigurerFactory componentMetadataConfigurerFactory) {
     configurerFactory = componentMetadataConfigurerFactory;
   }
+
+  private static final class MuleCoreExtensionModelLoader extends ExtensionModelLoader {
+
+    private final String id;
+
+    public MuleCoreExtensionModelLoader(String id) {
+      this.id = id;
+    }
+
+    @Override
+    protected void declareExtension(ExtensionLoadingContext context) {
+      // nothing to do
+    }
+
+    @Override
+    public String getId() {
+      return id;
+    }
+  }
+
 }
