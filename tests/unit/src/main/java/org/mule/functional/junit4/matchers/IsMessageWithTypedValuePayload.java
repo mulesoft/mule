@@ -16,7 +16,7 @@ import org.hamcrest.TypeSafeMatcher;
 /**
  * Verifies a {@link Message}'s payload, using a {@link TypedValue} matcher.
  *
- * @since 4.8
+ * @since 4.6.4
  */
 public class IsMessageWithTypedValuePayload<T> extends TypeSafeMatcher<Message> {
 

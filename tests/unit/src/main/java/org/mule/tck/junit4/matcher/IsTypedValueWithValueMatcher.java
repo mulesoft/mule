@@ -15,7 +15,7 @@ import org.hamcrest.TypeSafeMatcher;
 /**
  * Verifies that a {@link TypedValue} has the expected value.
  *
- * @since 4.8
+ * @since 4.6.4
  */
 public class IsTypedValueWithValueMatcher<T> extends TypeSafeMatcher<TypedValue<? super T>> {
 
