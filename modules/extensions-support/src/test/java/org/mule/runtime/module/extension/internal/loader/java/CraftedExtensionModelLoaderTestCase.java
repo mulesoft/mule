@@ -7,14 +7,15 @@
 package org.mule.runtime.module.extension.internal.loader.java;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
-import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoader.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 import static org.mule.runtime.module.extension.internal.loader.java.CraftedExtensionModelLoader.TYPE_PROPERTY_NAME;
 
 import static java.util.Optional.of;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.runtime.api.dsl.DslResolvingContext;
@@ -34,21 +35,23 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import io.qameta.allure.Issue;
 
 @SmallTest
-@RunWith(MockitoJUnitRunner.class)
 public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
 
   private static final String EXTENSION_NAME = "crafted extension";
 
   private ExtensionModelLoader loader = new CraftedExtensionModelLoader();
   private final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+  @Rule
+  public MockitoRule rule = MockitoJUnit.rule();
 
   @Rule
   public ExpectedException expectedException = none();
@@ -67,7 +70,9 @@ public class CraftedExtensionModelLoaderTestCase extends AbstractMuleTestCase {
 
   @Test
   public void load() throws Exception {
-    ExtensionModel extensionModel = loader.loadExtensionModel(classLoader, dslResolvingContext, attributes);
+    ExtensionModel extensionModel = loader.loadExtensionModel(builder(classLoader, dslResolvingContext)
+        .addParameters(attributes)
+        .build());
     assertThat(extensionModel, is(notNullValue()));
     assertThat(extensionModel.getName(), is(EXTENSION_NAME));
   }

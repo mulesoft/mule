@@ -86,8 +86,6 @@ module org.mule.runtime.spring.config {
 
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.config.internal.dsl.model.CoreComponentBuildingDefinitionProvider;
-  provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
-      org.mule.runtime.config.internal.dsl.processor.xml.ModuleXmlNamespaceInfoProvider;
 
   // Required to build MUnit chains
   exports org.mule.runtime.config.privileged.dsl.spring;

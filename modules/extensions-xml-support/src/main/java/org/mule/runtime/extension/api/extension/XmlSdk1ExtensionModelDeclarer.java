@@ -16,9 +16,9 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.extension.XmlSdkTypesValueProvider.ID;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_DSL_NAMESPACE_URI;
-import static org.mule.runtime.extension.internal.dsl.xml.XmlDslConstants.MODULE_ROOT_NODE_NAME;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_DSL_NAMESPACE;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_DSL_NAMESPACE_URI;
+import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider.MODULE_ROOT_NODE_NAME;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.OperationVisibility.PRIVATE;
 import static org.mule.runtime.extension.internal.loader.xml.XmlExtensionLoaderDelegate.OperationVisibility.PUBLIC;
 import static org.mule.runtime.module.extension.internal.loader.java.property.ValueProviderFactoryModelProperty.builder;

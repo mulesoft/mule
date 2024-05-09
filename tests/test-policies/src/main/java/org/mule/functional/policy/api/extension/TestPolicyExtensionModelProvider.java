@@ -7,27 +7,39 @@
 package org.mule.functional.policy.api.extension;
 
 import static org.mule.runtime.api.dsl.DslResolvingContext.nullDslResolvingContext;
+import static org.mule.runtime.extension.api.loader.ExtensionModelLoadingRequest.builder;
 
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.extension.internal.loader.DefaultExtensionLoadingContext;
-import org.mule.runtime.extension.internal.loader.ExtensionModelFactory;
+import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
+import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
 
 /**
  * Utility class to access the {@link ExtensionModel} definition for test Policy components
  *
  * @since 4.4
  */
-public final class TestPolicyExtensionModelProvider {
+public final class TestPolicyExtensionModelProvider extends ExtensionModelLoader {
 
   private TestPolicyExtensionModelProvider() {
     // Nothing to do
   }
 
-  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new ExtensionModelFactory()
-      .create(new DefaultExtensionLoadingContext(new TestPolicyExtensionModelDeclarer().createExtensionModel(),
-                                                 TestPolicyExtensionModelProvider.class.getClassLoader(),
-                                                 nullDslResolvingContext())));
+  private static final LazyValue<ExtensionModel> EXTENSION_MODEL = new LazyValue<>(() -> new TestPolicyExtensionModelProvider()
+      .loadExtensionModel(new TestPolicyExtensionModelDeclarer().createExtensionModel(),
+                          builder(TestPolicyExtensionModelProvider.class.getClassLoader(),
+                                  nullDslResolvingContext())
+                                      .build()));
+
+  @Override
+  protected void declareExtension(ExtensionLoadingContext context) {
+    // nothing to do
+  }
+
+  @Override
+  public String getId() {
+    return "test-policy";
+  }
 
   /**
    * @return the {@link ExtensionModel} definition for test policies

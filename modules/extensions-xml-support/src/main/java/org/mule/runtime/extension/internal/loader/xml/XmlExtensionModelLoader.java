@@ -8,7 +8,6 @@ package org.mule.runtime.extension.internal.loader.xml;
 
 import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_LOADER_ID;
 import static org.mule.runtime.extension.api.ExtensionConstants.XML_SDK_RESOURCE_PROPERTY_NAME;
-import static org.mule.runtime.extension.internal.loader.enricher.BooleanParameterDeclarationEnricher.DONT_SET_DEFAULT_VALUE_TO_BOOLEAN_PARAMS;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;

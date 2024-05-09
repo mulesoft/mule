@@ -12,7 +12,6 @@
     <properties>
         <javaModuleName>org.mule.runtime.oauth.api</javaModuleName>
         <formatterConfigPath>../../formatter.xml</formatterConfigPath>
-        <muleOAuthClientVersion>2.3.0-SNAPSHOT</muleOAuthClientVersion>
         <!-- because this module requires transitive org.mule.oauth.client.api -->
         <revapi.checkDependencies>true</revapi.checkDependencies>
     </properties>
@@ -33,7 +32,6 @@
         <dependency>
             <groupId>org.mule.commons</groupId>
             <artifactId>mule-oauth-client-api</artifactId>
-            <version>${muleOAuthClientVersion}</version>
         </dependency>
     </dependencies>
 </project>

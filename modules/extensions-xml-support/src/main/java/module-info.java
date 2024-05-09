@@ -51,6 +51,8 @@ module org.mule.runtime.extensions.xml.support {
       org.mule.runtime.extension.api.extension.XmlSdk1RuntimeExtensionModelProvider;
   provides org.mule.runtime.dsl.api.component.ComponentBuildingDefinitionProvider with
       org.mule.runtime.extension.internal.config.dsl.XmlExtensionBuildingDefinitionProvider;
+  provides org.mule.runtime.dsl.api.xml.XmlNamespaceInfoProvider with
+      org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamespaceInfoProvider;
   provides org.mule.runtime.extension.api.loader.ExtensionModelLoaderProvider with
       org.mule.runtime.extension.api.loader.xml.XmlExtensionModelLoaderProvider;
 

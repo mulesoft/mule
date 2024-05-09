@@ -8,6 +8,8 @@ package org.mule.tck.junit4.matcher;
 
 import static org.mule.tck.junit4.matcher.ErrorTypeMatcher.errorType;
 
+import static org.hamcrest.collection.IsMapContaining.hasEntry;
+
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
 import org.mule.runtime.api.metadata.TypedValue;
@@ -29,11 +31,12 @@ import java.util.Map;
 public class EventMatcher extends TypeSafeMatcher<CoreEvent> {
 
   private Matcher<Message> messageMatcher;
-  private Matcher<Map<String, TypedValue<?>>> variablesMatcher;
+  private Matcher<Map<? extends String, ? extends TypedValue<Object>>> variablesMatcher;
   private Matcher<ErrorType> errorTypeMatcher;
   private Matcher<SecurityContext> securityContextMatcher;
 
-  public EventMatcher(Matcher<Message> messageMatcher, Matcher<Map<String, TypedValue<?>>> variablesMatcher,
+  public EventMatcher(Matcher<Message> messageMatcher,
+                      Matcher<Map<? extends String, ? extends TypedValue<Object>>> variablesMatcher,
                       Matcher<ErrorType> errorTypeMatcher, Matcher<SecurityContext> securityContextMatcher) {
     this.messageMatcher = messageMatcher;
     this.variablesMatcher = variablesMatcher;
@@ -61,8 +64,12 @@ public class EventMatcher extends TypeSafeMatcher<CoreEvent> {
     return new EventMatcher(messageMatcher, null, null, null);
   }
 
-  public static EventMatcher hasVariables(Matcher<Map<String, TypedValue<?>>> variablesMatcher) {
+  public static EventMatcher hasVariables(Matcher<Map<? extends String, ? extends TypedValue<Object>>> variablesMatcher) {
     return new EventMatcher(null, variablesMatcher, null, null);
+  }
+
+  public static EventMatcher hasVariable(Matcher<? super String> nameMatcher, Matcher<? super TypedValue<Object>> valueMatcher) {
+    return new EventMatcher(null, hasEntry(nameMatcher, valueMatcher), null, null);
   }
 
   public static EventMatcher hasSecurityContext(Matcher<SecurityContext> securityContextMatcher) {

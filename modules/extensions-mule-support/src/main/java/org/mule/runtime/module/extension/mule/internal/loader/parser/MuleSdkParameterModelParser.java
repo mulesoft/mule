@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.module.extension.mule.internal.loader.parser;
 
+import static org.mule.metadata.api.model.MetadataFormat.JAVA;
 import static org.mule.runtime.api.component.ComponentIdentifier.buildFromStringRepresentation;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
-import static org.mule.runtime.extension.internal.declaration.type.MetadataTypeConstants.CONFIG_TYPE;
 import static org.mule.runtime.module.extension.internal.type.catalog.SpecialTypesTypeLoader.VOID;
 
 import static java.lang.String.format;
@@ -22,7 +22,9 @@ import static java.util.Optional.of;
 
 import org.mule.metadata.api.TypeLoader;
 import org.mule.metadata.api.annotation.TypeAnnotation;
+import org.mule.metadata.api.builder.BaseTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.java.api.annotation.ClassInformationAnnotation;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.MuleVersion;
@@ -40,11 +42,12 @@ import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.connectivity.oauth.OAuthParameterModelProperty;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypedValueTypeAnnotation;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
+import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.module.extension.internal.loader.java.enricher.MetadataTypeEnricher;
-import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.ParameterModelParser;
 import org.mule.runtime.module.extension.internal.loader.parser.StereotypeModelFactory;
 import org.mule.runtime.module.extension.internal.loader.parser.java.utils.ResolvedMinMuleVersion;
+import org.mule.runtime.module.extension.internal.loader.parser.metadata.InputResolverModelParser;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +63,15 @@ public class MuleSdkParameterModelParser extends BaseMuleSdkExtensionModelParser
   private static final MetadataTypeEnricher METADATA_TYPE_ENRICHER = new MetadataTypeEnricher();
   private static final Set<TypeAnnotation> METADATA_TYPE_ANNOTATIONS = singleton(new TypedValueTypeAnnotation());
   private static final String MIN_MULE_VERSION = "4.5";
+
+  /**
+   * {@link MetadataType} representing a {@link ConfigurationProvider}, suitable for config-ref parameters.
+   */
+  private static final MetadataType CONFIG_TYPE = BaseTypeBuilder.create(JAVA)
+      .objectType()
+      .id(ConfigurationProvider.class.getName())
+      .with(new ClassInformationAnnotation(ConfigurationProvider.class))
+      .build();
 
   protected final ComponentAst parameterAst;
   private final TypeLoader typeLoader;
