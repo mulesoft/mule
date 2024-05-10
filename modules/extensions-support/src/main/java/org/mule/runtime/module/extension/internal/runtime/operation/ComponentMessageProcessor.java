@@ -11,6 +11,7 @@ import static org.mule.runtime.api.functional.Either.left;
 import static org.mule.runtime.api.functional.Either.right;
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.profiling.type.RuntimeProfilingEventTypes.OPERATION_THREAD_RELEASE;
+import static org.mule.runtime.api.util.MuleSystemProperties.SYSTEM_PROPERTY_PREFIX;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.disposeIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
@@ -54,6 +55,7 @@ import static org.mule.runtime.tracer.customization.api.InternalSpanNames.OPERAT
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.PARAMETERS_RESOLUTION_SPAN_NAME;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.VALUE_RESOLUTION_SPAN_NAME;
 
+import static java.lang.Boolean.getBoolean;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.util.Optional.empty;
@@ -94,10 +96,10 @@ import org.mule.runtime.core.api.transaction.TransactionConfig;
 import org.mule.runtime.core.internal.event.InternalEvent;
 import org.mule.runtime.core.internal.event.NullEventFactory;
 import org.mule.runtime.core.internal.exception.MessagingException;
+import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.policy.OperationExecutionFunction;
 import org.mule.runtime.core.internal.policy.OperationPolicy;
 import org.mule.runtime.core.internal.policy.PolicyManager;
-import org.mule.runtime.core.internal.interception.ParametersResolverProcessor;
 import org.mule.runtime.core.internal.processor.strategy.ComponentInnerProcessor;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.core.internal.profiling.InternalProfilingService;
@@ -196,6 +198,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
+  private static final boolean IS_SAME_THREAD_OPTIMIZATION_DISABLED =
+      getBoolean(SYSTEM_PROPERTY_PREFIX + "same.thread.optimization.disable");
+
   protected final ExtensionModel extensionModel;
   protected ResolverSet resolverSet;
   protected final String target;
@@ -395,7 +400,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
                 }
               };
 
-              if (!mayCompleteInDifferentThread && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())) {
+              if (!mayCompleteInDifferentThread && from(event).isNoPolicyOperation(getLocation(), event.getContext().getId())
+                  && !IS_SAME_THREAD_OPTIMIZATION_DISABLED) {
                 onEventSynchronous(event, executorCallback, ctx);
               } else {
                 onEvent(event, executorCallback, ctx);
