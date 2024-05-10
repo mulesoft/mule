@@ -43,6 +43,7 @@ import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_PARAMETER
 import static org.mule.runtime.extension.api.ExtensionConstants.TARGET_VALUE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasNoTransactionalActionModelProperty;
 import static org.mule.runtime.module.extension.internal.runtime.execution.CompletableOperationExecutorFactory.extractExecutorInitialisationParams;
 import static org.mule.runtime.module.extension.internal.runtime.execution.SdkInternalContext.from;
 import static org.mule.runtime.module.extension.internal.util.InterceptorChainUtils.createConnectionInterceptorsChain;
@@ -116,7 +117,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -1185,7 +1185,7 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
   }
 
   private boolean requiresTransactionalActionConfiguration(T componentModel) {
-    return !componentModel.getModelProperty(NoTransactionalActionModelProperty.class).isPresent();
+    return !hasNoTransactionalActionModelProperty(componentModel);
   }
 
   private boolean hasNestedChain(T componentModel) {

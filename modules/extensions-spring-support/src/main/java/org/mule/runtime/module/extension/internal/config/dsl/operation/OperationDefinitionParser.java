@@ -6,15 +6,16 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasErrorMappingModelProperty;
+
 import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.dsl.api.component.ComponentBuildingDefinition.Builder;
 import org.mule.runtime.extension.api.dsl.syntax.resolver.DslSyntaxResolver;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.module.extension.internal.parser.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionDefinitionParser;
 import org.mule.runtime.module.extension.internal.config.dsl.ExtensionParsingContext;
+import org.mule.runtime.module.extension.internal.parser.AbstractComponentDefinitionParser;
 import org.mule.runtime.module.extension.internal.runtime.operation.OperationMessageProcessor;
 
 /**
@@ -34,7 +35,7 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
 
   @Override
   protected boolean hasErrorMappingsGroup() {
-    return !getComponentModel().getModelProperty(NoErrorMappingModelProperty.class).isPresent();
+    return !hasErrorMappingModelProperty(getComponentModel());
   }
 
   @Override

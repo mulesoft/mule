@@ -15,6 +15,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasTransactionalActionModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasTransactionalTypeModelProperty;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConfigFieldFromSourceObject;
@@ -46,7 +48,7 @@ import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.lifecycle.Lifecycle;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.parameter.ParameterModel;
 import org.mule.runtime.api.meta.model.source.SourceModel;
 import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.api.tx.TransactionType;
@@ -65,8 +67,6 @@ import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.source.BackPressureAction;
-import org.mule.runtime.extension.internal.property.TransactionalActionModelProperty;
-import org.mule.runtime.extension.internal.property.TransactionalTypeModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSetResult;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
@@ -92,6 +92,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
@@ -559,17 +560,17 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   private String getTransactionalActionFieldName() {
-    return getFieldNameEnrichedWith(TransactionalActionModelProperty.class, TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    return getFieldNameEnrichedWith(p -> hasTransactionalActionModelProperty(p), TRANSACTIONAL_ACTION_PARAMETER_NAME);
   }
 
   private String getTransactionTypeFieldName() {
-    return getFieldNameEnrichedWith(TransactionalTypeModelProperty.class, TRANSACTIONAL_TYPE_PARAMETER_NAME);
+    return getFieldNameEnrichedWith(p -> hasTransactionalTypeModelProperty(p), TRANSACTIONAL_TYPE_PARAMETER_NAME);
   }
 
-  private String getFieldNameEnrichedWith(Class<? extends ModelProperty> type, String defaultName) {
+  private String getFieldNameEnrichedWith(Predicate<ParameterModel> paramFilter, String defaultName) {
     return sourceModel.getAllParameterModels()
         .stream()
-        .filter(param -> param.getModelProperty(type).isPresent())
+        .filter(paramFilter)
         .filter(param -> param.getModelProperty(DeclaringMemberModelProperty.class).isPresent())
         .map(param -> param.getModelProperty(DeclaringMemberModelProperty.class).get())
         .findAny()

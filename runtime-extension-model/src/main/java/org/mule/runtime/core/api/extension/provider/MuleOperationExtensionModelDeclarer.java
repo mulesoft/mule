@@ -23,6 +23,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR;
 import static org.mule.runtime.extension.api.error.ErrorConstants.ERROR_TYPE_DEFINITION;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noErrorMappingModelProperty;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.DEPRECATED_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OPERATION_DEF_STEREOTYPE;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.OUTPUT_ATTRIBUTES_STEREOTYPE;
@@ -42,7 +43,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 /**
  * Builds the {@link ExtensionDeclarer} for the {@code operation} namespace used to define Mule DSL operations
@@ -231,7 +231,7 @@ public class MuleOperationExtensionModelDeclarer {
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
         .describedAs("Throws an error with the specified type and description.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     raiseError.withOutput().ofType(VOID_TYPE);
     raiseError.withOutputAttributes().ofType(VOID_TYPE);

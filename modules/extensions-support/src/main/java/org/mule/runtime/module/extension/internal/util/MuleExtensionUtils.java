@@ -20,6 +20,7 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
@@ -94,7 +95,6 @@ import org.mule.runtime.extension.api.runtime.source.BackPressureMode;
 import org.mule.runtime.extension.api.runtime.source.SdkSourceFactory;
 import org.mule.runtime.extension.api.runtime.source.SourceCompletionCallback;
 import org.mule.runtime.extension.api.runtime.source.SourceFactory;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.metadata.internal.NullMetadataResolverFactory;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.ComponentExecutorModelProperty;
@@ -647,7 +647,7 @@ public class MuleExtensionUtils {
       ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
       return (connectableComponentModel.requiresConnection()
           && (connectableComponentModel.supportsStreaming()
-              || connectableComponentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()));
+              || hasPagedOperationModelProperty(connectableComponentModel)));
     }
     return false;
   }
@@ -735,8 +735,11 @@ public class MuleExtensionUtils {
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                        boolean supportsOAuth,
                                                                        ComponentTracer<CoreEvent> operationConnectionTracer) {
-    return operationModel.getModelProperty(PagedOperationModelProperty.class)
-        .map(mp -> new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
+    if(hasPagedOperationModelProperty(operationModel)) {
+      return Optional.of(new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
+    } else {
+      return empty();
+    }
   }
 
   private static Set<String> resolveParameterNames(ParameterGroupModel group, Map<String, ?> parameters,

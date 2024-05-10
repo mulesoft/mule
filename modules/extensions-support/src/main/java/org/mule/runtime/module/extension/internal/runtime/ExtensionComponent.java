@@ -17,6 +17,7 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
 import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
@@ -81,7 +82,6 @@ import org.mule.runtime.extension.api.runtime.config.ConfigurationInstance;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
 import org.mule.runtime.extension.api.util.ExtensionModelUtils;
 import org.mule.runtime.extension.api.values.ComponentValueProvider;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.metadata.api.cache.MetadataCacheId;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGenerator;
 import org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory;
@@ -230,9 +230,11 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
 
     if (cursorProviderFactory == null) {
-      cursorProviderFactory = componentModel.getModelProperty(PagedOperationModelProperty.class)
-          .map(p -> (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory())
-          .orElseGet(() -> streamingManager.forBytes().getDefaultCursorProviderFactory());
+      if(hasPagedOperationModelProperty(componentModel)) {
+        cursorProviderFactory = (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory();
+      } else {
+        cursorProviderFactory = streamingManager.forBytes().getDefaultCursorProviderFactory();
+      }
     }
 
     if (!featureFlaggingService.isEnabled(START_EXTENSION_COMPONENTS_WITH_ARTIFACT_CLASSLOADER) &&

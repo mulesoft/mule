@@ -22,6 +22,10 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.OUTP
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.BEHAVIOUR;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.PRIMARY_CONTENT;
 import static org.mule.runtime.api.meta.model.stereotype.StereotypeModelBuilder.newStereotype;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
+import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -81,11 +85,9 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.ON_ERROR
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSOR;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noErrorMappingModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.targetModelProperty;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_NAMESPACE;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_PREFIX;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CORE_SCHEMA_LOCATION;
-import static org.mule.runtime.config.internal.dsl.utils.DslConstants.FLOW_ELEMENT_IDENTIFIER;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
 import static java.util.Arrays.asList;
@@ -127,7 +129,6 @@ import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProvider
 import org.mule.runtime.core.privileged.extension.SingletonModelProperty;
 import org.mule.runtime.extension.api.declaration.type.DynamicConfigExpirationTypeBuilder;
 import org.mule.runtime.extension.api.declaration.type.annotation.TypeDslAnnotation;
-import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
 import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.extension.api.model.deprecated.ImmutableDeprecationModel;
 import org.mule.runtime.extension.api.property.NoRedeliveryPolicyModelProperty;
@@ -135,11 +136,8 @@ import org.mule.runtime.extension.api.property.NoWrapperModelProperty;
 import org.mule.runtime.extension.api.property.QNameModelProperty;
 import org.mule.runtime.extension.api.property.SinceMuleVersionModelProperty;
 import org.mule.runtime.extension.api.stereotype.MuleStereotypes;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
-import org.mule.runtime.extension.internal.property.TargetModelProperty;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
 
@@ -356,7 +354,7 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Ensures that only unique messages are received by a service by checking the unique ID of the incoming message. "
             + "Note that the ID used can be generated from the message using an expression defined in the 'idExpression' "
             + "attribute. Otherwise, a 'DUPLICATE_MESSAGE' error is generated.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     validator.withOutput().ofType(VOID_TYPE);
     validator.withOutputAttributes().ofType(VOID_TYPE);
@@ -420,7 +418,7 @@ public class MuleExtensionModelDeclarer {
             + "before returning. Message processing in the referenced \u0027flow\u0027 will occur within the context of the "
             + "referenced flow and will therefore use its error handler etc.")
         .withErrorModel(routingError)
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     flowRef.withOutput().ofType(ANY_TYPE);
     flowRef.withOutputAttributes().ofType(ANY_TYPE);
@@ -439,7 +437,7 @@ public class MuleExtensionModelDeclarer {
             + "using the " + DEFAULT_LOG_LEVEL
             + " level to the \u0027org.mule.runtime.core.api.processor.LoggerMessageProcessor\u0027 category but "
             + "the level and category can both be configured to suit your needs.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     logger.withOutput().ofType(VOID_TYPE);
     logger.withOutputAttributes().ofType(VOID_TYPE);
@@ -468,7 +466,7 @@ public class MuleExtensionModelDeclarer {
   private void declareSetPayload(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer setPayload = extensionDeclarer.withOperation("setPayload")
         .describedAs("A processor that sets the payload with the provided value.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     setPayload.withOutput().ofType(VOID_TYPE);
     setPayload.withOutputAttributes().ofType(VOID_TYPE);
@@ -495,7 +493,7 @@ public class MuleExtensionModelDeclarer {
   private void declareSetVariable(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer setVariable = extensionDeclarer.withOperation("setVariable")
         .describedAs("A processor that adds variables.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     setVariable.withOutput().ofType(VOID_TYPE);
     setVariable.withOutputAttributes().ofType(VOID_TYPE);
@@ -528,7 +526,7 @@ public class MuleExtensionModelDeclarer {
   private void declareParseTemplate(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer parseTemplate = extensionDeclarer.withOperation("parseTemplate")
         .describedAs("Parses a template defined inline.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     parseTemplate.withOutput().ofType(ANY_TYPE);
     parseTemplate.withOutputAttributes().ofType(VOID_TYPE);
@@ -564,7 +562,7 @@ public class MuleExtensionModelDeclarer {
   private void declareRemoveVariable(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer removeVariable = extensionDeclarer.withOperation("removeVariable")
         .describedAs("A processor that removes variables by name or a wildcard expression.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     removeVariable.withOutput().ofType(VOID_TYPE);
     removeVariable.withOutputAttributes().ofType(VOID_TYPE);
@@ -579,7 +577,7 @@ public class MuleExtensionModelDeclarer {
   private void declareRaiseError(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
         .describedAs("Throws an error with the specified type and description.")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     raiseError.withOutput().ofType(VOID_TYPE);
     raiseError.withOutputAttributes().ofType(VOID_TYPE);
@@ -829,7 +827,7 @@ public class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-        .withModelProperty(new TargetModelProperty());
+        .withModelProperty(targetModelProperty());
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
@@ -885,7 +883,7 @@ public class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build())
-        .withModelProperty(new TargetModelProperty());
+        .withModelProperty(targetModelProperty());
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);

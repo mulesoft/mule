@@ -11,6 +11,11 @@ import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.composedOperationModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noConnectivityErrorModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noReconnectionStrategyModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noStreamingConfigurationModelProperty;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noTransactionalActionModelProperty;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -36,11 +41,6 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
-import org.mule.runtime.extension.internal.property.NoConnectivityErrorModelProperty;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
-import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
-import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
@@ -112,11 +112,11 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   private final Characteristic<List<ErrorModelParser>> errorModels;
 
   private final List<ModelProperty> additionalModelProperties =
-      asList(new NoStreamingConfigurationModelProperty(),
-             new NoTransactionalActionModelProperty(),
-             new NoReconnectionStrategyModelProperty(),
-             new NoConnectivityErrorModelProperty(),
-             new ComposedOperationModelProperty());
+      asList(noStreamingConfigurationModelProperty(),
+             noTransactionalActionModelProperty(),
+             noReconnectionStrategyModelProperty(),
+             noConnectivityErrorModelProperty(),
+             composedOperationModelProperty());
 
   private String name;
 

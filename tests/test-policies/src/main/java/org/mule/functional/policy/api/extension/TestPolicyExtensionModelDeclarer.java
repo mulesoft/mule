@@ -13,6 +13,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noErrorMappingModelProperty;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
@@ -21,7 +22,6 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
 import org.mule.runtime.core.internal.extension.CustomLocationPartModelProperty;
-import org.mule.runtime.extension.internal.property.NoErrorMappingModelProperty;
 
 /**
  * An {@link ExtensionDeclarer} for test Policy components
@@ -82,7 +82,7 @@ class TestPolicyExtensionModelDeclarer {
   private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
         .withOperation("executeNext")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     // By this operation alone we cannot determine what its output will be, it will depend on the context on which this operation
     // is located.
@@ -93,7 +93,7 @@ class TestPolicyExtensionModelDeclarer {
   private void declareCustomProcessor(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
         .withOperation("customProcessor")
-        .withModelProperty(new NoErrorMappingModelProperty());
+        .withModelProperty(noErrorMappingModelProperty());
 
     executeNext.withOutput().ofType(ANY_TYPE);
     executeNext.withOutputAttributes().ofType(ANY_TYPE);

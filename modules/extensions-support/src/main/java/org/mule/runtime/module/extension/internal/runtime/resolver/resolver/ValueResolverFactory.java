@@ -8,11 +8,11 @@ package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver.fromUnwrapped;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isParameterResolver;
-import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isTypedValue;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.toDataType;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.isExpression;

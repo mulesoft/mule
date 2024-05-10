@@ -12,6 +12,7 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.startIfNeeded;
 import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.stopIfNeeded;
 import static org.mule.runtime.core.internal.util.FunctionalUtils.withNullEvent;
+import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
 import static org.mule.runtime.config.internal.dsl.utils.DslConstants.CONFIG_ATTRIBUTE_NAME;
 import static org.mule.runtime.module.extension.internal.runtime.client.operation.OperationClient.from;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.findOperation;
@@ -51,7 +52,6 @@ import org.mule.runtime.extension.api.client.source.SourceParameterizer;
 import org.mule.runtime.extension.api.client.source.SourceResultHandler;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.internal.client.ComplexParameter;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolvingContext;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.DefaultOperationParameterizer;
 import org.mule.runtime.module.extension.internal.runtime.client.operation.EventedOperationsParameterDecorator;
@@ -350,7 +350,7 @@ public final class DefaultExtensionsClient implements ExtensionsClient, Initiali
   }
 
   private void configureLegacyRepeatableStreaming(OperationParameterizer parameterizer, OperationModel operationModel) {
-    if (operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+    if (hasPagedOperationModelProperty(operationModel)) {
       setDefaultRepeatableIterables(parameterizer);
     } else if (operationModel.supportsStreaming()) {
       setDefaultRepeatableStreaming(parameterizer);
