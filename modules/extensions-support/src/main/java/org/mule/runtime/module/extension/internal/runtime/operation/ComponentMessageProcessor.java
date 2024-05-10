@@ -198,8 +198,8 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
       "Root component '%s' defines an invalid usage of operation '%s' which uses %s as %s";
   private static final Logger LOGGER = getLogger(ComponentMessageProcessor.class);
   private static final ExtensionTransactionFactory TRANSACTION_FACTORY = new ExtensionTransactionFactory();
-  private static final boolean IS_SAME_THREAD_OPTIMIZATION_DISABLED =
-      getBoolean(SYSTEM_PROPERTY_PREFIX + "same.thread.optimization.disable");
+  private static final boolean IS_SAME_THREAD_OPTIMIZATION_DISABLED = true;
+  // getBoolean(SYSTEM_PROPERTY_PREFIX + "same.thread.optimization.disable");
 
   protected final ExtensionModel extensionModel;
   protected ResolverSet resolverSet;
