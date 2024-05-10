@@ -31,7 +31,7 @@ public class TlsRevocationCheckTestCase extends MuleArtifactFunctionalTestCase {
   }
 
   @Test
-  public void testTlsContextKeyStoreProperties() throws Exception {
+  public void testTlsContextRevocationCheck() throws Exception {
     TlsContextTrustStoreConfiguration trustStoreConfig = tlsContextFactory.getTrustStoreConfiguration();
     assertThat(trustStoreConfig.getAlgorithm(), equalTo(ALGORITHM));
   }
