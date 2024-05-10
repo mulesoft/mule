@@ -15,7 +15,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.extension.internal.notification.ExtensionAction;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 
 import java.util.function.Supplier;
