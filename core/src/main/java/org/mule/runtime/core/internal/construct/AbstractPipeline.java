@@ -278,9 +278,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
     doInitialiseProcessingStrategy();
 
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::incrementDeclaredTriggerFlow,
-                                 DefaultFlowsSummaryStatistics::incrementDeclaredApikitFlow,
-                                 DefaultFlowsSummaryStatistics::incrementDeclaredPrivateFlow);
+    updateFlowsSummaryStatistics(t -> t.incrementDeclaredTriggerFlow(getName()),
+                                 t -> t.incrementDeclaredApikitFlow(getName()),
+                                 t -> t.incrementDeclaredPrivateFlow(getName()));
   }
 
   @Override
@@ -636,9 +636,9 @@ public abstract class AbstractPipeline extends AbstractFlowConstruct implements 
 
   @Override
   protected void doDispose() {
-    updateFlowsSummaryStatistics(DefaultFlowsSummaryStatistics::decrementDeclaredTriggerFlow,
-                                 DefaultFlowsSummaryStatistics::decrementDeclaredApikitFlow,
-                                 DefaultFlowsSummaryStatistics::decrementDeclaredPrivateFlow);
+    updateFlowsSummaryStatistics(t -> t.decrementDeclaredTriggerFlow(getName()),
+                                 t -> t.decrementDeclaredApikitFlow(getName()),
+                                 t -> t.decrementDeclaredPrivateFlow(getName()));
 
     if (errorRouterForSourceResponseError != null) {
       synchronized (this) {
