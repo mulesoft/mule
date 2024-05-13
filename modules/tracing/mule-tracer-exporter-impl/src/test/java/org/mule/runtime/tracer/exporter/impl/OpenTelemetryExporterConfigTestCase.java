@@ -38,6 +38,7 @@ import static org.testcontainers.utility.MountableFile.forHostPath;
 import org.mule.runtime.tracer.exporter.config.api.SpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.config.OpenTelemetryAutoConfigurableSpanExporterConfiguration;
 import org.mule.runtime.tracer.exporter.impl.optel.resources.SpanExporterConfiguratorException;
+import org.mule.tck.junit4.rule.DynamicPort;
 import org.mule.tck.probe.JUnitLambdaProbe;
 import org.mule.tck.probe.PollingProber;
 
@@ -107,6 +108,11 @@ public class OpenTelemetryExporterConfigTestCase {
 
   @ClassRule
   public static final GrpcServerRule server = new GrpcServerRule();
+
+  public static final String SERVER_PORT = "SERVER_PORT";
+
+  @ClassRule
+  public static final DynamicPort serverPort = new DynamicPort(SERVER_PORT);
 
   @Before
   public void before() {
@@ -305,7 +311,7 @@ public class OpenTelemetryExporterConfigTestCase {
                    }
                  });
 
-      sb.http(0);
+      sb.http(serverPort.getNumber());
     }
 
     public void reset() {

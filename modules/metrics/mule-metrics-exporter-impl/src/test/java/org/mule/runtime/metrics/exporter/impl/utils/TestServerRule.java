@@ -24,12 +24,19 @@ import com.linecorp.armeria.testing.junit4.server.ServerRule;
 import org.jetbrains.annotations.NotNull;
 
 import io.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceResponse;
+import org.mule.tck.junit4.rule.DynamicPort;
 
 public class TestServerRule extends ServerRule {
 
   private static final String GRPC_ENDPOINT_PATH = "/opentelemetry.proto.collector.metrics.v1.MetricsService/Export";
 
+  private final int serverPort;
+
   private List<TestExportedMeter> metrics = new ArrayList<>();
+
+  public TestServerRule(int serverPort) {
+    this.serverPort = serverPort;
+  }
 
   @Override
   protected void configure(ServerBuilder sb) {
@@ -48,7 +55,7 @@ public class TestServerRule extends ServerRule {
                  }
                });
 
-    sb.http(0);
+    sb.http(serverPort);
   }
 
   public void reset() {
