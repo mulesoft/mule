@@ -10,7 +10,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERRO
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isNoErrorMapping;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isNoErrorMapping;
 
 import static java.util.Optional.empty;
 

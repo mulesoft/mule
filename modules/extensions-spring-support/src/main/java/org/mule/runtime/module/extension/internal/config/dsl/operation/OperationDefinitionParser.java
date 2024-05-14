@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isNoErrorMapping;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isNoErrorMapping;
 
 import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.model.ExtensionModel;

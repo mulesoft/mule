@@ -86,7 +86,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoErrorMapping;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoErrorMapping;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
 import static java.util.Arrays.asList;

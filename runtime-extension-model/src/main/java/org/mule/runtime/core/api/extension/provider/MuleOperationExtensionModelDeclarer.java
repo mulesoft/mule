@@ -42,7 +42,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.display.LayoutModel;
 import org.mule.runtime.core.internal.extension.CustomBuildingDefinitionProviderModelProperty;
-import org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils;
+import org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils;
 
 /**
  * Builds the {@link ExtensionDeclarer} for the {@code operation} namespace used to define Mule DSL operations
@@ -232,7 +232,7 @@ public class MuleOperationExtensionModelDeclarer {
     OperationDeclarer raiseError = extensionDeclarer.withOperation("raiseError")
         .describedAs("Throws an error with the specified type and description.");
 
-    ModelPropertiesDeclarationUtils.withNoErrorMapping(raiseError);
+    ComponentDeclarationUtils.withNoErrorMapping(raiseError);
 
     raiseError.withOutput().ofType(VOID_TYPE);
     raiseError.withOutputAttributes().ofType(VOID_TYPE);

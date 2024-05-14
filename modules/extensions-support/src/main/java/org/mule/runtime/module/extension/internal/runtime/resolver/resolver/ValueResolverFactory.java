@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.resolver.resolver;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.ExpressionSupport.REQUIRED;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isTargetParameter;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isTargetParameter;
 import static org.mule.runtime.module.extension.internal.loader.java.property.stackabletypes.StackedTypesModelProperty.getStackedTypesModelProperty;
 import static org.mule.runtime.module.extension.internal.runtime.resolver.StaticValueResolver.fromUnwrapped;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.isLiteral;

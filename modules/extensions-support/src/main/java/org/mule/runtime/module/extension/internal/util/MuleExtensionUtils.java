@@ -22,7 +22,7 @@ import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 

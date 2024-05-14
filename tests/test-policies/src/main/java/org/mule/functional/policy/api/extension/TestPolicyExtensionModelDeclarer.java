@@ -14,7 +14,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoErrorMapping;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoErrorMapping;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;

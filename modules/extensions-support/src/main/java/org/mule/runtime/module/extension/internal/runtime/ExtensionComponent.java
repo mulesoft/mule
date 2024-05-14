@@ -18,7 +18,7 @@ import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNO
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;

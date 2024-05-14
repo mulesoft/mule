@@ -27,7 +27,7 @@ import static org.mule.runtime.extension.internal.config.dsl.xml.ModuleXmlNamesp
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.MODULE_TLS_ENABLED_MARKER_ANNOTATION_QNAME;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.addTlsContextParameter;
 import static org.mule.runtime.extension.internal.loader.xml.TlsEnabledComponentUtils.isTlsConfigurationSupported;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoReconnectionStrategy;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoReconnectionStrategy;
 import static org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework.XML_SDK;
 import static org.mule.runtime.module.extension.internal.runtime.exception.ErrorMappingUtils.forEachErrorMappingDo;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getValidatedJavaVersionsIntersection;

@@ -11,10 +11,10 @@ import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoConnectivityError;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoReconnectionStrategy;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoStreamingConfiguration;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoTransactionalAction;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoConnectivityError;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoReconnectionStrategy;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoStreamingConfiguration;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoTransactionalAction;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -159,10 +159,10 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   public <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
     OperationDeclarer opDeclarer = (OperationDeclarer) declarer;
 
-    withNoStreamingConfiguration(declarer);
-    withNoTransactionalAction(declarer);
-    withNoReconnectionStrategy(declarer);
-    withNoConnectivityError(declarer);
+    withNoStreamingConfiguration(opDeclarer);
+    withNoTransactionalAction(opDeclarer);
+    withNoReconnectionStrategy(opDeclarer);
+    withNoConnectivityError(opDeclarer);
     opDeclarer.withModelProperty(new ComposedOperationModelProperty());
   }
 

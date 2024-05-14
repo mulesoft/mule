@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 
 import static java.lang.String.format;
