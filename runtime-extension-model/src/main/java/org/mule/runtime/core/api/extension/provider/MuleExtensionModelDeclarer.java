@@ -86,6 +86,7 @@ import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.PROCESSO
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SERIALIZER;
 import static org.mule.runtime.extension.api.stereotype.MuleStereotypes.SUB_FLOW;
 import static org.mule.runtime.extension.internal.loader.util.InfrastructureParameterBuilder.addReconnectionStrategyParameter;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.targetModelProperty;
 import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoErrorMapping;
 import static org.mule.sdk.api.stereotype.MuleStereotypes.CONFIGURATION_ELEMENT;
 
@@ -112,6 +113,7 @@ import org.mule.runtime.api.meta.model.declaration.fluent.HasParametersDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedComponentDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.NestedRouteDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
+import org.mule.runtime.api.meta.model.declaration.fluent.OptionalParameterDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.ParameterGroupDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.SourceDeclarer;
 import org.mule.runtime.api.meta.model.display.ClassValueModel;
@@ -825,7 +827,7 @@ public class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-    scatterGather.onParameterGroup(OUTPUT)
+    final OptionalParameterDeclarer targetParamDeclarer = scatterGather.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
@@ -834,8 +836,7 @@ public class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    withNoErrorMapping(scatterGather);
+    targetModelProperty(targetParamDeclarer);
 
     scatterGather.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     scatterGather.withOutputAttributes().ofDynamicType(ANY_TYPE);
@@ -882,7 +883,7 @@ public class MuleExtensionModelDeclarer {
         .withExpressionSupport(NOT_SUPPORTED)
         .describedAs(TARGET_PARAMETER_DESCRIPTION)
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-    parallelForeach.onParameterGroup(OUTPUT)
+    final OptionalParameterDeclarer targetParamDeclarer = parallelForeach.onParameterGroup(OUTPUT)
         .withOptionalParameter(TARGET_VALUE_PARAMETER_NAME)
         .ofType(STRING_TYPE)
         .defaultingTo(PAYLOAD)
@@ -891,8 +892,7 @@ public class MuleExtensionModelDeclarer {
         .withRole(BEHAVIOUR)
         .withDisplayModel(DisplayModel.builder().displayName(TARGET_VALUE_PARAMETER_DISPLAY_NAME).build())
         .withLayout(LayoutModel.builder().tabName(ADVANCED_TAB).build());
-
-    withNoErrorMapping(parallelForeach);
+    targetModelProperty(targetParamDeclarer);
 
     parallelForeach.withOutput().ofDynamicType(BaseTypeBuilder.create(MetadataFormat.JAVA).arrayType().of(ANY_TYPE).build());
     parallelForeach.withOutputAttributes().ofDynamicType(ANY_TYPE);
