@@ -736,7 +736,7 @@ public class MuleExtensionUtils {
                                                                        boolean supportsOAuth,
                                                                        ComponentTracer<CoreEvent> operationConnectionTracer) {
     if (isPagedOperation(operationModel)) {
-      return Optional.of(new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
+      return of(new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
     } else {
       return empty();
     }
