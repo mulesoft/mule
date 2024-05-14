@@ -46,6 +46,7 @@ import org.mule.maven.pom.parser.api.MavenPomParser;
 import org.mule.maven.pom.parser.api.MavenPomParserProvider;
 import org.mule.maven.pom.parser.api.model.AdditionalPluginDependencies;
 import org.mule.maven.pom.parser.api.model.BundleDependency;
+import org.mule.maven.pom.parser.api.model.PomParentCoordinates;
 import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.deployable.AbstractDeployableProjectModelBuilder;
@@ -141,7 +142,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
 
     // 2) if a version is passed using system properties, use the version instead
-    String originalPomVersion = parser.getModel().getVersion();
+    String originalPomVersion = this.getVersion(parser);
     Matcher matcher = PLACEHOLDER_PATTERN.matcher(originalPomVersion);
     if (matcher.find()) {
       String potentialProperty = matcher.group(1);
@@ -151,7 +152,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
-    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
+    ArtifactCoordinates deployableArtifactCoordinates = this.getDeployableProjectArtifactCoordinates(parser);
 
     try (MavenClient mavenClient = createMavenClient(mavenConfiguration)) {
       resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
@@ -217,10 +218,78 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
         .build();
   }
 
+  /**
+   * Retrieves the groupId of the deployable project from the {@link MavenPomParser}.
+   *
+   * @param parser the {@link MavenPomParser} to retrieve the groupId from.
+   *
+   * @return the groupId of the deployable project.
+   */
+  private String getGroupId(MavenPomParser parser) {
+    String groupId = parser.getModel().getGroupId();
+    if (groupId == null) {
+      groupId = parser.getModel().getParent()
+          .map(PomParentCoordinates::getGroupId)
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
+      if (groupId == null) {
+        throw new MuleRuntimeException(createStaticMessage("GroupId is null in both current and parent POM"));
+      }
+    }
+    return groupId;
+  }
+
+  // *
+  /**
+   * Retrieves the artifactId of the deployable project from the {@link MavenPomParser}.
+   *
+   * @param parser the {@link MavenPomParser} to retrieve the artifactId from.
+   *
+   * @return the artifactId of the deployable project.
+   */
+  private String getArtifactId(MavenPomParser parser) {
+    String artifactId = parser.getModel().getArtifactId();
+    if (artifactId == null) {
+      artifactId = parser.getModel().getParent()
+          .map(PomParentCoordinates::getArtifactId)
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
+      if (artifactId == null) {
+        throw new MuleRuntimeException(createStaticMessage("ArtifactId is null in both current and parent POM"));
+      }
+    }
+    return artifactId;
+  }
+
+  /**
+   * Retrieves the version of the deployable project from the {@link MavenPomParser}.
+   *
+   * @param parser the {@link MavenPomParser} to retrieve the version from.
+   *
+   * @return the version of the deployable project.
+   */
+  private String getVersion(MavenPomParser parser) {
+    String version = parser.getModel().getVersion();
+    if (version == null) {
+      version = parser.getModel().getParent()
+          .map(PomParentCoordinates::getVersion)
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
+      if (version == null) {
+        throw new MuleRuntimeException(createStaticMessage("Version is null in both current and parent POM"));
+      }
+    }
+    return version;
+  }
+
+  /**
+   * Retrieves the {@link ArtifactCoordinates} of the deployable project from the {@link MavenPomParser}.
+   *
+   * @param parser the {@link MavenPomParser} to retrieve the {@link ArtifactCoordinates} from.
+   *
+   * @return the {@link ArtifactCoordinates} of the deployable project.
+   */
   private ArtifactCoordinates getDeployableProjectArtifactCoordinates(MavenPomParser parser) {
     ApplicationGAVModel deployableGAVModel =
-        new ApplicationGAVModel(parser.getModel().getGroupId(), parser.getModel().getArtifactId(),
-                                parser.getModel().getVersion());
+        new ApplicationGAVModel(this.getGroupId(parser), this.getArtifactId(parser),
+                                this.getVersion(parser));
     return getDeployableArtifactCoordinates(parser, deployableGAVModel);
   }
 
