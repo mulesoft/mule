@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
-import static org.mule.runtime.extension.internal.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
+import static org.mule.runtime.extension.privileged.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
