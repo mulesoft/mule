@@ -16,7 +16,7 @@ import static org.mule.test.allure.AllureConstants.ErrorHandlingFeature.ErrorHan
 
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.exception.AbstractErrorTypeMatcherTestCase;
 import org.mule.runtime.core.api.exception.ErrorTypeMatcher;
 import org.mule.runtime.core.api.exception.SingleErrorTypeMatcher;
@@ -53,7 +53,7 @@ public class SingleErrorTypeMatcherTestCase extends AbstractErrorTypeMatcherTest
   public void matchChild() {
     ComponentIdentifier customTransformerIdentifier =
         ComponentIdentifier.builder().name("custom").namespace(CORE_NAMESPACE_NAME).build();
-    ErrorType customTransformerErrorType = ErrorTypeBuilder.builder()
+    ErrorType customTransformerErrorType = DefaultErrorTypeBuilder.builder()
         .namespace(customTransformerIdentifier.getNamespace())
         .identifier(customTransformerIdentifier.getName())
         .parentErrorType(transformationErrorType)

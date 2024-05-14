@@ -15,7 +15,10 @@
     </description>
 
     <properties>
-        <surefire.args>${surefire.test.unit.open.args}</surefire.args>
+        <surefire.args>
+            --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.model=org.mule.runtime.extensions.mule.support
+            ${surefire.test.unit.open.args}
+        </surefire.args>
 
         <javaModuleName>org.mule.runtime.extensions.mule.support</javaModuleName>
         <skipExportTests>false</skipExportTests>

@@ -36,7 +36,7 @@ import org.mule.runtime.api.i18n.I18nMessage;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
 import org.mule.runtime.api.message.Message;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.privileged.message.PrivilegedError;
@@ -66,9 +66,9 @@ public class ErrorBuilderTestCase extends AbstractMuleTestCase {
   private static final String EXCEPTION_MESSAGE = "message";
   private static final String SUPPRESSED_EXCEPTION_MESSAGE = "suppressed message";
   private final ErrorType mockErrorType = mock(ErrorType.class);
-  private final ErrorType anyError = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+  private final ErrorType anyError = DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
   private final ErrorType testError =
-      ErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
+      DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("TEST").parentErrorType(anyError).build();
 
   @Rule
   public ExpectedException expectedException = none();
