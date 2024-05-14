@@ -25,7 +25,7 @@ import org.mule.runtime.api.exception.MuleExceptionInfo;
 import org.mule.runtime.api.lifecycle.InitialisationException;
 import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.message.ErrorType;
-import org.mule.runtime.ast.internal.error.ErrorTypeBuilder;
+import org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.core.api.construct.Flow;
 import org.mule.runtime.core.api.event.CoreEvent;
@@ -104,13 +104,13 @@ public abstract class AbstractErrorHandlerTestCase extends AbstractMuleContextTe
   }
 
   private CoreEvent getCoreEventWithSuppressedError(MuleContext muleContext) {
-    ErrorType anyErrorType = ErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
+    ErrorType anyErrorType = DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("ANY").build();
     ErrorType suppressedErrorType =
-        ErrorTypeBuilder.builder().namespace("MULE").identifier("SUPPRESSED").parentErrorType(anyErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("SUPPRESSED").parentErrorType(anyErrorType).build();
     ErrorType unsuppressedErrorType =
-        ErrorTypeBuilder.builder().namespace("MULE").identifier("UNSUPPRESSED").parentErrorType(anyErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("UNSUPPRESSED").parentErrorType(anyErrorType).build();
     ErrorType sourceResponseErrorType =
-        ErrorTypeBuilder.builder().namespace("MULE").identifier("SOURCE_RESPONSE").parentErrorType(anyErrorType).build();
+        DefaultErrorTypeBuilder.builder().namespace("MULE").identifier("SOURCE_RESPONSE").parentErrorType(anyErrorType).build();
     Error errorWithSuppression = mock(PrivilegedError.class);
     Error suppressedError = mock(Error.class);
     CoreEvent event = mock(CoreEvent.class);

@@ -7,7 +7,7 @@
 package org.mule.runtime.core.internal.exception;
 
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT;
-import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
+import static org.mule.runtime.ast.api.error.ErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
@@ -41,6 +41,7 @@ import org.mule.runtime.api.security.SecurityException;
 import org.mule.runtime.api.security.ServerSecurityException;
 import org.mule.runtime.api.streaming.exception.StreamingBufferSizeExceededException;
 import org.mule.runtime.api.tx.TransactionException;
+import org.mule.runtime.ast.api.error.ErrorTypeBuilder;
 import org.mule.runtime.core.api.exception.ExceptionMapper;
 import org.mule.runtime.core.api.expression.ExpressionRuntimeException;
 import org.mule.runtime.core.api.retry.policy.RetryPolicyExhaustedException;
