@@ -11,11 +11,10 @@ import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.composedOperationModelProperty;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noConnectivityErrorModelProperty;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noReconnectionStrategyModelProperty;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noStreamingConfigurationModelProperty;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noTransactionalActionModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoConnectivityError;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoReconnectionStrategy;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoStreamingConfiguration;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoTransactionalAction;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -31,6 +30,8 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -42,6 +43,7 @@ import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ComposedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
@@ -111,13 +113,6 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   private final FilteringCharacteristic<Boolean> isTransactional = new IsTransactionalCharacteristic();
   private final Characteristic<List<ErrorModelParser>> errorModels;
 
-  private final List<ModelProperty> additionalModelProperties =
-      asList(noStreamingConfigurationModelProperty(),
-             noTransactionalActionModelProperty(),
-             noReconnectionStrategyModelProperty(),
-             noConnectivityErrorModelProperty(),
-             composedOperationModelProperty());
-
   private String name;
 
   public MuleSdkOperationModelParser(ComponentAst operation, String namespace, TypeLoader typeLoader,
@@ -157,7 +152,18 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return additionalModelProperties;
+    return emptyList();
+  }
+
+  @Override
+  public <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
+    OperationDeclarer opDeclarer = (OperationDeclarer) declarer;
+
+    withNoStreamingConfiguration(declarer);
+    withNoTransactionalAction(declarer);
+    withNoReconnectionStrategy(declarer);
+    withNoConnectivityError(declarer);
+    opDeclarer.withModelProperty(new ComposedOperationModelProperty());
   }
 
   @Override

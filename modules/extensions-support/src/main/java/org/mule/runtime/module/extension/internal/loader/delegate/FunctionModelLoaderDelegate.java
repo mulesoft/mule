@@ -11,12 +11,13 @@ import static org.mule.runtime.module.extension.internal.loader.utils.ModelLoade
 import org.mule.runtime.api.meta.model.declaration.fluent.ExtensionDeclarer;
 import org.mule.runtime.api.meta.model.declaration.fluent.FunctionDeclarer;
 import org.mule.runtime.module.extension.internal.loader.parser.FunctionModelParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for declaring functions through a {@link DefaultExtensionModelLoaderDelegate}
@@ -55,7 +56,7 @@ final class FunctionModelLoaderDelegate extends AbstractComponentModelLoaderDele
 
       parser.getOutputType().applyOn(function.withOutput());
       loader.getParameterModelsLoaderDelegate().declare(function, parser.getParameterGroupModelParsers());
-      parser.getAdditionalModelProperties().forEach(function::withModelProperty);
+      parser.addAdditionalModelProperties(function);
       parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
         function.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
         LOGGER.debug(resolvedMMV.getReason());

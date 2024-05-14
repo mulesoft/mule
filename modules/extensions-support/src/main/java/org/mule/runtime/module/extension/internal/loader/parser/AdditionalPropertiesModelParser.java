@@ -7,6 +7,7 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 
 import java.util.List;
 
@@ -22,6 +23,21 @@ public interface AdditionalPropertiesModelParser {
    * specifically linked to the type of syntax used to define the extension.
    *
    * @return a list with {@link ModelProperty} instances.
+   * @deprecated since 1.8 use {@link #addAdditionalModelProperties(HasModelProperties)} instead.
    */
+  @Deprecated
   List<ModelProperty> getAdditionalModelProperties();
+
+  /**
+   * Applies all the {@link ModelProperty model properties} at the extension level which are specifically linked to the type of
+   * syntax used to define the extension.
+   * 
+   * @param <D>      the concrete declarer type
+   * @param declarer the declarer to add the model properties to
+   * 
+   * @since 1.8
+   */
+  default <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
+    getAdditionalModelProperties().forEach(declarer::withModelProperty);
+  }
 }

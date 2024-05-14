@@ -126,7 +126,7 @@ final class SourceModelLoaderDelegate extends AbstractComponentModelLoaderDelega
                                                         sourceDeclarer,
                                                         of(() -> getStereotypeModelLoaderDelegate()
                                                             .getDefaultSourceStereotype(parser.getName())));
-      parser.getAdditionalModelProperties().forEach(sourceDeclarer::withModelProperty);
+      parser.addAdditionalModelProperties(sourceDeclarer);
 
       Optional<SourceCallbackModelParser> successCallbackSourceCallbackModelParser = parser.getOnSuccessCallbackParser();
       if (successCallbackSourceCallbackModelParser.isPresent()) {

@@ -10,7 +10,7 @@ import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERRO
 import static org.mule.runtime.ast.api.util.ComponentAstPredicatesFactory.currentElemement;
 import static org.mule.runtime.core.api.error.Errors.Identifiers.ANY_IDENTIFIER;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasErrorMappingModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isNoErrorMapping;
 
 import static java.util.Optional.empty;
 
@@ -31,7 +31,7 @@ abstract class AbstractErrorMappingValidation implements Validation {
   @Override
   public final Predicate<List<ComponentAst>> applicable() {
     return currentElemement(component -> component.getModel(OperationModel.class)
-        .map(opModel -> !hasErrorMappingModelProperty(opModel)
+        .map(opModel -> !isNoErrorMapping(opModel)
             && component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME) != null
             && component.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME).getValue().getValue().isPresent())
         .orElse(false));

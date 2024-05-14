@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.config.dsl.operation;
 
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasErrorMappingModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isNoErrorMapping;
 
 import org.mule.metadata.api.model.VoidType;
 import org.mule.runtime.api.meta.model.ExtensionModel;
@@ -35,7 +35,7 @@ public class OperationDefinitionParser extends AbstractComponentDefinitionParser
 
   @Override
   protected boolean hasErrorMappingsGroup() {
-    return !hasErrorMappingModelProperty(getComponentModel());
+    return !isNoErrorMapping(getComponentModel());
   }
 
   @Override

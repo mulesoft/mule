@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -56,7 +56,7 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   @Override
   public void before(ExecutionContext<ComponentModel> executionContext) throws Exception {
     final ComponentModel componentModel = executionContext.getComponentModel();
-    if (hasPagedOperationModelProperty(componentModel)) {
+    if (isPagedOperation(componentModel)) {
       return;
     }
 

@@ -128,7 +128,7 @@ final class OperationModelLoaderDelegate extends AbstractComponentModelLoaderDel
     loader.getParameterModelsLoaderDelegate().declare(operation, parser.getParameterGroupModelParsers());
     addSemanticTerms(operation.getDeclaration(), parser);
     parser.getExecutionType().ifPresent(operation::withExecutionType);
-    parser.getAdditionalModelProperties().forEach(operation::withModelProperty);
+    parser.addAdditionalModelProperties(operation);
     parser.getExceptionHandlerModelProperty().ifPresent(operation::withModelProperty);
 
     declareChains(parser, operation);

@@ -8,7 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.exception;
 
 import static org.mule.runtime.api.meta.model.parameter.ParameterGroupModel.ERROR_MAPPINGS;
 import static org.mule.runtime.extension.api.ExtensionConstants.ERROR_MAPPINGS_PARAMETER_NAME;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasErrorMappingModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isNoErrorMapping;
 
 import org.mule.runtime.api.meta.model.operation.OperationModel;
 import org.mule.runtime.ast.api.ComponentAst;
@@ -37,7 +37,7 @@ public final class ErrorMappingUtils {
    */
   public static void forEachErrorMappingDo(ComponentAst operation, Consumer<List<ErrorMapping>> action) {
     operation.getModel(OperationModel.class).ifPresent(opModel -> {
-      if (!hasErrorMappingModelProperty(opModel)) {
+      if (!isNoErrorMapping(opModel)) {
         final ComponentParameterAst errorMappingsParam = operation.getParameter(ERROR_MAPPINGS, ERROR_MAPPINGS_PARAMETER_NAME);
         if (errorMappingsParam != null) {
           errorMappingsParam.<List<ErrorMapping>>getValue().applyRight(action);

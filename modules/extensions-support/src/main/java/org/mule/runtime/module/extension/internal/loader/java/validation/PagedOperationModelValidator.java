@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.loader.java.validation;
 
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
 
 import static java.lang.String.format;
@@ -36,7 +36,7 @@ public class PagedOperationModelValidator implements ExtensionModelValidator {
         boolean hasConnectionParameter = operationModel.getModelProperty(ExtensionOperationDescriptorModelProperty.class)
             .map(property -> getConnectionParameter(property.getOperationElement()).isPresent())
             .orElse(false);
-        if (hasConnectionParameter && hasPagedOperationModelProperty(operationModel)) {
+        if (hasConnectionParameter && isPagedOperation(operationModel)) {
           problemsReporter.addError(new Problem(operationModel, format(
                                                                        "Operation '%s' in Extension '%s' is paged and has a parameter annotated with '%s' at the same time. Paged operation shouldn't have a connection parameter.",
                                                                        operationModel.getName(), extensionModel.getName(),

@@ -13,8 +13,8 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.noErrorMappingModelProperty;
 import static org.mule.runtime.extension.api.util.XmlModelUtils.buildSchemaLocation;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.withNoErrorMapping;
 
 import org.mule.runtime.api.meta.model.XmlDslModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.ConstructDeclarer;
@@ -81,8 +81,8 @@ class TestPolicyExtensionModelDeclarer {
 
   private void declareExecuteNext(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
-        .withOperation("executeNext")
-        .withModelProperty(noErrorMappingModelProperty());
+        .withOperation("executeNext");
+    withNoErrorMapping(executeNext);
 
     // By this operation alone we cannot determine what its output will be, it will depend on the context on which this operation
     // is located.
@@ -92,8 +92,8 @@ class TestPolicyExtensionModelDeclarer {
 
   private void declareCustomProcessor(ExtensionDeclarer extensionDeclarer) {
     OperationDeclarer executeNext = extensionDeclarer
-        .withOperation("customProcessor")
-        .withModelProperty(noErrorMappingModelProperty());
+        .withOperation("customProcessor");
+    withNoErrorMapping(executeNext);
 
     executeNext.withOutput().ofType(ANY_TYPE);
     executeNext.withOutputAttributes().ofType(ANY_TYPE);

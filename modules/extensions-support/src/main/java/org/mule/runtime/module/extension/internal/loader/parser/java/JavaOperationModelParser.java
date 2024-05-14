@@ -9,6 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.privileged.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.pagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
@@ -40,6 +41,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -52,7 +54,6 @@ import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -301,9 +302,14 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private void parseAutoPaging() {
     supportsStreaming = true;
     connected = true;
-    additionalModelProperties.add(new PagedOperationModelProperty());
     parsePagingTx();
   }
+
+  @Override
+  public <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
+    pagedOperation(declarer);
+  }
+
 
   private void parsePagingTx() {
     Type returnTypeElement = operationElement.getReturnType();

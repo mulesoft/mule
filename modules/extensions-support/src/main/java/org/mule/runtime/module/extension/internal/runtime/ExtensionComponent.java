@@ -17,8 +17,8 @@ import static org.mule.runtime.core.api.util.ExceptionUtils.extractOfType;
 import static org.mule.runtime.core.internal.component.ComponentAnnotations.ANNOTATION_COMPONENT_CONFIG;
 import static org.mule.runtime.core.internal.event.NullEventFactory.getNullEvent;
 import static org.mule.runtime.core.internal.util.CompositeClassLoader.from;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
 import static org.mule.runtime.extension.api.values.ValueResolvingException.UNKNOWN;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.metadata.api.cache.MetadataCacheIdGeneratorFactory.METADATA_CACHE_ID_GENERATOR_KEY;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getClassLoader;
 import static org.mule.runtime.module.extension.internal.value.ValueProviderUtils.getValueProviderModels;
@@ -230,7 +230,7 @@ public abstract class ExtensionComponent<T extends ComponentModel> extends Abstr
     this.metadataMediator = new DefaultMetadataMediator<>(componentModel, reflectionCache);
 
     if (cursorProviderFactory == null) {
-      if(hasPagedOperationModelProperty(componentModel)) {
+      if (isPagedOperation(componentModel)) {
         cursorProviderFactory = (CursorProviderFactory) streamingManager.forObjects().getDefaultCursorProviderFactory();
       } else {
         cursorProviderFactory = streamingManager.forBytes().getDefaultCursorProviderFactory();

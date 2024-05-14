@@ -20,9 +20,9 @@ import static org.mule.runtime.core.api.transaction.TransactionConfig.ACTION_NOT
 import static org.mule.runtime.core.api.util.ClassUtils.withContextClassLoader;
 import static org.mule.runtime.core.api.util.StringUtils.DASH;
 import static org.mule.runtime.extension.api.util.ExtensionMetadataTypeUtils.getId;
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
 import static org.mule.runtime.extension.api.util.NameUtils.getComponentModelTypeName;
 import static org.mule.runtime.extension.api.util.NameUtils.getModelName;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.TYPE_PROPERTY_NAME;
 import static org.mule.runtime.module.extension.internal.loader.java.AbstractJavaExtensionModelLoader.VERSION;
 
@@ -647,7 +647,7 @@ public class MuleExtensionUtils {
       ConnectableComponentModel connectableComponentModel = (ConnectableComponentModel) componentModel;
       return (connectableComponentModel.requiresConnection()
           && (connectableComponentModel.supportsStreaming()
-              || hasPagedOperationModelProperty(connectableComponentModel)));
+              || isPagedOperation(connectableComponentModel)));
     }
     return false;
   }
@@ -735,7 +735,7 @@ public class MuleExtensionUtils {
                                                                        ExtensionConnectionSupplier extensionConnectionSupplier,
                                                                        boolean supportsOAuth,
                                                                        ComponentTracer<CoreEvent> operationConnectionTracer) {
-    if(hasPagedOperationModelProperty(operationModel)) {
+    if (isPagedOperation(operationModel)) {
       return Optional.of(new PagingResultTransformer(extensionConnectionSupplier, supportsOAuth, operationConnectionTracer));
     } else {
       return empty();

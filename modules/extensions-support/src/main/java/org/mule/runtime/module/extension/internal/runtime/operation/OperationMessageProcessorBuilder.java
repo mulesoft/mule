@@ -6,7 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
-import static org.mule.runtime.extension.api.util.ModelPropertiesDeclarationUtils.hasPagedOperationModelProperty;
+import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
@@ -57,7 +57,7 @@ public final class OperationMessageProcessorBuilder
     OperationMessageProcessor operationMessageProcessor = null;
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
-    boolean isPagedOperation = hasPagedOperationModelProperty(operationModel);
+    boolean isPagedOperation = isPagedOperation(operationModel);
 
     if (isPagedOperation) {
       resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
