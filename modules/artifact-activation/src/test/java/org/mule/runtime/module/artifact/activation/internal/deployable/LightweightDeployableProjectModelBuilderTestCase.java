@@ -18,7 +18,6 @@ import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.junit.rules.ExpectedException.none;
 
 import org.mule.maven.client.api.MavenReactorResolver;
@@ -97,7 +96,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   }
 
   @Test
-  @Issue("W-12142901")
+  @Issue("W-14998254")
   public void createDeployableProjectModelWithInvalidGAVAndMissingParentPom() throws Exception {
     expectedException.expect(MuleRuntimeException.class);
 
@@ -109,9 +108,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
 
     PluginFileMavenReactor pluginFileMavenReactor =
         new PluginFileMavenReactor(artifact, "org.mule.test", "application-using-additional-libraries", "1.0.0");
-
-    DeployableProjectModel deployableProjectModel =
-        getDeployableProjectModel("apps/lightweight/db-plugin-with-missing-gav", pluginFileMavenReactor);
+     getDeployableProjectModel("apps/lightweight/db-plugin-with-missing-gav", pluginFileMavenReactor);
   }
 
 
