@@ -30,7 +30,6 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
@@ -77,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -156,14 +156,14 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   }
 
   @Override
-  public <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
-    OperationDeclarer opDeclarer = (OperationDeclarer) declarer;
-
-    withNoStreamingConfiguration(opDeclarer);
-    withNoTransactionalAction(opDeclarer);
-    withNoReconnectionStrategy(opDeclarer);
-    withNoConnectivityError(opDeclarer);
-    opDeclarer.withModelProperty(new ComposedOperationModelProperty());
+  public Consumer<OperationDeclarer> getAdditionalModelPropertiesConfigurer() {
+    return declarer -> {
+      withNoStreamingConfiguration(declarer);
+      withNoTransactionalAction(declarer);
+      withNoReconnectionStrategy(declarer);
+      withNoConnectivityError(declarer);
+      declarer.withModelProperty(new ComposedOperationModelProperty());
+    };
   }
 
   @Override

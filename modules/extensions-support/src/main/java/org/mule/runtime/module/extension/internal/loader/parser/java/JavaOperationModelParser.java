@@ -9,7 +9,7 @@ package org.mule.runtime.module.extension.internal.loader.parser.java;
 import static org.mule.runtime.api.meta.ExpressionSupport.NOT_SUPPORTED;
 import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.extension.privileged.semantic.SemanticTermsHelper.getAllTermsFromAnnotations;
-import static org.mule.runtime.extension.privileged.util.ModelPropertiesDeclarationUtils.pagedOperation;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.asPagedOperation;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getCompletionCallbackParameters;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConfigParameter;
 import static org.mule.runtime.module.extension.internal.loader.parser.java.JavaExtensionModelParserUtils.getConnectionParameter;
@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.toList;
 import org.mule.runtime.api.meta.ExpressionSupport;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -94,6 +94,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -294,7 +295,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     isDynamicResolver = attributesResolverModelParser.isPresent() && attributesResolverModelParser.get().hasAttributesResolver();
     outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), isDynamicResolver);
 
-    if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
+    autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement);
+    if (autoPaging) {
       parseAutoPaging();
     }
   }
@@ -306,10 +308,15 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   }
 
   @Override
-  public <D> void addAdditionalModelProperties(HasModelProperties<D> declarer) {
-    pagedOperation(declarer);
-  }
+  public Consumer<OperationDeclarer> getAdditionalModelPropertiesConfigurer() {
+    return declarer -> {
+      super.getAdditionalModelPropertiesConfigurer().accept(declarer);
 
+      if (autoPaging) {
+        asPagedOperation(declarer);
+      }
+    };
+  }
 
   private void parsePagingTx() {
     Type returnTypeElement = operationElement.getReturnType();
