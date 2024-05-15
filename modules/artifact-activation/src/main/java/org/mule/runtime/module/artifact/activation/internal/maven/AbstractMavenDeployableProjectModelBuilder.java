@@ -227,6 +227,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
    */
   private String getGroupId(MavenPomParser parser) {
     String groupId = parser.getModel().getGroupId();
+    String x = parser.getModel().getParent().get().getGroupId();
     if (groupId == null) {
       groupId = parser.getModel().getParent()
           .map(PomParentCoordinates::getGroupId)

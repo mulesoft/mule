@@ -1,0 +1,23 @@
+{
+  "configs": [
+    "testing.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "Mule Reusable App With Additional Dependencies",
+  "minMuleVersion": "4.0.0",
+  "requiredProduct": "MULE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "testing.xml"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}
