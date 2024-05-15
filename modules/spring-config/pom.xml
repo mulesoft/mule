@@ -43,6 +43,7 @@
               --add-opens=org.mule.runtime.spring.config/org.mule.runtime.config.internal.registry=org.mule.runtime.core
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal=org.mule.runtime.spring.config
             --add-exports=org.mule.runtime.artifact.ast/org.mule.runtime.ast.internal.validation=org.mule.runtime.spring.config
+            --add-exports=org.mule.runtime.artifact.ast.dependency.graph/org.mule.runtime.ast.graph.internal=org.mule.runtime.spring.config
             ${surefire.test.unit.open.args}
         </surefire.args>
 
