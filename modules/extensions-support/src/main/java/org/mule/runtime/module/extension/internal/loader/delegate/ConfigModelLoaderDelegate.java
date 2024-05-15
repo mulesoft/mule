@@ -50,7 +50,7 @@ final class ConfigModelLoaderDelegate extends AbstractComponentModelLoaderDelega
       configParser.getDeprecationModel().ifPresent(dm -> configurationDeclarer.getDeclaration().withDeprecation(dm));
       configParser.getDisplayModel().ifPresent(d -> configurationDeclarer.getDeclaration().setDisplayModel(d));
       configParser.getExternalLibraryModels().forEach(configurationDeclarer::withExternalLibrary);
-      configParser.getAdditionalModelPropertiesConfigurer().accept(declarer);
+      configParser.getAdditionalModelPropertiesConfigurer().accept(configurationDeclarer);
       configParser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
         configurationDeclarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
         LOGGER.debug(resolvedMMV.getReason());
