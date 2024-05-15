@@ -18,9 +18,12 @@ import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -38,6 +41,7 @@ import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(DEPLOYMENT_TYPE)
 @Story(LIGHTWEIGHT)
@@ -58,6 +62,9 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
                              .getClassLoader()).getSettingsSupplierFactory()
                                  .environmentUserSettingsSupplier().get()
                                  .getAbsolutePath());
+
+  @Rule
+  public ExpectedException expectedException = none();
 
   @Before
   public void before() {
@@ -88,6 +95,25 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
   }
+
+  @Test
+  @Issue("W-12142901")
+  public void createDeployableProjectModelWithInvalidGAVAndMissingParentPom() throws Exception {
+    expectedException.expect(MuleRuntimeException.class);
+
+    installArtifact(getResourceFolder("apps/lightweight/application-using-additional-libraries"),
+                    getMavenConfig().getLocalMavenRepositoryLocation());
+    File artifact =
+        new File(getMavenConfig().getLocalMavenRepositoryLocation(),
+                 "org/mule/test/application-using-additional-libraries/1.0.0/");
+
+    PluginFileMavenReactor pluginFileMavenReactor =
+        new PluginFileMavenReactor(artifact, "org.mule.test", "application-using-additional-libraries", "1.0.0");
+
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/lightweight/db-plugin-with-missing-gav", pluginFileMavenReactor);
+  }
+
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
       throws URISyntaxException {
