@@ -108,7 +108,7 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
 
     PluginFileMavenReactor pluginFileMavenReactor =
         new PluginFileMavenReactor(artifact, "org.mule.test", "application-using-additional-libraries", "1.0.0");
-     getDeployableProjectModel("apps/lightweight/db-plugin-with-missing-gav", pluginFileMavenReactor);
+    getDeployableProjectModel("apps/lightweight/db-plugin-with-missing-gav", pluginFileMavenReactor);
   }
 
 
