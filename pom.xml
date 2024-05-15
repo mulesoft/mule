@@ -288,6 +288,7 @@
         <armeriaVersion>1.20.3</armeriaVersion>
         <protobufVersion>3.21.9</protobufVersion>
         <openTelemetryProtoVersion>1.7.1-alpha</openTelemetryProtoVersion>
+        <springSecurityVersion>5.7.12</springSecurityVersion>
     </properties>
 
     <dependencyManagement>
@@ -544,6 +545,22 @@
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobufVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>${springSecurityVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${springSecurityVersion}</version>
             </dependency>
 
             <!-- NOT the service (with mule-service classifier) -->
