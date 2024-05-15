@@ -6,8 +6,9 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.notification;
 
-import static java.lang.String.format;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+
+import static java.lang.String.format;
 
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.event.Event;
@@ -15,7 +16,6 @@ import org.mule.runtime.api.metadata.DataType;
 import org.mule.runtime.api.metadata.TypedValue;
 import org.mule.runtime.api.notification.ExtensionNotification;
 import org.mule.runtime.api.util.LazyValue;
-import org.mule.runtime.extension.internal.notification.ExtensionAction;
 import org.mule.sdk.api.notification.NotificationActionDefinition;
 
 import java.util.function.Supplier;

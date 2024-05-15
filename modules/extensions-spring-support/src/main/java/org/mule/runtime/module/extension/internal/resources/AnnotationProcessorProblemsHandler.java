@@ -13,7 +13,7 @@ import org.mule.runtime.api.meta.NamedObject;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.extension.api.loader.ProblemsReporter;
-import org.mule.runtime.extension.internal.loader.ProblemsHandler;
+import org.mule.runtime.extension.privileged.loader.ProblemsHandler;
 import org.mule.runtime.module.extension.api.loader.java.type.WithElement;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionOperationDescriptorModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.type.property.ExtensionParameterDescriptorModelProperty;
