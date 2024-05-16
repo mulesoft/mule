@@ -69,9 +69,8 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Object>
 
     routes.values().forEach(route -> {
       MetadataType type = extractor.apply(route.get()).orElse(VOID_TYPE);
-      if (!consideredTypes.contains(type)) {
+      if (consideredTypes.add(type)) {
         builder.of(type);
-        consideredTypes.add(type);
       }
     });
     if (consideredTypes.size() > 1) {
