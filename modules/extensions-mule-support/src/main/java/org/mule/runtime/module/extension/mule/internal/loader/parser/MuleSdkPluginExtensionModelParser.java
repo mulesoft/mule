@@ -31,7 +31,7 @@ import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.ast.api.ArtifactAst;
 import org.mule.runtime.ast.api.ComponentAst;
-import org.mule.runtime.ast.internal.model.ExtensionModelHelper;
+import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.module.extension.internal.loader.ExtensionDevelopmentFramework;
 import org.mule.runtime.module.extension.internal.loader.java.property.LicenseModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.ErrorModelParser;

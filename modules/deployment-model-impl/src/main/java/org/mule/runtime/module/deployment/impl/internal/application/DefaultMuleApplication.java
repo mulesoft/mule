@@ -299,6 +299,7 @@ public class DefaultMuleApplication extends AbstractDeployableArtifact<Applicati
       }
       artifactContext = artifactBuilder.build();
       setMuleContext(artifactContext.getMuleContext(), artifactContext.getRegistry());
+      LOGGER.debug(artifactContext.getMuleContext().getStatistics().getFlowSummaryStatistics().toString());
     } catch (Exception e) {
       setStatusToFailed();
 

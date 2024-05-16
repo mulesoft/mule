@@ -6,8 +6,7 @@
  */
 package org.mule.runtime.core.internal.exception;
 
-import static org.mule.runtime.ast.api.error.ErrorTypeRepositoryProvider.getCoreErrorTypeRepo;
-import static org.mule.runtime.ast.internal.error.ErrorTypeBuilder.builder;
+import static org.mule.runtime.ast.internal.error.DefaultErrorTypeBuilder.builder;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.ANY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.CLIENT_SECURITY;
 import static org.mule.runtime.core.api.error.Errors.ComponentIdentifiers.Handleable.COMPOSITE_ROUTING;
