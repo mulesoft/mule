@@ -1,19 +1,12 @@
 {
-  "configs": [
-    "testing.xml"
-  ],
-  "secureProperties": [],
-  "redeploymentEnabled": true,
-  "name": "Mule Reusable App With Additional Dependencies",
+  "name": "api-app-gav-present-in-parent",
   "minMuleVersion": "4.0.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
     "id": "mule",
     "attributes": {
       "exportedPackages": [],
-      "exportedResources": [
-        "testing.xml"
-      ]
+      "exportedResources": []
     }
   },
   "bundleDescriptorLoader": {

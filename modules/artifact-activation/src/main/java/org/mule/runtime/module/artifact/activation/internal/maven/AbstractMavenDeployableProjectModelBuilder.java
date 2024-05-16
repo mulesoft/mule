@@ -142,7 +142,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     MavenPomParser parser = MavenPomParserProvider.discoverProvider().createMavenPomParserClient(pom.toPath(), activeProfiles);
 
     // 2) if a version is passed using system properties, use the version instead
-    String originalPomVersion = this.getVersion(parser);
+    String originalPomVersion = getVersion(parser);
     Matcher matcher = PLACEHOLDER_PATTERN.matcher(originalPomVersion);
     if (matcher.find()) {
       String potentialProperty = matcher.group(1);
@@ -152,7 +152,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     }
     deployableArtifactRepositoryFolder = this.mavenConfiguration.getLocalMavenRepositoryLocation();
 
-    ArtifactCoordinates deployableArtifactCoordinates = this.getDeployableProjectArtifactCoordinates(parser);
+    ArtifactCoordinates deployableArtifactCoordinates = getDeployableProjectArtifactCoordinates(parser);
 
     try (MavenClient mavenClient = createMavenClient(mavenConfiguration)) {
       resolveDeployableDependencies(mavenClient, pom, parser, activeProfiles);
@@ -227,11 +227,10 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
    */
   private String getGroupId(MavenPomParser parser) {
     String groupId = parser.getModel().getGroupId();
-    String x = parser.getModel().getParent().get().getGroupId();
     if (groupId == null) {
       groupId = parser.getModel().getParent()
           .map(PomParentCoordinates::getGroupId)
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Failed to retrieve groupId from the artifact, trying to retrieve from parent POM but parent POM is not present")));
       if (groupId == null) {
         throw new MuleRuntimeException(createStaticMessage("GroupId is null in both current and parent POM"));
       }
@@ -239,7 +238,6 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     return groupId;
   }
 
-  // *
   /**
    * Retrieves the artifactId of the deployable project from the {@link MavenPomParser}.
    *
@@ -250,12 +248,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
   private String getArtifactId(MavenPomParser parser) {
     String artifactId = parser.getModel().getArtifactId();
     if (artifactId == null) {
-      artifactId = parser.getModel().getParent()
-          .map(PomParentCoordinates::getArtifactId)
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
-      if (artifactId == null) {
-        throw new MuleRuntimeException(createStaticMessage("ArtifactId is null in both current and parent POM"));
-      }
+      throw new MuleRuntimeException(createStaticMessage("ArtifactId is null in the POM"));
     }
     return artifactId;
   }
@@ -272,7 +265,7 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
     if (version == null) {
       version = parser.getModel().getParent()
           .map(PomParentCoordinates::getVersion)
-          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Parent POM is not present")));
+          .orElseThrow(() -> new MuleRuntimeException(createStaticMessage("Failed to retrieve version from the artifact, trying to retrieve from parent POM but parent POM is not present")));
       if (version == null) {
         throw new MuleRuntimeException(createStaticMessage("Version is null in both current and parent POM"));
       }
@@ -289,8 +282,8 @@ public abstract class AbstractMavenDeployableProjectModelBuilder extends Abstrac
    */
   private ArtifactCoordinates getDeployableProjectArtifactCoordinates(MavenPomParser parser) {
     ApplicationGAVModel deployableGAVModel =
-        new ApplicationGAVModel(this.getGroupId(parser), this.getArtifactId(parser),
-                                this.getVersion(parser));
+        new ApplicationGAVModel(getGroupId(parser), getArtifactId(parser),
+                                getVersion(parser));
     return getDeployableArtifactCoordinates(parser, deployableGAVModel);
   }
 
