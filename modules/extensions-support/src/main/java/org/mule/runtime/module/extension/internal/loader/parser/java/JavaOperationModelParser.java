@@ -307,17 +307,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     parsePagingTx();
   }
 
-  @Override
-  public Consumer<OperationDeclarer> getAdditionalModelPropertiesConfigurer() {
-    return declarer -> {
-      super.getAdditionalModelPropertiesConfigurer().accept(declarer);
-
-      if (autoPaging) {
-        asPagedOperation(declarer);
-      }
-    };
-  }
-
   private void parsePagingTx() {
     Type returnTypeElement = operationElement.getReturnType();
     List<TypeGeneric> generics = returnTypeElement.getGenerics();
@@ -438,6 +427,26 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public boolean isAutoPaging() {
     return autoPaging;
+  }
+
+  @Override
+  public boolean hasStreamingConfiguration() {
+    return true;
+  }
+
+  @Override
+  public boolean hasTransactionalAction() {
+    return true;
+  }
+
+  @Override
+  public boolean hasReconnectionStrategy() {
+    return true;
+  }
+
+  @Override
+  public boolean propagatesConnectivityError() {
+    return true;
   }
 
   @Override

@@ -116,7 +116,7 @@ public class DefaultExtensionModelLoaderDelegate implements ModelLoaderDelegate 
     parser.getDeprecationModel().ifPresent(declarer::withDeprecation);
     parser.getExternalLibraryModels().forEach(declarer::withExternalLibrary);
     parser.getExtensionHandlerModelProperty().ifPresent(declarer::withModelProperty);
-    parser.getAdditionalModelPropertiesConfigurer().accept(declarer);
+    parser.getAdditionalModelProperties().forEach(declarer::withModelProperty);
     parser.getResolvedMinMuleVersion().ifPresent(resolvedMMV -> {
       declarer.withMinMuleVersion(resolvedMMV.getMinMuleVersion());
       LOGGER.debug(resolvedMMV.getReason());

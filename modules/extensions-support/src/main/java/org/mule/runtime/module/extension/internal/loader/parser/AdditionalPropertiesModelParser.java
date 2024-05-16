@@ -7,10 +7,8 @@
 package org.mule.runtime.module.extension.internal.loader.parser;
 
 import org.mule.runtime.api.meta.model.ModelProperty;
-import org.mule.runtime.api.meta.model.declaration.fluent.HasModelProperties;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * General contract for a model parser capable of reading additional model properties
@@ -24,19 +22,7 @@ public interface AdditionalPropertiesModelParser {
    * specifically linked to the type of syntax used to define the extension.
    *
    * @return a list with {@link ModelProperty} instances.
-   * @deprecated since 1.8 use {@link #getAdditionalModelPropertiesConfigurers()} instead.
    */
-  @Deprecated
   List<ModelProperty> getAdditionalModelProperties();
 
-  /**
-   * Returns {@link Consumer}s that apply all the {@link ModelProperty model properties} at the extension level which are
-   * specifically linked to the type of syntax used to define the extension.
-   * 
-   * @since 1.8
-   */
-  default <D extends HasModelProperties> Consumer<D> getAdditionalModelPropertiesConfigurer() {
-    return declarer -> getAdditionalModelProperties()
-        .forEach(mp -> declarer.withModelProperty(mp));
-  }
 }

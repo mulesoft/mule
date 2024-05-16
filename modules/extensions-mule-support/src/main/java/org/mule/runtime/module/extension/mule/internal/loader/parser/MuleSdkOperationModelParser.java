@@ -152,18 +152,27 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return emptyList();
+    return singletonList(new ComposedOperationModelProperty());
   }
 
   @Override
-  public Consumer<OperationDeclarer> getAdditionalModelPropertiesConfigurer() {
-    return declarer -> {
-      withNoStreamingConfiguration(declarer);
-      withNoTransactionalAction(declarer);
-      withNoReconnectionStrategy(declarer);
-      withNoConnectivityError(declarer);
-      declarer.withModelProperty(new ComposedOperationModelProperty());
-    };
+  public boolean hasStreamingConfiguration() {
+    return false;
+  }
+
+  @Override
+  public boolean hasTransactionalAction() {
+    return false;
+  }
+
+  @Override
+  public boolean hasReconnectionStrategy() {
+    return false;
+  }
+
+  @Override
+  public boolean propagatesConnectivityError() {
+    return false;
   }
 
   @Override
