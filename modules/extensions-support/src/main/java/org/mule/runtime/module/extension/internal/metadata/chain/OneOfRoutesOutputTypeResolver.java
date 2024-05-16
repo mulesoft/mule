@@ -18,6 +18,7 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -64,11 +65,18 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Object>
     Map<String, Supplier<MessageMetadataType>> routes = context.getRouterOutputMetadataContext()
         .map(ctx -> ctx.getRouteOutputMessageTypes())
         .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
+    HashSet<MetadataType> consideredTypes = new HashSet<>();
 
     routes.values().forEach(route -> {
       MetadataType type = extractor.apply(route.get()).orElse(VOID_TYPE);
-      builder.of(type);
+      if (consideredTypes.add(type)) {
+        builder.of(type);
+      }
     });
-    return builder.build();
+    if (consideredTypes.size() > 1) {
+      return builder.build();
+    } else {
+      return consideredTypes.iterator().next();
+    }
   }
 }
