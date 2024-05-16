@@ -1,0 +1,24 @@
+{
+  "4.8.0": {
+    "revapi": {
+      "differences": {
+        "differences": [
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeChanged",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver::createMulePluginClassLoader(org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader, org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor, org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver::createMulePluginClassLoader(org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader, org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor, org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver)",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          },
+          {
+            "ignore": true,
+            "code": "java.method.returnTypeChanged",
+            "old": "method org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver::createMulePluginClassLoader(org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader, org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor, org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver, org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver)",
+            "new": "method org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader org.mule.runtime.module.artifact.activation.api.classloader.ArtifactClassLoaderResolver::createMulePluginClassLoader(org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader, org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor, org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver, org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderResolver)",
+            "justification": "ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE"
+          }
+        ]
+      }
+    }
+  }
+}

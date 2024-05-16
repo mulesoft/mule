@@ -222,7 +222,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     final DomainDescriptor newDomainDescriptor = domainClassLoader.getArtifactDescriptor();
     newDomainDescriptor.setPlugins(Stream.of(plugin1Descriptor, plugin2Descriptor).collect(toSet()));
 
-    final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(domainClassLoader, plugin2Descriptor,
                                      (apds, d) -> empty());
 
@@ -332,7 +332,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     final MuleArtifactClassLoader domainClassLoader = (MuleArtifactClassLoader) applicationClassLoader.getParent().getParent();
 
-    final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin2Descriptor,
                                      (apds, d) -> empty());
 
@@ -374,11 +374,11 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
         .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().exportingPackages(singleton(plugin2ExportedPackage))
             .build());
 
-    final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      (apds, d) -> of(plugin2Descriptor));
 
-    assertThat(pluginClassLoader.getParent(), is(applicationClassLoader.getParent()));
+    assertThat(((ClassLoader) pluginClassLoader).getParent(), is(applicationClassLoader.getParent()));
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(plugin2ExportedPackage), is(PARENT_FIRST));
   }
 
@@ -394,7 +394,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
                                                                              moduleRepository, nativeLibraryFinderFactory));
 
-    final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      (apds, d) -> empty());
 
@@ -417,7 +417,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
 
     MuleDeployableArtifactClassLoader applicationClassLoader = getTestApplicationClassLoader(singletonList(plugin2Descriptor));
 
-    final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      (apds, d) -> of(plugin2Descriptor));
 
@@ -462,7 +462,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
         .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder().withLocalPackages(singleton(pluginPackage))
             .dependingOn(singleton(pluginDependency)).build());
 
-    final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      (apds, d) -> of(plugin2Descriptor));
 
@@ -488,7 +488,7 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
         .setClassLoaderConfiguration(new ClassLoaderConfigurationBuilder()
             .withLocalPackages(Stream.of(package1Name, package2Name).collect(toSet())).build());
 
-    final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(applicationClassLoader, plugin1Descriptor,
                                      (apds, d) -> empty());
 
@@ -514,27 +514,27 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     MuleDeployableArtifactClassLoader domainClassLoader =
         getTestDomainClassLoader(emptyList());
 
-    final MuleArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
+    final ArtifactClassLoader plugin2ClassLoader = artifactClassLoaderResolver
         .createMulePluginClassLoader(domainClassLoader, plugin2Descriptor,
                                      (apds, d) -> empty());
 
-    MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver.createMulePluginClassLoader(domainClassLoader,
-                                                                                                        plugin1Descriptor,
-                                                                                                        (apds,
-                                                                                                         d) -> of(plugin2Descriptor),
-                                                                                                        (ownerClassLoader,
-                                                                                                         pluginDescriptor) -> {
-                                                                                                          if (pluginDescriptor
+    ArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver.createMulePluginClassLoader(domainClassLoader,
+                                                                                                    plugin1Descriptor,
+                                                                                                    (apds,
+                                                                                                     d) -> of(plugin2Descriptor),
+                                                                                                    (ownerClassLoader,
+                                                                                                     pluginDescriptor) -> {
+                                                                                                      if (pluginDescriptor
+                                                                                                          .getBundleDescriptor()
+                                                                                                          .getArtifactId()
+                                                                                                          .equals(plugin2Descriptor
                                                                                                               .getBundleDescriptor()
-                                                                                                              .getArtifactId()
-                                                                                                              .equals(plugin2Descriptor
-                                                                                                                  .getBundleDescriptor()
-                                                                                                                  .getArtifactId())) {
-                                                                                                            return of(() -> plugin2ClassLoader);
-                                                                                                          } else {
-                                                                                                            return empty();
-                                                                                                          }
-                                                                                                        });
+                                                                                                              .getArtifactId())) {
+                                                                                                        return of(() -> plugin2ClassLoader);
+                                                                                                      } else {
+                                                                                                        return empty();
+                                                                                                      }
+                                                                                                    });
 
     assertThat(pluginClassLoader.getClassLoaderLookupPolicy().getPackageLookupStrategy(PRIVILEGED_PACKAGE),
                instanceOf(DelegateOnlyLookupStrategy.class));

@@ -151,6 +151,7 @@ public class MuleArtifactClassLoader extends FineGrainedControlClassLoader imple
 
   @Override
   public URL findResource(String name) {
+    // TODO what is the purpose of this?
     if (name.startsWith(RESOURCE_PREFIX)) {
       Matcher matcher = GAV_EXTENDED_PATTERN.matcher(name);
       // Check for specific artifact requests within our URLs

@@ -8,6 +8,7 @@ package org.mule.runtime.module.artifact.activation.internal.classloader;
 
 import static org.mule.runtime.api.i18n.I18nMessageFactory.createStaticMessage;
 import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static org.mule.runtime.jpms.api.JpmsUtils.createModuleLayerClassLoader;
 import static org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver.pluginDescriptorResolver;
 import static org.mule.runtime.module.artifact.activation.internal.PluginsDependenciesProcessor.process;
 import static org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy.CHILD_ONLY;
@@ -42,7 +43,6 @@ import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DefaultArtifactClassLoaderFilter;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ParentFirstLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
@@ -51,7 +51,8 @@ import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DeployableArtifactDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.DomainDescriptor;
-import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.LookupStrategyFilteredClassLoader;
+import org.mule.runtime.module.artifact.internal.classloader.MulePluginModuleLayerClassLoader;
 
 import java.io.File;
 import java.net.URL;
@@ -361,19 +362,19 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
   //////////////////////////////////////////////////////////
 
   @Override
-  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                             ArtifactPluginDescriptor descriptor,
-                                                             PluginDescriptorResolver pluginDescriptorResolver) {
+  public ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                         ArtifactPluginDescriptor descriptor,
+                                                         PluginDescriptorResolver pluginDescriptorResolver) {
     return createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver,
                                        (ownerClassLoader, artifactPluginDescriptor) -> empty());
 
   }
 
   @Override
-  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                             ArtifactPluginDescriptor descriptor,
-                                                             PluginDescriptorResolver pluginDescriptorResolver,
-                                                             PluginClassLoaderResolver pluginClassLoaderResolver) {
+  public ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                         ArtifactPluginDescriptor descriptor,
+                                                         PluginDescriptorResolver pluginDescriptorResolver,
+                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
     RegionClassLoader regionClassLoader = (RegionClassLoader) ownerArtifactClassLoader.getParent();
     final String pluginArtifactId = getArtifactPluginId(regionClassLoader.getArtifactId(), descriptor.getName());
 
@@ -382,10 +383,12 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
                                                                           pluginDescriptorResolver,
                                                                           pluginClassLoaderResolver);
 
-    MuleArtifactClassLoader pluginClassLoader =
-        new MulePluginClassLoader(pluginArtifactId, descriptor, descriptor.getClassLoaderConfiguration().getUrls(),
-                                  regionClassLoader, pluginLookupPolicy);
-    return pluginClassLoader;
+    final ClassLoader fileterdRegionClassLoader = new LookupStrategyFilteredClassLoader(regionClassLoader, pluginLookupPolicy);
+
+    final ClassLoader pluginLayerLoader =
+        createModuleLayerClassLoader(descriptor.getClassLoaderConfiguration().getUrls(), fileterdRegionClassLoader);
+
+    return new MulePluginModuleLayerClassLoader(pluginArtifactId, descriptor, pluginLayerLoader, pluginLookupPolicy);
   }
 
   protected ClassLoaderLookupPolicy createPluginLookupPolicy(ArtifactPluginDescriptor descriptor,
@@ -455,18 +458,22 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
     }
 
     List<String> pluginLocalPackages = new ArrayList<>();
-    for (String localPackage : descriptor.getClassLoaderConfiguration().getLocalPackages()) {
-      // packages exported from another artifact in the region will be ParentFirst,
-      // even if they are also exported by the container.
-      if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
-          || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
-              && muleModulesExportedPackages.contains(localPackage))) {
-        LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
-            + "', but it will be ignored since it is already available from the container.");
-      } else {
-        pluginLocalPackages.add(localPackage);
-      }
-    }
+
+    concat(concat(descriptor.getClassLoaderConfiguration().getLocalPackages().stream(),
+                  descriptor.getClassLoaderConfiguration().getExportedPackages().stream()),
+           descriptor.getClassLoaderConfiguration().getPrivilegedExportedPackages().stream())
+               .forEach(localPackage -> {
+                 // packages exported from another artifact in the region will be ParentFirst,
+                 // even if they are also exported by the container.
+                 if (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ContainerOnlyLookupStrategy
+                     || (baseLookupPolicy.getPackageLookupStrategy(localPackage) instanceof ParentFirstLookupStrategy
+                         && muleModulesExportedPackages.contains(localPackage))) {
+                   LOGGER.debug("Plugin '" + descriptor.getName() + "' contains a local package '" + localPackage
+                       + "', but it will be ignored since it is already available from the container.");
+                 } else {
+                   pluginLocalPackages.add(localPackage);
+                 }
+               });
 
     return baseLookupPolicy.extend(pluginsLookupPolicies).extend(pluginLocalPackages.stream(), CHILD_ONLY, true);
   }
@@ -496,8 +503,8 @@ public class DefaultArtifactClassLoaderResolver implements ArtifactClassLoaderRe
         .findFirst().isPresent();
   }
 
-  private MuleArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader,
-                                                           ArtifactPluginDescriptor descriptor) {
+  private ArtifactClassLoader resolvePluginClassLoader(ArtifactClassLoader ownerClassLoader,
+                                                       ArtifactPluginDescriptor descriptor) {
     return createMulePluginClassLoader((MuleDeployableArtifactClassLoader) ownerClassLoader,
                                        descriptor,
                                        pluginDescriptorResolver());

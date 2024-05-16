@@ -13,7 +13,6 @@ import org.mule.runtime.module.artifact.activation.api.plugin.PluginClassLoaderR
 import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorResolver;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -106,21 +105,21 @@ public class TrackingArtifactClassLoaderResolverDecorator implements ArtifactCla
   }
 
   @Override
-  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                             ArtifactPluginDescriptor descriptor,
-                                                             PluginDescriptorResolver pluginDescriptorResolver) {
-    MuleArtifactClassLoader mulePluginClassLoader = delegate
+  public ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                         ArtifactPluginDescriptor descriptor,
+                                                         PluginDescriptorResolver pluginDescriptorResolver) {
+    ArtifactClassLoader mulePluginClassLoader = delegate
         .createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver);
     track(mulePluginClassLoader);
     return mulePluginClassLoader;
   }
 
   @Override
-  public MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                             ArtifactPluginDescriptor descriptor,
-                                                             PluginDescriptorResolver pluginDescriptorResolver,
-                                                             PluginClassLoaderResolver pluginClassLoaderResolver) {
-    MuleArtifactClassLoader mulePluginClassLoader = delegate
+  public ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                         ArtifactPluginDescriptor descriptor,
+                                                         PluginDescriptorResolver pluginDescriptorResolver,
+                                                         PluginClassLoaderResolver pluginClassLoaderResolver) {
+    ArtifactClassLoader mulePluginClassLoader = delegate
         .createMulePluginClassLoader(ownerArtifactClassLoader, descriptor, pluginDescriptorResolver, pluginClassLoaderResolver);
     track(mulePluginClassLoader);
     return mulePluginClassLoader;
