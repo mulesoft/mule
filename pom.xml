@@ -162,7 +162,7 @@
 
         <!-- Mule Snapshot Dependencies -->
         <mulePropertiesApiVersion>1.3.0-rc3</mulePropertiesApiVersion>
-        <muleExtensionsApiVersion>1.7.0-SNAPSHOT</muleExtensionsApiVersion>
+        <muleExtensionsApiVersion>1.7.0-rc3</muleExtensionsApiVersion>
         <muleConnectivityApiVersion>1.1.0-SNAPSHOT</muleConnectivityApiVersion>
         <muleHttpPolicyApiVersion>1.7.0-SNAPSHOT</muleHttpPolicyApiVersion>
         <mulePolicyApiVersion>1.7.0-SNAPSHOT</mulePolicyApiVersion>
