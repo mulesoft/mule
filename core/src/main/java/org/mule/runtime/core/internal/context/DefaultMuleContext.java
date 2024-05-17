@@ -1585,7 +1585,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
 
   private static void configureEnableXmlSdkReset() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
-    featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion("4.4.0"));
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion("4.8.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
