@@ -235,13 +235,14 @@ public final class JpmsUtils {
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
                                               boolean filterBootModules) {
-    final Set<String> bootModules;
+    final Set<String> modulesToFilter;
     if (filterBootModules) {
-      bootModules = boot().modules().stream()
+      ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
+      modulesToFilter = getParentLayersModules(layer)
           .map(m -> m.getName())
           .collect(toSet());
     } else {
-      bootModules = emptySet();
+      modulesToFilter = emptySet();
     }
 
     Path[] paths = Stream.of(modulePathEntries)
@@ -259,7 +260,7 @@ public final class JpmsUtils {
     Map<Boolean, List<ModuleReference>> modulesByIsolation = modulesFinder
         .findAll()
         .stream()
-        .filter(moduleRef -> !bootModules.contains(moduleRef.descriptor().name()))
+        .filter(moduleRef -> !modulesToFilter.contains(moduleRef.descriptor().name()))
         .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
@@ -331,6 +332,15 @@ public final class JpmsUtils {
 
 
     return controller.layer();
+  }
+
+  private static Stream<Module> getParentLayersModules(ModuleLayer moduleLayer) {
+    Stream<Module> modules = moduleLayer.modules().stream();
+    for (ModuleLayer parent : moduleLayer.parents()) {
+      modules = Stream.concat(modules, getParentLayersModules(parent));
+    }
+
+    return modules;
   }
 
   /**
