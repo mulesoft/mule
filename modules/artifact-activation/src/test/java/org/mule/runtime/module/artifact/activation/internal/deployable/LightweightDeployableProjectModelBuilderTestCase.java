@@ -105,6 +105,8 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   @Description("When pom has invalid GAV and no parent pom, then MuleRuntimeException will be the thrown.")
   public void createDeployableProjectModelWithInvalidGAVAndMissingParentPom() throws Exception {
     expectedException.expect(MuleRuntimeException.class);
+    expectedException
+        .expectMessage("Failed to retrieve version from the artifact, trying to retrieve from parent POM but parent POM is not present");
     getDeployableProjectModel("apps/lightweight/test-app-missing-gav", null);
   }
 
@@ -122,9 +124,9 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
 
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel("apps/lightweight/test-app-missing-gav-valid-parent", pluginFileMavenReactor);
-    MatcherAssert.assertThat(deployableProjectModel.getDescriptor().getVersion(), Matchers.is("1.2.0-POM"));
-    MatcherAssert.assertThat(deployableProjectModel.getDescriptor().getGroupId(), Matchers.is("test"));
-    MatcherAssert.assertThat(deployableProjectModel.getDescriptor().getArtifactId(), Matchers.is("api-app"));
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), Matchers.is("1.2.0-POM"));
+    assertThat(deployableProjectModel.getDescriptor().getGroupId(), Matchers.is("test"));
+    assertThat(deployableProjectModel.getDescriptor().getArtifactId(), Matchers.is("test-app-missing-gav-valid-parent"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)

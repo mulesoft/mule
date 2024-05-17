@@ -1,5 +1,5 @@
 {
-  "name": "api-app",
+  "name": "test-app-missing-gav-valid-parent",
   "minMuleVersion": "4.0.0",
   "requiredProduct": "MULE",
   "classLoaderModelLoaderDescriptor": {
