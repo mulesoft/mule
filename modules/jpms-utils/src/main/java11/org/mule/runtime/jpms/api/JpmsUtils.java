@@ -230,15 +230,17 @@ public final class JpmsUtils {
    * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
    * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
    *                                           parent will be created for modules that need to be isolated.
+   * @param filterParentModules                whether modules already present in parent layers should be removed from the given
+   *                                           {@code modulePathEntries}.
    * @return a new {@link ModuleLayer}.
    */
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
-                                              boolean filterBootModules) {
+                                              boolean filterParentModules) {
     final Set<String> modulesToFilter;
-    if (filterBootModules) {
+    if (filterParentModules) {
       ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
-      modulesToFilter = getParentLayersModules(layer)
+      modulesToFilter = getParentLayersModules(layer).stream()
           .map(m -> m.getName())
           .collect(toSet());
     } else {
@@ -334,10 +336,10 @@ public final class JpmsUtils {
     return controller.layer();
   }
 
-  private static Stream<Module> getParentLayersModules(ModuleLayer moduleLayer) {
-    Stream<Module> modules = moduleLayer.modules().stream();
+  private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer) {
+    Set<Module> modules = new HashSet<>(moduleLayer.modules());
     for (ModuleLayer parent : moduleLayer.parents()) {
-      modules = Stream.concat(modules, getParentLayersModules(parent));
+      modules.addAll(getParentLayersModules(parent));
     }
 
     return modules;
