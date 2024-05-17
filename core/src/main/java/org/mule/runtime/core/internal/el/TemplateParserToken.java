@@ -16,6 +16,15 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+/**
+ * Represents a token in the context of the parsing of a template.
+ * <p>
+ * Tokens are used to represent a section of the template that needs to be replaced with the result of some sub-template
+ * resolution.
+ *
+ * @see TemplateParser
+ */
 class TemplateParserToken {
 
   private static TemplateParserToken getNewToken() {
@@ -32,14 +41,27 @@ class TemplateParserToken {
     this.searchPattern = Pattern.compile(id);
   }
 
+  /**
+   * @return The token ID. This is what will be replaced later on.
+   */
   public String getId() {
     return searchPattern.pattern();
   }
 
+  /**
+   * @param replacement The replacement string that will be used at the replacement time.
+   * @return A token bound to a specific replacement string.
+   */
   public Replacement buildReplacement(String replacement) {
     return new Replacement(replacement);
   }
 
+  /**
+   * Entry point to retrieve {@link TemplateParserToken}s.
+   * <p>
+   * Performs caching of the tokens for performance and to achieve repeatability of token assignation for the same template input.
+   * This is important for evaluation callbacks that use caching.
+   */
   static class Provider {
 
     private static final int POOL_INITIAL_SIZE = 10;
@@ -60,6 +82,17 @@ class TemplateParserToken {
 
     private int curOffset = 0;
 
+    /**
+     * Provides {@link TemplateParserToken}s.
+     * <p>
+     * It is guaranteed that the same {@link Provider} instance will never return the same token.
+     * <p>
+     * The same {@link TemplateParserToken} may be provided by different {@link Provider} instances.
+     * <p>
+     * Thread-safe.
+     *
+     * @return A {@link TemplateParserToken} ready to use.
+     */
     public TemplateParserToken getToken() {
       if (tokensPool.size() <= curOffset) {
         // Because we are not in a critical section, it is possible that another thread may have already added a new token to the
@@ -72,6 +105,10 @@ class TemplateParserToken {
     }
   }
 
+
+  /**
+   * Represents a {@link TemplateParserToken} associated with a string to replace it with.
+   */
   class Replacement {
 
     private final String replacement;
@@ -80,6 +117,16 @@ class TemplateParserToken {
       this.replacement = replacement;
     }
 
+    /**
+     * Replaces all the occurrences of the token in the given string by the bound replacement string after applying a mapping
+     * function.
+     * <p>
+     * The mapping function is not invoked if there is no match. It should not have side effects.
+     *
+     * @param original          The original string, potentially with tokens to be replaced.
+     * @param replacementMapper The mapping function to apply to the bound replacement string before actual replacement.
+     * @return The resulting string after replacements.
+     */
     public String replace(String original, Function<String, String> replacementMapper) {
       Matcher matcher = searchPattern.matcher(original);
       if (!matcher.find()) {
