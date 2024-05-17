@@ -78,11 +78,21 @@ class TemplateParserToken {
         return original;
       }
 
+      // Now that we know there was a match, we can apply the mapper
+      String mappedReplacement = replacementMapper.apply(replacement);
+
       // Can't use replaceFirst or appendReplacement because those make special treatment for backslashes and dollar signs,
       // we don't want that
-      return original.substring(0, matcher.start())
-          + replacementMapper.apply(this.replacement)
-          + original.substring(matcher.end());
+      int lastEndOfMatch = 0;
+      StringBuilder sb = new StringBuilder();
+      do {
+        sb.append(original, lastEndOfMatch, matcher.start());
+        sb.append(mappedReplacement);
+        lastEndOfMatch = matcher.end();
+      } while (matcher.find());
+
+      sb.append(original, lastEndOfMatch, original.length());
+      return sb.toString();
     }
   }
 }

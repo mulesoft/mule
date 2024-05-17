@@ -284,6 +284,16 @@ public class TemplateParserTestCase extends AbstractMuleTestCase {
   }
 
   @Test
+  public void muleParserReplacesCorrectlyWhenTokenIsRepeatedByCallback() {
+    TemplateParser tp = createMuleStyleParser();
+    String template = "#[hello #[world]]";
+
+    String result = tp.parse(null, template, token -> token + token);
+
+    assertThat(result, is("hello worldworldhello worldworld"));
+  }
+
+  @Test
   public void muleParserManagesConcatenation() {
     TemplateParser tp = createMuleStyleParser();
 
