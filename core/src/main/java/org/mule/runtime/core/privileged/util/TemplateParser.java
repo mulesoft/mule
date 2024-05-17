@@ -7,7 +7,6 @@
 package org.mule.runtime.core.privileged.util;
 
 import static java.lang.Boolean.parseBoolean;
-import static java.lang.Integer.MAX_VALUE;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
@@ -20,10 +19,8 @@ import org.mule.runtime.api.util.collection.SmallMap;
 import org.mule.runtime.core.api.util.CaseInsensitiveHashMap;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,7 +73,6 @@ public final class TemplateParser {
    */
   protected static final Logger logger = LoggerFactory.getLogger(TemplateParser.class);
 
-  private static final Random RANDOM = new Random();
 
   @Deprecated
   private static boolean IS_COMPATIBILITY_MODE_ENABLED = isCompatibilityModeEnabled();
@@ -158,7 +154,8 @@ public final class TemplateParser {
     validateBalanceMuleStyle(template);
 
     // Will be storing the tokens candidate for callback evaluation
-    Map<String, String> tokens = new LinkedHashMap<>();
+    List<TemplateParserToken.Replacement> tokenReplacements = new ArrayList<>();
+    TemplateParserToken.Provider tokenProvider = new TemplateParserToken.Provider();
 
     boolean lastIsBackSlash = false;
     boolean lastStartedExpression = false;
@@ -193,13 +190,11 @@ public final class TemplateParser {
       if (c == OPEN_EXPRESSION && lastStartedExpression) {
         int closing = closingBracesPosition(template, currentPosition);
         String enclosingTemplate = template.substring(currentPosition + 1, closing);
-        // TODO: performance - pool the IDs and use compiled Patterns
-        // The token ID needs to be valid in any context in which the original expression was valid -> using an integer
-        String tokenId = '1' + format("%010d", RANDOM.nextInt() & MAX_VALUE);
+        TemplateParserToken token = tokenProvider.getToken();
         // Remember the token and its associated ID
-        tokens.put(tokenId, enclosingTemplate);
+        tokenReplacements.add(token.buildReplacement(enclosingTemplate));
         // Append the token ID on the result as a reference, so we can replace it at the end with the evaluated token value
-        result.append(tokenId);
+        result.append(token.getId());
         currentPosition = closing;
       } else if ((c != START_EXPRESSION || lastIsBackSlash) && c != '\\') {
         result.append(c);
@@ -215,11 +210,10 @@ public final class TemplateParser {
     String evaluatedTokenizedTemplate = depth > 0 ? evaluateToken(callback, result.toString()) : result.toString();
 
     // Parses any token found and replaces on the tokenized result
-    for (Map.Entry<String, String> tokenEntry : tokens.entrySet()) {
-      // TODO: performance - avoid parsing the value if there is no match
-      evaluatedTokenizedTemplate = evaluatedTokenizedTemplate.replace(tokenEntry.getKey(),
-                                                                      parseMule(props, tokenEntry.getValue(), callback,
-                                                                                depth + 1));
+    for (TemplateParserToken.Replacement tokenReplacement : tokenReplacements) {
+      evaluatedTokenizedTemplate = tokenReplacement.replace(evaluatedTokenizedTemplate,
+                                                            (innerTemplate) -> parseMule(props, innerTemplate, callback,
+                                                                                         depth + 1));
     }
 
     return evaluatedTokenizedTemplate;
