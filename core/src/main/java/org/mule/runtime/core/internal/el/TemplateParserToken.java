@@ -27,13 +27,13 @@ import java.util.regex.Pattern;
  */
 class TemplateParserToken {
 
+  private static final Random RANDOM = new Random();
+
   private static TemplateParserToken getNewToken() {
     // The token ID needs to be valid in any context in which the original expression was valid -> using an integer
     String id = '1' + format("%010d", RANDOM.nextInt() & MAX_VALUE);
     return new TemplateParserToken(id);
   }
-
-  private static final Random RANDOM = new Random();
 
   private final Pattern searchPattern;
 
