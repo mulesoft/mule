@@ -9,9 +9,9 @@ package org.mule.runtime.core.internal.el;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.String.format;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,13 +42,29 @@ class TemplateParserToken {
 
   static class Provider {
 
-    private static final List<TemplateParserToken> tokensPool = new ArrayList<>();
+    private static final int POOL_INITIAL_SIZE = 10;
+
+    // Choosing a copy-on-write array list because we anticipate reads to be extremely dominant.
+    // This will give us no contention during reads at the expense of O(N) on the appends.
+    // We are giving it a sensible initial size that should be good for most templates.
+    // For applications with templates requiring more tokens, appends will stop happening once the application is warmed up.
+    private static final List<TemplateParserToken> tokensPool = new CopyOnWriteArrayList<>(createInitialTokensBatch());
+
+    private static TemplateParserToken[] createInitialTokensBatch() {
+      TemplateParserToken[] tokens = new TemplateParserToken[POOL_INITIAL_SIZE];
+      for (int i = 0; i < tokens.length; i++) {
+        tokens[i] = TemplateParserToken.getNewToken();
+      }
+      return tokens;
+    }
 
     private int curOffset = 0;
 
     public TemplateParserToken getToken() {
-      // TODO: thread safety
       if (tokensPool.size() <= curOffset) {
+        // Because we are not in a critical section, it is possible that another thread may have already added a new token to the
+        // pool, so we might be adding a token we don't strictly need. We consider that an acceptable trade-off for minimizing
+        // contention.
         tokensPool.add(TemplateParserToken.getNewToken());
       }
 
