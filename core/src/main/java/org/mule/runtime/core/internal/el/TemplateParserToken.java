@@ -18,32 +18,26 @@ import java.util.regex.Pattern;
 
 class TemplateParserToken {
 
-  private static final Random RANDOM = new Random();
-
-  private final String id;
-  private final Pattern searchPattern;
-
-  public static TemplateParserToken getNewToken() {
+  private static TemplateParserToken getNewToken() {
     // The token ID needs to be valid in any context in which the original expression was valid -> using an integer
     String id = '1' + format("%010d", RANDOM.nextInt() & MAX_VALUE);
     return new TemplateParserToken(id);
   }
 
+  private static final Random RANDOM = new Random();
+
+  private final Pattern searchPattern;
+
   private TemplateParserToken(String id) {
-    this.id = id;
     this.searchPattern = Pattern.compile(id);
   }
 
   public String getId() {
-    return id;
-  }
-
-  public Pattern getSearchPattern() {
-    return searchPattern;
+    return searchPattern.pattern();
   }
 
   public Replacement buildReplacement(String replacement) {
-    return new Replacement(this, replacement);
+    return new Replacement(replacement);
   }
 
   static class Provider {
@@ -62,18 +56,16 @@ class TemplateParserToken {
     }
   }
 
-  static class Replacement {
+  class Replacement {
 
-    private final TemplateParserToken token;
     private final String replacement;
 
-    private Replacement(TemplateParserToken token, String replacement) {
-      this.token = token;
+    private Replacement(String replacement) {
       this.replacement = replacement;
     }
 
     public String replace(String original, Function<String, String> replacementMapper) {
-      Matcher matcher = token.getSearchPattern().matcher(original);
+      Matcher matcher = searchPattern.matcher(original);
       if (!matcher.find()) {
         return original;
       }
