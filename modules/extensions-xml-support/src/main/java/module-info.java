@@ -69,6 +69,7 @@ module org.mule.runtime.extensions.xml.support {
       net.bytebuddy,
       spring.core;
   opens org.mule.runtime.extension.internal.processor to
-      spring.core;
+      spring.core,
+      spring.beans;
 
 }
