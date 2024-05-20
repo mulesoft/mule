@@ -62,6 +62,8 @@ module org.mule.runtime.extensions.xml.support {
   exports org.mule.runtime.extension.internal.factories to
       org.mule.runtime.spring.config,
       spring.beans;
+  exports org.mule.runtime.extension.internal.processor to
+      spring.beans;
 
   opens org.mule.runtime.extension.internal.config.dsl to
       net.bytebuddy;
@@ -70,5 +72,4 @@ module org.mule.runtime.extensions.xml.support {
       spring.core;
   opens org.mule.runtime.extension.internal.processor to
       spring.core;
-
 }
