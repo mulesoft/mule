@@ -52,7 +52,6 @@ import org.mule.runtime.extension.api.runtime.process.RouterCompletionCallback;
 import org.mule.runtime.extension.api.runtime.process.VoidCompletionCallback;
 import org.mule.runtime.extension.api.runtime.route.Chain;
 import org.mule.runtime.extension.api.runtime.route.Route;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionElement;
 import org.mule.runtime.module.extension.api.loader.java.type.ExtensionParameter;
@@ -293,7 +292,8 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
     isDynamicResolver = attributesResolverModelParser.isPresent() && attributesResolverModelParser.get().hasAttributesResolver();
     outputAttributesType = new DefaultOutputModelParser(getOperationAttributesType(operationElement), isDynamicResolver);
 
-    if (autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement)) {
+    autoPaging = JavaExtensionModelParserUtils.isAutoPaging(operationElement);
+    if (autoPaging) {
       parseAutoPaging();
     }
   }
@@ -301,7 +301,6 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   private void parseAutoPaging() {
     supportsStreaming = true;
     connected = true;
-    additionalModelProperties.add(new PagedOperationModelProperty());
     parsePagingTx();
   }
 
@@ -425,6 +424,26 @@ public class JavaOperationModelParser extends AbstractJavaExecutableComponentMod
   @Override
   public boolean isAutoPaging() {
     return autoPaging;
+  }
+
+  @Override
+  public boolean hasStreamingConfiguration() {
+    return supportsStreaming();
+  }
+
+  @Override
+  public boolean hasTransactionalAction() {
+    return isTransactional();
+  }
+
+  @Override
+  public boolean hasReconnectionStrategy() {
+    return isConnected();
+  }
+
+  @Override
+  public boolean propagatesConnectivityError() {
+    return isConnected();
   }
 
   @Override
