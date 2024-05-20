@@ -8,6 +8,7 @@ package org.mule.runtime.module.extension.internal.runtime.connectivity;
 
 import static org.mule.runtime.core.api.util.ExceptionUtils.extractConnectionException;
 import static org.mule.runtime.core.api.util.StreamingUtils.supportsStreaming;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.CONNECTION_PARAM;
 
 import org.mule.runtime.api.connection.ConnectionException;
@@ -18,7 +19,6 @@ import org.mule.runtime.api.tx.TransactionException;
 import org.mule.runtime.core.api.event.CoreEvent;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Interceptor;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.internal.ExtensionProperties;
 import org.mule.runtime.tracer.api.component.ComponentTracer;
@@ -56,7 +56,7 @@ public final class ConnectionInterceptor implements Interceptor<ComponentModel> 
   @Override
   public void before(ExecutionContext<ComponentModel> executionContext) throws Exception {
     final ComponentModel componentModel = executionContext.getComponentModel();
-    if (componentModel.getModelProperty(PagedOperationModelProperty.class).isPresent()) {
+    if (isPagedOperation(componentModel)) {
       return;
     }
 
