@@ -15,8 +15,8 @@ import static org.mule.runtime.core.api.lifecycle.LifecycleUtils.initialiseIfNee
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_ACTION_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.ExtensionConstants.TRANSACTIONAL_TYPE_PARAMETER_NAME;
 import static org.mule.runtime.extension.api.runtime.source.BackPressureAction.FAIL;
-import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.hasTransactionalAction;
-import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.hasTransactionalType;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isTransactionalAction;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isTransactionalType;
 import static org.mule.runtime.module.extension.api.util.MuleExtensionUtils.getInitialiserEvent;
 import static org.mule.runtime.module.extension.internal.ExtensionProperties.BACK_PRESSURE_ACTION_CONTEXT_PARAM;
 import static org.mule.runtime.module.extension.internal.util.IntrospectionUtils.fetchConfigFieldFromSourceObject;
@@ -560,11 +560,11 @@ public class SourceAdapter implements Lifecycle, Restartable {
   }
 
   private String getTransactionalActionFieldName() {
-    return getFieldNameEnrichedWith(p -> hasTransactionalAction(p), TRANSACTIONAL_ACTION_PARAMETER_NAME);
+    return getFieldNameEnrichedWith(p -> isTransactionalAction(p), TRANSACTIONAL_ACTION_PARAMETER_NAME);
   }
 
   private String getTransactionTypeFieldName() {
-    return getFieldNameEnrichedWith(p -> hasTransactionalType(p), TRANSACTIONAL_TYPE_PARAMETER_NAME);
+    return getFieldNameEnrichedWith(p -> isTransactionalType(p), TRANSACTIONAL_TYPE_PARAMETER_NAME);
   }
 
   private String getFieldNameEnrichedWith(Predicate<ParameterModel> paramFilter, String defaultName) {
