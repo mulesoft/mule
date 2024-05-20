@@ -13,6 +13,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.mule.metadata.api.model.MetadataFormat.JAVA;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.el.BindingContextUtils.NULL_BINDING_CONTEXT;
 import static org.mule.runtime.api.el.BindingContextUtils.getTargetBindingContext;
 import static org.mule.runtime.api.meta.model.parameter.ParameterRole.CONTENT;
@@ -38,6 +39,7 @@ import org.mule.metadata.api.utils.MetadataTypeUtils;
 import org.mule.runtime.api.component.Component;
 import org.mule.runtime.api.component.ComponentIdentifier;
 import org.mule.runtime.api.component.location.ComponentLocation;
+import org.mule.runtime.api.config.FeatureFlaggingService;
 import org.mule.runtime.api.el.BindingContext;
 import org.mule.runtime.api.el.CompiledExpression;
 import org.mule.runtime.api.el.ExpressionLanguageSession;
@@ -69,6 +71,7 @@ import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.message.ErrorBuilder;
 import org.mule.runtime.core.internal.message.InternalEvent;
 import org.mule.runtime.core.privileged.event.BaseEventContext;
+import org.mule.runtime.core.privileged.event.PrivilegedEvent;
 import org.mule.runtime.core.privileged.processor.chain.MessageProcessorChain;
 import org.mule.runtime.extension.internal.config.dsl.XmlSdkConfigurationProvider;
 
@@ -118,6 +121,7 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Inject
   private Collection<ExceptionContextProvider> exceptionContextProviders;
 
+  private FeatureFlaggingService featureFlaggingService;
   private final ExtensionManager extensionManager;
 
   private MessageProcessorChain nestedChain;
@@ -339,6 +343,12 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
     if (!returnsVoid) {
       originalEvent = createNewEventFromJustMessage(originalEvent, chainEvent);
     }
+
+    // Avoid leaking the MDC context outside the XML SDK operation by clearing it out using the chainEvent
+    if (featureFlaggingService.isEnabled(ENABLE_XML_SDK_MDC_RESET)) {
+      PrivilegedEvent.builder(chainEvent).clearLoggingVariables();
+    }
+
     return originalEvent;
   }
 
@@ -467,5 +477,10 @@ public class ModuleOperationMessageProcessor extends AbstractMessageProcessorOwn
   @Override
   public List<EnrichedErrorMapping> getErrorMappings() {
     return errorMappings;
+  }
+
+  @Inject
+  public void setFeatureFlaggingService(FeatureFlaggingService featureFlaggingService) {
+    this.featureFlaggingService = featureFlaggingService;
   }
 }
