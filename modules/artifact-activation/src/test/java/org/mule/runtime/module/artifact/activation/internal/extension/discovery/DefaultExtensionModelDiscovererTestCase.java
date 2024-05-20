@@ -7,6 +7,7 @@
 package org.mule.runtime.module.artifact.activation.internal.extension.discovery;
 
 import static org.mule.runtime.api.meta.Category.COMMUNITY;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.setConfigurerFactory;
 import static org.mule.runtime.extension.api.provider.RuntimeExtensionModelProviderLoaderUtils.discoverRuntimeExtensionModels;
 import static org.mule.runtime.extension.api.ExtensionConstants.ALL_SUPPORTED_JAVA_VERSIONS;
 import static org.mule.test.allure.AllureConstants.ExtensionModelDiscoveryFeature.EXTENSION_MODEL_DISCOVERY;
@@ -22,9 +23,12 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.Before;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.extension.api.loader.ExtensionLoadingContext;
 import org.mule.runtime.extension.api.loader.ExtensionModelLoader;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurer;
+import org.mule.runtime.extension.api.metadata.ComponentMetadataConfigurerFactory;
 import org.mule.runtime.module.artifact.activation.api.extension.discovery.ExtensionModelLoaderRepository;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -42,6 +46,11 @@ import org.junit.Test;
 
 @Feature(EXTENSION_MODEL_DISCOVERY)
 public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCase {
+
+  @Before
+  public void setup() {
+    setConfigurerFactory(createMockedFactory());
+  }
 
   @Test
   @Issue("MULE-19858")
@@ -96,6 +105,20 @@ public class DefaultExtensionModelDiscovererTestCase extends AbstractMuleTestCas
         .map(ExtensionModel::getArtifactCoordinates)
         .collect(toList())),
                hasItem(of(descriptor.getBundleDescriptor())));
+  }
+
+  private static ComponentMetadataConfigurerFactory createMockedFactory() {
+    ComponentMetadataConfigurer mockConfigurer = mock(ComponentMetadataConfigurer.class);
+    when(mockConfigurer.asAllOfRouter()).thenReturn(mockConfigurer);
+    when(mockConfigurer.asPassthroughScope()).thenReturn(mockConfigurer);
+    when(mockConfigurer.asOneOfRouter()).thenReturn(mockConfigurer);
+    return new ComponentMetadataConfigurerFactory() {
+
+      @Override
+      public ComponentMetadataConfigurer create() {
+        return mockConfigurer;
+      }
+    };
   }
 
 }
