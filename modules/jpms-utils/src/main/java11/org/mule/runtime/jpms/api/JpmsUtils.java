@@ -230,18 +230,21 @@ public final class JpmsUtils {
    * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
    * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
    *                                           parent will be created for modules that need to be isolated.
+   * @param filterParentModules                whether modules already present in parent layers should be removed from the given
+   *                                           {@code modulePathEntries}.
    * @return a new {@link ModuleLayer}.
    */
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
-                                              boolean filterBootModules) {
-    final Set<String> bootModules;
-    if (filterBootModules) {
-      bootModules = boot().modules().stream()
+                                              boolean filterParentModules) {
+    final Set<String> modulesToFilter;
+    if (filterParentModules) {
+      ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
+      modulesToFilter = getParentLayersModules(layer).stream()
           .map(m -> m.getName())
           .collect(toSet());
     } else {
-      bootModules = emptySet();
+      modulesToFilter = emptySet();
     }
 
     Path[] paths = Stream.of(modulePathEntries)
@@ -259,7 +262,7 @@ public final class JpmsUtils {
     Map<Boolean, List<ModuleReference>> modulesByIsolation = modulesFinder
         .findAll()
         .stream()
-        .filter(moduleRef -> !bootModules.contains(moduleRef.descriptor().name()))
+        .filter(moduleRef -> !modulesToFilter.contains(moduleRef.descriptor().name()))
         .collect(partitioningBy(moduleRef -> isolateInOrphanLayer(moduleRef, parentLayer)));
 
     ModuleLayer resolvedParentLayer = parentLayer.orElse(boot());
@@ -331,6 +334,15 @@ public final class JpmsUtils {
 
 
     return controller.layer();
+  }
+
+  private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer) {
+    Set<Module> modules = new HashSet<>(moduleLayer.modules());
+    for (ModuleLayer parent : moduleLayer.parents()) {
+      modules.addAll(getParentLayersModules(parent));
+    }
+
+    return modules;
   }
 
   /**
