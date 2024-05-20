@@ -239,7 +239,6 @@ public final class JpmsUtils {
                                               boolean filterParentModules) {
     final Set<String> modulesToFilter;
     if (filterParentModules) {
-      ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
       modulesToFilter = boot().modules().stream()
           .map(m -> m.getName())
           .collect(toSet());
@@ -334,15 +333,6 @@ public final class JpmsUtils {
 
 
     return controller.layer();
-  }
-
-  private static Set<Module> getParentLayersModules(ModuleLayer moduleLayer) {
-    Set<Module> modules = new HashSet<>(moduleLayer.modules());
-    for (ModuleLayer parent : moduleLayer.parents()) {
-      modules.addAll(getParentLayersModules(parent));
-    }
-
-    return modules;
   }
 
   /**
