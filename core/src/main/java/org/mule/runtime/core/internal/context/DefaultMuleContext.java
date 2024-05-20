@@ -16,6 +16,7 @@ import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_ATTRIBUTE_P
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_POJO_TEXT_CDATA_WHITESPACE_TRIMMING;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_REGISTRY_BOOTSTRAP_OPTIONAL_ENTRIES;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DISABLE_SCHEDULER_LOGGING;
+import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_XML_SDK_MDC_RESET;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_HONOUR_MIXED_CONTENT_STRUCTURE;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.DW_REMOVE_SHADOWED_IMPLICIT_INPUTS;
 import static org.mule.runtime.api.config.MuleRuntimeFeature.ENABLE_POLICY_ISOLATION;
@@ -358,6 +359,7 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
       configureCommonsPool2DisableJmx();
       configureDisableSchedulerLogging();
       configureErrorAndRollbackTxWhenTimeout();
+      configureEnableXmlSdkReset();
     }
   }
 
@@ -1580,6 +1582,11 @@ public class DefaultMuleContext implements MuleContextWithRegistry, PrivilegedMu
   private static void configureErrorAndRollbackTxWhenTimeout() {
     FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
     featureFlaggingRegistry.registerFeatureFlag(ERROR_AND_ROLLBACK_TX_WHEN_TIMEOUT, minMuleVersion("4.6.1"));
+  }
+
+  private static void configureEnableXmlSdkReset() {
+    FeatureFlaggingRegistry featureFlaggingRegistry = FeatureFlaggingRegistry.getInstance();
+    featureFlaggingRegistry.registerFeatureFlag(ENABLE_XML_SDK_MDC_RESET, minMuleVersion("4.8.0"));
   }
 
   private static Predicate<FeatureContext> minMuleVersion(String version) {
