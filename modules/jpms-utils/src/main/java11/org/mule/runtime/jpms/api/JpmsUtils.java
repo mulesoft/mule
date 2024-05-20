@@ -230,15 +230,13 @@ public final class JpmsUtils {
    * @param parentLayer                        a layer of modules that will be visible from the newly created {@link ModuleLayer}.
    * @param isolateDependenciesInTheirOwnLayer whether an additional {@link ModuleLayer} having only the {@code boot} layer as
    *                                           parent will be created for modules that need to be isolated.
-   * @param filterParentModules                whether modules already present in parent layers should be removed from the given
-   *                                           {@code modulePathEntries}.
    * @return a new {@link ModuleLayer}.
    */
   public static ModuleLayer createModuleLayer(URL[] modulePathEntries, ClassLoader parent, Optional<ModuleLayer> parentLayer,
                                               boolean isolateDependenciesInTheirOwnLayer,
-                                              boolean filterParentModules) {
+                                              boolean filterBootModules) {
     final Set<String> modulesToFilter;
-    if (filterParentModules) {
+    if (filterBootModules) {
       modulesToFilter = boot().modules().stream()
           .map(m -> m.getName())
           .collect(toSet());
