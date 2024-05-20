@@ -63,7 +63,7 @@ module org.mule.runtime.extensions.xml.support {
       org.mule.runtime.spring.config,
       spring.beans;
   exports org.mule.runtime.extension.internal.processor to
-    spring.beans;
+      spring.beans;
 
   opens org.mule.runtime.extension.internal.config.dsl to
       net.bytebuddy;
