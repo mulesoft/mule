@@ -240,7 +240,7 @@ public final class JpmsUtils {
     final Set<String> modulesToFilter;
     if (filterParentModules) {
       ModuleLayer layer = isolateDependenciesInTheirOwnLayer ? boot() : parentLayer.orElse(boot());
-      modulesToFilter = getParentLayersModules(layer).stream()
+      modulesToFilter = boot().modules().stream()
           .map(m -> m.getName())
           .collect(toSet());
     } else {
