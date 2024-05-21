@@ -113,14 +113,14 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   @Issue("W-14998254")
   public void createDeployableProjectModelWithGAVPresentInParentPom() throws Exception {
 
-    installArtifact(getResourceFolder("apps/lightweight/api-app-no-dependencies"),
+    installArtifact(getResourceFolder("apps/lightweight/parent-artifact-no-dependencies"),
                     getMavenConfig().getLocalMavenRepositoryLocation());
     File artifact =
         new File(getMavenConfig().getLocalMavenRepositoryLocation(),
-                 "org/mule/test/api-app-no-dependencies/1.0.0/");
+                 "org/mule/test/parent-artifact-no-dependencies/1.0.0/");
 
     PluginFileMavenReactor pluginFileMavenReactor =
-        new PluginFileMavenReactor(artifact, "org.mule.test", "api-app-no-dependencies", "1.0.0");
+        new PluginFileMavenReactor(artifact, "org.mule.test", "parent-artifact-no-dependencies", "1.0.0");
 
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel("apps/lightweight/test-app-missing-gav-valid-parent", pluginFileMavenReactor);
