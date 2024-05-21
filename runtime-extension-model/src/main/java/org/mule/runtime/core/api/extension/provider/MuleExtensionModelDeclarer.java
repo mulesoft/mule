@@ -661,8 +661,8 @@ public class MuleExtensionModelDeclarer {
             " The actual time interval depends on the previous execution but should not exceed twice this number.\n" +
             " Default value is 60000 (one minute)");
 
-    untilSuccessful.withOutput().ofType(ANY_TYPE);
-    untilSuccessful.withOutputAttributes().ofType(ANY_TYPE);
+    untilSuccessful.withOutput().ofDynamicType(ANY_TYPE);
+    untilSuccessful.withOutputAttributes().ofDynamicType(ANY_TYPE);
     configurerFactory.create().asPassthroughScope().configure(untilSuccessful);
   }
 
