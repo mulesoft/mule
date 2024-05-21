@@ -244,7 +244,6 @@ public final class JpmsUtils {
       bootModules = emptySet();
     }
 
-
     Path[] paths = Stream.of(modulePathEntries)
         .map(url -> {
           try {
