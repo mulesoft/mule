@@ -38,8 +38,6 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -115,18 +113,20 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
   @Issue("W-14998254")
   public void createDeployableProjectModelWithGAVPresentInParentPom() throws Exception {
 
+    installArtifact(getResourceFolder("apps/lightweight/api-app-no-dependencies"),
+                    getMavenConfig().getLocalMavenRepositoryLocation());
     File artifact =
         new File(getMavenConfig().getLocalMavenRepositoryLocation(),
-                 "org/mule/test/api-app/1.0.0/");
+                 "org/mule/test/api-app-no-dependencies/1.0.0/");
 
     PluginFileMavenReactor pluginFileMavenReactor =
-        new PluginFileMavenReactor(artifact, "org.mule.test", "api-app", "1.0.0");
+        new PluginFileMavenReactor(artifact, "org.mule.test", "api-app-no-dependencies", "1.0.0");
 
     DeployableProjectModel deployableProjectModel =
         getDeployableProjectModel("apps/lightweight/test-app-missing-gav-valid-parent", pluginFileMavenReactor);
-    assertThat(deployableProjectModel.getDescriptor().getVersion(), Matchers.is("1.2.0-POM"));
-    assertThat(deployableProjectModel.getDescriptor().getGroupId(), Matchers.is("test"));
-    assertThat(deployableProjectModel.getDescriptor().getArtifactId(), Matchers.is("test-app-missing-gav-valid-parent"));
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.0"));
+    assertThat(deployableProjectModel.getDescriptor().getGroupId(), is("org.mule.test"));
+    assertThat(deployableProjectModel.getDescriptor().getArtifactId(), is("test-app-missing-gav-valid-parent"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
