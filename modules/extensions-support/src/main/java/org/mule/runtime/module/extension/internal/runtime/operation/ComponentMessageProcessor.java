@@ -736,8 +736,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
     try {
-      return from(event)
-          .getOperationExecutionParams(getLocation(), event.getContext().getId());
+      throw new NullPointerException("Everything is lost");
+//      return from(event)
+//          .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {
       LOGGER.debug("Null SDK Context at {} for event - {}", getLocation() != null ? getLocation().getLocation() : "null",
                    event.getContext().getId());
