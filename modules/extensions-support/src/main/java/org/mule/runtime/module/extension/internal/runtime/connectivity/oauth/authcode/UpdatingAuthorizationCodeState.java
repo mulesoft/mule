@@ -26,7 +26,6 @@ public class UpdatingAuthorizationCodeState
     implements AuthorizationCodeState, org.mule.sdk.api.connectivity.oauth.AuthorizationCodeState {
 
   private AuthorizationCodeState delegate;
-  private boolean invalidated = false;
   private TokenService tokenService;
 
   public UpdatingAuthorizationCodeState(AuthorizationCodeConfig config,
@@ -36,6 +35,7 @@ public class UpdatingAuthorizationCodeState
                                         TokenService tokenService) {
     delegate = toAuthorizationCodeState(config, initialContext);
     this.tokenService = tokenService;
+    tokenService.registerToken(delegate.getAccessToken());
     dancer.addListener(initialContext.getResourceOwnerId(), new AuthorizationCodeListener() {
 
       @Override
@@ -50,13 +50,11 @@ public class UpdatingAuthorizationCodeState
 
       @Override
       public void onTokenInvalidated() {
-        invalidated = true;
         tokenService.invalidateToken(delegate.getAccessToken());
       }
 
       private void update(ResourceOwnerOAuthContext context) {
         delegate = toAuthorizationCodeState(config, context);
-        invalidated = false;
         tokenService.registerToken(delegate.getAccessToken());
         onUpdate.accept(context);
       }
