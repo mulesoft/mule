@@ -737,8 +737,9 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
     try {
-      return from(event)
-          .getOperationExecutionParams(getLocation(), event.getContext().getId());
+      throw new NullPointerException("Everything is lost");
+//      return from(event)
+//          .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {
       throw propagateWrappingFatal(new EventProcessingException(createStaticMessage("Maybe the non-blocking operation @ '"
           + getLocation().getLocation() + "' used its callback more than once?"),
