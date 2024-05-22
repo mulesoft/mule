@@ -142,6 +142,34 @@ public interface OperationModelParser extends SemanticTermsParser, AdditionalPro
   boolean isAutoPaging();
 
   /**
+   * Returns whether this operation supports configuring its streaming.
+   * 
+   * @since 4.8
+   */
+  boolean hasStreamingConfiguration();
+
+  /**
+   * Returns whether this operation supports configuring its transactional action.
+   * 
+   * @since 4.8
+   */
+  boolean hasTransactionalAction();
+
+  /**
+   * Returns whether this operation supports configuring its reconnection strategy.
+   * 
+   * @since 4.8
+   */
+  boolean hasReconnectionStrategy();
+
+  /**
+   * Returns whether this operation propagates connectivity errors.
+   * 
+   * @since 4.8
+   */
+  boolean propagatesConnectivityError();
+
+  /**
    * @return the operation's {@link ExecutionType} if one was defined. If no value present, Mule will infer one.
    */
   Optional<ExecutionType> getExecutionType();

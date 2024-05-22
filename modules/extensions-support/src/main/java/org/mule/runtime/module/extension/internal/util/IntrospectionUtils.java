@@ -69,7 +69,6 @@ import org.mule.runtime.api.meta.model.ComponentModel;
 import org.mule.runtime.api.meta.model.EnrichableModel;
 import org.mule.runtime.api.meta.model.ExtensionModel;
 import org.mule.runtime.api.meta.model.HasOutputModel;
-import org.mule.runtime.api.meta.model.ModelProperty;
 import org.mule.runtime.api.meta.model.SubTypesModel;
 import org.mule.runtime.api.meta.model.connection.ConnectionProviderModel;
 import org.mule.runtime.api.meta.model.declaration.fluent.BaseDeclaration;
@@ -107,7 +106,6 @@ import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.extension.api.runtime.streaming.PagingProvider;
 import org.mule.runtime.extension.internal.loader.util.JavaParserUtils;
-import org.mule.runtime.extension.internal.property.TargetModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.type.FieldElement;
 import org.mule.runtime.module.extension.api.loader.java.type.MethodElement;
 import org.mule.runtime.module.extension.api.loader.java.type.Type;
@@ -1426,10 +1424,6 @@ public final class IntrospectionUtils {
 
   public static boolean isParameterResolver(MetadataType metadataType) {
     return metadataType.getAnnotation(ParameterResolverTypeAnnotation.class).isPresent();
-  }
-
-  public static boolean isTargetParameter(Set<ModelProperty> modelProperties) {
-    return modelProperties.stream().anyMatch(modelProperty -> modelProperty instanceof TargetModelProperty);
   }
 
   public static boolean isLiteral(MetadataType metadataType) {

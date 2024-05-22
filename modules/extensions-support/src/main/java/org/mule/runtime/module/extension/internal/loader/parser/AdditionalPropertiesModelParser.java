@@ -24,4 +24,5 @@ public interface AdditionalPropertiesModelParser {
    * @return a list with {@link ModelProperty} instances.
    */
   List<ModelProperty> getAdditionalModelProperties();
+
 }

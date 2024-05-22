@@ -11,6 +11,10 @@ import static org.mule.runtime.api.meta.model.ComponentVisibility.PUBLIC;
 import static org.mule.runtime.api.meta.model.operation.ExecutionType.CPU_LITE;
 import static org.mule.runtime.ast.api.util.AstTraversalDirection.TOP_DOWN;
 import static org.mule.runtime.core.api.util.StringUtils.isBlank;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoConnectivityError;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoReconnectionStrategy;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoStreamingConfiguration;
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.withNoTransactionalAction;
 
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
@@ -26,6 +30,7 @@ import org.mule.metadata.api.TypeLoader;
 import org.mule.runtime.api.meta.MuleVersion;
 import org.mule.runtime.api.meta.model.ComponentVisibility;
 import org.mule.runtime.api.meta.model.ModelProperty;
+import org.mule.runtime.api.meta.model.declaration.fluent.OperationDeclarer;
 import org.mule.runtime.api.meta.model.deprecated.DeprecationModel;
 import org.mule.runtime.api.meta.model.display.DisplayModel;
 import org.mule.runtime.api.meta.model.notification.NotificationModel;
@@ -36,12 +41,8 @@ import org.mule.runtime.ast.api.ComponentAst;
 import org.mule.runtime.ast.api.model.ExtensionModelHelper;
 import org.mule.runtime.extension.api.exception.IllegalModelDefinitionException;
 import org.mule.runtime.extension.api.exception.IllegalOperationModelDefinitionException;
-import org.mule.runtime.extension.internal.property.ComposedOperationModelProperty;
-import org.mule.runtime.extension.internal.property.NoConnectivityErrorModelProperty;
-import org.mule.runtime.extension.internal.property.NoReconnectionStrategyModelProperty;
-import org.mule.runtime.extension.internal.property.NoStreamingConfigurationModelProperty;
-import org.mule.runtime.extension.internal.property.NoTransactionalActionModelProperty;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
+import org.mule.runtime.module.extension.internal.loader.java.property.ComposedOperationModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.ExceptionHandlerModelProperty;
 import org.mule.runtime.module.extension.internal.loader.java.property.MediaTypeModelProperty;
 import org.mule.runtime.module.extension.internal.loader.parser.AttributesResolverModelParser;
@@ -75,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -110,13 +112,6 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
   private final Characteristic<List<NotificationModel>> notificationModels = new AggregatedNotificationsCharacteristic();
   private final FilteringCharacteristic<Boolean> isTransactional = new IsTransactionalCharacteristic();
   private final Characteristic<List<ErrorModelParser>> errorModels;
-
-  private final List<ModelProperty> additionalModelProperties =
-      asList(new NoStreamingConfigurationModelProperty(),
-             new NoTransactionalActionModelProperty(),
-             new NoReconnectionStrategyModelProperty(),
-             new NoConnectivityErrorModelProperty(),
-             new ComposedOperationModelProperty());
 
   private String name;
 
@@ -157,7 +152,27 @@ class MuleSdkOperationModelParser extends BaseMuleSdkExtensionModelParser implem
 
   @Override
   public List<ModelProperty> getAdditionalModelProperties() {
-    return additionalModelProperties;
+    return singletonList(new ComposedOperationModelProperty());
+  }
+
+  @Override
+  public boolean hasStreamingConfiguration() {
+    return false;
+  }
+
+  @Override
+  public boolean hasTransactionalAction() {
+    return false;
+  }
+
+  @Override
+  public boolean hasReconnectionStrategy() {
+    return false;
+  }
+
+  @Override
+  public boolean propagatesConnectivityError() {
+    return false;
   }
 
   @Override

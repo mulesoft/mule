@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.module.extension.internal.runtime.operation;
 
+import static org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils.isPagedOperation;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.getPagingResultTransformer;
 import static org.mule.runtime.module.extension.internal.util.MuleExtensionUtils.supportsOAuth;
 import static org.mule.runtime.tracer.customization.api.InternalSpanNames.GET_CONNECTION_SPAN_NAME;
@@ -19,7 +20,6 @@ import org.mule.runtime.core.api.extension.ExtensionManager;
 import org.mule.runtime.core.internal.exception.EnrichedErrorMapping;
 import org.mule.runtime.core.internal.profiling.DummyComponentTracerFactory;
 import org.mule.runtime.extension.api.runtime.config.ConfigurationProvider;
-import org.mule.runtime.extension.internal.property.PagedOperationModelProperty;
 import org.mule.runtime.module.extension.api.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.api.runtime.resolver.ValueResolver;
 import org.mule.runtime.module.extension.internal.runtime.streaming.PagingResultTransformer;
@@ -57,7 +57,7 @@ public final class OperationMessageProcessorBuilder
     OperationMessageProcessor operationMessageProcessor = null;
 
     final boolean supportsOAuth = supportsOAuth(extensionModel);
-    boolean isPagedOperation = operationModel.getModelProperty(PagedOperationModelProperty.class).isPresent();
+    boolean isPagedOperation = isPagedOperation(operationModel);
 
     if (isPagedOperation) {
       resultTransformer = getPagingResultTransformer(operationModel, extensionConnectionSupplier, supportsOAuth,
