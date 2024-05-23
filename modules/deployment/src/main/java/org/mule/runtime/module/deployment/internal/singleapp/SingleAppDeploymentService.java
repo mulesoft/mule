@@ -55,6 +55,7 @@ import java.util.TimeZone;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -321,7 +322,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
     this.deploymentDirectoryWatcher.start();
   }
 
-  private DeploymentDirectoryWatcher resolveDeploymentDirectoryWatcher() {
+  protected DeploymentDirectoryWatcher resolveDeploymentDirectoryWatcher() {
     return new DeploymentDirectoryWatcher(new DomainBundleArchiveDeployer(domainBundleDeploymentListener, domainDeployer, domains,
                                                                           applicationDeployer, applications,
                                                                           domainDeploymentListener,
@@ -348,7 +349,7 @@ public class SingleAppDeploymentService implements DeploymentService, Startable 
 
   @Override
   public void stop() {
-    // Nothing to do.
+    deploymentDirectoryWatcher.stop(true);
   }
 
   @Override
