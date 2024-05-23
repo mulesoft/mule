@@ -209,9 +209,18 @@ public class DeploymentDirectoryWatcher implements Runnable {
    * Stops the deployment scan service.
    */
   public void stop() {
+    stop(disposeArtifactsOnStop);
+  }
+
+  /**
+   * Stops the deployment scan service.
+   *
+   * @param disposeArtifacts dispose artifacts.
+   */
+  public void stop(boolean disposeArtifacts) {
     stopAppDirMonitorTimer();
 
-    if (disposeArtifactsOnStop) {
+    if (disposeArtifacts) {
       deploymentLock.lock();
       try {
         setDoNotPersistStopStatusOfArtifacts();
