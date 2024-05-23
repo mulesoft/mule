@@ -36,7 +36,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @since 4.3
  */
 public class SdkInternalContext implements EventInternalContext<SdkInternalContext> {
+
   private static final Logger LOGGER = getLogger(SdkInternalContext.class);
+
   /**
    * Extracts an instance stored in the given {@code event}
    *
