@@ -27,4 +27,9 @@ public class ChildOnlyLookupStrategy implements LookupStrategy {
   public List<ClassLoader> getClassLoaders(ClassLoader classLoader) {
     return singletonList(classLoader);
   }
+
+  @Override
+  public String toString() {
+    return "ChildOnlyLookupStrategy";
+  }
 }

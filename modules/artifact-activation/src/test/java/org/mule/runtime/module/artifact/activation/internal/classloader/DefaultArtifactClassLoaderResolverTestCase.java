@@ -48,6 +48,7 @@ import org.mule.runtime.module.artifact.activation.api.ArtifactActivationExcepti
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ChildOnlyLookupStrategy;
+import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.DelegateOnlyLookupStrategy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
@@ -390,8 +391,18 @@ public class DefaultArtifactClassLoaderResolverTestCase extends AbstractMuleTest
     when(privilegedModule.getPrivilegedArtifacts()).thenReturn(singleton(PLUGIN_ARTIFACT_ID1));
     when(privilegedModule.getPrivilegedExportedPackages()).thenReturn(singleton(PRIVILEGED_PACKAGE));
     when(moduleRepository.getModules()).thenReturn(singletonList(privilegedModule));
+
+    final ArtifactClassLoader containerClassLoader = spy(createContainerClassLoader(moduleRepository));
+    final ClassLoaderLookupPolicy containerLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(containerLookupPolicy.getClassLookupStrategy(any()))
+        .thenReturn(new ContainerOnlyLookupStrategy(this.getClass().getClassLoader()));
+    when(containerLookupPolicy.extend(any()))
+        .thenReturn(containerLookupPolicy);
+    when(containerClassLoader.getClassLoaderLookupPolicy())
+        .thenReturn(containerLookupPolicy);
+
     // refresh the artifactClassLoaderResolver with the updated modules in the moduleRepository
-    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(createContainerClassLoader(moduleRepository),
+    artifactClassLoaderResolver = spy(new DefaultArtifactClassLoaderResolver(containerClassLoader,
                                                                              moduleRepository, nativeLibraryFinderFactory));
 
     final MuleArtifactClassLoader pluginClassLoader = artifactClassLoaderResolver
