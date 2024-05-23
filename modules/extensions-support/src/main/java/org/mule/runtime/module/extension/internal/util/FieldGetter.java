@@ -12,56 +12,50 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * Utility class which allows setting the value of a {@link Field} on random compatible instances
- *
- * @param <Target> the generic type of the objects which contain the field
- * @param <Value>  the field's generic type
- */
-public final class FieldSetter<Target, Value> {
+public final class FieldGetter<Target, Value> {
 
   /**
    * The {@link Field} in which the value is to be assigned
    */
   private final Field field;
-  private final Method setterMethod;
+  private final Method getterMethod;
 
-  public FieldSetter(Field field) {
-    Method setterMethod = null;
+  public FieldGetter(Field field) {
+    Method getterMethod = null;
 
     this.field = field;
     try {
       field.setAccessible(true);
     } catch (Exception e) {
-      // create a bean property setter fallback
+      // create a bean property getter fallback
       try {
-        setterMethod =
-            field.getDeclaringClass().getDeclaredMethod("set" + capitalize(field.getName()), field.getType());
+        getterMethod =
+            field.getDeclaringClass().getDeclaredMethod("get" + capitalize(field.getName()));
       } catch (NoSuchMethodException e1) {
         e.addSuppressed(e1);
         throw e;
       }
     }
 
-    this.setterMethod = setterMethod;
+    this.getterMethod = getterMethod;
   }
 
   /**
-   * Sets the {@code value} into the {@code target} instance
+   * Gets the {@code value} into the {@code target} instance
    *
-   * @param target the object on which the field value is to be set
-   * @param value  the value to set
+   * @param target the object from which the field value is to be get
+   * @return value the value
    */
-  public void set(Target target, Value value) {
-    if (setterMethod != null) {
+  public Value get(Target target) {
+    if (getterMethod != null) {
       try {
-        setterMethod.invoke(target, value);
+        return (Value) getterMethod.invoke(target);
       } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
         throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
       }
     } else {
       try {
-        field.set(target, value);
+        return (Value) field.get(target);
       } catch (IllegalAccessException ex) {
         throw new IllegalStateException("Unexpected reflection exception - " + ex.getClass().getName() + ": " + ex.getMessage());
       }
@@ -69,7 +63,7 @@ public final class FieldSetter<Target, Value> {
   }
 
   /**
-   * @return The {@link Field} to be set
+   * @return The {@link Field} to be get
    */
   public Field getField() {
     return field;
@@ -94,7 +88,7 @@ public final class FieldSetter<Target, Value> {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    FieldSetter other = (FieldSetter) obj;
+    FieldGetter other = (FieldGetter) obj;
     if (field == null) {
       if (other.field != null) {
         return false;
@@ -104,6 +98,4 @@ public final class FieldSetter<Target, Value> {
     }
     return true;
   }
-
-
 }

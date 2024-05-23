@@ -616,9 +616,8 @@ public final class IntrospectionUtils {
       throws IllegalAccessException, NoSuchFieldException {
     final Optional<Field> fieldOptional = getField(object.getClass(), fieldName, reflectionCache);
     if (fieldOptional.isPresent()) {
-      final Field field = fieldOptional.get();
-      field.setAccessible(true);
-      return field.get(object);
+      return new FieldGetter(fieldOptional.get())
+          .get(object);
     } else {
       throw new NoSuchFieldException();
     }
