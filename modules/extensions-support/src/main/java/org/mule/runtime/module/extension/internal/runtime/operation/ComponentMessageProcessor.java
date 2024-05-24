@@ -736,7 +736,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
     try {
-      throw new NullPointerException("Everything is lost");
       return from(event)
           .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {
