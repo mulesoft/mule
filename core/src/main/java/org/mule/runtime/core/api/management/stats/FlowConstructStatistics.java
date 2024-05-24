@@ -35,6 +35,8 @@ public interface FlowConstructStatistics extends Statistics {
    */
   void incExecutionError();
 
+  // void incExecutionError(Exception error);
+
   /**
    * Indicates that a fatal error has occurred
    */
