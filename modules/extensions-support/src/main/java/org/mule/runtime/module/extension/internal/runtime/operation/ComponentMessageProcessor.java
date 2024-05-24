@@ -117,7 +117,6 @@ import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExec
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutor.ExecutorCallback;
 import org.mule.runtime.extension.api.runtime.operation.CompletableComponentExecutorFactory;
 import org.mule.runtime.extension.api.runtime.operation.ExecutionContext;
-import org.mule.runtime.extension.privileged.util.ComponentDeclarationUtils;
 import org.mule.runtime.module.extension.api.loader.java.property.CompletableComponentExecutorModelProperty;
 import org.mule.runtime.module.extension.api.runtime.privileged.ExecutionContextAdapter;
 import org.mule.runtime.module.extension.api.runtime.resolver.ParameterValueResolver;
@@ -737,7 +736,6 @@ public abstract class ComponentMessageProcessor<T extends ComponentModel> extend
 
   protected OperationExecutionParams getOperationExecutionParams(final CoreEvent event) {
     try {
-      throw new NullPointerException("Everything is lost");
       return from(event)
           .getOperationExecutionParams(getLocation(), event.getContext().getId());
     } catch (NullPointerException npe) {

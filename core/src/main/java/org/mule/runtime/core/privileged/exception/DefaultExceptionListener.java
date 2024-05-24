@@ -24,6 +24,7 @@ import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.TypedException;
 import org.mule.runtime.api.lifecycle.Initialisable;
 import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.api.notification.ExceptionNotification;
 import org.mule.runtime.api.notification.ExceptionNotificationListener;
 import org.mule.runtime.api.notification.Notification;
@@ -134,10 +135,9 @@ public final class DefaultExceptionListener implements Initialisable {
     }
   }
 
-  public void processStatistics(MessagingException error) {
+  public void processStatistics(Exception exception, Error error) {
     if (statistics != null) {
-      // statistics.incExecutionError(error);
-      statistics.incExecutionError();
+      statistics.incExecutionError(exception, error);
     }
   }
 

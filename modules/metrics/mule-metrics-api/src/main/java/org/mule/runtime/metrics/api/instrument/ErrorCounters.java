@@ -6,6 +6,8 @@
  */
 package org.mule.runtime.metrics.api.instrument;
 
+import org.mule.runtime.api.message.Error;
+
 import java.util.function.Consumer;
 
 public interface ErrorCounters extends Instrument {
