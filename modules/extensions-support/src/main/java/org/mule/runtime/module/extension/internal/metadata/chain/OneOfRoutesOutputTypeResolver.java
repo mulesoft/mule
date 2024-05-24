@@ -11,6 +11,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 
 import org.mule.metadata.api.builder.UnionTypeBuilder;
 import org.mule.metadata.api.model.MetadataType;
+import org.mule.metadata.api.model.UnionType;
 import org.mule.metadata.message.api.MessageMetadataType;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.metadata.MetadataContext;
@@ -61,22 +62,20 @@ public class OneOfRoutesOutputTypeResolver implements OutputTypeResolver<Object>
 
   private MetadataType union(MetadataContext context, Function<MessageMetadataType, Optional<MetadataType>> extractor)
       throws MetadataResolvingException {
-    UnionTypeBuilder builder = context.getTypeBuilder().unionType();
+    UnionTypeBuilder builder = context.getTypeBuilder().unionType().flattens().removesRepetitions();
     Map<String, Supplier<MessageMetadataType>> routes = context.getRouterOutputMetadataContext()
         .map(ctx -> ctx.getRouteOutputMessageTypes())
         .orElseThrow(() -> new MetadataResolvingException("Route propagation context not available", UNKNOWN));
-    HashSet<MetadataType> consideredTypes = new HashSet<>();
 
     routes.values().forEach(route -> {
       MetadataType type = extractor.apply(route.get()).orElse(VOID_TYPE);
-      if (consideredTypes.add(type)) {
-        builder.of(type);
-      }
+      builder.of(type);
     });
-    if (consideredTypes.size() > 1) {
-      return builder.build();
+    UnionType result = builder.build();
+    if (result.getTypes().size() > 1) {
+      return result;
     } else {
-      return consideredTypes.iterator().next();
+      return result.getTypes().get(0);
     }
   }
 }
