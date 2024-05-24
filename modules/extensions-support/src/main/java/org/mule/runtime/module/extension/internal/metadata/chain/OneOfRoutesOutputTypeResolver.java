@@ -19,7 +19,6 @@ import org.mule.runtime.api.metadata.MetadataResolvingException;
 import org.mule.runtime.api.metadata.resolving.AttributesTypeResolver;
 import org.mule.runtime.api.metadata.resolving.OutputTypeResolver;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
