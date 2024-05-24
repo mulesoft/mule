@@ -134,8 +134,9 @@ public final class DefaultExceptionListener implements Initialisable {
     }
   }
 
-  public void processStatistics() {
+  public void processStatistics(MessagingException error) {
     if (statistics != null) {
+      // statistics.incExecutionError(error);
       statistics.incExecutionError();
     }
   }
