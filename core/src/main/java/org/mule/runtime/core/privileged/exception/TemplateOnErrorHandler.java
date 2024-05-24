@@ -450,7 +450,7 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
 
   protected Function<CoreEvent, CoreEvent> beforeRouting() {
     return event -> {
-      Exception exception = getException(event);
+      MessagingException exception = getException(event);
 
       getNotificationFirer().dispatch(new ErrorHandlerNotification(createInfo(event, exception, configuredMessageProcessors),
 
@@ -459,14 +459,18 @@ public abstract class TemplateOnErrorHandler extends AbstractDeclaredExceptionLi
         getExceptionListener().fireNotification(exception, event);
       }
       logException(exception, event);
-      getExceptionListener().processStatistics();
+      getExceptionListener().processStatistics(exception);
       markExceptionAsHandledIfRequired(exception);
       return event;
     };
   }
 
-  protected Exception getException(CoreEvent event) {
+  protected MessagingException getException(CoreEvent event) {
     return ErrorHandlerContextManager.from(this, event).getException();
+  }
+
+  protected Optional<Error> getError(CoreEvent event) {
+    return ErrorHandlerContextManager.from(this, event).getOriginalEvent().getError();
   }
 
   /**
