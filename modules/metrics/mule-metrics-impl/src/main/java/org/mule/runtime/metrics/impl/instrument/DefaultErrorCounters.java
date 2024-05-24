@@ -8,6 +8,7 @@ package org.mule.runtime.metrics.impl.instrument;
 
 import static java.util.Optional.ofNullable;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
