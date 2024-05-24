@@ -10,6 +10,7 @@ import static org.mule.runtime.metrics.api.meter.MeterProperties.MULE_METER_ARTI
 
 import static java.lang.System.currentTimeMillis;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.core.api.management.stats.ArtifactMeterProvider;
 import org.mule.runtime.core.api.management.stats.ComponentStatistics;
 import org.mule.runtime.core.api.management.stats.FlowConstructStatistics;
@@ -48,7 +49,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
 
   // Transient to avoid de-serialization backward compatibility problems (MULE-19020)
   private transient final AtomicLong connectionErrors = new AtomicLong(0);
-
   private transient final List<DefaultResetOnQueryCounter> eventsReceivedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> messagesDispatchedCounters = new CopyOnWriteArrayList<>();
   private transient final List<DefaultResetOnQueryCounter> totalExecutionErrorsCounters = new CopyOnWriteArrayList<>();
@@ -71,20 +71,6 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
   @Override
   public boolean isEnabled() {
     return enabled;
-  }
-
-  @Override
-  public void incExecutionError() {
-    incExecutionError(null);
-  }
-
-  public void incExecutionError(Exception error) {
-    if (isEnabled()) {
-      executionError.addAndGet(1);
-      totalExecutionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
-    }
-    if (error != null)
-      errorCounters.add(error);
   }
 
   @Override
@@ -189,6 +175,19 @@ public class DefaultFlowConstructStatistics implements FlowConstructStatistics {
     if (isEnabled()) {
       dispatchedMessages.addAndGet(1);
       messagesDispatchedCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
+  }
+
+  @Override
+  public void incExecutionError(Exception exception, Error error) {
+    if (isEnabled()) {
+      executionError.addAndGet(1);
+      totalExecutionErrorsCounters.forEach(DefaultResetOnQueryCounter::increment);
+    }
+    if (error != null) {
+      errorCounters.add(error);
+    } else {
+      errorCounters.add(exception);
     }
   }
 
