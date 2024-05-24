@@ -18,9 +18,11 @@ import static java.util.Collections.singletonList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.rules.ExpectedException.none;
 
 import org.mule.maven.client.api.MavenReactorResolver;
 import org.mule.maven.pom.parser.api.model.BundleDescriptor;
+import org.mule.runtime.api.exception.MuleRuntimeException;
 import org.mule.runtime.module.artifact.activation.api.deployable.DeployableProjectModel;
 import org.mule.runtime.module.artifact.activation.internal.maven.LightweightDeployableProjectModelBuilder;
 import org.mule.runtime.module.artifact.api.descriptor.BundleDependency;
@@ -32,12 +34,14 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 @Feature(DEPLOYMENT_TYPE)
 @Story(LIGHTWEIGHT)
@@ -59,10 +63,14 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
                                  .environmentUserSettingsSupplier().get()
                                  .getAbsolutePath());
 
+  @Rule
+  public ExpectedException expectedException = none();
+
   @Before
   public void before() {
     reset();
   }
+
 
   @Test
   @Issue("W-12142901")
@@ -87,6 +95,38 @@ public class LightweightDeployableProjectModelBuilderTestCase extends AbstractMu
         additionalBundleDependencies.get(0).getDescriptor();
     assertThat(descriptor.getGroupId(), is("org.apache.derby"));
     assertThat(descriptor.getArtifactId(), is("derby"));
+  }
+
+
+  @Test
+  @Issue("W-14998254")
+  @Description("When pom has invalid GAV and no parent pom, then MuleRuntimeException will be the thrown.")
+  public void createDeployableProjectModelWithInvalidGAVAndMissingParentPom() throws Exception {
+    expectedException.expect(MuleRuntimeException.class);
+    expectedException
+        .expectMessage("Failed to retrieve version from the artifact, trying to retrieve from parent POM but parent POM is not present");
+    getDeployableProjectModel("apps/lightweight/test-app-missing-gav", null);
+  }
+
+
+  @Test
+  @Issue("W-14998254")
+  public void createDeployableProjectModelWithGAVPresentInParentPom() throws Exception {
+
+    installArtifact(getResourceFolder("apps/lightweight/parent-artifact-no-dependencies"),
+                    getMavenConfig().getLocalMavenRepositoryLocation());
+    File artifact =
+        new File(getMavenConfig().getLocalMavenRepositoryLocation(),
+                 "org/mule/test/parent-artifact-no-dependencies/1.0.0/");
+
+    PluginFileMavenReactor pluginFileMavenReactor =
+        new PluginFileMavenReactor(artifact, "org.mule.test", "parent-artifact-no-dependencies", "1.0.0");
+
+    DeployableProjectModel deployableProjectModel =
+        getDeployableProjectModel("apps/lightweight/test-app-missing-gav-valid-parent", pluginFileMavenReactor);
+    assertThat(deployableProjectModel.getDescriptor().getVersion(), is("1.0.0"));
+    assertThat(deployableProjectModel.getDescriptor().getGroupId(), is("org.mule.test"));
+    assertThat(deployableProjectModel.getDescriptor().getArtifactId(), is("test-app-missing-gav-valid-parent"));
   }
 
   private DeployableProjectModel getDeployableProjectModel(String deployablePath, MavenReactorResolver mavenReactorResolver)
