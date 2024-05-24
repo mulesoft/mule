@@ -7,8 +7,11 @@
 package org.mule.runtime.config.internal.context.metrics;
 
 import org.mule.runtime.metrics.api.MeterProvider;
+import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.LongUpDownCounter;
+import org.mule.runtime.metrics.api.instrument.builder.ErrorCountersBuilder;
+import org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongCounterBuilder;
 import org.mule.runtime.metrics.api.instrument.builder.LongUpDownCounterBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
@@ -35,10 +38,12 @@ public class NoopMeterProvider implements MeterProvider {
 
     private final LongUpDownCounterBuilder LONG_UP_DOWN_COUNTER_BUILDER_INSTANCE = new NoopLongUpDownCounterBuilder();
     private final LongCounterBuilder LONG_COUNTER_BUILDER_INSTANCE = new NoopLongCounterBuilder();
+    private final ErrorCountersBuilder ERROR_COUNTERS_BUILDER_INSTANCE = new NoopErrorCountersBuilder();
+    private final Meter METER_INSTANCE = new NoopMeter();
 
     @Override
     public Meter build() {
-      return new NoopMeter();
+      return METER_INSTANCE;
     }
 
     @Override
@@ -76,6 +81,11 @@ public class NoopMeterProvider implements MeterProvider {
       @Override
       public LongCounterBuilder counterBuilder(String name) {
         return LONG_COUNTER_BUILDER_INSTANCE;
+      }
+
+      @Override
+      public ErrorCountersBuilder errorCountersBuilder(String name) {
+        return ERROR_COUNTERS_BUILDER_INSTANCE;
       }
     }
 
@@ -263,6 +273,59 @@ public class NoopMeterProvider implements MeterProvider {
         @Override
         public long incrementAndGetAsLong() {
           return 0;
+        }
+      }
+    }
+
+    private class NoopErrorCountersBuilder implements ErrorCountersBuilder {
+
+      private final ErrorCounters NOOP_ERROR_COUNTERS = new NoopErrorCounters();
+
+      @Override
+      public InstrumentBuilder<ErrorCounters> withDescription(String description) {
+        return this;
+      }
+
+      @Override
+      public InstrumentBuilder<ErrorCounters> withUnit(String unit) {
+        return this;
+      }
+
+      @Override
+      public ErrorCounters build() {
+        return NOOP_ERROR_COUNTERS;
+      }
+
+      private class NoopErrorCounters implements ErrorCounters {
+
+        @Override
+        public void add(Error value) {
+          // Nothing to do
+        }
+
+        @Override
+        public void add(Throwable value) {
+          // Nothing to do
+        }
+
+        @Override
+        public void onNewError(Consumer<LongCounter> newErrorCounterConsumer) {
+          // Nothing to do
+        }
+
+        @Override
+        public String getName() {
+          return NOOP;
+        }
+
+        @Override
+        public String getDescription() {
+          return NOOP;
+        }
+
+        @Override
+        public Meter getMeter() {
+          return new NoopMeter();
         }
       }
     }
