@@ -7,6 +7,7 @@
 package org.mule.runtime.core.api.management.stats;
 
 import org.mule.api.annotation.NoImplement;
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.metrics.api.MeterProvider;
 
 /**
@@ -33,9 +34,7 @@ public interface FlowConstructStatistics extends Statistics {
   /**
    * Indicates that an execution error has occurred
    */
-  void incExecutionError();
-
-  // void incExecutionError(Exception error);
+  void incExecutionError(Exception exception, Error error);
 
   /**
    * Indicates that a fatal error has occurred
@@ -121,7 +120,7 @@ public interface FlowConstructStatistics extends Statistics {
    * <p>
    * Counter initial value is set to the value of {@link #getExecutionErrors()} when this method is called.
    * <p>
-   * If this is called concurrently with {@link #incExecutionError()}, there is chance of a race condition occurring where an
+   * If this is called concurrently with {@link #incExecutionError(Error)}, there is chance of a race condition occurring where an
    * event may be counted twice. To avoid this possibility, get the counters before statistics begin to be populated.
    * 
    * @return a counter for {@link #getExecutionErrors()}.

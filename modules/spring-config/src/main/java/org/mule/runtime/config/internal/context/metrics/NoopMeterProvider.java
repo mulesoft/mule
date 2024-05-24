@@ -6,6 +6,7 @@
  */
 package org.mule.runtime.config.internal.context.metrics;
 
+import org.mule.runtime.api.message.Error;
 import org.mule.runtime.metrics.api.MeterProvider;
 import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
