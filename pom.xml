@@ -133,8 +133,7 @@
         <javaReleaseVersion>8</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
-        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property
-        </mule.termination.log.path.env.variable>
+        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -373,17 +372,17 @@
                 <artifactId>awaitility</artifactId>
                 <version>${awaitilityVersion}</version>
                 <exclusions>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-library</artifactId>
-                   </exclusion>
-                   <exclusion>
-                       <groupId>org.hamcrest</groupId>
-                       <artifactId>hamcrest-core</artifactId>
-                   </exclusion>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-library</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.hamcrest</groupId>
+                        <artifactId>hamcrest-core</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
-            
+
             <dependency>
                 <groupId>xmlunit</groupId>
                 <artifactId>xmlunit</artifactId>
@@ -1359,7 +1358,7 @@
                             <configuration>
                                 <additionalClasspathElements>
                                     <!-- Add this to the classpath so it is available when running tests with jvm8 -->
-                                    <!-- but it does not interfere with the module system --> 
+                                    <!-- but it does not interfere with the module system -->
                                     <!-- (it has colliding packages with java.xml module) when running with java11+ -->
                                     <additionalClasspathElement>${settings.localRepository}/xml-apis/xml-apis/1.4.01/xml-apis-1.4.01.jar</additionalClasspathElement>
                                 </additionalClasspathElements>
