@@ -133,7 +133,8 @@
         <javaReleaseVersion>8</javaReleaseVersion>
         <javaModuleName>${project.groupId}.${project.artifactId}</javaModuleName>
         <javaTestModuleName>${javaModuleName}.test</javaTestModuleName>
-        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property</mule.termination.log.path.env.variable>
+        <mule.termination.log.path.env.variable>${java.io.tmpdir}/termination_log_set_by_env_property
+        </mule.termination.log.path.env.variable>
 
         <!-- Properties that can be overriden in submodules -->
         <skipExportTests>true</skipExportTests>
@@ -190,7 +191,7 @@
         <install.plugin.version>2.5.2</install.plugin.version>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
- 
+
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
@@ -228,7 +229,7 @@
         <skipMuleModuleMojos>false</skipMuleModuleMojos>
         <skipRevapiCheck>${skipMuleModuleMojos}</skipRevapiCheck>
         <mule.module.maven.plugin.fillOptionalPackages>false</mule.module.maven.plugin.fillOptionalPackages>
-        
+
         <surefire.additional.jacoco.args></surefire.additional.jacoco.args>
         <surefire.args.base>
             -XX:+TieredCompilation
@@ -237,7 +238,7 @@
             -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile='${session.executionRootDirectory}/target/jacoco.exec'${surefire.additional.jacoco.args}
         </surefire.args.base>
         <surefire.args>${surefire.args.base}</surefire.args>
-        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED --> 
+        <!-- TODO W-13145677 Make the add-opens specific to 'org.mule.test.unit' instead of ALL-UNNAMED -->
         <surefire.test.unit.open.args>
             -XX:+IgnoreUnrecognizedVMOptions
             --add-opens=java.base/java.lang=ALL-UNNAMED
