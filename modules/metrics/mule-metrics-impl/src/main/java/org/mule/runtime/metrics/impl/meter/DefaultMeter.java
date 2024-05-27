@@ -80,7 +80,9 @@ public class DefaultMeter implements Meter {
 
   @Override
   public ErrorCountersBuilder errorCountersBuilder(String name) {
-    return DefaultErrorCounters.builder(name, "", this);
+    return DefaultErrorCounters.builder(name, "", this)
+        .withInstrumentRepository(instrumentRepository)
+        .withMeterExporter(meterExporter);
   }
 
   private static class DefaultMeterBuilder implements MeterBuilderWithRepository {
