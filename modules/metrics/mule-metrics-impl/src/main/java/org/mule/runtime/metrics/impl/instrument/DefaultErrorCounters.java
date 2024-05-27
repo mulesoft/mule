@@ -52,7 +52,7 @@ public class DefaultErrorCounters implements ErrorCounters {
   @Override
   public void add(Throwable error) {
     String errorId = getErrorId(error);
-    errorCounters.getOrDefault(errorId, buildNewErrorCounter(errorId));
+    errorCounters.getOrDefault(getErrorId(error), buildNewErrorCounter(errorId));
   }
 
   @Override
@@ -61,8 +61,8 @@ public class DefaultErrorCounters implements ErrorCounters {
   }
 
   private LongCounter buildNewErrorCounter(String errorId) {
-    LongCounter newErrorCounter =
-        DefaultLongCounter.builder("error@" + errorId + "-count", getMeter()).withDescription("Mule runtime error count").build();
+    LongCounter newErrorCounter = getMeter().counterBuilder("error@" + errorId + "-count")
+        .withDescription("Mule runtime error count").build();
     onNewError(newErrorCounter);
     return newErrorCounter;
   }
