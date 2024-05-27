@@ -26,7 +26,9 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
@@ -62,7 +64,10 @@ import io.qameta.allure.Story;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.hamcrest.Matchers;
+
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 @Feature(CLASSLOADING_ISOLATION)
 @Story(CLASSLOADER_GENERATION)
@@ -206,6 +211,14 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
 
     List<ArtifactPluginDescriptor> artifactPluginDescriptors = singletonList(plugin1Descriptor);
 
+    ArtifactClassLoader containerClassLoader = spy(createContainerClassLoader(moduleRepository));
+    ClassLoaderLookupPolicy containerLookupPolicy = mock(ClassLoaderLookupPolicy.class);
+    when(containerLookupPolicy.getClassLookupStrategy(argThat(any(String.class))))
+        .thenReturn(new ContainerOnlyLookupStrategy(this.getClass().getClassLoader()));
+    when(containerLookupPolicy.extend(argThat(any(Map.class))))
+        .thenReturn(containerLookupPolicy);
+    doReturn(containerLookupPolicy).when(containerClassLoader).getClassLoaderLookupPolicy();
+
     ClassLoaderLookupPolicy pluginBaseLookupPolicy = mock(ClassLoaderLookupPolicy.class);
     ArgumentCaptor<Map> mapArgumentCaptor = forClass(Map.class);
     when(regionOwnerLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class))))
@@ -213,6 +226,10 @@ public class DefaultRegionPluginClassLoadersFactoryTestCase extends AbstractMule
     when(pluginBaseLookupPolicy.extend(mapArgumentCaptor.capture())).thenReturn(pluginBaseLookupPolicy);
     when(pluginBaseLookupPolicy.extend(argThat(any(Stream.class)), argThat(any(LookupStrategy.class)), eq(true)))
         .thenReturn(pluginLookupPolicy);
+
+    DefaultRegionPluginClassLoadersFactory factory =
+        new DefaultRegionPluginClassLoadersFactory(new DefaultArtifactClassLoaderResolver(containerClassLoader,
+                                                                                          moduleRepository, null));
 
     List<ArtifactClassLoader> pluginClassLoaders =
         factory.createPluginClassLoaders(regionClassLoader, artifactPluginDescriptors, regionOwnerLookupPolicy);
