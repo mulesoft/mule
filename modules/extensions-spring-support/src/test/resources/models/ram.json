@@ -1296,9 +1296,6 @@
                     },
                     "model": {
                       "type": "String"
-                    },
-                    "annotations": {
-                      "visibility": "READ_ONLY"
                     }
                   },
                   {
@@ -1307,9 +1304,6 @@
                     },
                     "model": {
                       "type": "String"
-                    },
-                    "annotations": {
-                      "visibility": "READ_ONLY"
                     }
                   }
                 ]
