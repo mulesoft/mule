@@ -100,7 +100,7 @@ public class OpenTelemetryMeterExporter implements MeterExporter, Disposable {
         .setDescription(upDownCounter.getDescription());
 
     if (upDownCounter.getUnit() != null) {
-      longUpDownCounter = longUpDownCounter.setUnit(Objects.toString(upDownCounter.getUnit(), ""));
+      longUpDownCounter = longUpDownCounter.setUnit(upDownCounter.getUnit());
     }
 
     upDownCounters
