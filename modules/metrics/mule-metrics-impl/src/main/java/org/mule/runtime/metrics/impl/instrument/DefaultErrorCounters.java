@@ -6,10 +6,10 @@
  */
 package org.mule.runtime.metrics.impl.instrument;
 
+import static org.mule.runtime.api.exception.ExceptionHelper.getRootException;
 import static java.util.Optional.ofNullable;
 
 import org.mule.runtime.api.message.Error;
-import org.mule.runtime.core.api.util.UUID;
 import org.mule.runtime.metrics.api.instrument.ErrorCounters;
 import org.mule.runtime.metrics.api.instrument.LongCounter;
 import org.mule.runtime.metrics.api.instrument.builder.ErrorCountersBuilder;
@@ -17,6 +17,7 @@ import org.mule.runtime.metrics.api.instrument.builder.InstrumentBuilder;
 import org.mule.runtime.metrics.api.meter.Meter;
 import org.mule.runtime.metrics.exporter.api.MeterExporter;
 import org.mule.runtime.metrics.impl.instrument.repository.InstrumentRepository;
+import org.mule.runtime.metrics.impl.util.StackHasher;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -31,8 +32,8 @@ public class DefaultErrorCounters implements ErrorCounters {
   private final String description;
   private final Map<String, LongCounter> errorCounters = new ConcurrentHashMap<>();
   private final Set<Consumer<LongCounter>> onNewErrorConsumers = new HashSet<>();
-
-  // TODO: Include total error count
+  // TODO: Make an ErrorIdGenerator interface in order to encapsulate the stack hash implementation
+  private final StackHasher errorIdGenerator = new StackHasher();
 
   private DefaultErrorCounters(String name, String description, Meter meter) {
     this.name = name;
@@ -61,7 +62,7 @@ public class DefaultErrorCounters implements ErrorCounters {
   }
 
   private LongCounter buildNewErrorCounter(String errorId) {
-    LongCounter newErrorCounter = getMeter().counterBuilder("error@" + errorId + "-count")
+    LongCounter newErrorCounter = getMeter().counterBuilder("error-count-" + errorId)
         .withDescription("Mule runtime error count").build();
     onNewError(newErrorCounter);
     return newErrorCounter;
@@ -72,13 +73,11 @@ public class DefaultErrorCounters implements ErrorCounters {
   }
 
   private String getErrorId(Error error) {
-    // TODO Implement error id logic.
-    return UUID.getUUID();
+    return errorIdGenerator.hexHash(getRootException(error.getCause()));
   }
 
   private String getErrorId(Throwable error) {
-    // TODO Implement error id logic.
-    return UUID.getUUID();
+    return errorIdGenerator.hexHash(getRootException(error));
   }
 
   @Override
