@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.Objects;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.LongCounterBuilder;
