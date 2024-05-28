@@ -11,8 +11,8 @@ import static org.mule.runtime.core.api.util.ClassUtils.getStaticFieldValue;
 import static org.mule.runtime.core.api.util.ClassUtils.loadClass;
 import static org.mule.runtime.module.artifact.classloader.DependencyResolver.getDependencyFromMaven;
 import static org.mule.runtime.module.artifact.classloader.SimpleClassLoaderLookupPolicy.CHILD_FIRST_CLASSLOADER_LOOKUP_POLICY;
-import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
 import static org.mule.test.allure.AllureConstants.JavaSdk.JAVA_SDK;
+import static org.mule.test.allure.AllureConstants.JavaSdk.ArtifactLifecycleListener.ARTIFACT_LIFECYCLE_LISTENER;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LEAK_PREVENTION;
 import static org.mule.test.allure.AllureConstants.LeakPrevention.LeakPreventionMetaspace.METASPACE_LEAK_PREVENTION_ON_REDEPLOY;
 
@@ -24,14 +24,14 @@ import static org.apache.commons.lang3.JavaVersion.JAVA_17;
 import static org.apache.commons.lang3.SystemUtils.isJavaVersionAtLeast;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 import static org.mockito.Mockito.mock;
 
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
 import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor;
+import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
 import org.mule.runtime.module.artifact.internal.classloader.MulePluginClassLoader;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 
@@ -49,15 +49,16 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Features;
 import io.qameta.allure.Stories;
 import io.qameta.allure.Story;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 @Features({@Feature(LEAK_PREVENTION), @Feature(JAVA_SDK)})
 @Stories({@Story(METASPACE_LEAK_PREVENTION_ON_REDEPLOY), @Story(ARTIFACT_LIFECYCLE_LISTENER)})
@@ -113,7 +114,7 @@ public class IBMMQResourceReleaserTestCase extends AbstractMuleTestCase {
 
     artifactClassLoader =
         new MulePluginClassLoader("IBMMQResourceReleaserTestCase",
-                                  mock(ArtifactDescriptor.class),
+                                  mock(ArtifactPluginDescriptor.class),
                                   new URL[] {getDependencyFromMaven(DRIVER_GROUP_ID, DRIVER_ARTIFACT_ID, driverVersion)},
                                   currentThread().getContextClassLoader(),
                                   testLookupPolicy);

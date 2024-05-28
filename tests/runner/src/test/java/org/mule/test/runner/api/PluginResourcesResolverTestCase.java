@@ -6,10 +6,10 @@
  */
 package org.mule.test.runner.api;
 
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.MULE_LOADER_ID;
 import static org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor.MULE_PLUGIN_CLASSIFIER;
 
 import static java.util.Collections.emptyList;
@@ -30,6 +30,7 @@ import org.mule.runtime.api.deployment.meta.MuleArtifactLoaderDescriptorBuilder;
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.meta.MulePluginModel.MulePluginModelBuilder;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.tck.junit4.AbstractMuleTestCase;
 import org.mule.tck.size.SmallTest;
 
@@ -95,7 +96,13 @@ public class PluginResourcesResolverTestCase extends AbstractMuleTestCase {
   }
 
   private PluginUrlClassification newPluginUrlClassification(List<URL> urls) {
-    return new PluginUrlClassification(MULE_PLUGIN_CLASSIFIER, urls, emptyList(), emptyList());
+    return new PluginUrlClassification(MULE_PLUGIN_CLASSIFIER, urls, emptyList(),
+                                       new BundleDescriptor.Builder()
+                                           .setGroupId("g")
+                                           .setArtifactId("a")
+                                           .setVersion("v")
+                                           .build(),
+                                       emptyList());
   }
 
   private void assertResolvedResources(PluginUrlClassification original, PluginUrlClassification resolved) {

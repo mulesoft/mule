@@ -6,12 +6,12 @@
  */
 package org.mule.runtime.container.internal;
 
-import static org.mule.runtime.api.util.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
+import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.mule.runtime.module.artifact.api.classloader.LookupStrategy;
 
 /**
  * Defines a {@link LookupStrategy} that will search on the container's classloader only, without searching on the given
@@ -27,7 +27,7 @@ public class ContainerOnlyLookupStrategy implements LookupStrategy {
    * @param containerClassLoader class loader containing the container classes. Not null.
    */
   public ContainerOnlyLookupStrategy(ClassLoader containerClassLoader) {
-    checkArgument(containerClassLoader != null, "containerClassLoader cannot be null");
+    requireNonNull(containerClassLoader, "containerClassLoader cannot be null");
     classLoaders = new ArrayList<>();
     classLoaders.add(containerClassLoader);
   }
@@ -35,5 +35,10 @@ public class ContainerOnlyLookupStrategy implements LookupStrategy {
   @Override
   public List<ClassLoader> getClassLoaders(ClassLoader classLoader) {
     return classLoaders;
+  }
+
+  @Override
+  public String toString() {
+    return "ContainerOnlyLookupStrategy[classloaders=" + classLoaders + "]";
   }
 }

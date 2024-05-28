@@ -6,16 +6,18 @@
  */
 package org.mule.test.runner.api;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
-import static org.mule.runtime.deployment.model.api.artifact.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptor.MULE_ARTIFACT_JSON_DESCRIPTOR;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_PACKAGES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.EXPORTED_RESOURCES;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_ARTIFACTS_IDS;
+import static org.mule.runtime.module.artifact.api.descriptor.ArtifactDescriptorConstants.PRIVILEGED_EXPORTED_PACKAGES;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_ARTIFACT_PATH_INSIDE_JAR;
 import static org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor.MULE_AUTO_GENERATED_ARTIFACT_PATH_INSIDE_JAR;
+
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 import org.mule.runtime.api.deployment.meta.MulePluginModel;
 import org.mule.runtime.api.deployment.persistence.MulePluginModelJsonSerializer;
@@ -90,6 +92,7 @@ public class PluginResourcesResolver {
 
       return new PluginUrlClassification(pluginUrlClassification.getName(), pluginUrlClassification.getUrls(),
                                          pluginUrlClassification.getExportClasses(),
+                                         pluginUrlClassification.getPluginBundleDescriptor(),
                                          pluginUrlClassification.getPluginDependencies(), exportPackages, exportResources,
                                          privilegedExportedPackages, privilegedArtifacts);
     } catch (IOException e) {

@@ -47,6 +47,7 @@ import static org.eclipse.aether.util.filter.DependencyFilterUtils.orFilter;
 import org.mule.runtime.api.util.Pair;
 import org.mule.runtime.api.util.Reference;
 import org.mule.runtime.extension.api.annotation.Extension;
+import org.mule.runtime.module.artifact.api.descriptor.BundleDescriptor;
 import org.mule.test.runner.classification.PatternExclusionsDependencyFilter;
 import org.mule.test.runner.classification.PatternInclusionsDependencyFilter;
 import org.mule.test.runner.utils.RunnerModuleUtils;
@@ -722,10 +723,20 @@ public class AetherClassPathClassifier implements ClassPathClassifier, AutoClose
           .map(dependency -> toVersionlessId(dependency.getArtifact()))
           .collect(toList());
       final String versionLessId = toVersionlessId(node.getArtifact());
+
+      final BundleDescriptor bundleDescriptorForNode = new BundleDescriptor.Builder()
+          .setGroupId(node.getArtifact().getGroupId())
+          .setArtifactId(node.getArtifact().getArtifactId())
+          .setVersion(node.getArtifact().getVersion())
+          .setBaseVersion(node.getArtifact().getBaseVersion())
+          .setType(node.getArtifact().getExtension())
+          .setClassifier(node.getArtifact().getClassifier())
+          .build();
+
       final PluginUrlClassification pluginUrlClassification =
-          pluginResourcesResolver.resolvePluginResourcesFor(
-                                                            new PluginUrlClassification(versionLessId, node.getUrls(),
+          pluginResourcesResolver.resolvePluginResourcesFor(new PluginUrlClassification(versionLessId, node.getUrls(),
                                                                                         node.getExportClasses(),
+                                                                                        bundleDescriptorForNode,
                                                                                         pluginDependencies));
 
       classifiedPluginUrls.put(versionLessId, pluginUrlClassification);
