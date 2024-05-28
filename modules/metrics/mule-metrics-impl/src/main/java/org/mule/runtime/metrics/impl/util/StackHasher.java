@@ -16,7 +16,7 @@ public class StackHasher {
   /**
    * Constructs a {@link StackHasher} with the given filter.
    *
-   * @param filter filter
+   * @param filter The filter that will include or exclude a {@link StackTraceElement} has part of the hashing function inputs.
    */
   public StackHasher(StackElementFilter filter) {
     this.filter = filter;
@@ -34,8 +34,8 @@ public class StackHasher {
    * <p>
    * Two errors with the same stack hash are most probably same errors.
    *
-   * @param error the error to generate a hash from
-   * @return the generated hexadecimal hash
+   * @param error The error to generate a hash from.
+   * @return The generated hexadecimal hash.
    */
   public String hexHash(Throwable error) {
     return toHex(hash(error, null));
@@ -44,11 +44,11 @@ public class StackHasher {
   /**
    * Generates and returns Hexadecimal hashes for the error stack and each ancestor {@link Throwable#getCause() cause}.
    * <p>
-   * The first queue element is the stack hash for the topmost error, the next one (if any) is its direct
-   * {@link Throwable#getCause() cause} hash, and so on...
+   * The first queue element is the stack hash of the top error, the next one (if any) is its direct {@link Throwable#getCause()
+   * cause} hash, and so on...
    *
-   * @param error the error to generate a hash from
-   * @return a Dequeue with hashes
+   * @param error The top error to generate the hashes from.
+   * @return A Dequeue with the calculated hashes.
    */
   public Deque<String> hexHashes(Throwable error) {
     Deque<String> hexHashes = new ArrayDeque<>();
@@ -61,30 +61,25 @@ public class StackHasher {
    * <p>
    * Two errors with the same stack hash are most probably same errors.
    *
-   * @param error     the error to generate a hash from
-   * @param hexHashes
-   * @return the generated hexadecimal hash
+   * @param error     The error to generate a hash from.
+   * @param hexHashes When provided, a hexadecimal representation of the hash will be pushed to this queue (can be null).
+   * @return The generated hexadecimal hash.
    */
   private int hash(Throwable error, Deque<String> hexHashes) {
     int hash = 0;
 
-    // compute parent error hash
+    // Nested errors
     if (error.getCause() != null && error.getCause() != error) {
-      // has parent error
       hash = hash(error.getCause(), hexHashes);
     }
 
-    // then this error hash
-    // hash error classname
+    // Top error hash
     hash = 31 * hash + error.getClass().getName().hashCode();
-    // hash stacktrace
     for (StackTraceElement element : error.getStackTrace()) {
       if (filter.accept(element)) {
         hash = 31 * hash + hash(element);
       }
     }
-
-    // push hexadecimal representation of hash
     if (hexHashes != null) {
       hexHashes.push(toHex(hash));
     }
