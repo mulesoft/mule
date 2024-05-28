@@ -18,7 +18,6 @@ import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorRe
 import org.mule.runtime.module.artifact.activation.internal.classloader.DefaultArtifactClassLoaderResolver;
 import org.mule.runtime.module.artifact.activation.internal.nativelib.DefaultNativeLibraryFinderFactory;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
 import org.mule.runtime.module.artifact.api.descriptor.ArtifactPluginDescriptor;
@@ -217,9 +216,9 @@ public interface ArtifactClassLoaderResolver {
    *                                 dependency of the artifact for {@code ownerArtifactClassLoader}.
    * @return a classloader for a plugin within a given application or domain.
    */
-  MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                      ArtifactPluginDescriptor descriptor,
-                                                      PluginDescriptorResolver pluginDescriptorResolver);
+  ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                  ArtifactPluginDescriptor descriptor,
+                                                  PluginDescriptorResolver pluginDescriptorResolver);
 
   /**
    * Creates a class loader for a plugin.
@@ -239,8 +238,8 @@ public interface ArtifactClassLoaderResolver {
    *                                  be obtained from the owner artifact class loaders.
    * @return a classloader for a plugin within a given application or domain.
    */
-  MuleArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
-                                                      ArtifactPluginDescriptor descriptor,
-                                                      PluginDescriptorResolver pluginDescriptorResolver,
-                                                      PluginClassLoaderResolver pluginClassLoaderResolver);
+  ArtifactClassLoader createMulePluginClassLoader(MuleDeployableArtifactClassLoader ownerArtifactClassLoader,
+                                                  ArtifactPluginDescriptor descriptor,
+                                                  PluginDescriptorResolver pluginDescriptorResolver,
+                                                  PluginClassLoaderResolver pluginClassLoaderResolver);
 }

@@ -11,7 +11,6 @@ import static org.mule.test.allure.AllureConstants.ClassloadingIsolationFeature.
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +20,6 @@ import org.mule.runtime.module.artifact.activation.api.plugin.PluginDescriptorRe
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.ArtifactClassLoaderManager;
 import org.mule.runtime.module.artifact.api.classloader.ClassLoaderLookupPolicy;
-import org.mule.runtime.module.artifact.api.classloader.MuleArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.MuleDeployableArtifactClassLoader;
 import org.mule.runtime.module.artifact.api.classloader.RegionClassLoader;
 import org.mule.runtime.module.artifact.api.descriptor.ApplicationDescriptor;
@@ -111,7 +109,7 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
                                      mock(PluginDescriptorResolver.class), mock(PluginClassLoaderResolver.class)));
   }
 
-  private void verifyClassLoaderRegistered(MuleArtifactClassLoader classLoader) {
+  private void verifyClassLoaderRegistered(ArtifactClassLoader classLoader) {
     verify(artifactClassLoaderManager).register(classLoader);
   }
 
@@ -139,7 +137,7 @@ public class TrackingArtifactClassLoaderResolverDecoratorTestCase extends Abstra
                                      mock(PluginDescriptorResolver.class), mock(PluginClassLoaderResolver.class)));
   }
 
-  private void verifyClassLoaderDisposed(MuleArtifactClassLoader classLoader) {
+  private void verifyClassLoaderDisposed(ArtifactClassLoader classLoader) {
     classLoader.dispose();
     verify(artifactClassLoaderManager).unregister(classLoader.getArtifactId());
   }
