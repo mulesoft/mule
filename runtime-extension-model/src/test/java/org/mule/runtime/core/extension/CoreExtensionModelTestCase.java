@@ -24,6 +24,7 @@ import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelPro
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_NAME;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.MULE_VERSION;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.STRING_TYPE;
+import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.VOID_TYPE;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.getExtensionModel;
 import static org.mule.runtime.core.api.extension.provider.MuleExtensionModelProvider.setConfigurerFactory;
 import static org.mule.runtime.core.extension.ComponentConfigurerTestUtils.createMockedFactory;
@@ -260,7 +261,7 @@ public class CoreExtensionModelTestCase {
     final SourceModel schedulerModel = coreExtensionModel.getSourceModel("scheduler").get();
     assertSteretorype(schedulerModel.getStereotype(), "SCHEDULER", SOURCE);
 
-    assertOutputTypes(schedulerModel, ANY_TYPE, ANY_TYPE);
+    assertOutputTypes(schedulerModel, VOID_TYPE, VOID_TYPE);
     assertThat(schedulerModel.getErrorModels(), empty());
     assertThat(schedulerModel.hasResponse(), is(false));
 

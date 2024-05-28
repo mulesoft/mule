@@ -287,8 +287,8 @@ public class MuleExtensionModelDeclarer {
         .describedAs("Source that schedules periodic execution of a flow.")
         .withModelProperty(NoRedeliveryPolicyModelProperty.INSTANCE);
 
-    scheduler.withOutput().ofType(ANY_TYPE);
-    scheduler.withOutputAttributes().ofType(ANY_TYPE);
+    scheduler.withOutput().ofType(VOID_TYPE);
+    scheduler.withOutputAttributes().ofType(VOID_TYPE);
 
     scheduler.onDefaultParameterGroup()
         .withRequiredParameter("schedulingStrategy")
